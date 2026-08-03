@@ -1,0 +1,76 @@
+{% extends "community/wizard/base_wizard.html" %}
+{% load static i18n %}
+
+{% block wizard_content %}
+<div class="wizard-card text-center">
+    <div class="mb-4">
+        <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3 wizard-success-icon" style="width:100px;height:100px;background:linear-gradient(135deg,#10b981,#059669);color:white;font-size:2.5rem;">
+            <i class="fas fa-check"></i>
+        </div>
+    </div>
+
+    <h2 class="mb-3">Your Workspace is Ready!</h2>
+    <p class="lead mb-5">Everything is set up. Welcome to your new project dashboard.</p>
+
+    <div class="row g-4 mb-5" style="text-align:left;">
+        <div class="col-md-4">
+            <div class="card rounded-3 border-0 h-100" style="background:var(--bg-surface-secondary,#f8fafc);">
+                <div class="card-body p-4 text-center">
+                    <i class="fas fa-folder-tree text-primary fs-2 mb-2"></i>
+                    <h6 class="fw-700">Project Board</h6>
+                    <p class="text-secondary small mb-0">Your Kanban board with phases, tasks, and milestones is ready.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card rounded-3 border-0 h-100" style="background:var(--bg-surface-secondary,#f8fafc);">
+                <div class="card-body p-4 text-center">
+                    <i class="fas fa-file-contract text-primary fs-2 mb-2"></i>
+                    <h6 class="fw-700">Contract & Proposal</h6>
+                    <p class="text-secondary small mb-0">Your signed proposal and contract are stored in your documents.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card rounded-3 border-0 h-100" style="background:var(--bg-surface-secondary,#f8fafc);">
+                <div class="card-body p-4 text-center">
+                    <i class="fas fa-comments text-primary fs-2 mb-2"></i>
+                    <h6 class="fw-700">Team Chat</h6>
+                    <p class="text-secondary small mb-0">Direct messaging with your project team is now active.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
+        {% if project %}
+        <a href="{% url 'projects:project_detail' project.id %}" class="btn-wizard-next px-5 py-3 text-decoration-none text-center">
+            <i class="fas fa-arrow-right me-2"></i>Open Project Board
+        </a>
+        {% endif %}
+        <a href="{% url 'community:dashboard' %}" class="btn btn-outline-secondary rounded-pill px-5 py-3 fw-700 text-decoration-none text-center">
+            <i class="fas fa-th-large me-2"></i>Go to Dashboard
+        </a>
+    </div>
+
+    <div class="mt-5 pt-4 border-top">
+        <p class="text-secondary small mb-1">
+            <i class="fas fa-envelope me-2"></i>A confirmation email has been sent to <strong>{{ user.email }}</strong>
+        </p>
+        <p class="text-secondary small mb-0">
+            Your project team will reach out within 24 hours.
+        </p>
+    </div>
+</div>
+
+<style>
+.wizard-success-icon {
+    animation: wizardSuccessPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes wizardSuccessPop {
+    0% { transform: scale(0); opacity: 0; }
+    60% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+}
+</style>
+{% endblock %}

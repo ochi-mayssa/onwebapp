@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+  <!-- Background -->
+  <rect width="800" height="500" fill="#f8f9fa"/>
+  
+  <!-- Title -->
+  <text x="400" y="30" font-family="Arial" font-size="20" font-weight="bold" text-anchor="middle" fill="#333">Automated Workflow Monitoring System</text>
+  
+  <!-- Legend -->
+  <rect x="50" y="50" width="15" height="15" fill="#e3f2fd" stroke="#2196f3"/>
+  <text x="75" y="62" font-family="Arial" font-size="12">Process</text>
+  <rect x="50" y="75" width="15" height="15" fill="#fff3cd" stroke="#ffc107"/>
+  <text x="75" y="87" font-family="Arial" font-size="12">Trigger/Event</text>
+  
+  <!-- Boxes -->
+  
+  <!-- Database / Models -->
+  <g transform="translate(50, 200)">
+    <rect width="150" height="80" rx="10" fill="#e3f2fd" stroke="#2196f3" stroke-width="2"/>
+    <text x="75" y="30" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle">Django Models</text>
+    <text x="75" y="50" font-family="Arial" font-size="12" text-anchor="middle">Project / Phase</text>
+    <text x="75" y="65" font-family="Arial" font-size="12" text-anchor="middle">WorkflowNotification</text>
+  </g>
+  
+  <!-- Signals -->
+  <g transform="translate(250, 200)">
+    <polygon points="0,0 120,0 140,40 120,80 0,80 20,40" fill="#fff3cd" stroke="#ffc107" stroke-width="2"/>
+    <text x="70" y="45" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle">Signals</text>
+    <text x="70" y="60" font-family="Arial" font-size="10" text-anchor="middle">post_save</text>
+  </g>
+  
+  <!-- Celery Tasks -->
+  <g transform="translate(250, 50)">
+    <rect width="140" height="80" rx="10" fill="#e3f2fd" stroke="#2196f3" stroke-width="2"/>
+    <text x="70" y="30" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle">Celery Tasks</text>
+    <text x="70" y="50" font-family="Arial" font-size="12" text-anchor="middle">Check Overdue</text>
+    <text x="70" y="65" font-family="Arial" font-size="12" text-anchor="middle">Daily Reports</text>
+  </g>
+  
+  <!-- Dashboards -->
+  <g transform="translate(550, 150)">
+    <rect width="180" height="180" rx="10" fill="#d4edda" stroke="#28a745" stroke-width="2"/>
+    <text x="90" y="30" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle">Dashboards</text>
+    
+    <!-- Client -->
+    <rect x="20" y="50" width="140" height="50" rx="5" fill="#fff" stroke="#28a745"/>
+    <text x="90" y="70" font-family="Arial" font-size="12" font-weight="bold" text-anchor="middle">Client View</text>
+    <text x="90" y="85" font-family="Arial" font-size="10" text-anchor="middle">Progress & Alerts</text>
+    
+    <!-- Admin -->
+    <rect x="20" y="110" width="140" height="50" rx="5" fill="#fff" stroke="#28a745"/>
+    <text x="90" y="130" font-family="Arial" font-size="12" font-weight="bold" text-anchor="middle">Admin View</text>
+    <text x="90" y="145" font-family="Arial" font-size="10" text-anchor="middle">KPIs & Audit Log</text>
+  </g>
+  
+  <!-- Arrows -->
+  
+  <!-- DB -> Signal -->
+  <line x1="200" y1="240" x2="250" y2="240" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- Signal -> Dashboard -->
+  <line x1="390" y1="240" x2="550" y2="240" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="470" y="230" font-family="Arial" font-size="10" text-anchor="middle">Real-time Update</text>
+  
+  <!-- Celery -> DB -->
+  <path d="M 250 90 Q 125 90 125 200" stroke="#333" stroke-width="2" fill="none" marker-end="url(#arrow)" stroke-dasharray="5,5"/>
+  <text x="130" y="150" font-family="Arial" font-size="10">Updates Status</text>
+  
+  <!-- DB -> Dashboard -->
+  <path d="M 200 270 Q 375 350 550 270" stroke="#333" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+  <text x="375" y="330" font-family="Arial" font-size="10" text-anchor="middle">Data Fetch (Views)</text>
+
+  <!-- Definitions -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#333" />
+    </marker>
+  </defs>
+</svg>

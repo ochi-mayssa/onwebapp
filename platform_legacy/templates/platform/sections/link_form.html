@@ -1,0 +1,12 @@
+{% extends 'platform/base_platform.html' %}
+
+{% block title %}Add Link{% endblock %}
+
+{% block content %}
+<h1>Add Link</h1>
+<form method="post">{% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Save</button>
+</form>
+<p><a href="{% url 'platform:links' %}">Back to links</a></p>
+{% endblock %}

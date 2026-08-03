@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">Invoice #{{ invoice.id }}</h4>
+            <div>
+                <span class="badge bg-light text-dark">{{ invoice.get_status_display }}</span>
+                <button class="btn btn-sm btn-outline-light ms-2" onclick="window.print()">
+                    <i class="fas fa-print"></i> Print
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <!-- Header -->
+            <div class="row mb-4">
+                <div class="col-6">
+                    <h5>From:</h5>
+                    <strong>OnWebApp Solutions</strong><br>
+                    123 Tech Street<br>
+                    Digital City, 10001<br>
+                    billing@onwebapp.com
+                </div>
+                <div class="col-6 text-end">
+                    <h5>To:</h5>
+                    <strong>{{ invoice.client.get_full_name|default:invoice.client.username }}</strong><br>
+                    {{ invoice.client.email }}<br>
+                    {% if project %}Project: {{ project.title }}{% endif %}
+                </div>
+            </div>
+
+            <!-- Details -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <table class="table table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Description</th>
+                                <th class="text-end">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    Project Service: {{ project.get_project_type_display }}
+                                    <br>
+                                    <small class="text-muted">Initial billing for project start.</small>
+                                </td>
+                                <td class="text-end">{{ invoice.currency }} {{ invoice.amount }}</td>
+                            </tr>
+                            <!-- Tax/Fees could go here -->
+                            <tr class="fw-bold">
+                                <td>Total</td>
+                                <td class="text-end">{{ invoice.currency }} {{ invoice.amount }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="row">
+                <div class="col-12 text-muted small">
+                    <p><strong>Issued:</strong> {{ invoice.issued_date }}</p>
+                    <p><strong>Due Date:</strong> {{ invoice.due_date }}</p>
+                    <p><strong>Status:</strong> {{ invoice.get_status_display }}</p>
+                    <p>Please make payment within 14 days. Thank you for your business!</p>
+                    
+                    <div class="mt-4 text-center">
+                        <a href="?download=true" class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-file-pdf"></i> Download PDF
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

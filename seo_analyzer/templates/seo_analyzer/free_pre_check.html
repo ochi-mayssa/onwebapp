@@ -1,0 +1,174 @@
+
+{% extends 'base.html' %}
+{% block title %}Free Website Pre-Check | OnWebApp{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home:home' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'seo_analyzer:index' %}">SEO</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Free Website Pre-Check</li>
+        </ol>
+    </nav>
+
+    <div class="text-center mb-5">
+        <h1 class="display-4 mb-3">Free Website Pre-Check</h1>
+        <p class="lead text-muted">Quickly check your website's basic health for free</p>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card mb-5 shadow-lg">
+                <div class="card-body p-4">
+                    <h3 class="card-title mb-4">Check Your Website</h3>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            {{ form.url.label_tag }}
+                            {{ form.url }}
+                            {% if form.url.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.url.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-lg w-100">
+                            Check Website
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            {% if results %}
+            <!-- Results Section -->
+            <div class="card mb-5 shadow-lg">
+                <div class="card-body p-5">
+                    <h2 class="mb-4 text-center">Your Website Health Results</h2>
+
+                    <!-- Health Score -->
+                    <div class="text-center mb-5">
+                        <div class="display-1 fw-bold 
+                            {% if results.status_label == 'Excellent' or results.status_label == 'Good' %}text-success
+                            {% elif results.status_label == 'Needs Improvement' %}text-warning
+                            {% else %}text-danger{% endif %}">
+                            {{ results.health_score }}/100
+                        </div>
+                        <h3 class="mt-2">{{ results.status_label }}</h3>
+
+                        <div class="d-flex justify-content-center gap-4 mt-4">
+                            <div class="text-center">
+                                <div class="fw-bold text-danger">{{ results.critical_issues }}</div>
+                                <small class="text-muted">Critical Issues</small>
+                            </div>
+                            <div class="text-center">
+                                <div class="fw-bold text-warning">{{ results.warnings }}</div>
+                                <small class="text-muted">Warnings</small>
+                            </div>
+                            <div class="text-center">
+                                <div class="fw-bold text-success">{{ results.passed }}</div>
+                                <small class="text-muted">Passed</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Checks Table -->
+                    <div class="table-responsive mb-5">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Check</th>
+                                    <th>Status</th>
+                                    <th>Finding</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for check in results.checks %}
+                                <tr>
+                                    <td>{{ check.name }}</td>
+                                    <td>
+                                        {% if check.status == 'PASS' %}
+                                            <span class="badge bg-success">PASS</span>
+                                        {% elif check.status == 'WARNING' %}
+                                            <span class="badge bg-warning text-dark">WARNING</span>
+                                        {% elif check.status == 'FAIL' %}
+                                            <span class="badge bg-danger">FAIL</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">NOT EVALUATED</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ check.finding }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Premium CTA Section -->
+                    <div class="bg-gradient text-white p-5 rounded-3" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <h3 class="mb-3 text-center">Want to Go Deeper?</h3>
+                        <p class="text-center mb-4">
+                            Your free website check gives you a quick overview of your website's basic SEO health. Unlock the complete OnWebApp SEO Intelligence Suite to discover deeper technical, URL, and link issues, understand their impact, and receive actionable recommendations.
+                        </p>
+
+                        <!-- Dynamic Result Summary -->
+                        <div class="text-center mb-4">
+                            {% if results.critical_issues > 0 %}
+                                <p class="fw-bold mb-0">{{ results.critical_issues }} SEO issue{% if results.critical_issues != 1 %}s{% endif %} detected in this quick check.</p>
+                            {% elif results.warnings > 0 %}
+                                <p class="fw-bold mb-0">{{ results.warnings }} warning{% if results.warnings != 1 %}s{% endif %} detected in this quick check.</p>
+                            {% else %}
+                                <p class="fw-bold mb-0">Your basic SEO checks look healthy. A complete analysis can uncover deeper technical, URL, and link opportunities.</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Premium Tools Preview -->
+                        <div class="row g-4 mb-5">
+                            <div class="col-md-4 text-center">
+                                <div class="card h-100 text-dark bg-white">
+                                    <div class="card-body">
+                                        <span class="fs-3">🔒</span>
+                                        <h5 class="fw-semibold mt-2">SEO Checker</h5>
+                                        <p class="small">Run a complete technical and on-page SEO analysis with detailed issues, priorities, and actionable recommendations.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-center">
+                                <div class="card h-100 text-dark bg-white">
+                                    <div class="card-body">
+                                        <span class="fs-3">🔒</span>
+                                        <h5 class="fw-semibold mt-2">URL Intelligence</h5>
+                                        <p class="small">Analyze URL structure, indexability, canonical signals, redirects, parameters, and optimization opportunities.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-center">
+                                <div class="card h-100 text-dark bg-white">
+                                    <div class="card-body">
+                                        <span class="fs-3">🔒</span>
+                                        <h5 class="fw-semibold mt-2">Link Intelligence</h5>
+                                        <p class="small">Analyze internal links, external links, broken links, and backlink signals to understand your website's linking ecosystem.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pricing & CTA -->
+                        <div class="text-center">
+                            <div class="fs-1 fw-bold mb-2">$50</div>
+                            <div class="fs-4 mb-2">Complete SEO Intelligence</div>
+                            <p class="mb-4">Unlock SEO Checker, URL Intelligence, and Link Intelligence in one complete analysis suite.</p>
+                            <a href="{% url 'payments:plans' %}" class="btn btn-light btn-lg">
+                                Subscribe & Unlock Full Analysis
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

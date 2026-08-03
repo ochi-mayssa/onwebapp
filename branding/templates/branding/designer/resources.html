@@ -1,0 +1,224 @@
+{% extends "branding/base.html" %}
+{% load branding_extras %}
+
+{% block title %}Design Resources{% endblock %}
+
+{% block branding_content %}
+<div class="container-fluid py-4">
+
+  {# ── Header ── #}
+  <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+    <div>
+      <h1 class="h4 fw-bold mb-1"><i class="fa-solid fa-book-open me-2"></i>Design Resources</h1>
+      <p class="text-muted mb-0 small">Shared and personal design assets for the team</p>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+      <a href="{% url 'branding:designer_dashboard' %}" class="btn btn-sm btn-outline-secondary">
+        <i class="fa-solid fa-arrow-left me-1"></i>Dashboard
+      </a>
+      <button class="btn btn-sm btn-brand-primary" data-bs-toggle="collapse" data-bs-target="#addResourceForm" aria-expanded="false">
+        <i class="fa-solid fa-plus me-1"></i>Add Resource
+      </button>
+    </div>
+  </div>
+
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb small">
+      <li class="breadcrumb-item"><a href="{% url 'branding:designer_dashboard' %}">Dashboard</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Design Resources</li>
+    </ol>
+  </nav>
+
+  {# ── Add Resource Form (collapsed) ── #}
+  <div class="collapse mb-4" id="addResourceForm">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white">
+        <h6 class="mb-0 fw-bold"><i class="fa-solid fa-cloud-arrow-up me-1"></i>Add New Resource</h6>
+      </div>
+      <div class="card-body">
+        <form method="post" action="{{ request.path }}" enctype="multipart/form-data">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="add_resource">
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="res-title" class="form-label small fw-semibold">Title *</label>
+              <input type="text" class="form-control form-control-sm" id="res-title" name="title" required placeholder="e.g. Brand Logo Pack">
+            </div>
+            <div class="col-md-6">
+              <label for="res-category" class="form-label small fw-semibold">Category</label>
+              <select class="form-select form-select-sm" id="res-category" name="category">
+                {% for val, label in categories %}
+                <option value="{{ val }}">{{ label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="res-description" class="form-label small fw-semibold">Description</label>
+              <textarea class="form-control form-control-sm" id="res-description" name="description" rows="2" placeholder="Brief description of this resource..."></textarea>
+            </div>
+            <div class="col-md-6">
+              <label for="res-shared-level" class="form-label small fw-semibold">Visibility</label>
+              <select class="form-select form-select-sm" id="res-shared-level" name="shared_level">
+                <option value="personal">Personal</option>
+                <option value="team">Team Shared</option>
+                <option value="collection">Collection-Specific</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="res-url" class="form-label small fw-semibold">URL (optional)</label>
+              <input type="url" class="form-control form-control-sm" id="res-url" name="url" placeholder="https://...">
+            </div>
+            <div class="col-md-6">
+              <label for="res-file" class="form-label small fw-semibold">File Upload</label>
+              <input type="file" class="form-control form-control-sm" id="res-file" name="file">
+            </div>
+            <div class="col-md-6">
+              <label for="res-tags" class="form-label small fw-semibold">Tags (comma-separated)</label>
+              <input type="text" class="form-control form-control-sm" id="res-tags" name="tags" placeholder="e.g. logo, branding, vector">
+            </div>
+            <div class="col-md-6">
+              <label for="res-collection" class="form-label small fw-semibold">Collection (optional)</label>
+              <select class="form-select form-select-sm" id="res-collection" name="collection_id">
+                <option value="">— None —</option>
+                {% for col in collections %}
+                <option value="{{ col.pk }}">{{ col.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <div class="mt-3">
+            <button type="submit" class="btn btn-sm btn-primary">
+              <i class="fa-solid fa-plus me-1"></i>Add Resource
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  {# ── Category Filter ── #}
+  <div class="d-flex flex-wrap gap-2 mb-4">
+    <a href="{{ request.path }}" class="btn btn-sm rounded-pill {% if not category_filter %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+      All
+    </a>
+    {% for val, label in categories %}
+    <a href="{{ request.path }}?category={{ val }}" class="btn btn-sm rounded-pill {% if category_filter == val %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+      {{ label }}
+    </a>
+    {% endfor %}
+  </div>
+
+  {# ── My Resources ── #}
+  <section class="mb-5">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <h5 class="fw-bold mb-0"><i class="fa-solid fa-user me-1 text-primary"></i>My Resources</h5>
+      <span class="badge bg-primary rounded-pill">{{ mine|length }}</span>
+    </div>
+    {% if mine %}
+    <div class="row g-3">
+      {% for res in mine %}
+      <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+        <div class="card h-100 border-0 shadow-sm resource-card">
+          <div class="card-body d-flex flex-column">
+            <div class="d-flex align-items-start justify-content-between mb-2">
+              <h6 class="card-title fw-bold mb-0 text-truncate" title="{{ res.title }}">{{ res.title }}</h6>
+              <span class="badge bg-light text-dark text-uppercase fw-semibold small">{{ res.get_category_display }}</span>
+            </div>
+            {% if res.description %}
+            <p class="card-text text-muted small flex-grow-1">{{ res.description|truncatechars:100 }}</p>
+            {% else %}
+            <p class="card-text text-muted small flex-grow-1 fst-italic">No description</p>
+            {% endif %}
+            <div class="d-flex flex-wrap gap-1 mb-2">
+              {% for tag in res.tags %}
+              <span class="badge bg-secondary bg-opacity-10 text-secondary small">{{ tag }}</span>
+              {% endfor %}
+            </div>
+            <div class="d-flex align-items-center justify-content-between text-muted x-small mt-auto pt-2 border-top">
+              <span><i class="fa-solid fa-download me-1"></i>{{ res.download_count }}</span>
+              <span><i class="fa-solid fa-user me-1"></i>{{ res.owner.get_full_name|default:res.owner.username }}</span>
+            </div>
+            <div class="d-flex gap-1 mt-2">
+              {% if res.file %}
+              <a href="{{ res.file.url }}" class="btn btn-sm btn-outline-primary flex-grow-1" download>
+                <i class="fa-solid fa-download me-1"></i>Download
+              </a>
+              {% endif %}
+              {% if res.url %}
+              <a href="{{ res.url }}" class="btn btn-sm btn-outline-secondary" target="_blank" rel="noopener" title="Open external link">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+              </a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center text-muted py-5">
+      <i class="fa-solid fa-inbox fa-2x mb-2 d-block"></i>
+      <p class="small mb-0">No personal resources yet. Add one above!</p>
+    </div>
+    {% endif %}
+  </section>
+
+  {# ── Team Shared Resources ── #}
+  <section class="mb-4">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <h5 class="fw-bold mb-0"><i class="fa-solid fa-users me-1 text-success"></i>Team Shared Resources</h5>
+      <span class="badge bg-success rounded-pill">{{ shared|length }}</span>
+    </div>
+    {% if shared %}
+    <div class="row g-3">
+      {% for res in shared %}
+      <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+        <div class="card h-100 border-0 shadow-sm resource-card">
+          <div class="card-body d-flex flex-column">
+            <div class="d-flex align-items-start justify-content-between mb-2">
+              <h6 class="card-title fw-bold mb-0 text-truncate" title="{{ res.title }}">{{ res.title }}</h6>
+              <span class="badge bg-light text-dark text-uppercase fw-semibold small">{{ res.get_category_display }}</span>
+            </div>
+            {% if res.description %}
+            <p class="card-text text-muted small flex-grow-1">{{ res.description|truncatechars:100 }}</p>
+            {% else %}
+            <p class="card-text text-muted small flex-grow-1 fst-italic">No description</p>
+            {% endif %}
+            <div class="d-flex flex-wrap gap-1 mb-2">
+              {% for tag in res.tags %}
+              <span class="badge bg-secondary bg-opacity-10 text-secondary small">{{ tag }}</span>
+              {% endfor %}
+            </div>
+            <div class="d-flex align-items-center justify-content-between text-muted x-small mt-auto pt-2 border-top">
+              <span><i class="fa-solid fa-download me-1"></i>{{ res.download_count }}</span>
+              <span><i class="fa-solid fa-user me-1"></i>{{ res.owner.get_full_name|default:res.owner.username }}</span>
+            </div>
+            <div class="d-flex gap-1 mt-2">
+              {% if res.file %}
+              <a href="{{ res.file.url }}" class="btn btn-sm btn-outline-primary flex-grow-1" download>
+                <i class="fa-solid fa-download me-1"></i>Download
+              </a>
+              {% endif %}
+              {% if res.url %}
+              <a href="{{ res.url }}" class="btn btn-sm btn-outline-secondary" target="_blank" rel="noopener" title="Open external link">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+              </a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center text-muted py-5">
+      <i class="fa-solid fa-inbox fa-2x mb-2 d-block"></i>
+      <p class="small mb-0">No shared resources available{% if category_filter %} for this category{% endif %}.</p>
+    </div>
+    {% endif %}
+  </section>
+
+</div>
+{% endblock %}

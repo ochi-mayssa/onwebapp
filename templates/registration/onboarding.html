@@ -1,0 +1,664 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+{% endblock %}
+
+{% block navbar %}{% endblock %}
+
+{% block content %}
+<div class="container py-4 py-lg-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-10 col-lg-8 col-xl-7">
+            <!-- Progress Indicator -->
+            <div class="mb-4 mb-md-5">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h1 class="h3 fw-bold text-body mb-0">{% trans "Welcome to OnWebApp! Let's build your vision." %}</h1>
+                    <span class="badge bg-primary-soft text-primary fs-6 px-3 py-2">
+                        <span id="currentStepNum">1</span>/<span id="totalStepsNum">4</span>
+                    </span>
+                </div>
+                <p class="text-muted mb-3">{% trans "Answer a few questions to unlock your tailored experience." %}</p>
+                
+                <div class="progress" style="height: 8px;">
+                    <div class="progress-bar bg-primary rounded-pill transition-all" role="progressbar" 
+                         style="width: 0%" id="progressBar">
+                        <div class="progress-dot"></div>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between mt-2">
+                    {% for i in "1234" %}
+                    <small class="text-muted step-label" data-step="{{ forloop.counter }}">
+                        {% if forloop.counter == 1 %}{% trans "Your Path" %}
+                        {% elif forloop.counter == 2 %}{% trans "Toolkit" %}
+                        {% elif forloop.counter == 3 %}{% trans "Goals" %}
+                        {% elif forloop.counter == 4 %}{% trans "Timeline" %}
+                        {% endif %}
+                    </small>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Main Card -->
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden animate__animated animate__fadeIn">
+                <div class="card-body p-4 p-md-5">
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger alert-dismissible fade show rounded-3 mb-4" role="alert">
+                        {{ form.non_field_errors }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    {% endif %}
+
+                    <form method="post" id="onboardingForm" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Step 1: Service Type -->
+                        <div class="step-container animate__animated" data-step="1">
+                            <div class="text-center mb-5">
+                                <div class="icon-wrapper bg-primary-soft text-primary rounded-3 p-3 d-inline-block mb-3">
+                                    <i class="fas fa-rocket fa-2x"></i>
+                                </div>
+                                <h2 class="h3 fw-bold mb-2">{% trans "Choose Your Path" %}</h2>
+                                <p class="text-muted mb-4">{% trans "Select the service that best aligns with your objectives." %}</p>
+                            </div>
+                            
+                            <div class="row g-4">
+                                {% for radio in form.service_type %}
+                                <div class="col-12">
+                                    <div class="service-option position-relative">
+                                        <input type="radio" name="{{ radio.data.name }}" value="{{ radio.data.value }}" 
+                                               class="btn-check visually-hidden" id="{{ radio.id_for_label }}"
+                                               {% if radio.data.selected %}checked{% endif %} required>
+                                        <label class="card h-100 border-2 rounded-4 cursor-pointer hover-lift p-4 transition-all bg-surface" 
+                                               for="{{ radio.id_for_label }}">
+                                            <div class="row g-3 align-items-center">
+                                                <div class="col-auto">
+                                                    <div class="icon-circle bg-primary-soft text-primary rounded-circle p-3">
+                                                        {% if radio.data.value == 'full_platform' %}
+                                                        <i class="fas fa-layer-group fa-lg"></i>
+                                                        {% elif radio.data.value == 'community' %}
+                                                        <i class="fas fa-users fa-lg"></i>
+                                                        {% else %}
+                                                        <i class="fas fa-star fa-lg"></i>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                                <div class="col">
+                                                    <h4 class="h5 mb-2">
+                                                        {% if radio.data.value == 'full_platform' %}
+                                                        <span class="text-primary">{% trans "Full Digital Platform" %}</span>
+                                                        {% elif radio.data.value == 'community' %}
+                                                        <span class="text-success">{% trans "Community Services" %}</span>
+                                                        {% else %}
+                                                        {{ radio.choice_label }}
+                                                        {% endif %}
+                                                    </h4>
+                                                    <p class="text-muted small mb-0">
+                                                        {% if radio.data.value == 'full_platform' %}
+                                                        {% trans "End-to-end digital transformation. Ideal for businesses needing a complete ecosystem (CRM, RPA, Website, Social)." %}
+                                                        {% elif radio.data.value == 'community' %}
+                                                        {% trans "Focus on growth and engagement. Perfect for creators and communities needing a website and brand identity." %}
+                                                        {% endif %}
+                                                    </p>
+                                                </div>
+                                                <div class="col-auto">
+                                                    <div class="check-circle bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 24px; height: 24px;">
+                                                        <i class="fas fa-check fa-xs"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div class="alert alert-warning border-0 bg-warning-soft mt-4 d-none" id="error-step-1">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                {% trans "Please select an option to continue" %}
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Community Needs -->
+                        <div class="step-container d-none animate__animated" data-step="2">
+                            <div class="text-center mb-5">
+                                <div class="icon-wrapper bg-success-soft text-success rounded-3 p-3 d-inline-block mb-3">
+                                    <i class="fas fa-hands-helping fa-2x"></i>
+                                </div>
+                                <h2 class="h3 fw-bold mb-2">{% trans "Customize Your Toolkit" %}</h2>
+                                <p class="text-muted mb-4">{% trans "Select the tools you need to accelerate your growth." %}</p>
+                            </div>
+                            
+                            <div class="row g-3">
+                                {% for checkbox in form.community_needs_selection %}
+                                <div class="col-md-6">
+                                    <div class="community-option position-relative h-100">
+                                        <input type="checkbox" name="{{ checkbox.data.name }}" value="{{ checkbox.data.value }}" 
+                                               class="btn-check visually-hidden" id="{{ checkbox.id_for_label }}"
+                                               {% if checkbox.data.selected %}checked{% endif %}>
+                                        <label class="card h-100 border-2 rounded-4 cursor-pointer hover-lift p-4 transition-all bg-surface" 
+                                               for="{{ checkbox.id_for_label }}">
+                                            <div class="d-flex align-items-start">
+                                                <div class="flex-grow-1">
+                                                    <h5 class="h6 mb-2">{{ checkbox.choice_label }}</h5>
+                                                    <small class="text-muted d-block">
+                                                        {% if checkbox.data.value == 'website' %}
+                                                        {% trans "High-performance websites designed to convert." %}
+                                                        {% elif checkbox.data.value == 'branding' %}
+                                                        {% trans "Memorable visual identity that stands out." %}
+                                                        {% elif checkbox.data.value == 'social' %}
+                                                        {% trans "Strategic growth on key platforms." %}
+                                                        {% elif checkbox.data.value == 'content' %}
+                                                        {% trans "Engaging content that tells your story." %}
+                                                        {% endif %}
+                                                    </small>
+                                                </div>
+                                                <div class="check-square bg-success text-white rounded-3 d-flex align-items-center justify-content-center ms-3" style="width: 28px; height: 28px;">
+                                                    <i class="fas fa-check fa-sm"></i>
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div class="alert alert-warning border-0 bg-warning-soft mt-4 d-none" id="error-step-2">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                {% trans "Please select at least one option" %}
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Project Description -->
+                        <div class="step-container d-none animate__animated" data-step="3">
+                            <div class="text-center mb-5">
+                                <div class="icon-wrapper bg-info-soft text-info rounded-3 p-3 d-inline-block mb-3">
+                                    <i class="fas fa-bullseye fa-2x"></i>
+                                </div>
+                                <h2 class="h3 fw-bold mb-2">{% trans "Define Your Success" %}</h2>
+                                <p class="text-muted mb-4">{% trans "Tell us what you want to achieve." %}</p>
+                            </div>
+                            
+                            <div class="vstack gap-3">
+                                {% for radio in form.project_description %}
+                                <div class="project-option">
+                                    <input type="radio" name="{{ radio.data.name }}" value="{{ radio.data.value }}" 
+                                           class="btn-check visually-hidden" id="{{ radio.id_for_label }}"
+                                           {% if radio.data.selected %}checked{% endif %} required>
+                                    <label class="card border-2 rounded-4 cursor-pointer hover-lift p-4 transition-all bg-surface" 
+                                           for="{{ radio.id_for_label }}">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h5 class="h6 mb-1">{{ radio.choice_label }}</h5>
+                                                <small class="text-muted">
+                                                    {% if radio.data.value == 'launch' %}
+                                                    {% trans "Bring a new idea to life." %}
+                                                    {% elif radio.data.value == 'grow' %}
+                                                    {% trans "Scale an existing business." %}
+                                                    {% elif radio.data.value == 'transform' %}
+                                                    {% trans "Modernize your digital presence." %}
+                                                    {% endif %}
+                                                </small>
+                                            </div>
+                                            <i class="fas fa-chevron-right text-primary ms-3"></i>
+                                        </div>
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div class="alert alert-warning border-0 bg-warning-soft mt-4 d-none" id="error-step-3">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                {% trans "Please select an option to continue" %}
+                            </div>
+                        </div>
+
+                        <!-- Step 4: Timeline -->
+                        <div class="step-container d-none animate__animated" data-step="4">
+                            <div class="text-center mb-5">
+                                <div class="icon-wrapper bg-purple-soft text-purple rounded-3 p-3 d-inline-block mb-3">
+                                    <i class="fas fa-calendar-alt fa-2x"></i>
+                                </div>
+                                <h2 class="h3 fw-bold mb-2">{% trans "Set Your Pace" %}</h2>
+                                <p class="text-muted mb-4">{% trans "When do you want to kick off this project?" %}</p>
+                            </div>
+                            
+                            <div class="row g-3">
+                                {% for radio in form.start_timeline %}
+                                <div class="col-6 col-md-3">
+                                    <div class="timeline-option h-100">
+                                        <input type="radio" name="{{ radio.data.name }}" value="{{ radio.data.value }}" 
+                                               class="btn-check visually-hidden" id="{{ radio.id_for_label }}"
+                                               {% if radio.data.selected %}checked{% endif %}>
+                                        <label class="card h-100 border-2 rounded-4 cursor-pointer hover-lift p-3 text-center transition-all bg-surface" 
+                                               for="{{ radio.id_for_label }}">
+                                            <div class="timeline-icon mb-3">
+                                                {% if radio.data.value == 'immediately' %}
+                                                <i class="fas fa-bolt fa-2x text-warning"></i>
+                                                {% elif radio.data.value == '1_month' %}
+                                                <i class="fas fa-rocket fa-2x text-primary"></i>
+                                                {% elif radio.data.value == '3_months' %}
+                                                <i class="fas fa-calendar fa-2x text-info"></i>
+                                                {% elif radio.data.value == 'just_browsing' %}
+                                                <i class="fas fa-binoculars fa-2x text-secondary"></i>
+                                                {% endif %}
+                                            </div>
+                                            <h6 class="mb-2">{{ radio.choice_label }}</h6>
+                                            {% if radio.data.value == 'immediately' %}
+                                            <small class="text-muted d-block">{% trans "I'm ready to start today." %}</small>
+                                            {% elif radio.data.value == '1_month' %}
+                                            <small class="text-muted d-block">{% trans "Planning for next month." %}</small>
+                                            {% elif radio.data.value == '3_months' %}
+                                            <small class="text-muted d-block">{% trans "Researching for future." %}</small>
+                                            {% elif radio.data.value == 'just_browsing' %}
+                                            <small class="text-muted d-block">{% trans "Just exploring options." %}</small>
+                                            {% endif %}
+                                        </label>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div class="alert alert-info border-0 bg-info-soft mt-4">
+                                <i class="fas fa-info-circle me-2"></i>
+                                {% trans "This step is optional. You can always adjust your timeline later." %}
+                            </div>
+                        </div>
+
+                        <!-- Navigation -->
+                        <div class="d-flex justify-content-between align-items-center mt-5 pt-4 border-top">
+                            <button type="button" class="btn btn-outline-secondary px-4 py-2 rounded-pill" id="prevBtn">
+                                <i class="fas fa-arrow-left me-2"></i>
+                                <span class="d-none d-md-inline">{% trans "Go Back" %}</span>
+                            </button>
+                            
+                            <div class="step-indicators d-none d-md-flex">
+                                {% for i in "1234" %}
+                                <div class="step-dot mx-1 {% if forloop.first %}active{% endif %}" data-step="{{ forloop.counter }}"></div>
+                                {% endfor %}
+                            </div>
+                            
+                            <div>
+                                <button type="button" class="btn btn-primary px-5 py-2 rounded-pill" id="nextBtn">
+                                    <span class="me-2">{% trans "Continue" %}</span>
+                                    <i class="fas fa-arrow-right"></i>
+                                </button>
+                                <button type="submit" class="btn btn-success px-5 py-2 rounded-pill d-none" id="submitBtn">
+                                    <span class="me-2">{% trans "Complete Setup" %}</span>
+                                    <i class="fas fa-check"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Help Footer -->
+                <div class="card-footer bg-light border-0 py-3 px-4 text-center">
+                    <small class="text-muted">
+                        <i class="fas fa-question-circle me-1"></i>
+                        {% trans "Need help deciding?" %}
+                        <a href="#" class="text-decoration-none ms-1">{% trans "Contact our team" %}</a>
+                    </small>
+                </div>
+            </div>
+            
+            <!-- Skip Option -->
+            <div class="text-center mt-4">
+                <button type="button" class="btn btn-link text-muted" id="skipBtn">
+                    <small>
+                        <i class="fas fa-forward me-1"></i>
+                        {% trans "Skip setup for now" %}
+                    </small>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+:root {
+    --primary-soft: rgba(13, 110, 253, 0.1);
+    --success-soft: rgba(25, 135, 84, 0.1);
+    --warning-soft: rgba(255, 193, 7, 0.1);
+    --info-soft: rgba(13, 202, 240, 0.1);
+    --purple-soft: rgba(111, 66, 193, 0.1);
+}
+
+.transition-all {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.1) !important;
+}
+
+.bg-primary-soft { background-color: var(--primary-soft); }
+.bg-success-soft { background-color: var(--success-soft); }
+.bg-warning-soft { background-color: var(--warning-soft); }
+.bg-info-soft { background-color: var(--info-soft); }
+.bg-purple-soft { background-color: var(--purple-soft); }
+
+/* Progress Bar */
+.progress {
+    overflow: visible;
+}
+.progress-bar {
+    position: relative;
+    transition: width 0.6s ease;
+}
+.progress-dot {
+    position: absolute;
+    right: -6px;
+    top: -4px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background-color: var(--bs-primary);
+    border: 3px solid white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Step Labels */
+.step-label.active {
+    color: var(--bs-primary);
+    font-weight: 600;
+}
+
+/* Check Circles */
+.check-circle {
+    opacity: 0;
+    transform: scale(0);
+    transition: all 0.3s ease;
+}
+.btn-check:checked + label .check-circle {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* Check Squares */
+.check-square {
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.3s ease;
+}
+.btn-check:checked + label .check-square {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* Step Dots */
+.step-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--bs-gray-300);
+    transition: all 0.3s ease;
+}
+.step-dot.active {
+    background-color: var(--bs-primary);
+    transform: scale(1.2);
+}
+
+/* Selected States */
+.btn-check:checked + label {
+    border-color: var(--bs-primary) !important;
+    background-color: rgba(var(--bs-primary-rgb), 0.05);
+}
+.btn-check:checked + label.border-success {
+    border-color: var(--bs-success) !important;
+    background-color: rgba(var(--bs-success-rgb), 0.05);
+}
+
+/* Animation Classes */
+.step-container {
+    animation-duration: 0.5s;
+}
+.fade-out {
+    animation: fadeOut 0.3s forwards;
+}
+@keyframes fadeOut {
+    to { opacity: 0; transform: translateX(-20px); }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const config = {
+        currentStep: 1,
+        totalSteps: 4,
+        animationSpeed: 300
+    };
+
+    const elements = {
+        prevBtn: document.getElementById('prevBtn'),
+        nextBtn: document.getElementById('nextBtn'),
+        submitBtn: document.getElementById('submitBtn'),
+        skipBtn: document.getElementById('skipBtn'),
+        progressBar: document.getElementById('progressBar'),
+        currentStepNum: document.getElementById('currentStepNum'),
+        totalStepsNum: document.getElementById('totalStepsNum'),
+        stepLabels: document.querySelectorAll('.step-label'),
+        stepDots: document.querySelectorAll('.step-dot'),
+        form: document.getElementById('onboardingForm')
+    };
+
+    function animateStepOut() {
+        const currentContainer = document.querySelector(`.step-container[data-step="${config.currentStep}"]`);
+        if (currentContainer) {
+            currentContainer.classList.add('animate__fadeOutLeft');
+            setTimeout(() => {
+                currentContainer.classList.remove('animate__fadeOutLeft');
+            }, config.animationSpeed);
+        }
+    }
+
+    function animateStepIn() {
+        const currentContainer = document.querySelector(`.step-container[data-step="${config.currentStep}"]`);
+        if (currentContainer) {
+            currentContainer.classList.add('animate__fadeInRight');
+            setTimeout(() => {
+                currentContainer.classList.remove('animate__fadeInRight');
+            }, config.animationSpeed);
+        }
+    }
+
+    function updateProgress() {
+        const progress = ((config.currentStep - 1) / (config.totalSteps - 1)) * 100;
+        elements.progressBar.style.width = `${progress}%`;
+        
+        // Update step labels
+        elements.stepLabels.forEach((label, index) => {
+            label.classList.toggle('active', index + 1 <= config.currentStep);
+        });
+        
+        // Update step dots
+        elements.stepDots.forEach((dot, index) => {
+            dot.classList.toggle('active', index + 1 === config.currentStep);
+        });
+        
+        // Update counters
+        const serviceType = document.querySelector('input[name="service_type"]:checked');
+        const isFullPlatform = serviceType && serviceType.value === 'full_platform';
+        
+        let displayTotal = isFullPlatform ? 3 : config.totalSteps;
+        let displayCurrent = config.currentStep;
+        
+        if (isFullPlatform && config.currentStep > 2) {
+            displayCurrent = config.currentStep - 1;
+        }
+        
+        elements.currentStepNum.textContent = displayCurrent;
+        elements.totalStepsNum.textContent = displayTotal;
+    }
+
+    function updateButtons() {
+        elements.prevBtn.style.visibility = config.currentStep > 1 ? 'visible' : 'hidden';
+        
+        if (config.currentStep === config.totalSteps) {
+            elements.nextBtn.classList.add('d-none');
+            elements.submitBtn.classList.remove('d-none');
+        } else {
+            elements.nextBtn.classList.remove('d-none');
+            elements.submitBtn.classList.add('d-none');
+        }
+    }
+
+    function showStep(step) {
+        // Hide all steps
+        document.querySelectorAll('.step-container').forEach(el => {
+            el.classList.add('d-none');
+            el.classList.remove('animate__fadeInRight', 'animate__fadeOutLeft');
+        });
+        
+        // Show current step
+        const currentContainer = document.querySelector(`.step-container[data-step="${step}"]`);
+        if (currentContainer) {
+            currentContainer.classList.remove('d-none');
+        }
+        
+        updateProgress();
+        updateButtons();
+    }
+
+    function validateStep(step) {
+        const container = document.querySelector(`.step-container[data-step="${step}"]`);
+        const errorMsg = container.querySelector('.alert-warning');
+        let isValid = true;
+        
+        // Hide previous errors
+        if (errorMsg) errorMsg.classList.add('d-none');
+        
+        switch(step) {
+            case 1:
+                const serviceSelected = container.querySelector('input[name="service_type"]:checked');
+                if (!serviceSelected) {
+                    isValid = false;
+                }
+                break;
+                
+            case 2:
+                // Only validate if step is visible (not skipped)
+                const isSkipped = document.querySelector('input[name="service_type"][value="full_platform"]:checked');
+                if (!isSkipped) {
+                    const needsSelected = container.querySelectorAll('input[type="checkbox"]:checked');
+                    if (needsSelected.length === 0) {
+                        isValid = false;
+                    }
+                }
+                break;
+                
+            case 3:
+                const goalSelected = container.querySelector('input[name="project_description"]:checked');
+                if (!goalSelected) {
+                    isValid = false;
+                }
+                break;
+                
+            case 4:
+                // Timeline is optional
+                break;
+        }
+        
+        if (!isValid && errorMsg) {
+            errorMsg.classList.remove('d-none');
+            errorMsg.classList.add('animate__shakeX');
+            setTimeout(() => errorMsg.classList.remove('animate__shakeX'), 1000);
+        }
+        
+        return isValid;
+    }
+
+    function goToNextStep() {
+        if (!validateStep(config.currentStep)) return;
+        
+        animateStepOut();
+        
+        setTimeout(() => {
+            let nextStep = config.currentStep + 1;
+            
+            // Skip step 2 if full platform selected
+            if (config.currentStep === 1) {
+                const isFullPlatform = document.querySelector('input[name="service_type"][value="full_platform"]:checked');
+                if (isFullPlatform) {
+                    nextStep = 3;
+                }
+            }
+            
+            if (nextStep <= config.totalSteps) {
+                config.currentStep = nextStep;
+                showStep(config.currentStep);
+                animateStepIn();
+                
+                // Scroll to top of card
+                document.querySelector('.card-body').scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' 
+                });
+            }
+        }, config.animationSpeed);
+    }
+
+    function goToPrevStep() {
+        animateStepOut();
+        
+        setTimeout(() => {
+            let prevStep = config.currentStep - 1;
+            
+            // Skip back over step 2 if full platform selected
+            if (config.currentStep === 3) {
+                const isFullPlatform = document.querySelector('input[name="service_type"][value="full_platform"]:checked');
+                if (isFullPlatform) {
+                    prevStep = 1;
+                }
+            }
+            
+            if (prevStep >= 1) {
+                config.currentStep = prevStep;
+                showStep(config.currentStep);
+                animateStepIn();
+            }
+        }, config.animationSpeed);
+    }
+
+    // Auto-advance for radios (with delay for visual feedback)
+    document.querySelectorAll('input[type="radio"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (this.name === 'start_timeline') {
+                // For timeline (last step), don't auto-advance
+                return;
+            }
+            
+            setTimeout(() => {
+                if (config.currentStep < config.totalSteps) {
+                    goToNextStep();
+                }
+            }, 600);
+        });
+    });
+
+    // Event Listeners
+    elements.nextBtn.addEventListener('click', goToNextStep);
+    elements.prevBtn.addEventListener('click', goToPrevStep);
+    
+    elements.skipBtn.addEventListener('click', function() {
+        if (confirm('{% trans "Skip onboarding? You can complete it later from your dashboard." %}')) {
+            window.location.href = '/dashboard/';
+        }
+    });
+
+    // Form submission
+    elements.form.addEventListener('submit', function(e) {
+        if (!validateStep(config.currentStep)) {
+            e.preventDefault();
+            return;
+        }
+        
+        // Add loading state
+        elements.submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> {% trans "Setting up..." %}';
+        elements.submitBtn.disabled = true;
+    });
+
+    // Initialize
+    showStep(config.currentStep);
+});
+</script>
+{% endblock %}

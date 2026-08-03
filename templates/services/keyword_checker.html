@@ -1,0 +1,61 @@
+{% extends 'services/futuristic_service_base.html' %}
+{% load static %}
+
+{% block service_content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card border-0 rounded-4 holographic-card h-100 animate-on-scroll slide-up">
+            <div class="card-body p-4">
+                <h5 class="card-title mb-3 text-cyan neon-text">Keyword Checker</h5>
+                <p class="text-cyan opacity-75 mb-4">The Keyword Checker validates feasibility: enter a keyword and site URL to assess if the site can rank (authority, pages, backlinks, competition).</p>
+                <form method="post" id="keywordCheckerForm">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label text-light">Keyword</label>
+                        {{ kw_form.query }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-light">Site URL</label>
+                        {{ url_form.url }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-light">Email</label>
+                        {{ kw_form.email }}
+                    </div>
+                    <button type="submit" class="btn holographic-btn w-100 mt-2">Check Feasibility</button>
+                </form>
+            </div>
+        </div>
+
+        {% if result %}
+        <div class="card border-0 rounded-4 holographic-card mt-4 animate-on-scroll slide-up" style="transition-delay: 0.1s;">
+            <div class="card-body p-4">
+                <h5 class="card-title mb-4 text-cyan neon-text">Results</h5>
+                <p class="text-light mb-3">Evaluation for <strong class="text-cyan">{{ result.query }}</strong> on <strong class="text-cyan">{{ result.url }}</strong></p>
+                <div class="mb-4 p-3 border border-cyan border-opacity-25 rounded-3 bg-black bg-opacity-25">
+                    <p class="mb-2 text-light"><strong>Feasible:</strong> {% if result.feasible %}<span class="text-success neon-text">Yes</span>{% else %}<span class="text-danger neon-text">No</span>{% endif %}</p>
+                    <p class="mb-2 text-light"><strong>Keyword source:</strong> {{ result.kw.source }}</p>
+                    <p class="mb-0 text-light"><strong>Site SEO score:</strong> {{ result.seo.seo_score }}</p>
+                </div>
+                {% if result.kw.suggested_keywords %}
+                <h6 class="mb-3 text-cyan">Suggested keywords</h6>
+                <ul class="list-group">
+                    {% for k in result.kw.suggested_keywords %}
+                    <li class="list-group-item bg-transparent border border-cyan border-opacity-25 text-light">{{ k }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('input, select, textarea').forEach(el => {
+            el.classList.add('form-control', 'cyber-input', 'bg-transparent', 'text-light');
+        });
+    });
+</script>
+{% endblock %}

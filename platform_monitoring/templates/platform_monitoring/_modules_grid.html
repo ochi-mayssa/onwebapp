@@ -1,0 +1,34 @@
+{% load i18n %}
+<div class="row g-3 mb-4">
+  {% for mod in modules %}
+    <div class="col-xl-3 col-lg-4 col-md-6">
+      <div class="card h-100 border-0 shadow-sm card-hover-border transition-hover rounded-16 overflow-hidden">
+        <div class="card-body p-4">
+          <div class="d-flex align-items-start justify-content-between mb-3">
+            <div class="d-flex align-items-center justify-content-center rounded-14 bg-{{ accent|default:'primary' }}-soft text-{{ accent|default:'primary' }}"
+                 style="width:44px;height:44px;">
+              <i data-lucide="{{ mod.icon|default:'box' }}" style="width:20px;height:20px;"></i>
+            </div>
+            <span class="badge rounded-pill {{ mod.badge.class }} d-inline-flex align-items-center gap-1 small">
+              <span class="d-inline-block rounded-circle {{ mod.badge.dot }}" style="width:7px;height:7px;"></span>
+              {{ mod.badge.label }}
+            </span>
+          </div>
+          <h5 class="fw-800 text-900 mb-1 h6">{{ mod.name }}</h5>
+          <p class="small text-muted mb-4" style="min-height: 44px;">{{ mod.description }}</p>
+        </div>
+        <div class="card-footer bg-white border-0 pt-0 px-4 pb-4">
+          {% if mod.route %}
+            <a href="{{ mod.route }}" class="btn btn-sm btn-outline-{{ accent|default:'primary' }} rounded-10 w-100 fw-700 d-inline-flex align-items-center justify-content-center gap-1">
+              {% trans "Open" %} <i data-lucide="arrow-right" style="width:14px;height:14px;"></i>
+            </a>
+          {% else %}
+            <button type="button" class="btn btn-sm btn-outline-secondary rounded-10 w-100 fw-700" disabled>
+              {% trans "Coming Soon" %} <i data-lucide="lock" style="width:14px;height:14px;"></i>
+            </button>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>

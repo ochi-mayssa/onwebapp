@@ -1,0 +1,59 @@
+{% extends "forum/base_forum.html" %}
+{% load static forum_tags %}
+
+{% block forum_title %}Moderation{% endblock %}
+
+{% block forum_content %}
+<div class="forum-card p-4 mb-4">
+    <h4 class="fw-800 mb-1"><i class="fas fa-shield-alt text-warning me-2"></i>Moderation Dashboard</h4>
+    <p class="text-secondary small mb-0">{{ reports|length }} unresolved reports</p>
+</div>
+
+{% if reports %}
+<h5 class="fw-700 mb-3">Pending Reports</h5>
+{% for report in reports %}
+<div class="forum-card p-3 mb-2" id="report-{{ report.pk }}">
+    <div class="d-flex justify-content-between align-items-start">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge bg-danger bg-opacity-10 text-danger small">{{ report.get_reason_display }}</span>
+                <span class="small text-secondary">by {{ report.reporter.username }}</span>
+                <span class="small text-secondary">{{ report.created_at|timesince }} ago</span>
+            </div>
+            {% if report.post %}
+            <a href="{% url 'forum:post_detail' report.post.slug %}" class="fw-600 text-body">{{ report.post.title }}</a>
+            {% endif %}
+            {% if report.description %}
+            <p class="small text-secondary mb-0 mt-1">{{ report.description }}</p>
+            {% endif %}
+        </div>
+        <button class="btn btn-sm btn-success rounded-pill resolve-btn" data-report-id="{{ report.pk }}">
+            <i class="fas fa-check me-1"></i>Resolve
+        </button>
+    </div>
+</div>
+{% endfor %}
+{% else %}
+<div class="text-center py-5 text-secondary">
+    <i class="fas fa-check-circle fs-1 text-success mb-2"></i>
+    <p class="mb-0">No pending reports. All clear!</p>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block forum_extra_js %}
+<script>
+document.querySelectorAll('.resolve-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        fetch('/forum/moderation/report/' + this.dataset.reportId + '/resolve/', {
+            method: 'POST',
+            headers: {'X-CSRFToken': '{{ csrf_token }}', 'Content-Type': 'application/json'},
+        }).then(r => r.json()).then(d => {
+            if (d.resolved) {
+                document.getElementById('report-' + this.dataset.reportId).remove();
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

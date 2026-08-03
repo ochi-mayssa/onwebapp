@@ -1,0 +1,194 @@
+{% extends "branding/base.html" %}
+{% load branding_extras %}
+
+{% block title %}Slack Integration{% endblock %}
+
+{% block branding_content %}
+<div class="container py-4">
+
+    {# ── Header ── #}
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+        <div>
+            <nav aria-label="breadcrumb" class="mb-2">
+                <ol class="breadcrumb mb-0 small">
+                    <li class="breadcrumb-item"><a href="{% url 'branding:designer_dashboard' %}" class="text-decoration-none"><i class="fa-solid fa-palette me-1"></i>My Work</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'branding:designer_dashboard' %}" class="text-decoration-none">Integrations</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Slack</li>
+                </ol>
+            </nav>
+            <h1 class="h4 fw-bold mb-1"><i class="fa-brands fa-slack me-2" style="color:#e01e5a;"></i>Slack Integration</h1>
+            <p class="text-muted mb-0 small">Get real-time notifications in your Slack workspace.</p>
+        </div>
+    </div>
+
+    {# ── Connection Status ── #}
+    {% if connection %}
+    <div class="detail-card rounded-4 p-4 mb-4">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="d-flex align-items-center justify-content-center rounded-3" style="width:48px;height:48px;background:#f0fdf4;">
+                    <i class="fa-solid fa-link fa-lg" style="color:#16a34a;"></i>
+                </div>
+                <div>
+                    <h6 class="fw-bold mb-0">Connected to Slack</h6>
+                    <p class="text-muted small mb-0">{{ connection.workspace_name }} &bull; <i class="fa-solid fa-hashtag me-1"></i>{{ connection.channel_name }}</p>
+                </div>
+            </div>
+            <form method="post" class="d-inline">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="disconnect">
+                <button type="submit" class="btn btn-sm btn-outline-danger">
+                    <i class="fa-solid fa-link-slash me-1"></i>Disconnect
+                </button>
+            </form>
+        </div>
+    </div>
+
+    {# ── Notification Settings ── #}
+    <div class="detail-card rounded-4 p-4 mb-4">
+        <h6 class="fw-bold mb-3"><i class="fa-solid fa-bell me-2 text-primary"></i>Notification Settings</h6>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="update_settings">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="notify_assignments" name="notify_assignments" value="1" {% if connection.notify_assignments %}checked{% endif %}>
+                        <label class="form-check-label fw-semibold" for="notify_assignments">New Assignments</label>
+                    </div>
+                    <small class="text-muted">Get notified when a new request is assigned to you.</small>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="notify_deadlines" name="notify_deadlines" value="1" {% if connection.notify_deadlines %}checked{% endif %}>
+                        <label class="form-check-label fw-semibold" for="notify_deadlines">Deadline Alerts</label>
+                    </div>
+                    <small class="text-muted">Receive alerts for upcoming and overdue deadlines.</small>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="notify_feedback" name="notify_feedback" value="1" {% if connection.notify_feedback %}checked{% endif %}>
+                        <label class="form-check-label fw-semibold" for="notify_feedback">Feedback Received</label>
+                    </div>
+                    <small class="text-muted">Notify when a client or supervisor leaves feedback.</small>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="notify_daily_digest" name="notify_daily_digest" value="1" {% if connection.notify_daily_digest %}checked{% endif %}>
+                        <label class="form-check-label fw-semibold" for="notify_daily_digest">Daily Digest</label>
+                    </div>
+                    <small class="text-muted">Receive a daily summary of your activity.</small>
+                </div>
+            </div>
+            <div class="text-end mt-4">
+                <button type="submit" class="btn btn-brand-primary btn-sm px-4">
+                    <i class="fa-solid fa-save me-1"></i>Save Settings
+                </button>
+            </div>
+        </form>
+    </div>
+
+    {# ── Test Notification ── #}
+    <div class="detail-card rounded-4 p-4 mb-4">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div>
+                <h6 class="fw-bold mb-1">Test Connection</h6>
+                <p class="text-muted small mb-0">Send a test notification to verify your Slack setup is working.</p>
+            </div>
+            <form method="post" class="d-inline">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="test">
+                <button type="submit" class="btn btn-sm btn-outline-primary">
+                    <i class="fa-solid fa-paper-plane me-1"></i>Send Test Notification
+                </button>
+            </form>
+        </div>
+    </div>
+
+    {# ── Recent Messages ── #}
+    <div class="detail-card rounded-4 p-4">
+        <h6 class="fw-bold mb-3"><i class="fa-solid fa-comments me-2 text-muted"></i>Recent Messages</h6>
+        {% if recent_messages %}
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Type</th>
+                        <th>Message</th>
+                        <th>Channel</th>
+                        <th class="text-nowrap">Sent At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for msg in recent_messages %}
+                    <tr>
+                        <td>
+                            <span class="badge rounded-pill {% if msg.message_type == 'assignment' %}bg-primary-subtle text-primary{% elif msg.message_type == 'deadline' %}bg-warning-subtle text-warning{% elif msg.message_type == 'feedback' %}bg-success-subtle text-success{% elif msg.message_type == 'digest' %}bg-info-subtle text-info{% else %}bg-secondary-subtle text-secondary{% endif %}">
+                                {{ msg.get_message_type_display }}
+                            </span>
+                        </td>
+                        <td class="text-truncate" style="max-width:350px;">{{ msg.text|truncatechars:120 }}</td>
+                        <td><i class="fa-solid fa-hashtag me-1 text-muted"></i>{{ msg.channel }}</td>
+                        <td class="text-nowrap x-small text-muted">{{ msg.sent_at|date:"M d, Y g:i A" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center text-muted py-4">
+            <i class="fa-regular fa-comments fa-2x mb-2 opacity-25"></i>
+            <p class="mb-0 small">No messages sent yet.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    {% else %}
+
+    {# ── Not Connected — Connect Form ── #}
+    <div class="detail-card rounded-4 p-5">
+        <div class="text-center mb-4">
+            <div class="mx-auto mb-3 d-flex align-items-center justify-content-center rounded-4" style="width:72px;height:72px;background:#f8f0ff;">
+                <i class="fa-brands fa-slack fa-2x" style="color:#e01e5a;"></i>
+            </div>
+            <h5 class="fw-bold">Connect to Slack</h5>
+            <p class="text-muted mb-0 small">Link your Slack workspace to receive real-time notifications.</p>
+        </div>
+        <form method="post" class="mx-auto" style="max-width:480px;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="connect">
+            <div class="mb-3">
+                <label for="bot_token" class="form-label x-small fw-700">Bot Token <span class="text-danger">*</span></label>
+                <input type="password" class="form-control form-control-sm" id="bot_token" name="bot_token" required placeholder="xoxb-...">
+                <div class="form-text">Your Slack bot OAuth token starting with <code>xoxb-</code>.</div>
+            </div>
+            <div class="mb-3">
+                <label for="workspace_name" class="form-label x-small fw-700">Workspace Name <span class="text-danger">*</span></label>
+                <input type="text" class="form-control form-control-sm" id="workspace_name" name="workspace_name" required placeholder="e.g. My Company">
+            </div>
+            <div class="mb-3">
+                <label for="channel_id" class="form-label x-small fw-700">Channel ID <span class="text-danger">*</span></label>
+                <input type="text" class="form-control form-control-sm" id="channel_id" name="channel_id" required placeholder="C01ABC123">
+            </div>
+            <div class="mb-4">
+                <label for="channel_name" class="form-label x-small fw-700">Channel Name <span class="text-danger">*</span></label>
+                <input type="text" class="form-control form-control-sm" id="channel_name" name="channel_name" required placeholder="e.g. design-updates">
+            </div>
+            <button type="submit" class="btn btn-brand-primary w-100">
+                <i class="fa-brands fa-slack me-2"></i>Connect Workspace
+            </button>
+        </form>
+    </div>
+
+    {% endif %}
+
+</div>
+
+<style>
+    .form-check-input:checked {
+        background-color: var(--bs-primary, #0d6efd);
+        border-color: var(--bs-primary, #0d6efd);
+    }
+</style>
+
+{% endblock %}

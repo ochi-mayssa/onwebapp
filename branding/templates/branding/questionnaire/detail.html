@@ -1,0 +1,272 @@
+{% extends 'branding/base.html' %}
+{% load branding_extras %}
+
+{% block title %}{{ questionnaire.title }} · Questionnaire{% endblock %}
+
+{% block branding_content %}
+<div class="detail-page">
+    <div class="container py-4 py-lg-5">
+
+        <div class="d-flex align-items-start justify-content-between flex-wrap gap-3 mb-4">
+            <div>
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <a href="{% url 'branding:questionnaire_list' request_pk=request_obj.pk %}" class="btn btn-back btn-sm"><i class="fa-solid fa-arrow-left me-1"></i>All Questionnaires</a>
+                    <span class="request-number-display">{{ request_obj.request_number }}</span>
+                </div>
+                <h1 class="fw-800 mb-1"><i class="fa-solid fa-clipboard-question me-2 text-primary"></i>{{ questionnaire.title }}</h1>
+                <p class="text-muted mb-0">{{ request_obj.company_name }} · {{ questions|length }} question{{ questions|length|pluralize }}</p>
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+                {% if is_designer %}
+                <a href="{% url 'branding:questionnaire_edit' pk=questionnaire.pk %}" class="btn btn-back"><i class="fa-solid fa-pen me-2"></i>Edit</a>
+                <a href="{% url 'branding:questionnaire_add_question' pk=questionnaire.pk %}" class="btn btn-back"><i class="fa-solid fa-plus me-2"></i>Add Question</a>
+                <a href="{% url 'branding:questionnaire_bulk_add' pk=questionnaire.pk %}" class="btn btn-back"><i class="fa-solid fa-layer-group me-2"></i>Bulk Add</a>
+                {% endif %}
+                <a href="{% url 'branding:questionnaire_answers' pk=questionnaire.pk %}" class="btn btn-back"><i class="fa-solid fa-list-check me-2"></i>View Answers</a>
+                {% if is_designer %}
+                <a href="{% url 'branding:questionnaire_export' pk=questionnaire.pk %}" class="btn btn-back"><i class="fa-solid fa-download me-2"></i>Export</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="detail-card rounded-4 p-4 mb-4">
+            <div class="d-flex align-items-start justify-content-between flex-wrap gap-3">
+                <div class="d-flex flex-wrap gap-2">
+                    <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-3 py-2">{{ questionnaire.get_phase_display }}</span>
+                    <span class="badge rounded-pill px-3 py-2 status-pill status-{{ questionnaire.status|lower }}">{{ questionnaire.get_status_display|default:questionnaire.status }}</span>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                    {% if questionnaire.share_url %}
+                    <div class="input-group input-group-sm" style="max-width: 400px;">
+                        <input type="text" class="form-control form-control-sm" id="shareUrl" value="{{ questionnaire.share_url }}" readonly>
+                        <button class="btn btn-back btn-sm" type="button" onclick="copyShareUrl()" title="Copy share link">
+                            <i class="fa-solid fa-copy"></i>
+                        </button>
+                    </div>
+                    {% endif %}
+                    <div class="text-end">
+                        <span class="x-small text-muted fw-700">Completion</span>
+                        <div class="fw-800 text-primary">{{ completion_percent }}%</div>
+                    </div>
+                </div>
+            </div>
+            {% if questionnaire.description %}
+            <p class="text-muted mb-0 mt-3">{{ questionnaire.description }}</p>
+            {% endif %}
+        </div>
+
+        <div class="detail-card rounded-4 p-3 mb-4">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="small fw-700">Progress</span>
+                <span class="x-small text-muted fw-700">{{ completion_percent }}% complete</span>
+            </div>
+            <div class="progress" style="height: 8px;">
+                <div class="progress-bar bg-primary" style="width: {{ completion_percent }}%;"></div>
+            </div>
+        </div>
+
+        {% if is_designer %}
+        <div class="d-flex gap-2 flex-wrap mb-4">
+            <form method="post" action="{% url 'branding:questionnaire_send' pk=questionnaire.pk %}" onsubmit="return confirm('Send this questionnaire to the client?');">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-brand-primary"><i class="fa-solid fa-paper-plane me-2"></i>Send to Client</button>
+            </form>
+            <form method="post" action="{% url 'branding:questionnaire_reminder' pk=questionnaire.pk %}" onsubmit="return confirm('Send a reminder for this questionnaire?');">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-back"><i class="fa-solid fa-bell me-2"></i>Send Reminder</button>
+            </form>
+            <a href="{% url 'branding:questionnaire_smart_suggest' pk=questionnaire.pk %}" class="btn btn-back"><i class="fa-solid fa-wand-magic-sparkles me-2"></i>Smart Suggest</a>
+        </div>
+        {% endif %}
+
+        {% if questions %}
+        <div class="detail-card rounded-4 p-4 mb-4">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h6 class="fw-800 mb-0"><i class="fa-solid fa-list-ol me-2 text-primary"></i>Questions</h6>
+                {% if is_designer %}
+                <form method="post" action="{% url 'branding:questionnaire_reorder_questions' pk=questionnaire.pk %}" id="reorderForm" style="display:none;">
+                    {% csrf_token %}
+                    <input type="hidden" name="order" id="reorderInput">
+                </form>
+                {% endif %}
+            </div>
+            <div id="questionsList" class="d-flex flex-column gap-2">
+                {% for Q in questions %}
+                <div class="question-row d-flex align-items-start gap-3 p-3 rounded-3 border" data-id="{{ Q.pk }}" style="background: var(--bs-tertiary-bg);">
+                    {% if is_designer %}
+                    <div class="drag-handle d-flex align-items-center text-muted" style="cursor: grab;" title="Drag to reorder">
+                        <i class="fa-solid fa-grip-vertical"></i>
+                    </div>
+                    {% endif %}
+                    <div class="flex-shrink-0 text-center" style="min-width: 32px;">
+                        <span class="x-small text-muted fw-700">{{ Q.sort_order|default:forloop.counter }}</span>
+                    </div>
+                    <div class="flex-grow-1 min-width-0">
+                        <div class="d-flex align-items-start justify-content-between gap-2 mb-1">
+                            <p class="fw-700 mb-0 text-truncate">{{ Q.text }}</p>
+                            <div class="d-flex gap-1 flex-shrink-0">
+                                {% if is_designer %}
+                                <a href="{% url 'branding:questionnaire_edit_question' qid=Q.pk %}" class="btn btn-sm btn-icon" title="Edit"><i class="fa-solid fa-pen"></i></a>
+                                <form method="post" action="{% url 'branding:questionnaire_delete_question' qid=Q.pk %}" class="d-inline" onsubmit="return confirm('Delete this question?');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-icon text-danger" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="d-flex flex-wrap gap-1">
+                            <span class="badge rounded-pill x-small status-pill status-{{ Q.question_type|lower }}">{{ Q.get_question_type_display|default:Q.question_type }}</span>
+                            {% if Q.importance %}
+                            <span class="badge rounded-pill x-small
+                                {% if Q.importance == 'CRITICAL' %}bg-danger-subtle text-danger
+                                {% elif Q.importance == 'HIGH' %}bg-warning-subtle text-warning
+                                {% elif Q.importance == 'MEDIUM' %}bg-info-subtle text-info
+                                {% else %}bg-secondary-subtle text-secondary{% endif %}">
+                                {{ Q.get_importance_display|default:Q.importance }}
+                            </span>
+                            {% endif %}
+                            {% if Q.is_required %}
+                            <span class="badge bg-primary-subtle text-primary rounded-pill x-small">Required</span>
+                            {% endif %}
+                            {% if Q.category %}
+                            <span class="badge bg-light text-dark rounded-pill x-small">{{ Q.category }}</span>
+                            {% endif %}
+                            {% if Q.conditions %}
+                            <span class="badge bg-info-subtle text-info rounded-pill x-small"><i class="fa-solid fa-code-branch me-1"></i>Conditional</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="flex-shrink-0 text-end" style="min-width: 60px;">
+                        {% with ans_count=Q.answers.count %}
+                        <span class="x-small text-muted" title="Answers"><i class="fa-solid fa-circle-check me-1"></i>{{ ans_count }}</span>
+                        {% endwith %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% else %}
+        <div class="detail-card rounded-4 p-5 text-center mb-4">
+            <div class="empty-state-icon mb-3" style="font-size: 4rem; color: var(--bs-primary); opacity: .3;">
+                <i class="fa-solid fa-circle-question"></i>
+            </div>
+            <h4 class="fw-800 mb-2">No Questions Yet</h4>
+            <p class="text-muted mb-4" style="max-width: 480px; margin: 0 auto;">
+                Add questions to gather structured feedback from the client.
+            </p>
+            {% if is_designer %}
+            <div class="d-flex justify-content-center gap-2">
+                <a href="{% url 'branding:questionnaire_add_question' pk=questionnaire.pk %}" class="btn btn-brand-primary px-4">
+                    <i class="fa-solid fa-plus me-2"></i>Add First Question
+                </a>
+                <a href="{% url 'branding:questionnaire_bulk_add' pk=questionnaire.pk %}" class="btn btn-back px-4">
+                    <i class="fa-solid fa-layer-group me-2"></i>Bulk Add
+                </a>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        {% if answers_summary %}
+        <div class="detail-card rounded-4 p-4 mb-4">
+            <h6 class="fw-800 mb-3"><i class="fa-solid fa-chart-bar me-2 text-primary"></i>Answers Summary</h6>
+            <div class="d-flex flex-column gap-2">
+                {% for item in answers_summary %}
+                <div class="d-flex align-items-center justify-content-between p-3 rounded-3 border" style="background: var(--bs-tertiary-bg);">
+                    <div class="flex-grow-1 min-width-0">
+                        <span class="fw-700 small text-truncate d-block">{{ item.question.text }}</span>
+                        {% if item.latest_answer %}
+                        <span class="x-small text-muted">Latest: {{ item.latest_answer|truncatechars:80 }}</span>
+                        {% endif %}
+                    </div>
+                    <span class="badge bg-primary-subtle text-primary rounded-pill x-small flex-shrink-0 ms-3">
+                        <i class="fa-solid fa-circle-check me-1"></i>{{ item.answer_count }} answer{{ item.answer_count|pluralize }}
+                    </span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+    'use strict';
+
+    var copyBtn = document.querySelector('[onclick="copyShareUrl()"]');
+    if (!copyBtn) return;
+
+    window.copyShareUrl = function () {
+        var input = document.getElementById('shareUrl');
+        if (input) {
+            navigator.clipboard.writeText(input.value).then(function () {
+                var icon = copyBtn.querySelector('i');
+                icon.className = 'fa-solid fa-check';
+                setTimeout(function () { icon.className = 'fa-solid fa-copy'; }, 1500);
+            });
+        }
+    };
+
+    var list = document.getElementById('questionsList');
+    if (!list || !list.querySelector('.drag-handle')) return;
+
+    var dragSrc = null;
+    list.querySelectorAll('.question-row').forEach(function (row) {
+        var handle = row.querySelector('.drag-handle');
+        if (!handle) return;
+        handle.addEventListener('mousedown', function () {
+            row.setAttribute('draggable', 'true');
+        });
+        row.addEventListener('dragstart', function (e) {
+            dragSrc = row;
+            row.classList.add('opacity-50');
+            e.dataTransfer.effectAllowed = 'move';
+        });
+        row.addEventListener('dragend', function () {
+            row.classList.remove('opacity-50');
+            row.setAttribute('draggable', 'false');
+        });
+        row.addEventListener('dragover', function (e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            var rect = row.getBoundingClientRect();
+            var mid = rect.top + rect.height / 2;
+            if (e.clientY < mid) {
+                row.style.borderTop = '2px solid var(--bs-primary)';
+                row.style.borderBottom = '';
+            } else {
+                row.style.borderBottom = '2px solid var(--bs-primary)';
+                row.style.borderTop = '';
+            }
+        });
+        row.addEventListener('dragleave', function () {
+            row.style.borderTop = '';
+            row.style.borderBottom = '';
+        });
+        row.addEventListener('drop', function (e) {
+            e.preventDefault();
+            row.style.borderTop = '';
+            row.style.borderBottom = '';
+            if (dragSrc === row) return;
+            var rect = row.getBoundingClientRect();
+            var mid = rect.top + rect.height / 2;
+            if (e.clientY < mid) {
+                list.insertBefore(dragSrc, row);
+            } else {
+                list.insertBefore(dragSrc, row.nextSibling);
+            }
+            var order = [];
+            list.querySelectorAll('.question-row').forEach(function (r) {
+                order.push(r.dataset.id);
+            });
+            document.getElementById('reorderInput').value = order.join(',');
+            document.getElementById('reorderForm').submit();
+        });
+    });
+})();
+</script>
+{% endblock %}

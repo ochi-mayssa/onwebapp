@@ -1,0 +1,123 @@
+{% extends "forum/base_forum.html" %}
+{% load static forum_tags %}
+
+{% block forum_title %}{% if edit %}Edit: {{ post.title }}{% else %}Create Post{% endif %}{% endblock %}
+
+{% block forum_content %}
+<div class="forum-card p-4">
+    <h4 class="fw-800 mb-1">{% if edit %}Edit Post{% else %}Create a Post{% endif %}</h4>
+    <p class="text-secondary small mb-4">
+        {% if edit %}Update your post below.{% else %}Share your knowledge, ask questions, or showcase your work.{% endif %}
+    </p>
+
+    <form method="post" id="postForm" action="{% if edit %}{% url 'forum:post_edit' post.slug %}{% else %}{% url 'forum:post_create' %}{% endif %}">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        <div class="mb-3">
+            <label class="form-label small fw-600">Title</label>
+            {{ form.title }}
+            {% if form.title.errors %}<div class="text-danger small mt-1">{{ form.title.errors }}</div>{% endif %}
+        </div>
+
+        <div class="row g-3 mb-3">
+            <div class="col-md-6">
+                <label class="form-label small fw-600">Category</label>
+                {{ form.category }}
+            </div>
+            <div class="col-md-6">
+                <label class="form-label small fw-600">Tags</label>
+                {{ form.tags_input }}
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label small fw-600">Content <span class="text-secondary">(Markdown supported)</span></label>
+            {{ form.content }}
+            {% if form.content.errors %}<div class="text-danger small mt-1">{{ form.content.errors }}</div>{% endif %}
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label small fw-600">Featured Image URL</label>
+            {{ form.featured_image }}
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label small fw-600">Status</label>
+            {{ form.status }}
+        </div>
+
+        <!-- Showcase toggle -->
+        <div class="mb-4 p-3 rounded-3" style="background:var(--bg-surface-secondary,#f8fafc);">
+            <div class="form-check">
+                {{ form.is_showcase }}
+                <label class="form-check-label fw-600" for="{{ form.is_showcase.id_for_label }}">
+                    This is a Showcase project
+                </label>
+                <div class="text-secondary small">Share your project for community feedback.</div>
+            </div>
+            <div class="row g-3 mt-2 showcase-fields" id="showcaseFields">
+                <div class="col-md-6">
+                    <label class="form-label small fw-600">Project Name</label>
+                    {{ form.project_name }}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-600">Tech Stack</label>
+                    {{ form.tech_stack }}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-600">GitHub Link</label>
+                    {{ form.github_link }}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-600">Live Demo</label>
+                    {{ form.live_demo }}
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center">
+            <a href="{% if edit %}{% url 'forum:post_detail' post.slug %}{% else %}{% url 'forum:home' %}{% endif %}" class="btn btn-outline-secondary rounded-pill px-4">Cancel</a>
+            <button type="submit" class="btn btn-primary rounded-pill px-5 fw-700">
+                {% if edit %}Update Post{% else %}Publish Post{% endif %}
+                <i class="fas fa-arrow-right ms-2"></i>
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const showcaseCheck = document.querySelector('#{{ form.is_showcase.id_for_label }}');
+    const showcaseFields = document.getElementById('showcaseFields');
+    function toggleShowcase() {
+        showcaseFields.style.display = showcaseCheck.checked ? 'flex' : 'none';
+    }
+    if (showcaseCheck) {
+        toggleShowcase();
+        showcaseCheck.addEventListener('change', toggleShowcase);
+    }
+
+    // Form submission handling - ensure no interference
+    const postForm = document.getElementById('postForm');
+    if (postForm) {
+        postForm.addEventListener('submit', function(e) {
+            // Log for debugging
+            console.log('Form submitting to:', postForm.action);
+            // Don't prevent default - allow normal submission
+        });
+        
+        // Ensure submit button works
+        const submitBtn = postForm.querySelector('button[type="submit"]');
+        if (submitBtn) {
+            submitBtn.addEventListener('click', function(e) {
+                console.log('Submit button clicked');
+                // Don't prevent default
+            });
+        }
+    }
+});
+</script>
+{% endblock %}

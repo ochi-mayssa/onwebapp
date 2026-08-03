@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block extra_head %}
+<style>
+    :root {
+        --primary: #6366F1;
+        --primary-glow: rgba(99, 102, 241, 0.4);
+        --slate-50: #F8FAFC;
+        --slate-100: #F1F5F9;
+        --slate-200: #E2E8F0;
+        --slate-600: #475569;
+        --slate-800: #1E293B;
+        --slate-900: #0F172A;
+    }
+
+    .service-container {
+        padding: 160px 0 100px;
+        position: relative;
+    }
+
+    /* Premium Card System */
+    .premium-card {
+        background: white;
+        border: 1px solid var(--slate-100);
+        border-radius: 40px;
+        padding: 40px;
+        box-shadow: 0 40px 80px -15px rgba(0, 0, 0, 0.05);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .premium-card:hover {
+        transform: translateY(-12px);
+        box-shadow: 0 60px 100px -20px rgba(99, 102, 241, 0.12);
+        border-color: var(--primary-glow);
+    }
+
+    .card-icon {
+        width: 64px;
+        height: 64px;
+        background: var(--slate-50);
+        color: var(--primary);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 32px;
+        transition: all 0.3s ease;
+    }
+
+    .premium-card:hover .card-icon {
+        background: var(--primary);
+        color: white;
+        transform: scale(1.1) rotate(5deg);
+    }
+
+    .neon-text {
+        background: linear-gradient(135deg, var(--slate-900) 0%, var(--slate-600) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 800;
+    }
+
+    .cyber-input {
+        width: 100%;
+        padding: 14px 20px;
+        background: var(--slate-50);
+        border: 1px solid var(--slate-100);
+        border-radius: 16px;
+        font-weight: 500;
+        color: var(--slate-900);
+        transition: all 0.3s ease;
+    }
+
+    .cyber-input:focus {
+        outline: none;
+        background: white;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px var(--primary-glow);
+    }
+
+    .holographic-btn {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        color: white !important;
+        padding: 14px 28px;
+        border-radius: 16px;
+        font-weight: 700;
+        border: none;
+        box-shadow: 0 10px 20px -5px var(--primary-glow);
+        transition: all 0.4s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .holographic-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 20px 40px -10px var(--primary-glow);
+    }
+
+    /* Animation Utilities */
+    .reveal {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: all 0.8s cubic-bezier(0.215, 0.61, 0.355, 1);
+    }
+    .reveal.active {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    {% block extra_css %}{% endblock %}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="service-container">
+    <div class="container">
+        {% block service_content %}{% endblock %}
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Scroll Reveal logic
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        
+        // Lucide Icons
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    });
+    
+    {% block extra_js %}{% endblock %}
+</script>
+{% endblock %}

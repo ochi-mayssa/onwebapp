@@ -1,0 +1,366 @@
+{% extends "base.html" %}
+{% load i18n static humanize %}
+
+{% block title %}{% trans "Social Media KPI Analysis" %} | OnWebApp{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'users:dashboard' %}">Dashboard</a></li>
+<li class="breadcrumb-item active">Social Media KPI</li>
+{% endblock %}
+
+{% block page_title %}{% trans "Social Media KPI Analysis" %}{% endblock %}
+{% block page_subtitle %}{% trans "Platform detection, account extraction, followers, engagement, growth and sentiment analysis." %}{% endblock %}
+
+{% block global_cta %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="row g-4">
+    <!-- Analysis Config -->
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
+          <div class="card-body p-4">
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <div class="p-2 rounded-3 bg-danger-soft text-danger">
+                    <i data-lucide="share-2" style="width: 20px;"></i>
+                </div>
+                <h6 class="fw-800 mb-0">Initialize Analysis</h6>
+            </div>
+            <form method="post" id="social-media-form">
+              {% csrf_token %}
+              <div class="mb-3">
+                <label class="form-label small fw-800 text-secondary uppercase tracking-wider">{{ form.handle.label }}</label>
+                {{ form.handle }}
+                {% if form.handle.help_text %}
+                <div class="small text-muted mt-2">{{ form.handle.help_text }}</div>
+                {% endif %}
+                {% if form.handle.errors %}<div class="text-danger small mt-2">{{ form.handle.errors|join:", " }}</div>{% endif %}
+              </div>
+              <div class="mb-4">
+                <label class="form-label small fw-800 text-secondary uppercase tracking-wider">{{ form.email.label }}</label>
+                {{ form.email }}
+                {% if form.email.errors %}<div class="text-danger small mt-2">{{ form.email.errors|join:", " }}</div>{% endif %}
+              </div>
+              <div class="mb-4">
+                <label class="form-label small fw-800 text-secondary uppercase tracking-wider">{{ form.days.label }}</label>
+                {{ form.days }}
+              </div>
+              <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-800 shadow-lg d-inline-flex align-items-center justify-content-center gap-2" id="metrics-btn">
+                <span class="spinner-border spinner-border-sm me-2 d-none" id="smSpinner" role="status" aria-hidden="true"></span>
+                <i data-lucide="zap" style="width: 18px;"></i>Initialize Metrics
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <div class="card border-0 bg-sidebar-bg text-white p-4 rounded-4 shadow-xl position-relative overflow-hidden">
+            <div class="position-absolute top-0 end-0 p-4 opacity-10">
+                <i data-lucide="sparkles" style="width: 120px; height: 120px;"></i>
+            </div>
+            <h6 class="fw-800 mb-3 text-white position-relative">What Happens Next</h6>
+            <ul class="list-unstyled mb-0 small position-relative">
+              <li class="mb-2 d-flex align-items-start gap-2">
+                <i data-lucide="scan-line" style="width:14px;height:14px;flex-shrink:0;margin-top:2px;" class="text-success"></i>
+                <span class="text-white text-opacity-75">Detect platform from profile URL</span>
+              </li>
+              <li class="mb-2 d-flex align-items-start gap-2">
+                <i data-lucide="at-sign" style="width:14px;height:14px;flex-shrink:0;margin-top:2px;" class="text-success"></i>
+                <span class="text-white text-opacity-75">Extract account @handle</span>
+              </li>
+              <li class="mb-2 d-flex align-items-start gap-2">
+                <i data-lucide="database" style="width:14px;height:14px;flex-shrink:0;margin-top:2px;" class="text-success"></i>
+                <span class="text-white text-opacity-75">Query configured provider or stored data</span>
+              </li>
+              <li class="d-flex align-items-start gap-2">
+                <i data-lucide="bar-chart-big" style="width:14px;height:14px;flex-shrink:0;margin-top:2px;" class="text-success"></i>
+                <span class="text-white text-opacity-75">Display verified KPI results</span>
+              </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Metrics Result -->
+    <div class="col-lg-8">
+        {% if result %}
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+          <div class="card-body p-4">
+            <div class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-4">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="p-2 rounded-3 bg-success-soft text-success">
+                        <i data-lucide="bar-chart-big" style="width: 20px;"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-800 mb-0">Social Media KPI Result</h6>
+                        <div class="small text-secondary mt-1">Source: {{ result.source|title }}</div>
+                    </div>
+                </div>
+                <span class="badge bg-surface-secondary text-secondary rounded-pill px-3 py-2 fw-800 x-small d-inline-flex align-items-center gap-2">
+                    <i data-lucide="clock" style="width:12px;height:12px;"></i>Last Sync: {{ result.last_sync_display }}
+                </span>
+            </div>
+
+            <!-- Compact Identity / Result Header -->
+            <div class="row g-3 mb-4">
+              {% if result.detected_platform %}
+              <div class="col-sm-6 col-md-3">
+                <div class="p-3 rounded-4 bg-surface-secondary h-100">
+                  <div class="x-small text-secondary fw-800 uppercase tracking-widest mb-1">Platform</div>
+                  <div class="h6 fw-800 text-slate-900 mb-0">{{ result.detected_platform|title }}</div>
+                </div>
+              </div>
+              {% endif %}
+              <div class="col-sm-6 col-md-3">
+                <div class="p-3 rounded-4 bg-surface-secondary h-100">
+                  <div class="x-small text-secondary fw-800 uppercase tracking-widest mb-1">Account</div>
+                  <div class="h6 fw-800 text-primary mb-0">{{ result.account_label }}</div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-md-3">
+                <div class="p-3 rounded-4 bg-surface-secondary h-100">
+                  <div class="x-small text-secondary fw-800 uppercase tracking-widest mb-1">Provider Status</div>
+                  {% if result.provider_status == 'connected' %}
+                  <div class="h6 fw-800 text-success mb-0">{{ result.provider_status_text }}</div>
+                  {% else %}
+                  <div class="h6 fw-800 text-warning mb-0">{{ result.provider_status_text }}</div>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="col-sm-6 col-md-3">
+                <div class="p-3 rounded-4 bg-surface-secondary h-100">
+                  <div class="x-small text-secondary fw-800 uppercase tracking-widest mb-1">Last Sync</div>
+                  <div class="h6 fw-800 text-slate-900 mb-0">{{ result.last_sync_display }}</div>
+                </div>
+              </div>
+            </div>
+
+            {% if result.provider_status != 'connected' and result.detected_platform and result.normalized_handle %}
+            <div class="alert alert-warning rounded-4 border-0 mb-4 d-flex align-items-start gap-3">
+                <i data-lucide="check-circle-2" style="width:20px;height:20px;flex-shrink:0;" class="text-success mt-1"></i>
+                <div>
+                  <div class="fw-800 mb-1 text-dark">Platform detected successfully</div>
+                  <div class="small text-dark mb-2">
+                    <strong class="text-dark">{{ result.detected_platform|title }}</strong>
+                    <span class="text-secondary mx-2">·</span>
+                    <strong class="text-primary">{{ result.account_label }}</strong>
+                  </div>
+                  <div class="small text-dark mb-1">
+                    <span class="text-secondary">Provider Status:</span>
+                    <span class="fw-800 text-warning">{{ result.provider_status_text }}</span>
+                  </div>
+                  <div class="small text-muted">
+                    Real-time KPI data requires a configured social media data provider.
+                  </div>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if result.message and result.status == 'error' %}
+            <div class="alert alert-danger rounded-4 border-0 mb-4">
+                {{ result.message }}
+            </div>
+            {% elif result.message and result.status == 'unavailable' %}
+            <div class="alert alert-info rounded-4 border-0 mb-4">
+                {{ result.message }}
+            </div>
+            {% endif %}
+
+            <!-- KPI Cards -->
+            <h6 class="fw-800 text-slate-900 mb-3">Key Performance Indicators</h6>
+            <div class="row g-4 mb-5">
+              <div class="col-md-6 col-xl-3">
+                <div class="p-4 rounded-4 bg-surface-secondary border-0 h-100 transition-hover text-center">
+                  <div class="x-small text-secondary fw-800 uppercase tracking-widest mb-2">Total Followers</div>
+                  <div class="display-6 fw-800 text-slate-900 mb-0 lh-1">{{ result.total_followers_display }}</div>
+                </div>
+              </div>
+              <div class="col-md-6 col-xl-3">
+                <div class="p-4 rounded-4 bg-surface-secondary border-0 h-100 transition-hover text-center">
+                  <div class="x-small text-secondary fw-800 uppercase tracking-widest mb-2">Engagement</div>
+                  <div class="display-6 fw-800 text-primary mb-0 lh-1">{{ result.engagement_display }}</div>
+                  {% if result.engagement_formula and result.engagement_formula != 'Not Available' %}
+                  <div class="small text-secondary mt-2">{{ result.engagement_formula }}</div>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="col-md-6 col-xl-3">
+                <div class="p-4 rounded-4 bg-surface-secondary border-0 h-100 transition-hover text-center">
+                  <div class="x-small text-secondary fw-800 uppercase tracking-widest mb-2">Growth</div>
+                  {% if result.growth_chart and result.growth_chart.available %}
+                  <div class="display-6 fw-800 text-success mb-0 lh-1">{{ result.growth_chart.trend|default:"Not Available" }}</div>
+                  {% else %}
+                  <div class="display-6 fw-800 text-slate-700 mb-0 lh-1">Not Available</div>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="col-md-6 col-xl-3">
+                <div class="p-4 rounded-4 bg-surface-secondary border-0 h-100 transition-hover text-center">
+                  <div class="x-small text-secondary fw-800 uppercase tracking-widest mb-2">Sentiment</div>
+                  <div class="display-6 fw-800 mb-0 lh-1 {% if result.sentiment_available %}text-info{% else %}text-slate-700{% endif %}">{{ result.sentiment_badge }}</div>
+                </div>
+              </div>
+            </div>
+
+            <h6 class="fw-800 text-slate-900 mb-4">Audience Growth Trajectory</h6>
+            {% if result.growth_chart.available %}
+            <div style="height: 300px;">
+              <canvas id="followersChart"></canvas>
+            </div>
+            {{ result.growth_chart.labels|json_script:"followers-chart-labels" }}
+            {{ result.growth_chart.values|json_script:"followers-chart-values" }}
+            {% else %}
+            <div class="p-5 rounded-4 bg-surface-secondary text-secondary text-center">
+                <i data-lucide="line-chart" style="width:36px;height:36px;" class="mb-3 text-muted"></i>
+                <div class="fw-800 text-dark mb-1">No Historical Growth Data</div>
+                <div class="small mb-0">{{ result.growth_chart.message }}</div>
+            </div>
+            {% endif %}
+
+            <div class="mt-5">
+                <h6 class="fw-800 text-slate-900 mb-3">Sentiment Analysis</h6>
+                {% if result.sentiment_available %}
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="p-3 rounded-4 bg-success-soft text-center">
+                            <div class="small fw-800 text-success mb-1">Positive</div>
+                            <div class="h5 fw-800 mb-0">
+                                {% with p=result.sentiment_percentages.positive %}{% if p is not None %}{{ p|floatformat:1 }}%{% else %}—{% endif %}{% endwith %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 rounded-4 bg-secondary-soft text-center">
+                            <div class="small fw-800 text-secondary mb-1">Neutral</div>
+                            <div class="h5 fw-800 mb-0">
+                                {% with n=result.sentiment_percentages.neutral %}{% if n is not None %}{{ n|floatformat:1 }}%{% else %}—{% endif %}{% endwith %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 rounded-4 bg-danger-soft text-center">
+                            <div class="small fw-800 text-danger mb-1">Negative</div>
+                            <div class="h5 fw-800 mb-0">
+                                {% with neg=result.sentiment_percentages.negative %}{% if neg is not None %}{{ neg|floatformat:1 }}%{% else %}—{% endif %}{% endwith %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="small text-muted mt-3">{{ result.sentiment_message }}</div>
+                {% else %}
+                <div class="p-5 rounded-4 bg-surface-secondary text-secondary text-center">
+                    <i data-lucide="message-square-heart" style="width:36px;height:36px;" class="mb-3 text-muted"></i>
+                    <div class="fw-800 text-dark mb-1">Sentiment Not Available</div>
+                    <div class="small mb-0">{{ result.sentiment_message }}</div>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="mt-5">
+                <h6 class="fw-800 text-slate-900 mb-3">Platform Intelligence</h6>
+                {% if result.platforms %}
+                <div class="row g-3">
+                    {% for name, data in result.platforms.items %}
+                    <div class="col-md-4">
+                        <div class="p-3 rounded-4 bg-surface-secondary border-0 transition-hover">
+                            <div class="small fw-800 text-primary mb-1">{{ name|title }}</div>
+                            <div class="h5 fw-800 text-slate-900 mb-0">{{ data.followers_display|default:data.followers|intcomma }}</div>
+                            <div class="small text-secondary mt-2">Engagement: {{ data.engagement_display|default:"Not Available" }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="p-4 rounded-4 bg-surface-secondary text-secondary">
+                    No verified platform-level metrics are available for the submitted account.
+                </div>
+                {% endif %}
+            </div>
+          </div>
+        </div>
+        {% else %}
+        <!-- EMPTY STATE -->
+        <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
+            <div class="card-body p-5 text-center">
+                <div class="d-inline-flex align-items-center justify-content-center mb-4 rounded-circle bg-primary-soft" style="width:80px;height:80px;">
+                    <i data-lucide="share-2" style="width:36px;height:36px;" class="text-primary"></i>
+                </div>
+                <h4 class="fw-900 text-slate-900 mb-2">Social Media KPI Analysis</h4>
+                <p class="text-muted mb-4" style="max-width:520px;margin-left:auto;margin-right:auto;">
+                    Enter a supported social media profile URL or @handle above to initialize the analysis.
+                </p>
+                <div class="d-flex flex-wrap justify-content-center gap-2 small mb-2">
+                    <span class="badge rounded-pill bg-pink-soft text-body fw-700 px-3 py-2">Instagram</span>
+                    <span class="badge rounded-pill bg-blue-soft text-body fw-700 px-3 py-2">Facebook</span>
+                    <span class="badge rounded-pill bg-sky-soft text-body fw-700 px-3 py-2">LinkedIn</span>
+                    <span class="badge rounded-pill bg-black-soft text-body fw-700 px-3 py-2">TikTok</span>
+                    <span class="badge rounded-pill bg-red-soft text-body fw-700 px-3 py-2">YouTube</span>
+                    <span class="badge rounded-pill bg-indigo-soft text-body fw-700 px-3 py-2">X</span>
+                </div>
+                <div class="small text-muted">Supported platforms: Instagram · Facebook · LinkedIn · TikTok · YouTube · X</div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .transition-hover { transition: all 0.2s ease; }
+    .transition-hover:hover { transform: translateY(-2px); background-color: var(--bg-surface-tertiary); }
+    .x-small { font-size: 0.75rem; }
+    .uppercase { text-transform: uppercase; }
+    .bg-pink-soft { background-color: rgba(236, 72, 153, 0.10); color: #be185d; }
+    .bg-blue-soft { background-color: rgba(59, 130, 246, 0.10); color: #1d4ed8; }
+    .bg-sky-soft { background-color: rgba(14, 165, 233, 0.10); color: #0369a1; }
+    .bg-black-soft { background-color: rgba(15, 23, 42, 0.08); color: #0f172a; }
+    .bg-red-soft { background-color: rgba(239, 68, 68, 0.10); color: #b91c1c; }
+    .bg-indigo-soft { background-color: rgba(79, 70, 229, 0.10); color: #4338ca; }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    lucide.createIcons();
+
+    const form = document.getElementById('social-media-form');
+    if(form) {
+        form.addEventListener('submit', function() {
+            const btn = document.getElementById('metrics-btn');
+            const spinner = document.getElementById('smSpinner');
+            if(btn) btn.setAttribute('disabled', 'disabled');
+            if(spinner) spinner.classList.remove('d-none');
+        });
+    }
+
+    {% if result and result.growth_chart.available %}
+    const ctx = document.getElementById('followersChart');
+    if (ctx) {
+        const labelsNode = document.getElementById('followers-chart-labels');
+        const valuesNode = document.getElementById('followers-chart-values');
+        const labels = labelsNode ? JSON.parse(labelsNode.textContent) : [];
+        const values = valuesNode ? JSON.parse(valuesNode.textContent) : [];
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Followers',
+                    data: values,
+                    borderColor: '#EF4444',
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    borderWidth: 3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    }
+    {% endif %}
+});
+</script>
+{% endblock %}

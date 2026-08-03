@@ -1,0 +1,312 @@
+{% extends 'base.html' %}
+{% block title %}{% if is_admin %}Admin Dashboard{% else %}My Projects{% endif %} | OnWebApp{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+
+    {% if is_admin %}
+    <!-- Admin Header & Stats -->
+    <div class="row g-4 mb-5">
+        <div class="col-12">
+            <h1 class="fw-800 mb-1">Project Overview</h1>
+            <p class="text-secondary">Manage all client projects from a single view.</p>
+        </div>
+        <div class="col-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100 border-start border-4 border-primary">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <p class="x-small text-secondary fw-800 uppercase mb-1">Total Projects</p>
+                            <h2 class="mb-0 fw-800">{{ stats.total }}</h2>
+                        </div>
+                        <div class="p-3 rounded-3 bg-primary-soft text-primary">
+                            <i class="fas fa-folder fa-lg"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100 border-start border-4 border-success">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <p class="x-small text-secondary fw-800 uppercase mb-1">Active</p>
+                            <h2 class="mb-0 fw-800">{{ stats.active }}</h2>
+                        </div>
+                        <div class="p-3 rounded-3 bg-success-soft text-success">
+                            <i class="fas fa-bolt fa-lg"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100 border-start border-4 border-info">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <p class="x-small text-secondary fw-800 uppercase mb-1">Planning</p>
+                            <h2 class="mb-0 fw-800">{{ stats.planning }}</h2>
+                        </div>
+                        <div class="p-3 rounded-3 bg-info-soft text-info">
+                            <i class="fas fa-clipboard-list fa-lg"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100 border-start border-4 border-secondary">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <p class="x-small text-secondary fw-800 uppercase mb-1">Completed</p>
+                            <h2 class="mb-0 fw-800">{{ stats.completed }}</h2>
+                        </div>
+                        <div class="p-3 rounded-3 bg-surface-secondary text-secondary">
+                            <i class="fas fa-check-circle fa-lg"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <!-- Client Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-5">
+        <div>
+            <h1 class="fw-800 mb-1">My Projects</h1>
+            <p class="text-secondary mb-0">Track progress and manage your active projects.</p>
+        </div>
+        <a href="{% url 'community:wizard_start' %}?new=1" class="btn btn-success rounded-pill px-4 py-2 fw-800">
+            <i class="fas fa-plus me-2"></i>New Project
+        </a>
+    </div>
+    {% endif %}
+
+    <!-- Controls -->
+    <div class="row g-3 mb-4 align-items-center">
+        <div class="col-md-6">
+            <div class="input-group shadow-sm">
+                <span class="input-group-text bg-transparent border-end-0"><i class="fas fa-search text-secondary"></i></span>
+                <input type="text" id="projectSearch" class="form-control border-start-0 ps-0" placeholder="Search projects...">
+            </div>
+        </div>
+        {% if is_admin %}
+        <div class="col-md-6 text-md-end">
+            <div class="btn-group shadow-sm" role="group">
+                <button type="button" class="btn btn-outline-primary rounded-start-pill active fw-700" id="btnGridView" onclick="switchView('grid')">
+                    <i class="fas fa-th me-1"></i> Grid
+                </button>
+                <button type="button" class="btn btn-outline-primary rounded-end-pill fw-700" id="btnListView" onclick="switchView('list')">
+                    <i class="fas fa-list me-1"></i> List
+                </button>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if projects %}
+        <!-- Grid View -->
+        <div id="projectsGridView" class="row g-4">
+            {% for project in projects %}
+            <div class="col-md-6 col-lg-4 project-item" data-search="{{ project.title }} {{ project.client.get_full_name }} {{ project.get_current_status_display }}">
+                <div class="card h-100 border-0 shadow-sm transition-hover">
+                    <div class="position-relative">
+                        {% if project.brand_logo %}
+                        <div class="bg-surface-secondary p-4 text-center" style="height: 180px;">
+                            <img src="{{ project.brand_logo.url }}" class="img-fluid" alt="{{ project.title }}" style="max-height: 100%; object-fit: contain;">
+                        </div>
+                        {% else %}
+                        <div class="bg-surface-secondary d-flex align-items-center justify-content-center" style="height: 180px;">
+                            <span class="text-secondary fw-800 display-4">{{ project.title|slice:":1" }}</span>
+                        </div>
+                        {% endif %}
+                        {% if is_admin %}
+                        <div class="position-absolute top-0 end-0 m-3">
+                            <span class="badge rounded-pill px-3 py-2 fw-700
+                                {% if project.priority == 'HIGH' %}bg-danger
+                                {% elif project.priority == 'MEDIUM' %}bg-warning text-dark
+                                {% else %}bg-info text-dark{% endif %} shadow-sm">
+                                {{ project.get_priority_display }}
+                            </span>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="fw-800 mb-0 text-truncate" title="{{ project.title }}">{{ project.title }}</h5>
+                            {% if is_admin %}
+                            <small class="text-secondary text-end ms-2" style="min-width: 80px;">{{ project.client.get_full_name|default:project.client.username|truncatechars:15 }}</small>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-flex gap-2 mb-3 flex-wrap">
+                            <span class="badge rounded-pill px-3 py-1 fw-700 bg-surface-secondary text-secondary border">{{ project.get_current_status_display }}</span>
+                            {% if is_admin %}
+                            <span class="badge rounded-pill px-3 py-1 fw-700
+                                {% if project.agile_status == 'APPROVED' %}bg-success-soft text-success
+                                {% elif project.agile_status == 'CHANGES_REQUESTED' %}bg-danger-soft text-danger
+                                {% else %}bg-surface-secondary text-secondary{% endif %}">
+                                {{ project.get_agile_status_display }}
+                            </span>
+                            {% endif %}
+                        </div>
+
+                        <p class="text-secondary small mb-3">{{ project.description|truncatewords:15 }}</p>
+
+                        <div class="d-flex justify-content-between small mb-1">
+                            <span class="text-secondary fw-600">Progress</span>
+                            <span class="fw-700">{{ project.progress_percentage }}%</span>
+                        </div>
+                        <div class="progress rounded-pill" style="height: 6px; background-color: var(--bg-surface-secondary);">
+                            <div class="progress-bar {% if project.current_status == 'COMPLETED' %}bg-success{% else %}bg-primary{% endif %} rounded-pill" style="width: {{ project.progress_percentage }}%"></div>
+                        </div>
+                    </div>
+
+                    <div class="card-footer bg-transparent border-0 pt-0 pb-4 px-4">
+                        {% if is_admin %}
+                        <a href="{% url 'projects:admin_project_detail' project.id %}" class="btn btn-outline-primary w-100 rounded-pill fw-700">Manage Project</a>
+                        {% else %}
+                        <a href="{% url 'projects:project_detail' project.id %}" class="btn btn-outline-primary w-100 rounded-pill fw-700">
+                            <i class="fas fa-eye me-1"></i> View Dashboard
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- List View (Admin Only) -->
+        {% if is_admin %}
+        <div id="projectsListView" class="d-none">
+            <div class="card border-0 shadow-sm">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-surface-secondary">
+                            <tr>
+                                <th class="border-0 ps-4">Project</th>
+                                <th class="border-0">Client</th>
+                                <th class="border-0">Service</th>
+                                <th class="border-0">Status</th>
+                                <th class="border-0">Agile Plan</th>
+                                <th class="border-0">Progress</th>
+                                <th class="border-0">Updated</th>
+                                <th class="border-0 text-end pe-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for project in projects %}
+                            <tr class="project-item" data-search="{{ project.title }} {{ project.client.get_full_name }} {{ project.get_current_status_display }}">
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="rounded-3 bg-surface-secondary d-flex align-items-center justify-content-center fw-800" style="width: 40px; height: 40px;">
+                                            {% if project.brand_logo %}
+                                            <img src="{{ project.brand_logo.url }}" alt="" class="img-fluid" style="max-height: 100%;">
+                                            {% else %}
+                                            <span class="small">{{ project.title|slice:":1" }}</span>
+                                            {% endif %}
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0 fw-700">{{ project.title }}</h6>
+                                            <small class="text-secondary">{{ project.get_current_phase_display }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="fw-700">{{ project.client.get_full_name|default:project.client.username }}</div>
+                                    <div class="small text-secondary">{{ project.client.email }}</div>
+                                </td>
+                                <td>
+                                    {% if project.client.profile.service_type == 'community' %}
+                                    <span class="badge rounded-pill px-3 py-1 fw-700 bg-info-soft text-info border border-info">Community</span>
+                                    {% else %}
+                                    <span class="badge rounded-pill px-3 py-1 fw-700 bg-primary-soft text-primary border border-primary">Full Platform</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge rounded-pill px-3 py-1 fw-700 bg-surface-secondary text-secondary border">{{ project.get_current_status_display }}</span>
+                                </td>
+                                <td>
+                                    <span class="badge rounded-pill px-3 py-1 fw-700
+                                        {% if project.agile_status == 'APPROVED' %}bg-success-soft text-success
+                                        {% elif project.agile_status == 'CHANGES_REQUESTED' %}bg-danger-soft text-danger
+                                        {% else %}bg-surface-secondary text-secondary{% endif %}">
+                                        {{ project.get_agile_status_display }}
+                                    </span>
+                                </td>
+                                <td style="width: 15%;">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="small fw-700">{{ project.progress_percentage }}%</span>
+                                        <div class="progress flex-grow-1 rounded-pill" style="height: 4px; background-color: var(--bg-surface-secondary);">
+                                            <div class="progress-bar bg-primary rounded-pill" style="width: {{ project.progress_percentage }}%"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-secondary small fw-600">
+                                    {{ project.updated_at|date:"M d, Y" }}
+                                </td>
+                                <td class="text-end pe-4">
+                                    <a href="{% url 'projects:admin_project_detail' project.id %}" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-700">Manage</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+    {% else %}
+    <div class="text-center py-5">
+        <div class="p-4 rounded-circle bg-surface-secondary d-inline-flex mb-4">
+            <i class="fas fa-folder-plus text-secondary opacity-50" style="font-size: 2rem;"></i>
+        </div>
+        <h4 class="fw-800 text-secondary">No projects found</h4>
+        <p class="text-secondary mb-4">You haven't started any projects with us yet.</p>
+        <a href="{% url 'community:wizard_start' %}?new=1" class="btn btn-success rounded-pill px-4 py-2 fw-800">
+            <i class="fas fa-plus me-2"></i> Start Project
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    .transition-hover { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+    .transition-hover:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.08) !important; }
+    .uppercase { text-transform: uppercase; }
+</style>
+
+<script>
+    function switchView(view) {
+        const gridView = document.getElementById('projectsGridView');
+        const listView = document.getElementById('projectsListView');
+        const btnGrid = document.getElementById('btnGridView');
+        const btnList = document.getElementById('btnListView');
+
+        if (view === 'grid') {
+            gridView.classList.remove('d-none');
+            listView.classList.add('d-none');
+            btnGrid.classList.add('active');
+            btnList.classList.remove('active');
+        } else {
+            gridView.classList.add('d-none');
+            listView.classList.remove('d-none');
+            btnGrid.classList.remove('active');
+            btnList.classList.add('active');
+        }
+    }
+
+    document.getElementById('projectSearch').addEventListener('keyup', function() {
+        const query = this.value.toLowerCase();
+        document.querySelectorAll('.project-item').forEach(item => {
+            const searchData = item.getAttribute('data-search').toLowerCase();
+            item.style.display = searchData.includes(query) ? '' : 'none';
+        });
+    });
+</script>
+{% endblock %}

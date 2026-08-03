@@ -1,0 +1,169 @@
+{% extends "branding/base.html" %}
+{% load branding_extras %}
+
+{% block title %}Knowledge Base — My Work | OnWebApp{% endblock %}
+
+{% block branding_content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'branding:designer_dashboard' %}">My Work</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Knowledge Base</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <h2 class="mb-0"><i class="fas fa-book-open me-2"></i>Knowledge Base</h2>
+        <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#createArticleForm" aria-expanded="false" aria-controls="createArticleForm">
+            <i class="fas fa-plus me-1"></i>New Article
+        </button>
+    </div>
+
+    <div class="collapse mb-4" id="createArticleForm">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="mb-0"><i class="fas fa-pen-to-square me-2"></i>Create Article</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" action="{{ request.path }}">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="create_article">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="title" class="form-label">Title</label>
+                            <input type="text" name="title" id="title" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="category" class="form-label">Category</label>
+                            <select name="category" id="category" class="form-select" required>
+                                <option value="">Select category...</option>
+                                {% for value, label in categories %}
+                                <option value="{{ value }}">{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="summary" class="form-label">Summary</label>
+                        <textarea name="summary" id="summary" class="form-control" rows="2" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="content" class="form-label">Content</label>
+                        <textarea name="content" id="content" class="form-control" rows="6" required></textarea>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="tags" class="form-label">Tags</label>
+                            <input type="text" name="tags" id="tags" class="form-control" placeholder="Comma-separated tags">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="collection" class="form-label">Collection</label>
+                            <select name="collection" id="collection" class="form-select">
+                                <option value="">No collection</option>
+                                {% for c in collections %}
+                                <option value="{{ c.pk }}">{{ c.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i>Publish Article
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="get" action="{{ request.path }}" class="row g-2 align-items-end">
+                <div class="col">
+                    <label for="q" class="form-label visually-hidden">Search</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        <input type="text" name="q" id="q" class="form-control" placeholder="Search articles..." value="{{ q|default:'' }}">
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="mb-4">
+        <div class="btn-group flex-wrap" role="group">
+            <a href="{% url 'branding:knowledge_base' %}" class="btn {% if not category_filter %}btn-primary{% else %}btn-outline-primary{% endif %}">All</a>
+            {% for value, label in categories %}
+            <a href="{% url 'branding:knowledge_base' %}?category={{ value }}{% if q %}&q={{ q }}{% endif %}" class="btn {% if category_filter == value %}btn-primary{% else %}btn-outline-primary{% endif %}">{{ label }}</a>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% if featured %}
+    <div class="mb-4">
+        <h4 class="mb-3"><i class="fas fa-star text-warning me-2"></i>Featured Articles</h4>
+        <div class="row g-3">
+            {% for a in featured %}
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm border-warning">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="card-title mb-0">
+                                <a href="{% url 'branding:knowledge_detail' slug=a.slug %}" class="text-decoration-none">{{ a.title }}</a>
+                            </h5>
+                            <span class="badge bg-warning text-dark ms-2">Featured</span>
+                        </div>
+                        <p class="card-text text-muted small">{{ a.summary|truncatechars:120 }}</p>
+                        <span class="badge bg-primary">{{ a.get_category_display }}</span>
+                    </div>
+                    <div class="card-footer bg-white border-top-0">
+                        <small class="text-muted">
+                            <i class="fas fa-user me-1"></i>{{ a.author.get_full_name|default:a.author.username }}
+                            <span class="ms-2"><i class="fas fa-eye me-1"></i>{{ a.view_count }}</span>
+                            <span class="ms-2"><i class="fas fa-thumbs-up me-1"></i>{{ a.helpful_count }}</span>
+                        </small>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <h4 class="mb-3"><i class="fas fa-newspaper me-2"></i>All Articles</h4>
+    {% if articles %}
+    <div class="row g-3">
+        {% for a in articles %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <a href="{% url 'branding:knowledge_detail' slug=a.slug %}" class="text-decoration-none">{{ a.title }}</a>
+                    </h5>
+                    <p class="card-text text-muted small">{{ a.summary|truncatechars:120 }}</p>
+                    <span class="badge bg-primary">{{ a.get_category_display }}</span>
+                </div>
+                <div class="card-footer bg-white border-top-0">
+                    <small class="text-muted">
+                        <i class="fas fa-user me-1"></i>{{ a.author.get_full_name|default:a.author.username }}
+                        <span class="ms-2"><i class="fas fa-eye me-1"></i>{{ a.view_count }}</span>
+                        <span class="ms-2"><i class="fas fa-thumbs-up me-1"></i>{{ a.helpful_count }}</span>
+                        <span class="ms-2"><i class="fas fa-calendar me-1"></i>{{ a.created_at|date:"M d, Y" }}</span>
+                    </small>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="card shadow-sm">
+        <div class="card-body text-center py-5">
+            <i class="fas fa-book-open fa-3x text-muted mb-3"></i>
+            <h5 class="text-muted">No articles found</h5>
+            <p class="text-muted">Create your first article using the button above, or try a different search.</p>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

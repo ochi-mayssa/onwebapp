@@ -1,0 +1,13 @@
+{% extends 'platform/base_platform.html' %}
+
+{% block title %}Platform Dashboard{% endblock %}
+
+{% block content %}
+<h1>Platform Dashboard</h1>
+<p>Overview and quick links.</p>
+<ul>
+    <li><a href="{% url 'platform:links' %}">Manage Links</a></li>
+    <li><a href="{% url 'services:platform_links' %}">View Links (frontend)</a></li>
+    <li><a href="{% url 'home:index' %}">Site Home</a></li>
+</ul>
+{% endblock %}

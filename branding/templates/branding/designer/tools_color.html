@@ -1,0 +1,122 @@
+{% extends "branding/base.html" %}
+{% load branding_extras %}
+
+{% block title %}Color Picker{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'branding:designer_dashboard' %}">My Work</a></li>
+    <li class="breadcrumb-item">Tools</li>
+    <li class="breadcrumb-item active">Color Picker</li>
+  </ol>
+</nav>
+
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-header"><h5 class="mb-0">Interactive Color Picker</h5></div>
+      <div class="card-body">
+        <div class="d-flex gap-2 mb-3">
+          <input type="color" id="colorInput" class="form-control form-control-color" value="#000000">
+          <button type="button" class="btn btn-primary" id="addColorBtn">Add</button>
+        </div>
+        <div id="colorSwatches" class="d-flex flex-wrap gap-2 mb-3"></div>
+        <small class="text-muted">Max 10 colors. Click a swatch to copy its hex value.</small>
+      </div>
+    </div>
+
+    <div class="card mt-3">
+      <div class="card-header"><h5 class="mb-0">Save Palette</h5></div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="save_palette">
+          <input type="hidden" name="colors" id="colorsInput">
+          <div class="mb-3">
+            <label class="form-label">Palette Name</label>
+            <input type="text" name="name" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Request</label>
+            <select name="request" class="form-select">
+              <option value="">None</option>
+              {% for r in active_requests %}
+              <option value="{{ r.id }}">{{ r.title }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" name="is_public" id="isPublic">
+            <label class="form-check-label" for="isPublic">Public</label>
+          </div>
+          <button type="submit" class="btn btn-success">Save Palette</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-header"><h5 class="mb-0">My Palettes</h5></div>
+      <div class="card-body">
+        {% if palettes %}
+        <div class="row g-3">
+          {% for p in palettes %}
+          <div class="col-md-6">
+            <div class="card h-100">
+              <div class="card-body">
+                <h6 class="card-title">{{ p.name }}</h6>
+                <div class="d-flex flex-wrap gap-1 mb-2">
+                  {% for c in p.colors_list %}
+                  <div style="width:28px;height:28px;background:{{ c }};border-radius:4px;cursor:pointer;" title="{{ c }}" onclick="navigator.clipboard.writeText('{{ c }}')"></div>
+                  {% endfor %}
+                </div>
+                <small class="text-muted">{{ p.owner }} &middot; Used {{ p.use_count }} time{{ p.use_count|pluralize }}</small>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-muted mb-0">No palettes saved yet.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const maxColors = 10;
+let colors = [];
+const swatchesEl = document.getElementById('colorSwatches');
+const colorsInput = document.getElementById('colorsInput');
+
+document.getElementById('addColorBtn').addEventListener('click', () => {
+  if (colors.length >= maxColors) return;
+  const hex = document.getElementById('colorInput').value;
+  if (colors.includes(hex)) return;
+  colors.push(hex);
+  renderSwatches();
+});
+
+function renderSwatches() {
+  swatchesEl.innerHTML = '';
+  colors.forEach((c, i) => {
+    const el = document.createElement('div');
+    el.style.cssText = `width:36px;height:36px;background:${c};border-radius:6px;cursor:pointer;position:relative;border:2px solid #fff;box-shadow:0 0 0 1px #ccc;`;
+    el.title = `${c} — click to copy`;
+    el.addEventListener('click', () => {
+      navigator.clipboard.writeText(c);
+    });
+    const rm = document.createElement('span');
+    rm.textContent = '\u00d7';
+    rm.style.cssText = 'position:absolute;top:-6px;right:-6px;background:#dc3545;color:#fff;border-radius:50%;width:18px;height:18px;font-size:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;';
+    rm.addEventListener('click', (e) => { e.stopPropagation(); colors.splice(i, 1); renderSwatches(); });
+    el.appendChild(rm);
+    swatchesEl.appendChild(el);
+  });
+  colorsInput.value = colors.join(',');
+}
+</script>
+{% endblock %}

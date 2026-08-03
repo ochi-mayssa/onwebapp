@@ -1,0 +1,11 @@
+{% extends 'platform/base_platform.html' %}
+
+{% block title %}Link Detail{% endblock %}
+
+{% block content %}
+<h1>{{ link.title }}</h1>
+<p>Type: {{ link.link_type }}</p>
+<p>Description: {{ link.description }}</p>
+<p>URL: <a href="{{ link.url }}" target="_blank">{{ link.url }}</a></p>
+<p><a href="{% url 'platform:links' %}">Back to links</a></p>
+{% endblock %}

@@ -1,0 +1,99 @@
+{% extends "branding/base.html" %}
+{% load branding_extras %}
+
+{% block title %}Brand Check{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'branding:designer_dashboard' %}">My Work</a></li>
+    <li class="breadcrumb-item">Tools</li>
+    <li class="breadcrumb-item active">Brand Check</li>
+  </ol>
+</nav>
+
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-header"><h5 class="mb-0">Run Check</h5></div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="run_check">
+          <div class="mb-3">
+            <label class="form-label">Request</label>
+            <select name="request" class="form-select" required>
+              {% for r in active_requests %}
+              <option value="{{ r.id }}">{{ r.title }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Run Check</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="card mt-3">
+      <div class="card-header"><h5 class="mb-0">Summary</h5></div>
+      <div class="card-body">
+        <div class="d-flex justify-content-between">
+          <div class="text-center">
+            <div class="fs-3 fw-bold text-success">{{ pass_count|default:0 }}</div>
+            <small class="text-muted">PASS</small>
+          </div>
+          <div class="text-center">
+            <div class="fs-3 fw-bold text-warning">{{ warn_count|default:0 }}</div>
+            <small class="text-muted">WARN</small>
+          </div>
+          <div class="text-center">
+            <div class="fs-3 fw-bold text-danger">{{ fail_count|default:0 }}</div>
+            <small class="text-muted">FAIL</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-header"><h5 class="mb-0">Recent Checks</h5></div>
+      <div class="card-body">
+        {% if checks %}
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Check</th>
+                <th>Result</th>
+                <th>Details</th>
+                <th>Checked At</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for c in checks %}
+              <tr>
+                <td>{{ c.check_name }}</td>
+                <td>
+                  {% if c.result == "PASS" %}
+                  <span class="badge bg-success">PASS</span>
+                  {% elif c.result == "WARN" %}
+                  <span class="badge bg-warning text-dark">WARN</span>
+                  {% else %}
+                  <span class="badge bg-danger">FAIL</span>
+                  {% endif %}
+                </td>
+                <td><small>{{ c.details }}</small></td>
+                <td><small>{{ c.checked_at|date:"M d, Y H:i" }}</small></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <p class="text-muted mb-0">No checks run yet.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

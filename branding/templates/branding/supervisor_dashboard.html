@@ -1,0 +1,479 @@
+﻿{% extends 'branding/base.html' %}
+{% load branding_extras %}
+
+{% block title %}Supervisor Dashboard{% endblock %}
+
+{% block branding_content %}
+<div class="supervisor-page">
+    <div class="container-fluid px-4 py-4">
+
+        <!-- Header -->
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+            <div>
+                <h1 class="fw-800 mb-1">Supervisor Dashboard</h1>
+                <p class="text-muted mb-0">Team performance, project health, and workload overview.</p>
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="{% url 'branding:dashboard' %}" class="btn btn-sm btn-outline-secondary rounded-pill px-3"><i class="fa-solid fa-gauge-high me-1"></i>Staff Dashboard</a>
+                <a href="{% url 'branding:kanban' %}" class="btn btn-sm btn-outline-secondary rounded-pill px-3"><i class="fa-solid fa-table-columns me-1"></i>Board</a>
+            </div>
+        </div>
+
+        <!-- Alerts -->
+        {% if alerts %}
+        <div class="supervisor-alerts mb-4">
+            {% for a in alerts|slice:":6" %}
+            <a href="{{ a.url }}" class="supervisor-alert supervisor-alert-{{ a.type }}">
+                <i class="fa-solid {{ a.icon }} me-2"></i>{{ a.text }}
+            </a>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Key Metrics Cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-md-4 col-xl-2">
+                <div class="supervisor-card">
+                    <div class="supervisor-card-icon sc-active"><i class="fa-solid fa-folder-open"></i></div>
+                    <div class="supervisor-card-value">{{ active_count }}</div>
+                    <div class="supervisor-card-label">Active Projects</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-xl-2">
+                <div class="supervisor-card">
+                    <div class="supervisor-card-icon sc-overdue"><i class="fa-solid fa-clock"></i></div>
+                    <div class="supervisor-card-value">{{ overdue_count }}</div>
+                    <div class="supervisor-card-label">Overdue</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-xl-2">
+                <div class="supervisor-card">
+                    <div class="supervisor-card-icon sc-time"><i class="fa-solid fa-stopwatch"></i></div>
+                    <div class="supervisor-card-value">{{ avg_days|default:"--" }}</div>
+                    <div class="supervisor-card-label">Avg Days to Complete</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-xl-2">
+                <div class="supervisor-card">
+                    <div class="supervisor-card-icon sc-designers"><i class="fa-solid fa-users"></i></div>
+                    <div class="supervisor-card-value">{{ active_designers }}<span class="text-muted small">/{{ total_designers }}</span></div>
+                    <div class="supervisor-card-label">Active Designers</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-xl-2">
+                <div class="supervisor-card">
+                    <div class="supervisor-card-icon sc-workload"><i class="fa-solid fa-balance-scale"></i></div>
+                    <div class="supervisor-card-value">{{ workload_balance }}</div>
+                    <div class="supervisor-card-label">Avg Workload</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-xl-2">
+                <div class="supervisor-card">
+                    <div class="supervisor-card-icon sc-satisfaction"><i class="fa-solid fa-star"></i></div>
+                    <div class="supervisor-card-value">{% if satisfaction_pct %}{{ satisfaction_pct }}%{% else %}--{% endif %}</div>
+                    <div class="supervisor-card-label">Satisfaction</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status breakdown mini cards -->
+        <div class="row g-2 mb-4">
+            <div class="col"><a href="?tab=projects&filter=pending" class="status-mini-card {% if project_filter == 'pending' %}is-active{% endif %}"><span class="status-dot dot-pending"></span>Pending <strong>{{ pending_count }}</strong></a></div>
+            <div class="col"><a href="?tab=projects&filter=review" class="status-mini-card {% if project_filter == 'review' %}is-active{% endif %}"><span class="status-dot dot-review"></span>In Review <strong>{{ in_review_count }}</strong></a></div>
+            <div class="col"><a href="?tab=projects" class="status-mini-card"><span class="status-dot dot-assigned"></span>Assigned <strong>{{ assigned_count }}</strong></a></div>
+            <div class="col"><a href="?tab=projects" class="status-mini-card"><span class="status-dot dot-designing"></span>Designing <strong>{{ designing_count }}</strong></a></div>
+            <div class="col"><a href="?tab=projects" class="status-mini-card"><span class="status-dot dot-waiting"></span>Waiting <strong>{{ waiting_count }}</strong></a></div>
+            <div class="col"><a href="?tab=projects" class="status-mini-card"><span class="status-dot dot-revision"></span>Revision <strong>{{ revision_count }}</strong></a></div>
+            <div class="col"><a href="?tab=projects" class="status-mini-card"><span class="status-dot dot-completed"></span>Completed <strong>{{ completed_count }}</strong></a></div>
+        </div>
+
+        <!-- Tab Navigation -->
+        <ul class="nav supervisor-tabs mb-4">
+            <li><a class="nav-link {% if tab == 'overview' %}active{% endif %}" href="?tab=overview"><i class="fa-solid fa-chart-line me-1"></i>Overview</a></li>
+            <li><a class="nav-link {% if tab == 'staff' %}active{% endif %}" href="?tab=staff"><i class="fa-solid fa-users me-1"></i>Staff</a></li>
+            <li><a class="nav-link {% if tab == 'projects' %}active{% endif %}" href="?tab=projects"><i class="fa-solid fa-folder-open me-1"></i>Projects</a></li>
+            <li><a class="nav-link {% if tab == 'activity' %}active{% endif %}" href="?tab=activity"><i class="fa-solid fa-clock-rotate-left me-1"></i>Activity</a></li>
+        </ul>
+
+        <!-- ======================== OVERVIEW TAB ======================== -->
+        {% if tab == 'overview' %}
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="supervisor-panel chart-card">
+                    <h5 class="fw-800 mb-3"><i class="fa-solid fa-chart-line me-2 text-primary"></i>Requests - Last 30 Days</h5>
+                    <div class="chart-container chart-container-wide">
+                        <canvas id="chartRequests"></canvas>
+                        {% if not chart_created and not chart_completed %}
+                        <div class="chart-empty"><i class="fa-solid fa-chart-line d-block mb-2"></i>No requests yet</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="supervisor-panel chart-card">
+                    <h5 class="fw-800 mb-3"><i class="fa-solid fa-chart-pie me-2 text-primary"></i>Status Distribution</h5>
+                    <div class="chart-container chart-container-circular">
+                        <canvas id="chartStatus"></canvas>
+                        {% if not status_counts %}
+                        <div class="chart-empty"><i class="fa-solid fa-chart-pie d-block mb-2"></i>No status data</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="supervisor-panel chart-card">
+                    <h5 class="fw-800 mb-3"><i class="fa-solid fa-chart-bar me-2 text-primary"></i>Workload per Designer</h5>
+                    <div class="chart-container chart-container-wide">
+                        <canvas id="chartWorkload"></canvas>
+                        {% if not workload_values %}
+                        <div class="chart-empty"><i class="fa-solid fa-chart-bar d-block mb-2"></i>No workload data</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="supervisor-panel chart-card">
+                    <h5 class="fw-800 mb-3"><i class="fa-solid fa-chart-doughnut me-2 text-primary"></i>Priority Distribution</h5>
+                    <div class="chart-container chart-container-circular">
+                        <canvas id="chartPriority"></canvas>
+                        {% if not priority_counts %}
+                        <div class="chart-empty"><i class="fa-solid fa-chart-doughnut d-block mb-2"></i>No priority data</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- ======================== STAFF TAB ======================== -->
+        {% if tab == 'staff' %}
+        <div class="supervisor-panel">
+            <h5 class="fw-800 mb-3"><i class="fa-solid fa-users me-2 text-primary"></i>Designer Performance</h5>
+            <div class="table-responsive">
+                <table class="table supervisor-table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Designer</th>
+                            <th class="text-center">Active</th>
+                            <th class="text-center">Completed (Month)</th>
+                            <th class="text-center">Avg Days</th>
+                            <th class="text-center">On-Time %</th>
+                            <th class="text-center">Workload</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in designer_performance %}
+                        <tr class="{% if p.is_overloaded %}table-warning{% endif %}">
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="staff-avatar">{{ p.user.first_name|slice:":1"|upper }}{{ p.user.last_name|slice:":1"|upper }}</span>
+                                    <div>
+                                        <div class="fw-700">{{ p.user.get_full_name|default:p.user.username }}</div>
+                                        <div class="x-small text-muted">{{ p.user.email }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-center"><span class="fw-700">{{ p.active }}</span></td>
+                            <td class="text-center"><span class="fw-700">{{ p.completed_month }}</span></td>
+                            <td class="text-center">{% if p.avg_days %}{{ p.avg_days }}d{% else %}--{% endif %}</td>
+                            <td class="text-center">
+                                {% if p.on_time_pct is not None %}
+                                <span class="on-time-badge {% if p.on_time_pct >= 80 %}on-time-good{% elif p.on_time_pct >= 50 %}on-time-warn{% else %}on-time-bad{% endif %}">{{ p.on_time_pct }}%</span>
+                                {% else %}--{% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if p.is_overloaded %}
+                                <span class="workload-badge workload-over"><i class="fa-solid fa-exclamation-triangle me-1"></i>{{ p.active }}</span>
+                                {% else %}
+                                <span class="workload-badge workload-ok">{{ p.active }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                <a href="?tab=projects&filter=&designer={{ p.user.id }}" class="btn btn-sm btn-outline-primary rounded-pill px-3">View Projects</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="7" class="text-center text-muted py-4">No designers found.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- ======================== PROJECTS TAB ======================== -->
+        {% if tab == 'projects' %}
+        <div class="supervisor-panel">
+            <div class="d-flex flex-wrap gap-2 mb-3">
+                <a href="?tab=projects&filter=" class="filter-chip {% if not project_filter %}is-active{% endif %}">All</a>
+                <a href="?tab=projects&filter=pending" class="filter-chip {% if project_filter == 'pending' %}is-active{% endif %}">Pending Review</a>
+                <a href="?tab=projects&filter=review" class="filter-chip {% if project_filter == 'review' %}is-active{% endif %}">In Review</a>
+                <a href="?tab=projects&filter=overdue" class="filter-chip {% if project_filter == 'overdue' %}is-active{% endif %}">Overdue</a>
+                <a href="?tab=projects&filter=unassigned" class="filter-chip {% if project_filter == 'unassigned' %}is-active{% endif %}">Unassigned</a>
+                <div class="ms-auto">
+                    <select onchange="window.location.href='?tab=projects&filter={{ project_filter }}&sort='+this.value" class="form-select form-select-sm" style="width:auto;">
+                        <option value="-created_at" {% if project_sort == '-created_at' %}selected{% endif %}>Newest</option>
+                        <option value="created_at" {% if project_sort == 'created_at' %}selected{% endif %}>Oldest</option>
+                        <option value="-priority" {% if project_sort == '-priority' %}selected{% endif %}>Priority</option>
+                        <option value="status" {% if project_sort == 'status' %}selected{% endif %}>Status</option>
+                        <option value="company_name" {% if project_sort == 'company_name' %}selected{% endif %}>Company</option>
+                    </select>
+                </div>
+            </div>
+
+            {% if projects %}
+            <div class="table-responsive">
+                <table class="table supervisor-table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Request</th>
+                            <th>Company</th>
+                            <th>Designer</th>
+                            <th class="text-center">Priority</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center">Days</th>
+                            <th class="text-center">Due</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in projects %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'branding:request_detail' r.pk %}" class="fw-800 text-primary text-decoration-none">{{ r.request_number }}</a>
+                            </td>
+                            <td>
+                                <div class="fw-700">{{ r.company_name }}</div>
+                                <div class="x-small text-muted">{{ r.user.username }}</div>
+                            </td>
+                            <td>
+                                {% if r.designer %}
+                                <span class="d-inline-flex align-items-center gap-1"><i class="fa-solid fa-user-pen text-muted"></i>{{ r.designer.get_full_name|default:r.designer.username }}</span>
+                                {% else %}
+                                <span class="badge bg-warning text-dark"><i class="fa-solid fa-user-slash me-1"></i>Unassigned</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center"><span class="priority-badge priority-{{ r.priority|lower }}">{{ r.get_priority_display }}</span></td>
+                            <td class="text-center"><span class="status-pill status-{{ r.status|lower }}">{{ r.get_status_display }}</span></td>
+                            <td class="text-center text-muted small">{{ r.created_at|timesince }}</td>
+                            <td class="text-center">
+                                {% if r.estimated_delivery_date %}
+                                <span>{{ r.estimated_delivery_date|date:"M j" }}</span>
+                                {% else %}--{% endif %}
+                            </td>
+                            <td class="text-end">
+                                <div class="d-inline-flex gap-1">
+                                    <a href="{% url 'branding:request_detail' r.pk %}" class="btn btn-sm btn-icon" title="View"><i class="fa-solid fa-eye"></i></a>
+                                    {% if not r.designer %}
+                                    <button type="button" class="btn btn-sm btn-icon" data-bs-toggle="modal" data-bs-target="#assignModal{{ r.pk }}" title="Assign"><i class="fa-solid fa-user-plus"></i></button>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+
+                        {% if not r.designer %}
+                        <div class="modal fade" id="assignModal{{ r.pk }}" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered modal-sm">
+                                <form method="post" action="{% url 'branding:assign_designer' r.pk %}" class="modal-content rounded-4 border-0">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="next" value="{% url 'branding:supervisor_dashboard' %}">
+                                    <div class="modal-header border-0 pb-0">
+                                        <h6 class="modal-title fw-800">Assign Designer</h6>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p class="text-muted small mb-2">{{ r.request_number }} - {{ r.company_name }}</p>
+                                        <select name="designer" class="form-select form-select-sm" required>
+                                            <option value="" disabled selected>Select designer...</option>
+                                            {% for d in designers %}{% if d.groups.all %}<option value="{{ d.id }}">{{ d.get_full_name|default:d.username }}</option>{% endif %}{% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="modal-footer border-0 pt-0">
+                                        <button type="button" class="btn btn-sm btn-back" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-sm btn-brand-primary"><i class="fa-solid fa-user-check me-1"></i>Assign</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if projects.has_other_pages %}
+            <nav class="p-3 border-top">
+                <ul class="pagination pagination-sm justify-content-center mb-0">
+                    {% if projects.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?tab=projects&filter={{ project_filter }}&sort={{ project_sort }}&page={{ projects.previous_page_number }}">Prev</a></li>
+                    {% endif %}
+                    <li class="page-item disabled"><span class="page-link">Page {{ projects.number }} of {{ projects.paginator.num_pages }}</span></li>
+                    {% if projects.has_next %}
+                    <li class="page-item"><a class="page-link" href="?tab=projects&filter={{ project_filter }}&sort={{ project_sort }}&page={{ projects.next_page_number }}">Next</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fa-solid fa-folder-open fa-2x text-muted mb-2"></i>
+                <p class="text-muted mb-0">No projects match this filter.</p>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- ======================== ACTIVITY TAB ======================== -->
+        {% if tab == 'activity' %}
+        <div class="supervisor-panel">
+            <div class="d-flex flex-wrap gap-2 mb-3">
+                <a href="?tab=activity" class="filter-chip {% if not activity_filter %}is-active{% endif %}">All</a>
+                <a href="?tab=activity&activity_type=ASSIGNMENT" class="filter-chip {% if activity_filter == 'ASSIGNMENT' %}is-active{% endif %}">Assignments</a>
+                <a href="?tab=activity&activity_type=STATUS_CHANGE" class="filter-chip {% if activity_filter == 'STATUS_CHANGE' %}is-active{% endif %}">Status Changes</a>
+                <a href="?tab=activity&activity_type=UPLOAD" class="filter-chip {% if activity_filter == 'UPLOAD' %}is-active{% endif %}">Uploads</a>
+                <a href="?tab=activity&activity_type=CREATED" class="filter-chip {% if activity_filter == 'CREATED' %}is-active{% endif %}">Created</a>
+            </div>
+
+            {% if activity %}
+            <div class="activity-feed">
+                {% for entry in activity %}
+                <a href="{% url 'branding:request_detail' entry.request.pk %}" class="activity-item">
+                    <div class="activity-dot {% if entry.event_type == 'STATUS_CHANGE' %}dot-status{% elif entry.event_type == 'ASSIGNMENT' %}dot-assign{% elif entry.event_type == 'UPLOAD' %}dot-upload{% else %}dot-default{% endif %}"></div>
+                    <div class="activity-content">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <span class="fw-700 small">{{ entry.action }}</span>
+                            <span class="x-small text-muted">{{ entry.created_at|timesince }} ago</span>
+                        </div>
+                        <div class="x-small text-muted">
+                            {{ entry.request.request_number }} - {{ entry.request.company_name }}
+                            {% if entry.actor %} by {{ entry.actor.get_full_name|default:entry.actor.username }}{% endif %}
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+
+            {% if activity.has_other_pages %}
+            <nav class="p-3 border-top">
+                <ul class="pagination pagination-sm justify-content-center mb-0">
+                    {% if activity.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?tab=activity&activity_type={{ activity_filter }}&activity_page={{ activity.previous_page_number }}">Prev</a></li>
+                    {% endif %}
+                    <li class="page-item disabled"><span class="page-link">Page {{ activity.number }} of {{ activity.paginator.num_pages }}</span></li>
+                    {% if activity.has_next %}
+                    <li class="page-item"><a class="page-link" href="?tab=activity&activity_type={{ activity_filter }}&activity_page={{ activity.next_page_number }}">Next</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fa-solid fa-clock-rotate-left fa-2x text-muted mb-2"></i>
+                <p class="text-muted mb-0">No activity found.</p>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    {% if tab == 'overview' %}
+    const COLORS = ['#6366f1','#f59e0b','#3b82f6','#22c55e','#ef4444','#8b5cf6','#06b6d4','#ec4899','#f97316','#14b8a6'];
+
+    var hasLineData = {{ chart_created|safe }}.some(function(v){ return v > 0; }) || {{ chart_completed|safe }}.some(function(v){ return v > 0; });
+    var hasPieData = {{ status_counts|safe }}.length > 0;
+    var hasBarData = {{ workload_values|safe }}.some(function(v){ return v > 0; });
+    var hasDoughnutData = {{ priority_counts|safe }}.length > 0;
+
+    // Requests line chart
+    if (hasLineData) {
+        new Chart(document.getElementById('chartRequests'), {
+            type: 'line',
+            data: {
+                labels: {{ chart_dates|safe }},
+                datasets: [
+                    { label: 'Created', data: {{ chart_created|safe }}, borderColor: '#6366f1', backgroundColor: 'rgba(99,102,241,0.08)', fill: true, tension: 0.35, borderWidth: 2, pointRadius: 2, pointHoverRadius: 5 },
+                    { label: 'Completed', data: {{ chart_completed|safe }}, borderColor: '#22c55e', backgroundColor: 'rgba(34,197,94,0.08)', fill: true, tension: 0.35, borderWidth: 2, pointRadius: 2, pointHoverRadius: 5 }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'top', labels: { boxWidth: 14, padding: 16, usePointStyle: true, font: { size: 11 } } } },
+                scales: {
+                    x: { grid: { display: false }, ticks: { font: { size: 10 }, maxRotation: 45 } },
+                    y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 10 } }, grid: { color: 'rgba(0,0,0,0.04)' } }
+                },
+                layout: { padding: { top: 4, bottom: 4, left: 4, right: 4 } }
+            }
+        });
+    }
+
+    // Status pie
+    if (hasPieData) {
+        new Chart(document.getElementById('chartStatus'), {
+            type: 'pie',
+            data: {
+                labels: {{ status_labels|safe }},
+                datasets: [{ data: {{ status_counts|safe }}, backgroundColor: COLORS, borderWidth: 2, borderColor: '#fff' }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, padding: 12, font: { size: 11 } } } },
+                layout: { padding: { top: 8, bottom: 8, left: 8, right: 8 } }
+            }
+        });
+    }
+
+    // Workload bar
+    if (hasBarData) {
+        new Chart(document.getElementById('chartWorkload'), {
+            type: 'bar',
+            data: {
+                labels: {{ workload_labels|safe }},
+                datasets: [{ label: 'Active Projects', data: {{ workload_values|safe }}, backgroundColor: '#6366f1', borderRadius: 6, barThickness: 28 }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+                    y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 10 } }, grid: { color: 'rgba(0,0,0,0.04)' } }
+                },
+                layout: { padding: { top: 4, bottom: 4, left: 4, right: 4 } }
+            }
+        });
+    }
+
+    // Priority doughnut
+    if (hasDoughnutData) {
+        new Chart(document.getElementById('chartPriority'), {
+            type: 'doughnut',
+            data: {
+                labels: {{ priority_labels|safe }},
+                datasets: [{ data: {{ priority_counts|safe }}, backgroundColor: ['#22c55e','#f59e0b','#f97316','#ef4444'], borderWidth: 2, borderColor: '#fff' }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '55%',
+                plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, padding: 12, font: { size: 11 } } } },
+                layout: { padding: { top: 8, bottom: 8, left: 8, right: 8 } }
+            }
+        });
+    }
+    {% endif %}
+});
+</script>
+{% endblock %}

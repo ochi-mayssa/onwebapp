@@ -1,0 +1,108 @@
+{% extends "community/wizard/base_wizard.html" %}
+{% load static i18n %}
+
+{% block wizard_content %}
+<div class="wizard-card">
+    <div class="wizard-section-label mb-1">Step 7 of 13</div>
+    <h2 class="mb-2">AI Cost Estimation</h2>
+    <p class="lead mb-4">Based on your selections, here's what we estimate.</p>
+
+    <div id="estimationPlaceholder" class="text-center py-5">
+        <div class="spinner-border text-primary mb-3" role="status" style="width:3rem;height:3rem;">
+            <span class="visually-hidden">Calculating...</span>
+        </div>
+        <p class="text-secondary fw-600">Analyzing your project requirements...</p>
+    </div>
+
+    <div id="estimationResults" class="d-none">
+        <div class="row g-4 mb-4">
+            <div class="col-md-4">
+                <div class="text-center p-4 rounded-3" style="background:rgba(99,102,241,0.05);">
+                    <div class="text-primary fw-800 display-6" id="estBudget">—</div>
+                    <div class="text-secondary small fw-600 mt-1">Estimated Budget</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="text-center p-4 rounded-3" style="background:rgba(16,185,129,0.05);">
+                    <div class="text-success fw-800 display-6" id="estTimeline">—</div>
+                    <div class="text-secondary small fw-600 mt-1">Timeline</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="text-center p-4 rounded-3" style="background:rgba(245,158,11,0.05);">
+                    <div class="text-warning fw-800 display-6" id="estComplexity">—</div>
+                    <div class="text-secondary small fw-600 mt-1">Complexity Score</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card rounded-3 border-0" style="background:var(--bg-surface-secondary,#f8fafc);">
+            <div class="card-body p-4">
+                <h6 class="fw-700 mb-3"><i class="fas fa-list-check me-2 text-primary"></i>Breakdown</h6>
+                <div id="estBreakdown" class="row g-2"></div>
+            </div>
+        </div>
+
+        {% if session and session.current_step < 8 %}
+        <div class="mt-5 text-center">
+            <button type="post" class="btn-wizard-next px-5 py-3" onclick="document.getElementById('advanceForm').submit();">
+                Continue <i class="fas fa-arrow-right ms-2"></i>
+            </button>
+            <form method="post" id="advanceForm" class="d-none">
+                {% csrf_token %}
+            </form>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block wizard_js %}
+<script>
+(function(){
+    const estimation = {
+        budgetMin: {{ estimation.budget_min|floatformat:0 }},
+        budgetMax: {{ estimation.budget_max|floatformat:0 }},
+        timelineWeeks: {{ estimation.timeline_weeks }},
+        complexity: "{{ estimation.complexity }}",
+        teamSize: {{ estimation.team_size }},
+        recommended: "{{ estimation.recommended_package }}",
+        technologies: {{ estimation.technologies|safe }},
+        breakdown: {{ estimation.breakdown|safe }}
+    };
+
+    function estimate() {
+        const avgCost = Math.round((estimation.budgetMin + estimation.budgetMax) / 2);
+        const totalDays = estimation.timelineWeeks * 7;
+
+        setTimeout(() => {
+            document.getElementById('estimationPlaceholder').classList.add('d-none');
+            document.getElementById('estimationResults').classList.remove('d-none');
+
+            document.getElementById('estBudget').textContent = '$' + avgCost.toLocaleString();
+            document.getElementById('estTimeline').textContent = estimation.timelineWeeks + ' weeks';
+            document.getElementById('estComplexity').textContent = estimation.complexity;
+
+            let breakdownHtml = '';
+            estimation.breakdown.forEach(function(b) {
+                const cost = typeof b.cost === 'number' ? b.cost.toLocaleString() : b.cost;
+                breakdownHtml += '<div class="col-md-6"><div class="d-flex justify-content-between align-items-center p-2 rounded-2" style="background:var(--bg-surface,#fff);"><span class="small fw-600">' + b.item + '</span><span class="badge bg-light text-dark">' + b.timeline_weeks + 'w &bull; $' + cost + '</span></div></div>';
+            });
+
+            if (estimation.technologies.length > 0) {
+                breakdownHtml += '<div class="col-12 mt-3"><div class="p-2 rounded-2" style="background:var(--bg-surface,#fff);"><span class="small fw-700 text-secondary me-2">Tech Stack:</span>';
+                estimation.technologies.forEach(function(t) {
+                    breakdownHtml += '<span class="badge bg-primary bg-opacity-10 text-primary small fw-600 me-1 mb-1">' + t + '</span>';
+                });
+                breakdownHtml += '</div></div>';
+            }
+
+            breakdownHtml += '<div class="col-12 mt-2"><div class="d-flex justify-content-between align-items-center p-2 rounded-2 fw-800" style="background:rgba(99,102,241,0.06);"><span class="small">Total Estimate</span><span class="text-primary">$' + estimation.budgetMin.toLocaleString() + ' &ndash; $' + estimation.budgetMax.toLocaleString() + ' &bull; ' + estimation.timelineWeeks + ' weeks</span></div></div>';
+            document.getElementById('estBreakdown').innerHTML = breakdownHtml;
+        }, 1800);
+    }
+
+    estimate();
+})();
+</script>
+{% endblock %}

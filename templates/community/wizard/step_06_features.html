@@ -1,0 +1,39 @@
+{% extends "community/wizard/base_wizard.html" %}
+{% load static i18n %}
+
+{% block wizard_content %}
+<div class="wizard-card">
+    <div class="wizard-section-label mb-1">Step 6 of 13</div>
+    <h2 class="mb-2">Features & Integrations</h2>
+    <p class="lead mb-4">Select the features you need. We'll calculate complexity automatically.</p>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="row g-3">
+            {% for feature in features %}
+            <div class="col-sm-6 col-lg-4">
+                <input type="checkbox" name="features" value="{{ feature.0 }}" id="feat_{{ feature.0 }}" class="wizard-check-input" {% if feature.0 in selected_features %}checked{% endif %}>
+                <label for="feat_{{ feature.0 }}" class="wizard-check-label h-100">
+                    <span class="check-icon"><i class="fas fa-check" style="font-size:0.7rem;"></i></span>
+                    <div>
+                        <strong class="small">{{ feature.1 }}</strong>
+                    </div>
+                </label>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="mt-4">
+            <label class="form-label fw-700 small">Third-Party Integrations Needed</label>
+            <textarea name="integrations" class="wizard-input" rows="2" placeholder="e.g. Stripe, Mailchimp, Salesforce, Google Analytics...">{{ session.integrations|default:'' }}</textarea>
+        </div>
+
+        <div class="mt-5 text-center">
+            <button type="submit" class="btn-wizard-next px-5 py-3">
+                Continue <i class="fas fa-arrow-right ms-2"></i>
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% load i18n static %}
+{% block title %}{% trans 'Create Account' %}{% endblock %}
+
+{% block content %}
+<section class="position-relative min-vh-100 d-flex align-items-center justify-content-center overflow-hidden py-5">
+    <!-- Overlay removed to respect theme -->
+    
+    <div class="container position-relative z-1">
+        <div class="row justify-content-center">
+            <div class="col-md-7 col-lg-6 col-xl-5">
+                <div class="card border-0 rounded-4 shadow-lg overflow-hidden glass-panel animate-on-scroll slide-up">
+                    <div class="card-body p-4 p-sm-5">
+                        <div class="text-center mb-4">
+                            <h3 class="fw-bold mb-1">{% trans 'Create Account' %}</h3>
+                            <p class="text-muted small">{% trans 'Join us to access the platform services.' %}</p>
+                        </div>
+                        
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger bg-danger-soft border-danger border-opacity-25 text-danger small">
+                            {% for error in form.non_field_errors %}
+                            <div><i class="fas fa-exclamation-circle me-1"></i> {{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        <form method="post">
+                            {% csrf_token %}
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.username.id_for_label }}" class="form-label small text-muted">{% trans 'Username' %}</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-surface-secondary border-end-0 border-secondary border-opacity-25 text-muted"><i class="fas fa-user"></i></span>
+                                    {{ form.username }}
+                                </div>
+                                {% if form.username.errors %}<div class="text-danger small mt-1">{{ form.username.errors }}</div>{% endif %}
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.email.id_for_label }}" class="form-label small text-muted">{% trans 'Email Address' %}</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-surface-secondary border-end-0 border-secondary border-opacity-25 text-muted"><i class="fas fa-envelope"></i></span>
+                                    {{ form.email }}
+                                </div>
+                                {% if form.email.errors %}<div class="text-danger small mt-1">{{ form.email.errors }}</div>{% endif %}
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.password1.id_for_label }}" class="form-label small text-muted">{% trans 'Password' %}</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-surface-secondary border-end-0 border-secondary border-opacity-25 text-muted"><i class="fas fa-lock"></i></span>
+                                    {{ form.password1 }}
+                                </div>
+                                {% if form.password1.errors %}<div class="text-danger small mt-1">{{ form.password1.errors }}</div>{% endif %}
+                                <div class="mt-2">
+                                    <small class="text-muted d-block small"><i class="fas fa-info-circle me-1"></i> {% trans 'At least 8 characters' %}</small>
+                                    <small class="text-muted d-block small"><i class="fas fa-info-circle me-1"></i> {% trans 'Cannot be entirely numeric' %}</small>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="{{ form.password2.id_for_label }}" class="form-label small text-muted">{% trans 'Confirm Password' %}</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-surface-secondary border-end-0 border-secondary border-opacity-25 text-muted"><i class="fas fa-lock"></i></span>
+                                    {{ form.password2 }}
+                                </div>
+                                {% if form.password2.errors %}<div class="text-danger small mt-1">{{ form.password2.errors }}</div>{% endif %}
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary w-100 py-2 rounded-pill position-relative overflow-hidden group">
+                                <span class="position-relative z-1">{% trans 'Register' %}</span>
+                                <div class="position-absolute top-0 start-0 w-100 h-100 bg-gradient-primary opacity-0 group-hover-opacity-100 transition-all"></div>
+                            </button>
+                        </form>
+                        
+                        <div class="text-center mt-4 pt-3 border-top border-secondary border-opacity-10">
+                            <p class="mb-0 small text-muted">{% trans 'Already have an account?' %} <a href="{% url 'users:login_view' %}" class="text-decoration-none text-primary fw-bold">{% trans 'Sign in' %}</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    /* Inherit base background */
+    body {
+        background: var(--bg-body);
+    }
+
+    .glass-panel {
+        background: var(--bg-surface) !important;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow-md);
+        color: var(--text-primary);
+    }
+</style>
+{% endblock %}

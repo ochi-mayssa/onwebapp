@@ -1,0 +1,125 @@
+{% extends 'branding/base.html' %}
+
+{% block title %}Enterprise Branding Studio{% endblock %}
+
+{% block branding_content %}
+<div class="landing-page">
+    <!-- Hero -->
+    <section class="landing-hero position-relative overflow-hidden">
+        <div class="hero-glow hero-glow-1"></div>
+        <div class="hero-glow hero-glow-2"></div>
+        <div class="container position-relative py-5 py-lg-6 text-center">
+            <span class="hero-badge"><i class="fa-solid fa-sparkles me-2"></i>Premium Brand Design Service</span>
+            <h1 class="display-4 fw-800 mt-4 mb-3">A brand your customers<br class="d-none d-lg-block"> will <span class="text-gradient">never forget</span></h1>
+            <p class="lead text-muted mx-auto mb-4" style="max-width: 620px;">
+                From logo to full identity system — our studio crafts premium brands for ambitious
+                companies. Answer a few questions and get a curated collection in minutes.
+            </p>
+            <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
+                <a href="{% url 'branding:wizard' %}" class="btn btn-brand-primary btn-lg px-5">
+                    Start Your Project <i class="fa-solid fa-arrow-right ms-2"></i>
+                </a>
+                <a href="#library" class="btn btn-glass btn-lg px-5">Browse Brand Library</a>
+            </div>
+            <div class="hero-stats d-flex justify-content-center gap-4 gap-lg-5 mt-5 flex-wrap">
+                <div class="hero-stat"><div class="hero-stat-value">240+</div><div class="hero-stat-label">Brands launched</div></div>
+                <div class="hero-stat"><div class="hero-stat-value">8</div><div class="hero-stat-label">Industries covered</div></div>
+                <div class="hero-stat"><div class="hero-stat-value">24</div><div class="hero-stat-label">Curated collections</div></div>
+                <div class="hero-stat"><div class="hero-stat-value">4.9★</div><div class="hero-stat-label">Client rating</div></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How it works -->
+    <section class="py-5 py-lg-6">
+        <div class="container">
+            <div class="text-center mb-5">
+                <span class="section-kicker">How it works</span>
+                <h2 class="fw-800">From brief to brand in four steps</h2>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-3">
+                    <div class="how-card">
+                        <div class="how-num">01</div>
+                        <i class="fa-solid fa-building how-icon"></i>
+                        <h5 class="fw-800 mt-3">Company Info</h5>
+                        <p class="text-muted small mb-0">Tell us who you are, your industry and what makes you unique.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="how-card">
+                        <div class="how-num">02</div>
+                        <i class="fa-solid fa-brush how-icon"></i>
+                        <h5 class="fw-800 mt-3">Brand Identity</h5>
+                        <p class="text-muted small mb-0">Define your audience, values, colors and current branding.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="how-card">
+                        <div class="how-num">03</div>
+                        <i class="fa-solid fa-cloud-arrow-up how-icon"></i>
+                        <h5 class="fw-800 mt-3">Upload Assets</h5>
+                        <p class="text-muted small mb-0">Share existing logos, guidelines and inspiration images.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="how-card">
+                        <div class="how-num">04</div>
+                        <i class="fa-solid fa-folder-open how-icon"></i>
+                        <h5 class="fw-800 mt-3">Choose Collection</h5>
+                        <p class="text-muted small mb-0">Pick the collection that fits your vision and submit.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Brand library preview -->
+    <section id="library" class="py-5 py-lg-6 bg-surface-soft">
+        <div class="container">
+            <div class="d-flex align-items-end justify-content-between flex-wrap gap-3 mb-4">
+                <div>
+                    <span class="section-kicker">Brand Library</span>
+                    <h2 class="fw-800 mb-0">Curated collections</h2>
+                    <p class="text-muted mb-0">Explore identity systems designed for every industry.</p>
+                </div>
+                <a href="{% url 'branding:wizard' %}" class="btn btn-outline-brand">Start a Project <i class="fa-solid fa-arrow-right ms-2"></i></a>
+            </div>
+            <div class="row g-4">
+                {% for c in featured_collections %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="landing-collection">
+                        <div class="landing-collection-cover">
+                            {% if c.preview_image %}<img src="{{ c.preview_image.url }}" alt="{{ c.name }}" loading="lazy">
+                            {% else %}<div class="collection-cover-fallback"><span>{{ c.name|slice:":2"|upper }}</span></div>{% endif %}
+                            <span class="collection-cat">{{ c.get_category_display }}</span>
+                        </div>
+                        <div class="landing-collection-body">
+                            <h5 class="fw-800 mb-0">{{ c.name }}</h5>
+                            <span class="text-muted small">{{ c.industry }}</span>
+                            <div class="collection-tags mt-2">
+                                {% for tag in c.style_tags|slice:":3" %}<span class="style-tag">{{ tag }}</span>{% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="py-5 py-lg-6">
+        <div class="container">
+            <div class="cta-banner rounded-5 p-4 p-lg-5 text-center position-relative overflow-hidden">
+                <div class="hero-glow hero-glow-1"></div>
+                <h2 class="fw-800 mb-2">Ready to build a brand that stands out?</h2>
+                <p class="mb-4 opacity-75">Free consultation · Dedicated designer · Fast turnaround</p>
+                <a href="{% url 'branding:wizard' %}" class="btn btn-light btn-lg px-5 fw-800">
+                    Start Your Brand <i class="fa-solid fa-arrow-right ms-2"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

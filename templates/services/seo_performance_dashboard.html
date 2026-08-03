@@ -1,0 +1,899 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans "SEO Intelligence" %} | OnWebApp{% endblock %}
+{% block global_cta %}{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'users:dashboard' %}">Dashboard</a></li>
+<li class="breadcrumb-item active">SEO Analysis</li>
+{% endblock %}
+
+{% block page_title %}{% trans "Search Intelligence" %}{% endblock %}
+{% block page_subtitle %}{% trans "Comprehensive visibility analysis, performance scoring, and technical SEO monitoring." %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center gap-3 mb-4">
+                    <div class="p-2 rounded-3 bg-primary-soft text-primary">
+                        <i data-lucide="search" style="width: 20px;"></i>
+                    </div>
+                    <h6 class="fw-800 mb-0">Analysis Specification</h6>
+                </div>
+                <form method="post" id="seo-perf-form">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label class="form-label small fw-800 text-secondary uppercase tracking-wider">Target URL</label>
+                        {{ form.url }}
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label small fw-800 text-secondary uppercase tracking-wider">Notification Email</label>
+                        {{ form.email }}
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-800 shadow-lg" id="seo-perf-btn">
+                        <span class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true" id="submit-spinner"></span>
+                        <i data-lucide="zap" class="me-2" style="width: 18px;"></i>Run Diagnostics
+                    </button>
+                </form>
+                {% if result %}
+                <div class="mt-4 pt-4 border-top small text-muted">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="fw-700">Analysis Source</span>
+                        <span class="badge bg-info-soft text-info rounded-pill px-3 fw-800">{{ result.analysis_source|default:"Live Page Analysis" }}</span>
+                    </div>
+                    {% if result.analyzed_at %}
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="fw-700">Analyzed</span>
+                        <span class="text-slate-700">{{ result.analyzed_at|slice:19 }}</span>
+                    </div>
+                    {% endif %}
+                    {% if result.http_status %}
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="fw-700">HTTP Status</span>
+                        <span>
+                            {% if result.http_status == 200 %}
+                            <span class="badge bg-success-soft text-success rounded-pill px-2">200 OK</span>
+                            {% elif result.http_status >= 500 %}
+                            <span class="badge bg-danger-soft text-danger rounded-pill px-2">{{ result.http_status }}</span>
+                            {% elif result.http_status >= 400 %}
+                            <span class="badge bg-warning-soft text-warning rounded-pill px-2">{{ result.http_status }}</span>
+                            {% else %}
+                            <span class="badge bg-secondary-soft text-secondary rounded-pill px-2">{{ result.http_status }}</span>
+                            {% endif %}
+                        </span>
+                    </div>
+                    {% endif %}
+                    {% if result.link_check %}
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="fw-700">Links Checked</span>
+                        <span class="text-slate-700">{{ result.link_check.links_checked|default:0 }} / {{ result.link_check.links_discovered|default:0 }}</span>
+                    </div>
+                    {% if result.link_check.sample_limited %}
+                    <div class="text-center mt-2">
+                        <span class="badge bg-secondary-soft text-secondary rounded-pill px-2 py-1 x-small">Sample-limited to 50 internal links</span>
+                    </div>
+                    {% endif %}
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% if result %}
+    <div class="col-lg-8">
+
+        {% if result.error_message and not result.blocked %}
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-start gap-3">
+                    <div class="p-2 rounded-3 bg-danger-soft text-danger">
+                        <i data-lucide="alert-triangle" style="width: 24px;"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h6 class="fw-800 mb-1 text-danger">Analysis Limited</h6>
+                        <p class="mb-0 small text-muted">
+                            {% if result.error_type %}<strong class="text-slate-700">{{ result.error_type }}:</strong> {% endif %}
+                            {{ result.error_message }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+                    <div>
+                        <div class="small fw-800 text-secondary uppercase tracking-wider">Executive Summary</div>
+                        <h5 class="fw-800 mb-1">SEO Intelligence Report</h5>
+                        <div class="mb-2">
+                            <span class="small fw-800 text-secondary uppercase tracking-wider me-2">Target URL:</span>
+                            <span class="fw-700 text-primary small">{{ result.final_url|default:result.url }}</span>
+                        </div>
+                    </div>
+                    <span class="badge bg-success-soft text-success rounded-pill px-3 py-2 fw-800 x-small">{{ result.analysis_source|default:"Live Page Analysis" }}</span>
+                </div>
+
+                {% if result.executive_summary %}
+                <div class="row g-3 mb-4">
+                    <div class="col-md-12">
+                        <div class="p-4 rounded-4 bg-primary-soft text-slate-900 border-0">
+                            <div class="small fw-800 text-secondary uppercase tracking-wider">Overall SEO Health</div>
+                            <div class="d-flex align-items-end gap-3 flex-wrap">
+                                <div class="display-5 fw-800 text-slate-900 mb-0">
+                                    {% if result.executive_summary.overall_score is not None %}
+                                    {{ result.executive_summary.overall_score }}<span class="h5 text-slate-500">/100</span>
+                                    {% else %}
+                                    <span class="text-slate-500 h4">Not Available</span>
+                                    {% endif %}
+                                </div>
+                                {% if result.executive_summary.overall_status %}
+                                <span class="badge {% if result.executive_summary.overall_status == 'Excellent' %}bg-success text-white{% elif result.executive_summary.overall_status == 'Good' %}bg-primary text-white{% elif result.executive_summary.overall_status == 'Fair' %}bg-warning text-dark{% else %}bg-danger text-white{% endif %} rounded-pill px-3 py-2 fw-800 mb-2">
+                                    {{ result.executive_summary.overall_status }}
+                                </span>
+                                {% endif %}
+                            </div>
+                            <div class="small text-slate-600 mt-2">Average of available Technical, On-Page and Link Health scores.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-6 col-md-3">
+                        <div class="p-3 rounded-4 border border-danger-subtle bg-danger-soft text-center h-100">
+                            <div class="h3 fw-800 text-danger mb-0">{{ result.executive_summary.critical_issues|default:0 }}</div>
+                            <div class="small fw-800 text-danger uppercase tracking-wider mt-1">Critical</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="p-3 rounded-4 border border-warning-subtle bg-warning-soft text-center h-100">
+                            <div class="h3 fw-800 text-warning mb-0">{{ result.executive_summary.high_issues|default:0 }}</div>
+                            <div class="small fw-800 text-warning uppercase tracking-wider mt-1">High</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="p-3 rounded-4 border border-info-subtle bg-info-soft text-center h-100">
+                            <div class="h3 fw-800 text-info mb-0">{{ result.executive_summary.medium_issues|default:0 }}</div>
+                            <div class="small fw-800 text-info uppercase tracking-wider mt-1">Warnings</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="p-3 rounded-4 border border-success-subtle bg-success-soft text-center h-100">
+                            <div class="h3 fw-800 text-success mb-0">{{ result.executive_summary.passed_checks|default:0 }}</div>
+                            <div class="small fw-800 text-success uppercase tracking-wider mt-1">Passed</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <div class="p-3 rounded-4 bg-surface-secondary border-0">
+                            <div class="small fw-800 text-secondary uppercase tracking-wider">Links Discovered</div>
+                            <div class="h4 fw-800 text-slate-900 mb-0">{{ result.executive_summary.links_discovered|default:0 }}</div>
+                            <div class="small text-muted">
+                                Internal: {{ result.executive_summary.internal_links_discovered|default:0 }} /
+                                External: {{ result.executive_summary.external_links_discovered|default:0 }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 rounded-4 bg-surface-secondary border-0">
+                            <div class="small fw-800 text-secondary uppercase tracking-wider">Links Checked</div>
+                            <div class="h4 fw-800 text-slate-900 mb-0">{{ result.executive_summary.links_checked|default:0 }}</div>
+                            <div class="small text-muted">Internal links sampled and validated</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 rounded-4 bg-surface-secondary border-0">
+                            <div class="small fw-800 text-secondary uppercase tracking-wider">Broken Links</div>
+                            <div class="h4 fw-800 mb-0 {% if result.executive_summary.broken_links|default:0 > 0 %}text-danger{% else %}text-success{% endif %}">
+                                {{ result.executive_summary.broken_links|default:0 }}
+                            </div>
+                            <div class="small text-muted">Internal links with errors or issues</div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if result.kpis %}
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+            <div class="card-body p-4">
+                <h6 class="fw-800 mb-4">KPI Cards</h6>
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="p-4 rounded-4 border h-100">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <div class="small fw-800 text-secondary uppercase tracking-wider">Technical Health</div>
+                                    {% if result.kpis.technical_health.status %}
+                                    <span class="badge {% if result.kpis.technical_health.status == 'Excellent' %}bg-success text-white{% elif result.kpis.technical_health.status == 'Good' %}bg-primary text-white{% elif result.kpis.technical_health.status == 'Fair' %}bg-warning text-dark{% else %}bg-danger text-white{% endif %} rounded-pill px-2 py-1 fw-700 x-small mt-1 d-inline-block">
+                                        {{ result.kpis.technical_health.status }}
+                                    </span>
+                                    {% endif %}
+                                </div>
+                                <div class="h3 fw-800 text-slate-900 mb-0">
+                                    {% if result.kpis.technical_health.score is not None %}
+                                    {{ result.kpis.technical_health.score }}<span class="h6 text-slate-500">/100</span>
+                                    {% else %}
+                                    <span class="text-slate-500 h6">N/A</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% if result.kpis.technical_health.score is not None %}
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar {% if result.kpis.technical_health.score >= 75 %}bg-success{% elif result.kpis.technical_health.score >= 50 %}bg-warning{% else %}bg-danger{% endif %}" style="width: {{ result.kpis.technical_health.score }}%;"></div>
+                            </div>
+                            {% endif %}
+                            <div class="small text-muted mt-3">HTTPS · HTTP 200 · Indexability · Canonical · Title · Meta · H1</div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="p-4 rounded-4 border h-100">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <div class="small fw-800 text-secondary uppercase tracking-wider">On-Page SEO</div>
+                                    {% if result.kpis.on_page_seo.status %}
+                                    <span class="badge {% if result.kpis.on_page_seo.status == 'Excellent' %}bg-success text-white{% elif result.kpis.on_page_seo.status == 'Good' %}bg-primary text-white{% elif result.kpis.on_page_seo.status == 'Fair' %}bg-warning text-dark{% else %}bg-danger text-white{% endif %} rounded-pill px-2 py-1 fw-700 x-small mt-1 d-inline-block">
+                                        {{ result.kpis.on_page_seo.status }}
+                                    </span>
+                                    {% endif %}
+                                </div>
+                                <div class="h3 fw-800 text-slate-900 mb-0">
+                                    {% if result.kpis.on_page_seo.score is not None %}
+                                    {{ result.kpis.on_page_seo.score }}<span class="h6 text-slate-500">/100</span>
+                                    {% else %}
+                                    <span class="text-slate-500 h6">N/A</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% if result.kpis.on_page_seo.score is not None %}
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar {% if result.kpis.on_page_seo.score >= 75 %}bg-success{% elif result.kpis.on_page_seo.score >= 50 %}bg-warning{% else %}bg-danger{% endif %}" style="width: {{ result.kpis.on_page_seo.score }}%;"></div>
+                            </div>
+                            {% endif %}
+                            <div class="small text-muted mt-3">Title quality · Meta description · H1 structure · Image ALT · Headings</div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="p-4 rounded-4 border h-100">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <div class="small fw-800 text-secondary uppercase tracking-wider">Link Health</div>
+                                    {% if result.kpis.link_health.available and result.kpis.link_health.status %}
+                                    <span class="badge {% if result.kpis.link_health.status == 'Excellent' %}bg-success text-white{% elif result.kpis.link_health.status == 'Good' %}bg-primary text-white{% elif result.kpis.link_health.status == 'Fair' %}bg-warning text-dark{% else %}bg-danger text-white{% endif %} rounded-pill px-2 py-1 fw-700 x-small mt-1 d-inline-block">
+                                        {{ result.kpis.link_health.status }}
+                                    </span>
+                                    {% else %}
+                                    <span class="badge bg-secondary-soft text-secondary rounded-pill px-2 py-1 fw-700 x-small mt-1 d-inline-block">Insufficient</span>
+                                    {% endif %}
+                                </div>
+                                <div class="h3 fw-800 text-slate-900 mb-0">
+                                    {% if result.kpis.link_health.available and result.kpis.link_health.score is not None %}
+                                    {{ result.kpis.link_health.score }}<span class="h6 text-slate-500">/100</span>
+                                    {% else %}
+                                    <span class="text-slate-500 h6">N/A</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% if result.kpis.link_health.available and result.kpis.link_health.score is not None %}
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar {% if result.kpis.link_health.score >= 85 %}bg-success{% elif result.kpis.link_health.score >= 70 %}bg-warning{% else %}bg-danger{% endif %}" style="width: {{ result.kpis.link_health.score }}%;"></div>
+                            </div>
+                            {% endif %}
+                            <div class="small text-muted mt-3">
+                                {% if result.kpis.link_health.available %}
+                                Internal link validation: {{ result.executive_summary.links_checked|default:0 }} checked
+                                {% else %}
+                                No internal links were available to check on this page.
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="p-4 rounded-4 border h-100">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <div class="small fw-800 text-secondary uppercase tracking-wider">Indexability</div>
+                                    {% if result.kpis.indexability.status %}
+                                    <span class="badge {% if result.kpis.indexability.indexable %}bg-success text-white{% else %}bg-danger text-white{% endif %} rounded-pill px-2 py-1 fw-700 x-small mt-1 d-inline-block">
+                                        {{ result.kpis.indexability.status }}
+                                    </span>
+                                    {% endif %}
+                                </div>
+                                <div class="h3 fw-800 mb-0 {% if result.kpis.indexability.indexable %}text-success{% else %}text-danger{% endif %}">
+                                    {% if result.kpis.indexability.indexable %}Yes{% else %}No{% endif %}
+                                </div>
+                            </div>
+                            <div class="progress" style="height: 8px; margin-top: 16px;">
+                                <div class="progress-bar {% if result.kpis.indexability.indexable %}bg-success{% else %}bg-danger{% endif %}" style="width: {% if result.kpis.indexability.indexable %}100%{% else %}0%{% endif %};"></div>
+                            </div>
+                            <div class="small text-muted mt-3">HTTP 200 + No noindex meta tag detected</div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="p-3 rounded-4 bg-surface-secondary border-0 h-100">
+                            <div class="small fw-800 text-secondary uppercase tracking-wider mb-2">Visibility Index</div>
+                            <div class="h5 fw-800 mb-1 text-slate-500">Not Available</div>
+                            <div class="small text-muted">Requires search performance data (GSC integration).</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 rounded-4 bg-surface-secondary border-0 h-100">
+                            <div class="small fw-800 text-secondary uppercase tracking-wider mb-2">Index Coverage</div>
+                            <div class="h5 fw-800 mb-1 text-slate-500">Not Available</div>
+                            <div class="small text-muted">Requires Google Search Console data.</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 rounded-4 bg-surface-secondary border-0 h-100">
+                            <div class="small fw-800 text-secondary uppercase tracking-wider mb-2">Crawl Efficiency</div>
+                            <div class="h5 fw-800 mb-1 text-slate-500">Not Available</div>
+                            <div class="small text-muted">Requires multi-page crawl data.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+            <div class="card-body p-4">
+                <h6 class="fw-800 mb-4">Technical SEO</h6>
+                <div class="table-responsive">
+                    <table class="table table-borderless align-middle mb-0">
+                        <tbody>
+                            <tr>
+                                <td class="ps-0" style="width: 35%;"><div class="small fw-800 text-secondary uppercase tracking-wider">HTTPS</div></td>
+                                <td>
+                                    {% if result.https %}
+                                    <span class="badge bg-success-soft text-success rounded-pill px-3 py-1 fw-800">Active ✓</span>
+                                    <span class="small text-muted ms-2">Final URL served over secure HTTPS</span>
+                                    {% else %}
+                                    <span class="badge bg-danger-soft text-danger rounded-pill px-3 py-1 fw-800">Missing ✗</span>
+                                    <span class="small text-muted ms-2">Page was served over unencrypted HTTP</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="ps-0"><div class="small fw-800 text-secondary uppercase tracking-wider">HTTP Status</div></td>
+                                <td>
+                                    {% if result.http_status == 200 %}
+                                    <span class="badge bg-success-soft text-success rounded-pill px-3 py-1 fw-800">200 OK</span>
+                                    <span class="small text-muted ms-2">Page returns standard success status</span>
+                                    {% elif result.http_status %}
+                                    <span class="badge {% if result.http_status >= 500 %}bg-danger-soft text-danger{% elif result.http_status >= 400 %}bg-warning-soft text-warning{% else %}bg-info-soft text-info{% endif %} rounded-pill px-3 py-1 fw-800">{{ result.http_status }}</span>
+                                    <span class="small text-muted ms-2">Non-standard HTTP response</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary-soft text-secondary rounded-pill px-3 py-1 fw-800">Unknown</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="ps-0"><div class="small fw-800 text-secondary uppercase tracking-wider">Redirect</div></td>
+                                <td>
+                                    {% if result.redirected %}
+                                    <span class="badge bg-warning-soft text-warning rounded-pill px-3 py-1 fw-800">{{ result.redirect_count|default:1 }} redirect(s)</span>
+                                    <span class="small text-muted ms-2">Original URL redirected to final URL</span>
+                                    {% else %}
+                                    <span class="badge bg-success-soft text-success rounded-pill px-3 py-1 fw-800">No redirect</span>
+                                    <span class="small text-muted ms-2">URL resolved directly</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="ps-0"><div class="small fw-800 text-secondary uppercase tracking-wider">Response Time</div></td>
+                                <td>
+                                    {% if result.response_time is not None %}
+                                    <span class="fw-700 {% if result.response_time <= 1 %}text-success{% elif result.response_time <= 3 %}text-warning{% else %}text-danger{% endif %}">
+                                        {{ result.response_time|floatformat:2 }}s
+                                    </span>
+                                    {% else %}
+                                    <span class="text-slate-500">Not measured</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="ps-0"><div class="small fw-800 text-secondary uppercase tracking-wider">Page Size</div></td>
+                                <td>
+                                    {% if result.page_size is not None %}
+                                    <span class="fw-700 text-slate-700">
+                                        {% if result.page_size >= 1048576 %}
+                                            {{ result.page_size|filesizeformat }}
+                                        {% elif result.page_size >= 1024 %}
+                                            {{ result.page_size|filesizeformat }}
+                                        {% else %}
+                                            {{ result.page_size }} B
+                                        {% endif %}
+                                    </span>
+                                    <span class="small text-muted ms-2">({{ result.page_size }} bytes)</span>
+                                    {% else %}
+                                    <span class="text-slate-500">Not measured</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="ps-0"><div class="small fw-800 text-secondary uppercase tracking-wider">Content Type</div></td>
+                                <td><code class="small">{{ result.content_type|default:"Not detected" }}</code></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+            <div class="card-body p-4">
+                <h6 class="fw-800 mb-4">On-Page SEO</h6>
+                {% if result.on_page %}
+                <div class="row g-4 mb-4">
+                    <div class="col-lg-6">
+                        <div class="p-3 rounded-4 bg-surface-secondary">
+                            <div class="small fw-800 text-secondary uppercase tracking-wider mb-2">TITLE Tag</div>
+                            {% if result.on_page.title_exists %}
+                            <div class="fw-700 text-slate-900 mb-1">{{ result.on_page.title }}</div>
+                            <div class="d-flex gap-2">
+                                <span class="badge {% if result.on_page.title_length >= 30 and result.on_page.title_length <= 60 %}bg-success-soft text-success{% else %}bg-warning-soft text-warning{% endif %} rounded-pill px-2 py-1 fw-700 x-small">
+                                    {{ result.on_page.title_length }} chars
+                                </span>
+                                {% if result.on_page.title_length < 30 %}
+                                <span class="badge bg-warning-soft text-warning rounded-pill px-2 py-1 fw-700 x-small">Very short</span>
+                                {% elif result.on_page.title_length > 60 %}
+                                <span class="badge bg-warning-soft text-warning rounded-pill px-2 py-1 fw-700 x-small">Too long (truncated)</span>
+                                {% else %}
+                                <span class="badge bg-success-soft text-success rounded-pill px-2 py-1 fw-700 x-small">Optimal length</span>
+                                {% endif %}
+                            </div>
+                            {% else %}
+                            <span class="badge bg-danger-soft text-danger rounded-pill px-3 py-1 fw-800">MISSING</span>
+                            <div class="small text-muted mt-1">No title tag found in &lt;head&gt;</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="p-3 rounded-4 bg-surface-secondary">
+                            <div class="small fw-800 text-secondary uppercase tracking-wider mb-2">META Description</div>
+                            {% if result.on_page.meta_desc_exists %}
+                            <div class="fw-700 text-slate-700 mb-1 small">{{ result.on_page.meta_description }}</div>
+                            <div class="d-flex gap-2">
+                                <span class="badge {% if result.on_page.meta_desc_length >= 50 and result.on_page.meta_desc_length <= 320 %}bg-success-soft text-success{% else %}bg-warning-soft text-warning{% endif %} rounded-pill px-2 py-1 fw-700 x-small">
+                                    {{ result.on_page.meta_desc_length }} chars
+                                </span>
+                                {% if result.on_page.meta_desc_length < 50 %}
+                                <span class="badge bg-warning-soft text-warning rounded-pill px-2 py-1 fw-700 x-small">Very short</span>
+                                {% elif result.on_page.meta_desc_length > 320 %}
+                                <span class="badge bg-warning-soft text-warning rounded-pill px-2 py-1 fw-700 x-small">Too long (truncated)</span>
+                                {% else %}
+                                <span class="badge bg-success-soft text-success rounded-pill px-2 py-1 fw-700 x-small">Optimal length</span>
+                                {% endif %}
+                            </div>
+                            {% else %}
+                            <span class="badge bg-warning-soft text-warning rounded-pill px-3 py-1 fw-800">MISSING</span>
+                            <div class="small text-muted mt-1">No meta description found</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-borderless align-middle mb-0">
+                        <tbody>
+                            <tr>
+                                <td class="ps-0" style="width: 35%;"><div class="small fw-800 text-secondary uppercase tracking-wider">H1 Headings</div></td>
+                                <td>
+                                    {% if result.on_page.h1_count == 0 %}
+                                    <span class="badge bg-danger-soft text-danger rounded-pill px-3 py-1 fw-800">None found</span>
+                                    {% elif result.on_page.h1_count == 1 %}
+                                    <span class="badge bg-success-soft text-success rounded-pill px-3 py-1 fw-800">1 H1</span>
+                                    <div class="mt-1 small text-slate-700 fw-700">{{ result.on_page.h1_texts|first|default:"" }}</div>
+                                    {% else %}
+                                    <span class="badge bg-warning-soft text-warning rounded-pill px-3 py-1 fw-800">{{ result.on_page.h1_count }} H1s</span>
+                                    <div class="small text-muted ms-2">Best practice: single H1 per page</div>
+                                    <ul class="mb-0 mt-2 small">
+                                        {% for h1 in result.on_page.h1_texts %}
+                                        <li class="text-slate-700">{{ h1 }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="ps-0"><div class="small fw-800 text-secondary uppercase tracking-wider">Headings</div></td>
+                                <td>
+                                    <span class="badge bg-primary-soft text-primary rounded-pill px-2 py-1 fw-700 x-small">H2: {{ result.on_page.h2_count|default:0 }}</span>
+                                    <span class="badge bg-info-soft text-info rounded-pill px-2 py-1 fw-700 x-small ms-1">H3: {{ result.on_page.h3_count|default:0 }}</span>
+                                    {% if result.on_page.word_count is not None %}
+                                    <span class="badge bg-secondary-soft text-secondary rounded-pill px-2 py-1 fw-700 x-small ms-1">~{{ result.on_page.word_count }} words</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="ps-0"><div class="small fw-800 text-secondary uppercase tracking-wider">Canonical</div></td>
+                                <td>
+                                    {% if result.on_page.canonical_exists %}
+                                    {% if result.on_page.canonical_self %}
+                                    <span class="badge bg-success-soft text-success rounded-pill px-3 py-1 fw-800">Self-canonical ✓</span>
+                                    {% else %}
+                                    <span class="badge bg-danger-soft text-danger rounded-pill px-3 py-1 fw-800">Different canonical ⚠</span>
+                                    {% endif %}
+                                    <div class="small text-slate-700 mt-1"><code class="x-small">{{ result.on_page.canonical_url }}</code></div>
+                                    {% else %}
+                                    <span class="badge bg-warning-soft text-warning rounded-pill px-3 py-1 fw-800">MISSING</span>
+                                    <div class="small text-muted">No rel=canonical tag found</div>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="ps-0"><div class="small fw-800 text-secondary uppercase tracking-wider">Robots Meta</div></td>
+                                <td>
+                                    {% if result.on_page.noindex or result.on_page.nofollow %}
+                                    <span class="badge {% if result.on_page.noindex %}bg-danger-soft text-danger{% else %}bg-warning-soft text-warning{% endif %} rounded-pill px-3 py-1 fw-800">
+                                        {% if result.on_page.noindex %}NOINDEX{% endif %}
+                                        {% if result.on_page.noindex and result.on_page.nofollow %} · {% endif %}
+                                        {% if result.on_page.nofollow %}NOFOLLOW{% endif %}
+                                    </span>
+                                    <div class="small text-slate-700 mt-1"><code>{{ result.on_page.robots_meta }}</code></div>
+                                    {% else %}
+                                    <span class="badge bg-success-soft text-success rounded-pill px-3 py-1 fw-800">Indexable</span>
+                                    {% if result.on_page.robots_meta %}
+                                    <div class="small text-muted ms-2">{{ result.on_page.robots_meta }}</div>
+                                    {% else %}
+                                    <div class="small text-muted">No conflicting robots directives</div>
+                                    {% endif %}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="ps-0"><div class="small fw-800 text-secondary uppercase tracking-wider">HTML Lang</div></td>
+                                <td>
+                                    {% if result.on_page.html_lang %}
+                                    <code class="small fw-700">{{ result.on_page.html_lang }}</code>
+                                    {% else %}
+                                    <span class="badge bg-warning-soft text-warning rounded-pill px-3 py-1 fw-800">Not set</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="ps-0"><div class="small fw-800 text-secondary uppercase tracking-wider">Image ALT Coverage</div></td>
+                                <td>
+                                    {% if result.on_page.images_total > 0 %}
+                                    <div class="mb-1">
+                                        <span class="fw-700 d-inline-block">{{ result.on_page.images_total|default:0 }} images total</span>
+                                    </div>
+                                    <div class="small text-slate-700 lh-lg">
+                                        <span class="badge bg-success-soft text-success rounded-pill px-2 py-1 fw-700 x-small me-1">
+                                            With descriptive ALT: {{ result.on_page.images_with_alt|default:0 }}
+                                        </span>
+                                        <span class="badge bg-info-soft text-info rounded-pill px-2 py-1 fw-700 x-small me-1">
+                                            Empty ALT: {{ result.on_page.images_empty_alt|default:0 }}
+                                        </span>
+                                        <span class="badge {% if result.on_page.images_missing_alt > 0 %}bg-warning-soft text-warning{% else %}bg-secondary-soft text-secondary{% endif %} rounded-pill px-2 py-1 fw-700 x-small">
+                                            Missing ALT attribute: {{ result.on_page.images_missing_alt|default:0 }}
+                                        </span>
+                                    </div>
+                                    {% if result.on_page.images_alt_attribute_percentage is not None %}
+                                    <div class="progress mt-2" style="height: 6px; max-width: 300px;">
+                                        <div class="progress-bar {% if result.on_page.images_alt_attribute_percentage >= 90 %}bg-success{% elif result.on_page.images_alt_attribute_percentage >= 70 %}bg-warning{% else %}bg-danger{% endif %}" style="width: {{ result.on_page.images_alt_attribute_percentage }}%;"></div>
+                                    </div>
+                                    <div class="small text-muted mt-1">{{ result.on_page.images_alt_attribute_percentage }}% ALT Attribute Coverage (alt attribute present vs. completely missing)</div>
+                                    {% endif %}
+                                    {% else %}
+                                    <span class="text-slate-500 small">No images found on page</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="ps-0"><div class="small fw-800 text-secondary uppercase tracking-wider">Links</div></td>
+                                <td>
+                                    <span class="badge bg-primary-soft text-primary rounded-pill px-2 py-1 fw-700 x-small">Total: {{ result.on_page.links_total|default:0 }}</span>
+                                    <span class="badge bg-success-soft text-success rounded-pill px-2 py-1 fw-700 x-small ms-1">Internal: {{ result.on_page.links_internal|default:0 }}</span>
+                                    <span class="badge bg-info-soft text-info rounded-pill px-2 py-1 fw-700 x-small ms-1">External: {{ result.on_page.links_external|default:0 }}</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info mb-0">On-page elements could not be analyzed from the fetched response.</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+            <div class="card-body p-4">
+                <h6 class="fw-800 mb-4">Link Health</h6>
+                {% if result.link_check %}
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <div class="p-3 rounded-4 bg-surface-secondary text-center border-0 h-100">
+                            <div class="small fw-800 text-secondary uppercase tracking-wider">Discovered</div>
+                            <div class="h4 fw-800 text-slate-900 mb-0">{{ result.link_check.links_discovered|default:0 }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 rounded-4 bg-surface-secondary text-center border-0 h-100">
+                            <div class="small fw-800 text-secondary uppercase tracking-wider">Checked</div>
+                            <div class="h4 fw-800 text-primary mb-0">{{ result.link_check.links_checked|default:0 }}</div>
+                            {% if result.link_check.sample_limited %}
+                            <div class="x-small text-warning fw-700 mt-1">Sampled (50 limit)</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 rounded-4 bg-surface-secondary text-center border-0 h-100">
+                            <div class="small fw-800 text-secondary uppercase tracking-wider">Broken</div>
+                            <div class="h4 fw-800 mb-0 {% if result.link_check.broken_links and result.link_check.broken_links|length > 0 %}text-danger{% else %}text-success{% endif %}">
+                                {{ result.link_check.broken_links|length|default:0 }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% if result.link_check.links_discovered == 0 %}
+                <div class="alert alert-info mb-0">No internal links were discovered on the analyzed page.</div>
+                {% endif %}
+                {% else %}
+                <div class="alert alert-info mb-0">Link health data not available for this analysis.</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+            <div class="card-body p-4">
+                <h6 class="fw-800 mb-4">Detected Issues</h6>
+                {% if result.issues and result.issues|length > 0 %}
+                <div class="accordion" id="issuesAccordion">
+                    {% for issue in result.issues %}
+                    <div class="accordion-item border rounded-3 mb-2 overflow-hidden">
+                        <h2 class="accordion-header" id="headingIssue{{ forloop.counter }}">
+                            <button class="accordion-button bg-white py-3 px-4 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseIssue{{ forloop.counter }}" aria-expanded="false" aria-controls="collapseIssue{{ forloop.counter }}">
+                                <div class="d-flex align-items-center gap-2 flex-wrap w-100 me-3">
+                                    <span class="badge {% if issue.severity == 'Critical' %}bg-danger text-white{% elif issue.severity == 'High' %}bg-warning text-dark{% elif issue.severity == 'Medium' %}bg-info text-white{% elif issue.severity == 'Low' %}bg-secondary text-white{% else %}bg-primary-soft text-primary{% endif %} rounded-pill px-3 py-1 fw-800 x-small">
+                                        {{ issue.severity }}
+                                    </span>
+                                    <span class="fw-800 text-slate-900">{{ issue.issue }}</span>
+                                </div>
+                            </button>
+                        </h2>
+                        <div id="collapseIssue{{ forloop.counter }}" class="accordion-collapse collapse" aria-labelledby="headingIssue{{ forloop.counter }}" data-bs-parent="#issuesAccordion">
+                            <div class="accordion-body px-4 py-3 bg-surface-secondary border-top">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="small fw-800 text-secondary uppercase tracking-wider mb-1">Evidence</div>
+                                        <p class="small text-slate-700 mb-0">{{ issue.evidence }}</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="small fw-800 text-secondary uppercase tracking-wider mb-1">Why It Matters</div>
+                                        <p class="small text-slate-700 mb-0">{{ issue.why_it_matters }}</p>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="small fw-800 text-secondary uppercase tracking-wider mb-1">Recommended Action</div>
+                                        <p class="small fw-700 text-primary mb-0">{{ issue.recommended_action }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="alert alert-success mb-0">
+                    <i data-lucide="check-circle" class="me-2 align-middle" style="width: 18px;"></i>
+                    <strong>No issues detected.</strong> The analyzed page passes all checked SEO criteria.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+            <div class="card-body p-4">
+                <h6 class="fw-800 mb-3">Broken Internal Links</h6>
+                {% if result.link_check and result.link_check.broken_links and result.link_check.broken_links|length > 0 %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Broken URL</th>
+                                <th>Status Code</th>
+                                <th>Found On</th>
+                                <th>Severity</th>
+                                <th>Recommendation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in result.link_check.broken_links %}
+                            <tr>
+                                <td class="small text-break"><code class="x-small">{{ item.url }}</code></td>
+                                <td>
+                                    {% if item.status_code|stringformat:"s"|slice:"0" == "5" %}
+                                    <span class="badge bg-danger-soft text-danger">{{ item.status_code }}</span>
+                                    {% elif item.status_code == 404 or item.status_code == 410 %}
+                                    <span class="badge bg-warning-soft text-warning">{{ item.status_code }}</span>
+                                    {% elif item.error_type %}
+                                    <span class="badge bg-secondary-soft text-secondary">{{ item.error_type }}</span>
+                                    {% else %}
+                                    <span class="badge bg-info-soft text-info">{{ item.status_code }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="small text-break"><code class="x-small">{{ item.found_on }}</code></td>
+                                <td>
+                                    {% if item.severity == 'Critical' %}
+                                    <span class="badge bg-danger text-white">Critical</span>
+                                    {% elif item.severity == 'High' %}
+                                    <span class="badge bg-warning text-dark">High</span>
+                                    {% elif item.severity == 'Warning' %}
+                                    <span class="badge bg-secondary text-white">Warning</span>
+                                    {% else %}
+                                    <span class="badge bg-info text-white">{{ item.severity|default:"Medium" }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="small text-slate-700">{{ item.recommendation }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-success mb-0">
+                    <i data-lucide="check-circle" class="me-2 align-middle" style="width: 18px;"></i>
+                    <strong>No broken internal links detected</strong> in the analyzed sample.
+                    {% if result.link_check and result.link_check.links_checked > 0 %}
+                    <span class="small text-muted">({{ result.link_check.links_checked }} internal links checked)</span>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+            <div class="card-body p-4">
+                <h6 class="fw-800 mb-3">Recommendations</h6>
+                {% if result.prioritized_recommendations and result.prioritized_recommendations|length > 0 %}
+                <div class="list-group list-group-flush rounded-3 overflow-hidden border">
+                    {% for item in result.prioritized_recommendations %}
+                    <div class="list-group-item list-group-item-action px-4 py-3 transition-hover">
+                        <div class="d-flex align-items-start gap-3">
+                            <div class="mt-1">
+                                <span class="badge {% if item.priority == 'Critical' %}bg-danger text-white{% elif item.priority == 'High' %}bg-warning text-dark{% elif item.priority == 'Medium' %}bg-info text-white{% elif item.priority == 'Low' %}bg-secondary text-white{% else %}bg-primary-soft text-primary{% endif %} rounded-pill px-3 py-1 fw-800 x-small d-inline-block" style="min-width: 70px; text-align: center;">
+                                    {{ item.priority }}
+                                </span>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="fw-700 text-slate-900 mb-1">{{ item.recommendation }}</div>
+                                <div class="row g-2 mt-2">
+                                    {% if item.estimated_time and item.estimated_time != '—' %}
+                                    <div class="col-auto small text-muted"><i data-lucide="clock" style="width: 14px;" class="me-1 align-text-bottom"></i> {{ item.estimated_time }}</div>
+                                    {% endif %}
+                                    {% if item.business_impact and item.business_impact != '—' %}
+                                    <div class="col-auto small text-muted"><i data-lucide="trending-up" style="width: 14px;" class="me-1 align-text-bottom"></i> Impact: <span class="fw-700">{{ item.business_impact }}</span></div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="alert alert-success mb-0">
+                    <i data-lucide="check-circle" class="me-2 align-middle" style="width: 18px;"></i>
+                    <strong>No critical SEO recommendations detected</strong> for the analyzed page.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+            <div class="card-body p-4">
+                <h6 class="fw-800 mb-3">Operational Visibility Trend</h6>
+                <div class="alert alert-info mb-0">
+                    <i data-lucide="info" class="me-2 align-middle" style="width: 18px;"></i>
+                    <strong>{{ result.historical_note|default:"No historical data available yet." }}</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+            <div class="card-body p-4">
+                <h6 class="fw-800 mb-4">Analysis Metadata</h6>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="p-3 rounded-4 bg-surface-secondary">
+                            <div class="small fw-800 text-secondary uppercase tracking-wider mb-1">Original URL</div>
+                            <div class="small text-slate-900 fw-700 text-break">{{ result.url }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 rounded-4 bg-surface-secondary">
+                            <div class="small fw-800 text-secondary uppercase tracking-wider mb-1">Final URL</div>
+                            <div class="small text-slate-900 fw-700 text-break">{{ result.final_url|default:result.url }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 rounded-4 bg-surface-secondary">
+                            <div class="small fw-800 text-secondary uppercase tracking-wider mb-1">Analyzed At</div>
+                            <div class="small text-slate-900 fw-700">{{ result.analyzed_at|slice:19 }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 rounded-4 bg-surface-secondary">
+                            <div class="small fw-800 text-secondary uppercase tracking-wider mb-1">Analysis Source</div>
+                            <div class="small text-slate-900 fw-700">{{ result.analysis_source|default:"Live Page Analysis" }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 rounded-4 bg-surface-secondary">
+                            <div class="small fw-800 text-secondary uppercase tracking-wider mb-1">HTTP Status</div>
+                            <div class="small text-slate-900 fw-700">{{ result.http_status|default:"Not Available" }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 rounded-4 bg-surface-secondary">
+                            <div class="small fw-800 text-secondary uppercase tracking-wider mb-1">HTTPS</div>
+                            <div class="small text-slate-900 fw-700">{% if result.https %}Active{% else %}Inactive / Not detected{% endif %}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 rounded-4 bg-surface-secondary">
+                            <div class="small fw-800 text-secondary uppercase tracking-wider mb-1">Links Checked</div>
+                            <div class="small text-slate-900 fw-700">
+                                {% if result.link_check %}
+                                {{ result.link_check.links_checked|default:0 }} / {{ result.link_check.links_discovered|default:0 }}
+                                {% else %}
+                                0
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4 p-3 rounded-4 border border-info-subtle bg-info-soft">
+                    <div class="small text-info fw-700">
+                        <i data-lucide="shield-check" class="me-1 align-middle" style="width: 16px;"></i>
+                        All metrics in this report were measured directly from the live page HTTP response. No simulated, estimated, or fabricated values are shown. KPIs marked "Not Available" require external integrations (Google Search Console, ranking data providers, or multi-page crawl infrastructure).
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.transition-hover { transition: all 0.2s ease; }
+.transition-hover:hover { transform: translateY(-2px); background-color: var(--bg-surface-tertiary); }
+.x-small { font-size: 0.75rem; }
+.uppercase { text-transform: uppercase; }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    if (typeof lucide !== 'undefined' && lucide.createIcons) {
+        lucide.createIcons();
+    }
+
+    const form = document.getElementById('seo-perf-form');
+    const btn = document.getElementById('seo-perf-btn');
+    const spinner = document.getElementById('submit-spinner');
+    if (form) {
+        form.addEventListener('submit', function(){
+            if (btn) btn.setAttribute('disabled', 'disabled');
+            if (spinner) spinner.classList.remove('d-none');
+        });
+    }
+
+    document.querySelectorAll('#seo-perf-form input').forEach(function(el){
+        el.classList.add('form-control','border-slate-200','p-3','rounded-3');
+    });
+});
+</script>
+{% endblock %}

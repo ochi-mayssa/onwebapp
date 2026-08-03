@@ -1,0 +1,103 @@
+{% extends 'branding/base.html' %}
+{% load branding_extras %}
+
+{% block title %}Create Questionnaire · {{ request_obj.request_number }}{% endblock %}
+
+{% block branding_content %}
+<div class="detail-page">
+    <div class="container py-4 py-lg-5" style="max-width: 960px;">
+
+        <div class="d-flex align-items-center gap-2 mb-4">
+            <a href="{% url 'branding:questionnaire_create' request_pk=request_obj.pk %}" class="btn btn-back btn-sm"><i class="fa-solid fa-arrow-left me-1"></i>Back</a>
+            <div>
+                <h1 class="fw-800 mb-0"><i class="fa-solid fa-plus-circle me-2 text-primary"></i>{{ page_title|default:"New Questionnaire" }}</h1>
+                <p class="text-muted mb-0">{{ request_obj.request_number }} · {{ request_obj.company_name }}</p>
+            </div>
+        </div>
+
+        <form method="post" action="{% url 'branding:questionnaire_create' request_pk=request_obj.pk %}" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger d-flex align-items-start gap-2 rounded-4 border-0 shadow-sm mb-4">
+                <i class="fa-solid fa-circle-exclamation mt-1"></i>
+                <div>{{ form.non_field_errors }}</div>
+            </div>
+            {% endif %}
+
+            <div class="detail-card rounded-4 p-4 mb-4">
+                <h5 class="fw-800 section-heading"><i class="fa-solid fa-pen-nib me-2 text-primary"></i>Questionnaire Details</h5>
+                <div class="row g-3">
+                    <div class="col-12">
+                        {{ form.title.label_tag }}
+                        {{ form.title }}
+                        {% if form.title.errors %}
+                        <div class="text-danger small mt-1">{{ form.title.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-12">
+                        {{ form.description.label_tag }}
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                        <div class="text-danger small mt-1">{{ form.description.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.phase.label_tag }}
+                        {{ form.phase }}
+                        {% if form.phase.errors %}
+                        <div class="text-danger small mt-1">{{ form.phase.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.client.label_tag }}
+                        {{ form.client }}
+                        {% if form.client.errors %}
+                        <div class="text-danger small mt-1">{{ form.client.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-card rounded-4 p-4 mb-4">
+                <h5 class="fw-800 section-heading"><i class="fa-solid fa-gear me-2 text-primary"></i>Settings</h5>
+                <div class="row g-3 align-items-start">
+                    <div class="col-md-6">
+                        <div class="form-check mt-4">
+                            {{ form.send_email }}
+                            {{ form.send_email.label_tag }}
+                        </div>
+                        {% if form.send_email.errors %}
+                        <div class="text-danger small mt-1">{{ form.send_email.errors }}</div>
+                        {% endif %}
+                        <div class="form-text">Send the questionnaire to the client upon creation.</div>
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.expires_at.label_tag }}
+                        {{ form.expires_at }}
+                        {% if form.expires_at.errors %}
+                        <div class="text-danger small mt-1">{{ form.expires_at.errors }}</div>
+                        {% endif %}
+                        <div class="form-text">Leave blank for no expiration.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-card rounded-4 p-4 mb-4 border-primary border-opacity-25" style="border-width: 1px !important; border-style: dashed !important; background: var(--bs-primary-subtle, #e8f0fe);">
+                <div class="d-flex align-items-start gap-3">
+                    <i class="fa-solid fa-lightbulb text-primary mt-1"></i>
+                    <div>
+                        <h6 class="fw-800 mb-1">Adding Questions</h6>
+                        <p class="text-muted mb-0 small">After creating the questionnaire, you can add and configure individual questions from the questionnaire detail page.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 border-top pt-3">
+                <a href="{% url 'branding:client_project_progress' request_obj.pk %}" class="btn btn-back">Cancel</a>
+                <button type="submit" class="btn btn-brand-primary px-4"><i class="fa-solid fa-floppy-disk me-2"></i>Create Questionnaire</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

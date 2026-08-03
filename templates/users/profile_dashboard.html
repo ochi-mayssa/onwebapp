@@ -1,0 +1,280 @@
+{% extends "base.html" %}
+{% load static i18n %}
+
+{% block title %}{% trans "Enterprise Profile" %} | OnWebApp{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'users:dashboard' %}">Dashboard</a></li>
+<li class="breadcrumb-item active">Profile</li>
+{% endblock %}
+
+{% block page_title %}{% trans "Account Settings" %}{% endblock %}
+{% block page_subtitle %}{% trans "Manage your enterprise identity, billing, and system usage." %}{% endblock %}
+
+{% block dashboard_content %}
+<!-- Profile Header Card -->
+<div class="card mb-5 border-0 shadow-sm overflow-hidden" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);">
+    <div class="position-absolute top-0 end-0 p-5 opacity-10">
+        <i data-lucide="shield-check" style="width: 160px; height: 160px; color: #fff;"></i>
+    </div>
+    <div class="card-body p-5 position-relative" style="z-index: 1;">
+        <div class="row align-items-center">
+            <div class="col-md-8 d-flex align-items-center gap-4">
+                <div class="rounded-4 d-flex align-items-center justify-content-center shadow-lg" style="width: 88px; height: 88px; background: var(--accent-primary); color: #fff; font-size: 2.25rem; font-weight: 800; border: 4px solid rgba(255,255,255,0.1);">
+                    {{ request.user.first_name|default:request.user.username|slice:":1"|upper }}
+                </div>
+                <div>
+                    <h2 class="text-white fw-800 mb-1" style="letter-spacing: -0.03em;">{{ request.user.get_full_name|default:request.user.username }}</h2>
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="text-slate-400 d-flex align-items-center gap-1 small fw-600">
+                            <i data-lucide="building" style="width: 14px;"></i>
+                            {{ profile.company_name|default:"Client Account" }}
+                        </span>
+                        <span class="text-slate-700">•</span>
+                        <span class="badge {% if subscription_status == 'Active' %}bg-success-soft text-success{% else %}bg-warning-soft text-warning{% endif %} rounded-pill px-3 py-2">
+                            {{ plan_label }} · {{ subscription_status }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 text-md-end mt-4 mt-md-0">
+                <div class="text-slate-400 small fw-600 mb-1">Member since {{ request.user.date_joined|date:"F Y" }}</div>
+                <div class="text-white fw-800">{{ plan_hint|default:"Standard Enterprise Support" }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabs Navigation -->
+<div class="mb-5">
+    <div class="bg-surface-secondary p-1 rounded-4 d-inline-flex border border-color">
+        <ul class="nav nav-pills gap-1" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active px-4 py-2 fw-800 rounded-3 border-0" data-bs-toggle="tab" data-bs-target="#overview">Overview</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link px-4 py-2 fw-800 rounded-3 border-0" data-bs-toggle="tab" data-bs-target="#billing">Billing</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link px-4 py-2 fw-800 rounded-3 border-0" data-bs-toggle="tab" data-bs-target="#usage">Usage</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link px-4 py-2 fw-800 rounded-3 border-0" data-bs-toggle="tab" data-bs-target="#security">Security</button>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div class="tab-content">
+    <!-- Overview Tab -->
+    <div class="tab-pane fade show active" id="overview">
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-transparent border-0 p-4 pb-0">
+                        <h6 class="fw-800 mb-0">Enterprise Identity</h6>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <label class="text-secondary small fw-800 mb-1 d-block text-uppercase tracking-wider">Full Name</label>
+                                <div class="fw-700 text-primary-hover">{{ request.user.get_full_name|default:request.user.username }}</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="text-secondary small fw-800 mb-1 d-block text-uppercase tracking-wider">Email Address</label>
+                                <div class="fw-700 text-primary-hover">{{ request.user.email }}</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="text-secondary small fw-800 mb-1 d-block text-uppercase tracking-wider">Organization</label>
+                                <div class="fw-700 text-primary-hover">{{ profile.company_name|default:"—" }}</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="text-secondary small fw-800 mb-1 d-block text-uppercase tracking-wider">Industry</label>
+                                <div class="fw-700 text-primary-hover">{{ profile.industry|default:"—" }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="card border-0 shadow-sm h-100 transition-hover">
+                            <div class="card-body p-4">
+                                <div class="p-2 rounded-3 bg-primary-soft text-primary d-inline-block mb-3">
+                                    <i data-lucide="package" style="width: 20px;"></i>
+                                </div>
+                                <h6 class="fw-800 mb-2">ERP Integration</h6>
+                                <p class="text-secondary small mb-4">Manage supply chain and enterprise invoices.</p>
+                                <a href="{% url 'services:erp_integration' %}" class="btn btn-light btn-sm w-100 rounded-pill fw-800">Manage ERP</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card border-0 shadow-sm h-100 transition-hover">
+                            <div class="card-body p-4">
+                                <div class="p-2 rounded-3 bg-success-soft text-success d-inline-block mb-3">
+                                    <i data-lucide="users" style="width: 20px;"></i>
+                                </div>
+                                <h6 class="fw-800 mb-2">CRM Command</h6>
+                                <p class="text-secondary small mb-4">Track customer interactions and lifecycles.</p>
+                                <a href="{% url 'services:crm_integration' %}" class="btn btn-light btn-sm w-100 rounded-pill fw-800">Open Hub</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-transparent border-0 p-4 d-flex justify-content-between align-items-center">
+                        <h6 class="fw-800 mb-0">Security Pulse</h6>
+                        <a href="#" class="small fw-800 text-decoration-none">Audit Log</a>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="activity-feed">
+                            {% for log in logs|slice:":5" %}
+                            <div class="p-4 border-bottom border-light d-flex gap-3">
+                                <div class="rounded-circle bg-surface-secondary d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; flex-shrink: 0;">
+                                    <i data-lucide="shield" class="text-secondary" style="width: 14px;"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-800 small text-primary">{{ log.action|title }}</div>
+                                    <div class="text-secondary" style="font-size: 0.7rem; margin-top: 2px;">{{ log.timestamp|timesince }} ago · {{ log.ip_address|default:"System" }}</div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="p-5 text-center text-secondary small fw-600">No security logs recorded.</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Usage Tab -->
+    <div class="tab-pane fade" id="usage">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent border-0 p-4">
+                <h6 class="fw-800 mb-0">Resource Consumption</h6>
+            </div>
+            <div class="card-body p-4">
+                <div class="row g-5">
+                    {% for s in services %}
+                    <div class="col-md-6">
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <h6 class="fw-800 mb-1">{{ s.service_name }}</h6>
+                                    <span class="text-secondary x-small fw-600">Monthly Reset</span>
+                                </div>
+                                <div class="text-end">
+                                    <div class="fw-800 text-primary">{{ s.usage_count }}{% if s.limit > 0 %}/{{ s.limit }}{% endif %}</div>
+                                    <span class="text-secondary x-small fw-600">Requests</span>
+                                </div>
+                            </div>
+                            <div class="progress" style="height: 10px; background: var(--bg-surface-secondary); border-radius: 10px;">
+                                <div class="progress-bar rounded-pill {% if s.is_limit_reached %}bg-danger{% else %}bg-primary{% endif %}" 
+                                     style="width: {% if s.limit > 0 %}{{ s.percentage }}{% else %}100{% endif %}%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-12 p-5 text-center text-secondary fw-600">No usage data found.</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Billing Tab -->
+    <div class="tab-pane fade" id="billing">
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-transparent border-0 p-4">
+                        <h6 class="fw-800 mb-0">Subscription Model</h6>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="p-4 rounded-4 bg-surface-secondary border border-color mb-4">
+                            <div class="d-flex justify-content-between align-items-start mb-4">
+                                <div>
+                                    <div class="text-secondary small fw-800 mb-1 uppercase tracking-wider">Current Tier</div>
+                                    <h4 class="fw-800 text-primary mb-0">{{ plan_label }}</h4>
+                                </div>
+                                <span class="badge bg-success-soft text-success rounded-pill px-3 py-2 fw-800">{{ subscription_status }}</span>
+                            </div>
+                            <div class="row g-4">
+                                <div class="col-6">
+                                    <div class="text-secondary x-small fw-800 uppercase tracking-wider">Renewal Date</div>
+                                    <div class="fw-800 text-secondary">{{ next_billing_date|date:"M d, Y"|default:"—" }}</div>
+                                </div>
+                                <div class="col-6 text-end">
+                                    <div class="text-secondary x-small fw-800 uppercase tracking-wider">Billing Cycle</div>
+                                    <div class="fw-800 text-secondary">{{ billing_cycle_label }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-3">
+                            <a href="{% url 'payments:plans' %}" class="btn btn-primary px-4 rounded-pill fw-800">Change Plan</a>
+                            <button class="btn btn-light px-4 rounded-pill fw-800 border">Update Billing</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-5">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-transparent border-0 p-4">
+                        <h6 class="fw-800 mb-0">Recent Invoices</h6>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="activity-feed">
+                            {% for inv in invoices %}
+                            <div class="p-4 border-bottom border-light d-flex justify-content-between align-items-center transition-hover">
+                                <div>
+                                    <div class="fw-800 small text-primary mb-1">{{ inv.project.title }}</div>
+                                    <div class="text-secondary" style="font-size: 0.75rem;">{{ inv.issued_date|date:"M d, Y" }} · {{ inv.total_amount }} {{ inv.currency|upper }}</div>
+                                </div>
+                                <a href="{{ inv.pdf.url }}" class="btn btn-light btn-sm p-2 rounded-3 border" target="_blank">
+                                    <i data-lucide="download" style="width: 16px;"></i>
+                                </a>
+                            </div>
+                            {% empty %}
+                            <div class="p-5 text-center text-secondary small fw-600">No billing history available.</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .nav-pills .nav-link {
+        color: var(--text-secondary);
+        background: none;
+        transition: all 0.2s ease;
+    }
+    .nav-pills .nav-link:hover {
+        color: var(--accent-primary);
+        background-color: rgba(99, 102, 241, 0.05);
+    }
+    .nav-pills .nav-link.active {
+        background-color: #fff !important;
+        color: var(--accent-primary) !important;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    }
+    .transition-hover { transition: all 0.2s ease; }
+    .transition-hover:hover { transform: translateY(-2px); }
+    .x-small { font-size: 0.75rem; }
+    .uppercase { text-transform: uppercase; }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        lucide.createIcons();
+    });
+</script>
+{% endblock %}

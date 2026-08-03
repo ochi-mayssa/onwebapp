@@ -1,0 +1,189 @@
+{% extends "branding/base.html" %}
+{% load branding_extras %}
+
+{% block title %}Peer Reviews — {{ br.request_number|default:"BR-"|add:br.pk|stringformat:"s" }}{% endblock %}
+
+{% block branding_content %}
+<div class="container py-4">
+
+    {# ── Header ── #}
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+        <div>
+            <nav aria-label="breadcrumb" class="mb-1">
+                <ol class="breadcrumb small mb-0">
+                    <li class="breadcrumb-item"><a href="{% url 'branding:designer_dashboard' %}" class="text-decoration-none">My Work</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'branding:request_detail' br.pk %}" class="text-decoration-none">{{ br.request_number }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Peer Reviews</li>
+                </ol>
+            </nav>
+            <h1 class="h4 fw-bold mb-1"><i class="fa-solid fa-code-review me-2 text-primary"></i>Peer Reviews</h1>
+            <p class="text-muted mb-0 small">{{ br.company_name|default:br.request_number }}</p>
+        </div>
+        <a href="{% url 'branding:designer_dashboard' %}" class="btn btn-sm btn-outline-secondary">
+            <i class="fa-solid fa-arrow-left me-1"></i>Dashboard
+        </a>
+    </div>
+
+    {# ── Create Review Form (collapsible) ── #}
+    <div class="designer-section mb-4">
+        <h6 class="fw-bold mb-0">
+            <a class="text-decoration-none text-dark d-flex align-items-center justify-content-between" data-bs-toggle="collapse" href="#createReviewCollapse" role="button" aria-expanded="false" aria-controls="createReviewCollapse">
+                <span><i class="fa-solid fa-plus-circle me-1 text-success"></i>Create Peer Review</span>
+                <i class="fa-solid fa-chevron-down small text-muted"></i>
+            </a>
+        </h6>
+        <div class="collapse mt-3" id="createReviewCollapse">
+            <form method="post" action="{{ request.path }}">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="create_review">
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="pr-reviewer" class="form-label x-small fw-700">Reviewer</label>
+                        <select id="pr-reviewer" name="reviewer" class="form-select form-select-sm" required>
+                            <option value="">Select a designer...</option>
+                            {% for d in designers %}
+                                <option value="{{ d.id }}">{{ d.get_full_name|default:d.username }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="pr-draft" class="form-label x-small fw-700">Draft</label>
+                        <select id="pr-draft" name="draft" class="form-select form-select-sm" required>
+                            <option value="">Select a draft...</option>
+                            {% for d in drafts %}
+                                <option value="{{ d.id }}">{{ d.title|default:d.filename }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="pr-template" class="form-label x-small fw-700">Critique Template</label>
+                        <select id="pr-template" name="critique_template" class="form-select form-select-sm" required>
+                            <option value="">Select a template...</option>
+                            {% for t in templates %}
+                                <option value="{{ t.id }}">{{ t.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="pr-due" class="form-label x-small fw-700">Due Date</label>
+                        <input type="date" id="pr-due" name="due_date" class="form-control form-control-sm">
+                    </div>
+                    <div class="col-12">
+                        <label for="pr-message" class="form-label x-small fw-700">Message</label>
+                        <textarea id="pr-message" name="message" class="form-control form-control-sm" rows="3" placeholder="Add a note for the reviewer..."></textarea>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-sm mt-3">
+                    <i class="fa-solid fa-paper-plane me-1"></i>Create Review
+                </button>
+            </form>
+        </div>
+    </div>
+
+    {# ── My Reviews ── #}
+    <div class="mb-5">
+        <h5 class="fw-bold mb-3"><i class="fa-solid fa-user-check me-1 text-info"></i>My Reviews</h5>
+        {% if my_reviews %}
+            <div class="row g-3">
+                {% for review in my_reviews %}
+                <div class="col-md-6 col-xl-4">
+                    <a href="{% url 'branding:peer_review_detail' br.pk review.id %}" class="text-decoration-none">
+                        <div class="designer-section h-100 review-card">
+                            <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
+                                <div>
+                                    <span class="fw-bold text-dark">{{ review.reviewer.get_full_name|default:review.reviewer.username }}</span>
+                                    <span class="text-muted x-small d-block">Reviewer</span>
+                                </div>
+                                {% if review.status == 'PENDING' %}
+                                    <span class="badge bg-warning text-dark rounded-pill x-small">Pending</span>
+                                {% elif review.status == 'IN_PROGRESS' %}
+                                    <span class="badge bg-info rounded-pill x-small">In Progress</span>
+                                {% elif review.status == 'COMPLETED' %}
+                                    <span class="badge bg-success rounded-pill x-small">Completed</span>
+                                {% endif %}
+                            </div>
+                            {% if review.message %}
+                                <p class="text-muted small mb-2 text-truncate-2" style="max-height:2.6em;overflow:hidden;">{{ review.message|truncatechars:120 }}</p>
+                            {% endif %}
+                            <div class="d-flex align-items-center gap-3 x-small text-muted mt-auto">
+                                {% if review.due_date %}
+                                    <span><i class="fa-regular fa-calendar me-1"></i>Due {{ review.due_date|date:"M j, Y" }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="designer-section p-4 text-center">
+                <div class="empty-state-icon mx-auto mb-3" style="width:56px;height:56px;border-radius:50%;background:var(--bs-tertiary-bg,#f1f5f9);display:flex;align-items:center;justify-content:center;">
+                    <i class="fa-solid fa-user-check fa-2x text-muted"></i>
+                </div>
+                <h6 class="fw-bold mb-1">No reviews assigned to you</h6>
+                <p class="text-muted small mb-0">When someone requests a peer review from you, it will appear here.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    {# ── Reviews I Requested ── #}
+    <div class="mb-4">
+        <h5 class="fw-bold mb-3"><i class="fa-solid fa-paper-plane me-1 text-primary"></i>Reviews I Requested</h5>
+        {% if others_reviews %}
+            <div class="row g-3">
+                {% for review in others_reviews %}
+                <div class="col-md-6 col-xl-4">
+                    <a href="{% url 'branding:peer_review_detail' br.pk review.id %}" class="text-decoration-none">
+                        <div class="designer-section h-100 review-card">
+                            <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
+                                <div>
+                                    <span class="fw-bold text-dark">{{ review.reviewer.get_full_name|default:review.reviewer.username }}</span>
+                                    <span class="text-muted x-small d-block">Requested by {{ review.requested_by.get_full_name|default:review.requested_by.username }}</span>
+                                </div>
+                                {% if review.status == 'PENDING' %}
+                                    <span class="badge bg-warning text-dark rounded-pill x-small">Pending</span>
+                                {% elif review.status == 'IN_PROGRESS' %}
+                                    <span class="badge bg-info rounded-pill x-small">In Progress</span>
+                                {% elif review.status == 'COMPLETED' %}
+                                    <span class="badge bg-success rounded-pill x-small">Completed</span>
+                                {% endif %}
+                            </div>
+                            {% if review.message %}
+                                <p class="text-muted small mb-2 text-truncate-2" style="max-height:2.6em;overflow:hidden;">{{ review.message|truncatechars:120 }}</p>
+                            {% endif %}
+                            <div class="d-flex align-items-center gap-3 x-small text-muted mt-auto">
+                                {% if review.due_date %}
+                                    <span><i class="fa-regular fa-calendar me-1"></i>Due {{ review.due_date|date:"M j, Y" }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="designer-section p-4 text-center">
+                <div class="empty-state-icon mx-auto mb-3" style="width:56px;height:56px;border-radius:50%;background:var(--bs-tertiary-bg,#f1f5f9);display:flex;align-items:center;justify-content:center;">
+                    <i class="fa-solid fa-paper-plane fa-2x text-muted"></i>
+                </div>
+                <h6 class="fw-bold mb-1">No reviews requested yet</h6>
+                <p class="text-muted small mb-0">Use the form above to request a peer review from a fellow designer.</p>
+            </div>
+        {% endif %}
+    </div>
+
+</div>
+
+<style>
+    .text-truncate-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .review-card { transition: box-shadow .15s ease, transform .15s ease; }
+    .review-card:hover { box-shadow: 0 .25rem 1rem rgba(0,0,0,.08); transform: translateY(-1px); }
+</style>
+{% endblock %}

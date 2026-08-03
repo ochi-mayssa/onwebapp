@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans "Platform Monitoring" %} | OnWebApp{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'users:dashboard' %}">Dashboard</a></li>
+<li class="breadcrumb-item active">Monitoring</li>
+{% endblock %}
+
+{% block page_title %}{% trans "Operational Pulse" %}{% endblock %}
+{% block page_subtitle %}{% trans "Real-time health monitoring, geo-latency mapping, and uptime tracking for enterprise assets." %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="row g-4">
+    <!-- Configuration Column -->
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden" id="monitoring-tool">
+          <div class="card-body p-4">
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <div class="p-2 rounded-3 bg-primary-soft text-primary">
+                    <i data-lucide="activity" style="width: 20px;"></i>
+                </div>
+                <h6 class="fw-800 mb-0">Health Check Config</h6>
+            </div>
+            <form method="post" id="monitoring-form">
+              {% csrf_token %}
+              <div class="mb-4">
+                <label class="form-label small fw-800 text-secondary uppercase tracking-wider">Target Endpoint URL</label>
+                {{ form.url }}
+                <small class="form-text text-secondary x-small fw-600 mt-2 d-block">Monitoring supports HTTP/S, TCP, and DNS protocols.</small>
+              </div>
+              <div class="mb-4">
+                <label class="form-label small fw-800 text-secondary uppercase tracking-wider">Alert Email</label>
+                {{ form.email }}
+              </div>
+              <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-800 shadow-lg" id="monitor-btn">
+                <span class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true" id="submit-spinner"></span>
+                <i data-lucide="refresh-cw" class="me-2" style="width: 18px;"></i>Initialize Diagnostics
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <div class="card border-0 bg-sidebar-bg text-white p-4 rounded-4 shadow-xl position-relative overflow-hidden">
+            <div class="position-absolute top-0 end-0 p-4 opacity-10">
+                <i data-lucide="shield-check" style="width: 120px; height: 120px;"></i>
+            </div>
+            <h6 class="fw-800 mb-3 text-white position-relative">SLA Compliance</h6>
+            <div class="display-6 fw-800 mb-3 position-relative">99.99%</div>
+            <p class="text-white text-opacity-50 x-small fw-600 mb-0 position-relative">Current global average across all enterprise monitoring nodes.</p>
+        </div>
+    </div>
+
+    <!-- Live Status Column -->
+    <div class="col-lg-8">
+        {% if result %}
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+          <div class="card-body p-4">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="p-2 rounded-3 bg-success-soft text-success">
+                        <i data-lucide="check-circle" style="width: 20px;"></i>
+                    </div>
+                    <h6 class="fw-800 mb-0">Telemetry Result: <span class="text-primary">{{ result.url }}</span></h6>
+                </div>
+                <span class="badge bg-success-soft text-success rounded-pill px-3 py-2 fw-800 x-small">{{ result.status|default:"Operational" }}</span>
+            </div>
+
+            <div class="row g-4 mb-5">
+              <div class="col-md-4">
+                <div class="p-4 rounded-4 bg-surface-secondary border-0 text-center transition-hover">
+                  <div class="x-small text-secondary fw-800 uppercase tracking-widest mb-1">Global Uptime</div>
+                  <div class="h4 fw-800 text-slate-900 mb-0">{{ result.uptime|default:"99.9%" }}</div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="p-4 rounded-4 bg-surface-secondary border-0 text-center transition-hover">
+                  <div class="x-small text-secondary fw-800 uppercase tracking-widest mb-1">Response Time</div>
+                  <div class="h4 fw-800 text-slate-900 mb-0">{{ result.performance_score|default:"120" }}ms</div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="p-4 rounded-4 bg-surface-secondary border-0 text-center transition-hover">
+                  <div class="x-small text-secondary fw-800 uppercase tracking-widest mb-1">Last Check</div>
+                  <div class="h4 fw-800 text-slate-900 mb-0" style="font-size: 0.9rem;">{{ result.last_check|default:"Just now" }}</div>
+                </div>
+              </div>
+            </div>
+
+            <h6 class="fw-800 text-slate-900 mb-4">Latency Distribution (Global Nodes)</h6>
+            <div style="height: 300px;">
+                <canvas id="monitoringChart"></canvas>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Features Matrix -->
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="p-4 rounded-4 bg-white border border-color transition-hover">
+                    <div class="p-2 rounded-3 bg-primary-soft text-primary d-inline-block mb-3">
+                        <i data-lucide="globe" style="width: 20px;"></i>
+                    </div>
+                    <h6 class="fw-800 mb-2">Multi-Node Checks</h6>
+                    <p class="text-secondary small fw-600 mb-0">Diagnostic signals from 12 global locations to ensure regional accessibility.</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="p-4 rounded-4 bg-white border border-color transition-hover">
+                    <div class="p-2 rounded-3 bg-success-soft text-success d-inline-block mb-3">
+                        <i data-lucide="zap" style="width: 20px;"></i>
+                    </div>
+                    <h6 class="fw-800 mb-2">Core Web Vitals</h6>
+                    <p class="text-secondary small fw-600 mb-0">Deep resource analysis mapping LCP, FID, and CLS performance metrics.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .transition-hover { transition: all 0.2s ease; }
+    .transition-hover:hover { transform: translateY(-2px); background-color: var(--bg-surface-secondary); }
+    .x-small { font-size: 0.75rem; }
+    .uppercase { text-transform: uppercase; }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    lucide.createIcons();
+    
+    // Form handling
+    const form = document.getElementById('monitoring-form');
+    if(form) {
+        form.addEventListener('submit', function() {
+            const btn = document.getElementById('monitor-btn');
+            const spinner = document.getElementById('submit-spinner');
+            if(btn) btn.setAttribute('disabled', 'disabled');
+            if(spinner) spinner.classList.remove('d-none');
+        });
+    }
+
+    {% if result %}
+    const ctx = document.getElementById('monitoringChart');
+    if(ctx) {
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['New York', 'London', 'Tokyo', 'Singapore', 'Frankfurt', 'Sydney'],
+                datasets: [{
+                    label: 'Latency (ms)',
+                    data: [42, 88, 156, 142, 92, 198],
+                    backgroundColor: 'rgba(99, 102, 241, 0.2)',
+                    borderColor: '#6366f1',
+                    borderWidth: 2,
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    }
+    {% endif %}
+});
+</script>
+{% endblock %}

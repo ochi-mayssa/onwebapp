@@ -1,0 +1,324 @@
+{% extends 'branding/base.html' %}
+{% load branding_extras %}
+
+{% block title %}Edit {{ concept.title }} · Concept{% endblock %}
+
+{% block branding_content %}
+<div class="detail-page">
+    <div class="container py-4 py-lg-5" style="max-width: 960px;">
+
+        <div class="d-flex align-items-center gap-2 mb-4">
+            <a href="{% url 'branding:concept_detail' pk=concept.pk %}" class="btn btn-back btn-sm"><i class="fa-solid fa-arrow-left me-1"></i>Back</a>
+            <div>
+                <h1 class="fw-800 mb-0"><i class="fa-solid fa-pen me-2 text-primary"></i>Edit Concept</h1>
+                <p class="text-muted mb-0">{{ request_obj.request_number }} · {{ concept.title }}</p>
+            </div>
+        </div>
+
+        <form method="post" action="{% url 'branding:concept_edit' concept.pk %}" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger d-flex align-items-start gap-2 rounded-4 border-0 shadow-sm">
+                <i class="fa-solid fa-circle-exclamation mt-1"></i>
+                <div>{{ form.non_field_errors }}</div>
+            </div>
+            {% endif %}
+
+            <div class="detail-card rounded-4 p-4 mb-4">
+                <h5 class="fw-800 section-heading"><i class="fa-solid fa-pen-nib me-2 text-primary"></i>Basic Information</h5>
+                <div class="row g-3">
+                    <div class="col-12">
+                        {{ form.title.label_tag }}
+                        {{ form.title }}
+                    </div>
+                    <div class="col-12">
+                        {{ form.description.label_tag }}
+                        {{ form.description }}
+                    </div>
+                    <div class="col-12">
+                        {{ form.designer_ranking.label_tag }}
+                        {{ form.designer_ranking }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-card rounded-4 p-4 mb-4">
+                <h5 class="fw-800 section-heading"><i class="fa-solid fa-image me-2 text-primary"></i>Preview Image</h5>
+                <div class="row g-3 align-items-start">
+                    <div class="col-md-6">
+                        <label class="form-label fw-700 small">{{ form.preview_image.label }}</label>
+                        <div class="file-upload-wrapper position-relative">
+                            {{ form.preview_image }}
+                            <div class="file-upload-overlay d-flex align-items-center justify-content-center flex-column gap-2 rounded-3 border border-2 border-dashed p-4" id="previewOverlay" style="cursor: pointer; min-height: 180px;">
+                                {% if concept.preview_image %}
+                                <img src="{{ concept.preview_image.url }}" alt="Current" class="rounded-3" style="max-height: 160px; object-fit: contain;">
+                                <span class="small text-muted">Click to replace</span>
+                                {% else %}
+                                <i class="fa-solid fa-cloud-arrow-up fa-2x text-muted opacity-50"></i>
+                                <span class="small text-muted">Click or drag to upload</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-700 small">Preview</label>
+                        <div class="rounded-3 border overflow-hidden d-flex align-items-center justify-content-center bg-light" style="min-height: 180px;" id="previewContainer">
+                            {% if concept.preview_image %}
+                            <img src="{{ concept.preview_image.url }}" alt="Preview" class="w-100 rounded-3" style="max-height: 300px; object-fit: cover;">
+                            {% else %}
+                            <i class="fa-solid fa-image fa-3x text-muted opacity-25"></i>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-card rounded-4 p-4 mb-4">
+                <h5 class="fw-800 section-heading"><i class="fa-solid fa-swatchbook me-2 text-primary"></i>Color Palette</h5>
+                <div class="mb-3">
+                    <label class="form-label fw-700 small">Hex Values (comma-separated)</label>
+                    <input type="text" class="form-control" id="colorPaletteInput" placeholder="#FF5733, #3498DB, #2ECC71" value="">
+                    <input type="hidden" name="color_palette" id="color_palette_json" value="{{ form.color_palette.value|default:'' }}">
+                </div>
+                <div class="d-flex flex-wrap gap-3" id="colorPreview"></div>
+            </div>
+
+            <div class="detail-card rounded-4 p-4 mb-4">
+                <h5 class="fw-800 section-heading"><i class="fa-solid fa-font me-2 text-primary"></i>Typography</h5>
+                <div class="mb-3">
+                    <label class="form-label fw-700 small">Font Names (comma-separated)</label>
+                    <input type="text" class="form-control" id="fontsInput" placeholder="Montserrat, Open Sans, Playfair Display" value="">
+                    <input type="hidden" name="fonts" id="fonts_json" value="{{ form.fonts.value|default:'' }}">
+                </div>
+                <div class="d-flex flex-wrap gap-2" id="fontsPreview"></div>
+            </div>
+
+            <div class="detail-card rounded-4 p-4 mb-4">
+                <h5 class="fw-800 section-heading"><i class="fa-solid fa-tags me-2 text-primary"></i>Tags</h5>
+                <div class="option-chip-grid mt-2">{% for cb in form.tags %}{{ cb }}{% endfor %}</div>
+            </div>
+
+            <div class="detail-card rounded-4 p-4 mb-4">
+                <h5 class="fw-800 section-heading"><i class="fa-solid fa-object-ungroup me-2 text-primary"></i>Layout Description</h5>
+                <div class="row g-3">
+                    <div class="col-12">
+                        {{ form.layout_description.label_tag }}
+                        {{ form.layout_description }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                    <div class="detail-card rounded-4 p-4 h-100">
+                        <h5 class="fw-800 section-heading text-success"><i class="fa-solid fa-circle-check me-2"></i>Pros</h5>
+                        <div class="mb-3">
+                            <label class="form-label fw-700 small">One per line</label>
+                            <textarea class="form-control" id="prosInput" rows="5" placeholder="Strength 1&#10;Strength 2&#10;Strength 3"></textarea>
+                            <input type="hidden" name="pros" id="pros_json" value="{{ form.pros.value|default:'' }}">
+                        </div>
+                        <div id="prosPreview"></div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="detail-card rounded-4 p-4 h-100">
+                        <h5 class="fw-800 section-heading text-danger"><i class="fa-solid fa-circle-xmark me-2"></i>Cons</h5>
+                        <div class="mb-3">
+                            <label class="form-label fw-700 small">One per line</label>
+                            <textarea class="form-control" id="consInput" rows="5" placeholder="Consideration 1&#10;Consideration 2&#10;Consideration 3"></textarea>
+                            <input type="hidden" name="cons" id="cons_json" value="{{ form.cons.value|default:'' }}">
+                        </div>
+                        <div id="consPreview"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-card rounded-4 p-4 mb-4">
+                <h5 class="fw-800 section-heading"><i class="fa-solid fa-list-check me-2 text-primary"></i>Feature Checklist</h5>
+                <div class="mb-3">
+                    <label class="form-label fw-700 small">One feature per line</label>
+                    <textarea class="form-control" id="featuresInput" rows="5" placeholder="Feature 1&#10;Feature 2&#10;Feature 3"></textarea>
+                    <input type="hidden" name="feature_checklist" id="features_json" value="{{ form.feature_checklist.value|default:'' }}">
+                </div>
+                <div class="row g-2" id="featuresPreview"></div>
+            </div>
+
+            <div class="detail-card rounded-4 p-4 mb-4">
+                <h5 class="fw-800 section-heading"><i class="fa-solid fa-images me-2 text-primary"></i>Additional Images</h5>
+                <div class="mb-3">
+                    <label class="form-label fw-700 small">Upload supporting images (layouts, mockups, details)</label>
+                    <input type="file" name="additional_images" class="form-control" multiple accept="image/*" id="additionalImages">
+                </div>
+                {% if concept.supporting_images.all %}
+                <div class="row g-3 mb-3" id="existingImages">
+                    {% for img in concept.supporting_images.all %}
+                    <div class="col-6 col-md-4">
+                        <div class="rounded-3 overflow-hidden border position-relative">
+                            <img src="{{ img.image.url }}" alt="{{ img.caption|default:'Concept image' }}" class="w-100" style="height: 140px; object-fit: cover;">
+                            {% if img.image_type %}
+                            <span class="badge bg-dark bg-opacity-75 position-absolute bottom-0 start-0 m-1" style="font-size: .6rem;">{{ img.image_type|title }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                <div class="row g-3" id="additionalImagesPreview"></div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 border-top pt-3">
+                <a href="{% url 'branding:concept_detail' pk=concept.pk %}" class="btn btn-back">Cancel</a>
+                <button type="submit" class="btn btn-brand-primary px-4"><i class="fa-solid fa-floppy-disk me-2"></i>Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+    'use strict';
+
+    function parseJsonSafe(str) {
+        if (!str || !str.trim()) return [];
+        try { return JSON.parse(str); } catch (e) { return []; }
+    }
+
+    var existingPalette = parseJsonSafe('{{ form.color_palette.value|escapejs }}');
+    var existingFonts = parseJsonSafe('{{ form.fonts.value|escapejs }}');
+    var existingPros = parseJsonSafe('{{ form.pros.value|escapejs }}');
+    var existingCons = parseJsonSafe('{{ form.cons.value|escapejs }}');
+    var existingFeatures = parseJsonSafe('{{ form.feature_checklist.value|escapejs }}');
+
+    var previewInput = document.getElementById('id_preview_image');
+    var previewOverlay = document.getElementById('previewOverlay');
+    var previewContainer = document.getElementById('previewContainer');
+    if (previewInput && previewOverlay && previewContainer) {
+        previewOverlay.addEventListener('click', function () { previewInput.click(); });
+        previewInput.addEventListener('change', function () {
+            if (this.files && this.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    previewContainer.innerHTML = '<img src="' + e.target.result + '" alt="Preview" class="w-100 rounded-3" style="max-height: 300px; object-fit: cover;">';
+                    previewOverlay.innerHTML = '<img src="' + e.target.result + '" alt="Current" class="rounded-3" style="max-height: 160px; object-fit: contain;"><span class="small text-muted">Click to replace</span>';
+                };
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+    }
+
+    var colorInput = document.getElementById('colorPaletteInput');
+    var colorJson = document.getElementById('color_palette_json');
+    var colorPreview = document.getElementById('colorPreview');
+    if (colorInput && existingPalette.length) {
+        colorInput.value = existingPalette.join(', ');
+    }
+    function renderColorPreview() {
+        var val = colorInput.value.trim();
+        var colors = val ? val.split(',').map(function (c) { return c.trim(); }).filter(Boolean) : [];
+        colorJson.value = JSON.stringify(colors);
+        colorPreview.innerHTML = colors.map(function (c) {
+            return '<div class="text-center"><div class="rounded-circle shadow-sm border mb-1" style="width: 40px; height: 40px; background-color: ' + c + ';" title="' + c + '"></div><span class="x-small text-muted fw-700">' + c + '</span></div>';
+        }).join('');
+    }
+    if (colorInput) {
+        colorInput.addEventListener('input', renderColorPreview);
+        renderColorPreview();
+    }
+
+    var fontsInput = document.getElementById('fontsInput');
+    var fontsJson = document.getElementById('fonts_json');
+    var fontsPreview = document.getElementById('fontsPreview');
+    if (fontsInput && existingFonts.length) {
+        fontsInput.value = existingFonts.join(', ');
+    }
+    function renderFontsPreview() {
+        var val = fontsInput.value.trim();
+        var fonts = val ? val.split(',').map(function (f) { return f.trim(); }).filter(Boolean) : [];
+        fontsJson.value = JSON.stringify(fonts);
+        fontsPreview.innerHTML = fonts.map(function (f) {
+            return '<span class="badge bg-light text-dark rounded-pill px-3 py-2" style="font-size: .8rem;">' + f + '</span>';
+        }).join('');
+    }
+    if (fontsInput) {
+        fontsInput.addEventListener('input', renderFontsPreview);
+        renderFontsPreview();
+    }
+
+    var prosInput = document.getElementById('prosInput');
+    var prosJson = document.getElementById('pros_json');
+    var prosPreview = document.getElementById('prosPreview');
+    if (prosInput && existingPros.length) {
+        prosInput.value = existingPros.join('\n');
+    }
+    function renderListPreview(input, jsonField, container, icon, color) {
+        var val = input.value.trim();
+        var items = val ? val.split('\n').map(function (l) { return l.trim(); }).filter(Boolean) : [];
+        jsonField.value = JSON.stringify(items);
+        container.innerHTML = items.length ? '<ul class="list-unstyled mb-0">' + items.map(function (item) {
+            return '<li class="mb-1 d-flex align-items-start gap-2"><i class="fa-solid ' + icon + ' ' + color + ' mt-1" style="font-size: .7rem;"></i><span class="text-muted small">' + item + '</span></li>';
+        }).join('') + '</ul>' : '';
+    }
+    if (prosInput) {
+        prosInput.addEventListener('input', function () { renderListPreview(prosInput, prosJson, prosPreview, 'fa-check', 'text-success'); });
+        renderListPreview(prosInput, prosJson, prosPreview, 'fa-check', 'text-success');
+    }
+
+    var consInput = document.getElementById('consInput');
+    var consJson = document.getElementById('cons_json');
+    var consPreview = document.getElementById('consPreview');
+    if (consInput && existingCons.length) {
+        consInput.value = existingCons.join('\n');
+    }
+    if (consInput) {
+        consInput.addEventListener('input', function () { renderListPreview(consInput, consJson, consPreview, 'fa-xmark', 'text-danger'); });
+        renderListPreview(consInput, consJson, consPreview, 'fa-xmark', 'text-danger');
+    }
+
+    var featuresInput = document.getElementById('featuresInput');
+    var featuresJson = document.getElementById('features_json');
+    var featuresPreview = document.getElementById('featuresPreview');
+    if (featuresInput && existingFeatures.length) {
+        featuresInput.value = existingFeatures.join('\n');
+    }
+    function renderFeaturesPreview() {
+        var val = featuresInput.value.trim();
+        var items = val ? val.split('\n').map(function (l) { return l.trim(); }).filter(Boolean) : [];
+        featuresJson.value = JSON.stringify(items);
+        featuresPreview.innerHTML = items.map(function (item) {
+            return '<div class="col-sm-6 col-md-4"><div class="d-flex align-items-center gap-2 p-2 rounded-3" style="background: var(--bs-tertiary-bg);"><i class="fa-solid fa-square-check text-success" style="font-size: .9rem;"></i><span class="small">' + item + '</span></div></div>';
+        }).join('');
+    }
+    if (featuresInput) {
+        featuresInput.addEventListener('input', renderFeaturesPreview);
+        renderFeaturesPreview();
+    }
+
+    var additionalInput = document.getElementById('additionalImages');
+    var additionalPreview = document.getElementById('additionalImagesPreview');
+    if (additionalInput) {
+        additionalInput.addEventListener('change', function () {
+            additionalPreview.innerHTML = '';
+            Array.from(this.files).forEach(function (file) {
+                if (!file.type.startsWith('image/')) return;
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    var col = document.createElement('div');
+                    col.className = 'col-6 col-md-4';
+                    col.innerHTML = '<div class="rounded-3 overflow-hidden border"><img src="' + e.target.result + '" alt="' + file.name + '" class="w-100" style="height: 140px; object-fit: cover;"></div>';
+                    additionalPreview.appendChild(col);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+    }
+})();
+</script>
+<style>
+    .file-upload-wrapper input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 2; }
+    .file-upload-overlay { position: relative; z-index: 1; transition: border-color 0.2s ease, background-color 0.2s ease; }
+    .file-upload-wrapper input[type="file"]:hover + .file-upload-overlay { border-color: var(--bs-primary); background-color: rgba(var(--bs-primary-rgb), 0.05); }
+</style>
+{% endblock %}

@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block title %}Run Social Crawl{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'services:social_dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item active">Run Crawl</li>
+        </ol>
+    </nav>
+
+    <div class="card mb-4">
+        <div class="card-header">Configure Crawl</div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    {{ form.handle.label_tag }}
+                    {{ form.handle }}
+                    <div class="form-text">Enter username or handle (e.g. @nike).</div>
+                </div>
+                <div class="mb-3">
+                    {{ form.platforms.label_tag }}
+                    {{ form.platforms }}
+                </div>
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-robot"></i> Start Crawl
+                </button>
+            </form>
+        </div>
+    </div>
+
+    {% if error %}
+    <div class="alert alert-danger">
+        <i class="fas fa-exclamation-triangle"></i> {{ error }}
+    </div>
+    {% endif %}
+
+    {% if result %}
+    <div class="card">
+        <div class="card-header bg-success text-white">Crawl Results</div>
+        <div class="card-body">
+            {% for platform, data in result.items %}
+                <h5 class="text-capitalize">{{ platform }}</h5>
+                {% if data.status == 'success' %}
+                    <ul class="mb-3">
+                        <li>User: <strong>{{ data.user }}</strong></li>
+                        <li>Processed: {{ data.posts_processed }} posts</li>
+                        <li>New: {{ data.new_posts }} posts</li>
+                    </ul>
+                {% else %}
+                    <p class="text-warning">{{ data.message }}</p>
+                {% endif %}
+                <hr>
+            {% endfor %}
+            
+            <a href="{% url 'services:social_dashboard' %}" class="btn btn-outline-primary">View Dashboard</a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

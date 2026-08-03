@@ -1,0 +1,353 @@
+{% extends 'branding/base.html' %}
+{% load branding_extras %}
+
+{% block title %}Compare Concepts · {{ request_obj.request_number }}{% endblock %}
+
+{% block branding_content %}
+<div class="detail-page">
+    <div class="container py-4 py-lg-5">
+
+        <div class="d-flex align-items-start justify-content-between flex-wrap gap-3 mb-4">
+            <div>
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <a href="{% url 'branding:concept_list' request_pk=request_obj.pk %}" class="btn btn-back btn-sm"><i class="fa-solid fa-arrow-left me-1"></i>All Concepts</a>
+                    <span class="request-number-display">{{ request_obj.request_number }}</span>
+                </div>
+                <h1 class="fw-800 mb-1"><i class="fa-solid fa-code-compare me-2 text-primary"></i>Compare Concepts</h1>
+                <p class="text-muted mb-0">{{ request_obj.company_name }} · {{ concepts|length }} concept{{ concepts|length|pluralize }} selected</p>
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="{% url 'branding:concept_compare' request_pk=request_obj.pk %}" class="btn btn-back btn-sm">
+                    <i class="fa-solid fa-arrow-right me-1"></i>Add More Concepts
+                </a>
+                <button class="btn btn-sm {% if overlay_mode %}btn-primary{% else %}btn-outline-primary{% endif %}" id="overlayToggle">
+                    <i class="fa-solid fa-layer-group me-1"></i>Overlay Mode
+                </button>
+            </div>
+        </div>
+
+        {% if concepts|length < 2 %}
+        <div class="detail-card rounded-4 p-5 text-center">
+            <div class="mb-3" style="font-size: 4rem; color: var(--bs-primary); opacity: .3;">
+                <i class="fa-solid fa-code-compare"></i>
+            </div>
+            <h4 class="fw-800 mb-2">Select at Least Two Concepts</h4>
+            <p class="text-muted mb-4" style="max-width: 480px; margin: 0 auto;">
+                Choose two or more design concepts to compare them side by side. You can compare up to 3 concepts at once.
+            </p>
+            <a href="{% url 'branding:concept_list' request_pk=request_obj.pk %}" class="btn btn-brand-primary px-4">
+                <i class="fa-solid fa-arrow-left me-2"></i>Browse Concepts
+            </a>
+        </div>
+
+        {% else %}
+
+        {% if overlay_mode %}
+        <div class="detail-card rounded-4 p-4 mb-4">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h6 class="fw-800 mb-0"><i class="fa-solid fa-layer-group me-2 text-primary"></i>Overlay Comparison</h6>
+                <a href="?{% for cid in compare_ids %}{% if not forloop.first %}&{% endif %}concept={{ cid }}{% endfor %}" class="btn btn-sm btn-back">Exit Overlay</a>
+            </div>
+            <div class="position-relative" style="max-height: 500px; overflow: hidden; border-radius: 12px; background: var(--bs-tertiary-bg);">
+                {% for concept in concepts %}
+                <img src="{{ concept.preview_image.url }}" alt="{{ concept.title }}" class="overlay-img w-100" style="position: absolute; top: 0; left: 0; object-fit: contain; max-height: 500px; transition: opacity 0.3s ease;" data-index="{{ forloop.counter0 }}" {% if not forloop.first %}style="opacity: 0;"{% endif %}>
+                {% endfor %}
+                {% if concepts.0.preview_image %}
+                <img src="{{ concepts.0.preview_image.url }}" alt="" class="w-100" style="visibility: hidden; max-height: 500px;">
+                {% endif %}
+            </div>
+            <div class="d-flex align-items-center justify-content-between mt-3 flex-wrap gap-3">
+                <div class="d-flex gap-3 flex-wrap">
+                    {% for concept in concepts %}
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-secondary rounded-pill" style="font-size: .65rem;">{{ forloop.counter }}</span>
+                        <span class="small fw-700">{{ concept.title }}</span>
+                        <input type="range" class="form-range overlay-slider" min="0" max="100" value="{% widthratio forloop.counter concepts|length 100 %}" data-index="{{ forloop.counter0 }}" style="width: 120px;">
+                    </div>
+                    {% endfor %}
+                </div>
+                <span class="x-small text-muted">Drag sliders to adjust opacity</span>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="row g-4 mb-4" style="{% if overlay_mode %}margin-top: 1rem;{% endif %}">
+            {% for concept in concepts %}
+            <div class="col-md-{% if concepts|length == 2 %}6{% else %}4{% endif %}">
+                <div class="detail-card rounded-4 overflow-hidden h-100">
+                    <div class="position-relative" style="height: 240px; background: var(--bs-tertiary-bg);">
+                        {% if concept.preview_image %}
+                        <a href="{% url 'branding:concept_detail' pk=concept.pk %}">
+                            <img src="{{ concept.preview_image.url }}" alt="{{ concept.title }}" class="w-100" style="height: 240px; object-fit: cover;">
+                        </a>
+                        {% else %}
+                        <div class="d-flex align-items-center justify-content-center h-100">
+                            <i class="fa-solid fa-image fa-3x text-muted opacity-25"></i>
+                        </div>
+                        {% endif %}
+                        <div class="position-absolute top-0 start-0 m-2">
+                            <span class="badge rounded-pill px-2 py-1 status-pill status-{{ concept.status|lower }}">{{ concept.get_status_display|default:concept.status }}</span>
+                        </div>
+                        {% if concept.is_client_favorite %}
+                        <div class="position-absolute top-0 end-0 m-2">
+                            <span class="badge bg-danger rounded-pill px-2 py-1"><i class="fa-solid fa-heart me-1"></i>Favorite</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="p-4">
+                        <h6 class="fw-800 mb-1">{{ concept.title }}</h6>
+                        {% if concept.description %}
+                        <p class="text-muted small mb-3">{{ concept.description|truncatewords:30 }}</p>
+                        {% endif %}
+
+                        {% if concept.color_palette %}
+                        <div class="mb-3">
+                            <span class="x-small text-muted fw-700 d-block mb-1">Color Palette</span>
+                            <div class="d-flex flex-wrap gap-1">
+                                {% for color in concept.color_palette %}
+                                <span class="rounded-circle border" style="width: 24px; height: 24px; background-color: {{ color }}; display: inline-block; border-color: var(--bs-body-bg) !important;" title="{{ color }}"></span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if concept.fonts %}
+                        <div class="mb-3">
+                            <span class="x-small text-muted fw-700 d-block mb-1">Typography</span>
+                            <div class="d-flex flex-wrap gap-1">
+                                {% for font in concept.fonts %}
+                                <span class="badge bg-light text-dark rounded-pill px-2 py-0" style="font-size: .65rem;">{{ font }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if concept.tags %}
+                        <div class="mb-3">
+                            <span class="x-small text-muted fw-700 d-block mb-1">Tags</span>
+                            <div class="d-flex flex-wrap gap-1">
+                                {% for tag in concept.tags %}
+                                <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-2 py-0" style="font-size: .65rem;">{{ tag }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="pt-2 border-top">
+                            <a href="{% url 'branding:concept_detail' pk=concept.pk %}" class="btn btn-sm btn-brand-primary w-100">
+                                <i class="fa-solid fa-arrow-right me-1"></i>View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="detail-card rounded-4 p-4 mb-4">
+            <h6 class="fw-800 mb-3"><i class="fa-solid fa-star me-2 text-primary"></i>Element Ratings Comparison</h6>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th class="border-0 fw-700 small text-muted" style="min-width: 140px;">Element</th>
+                            {% for concept in concepts %}
+                            <th class="border-0 fw-700 small text-muted text-center" style="min-width: 120px;">
+                                <div class="d-flex flex-column align-items-center">
+                                    {% if concept.preview_image %}
+                                    <img src="{{ concept.preview_image.url }}" alt="" class="rounded-circle mb-1" style="width: 32px; height: 32px; object-fit: cover;">
+                                    {% endif %}
+                                    {{ concept.title }}
+                                </div>
+                            </th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for key, label in RATING_ELEMENTS %}
+                        <tr>
+                            <td class="fw-700 small">{{ label }}</td>
+                            {% for concept in concepts %}
+                            <td class="text-center">
+                                {% with avg_data=concept.element_ratings.all|dictsort:"element" %}
+                                {% with rating_data=concept|get_item:key %}
+                                {% endwith %}
+                                {% endwith %}
+                                {% with avg_score=None %}
+                                {% endwith %}
+                                <div class="d-inline-flex align-items-center gap-1 justify-content-center">
+                                    {% for r in concept.element_ratings.all %}
+                                    {% if r.element == key %}
+                                    <span class="fw-700 small">{{ r.score }}</span>
+                                    <i class="fa-solid fa-star text-warning" style="font-size: .7rem;"></i>
+                                    {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                        <tr class="border-top">
+                            <td class="fw-800 small">Average Rating</td>
+                            {% for concept in concepts %}
+                            <td class="text-center">
+                                {% if concept.avg_rating %}
+                                <span class="fw-800 text-primary">{{ concept.avg_rating|floatformat:1 }}</span>
+                                {% star_html_readonly concept.avg_rating %}
+                                {% else %}
+                                <span class="text-muted small">—</span>
+                                {% endif %}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td class="fw-800 small">Total Ratings</td>
+                            {% for concept in concepts %}
+                            <td class="text-center fw-700">{{ concept.total_ratings }}</td>
+                            {% endfor %}
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-md-6">
+                <div class="detail-card rounded-4 p-4 h-100 border-success border-opacity-25">
+                    <h6 class="fw-800 mb-3 text-success"><i class="fa-solid fa-circle-check me-2"></i>Pros Comparison</h6>
+                    {% for concept in concepts %}
+                    <div class="{% if not forloop.first %}mt-3 pt-3 border-top{% endif %}">
+                        <span class="x-small fw-700 text-muted d-block mb-2">{{ concept.title }}</span>
+                        {% if concept.pros %}
+                        <ul class="list-unstyled mb-0">
+                            {% for pro in concept.pros %}
+                            <li class="mb-1 d-flex align-items-start gap-2">
+                                <i class="fa-solid fa-check text-success mt-1" style="font-size: .6rem;"></i>
+                                <span class="small text-muted">{{ pro }}</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <span class="x-small text-muted">No pros listed</span>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="detail-card rounded-4 p-4 h-100 border-danger border-opacity-25">
+                    <h6 class="fw-800 mb-3 text-danger"><i class="fa-solid fa-circle-xmark me-2"></i>Cons Comparison</h6>
+                    {% for concept in concepts %}
+                    <div class="{% if not forloop.first %}mt-3 pt-3 border-top{% endif %}">
+                        <span class="x-small fw-700 text-muted d-block mb-2">{{ concept.title }}</span>
+                        {% if concept.cons %}
+                        <ul class="list-unstyled mb-0">
+                            {% for con in concept.cons %}
+                            <li class="mb-1 d-flex align-items-start gap-2">
+                                <i class="fa-solid fa-xmark text-danger mt-1" style="font-size: .6rem;"></i>
+                                <span class="small text-muted">{{ con }}</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <span class="x-small text-muted">No cons listed</span>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="detail-card rounded-4 p-4 mb-4">
+            <h6 class="fw-800 mb-3"><i class="fa-solid fa-list-check me-2 text-primary"></i>Feature Checklist Comparison</h6>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th class="border-0 fw-700 small text-muted" style="min-width: 200px;">Feature</th>
+                            {% for concept in concepts %}
+                            <th class="border-0 fw-700 small text-muted text-center">{{ concept.title }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% with all_features=None %}
+                        {% endwith %}
+                        {% for concept in concepts %}
+                        {% for feature in concept.feature_checklist %}
+                        <tr data-feature="{{ feature }}">
+                            <td class="small">{{ feature }}</td>
+                            {% for c in concepts %}
+                            <td class="text-center">
+                                {% if feature in c.feature_checklist %}
+                                <i class="fa-solid fa-square-check text-success" style="font-size: 1rem;"></i>
+                                {% else %}
+                                <i class="fa-regular fa-square text-muted" style="font-size: 1rem;"></i>
+                                {% endif %}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+    'use strict';
+
+    var overlayToggle = document.getElementById('overlayToggle');
+    if (overlayToggle) {
+        overlayToggle.addEventListener('click', function () {
+            var url = new URL(window.location.href);
+            if (url.searchParams.has('overlay')) {
+                url.searchParams.delete('overlay');
+            } else {
+                url.searchParams.set('overlay', '1');
+            }
+            window.location.href = url.toString();
+        });
+    }
+
+    var sliders = document.querySelectorAll('.overlay-slider');
+    var images = document.querySelectorAll('.overlay-img');
+    if (sliders.length && images.length) {
+        sliders.forEach(function (slider) {
+            slider.addEventListener('input', function () {
+                var idx = parseInt(this.dataset.index);
+                var opacity = parseInt(this.value) / 100;
+                images.forEach(function (img) {
+                    if (parseInt(img.dataset.index) === idx) {
+                        img.style.opacity = opacity;
+                    }
+                });
+            });
+        });
+    }
+
+    var featureRows = document.querySelectorAll('tbody tr[data-feature]');
+    var featureMap = {};
+    featureRows.forEach(function (row) {
+        var f = row.dataset.feature;
+        if (!featureMap[f]) featureMap[f] = [];
+        featureMap[f].push(row);
+    });
+    Object.keys(featureMap).forEach(function (f) {
+        if (featureMap[f].length > 1) {
+            featureMap[f].forEach(function (r, i) {
+                if (i > 0) r.style.display = 'none';
+            });
+        }
+    });
+})();
+</script>
+{% endblock %}

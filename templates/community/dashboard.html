@@ -1,0 +1,324 @@
+{% extends "base.html" %}
+{% load static i18n %}
+
+{% block title %}{% trans "Community Intelligence" %} | OnWebApp{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active">{% trans "Community" %}</li>
+{% endblock %}
+
+{% block page_title %}{% trans "Community Hub" %}{% endblock %}
+{% block page_subtitle %}{% trans "Collaborative tools for building websites and brand identities." %}{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'users:profile_edit' %}" class="btn btn-light rounded-pill px-4 border shadow-sm fw-800">
+    <i data-lucide="user-cog" class="me-2"></i>{% trans "Edit Identity" %}
+</a>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="row g-4">
+    <!-- Main Content Column -->
+    <div class="col-lg-8">
+
+        <!-- Stats Row -->
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-3 text-center">
+                        <div class="p-2 rounded-3 bg-primary-soft text-primary d-inline-flex mb-2">
+                            <i data-lucide="rocket" style="width: 18px;"></i>
+                        </div>
+                        <h4 class="fw-800 mb-0">{{ stats.projects_count }}</h4>
+                        <span class="x-small text-secondary fw-600">Projects</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-3 text-center">
+                        <div class="p-2 rounded-3 bg-success-soft text-success d-inline-flex mb-2">
+                            <i data-lucide="message-square" style="width: 18px;"></i>
+                        </div>
+                        <h4 class="fw-800 mb-0">{{ stats.forum_posts_count }}</h4>
+                        <span class="x-small text-secondary fw-600">Forum Posts</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-3 text-center">
+                        <div class="p-2 rounded-3 bg-warning-soft text-warning d-inline-flex mb-2">
+                            <i data-lucide="message-circle" style="width: 18px;"></i>
+                        </div>
+                        <h4 class="fw-800 mb-0">{{ stats.forum_comments_count }}</h4>
+                        <span class="x-small text-secondary fw-600">Comments</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-3 text-center">
+                        <div class="p-2 rounded-3 bg-danger-soft text-danger d-inline-flex mb-2">
+                            <i data-lucide="award" style="width: 18px;"></i>
+                        </div>
+                        <h4 class="fw-800 mb-0">{{ stats.badges_count }}</h4>
+                        <span class="x-small text-secondary fw-600">Badges</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Onboarding Session -->
+        {% if active_session %}
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="p-3 rounded-3 bg-success-soft text-success">
+                        <i data-lucide="wand-2" style="width: 24px;"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h6 class="fw-800 mb-1">Onboarding in Progress</h6>
+                        <p class="mb-0 text-secondary small fw-600">Step {{ active_session.current_step }} of 13 &bull; {{ active_session.get_status_display }}</p>
+                    </div>
+                    <a href="{% url 'community:wizard_step' active_session.current_step %}" class="btn btn-success btn-sm rounded-pill px-4 fw-800">Continue <i class="fas fa-arrow-right ms-1"></i></a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Alerts Section -->
+        {% if pending_approvals or delayed_phases %}
+        <div class="mb-4">
+            {% for phase in delayed_phases %}
+            <div class="p-4 rounded-4 bg-danger-soft border-0 shadow-sm d-flex align-items-center mb-3 reveal-up">
+                <div class="p-3 rounded-circle bg-white text-danger me-4 shadow-sm">
+                    <i data-lucide="alert-circle" style="width: 24px;"></i>
+                </div>
+                <div class="flex-grow-1">
+                    <h6 class="fw-800 mb-1 text-danger">Phase Delayed: {{ phase.project.title }}</h6>
+                    <p class="mb-0 small text-secondary fw-600">The {{ phase.get_phase_type_display }} phase requires immediate technical intervention.</p>
+                </div>
+                <a href="{% url 'projects:project_detail' phase.project.id %}" class="btn btn-danger btn-sm rounded-pill px-4 fw-800">Resolve</a>
+            </div>
+            {% endfor %}
+
+            {% for phase in pending_approvals %}
+            <div class="p-4 rounded-4 bg-warning-soft border-0 shadow-sm d-flex align-items-center mb-3 reveal-up">
+                <div class="p-3 rounded-circle bg-white text-warning me-4 shadow-sm">
+                    <i data-lucide="clock" style="width: 24px;"></i>
+                </div>
+                <div class="flex-grow-1">
+                    <h6 class="fw-800 mb-1 text-warning">Approval Required: {{ phase.project.title }}</h6>
+                    <p class="mb-0 small text-secondary fw-600">Please review and authorize the {{ phase.get_phase_type_display }} phase.</p>
+                </div>
+                <a href="{% url 'projects:project_detail' phase.project.id %}" class="btn btn-warning btn-sm rounded-pill px-4 fw-800">Review</a>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Community Tools Section -->
+        <div class="row g-4 mb-4">
+            <!-- Smart Onboarding Card -->
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100 transition-hover">
+                    <div class="card-body p-4 text-center">
+                        <div class="p-4 rounded-4 bg-success-soft text-success d-inline-flex mb-4 shadow-sm">
+                            <i data-lucide="wand-2" style="width: 32px; height: 32px;"></i>
+                        </div>
+                        <h5 class="fw-800 mb-2">{% trans "Smart Onboarding" %}</h5>
+                        <p class="text-secondary small mb-4 px-3">13-step guided wizard with AI-powered cost estimation and instant proposal generation.</p>
+                        <a href="{% url 'community:wizard_start' %}?new=1" class="btn btn-success w-100 rounded-pill py-2 fw-800">Start Wizard <i class="fas fa-arrow-right ms-1"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Brand Assist Card -->
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100 transition-hover">
+                    <div class="card-body p-4 text-center">
+                        <div class="p-4 rounded-4 bg-primary-soft text-primary d-inline-flex mb-4 shadow-sm">
+                            <i data-lucide="palette" style="width: 32px; height: 32px;"></i>
+                        </div>
+                        <h5 class="fw-800 mb-2">{% trans "Identity Studio" %}</h5>
+                        <p class="text-secondary small mb-4 px-3">Develop brand assets and visual systems with AI-assisted creative tools.</p>
+                        <a href="{% url 'community:brand_assist' %}" class="btn btn-primary w-100 rounded-pill py-2 fw-800">Open Studio</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Project Pipeline -->
+        <div class="card border-0 shadow-sm overflow-hidden">
+            <div class="card-header bg-transparent border-0 p-4 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-800">{% trans "Innovation Pipeline" %}</h5>
+                <span class="badge bg-surface-secondary text-secondary rounded-pill px-3 py-2 fw-800">{{ projects|length }} Active</span>
+            </div>
+            <div class="card-body p-0">
+                {% if projects %}
+                <div class="list-group list-group-flush border-0">
+                    {% for project in projects %}
+                    <a href="{% url 'projects:project_detail' project.id %}" class="list-group-item list-group-item-action p-4 bg-transparent border-bottom border-light transition-hover">
+                        <div class="d-flex w-100 justify-content-between align-items-center mb-3">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="p-2 rounded-3 bg-primary-soft text-primary"><i data-lucide="rocket" style="width: 18px;"></i></div>
+                                <h6 class="mb-0 fw-800">{{ project.title }}</h6>
+                            </div>
+                            <span class="badge rounded-pill px-3 py-2 
+                                {% if project.status == 'COMPLETED' %}bg-success-soft text-success
+                                {% elif project.status == 'IN_PROGRESS' %}bg-primary-soft text-primary
+                                {% elif project.status == 'DELAYED' %}bg-danger-soft text-danger
+                                {% else %}bg-surface-secondary text-secondary{% endif %} fw-800 x-small">
+                                {{ project.get_status_display }}
+                            </span>
+                        </div>
+                        <p class="text-secondary small mb-3 fw-600">{{ project.description|truncatechars:120 }}</p>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="x-small text-secondary fw-800 uppercase tracking-widest">Execution Progress</span>
+                            <span class="x-small text-primary fw-800">{{ project.progress_percentage }}%</span>
+                        </div>
+                        <div class="progress rounded-pill" style="height: 6px; background-color: var(--bg-surface-secondary);">
+                            <div class="progress-bar bg-primary rounded-pill shadow-sm" style="width: {{ project.progress_percentage }}%"></div>
+                        </div>
+                        <div class="mt-3 d-flex align-items-center gap-2">
+                            <i data-lucide="calendar" class="text-secondary" style="width: 12px;"></i>
+                            <span class="x-small text-secondary fw-600">Expected Delivery: {{ project.expected_delivery_date|date:"M d, Y" }}</span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="p-5 text-center">
+                    <div class="p-4 rounded-circle bg-surface-secondary d-inline-flex mb-4">
+                        <i data-lucide="inbox" class="text-secondary opacity-30" style="width: 48px; height: 48px;"></i>
+                    </div>
+                    <h6 class="fw-800 text-secondary">No projects in pipeline</h6>
+                    <p class="text-secondary small mb-3">Start your first project with our smart onboarding wizard.</p>
+                    <a href="{% url 'community:wizard_start' %}?new=1" class="btn btn-success btn-sm rounded-pill px-4 fw-800">Start Project <i class="fas fa-arrow-right ms-1"></i></a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Sidebar -->
+    <div class="col-lg-4">
+        <!-- Recent Activity -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-transparent border-0 p-4 pb-0 d-flex justify-content-between align-items-center">
+                <h6 class="fw-800 mb-0">Intelligence Feed</h6>
+                {% if activities.paginator.num_pages > 1 %}
+                <a href="?page={{ activities.number|add:1 }}" class="x-small fw-800 text-primary text-decoration-none">View All</a>
+                {% endif %}
+            </div>
+            <div class="card-body p-0">
+                {% if recent_activities %}
+                <div class="activity-feed">
+                    {% for activity in recent_activities %}
+                    <div class="p-4 border-bottom border-light d-flex gap-3 transition-hover">
+                        <div class="p-2 rounded-circle d-flex align-items-center justify-content-center
+                            {% if 'start' in activity.action|lower %}bg-success-soft text-success
+                            {% elif 'complete' in activity.action|lower %}bg-primary-soft text-primary
+                            {% elif 'payment' in activity.action|lower %}bg-warning-soft text-warning
+                            {% elif 'forum' in activity.action|lower or 'post' in activity.action|lower %}bg-info-soft text-info
+                            {% elif 'badge' in activity.action|lower %}bg-danger-soft text-danger
+                            {% else %}bg-surface-secondary text-secondary{% endif %}"
+                            style="width: 36px; height: 36px; flex-shrink: 0;">
+                            <i data-lucide="{% if 'start' in activity.action|lower %}play{% elif 'complete' in activity.action|lower %}check-circle{% elif 'payment' in activity.action|lower %}credit-card{% elif 'forum' in activity.action|lower or 'post' in activity.action|lower %}message-square{% elif 'badge' in activity.action|lower %}award{% else %}bell{% endif %}" style="width: 14px;"></i>
+                        </div>
+                        <div class="min-width-0">
+                            <p class="mb-1 small fw-800 text-primary text-truncate">{{ activity.action }}</p>
+                            <span class="x-small text-secondary fw-600">{{ activity.timestamp|timesince }} ago</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="p-5 text-center">
+                    <p class="text-secondary small fw-600 mb-0">No recent activity detected.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Support Card -->
+        <div class="card border-0 bg-sidebar-bg text-white p-4 p-md-5 rounded-4 shadow-xl overflow-hidden position-relative">
+            <div class="position-absolute top-0 end-0 p-4 opacity-10">
+                <i data-lucide="headset" style="width: 120px; height: 120px;"></i>
+            </div>
+            <h5 class="fw-800 mb-3 position-relative">{% trans "Expert Assistance" %}</h5>
+            <p class="text-white text-opacity-50 small mb-5 position-relative">Our technical support team is standing by to assist with your enterprise deployment.</p>
+            <a href="#" class="btn btn-white w-100 rounded-pill py-2 fw-800 position-relative shadow-lg">Contact Intelligence Support</a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .transition-hover { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+    .transition-hover:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.08); }
+    .x-small { font-size: 0.75rem; }
+    .uppercase { text-transform: uppercase; }
+    .tracking-widest { letter-spacing: 0.05em; }
+    .min-width-0 { min-width: 0; }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        lucide.createIcons();
+    });
+</script>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const socket = new WebSocket(protocol + '//' + window.location.host + '/ws/dashboard/');
+
+    socket.onopen = function(e) {
+        console.log("WebSocket connection established");
+    };
+
+    socket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        console.log('Received:', data);
+
+        if (data.message) {
+            showToast(data.message, data.status === 'DELAYED' ? 'danger' : 'info');
+            setTimeout(() => {
+                location.reload();
+            }, 3000);
+        }
+    };
+
+    socket.onclose = function(e) {
+        console.error('Chat socket closed unexpectedly');
+    };
+
+    function showToast(message, type='info') {
+        const toastContainer = document.getElementById('toast-container') || createToastContainer();
+        const bgClass = type === 'danger' ? 'bg-danger' : 'bg-primary';
+
+        const toastHtml = `
+            <div class="toast show align-items-center text-white ${bgClass} border-0 mb-2" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        ${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+        `;
+        toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+    }
+
+    function createToastContainer() {
+        const container = document.createElement('div');
+        container.id = 'toast-container';
+        container.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+        container.style.zIndex = '1050';
+        document.body.appendChild(container);
+        return container;
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,71 @@
+{% extends "branding/base.html" %}
+{% load branding_extras %}
+
+{% block title %}Edit Template — {{ tpl.name }}{% endblock %}
+
+{% block branding_content %}
+<div class="container py-4" style="max-width: 700px;">
+
+    {# ── Header ── #}
+    <nav aria-label="breadcrumb" class="mb-2">
+        <ol class="breadcrumb mb-0 small">
+            <li class="breadcrumb-item"><a href="{% url 'branding:designer_dashboard' %}" class="text-decoration-none"><i class="fa-solid fa-palette me-1"></i>My Work</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'branding:collection_template_list' %}" class="text-decoration-none">Collection Templates</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'branding:collection_template_detail' collection_pk=collection.pk %}" class="text-decoration-none">{{ collection.name }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Edit</li>
+        </ol>
+    </nav>
+    <h1 class="h4 fw-bold mb-4"><i class="fa-solid fa-pen me-2"></i>Edit Template</h1>
+
+    {# ── Form ── #}
+    <form method="post" enctype="multipart/form-data" class="detail-card rounded-4 p-4">
+        {% csrf_token %}
+
+        {% if form.errors %}
+        <div class="alert alert-danger small mb-3">
+            {% for field, errors in form.errors.items %}
+            <strong>{{ field }}:</strong> {{ errors|join:", " }}<br>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label for="id_name" class="form-label x-small fw-700">Name</label>
+                {{ form.name }}
+            </div>
+            <div class="col-md-6">
+                <label for="id_template_type" class="form-label x-small fw-700">Type</label>
+                {{ form.template_type }}
+            </div>
+            <div class="col-12">
+                <label for="id_description" class="form-label x-small fw-700">Description</label>
+                {{ form.description }}
+            </div>
+            <div class="col-md-6">
+                <label for="id_file" class="form-label x-small fw-700">File{% if tpl.file %} (current: {{ tpl.file.name|truncatechars:30 }}){% endif %}</label>
+                {{ form.file }}
+            </div>
+            <div class="col-md-6">
+                <label for="id_thumbnail" class="form-label x-small fw-700">Thumbnail{% if tpl.thumbnail %} (current set){% endif %}</label>
+                {{ form.thumbnail }}
+            </div>
+            <div class="col-md-6">
+                <label for="id_sort_order" class="form-label x-small fw-700">Sort Order</label>
+                {{ form.sort_order }}
+            </div>
+            <div class="col-md-6 d-flex align-items-end">
+                <div class="form-check form-switch">
+                    {{ form.is_active }}
+                    <label class="form-check-label small" for="id_is_active">Active</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4 d-flex gap-2">
+            <button type="submit" class="btn btn-sm btn-brand-primary"><i class="fa-solid fa-check me-1"></i>Save Changes</button>
+            <a href="{% url 'branding:collection_template_detail' collection_pk=collection.pk %}" class="btn btn-sm btn-outline-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

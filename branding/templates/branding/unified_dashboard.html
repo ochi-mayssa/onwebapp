@@ -1,0 +1,604 @@
+{% extends 'branding/base.html' %}
+{% load static branding_extras %}
+
+{% block branding_content %}
+<style>
+/* ═══════════════════════════════════════════════════════════════════════════
+   Unified Dashboard
+   ═══════════════════════════════════════════════════════════════════════════ */
+.ud-header{background:linear-gradient(135deg,var(--brand-primary,#4f46e5) 0%,var(--brand-accent,#7c3aed) 100%);color:#fff;border-radius:1rem;padding:1.5rem 2rem;margin-bottom:1.5rem;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem}
+.ud-header h1{margin:0;font-size:1.4rem;font-weight:700}
+.ud-header .subtitle{opacity:.85;font-size:.85rem}
+.ud-role-switch{display:flex;gap:.5rem;align-items:center}
+.ud-role-switch .btn{font-size:.75rem;padding:.3rem .8rem;border-radius:2rem;border:1px solid rgba(255,255,255,.3);color:#fff;background:rgba(255,255,255,.15)}
+.ud-role-switch .btn:hover,.ud-role-switch .btn.active{background:#fff;color:var(--brand-primary,#4f46e5)}
+.ud-layout-bar{display:flex;gap:.5rem;align-items:center;margin-bottom:1rem;flex-wrap:wrap}
+.ud-layout-bar .btn{font-size:.75rem;padding:.35rem .75rem;border-radius:.5rem}
+
+.ud-grid{display:grid;gap:1rem;grid-template-columns:repeat(var(--grid-cols,3),1fr)}
+.ud-grid.layout-compact{gap:.75rem}
+.ud-grid.layout-wide{grid-template-columns:repeat(2,1fr)}
+.ud-grid.layout-fullscreen{grid-template-columns:1fr}
+
+.ud-widget{background:var(--surface-card,#fff);border:1px solid var(--border-color,#e5e7eb);border-radius:.75rem;overflow:hidden;transition:box-shadow .2s,transform .2s}
+.ud-widget:hover{box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.ud-widget.dragging{opacity:.5;transform:scale(.98)}
+.ud-widget.drag-over{border-color:var(--brand-primary,#4f46e5);box-shadow:0 0 0 2px rgba(79,70,229,.25)}
+.ud-widget-header{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1rem;border-bottom:1px solid var(--border-color,#e5e7eb);background:var(--surface-muted,#f9fafb);cursor:move;user-select:none}
+.ud-widget-header h3{margin:0;font-size:.85rem;font-weight:600;display:flex;align-items:center;gap:.5rem}
+.ud-widget-header h3 i{font-size:.8rem;opacity:.6}
+.ud-widget-actions{display:flex;gap:.25rem}
+.ud-widget-actions .btn{padding:.2rem .4rem;font-size:.7rem;border:none;background:transparent;color:var(--text-secondary,#6b7280);border-radius:.3rem;cursor:pointer}
+.ud-widget-actions .btn:hover{background:var(--surface-hover,#f3f4f6);color:var(--text-primary,#111827)}
+.ud-widget-body{padding:1rem}
+.ud-widget.collapsed .ud-widget-body{display:none}
+
+.ud-empty{grid-column:1/-1;text-align:center;padding:2rem;color:var(--text-muted,#9ca3af);font-size:.9rem}
+.ud-add-widget{border:2px dashed var(--border-color,#d1d5db);border-radius:.75rem;display:flex;align-items:center;justify-content:center;min-height:120px;cursor:pointer;transition:all .2s;color:var(--text-muted,#9ca3af)}
+.ud-add-widget:hover{border-color:var(--brand-primary,#4f46e5);color:var(--brand-primary,#4f46e5);background:rgba(79,70,229,.04)}
+
+/* Stats widgets */
+.ud-stat-card{text-align:center;padding:.5rem 0}
+.ud-stat-value{font-size:2rem;font-weight:700;line-height:1.2;background:linear-gradient(135deg,var(--brand-primary,#4f46e5),var(--brand-accent,#7c3aed));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.ud-stat-label{font-size:.75rem;color:var(--text-secondary,#6b7280);margin-top:.25rem}
+.ud-stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(80px,1fr));gap:.5rem}
+
+/* Table widgets */
+.ud-table{width:100%;font-size:.8rem;border-collapse:collapse}
+.ud-table th{text-align:left;padding:.4rem .5rem;font-weight:600;color:var(--text-secondary,#6b7280);border-bottom:2px solid var(--border-color,#e5e7eb);font-size:.7rem;text-transform:uppercase;letter-spacing:.5px}
+.ud-table td{padding:.4rem .5rem;border-bottom:1px solid var(--border-color,#f3f4f6)}
+.ud-table tr:last-child td{border-bottom:none}
+.ud-table tr:hover td{background:var(--surface-hover,#f9fafb)}
+
+/* Feed widgets */
+.ud-feed-item{display:flex;gap:.75rem;padding:.5rem 0;border-bottom:1px solid var(--border-color,#f3f4f6)}
+.ud-feed-item:last-child{border-bottom:none}
+.ud-feed-dot{width:8px;height:8px;border-radius:50%;margin-top:.35rem;flex-shrink:0;background:var(--brand-primary,#4f46e5)}
+.ud-feed-dot.unread{background:var(--status-warning,#f59e0b)}
+.ud-feed-text{flex:1;font-size:.8rem;line-height:1.4}
+.ud-feed-text strong{font-weight:600}
+.ud-feed-time{font-size:.7rem;color:var(--text-muted,#9ca3af);margin-top:.15rem}
+
+/* Tool widgets */
+.ud-tool-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:.5rem}
+.ud-tool-item{display:flex;flex-direction:column;align-items:center;gap:.4rem;padding:.75rem .5rem;border-radius:.5rem;border:1px solid var(--border-color,#e5e7eb);text-decoration:none;color:var(--text-primary,#111827);font-size:.75rem;text-align:center;transition:all .2s}
+.ud-tool-item:hover{border-color:var(--brand-primary,#4f46e5);background:rgba(79,70,229,.04);transform:translateY(-1px)}
+.ud-tool-item i{font-size:1.2rem}
+
+/* Timer widget */
+.ud-timer-box{text-align:center;padding:1rem 0}
+.ud-timer-status{font-size:.8rem;color:var(--text-secondary,#6b7280);margin-bottom:.5rem}
+.ud-timer-time{font-size:2rem;font-weight:700;font-variant-numeric:tabular-nums;color:var(--brand-primary,#4f46e5)}
+.ud-timer-running .ud-timer-time{color:#ef4444;animation:pulse 1.5s infinite}
+.ud-timer-week{font-size:.8rem;color:var(--text-muted,#9ca3af);margin-top:.75rem}
+.ud-timer-btns{display:flex;gap:.5rem;justify-content:center;margin-top:.75rem}
+
+/* Add widget modal */
+.ud-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:1050;display:none;align-items:center;justify-content:center;padding:1rem}
+.ud-modal-overlay.show{display:flex}
+.ud-modal{background:var(--surface-card,#fff);border-radius:1rem;padding:1.5rem;max-width:560px;width:100%;max-height:80vh;overflow-y:auto}
+.ud-modal h2{margin:0 0 1rem;font-size:1.1rem}
+.ud-widget-pick{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.75rem}
+.ud-widget-pick-item{padding:1rem;border:1px solid var(--border-color,#e5e7eb);border-radius:.75rem;cursor:pointer;text-align:center;transition:all .2s}
+.ud-widget-pick-item:hover{border-color:var(--brand-primary,#4f46e5);background:rgba(79,70,229,.04)}
+.ud-widget-pick-item i{font-size:1.5rem;color:var(--brand-primary,#4f46e5);display:block;margin-bottom:.5rem}
+.ud-widget-pick-item span{font-size:.8rem;font-weight:500}
+
+/* Mobile */
+@media(max-width:768px){
+  .ud-grid{grid-template-columns:1fr !important}
+  .ud-header{padding:1rem}
+  .ud-header h1{font-size:1.1rem}
+  .ud-role-switch{flex-wrap:wrap}
+  .ud-layout-bar{overflow-x:auto;flex-wrap:nowrap;padding-bottom:.5rem}
+  .ud-widget-header{cursor:default}
+  .ud-tool-grid{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:480px){
+  .ud-stat-value{font-size:1.5rem}
+  .ud-tool-grid{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+
+<div class="container-fluid py-3">
+  {# ── Header ── #}
+  <div class="ud-header">
+    <div>
+      <h1><i class="fa-solid fa-gauge-high me-2"></i>Staff Dashboard</h1>
+      <div class="subtitle">Welcome back, {{ user.get_short_name|default:user.username }} &middot; {{ role|title }} view</div>
+    </div>
+    <div class="d-flex gap-2 align-items-center flex-wrap">
+      {% if switchable_roles %}
+      <div class="ud-role-switch">
+        {% for sr in switchable_roles %}
+        {% if sr.allowed %}
+        <button class="btn {% if effective_role == sr.role %}active{% endif %}" onclick="switchRole('{{ sr.role }}')">
+          {{ sr.label }}
+        </button>
+        {% endif %}
+        {% endfor %}
+      </div>
+      {% endif %}
+      <button class="btn btn-sm" style="background:rgba(255,255,255,.2);color:#fff;border-radius:.5rem" onclick="openAddWidget()" title="Add Widget">
+        <i class="fa-solid fa-plus me-1"></i>Add Widget
+      </button>
+      <button class="btn btn-sm" style="background:rgba(255,255,255,.15);color:#fff;border-radius:.5rem" onclick="toggleCompact()" title="Toggle compact">
+        <i class="fa-solid fa-compress"></i>
+      </button>
+    </div>
+  </div>
+
+  {# ── Layout Bar ── #}
+  <div class="ud-layout-bar">
+    <span class="small text-muted me-1">Layout:</span>
+    <button class="btn btn-sm btn-outline-secondary {% if layout == 'default' %}active{% endif %}" onclick="setLayout('default')">Grid</button>
+    <button class="btn btn-sm btn-outline-secondary {% if layout == 'compact' %}active{% endif %}" onclick="setLayout('compact')">Compact</button>
+    <button class="btn btn-sm btn-outline-secondary {% if layout == 'wide' %}active{% endif %}" onclick="setLayout('wide')">Wide</button>
+    <button class="btn btn-sm btn-outline-secondary {% if layout == 'fullscreen' %}active{% endif %}" onclick="setLayout('fullscreen')">Full</button>
+    <span class="ms-auto"></span>
+    <button class="btn btn-sm btn-outline-danger" onclick="resetDashboard()" title="Reset layout">
+      <i class="fa-solid fa-rotate-left me-1"></i>Reset
+    </button>
+  </div>
+
+  {# ── Widget Grid ── #}
+  <div class="ud-grid layout-{{ layout }}" id="widgetGrid" style="--grid-cols:{{ widget_cols }}">
+    {% for wid, wdata in widget_data.items %}
+    <div class="ud-widget {% if wdata.instance.is_collapsed %}collapsed{% endif %}"
+         data-widget-id="{{ wid }}"
+         draggable="true"
+         ondragstart="dragStart(event)" ondragover="dragOver(event)" ondrop="drop(event)"
+         style="grid-column:span {{ wdata.instance.width }};grid-row:span {{ wdata.instance.height }}">
+      <div class="ud-widget-header">
+        <h3>
+          <i class="{{ wdata.instance.widget_def.icon }}"></i>
+          {{ wdata.instance.title|default:wdata.instance.widget_def.label }}
+        </h3>
+        <div class="ud-widget-actions">
+          <button onclick="refreshWidget({{ wid }})" title="Refresh"><i class="fa-solid fa-rotate"></i></button>
+          <button onclick="toggleCollapse({{ wid }})" title="Collapse"><i class="fa-solid fa-chevron-{% if wdata.instance.is_collapsed %}down{% else %}up{% endif %}"></i></button>
+          <button onclick="removeWidget({{ wid }})" title="Remove"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+      </div>
+      <div class="ud-widget-body">
+        {% with wt=wdata.instance.widget_def.widget_type %}
+          {# ── Stats Widgets ── #}
+          {% if wt == 'stats_quick' %}
+          <div class="ud-stat-row">
+            <div class="ud-stat-card">
+              <div class="ud-stat-value">{{ wdata.data.total|default:"0" }}</div>
+              <div class="ud-stat-label">Total Projects</div>
+            </div>
+            <div class="ud-stat-card">
+              <div class="ud-stat-value">{{ wdata.data.active|default:"0" }}</div>
+              <div class="ud-stat-label">Active</div>
+            </div>
+            <div class="ud-stat-card">
+              <div class="ud-stat-value">{{ wdata.data.completed_week|default:"0" }}</div>
+              <div class="ud-stat-label">Done (7d)</div>
+            </div>
+            <div class="ud-stat-card">
+              <div class="ud-stat-value">{{ wdata.data.my_projects|default:"0" }}</div>
+              <div class="ud-stat-label">My Projects</div>
+            </div>
+            {% if wdata.data.overdue %}
+            <div class="ud-stat-card">
+              <div class="ud-stat-value" style="color:#ef4444;-webkit-text-fill-color:#ef4444">{{ wdata.data.overdue }}</div>
+              <div class="ud-stat-label">Overdue</div>
+            </div>
+            {% endif %}
+          </div>
+
+          {% elif wt == 'stats_projects' %}
+          <div class="ud-stat-row">
+            <div class="ud-stat-card"><div class="ud-stat-value">{{ wdata.data.total|default:"0" }}</div><div class="ud-stat-label">Total</div></div>
+            <div class="ud-stat-card"><div class="ud-stat-value">{{ wdata.data.pending|default:"0" }}</div><div class="ud-stat-label">Pending</div></div>
+            <div class="ud-stat-card"><div class="ud-stat-value">{{ wdata.data.in_progress|default:"0" }}</div><div class="ud-stat-label">In Progress</div></div>
+            <div class="ud-stat-card"><div class="ud-stat-value">{{ wdata.data.waiting|default:"0" }}</div><div class="ud-stat-label">Waiting</div></div>
+            <div class="ud-stat-card"><div class="ud-stat-value">{{ wdata.data.completed|default:"0" }}</div><div class="ud-stat-label">Completed</div></div>
+          </div>
+
+          {% elif wt == 'stats_team' %}
+          <div class="ud-stat-row">
+            <div class="ud-stat-card"><div class="ud-stat-value">{{ wdata.data.total_designers|default:"0" }}</div><div class="ud-stat-label">Designers</div></div>
+            <div class="ud-stat-card"><div class="ud-stat-value">{{ wdata.data.active_designers|default:"0" }}</div><div class="ud-stat-label">Active</div></div>
+            <div class="ud-stat-card"><div class="ud-stat-value">{{ wdata.data.unassigned|default:"0" }}</div><div class="ud-stat-label">Unassigned</div></div>
+          </div>
+
+          {% elif wt == 'stats_designer' %}
+          <div class="ud-stat-row">
+            <div class="ud-stat-card"><div class="ud-stat-value">{{ wdata.data.assigned|default:"0" }}</div><div class="ud-stat-label">Assigned</div></div>
+            <div class="ud-stat-card"><div class="ud-stat-value">{{ wdata.data.designing|default:"0" }}</div><div class="ud-stat-label">Designing</div></div>
+            <div class="ud-stat-card"><div class="ud-stat-value">{{ wdata.data.completed_week|default:"0" }}</div><div class="ud-stat-label">Done (7d)</div></div>
+          </div>
+
+          {# ── Table Widgets ── #}
+          {% elif wt == 'table_recent' or wt == 'table_team' or wt == 'table_deadlines' or wt == 'table_timesheet' %}
+          {% if wt == 'table_recent' %}
+          <table class="ud-table">
+            <thead><tr><th>#</th><th>Company</th><th>Status</th><th>Assigned</th><th>Date</th></tr></thead>
+            <tbody>
+            {% for r in wdata.data.requests %}
+            <tr>
+              <td><a href="{% url 'branding:request_detail' r.id %}">{{ r.number }}</a></td>
+              <td>{{ r.company|truncatechars:20 }}</td>
+              <td><span class="badge bg-{% if r.status == 'COMPLETED' %}success{% elif r.status == 'ARCHIVED' %}secondary{% elif r.status in 'REVISION,WAITING_CLIENT' %}warning{% elif r.status in 'IN_REVIEW,ASSIGNED,DESIGNING' %}primary{% else %}info{% endif %}" style="font-size:.65rem">{{ r.status|status_label }}</span></td>
+              <td>{{ r.assigned|truncatechars:15 }}</td>
+              <td class="text-muted">{{ r.created }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="text-center text-muted py-3">No recent requests</td></tr>
+            {% endfor %}
+            </tbody>
+          </table>
+
+          {% elif wt == 'table_team' %}
+          <table class="ud-table">
+            <thead><tr><th>Member</th><th>Active</th><th>Completed</th><th>Workload</th></tr></thead>
+            <tbody>
+            {% for m in wdata.data.members %}
+            <tr>
+              <td><a href="{% url 'branding:supervisor_designer_detail' m.id %}">{{ m.name }}</a></td>
+              <td>{{ m.active }}</td>
+              <td>{{ m.completed }}</td>
+              <td>
+                <div style="background:#e5e7eb;border-radius:999px;height:6px;width:80px">
+                  <div style="background:var(--brand-primary,#4f46e5);height:100%;border-radius:999px;width:{{ m.active|multiply:20 }}%"></div>
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="text-center text-muted py-3">No team members</td></tr>
+            {% endfor %}
+            </tbody>
+          </table>
+
+          {% elif wt == 'table_deadlines' %}
+          <table class="ud-table">
+            <thead><tr><th>#</th><th>Company</th><th>Deadline</th><th>Status</th></tr></thead>
+            <tbody>
+            {% for item in wdata.data.items %}
+            <tr>
+              <td><a href="{% url 'branding:request_detail' item.id %}">{{ item.number }}</a></td>
+              <td>{{ item.company|truncatechars:20 }}</td>
+              <td>{{ item.deadline }}</td>
+              <td><span class="badge bg-{% if item.status == 'COMPLETED' %}success{% else %}warning{% endif %}" style="font-size:.65rem">{{ item.status|status_label }}</span></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="text-center text-muted py-3">No upcoming deadlines</td></tr>
+            {% endfor %}
+            </tbody>
+          </table>
+
+          {% elif wt == 'table_timesheet' %}
+          <table class="ud-table">
+            <thead><tr><th>Request</th><th>Phase</th><th>Start</th><th>Duration</th></tr></thead>
+            <tbody>
+            {% for e in wdata.data.entries %}
+            <tr>
+              <td>{{ e.request|truncatechars:20 }}</td>
+              <td>{{ e.phase }}</td>
+              <td>{{ e.start }}</td>
+              <td>{{ e.duration }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="text-center text-muted py-3">No time entries this week</td></tr>
+            {% endfor %}
+            </tbody>
+          </table>
+          {% endif %}
+
+          {# ── Feed Widgets ── #}
+          {% elif wt == 'feed_activity' %}
+          {% for e in wdata.data.events %}
+          <div class="ud-feed-item">
+            <div class="ud-feed-dot"></div>
+            <div>
+              <div class="ud-feed-text"><strong>{{ e.user }}</strong> {{ e.action }} {% if e.request_number %}<a href="{% url 'branding:request_detail' e.id %}">{{ e.request_number }}</a>{% endif %}</div>
+              {% if e.description %}<div class="ud-feed-text text-muted">{{ e.description }}</div>{% endif %}
+              <div class="ud-feed-time">{{ e.time }}</div>
+            </div>
+          </div>
+          {% empty %}
+          <div class="text-center text-muted py-3">No recent activity</div>
+          {% endfor %}
+
+          {% elif wt == 'feed_notifications' %}
+          {% for n in wdata.data.notifications %}
+          <div class="ud-feed-item">
+            <div class="ud-feed-dot {% if not n.is_read %}unread{% endif %}"></div>
+            <div>
+              <div class="ud-feed-text"><strong>{{ n.title }}</strong></div>
+              <div class="ud-feed-text text-muted">{{ n.message }}</div>
+              <div class="ud-feed-time">{{ n.time }}</div>
+            </div>
+          </div>
+          {% empty %}
+          <div class="text-center text-muted py-3">No notifications</div>
+          {% endfor %}
+
+          {% elif wt == 'feed_messages' %}
+          {% for m in wdata.data.messages %}
+          <div class="ud-feed-item">
+            <div class="ud-feed-dot"></div>
+            <div>
+              <div class="ud-feed-text"><strong>{{ m.sender }}</strong> on {{ m.request_number }}</div>
+              <div class="ud-feed-text text-muted">{{ m.preview }}</div>
+              <div class="ud-feed-time">{{ m.time }}</div>
+            </div>
+          </div>
+          {% empty %}
+          <div class="text-center text-muted py-3">No messages</div>
+          {% endfor %}
+
+          {% elif wt == 'feed_calendar' %}
+          {% for ev in wdata.data.events %}
+          <div class="ud-feed-item">
+            <div class="ud-feed-dot" style="background:{% if ev.type == 'deadline' %}#ef4444{% elif ev.type == 'meeting' %}#3b82f6{% else %}#22c55e{% endif %}"></div>
+            <div>
+              <div class="ud-feed-text"><strong>{{ ev.title }}</strong></div>
+              <div class="ud-feed-time">{{ ev.start }}{% if ev.location %} &middot; {{ ev.location }}{% endif %}</div>
+            </div>
+          </div>
+          {% empty %}
+          <div class="text-center text-muted py-3">No upcoming events</div>
+          {% endfor %}
+
+          {# ── Chart Widgets (placeholder canvas) ── #}
+          {% elif 'chart' in wt %}
+          <div style="position:relative;height:180px">
+            <canvas id="chart-{{ wid }}" data-chart-type="{{ wt }}" data-chart-data='{{ wdata.data|to_json }}'></canvas>
+          </div>
+
+          {# ── Tool Widgets ── #}
+          {% elif wt == 'tools_shortcuts' %}
+          <div class="ud-tool-grid">
+            {% for s in wdata.data.shortcuts %}
+            <a href="{{ s.url }}" class="ud-tool-item">
+              <i class="{{ s.icon }}" style="color:{{ s.color }}"></i>
+              <span>{{ s.label }}</span>
+            </a>
+            {% endfor %}
+          </div>
+
+          {% elif wt == 'tools_timer' %}
+          <div class="ud-timer-box {% if wdata.data.is_running %}ud-timer-running{% endif %}">
+            <div class="ud-timer-status">{% if wdata.data.is_running %}Timer running{% else %}Timer stopped{% endif %}</div>
+            <div class="ud-timer-time" id="timerDisplay">{% if wdata.data.is_running %}{{ wdata.data.started_at }}{% else %}00:00{% endif %}</div>
+            {% if wdata.data.is_running %}<div style="font-size:.75rem;color:var(--text-secondary,#6b7280)">{{ wdata.data.active_request }}</div>{% endif %}
+            <div class="ud-timer-week">This week: {{ wdata.data.week_hours }}</div>
+          </div>
+
+          {% elif wt == 'tools_figma' %}
+          <div style="text-align:center;padding:.5rem 0">
+            <i class="fa-brands fa-figma" style="font-size:2rem;color:#a259ff"></i>
+            <div style="margin-top:.5rem;font-size:.8rem">{% if wdata.data.connected %}Connected{% else %}<a href="{% url 'branding:figma_integration' %}">Connect Figma</a>{% endif %}</div>
+            {% if wdata.data.connected %}<div style="font-size:.75rem;color:var(--text-muted,#9ca3af)">{{ wdata.data.workspace }} &middot; {{ wdata.data.last_sync }}</div>{% endif %}
+          </div>
+
+          {% elif wt == 'tools_adobe' %}
+          <div style="text-align:center;padding:.5rem 0">
+            <i class="fa-solid fa-palette" style="font-size:2rem;color:#ff0000"></i>
+            <div style="margin-top:.5rem;font-size:.8rem">{% if wdata.data.connected %}Connected{% else %}<a href="{% url 'branding:adobe_integration' %}">Connect Adobe CC</a>{% endif %}</div>
+            {% if wdata.data.connected %}<div style="font-size:.75rem;color:var(--text-muted,#9ca3af)">{{ wdata.data.account }} &middot; {{ wdata.data.last_sync }}</div>{% endif %}
+          </div>
+
+          {% else %}
+          <div class="text-center text-muted py-3">
+            <i class="fa-solid fa-puzzle-piece d-block mb-2" style="font-size:1.5rem"></i>
+            Widget data loading...
+          </div>
+          {% endif %}
+        {% endwith %}
+      </div>
+    </div>
+    {% endfor %}
+
+    {# ── Add Widget Button ── #}
+    <div class="ud-add-widget" onclick="openAddWidget()" title="Add a widget">
+      <div><i class="fa-solid fa-plus d-block mb-2" style="font-size:1.5rem"></i>Add Widget</div>
+    </div>
+  </div>
+</div>
+
+{# ── Add Widget Modal ── #}
+<div class="ud-modal-overlay" id="addWidgetModal">
+  <div class="ud-modal">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h2 class="mb-0"><i class="fa-solid fa-puzzle-piece me-2"></i>Add Widget</h2>
+      <button class="btn btn-sm" onclick="closeAddWidget()" style="font-size:1rem;border:none;background:transparent">&times;</button>
+    </div>
+    <div class="ud-widget-pick">
+      {% for wd in available_widgets %}
+      <div class="ud-widget-pick-item" onclick="addWidget('{{ wd.widget_type }}')">
+        <i class="{{ wd.icon }}"></i>
+        <span>{{ wd.label }}</span>
+      </div>
+      {% empty %}
+      <div class="text-center text-muted py-3" style="grid-column:1/-1">All available widgets are already on your dashboard.</div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════════════
+   Unified Dashboard — JavaScript
+   ═══════════════════════════════════════════════════════════════════════════ */
+const CSRF = '{{ csrf_token }}';
+const API = '/branding/staff/';
+
+function post(url, data) {
+  return fetch(url, {
+    method: 'POST',
+    headers: {'X-CSRFToken': CSRF, 'Content-Type': 'application/json'},
+    body: JSON.stringify(data)
+  }).then(r => r.json());
+}
+
+/* ── Role Switch ── */
+function switchRole(role) {
+  post(API + 'switch-role/', {role}).then(r => {
+    if (r.ok) location.reload();
+    else alert(r.error || 'Failed to switch role');
+  });
+}
+
+/* ── Layout ── */
+function setLayout(layout) {
+  post(API + 'save-layout/', {layout}).then(r => {
+    if (r.ok) location.reload();
+  });
+}
+
+function toggleCompact() {
+  const grid = document.getElementById('widgetGrid');
+  grid.classList.toggle('layout-compact');
+}
+
+/* ── Widget CRUD ── */
+function addWidget(type) {
+  const form = new FormData();
+  form.append('widget_type', type);
+  fetch(API + 'add-widget/', {method: 'POST', headers: {'X-CSRFToken': CSRF}, body: form})
+    .then(r => r.json()).then(r => { if (r.ok) location.reload(); });
+}
+
+function removeWidget(id) {
+  if (!confirm('Remove this widget?')) return;
+  post(API + 'widget/' + id + '/remove/').then(r => { if (r.ok) location.reload(); });
+}
+
+function toggleCollapse(id) {
+  post(API + 'widget/' + id + '/collapse/').then(r => { if (r.ok) location.reload(); });
+}
+
+function refreshWidget(id) {
+  fetch(API + 'widget/' + id + '/data/')
+    .then(r => r.json()).then(data => {
+      console.log('Widget data refreshed:', data);
+    });
+}
+
+function resetDashboard() {
+  if (!confirm('Reset dashboard to default layout?')) return;
+  post(API + 'reset/').then(r => { if (r.ok) location.reload(); });
+}
+
+/* ── Add Widget Modal ── */
+function openAddWidget() {
+  document.getElementById('addWidgetModal').classList.add('show');
+}
+function closeAddWidget() {
+  document.getElementById('addWidgetModal').classList.remove('show');
+}
+document.getElementById('addWidgetModal').addEventListener('click', function(e) {
+  if (e.target === this) closeAddWidget();
+});
+
+/* ── Drag & Drop ── */
+let draggedEl = null;
+
+function dragStart(e) {
+  draggedEl = e.target.closest('.ud-widget');
+  if (!draggedEl) return;
+  draggedEl.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', draggedEl.dataset.widgetId);
+}
+
+function dragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  const target = e.target.closest('.ud-widget');
+  if (target && target !== draggedEl) {
+    target.classList.add('drag-over');
+  }
+}
+
+function drop(e) {
+  e.preventDefault();
+  const target = e.target.closest('.ud-widget');
+  if (!target || target === draggedEl || !draggedEl) return;
+  target.classList.remove('drag-over');
+
+  const grid = document.getElementById('widgetGrid');
+  const children = [...grid.querySelectorAll('.ud-widget')];
+  const fromIdx = children.indexOf(draggedEl);
+  const toIdx = children.indexOf(target);
+
+  if (fromIdx < toIdx) {
+    grid.insertBefore(draggedEl, target.nextSibling);
+  } else {
+    grid.insertBefore(draggedEl, target);
+  }
+
+  savePositions();
+  draggedEl.classList.remove('dragging');
+  draggedEl = null;
+}
+
+function savePositions() {
+  const widgets = [...document.querySelectorAll('.ud-widget')].map((el, idx) => ({
+    id: parseInt(el.dataset.widgetId),
+    row: Math.floor(idx / {{ widget_cols }}),
+    col: idx % {{ widget_cols }}
+  }));
+  post(API + 'save-positions/', {widgets});
+}
+
+/* ── Touch Support ── */
+let touchStartX = 0, touchStartY = 0, touchWidget = null;
+
+document.querySelectorAll('.ud-widget-header').forEach(header => {
+  header.addEventListener('touchstart', e => {
+    touchWidget = header.closest('.ud-widget');
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+  }, {passive: true});
+
+  header.addEventListener('touchend', e => {
+    if (!touchWidget) return;
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    const dy = e.changedTouches[0].clientY - touchStartY;
+    if (Math.abs(dx) > 80 && Math.abs(dy) < 40) {
+      const wid = parseInt(touchWidget.dataset.widgetId);
+      if (dx > 0) { /* swipe right — collapse */ }
+      else { /* swipe left — remove */ }
+    }
+    touchWidget = null;
+  }, {passive: true});
+});
+
+/* ── Chart Init ── */
+document.querySelectorAll('canvas[data-chart-type]').forEach(canvas => {
+  const type = canvas.dataset.chartType;
+  try {
+    const data = JSON.parse(canvas.dataset.chartData);
+    const ctx = canvas.getContext('2d');
+    let chartType = 'bar';
+    if (type.includes('status')) chartType = 'doughnut';
+    else if (type.includes('timeline') || type.includes('performance')) chartType = 'line';
+
+    new Chart(ctx, {
+      type: chartType,
+      data: {
+        labels: data.labels || [],
+        datasets: [{
+          data: data.values || data.completed || data.created || [],
+          backgroundColor: data.colors || ['#4f46e5', '#7c3aed', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#06b6d4', '#22c55e'],
+          borderWidth: chartType === 'doughnut' ? 2 : 1,
+          tension: 0.3,
+          fill: chartType === 'line',
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {legend: {display: chartType === 'doughnut', position: 'right', labels: {boxWidth: 10, font: {size: 10}}}},
+        scales: chartType === 'doughnut' ? {} : {x: {display: false}, y: {beginAtZero: true, ticks: {font: {size: 10}}}},
+      }
+    });
+  } catch(err) { console.warn('Chart init error:', err); }
+});
+</script>
+{% endblock %}

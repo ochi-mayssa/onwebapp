@@ -1,0 +1,313 @@
+{% extends 'branding/base.html' %}
+{% load branding_extras %}
+
+{% block title %}Feedback Analysis · {{ request_obj.request_number }}{% endblock %}
+
+{% block branding_content %}
+<div class="detail-page">
+    <div class="container py-4 py-lg-5">
+
+        <div class="d-flex align-items-start justify-content-between flex-wrap gap-3 mb-4">
+            <div>
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <a href="{% url 'branding:concept_list' request_pk=request_obj.pk %}" class="btn btn-back btn-sm"><i class="fa-solid fa-arrow-left me-1"></i>All Concepts</a>
+                    <span class="request-number-display">{{ request_obj.request_number }}</span>
+                </div>
+                <h1 class="fw-800 mb-1"><i class="fa-solid fa-chart-bar me-2 text-primary"></i>Feedback Analysis</h1>
+                <p class="text-muted mb-0">{{ request_obj.company_name }} · {{ concept_analytics|length }} concept{{ concept_analytics|length|pluralize }}</p>
+            </div>
+        </div>
+
+        {% with total_concepts=concept_analytics|length %}
+        {% with total_feedback=None %}
+        {% endwith %}
+        {% endwith %}
+
+        {% with total_fb_count=0 %}
+        {% for a in concept_analytics %}{% widthratio a.total_feedback 1 0 %}{% endfor %}
+        {% endwith %}
+
+        {% with total_annotations=0 %}
+        {% for a in concept_analytics %}{% widthratio a.annotation_count 1 0 %}{% endfor %}
+        {% endwith %}
+
+        {% with total_resolved=0 %}
+        {% for a in concept_analytics %}{% widthratio a.resolved_annotations 1 0 %}{% endfor %}
+        {% endwith %}
+
+        <div class="row g-4 mb-4">
+            <div class="col-sm-6 col-lg-3">
+                <div class="detail-card rounded-4 p-4 text-center h-100">
+                    <div class="mb-2" style="font-size: 2rem; color: var(--bs-primary); opacity: .8;">
+                        <i class="fa-solid fa-lightbulb"></i>
+                    </div>
+                    <div class="display-6 fw-800 mb-1">{{ concept_analytics|length }}</div>
+                    <span class="small text-muted fw-700">Total Concepts</span>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="detail-card rounded-4 p-4 text-center h-100">
+                    <div class="mb-2" style="font-size: 2rem; color: var(--bs-success); opacity: .8;">
+                        <i class="fa-regular fa-comments"></i>
+                    </div>
+                    <div class="display-6 fw-800 mb-1" id="totalFeedbackCount">0</div>
+                    <span class="small text-muted fw-700">Total Feedback</span>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="detail-card rounded-4 p-4 text-center h-100">
+                    <div class="mb-2" style="font-size: 2rem; color: var(--bs-warning); opacity: .8;">
+                        <i class="fa-solid fa-star"></i>
+                    </div>
+                    <div class="display-6 fw-800 mb-1" id="avgOverallRating">—</div>
+                    <span class="small text-muted fw-700">Avg Rating</span>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="detail-card rounded-4 p-4 text-center h-100">
+                    <div class="mb-2" style="font-size: 2rem; color: var(--bs-info); opacity: .8;">
+                        <i class="fa-solid fa-comment-dots"></i>
+                    </div>
+                    <div class="display-6 fw-800 mb-1" id="totalAnnotationCount">0</div>
+                    <span class="small text-muted fw-700">Annotations</span>
+                </div>
+            </div>
+        </div>
+
+        {% with all_strengths=None %}
+        {% endwith %}
+        {% with all_improvements=None %}
+        {% endwith %}
+
+        <div class="detail-card rounded-4 p-4 mb-4">
+            <h6 class="fw-800 mb-3"><i class="fa-solid fa-sitemap me-2 text-primary"></i>Common Feedback Themes</h6>
+            <div class="row g-4" id="themesSection">
+                <div class="col-md-6">
+                    <div class="border rounded-3 p-3" style="background: rgba(25,135,84,.04);">
+                        <h6 class="fw-800 text-success small mb-2"><i class="fa-solid fa-circle-check me-1"></i>Common Strengths</h6>
+                        <ul class="list-unstyled mb-0" id="commonStrengths"></ul>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="border rounded-3 p-3" style="background: rgba(255,193,7,.04);">
+                        <h6 class="fw-800 text-warning small mb-2"><i class="fa-solid fa-triangle-exclamation me-1"></i>Common Improvements</h6>
+                        <ul class="list-unstyled mb-0" id="commonImprovements"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex flex-column gap-4" id="conceptCards">
+            {% for item in concept_analytics %}
+            <div class="detail-card rounded-4 overflow-hidden" data-avg="{{ item.avg_rating|default:'0' }}" data-feedback="{{ item.total_feedback|default:'0' }}" data-annotations="{{ item.annotation_count|default:'0' }}">
+                <div class="p-4 border-bottom d-flex align-items-start justify-content-between flex-wrap gap-3">
+                    <div class="d-flex align-items-center gap-3">
+                        {% if item.concept.preview_image %}
+                        <img src="{{ item.concept.preview_image.url }}" alt="{{ item.concept.title }}" class="rounded-3" style="width: 64px; height: 64px; object-fit: cover;">
+                        {% else %}
+                        <div class="rounded-3 d-flex align-items-center justify-content-center" style="width: 64px; height: 64px; background: var(--bs-tertiary-bg);">
+                            <i class="fa-solid fa-image text-muted opacity-50"></i>
+                        </div>
+                        {% endif %}
+                        <div>
+                            <h6 class="fw-800 mb-0">{{ item.concept.title }}</h6>
+                            <span class="x-small text-muted">{{ item.concept.get_status_display|default:item.concept.status }}</span>
+                        </div>
+                    </div>
+                    <a href="{% url 'branding:concept_detail' pk=item.concept.pk %}" class="btn btn-sm btn-back">
+                        <i class="fa-solid fa-eye me-1"></i>View
+                    </a>
+                </div>
+                <div class="p-4">
+                    <div class="row g-4">
+                        <div class="col-lg-7">
+                            <div class="mb-3">
+                                <span class="x-small fw-700 text-muted d-block mb-2">Element Ratings</span>
+                                {% for key, label in RATING_ELEMENTS %}
+                                {% with avg_score=item.element_avgs|get_item:key %}
+                                <div class="d-flex align-items-center gap-3 mb-2">
+                                    <span class="small fw-700" style="min-width: 100px;">{{ label }}</span>
+                                    <div class="flex-grow-1 position-relative" style="height: 22px; background: var(--bs-tertiary-bg); border-radius: 6px; overflow: hidden;">
+                                        {% if avg_score is not None %}
+                                        <div class="position-absolute top-0 start-0 h-100 rounded-6" style="width: {% widthratio avg_score 5 100 %}%; background: {% if avg_score >= 4 %}var(--bs-success){% elif avg_score >= 3 %}var(--bs-warning){% else %}var(--bs-danger){% endif %}; transition: width 0.6s ease;"></div>
+                                        <span class="position-absolute top-0 start-0 h-100 d-flex align-items-center px-2 small fw-700" style="z-index: 1; color: {% if avg_score >= 4 %}#fff{% elif avg_score >= 3 %}#000{% else %}#fff{% endif %};">{{ avg_score|floatformat:1 }}</span>
+                                        {% else %}
+                                        <span class="position-absolute top-0 start-0 h-100 d-flex align-items-center px-2 x-small text-muted">No ratings</span>
+                                        {% endif %}
+                                    </div>
+                                    <span class="x-small text-muted" style="min-width: 30px; text-align: right;">/ 5</span>
+                                </div>
+                                {% endwith %}
+                                {% endfor %}
+                            </div>
+
+                            <div class="d-flex gap-4 flex-wrap">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="fa-regular fa-comments text-muted"></i>
+                                    <span class="small"><span class="fw-800">{{ item.total_feedback }}</span> <span class="text-muted">feedback</span></span>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="fa-solid fa-comment-dots text-muted"></i>
+                                    <span class="small"><span class="fw-800">{{ item.annotation_count }}</span> <span class="text-muted">annotations</span></span>
+                                </div>
+                                {% if item.avg_rating %}
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="fa-solid fa-star text-warning"></i>
+                                    <span class="small"><span class="fw-800">{{ item.avg_rating|floatformat:1 }}</span> <span class="text-muted">avg rating</span></span>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-lg-5">
+                            <div class="row g-3">
+                                <div class="col-6">
+                                    <div class="border rounded-3 p-3 h-100" style="background: var(--bs-tertiary-bg);">
+                                        <span class="x-small fw-700 text-muted d-block mb-2">Annotations by Type</span>
+                                        {% for ann_type, count in item.annotation_types.items %}
+                                        <div class="d-flex align-items-center justify-content-between mb-1">
+                                            <span class="x-small"><i class="fa-solid fa-{% if ann_type == 'comment' %}comment{% elif ann_type == 'question' %}circle-question{% elif ann_type == 'suggestion' %}lightbulb{% elif ann_type == 'issue' %}triangle-exclamation{% else %}pencil{% endif %} me-1 text-muted"></i>{{ ann_type|title }}</span>
+                                            <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill" style="font-size: .6rem;">{{ count }}</span>
+                                        </div>
+                                        {% empty %}
+                                        <span class="x-small text-muted">No annotations</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="border rounded-3 p-3 h-100" style="background: var(--bs-tertiary-bg);">
+                                        <span class="x-small fw-700 text-muted d-block mb-2">Resolution Status</span>
+                                        {% if item.annotation_count %}
+                                        <div class="mb-2">
+                                            <div class="d-flex justify-content-between x-small mb-1">
+                                                <span class="text-success">Resolved</span>
+                                                <span class="fw-700">{{ item.resolved_annotations }} / {{ item.annotation_count }}</span>
+                                            </div>
+                                            <div style="height: 8px; background: var(--bs-body-bg); border-radius: 4px; overflow: hidden;">
+                                                <div style="height: 100%; width: {% widthratio item.resolved_annotations item.annotation_count 100 %}%; background: var(--bs-success); border-radius: 4px;"></div>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex justify-content-between x-small">
+                                            <span class="text-muted">Unresolved</span>
+                                            <span class="fw-700">{{ item.annotation_count|add:"-"|add:item.resolved_annotations }}</span>
+                                        </div>
+                                        {% else %}
+                                        <span class="x-small text-muted">No annotations yet</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if item.strengths or item.improvements %}
+                    <div class="mt-4 pt-3 border-top">
+                        <div class="row g-3">
+                            {% if item.strengths %}
+                            <div class="col-md-6">
+                                <span class="x-small fw-700 text-success d-block mb-2"><i class="fa-solid fa-circle-check me-1"></i>Strengths</span>
+                                <ul class="list-unstyled mb-0">
+                                    {% for s in item.strengths %}
+                                    <li class="mb-1 d-flex align-items-start gap-2">
+                                        <i class="fa-solid fa-check text-success mt-1" style="font-size: .55rem;"></i>
+                                        <span class="x-small text-muted">{{ s }}</span>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
+                            {% if item.improvements %}
+                            <div class="col-md-6">
+                                <span class="x-small fw-700 text-warning d-block mb-2"><i class="fa-solid fa-triangle-exclamation me-1"></i>Improvements</span>
+                                <ul class="list-unstyled mb-0">
+                                    {% for i in item.improvements %}
+                                    <li class="mb-1 d-flex align-items-start gap-2">
+                                        <i class="fa-solid fa-arrow-up text-warning mt-1" style="font-size: .55rem;"></i>
+                                        <span class="x-small text-muted">{{ i }}</span>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% if not concept_analytics %}
+        <div class="detail-card rounded-4 p-5 text-center">
+            <div class="mb-3" style="font-size: 4rem; color: var(--bs-primary); opacity: .3;">
+                <i class="fa-solid fa-chart-bar"></i>
+            </div>
+            <h4 class="fw-800 mb-2">No Feedback Data Yet</h4>
+            <p class="text-muted mb-4" style="max-width: 480px; margin: 0 auto;">
+                Feedback analysis will appear here once clients start providing feedback on design concepts.
+            </p>
+            <a href="{% url 'branding:concept_list' request_pk=request_obj.pk %}" class="btn btn-brand-primary px-4">
+                <i class="fa-solid fa-arrow-left me-2"></i>Back to Concepts
+            </a>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+    'use strict';
+
+    var cards = document.querySelectorAll('#conceptCards .detail-card[data-avg]');
+    var totalFb = 0, totalAnnotations = 0, ratingSum = 0, ratingCount = 0;
+    var strengthMap = {}, improvementMap = {};
+
+    cards.forEach(function (card) {
+        var fb = parseInt(card.dataset.feedback) || 0;
+        var ann = parseInt(card.dataset.annotations) || 0;
+        var avg = parseFloat(card.dataset.avg) || 0;
+        totalFb += fb;
+        totalAnnotations += ann;
+        if (avg > 0) { ratingSum += avg; ratingCount++; }
+
+        card.querySelectorAll('li').forEach(function (li) {
+            var text = li.textContent.trim();
+            if (!text) return;
+            var parent = li.closest('.col-md-6');
+            if (!parent) return;
+            var label = parent.querySelector('.fw-700');
+            if (!label) return;
+            var isStrength = label.classList.contains('text-success');
+            var map = isStrength ? strengthMap : improvementMap;
+            if (!map[text]) map[text] = 0;
+            map[text]++;
+        });
+    });
+
+    document.getElementById('totalFeedbackCount').textContent = totalFb;
+    document.getElementById('totalAnnotationCount').textContent = totalAnnotations;
+    document.getElementById('avgOverallRating').textContent = ratingCount > 0 ? (ratingSum / ratingCount).toFixed(1) : '—';
+
+    function renderList(map, containerId, emptyMsg) {
+        var el = document.getElementById(containerId);
+        if (!el) return;
+        var sorted = Object.keys(map).sort(function (a, b) { return map[b] - map[a]; });
+        if (sorted.length === 0) {
+            el.innerHTML = '<li class="x-small text-muted">' + emptyMsg + '</li>';
+            return;
+        }
+        sorted.slice(0, 8).forEach(function (key) {
+            var li = document.createElement('li');
+            li.className = 'mb-1 d-flex align-items-start gap-2';
+            li.innerHTML = '<i class="fa-solid fa-' + (containerId === 'commonStrengths' ? 'check text-success' : 'arrow-up text-warning') + ' mt-1" style="font-size: .55rem;"></i><span class="x-small text-muted">' + key + ' <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill" style="font-size: .55rem;">' + map[key] + '</span></span>';
+            el.appendChild(li);
+        });
+    }
+
+    renderList(strengthMap, 'commonStrengths', 'No common strengths identified yet');
+    renderList(improvementMap, 'commonImprovements', 'No common improvements identified yet');
+})();
+</script>
+{% endblock %}

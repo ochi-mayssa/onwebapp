@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ title }}</title>
+    <style>
+      body { font-family: Arial, sans-serif; color: #1f2937; }
+      .card { border: 1px solid #e5e7eb; border-radius: 8px; padding:16px; }
+      .muted { color: #6b7280; }
+      .summary { margin-top: 8px; margin-bottom: 12px; }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h2>{{ title }}</h2>
+      <p class="muted">This is an automated summary from AutomationIQ (demo).</p>
+      <div class="summary">
+        {% if result.summary %}
+        <p>{{ result.summary }}</p>
+        {% endif %}
+      </div>
+
+      <dl>
+        {% for k, v in result.items %}
+          <dt style="font-weight:700">{{ k|capfirst }}</dt>
+          <dd class="muted">{{ v }}</dd>
+        {% endfor %}
+      </dl>
+
+      {% if attachments %}
+        <p class="muted">Attached: Charts and visual aids.</p>
+      {% endif %}
+
+      <hr>
+      <p class="muted">If you did not request this email, simply ignore it.</p>
+      <p style="font-size:0.9rem; color:#9ca3af;">&copy; 2025 AutomationIQ</p>
+    </div>
+  </body>
+</html>

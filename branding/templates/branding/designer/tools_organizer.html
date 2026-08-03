@@ -1,0 +1,116 @@
+{% extends "branding/base.html" %}
+{% load branding_extras %}
+
+{% block title %}Asset Organizer{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'branding:designer_dashboard' %}">My Work</a></li>
+    <li class="breadcrumb-item">Tools</li>
+    <li class="breadcrumb-item active">Asset Organizer</li>
+  </ol>
+</nav>
+
+<div class="mb-3">
+  <a href="?folder=" class="btn btn-sm {% if not folder_filter %}btn-primary{% else %}btn-outline-primary{% endif %}">All</a>
+  {% for fo in folders %}
+  <a href="?folder={{ fo|urlencode }}" class="btn btn-sm {% if folder_filter == fo %}btn-primary{% else %}btn-outline-primary{% endif %}">{{ fo }}</a>
+  {% endfor %}
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-header"><h5 class="mb-0">Add Asset</h5></div>
+      <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="add_item">
+          <div class="mb-3">
+            <label class="form-label">Name</label>
+            <input type="text" name="name" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Type</label>
+            <select name="item_type" class="form-select" required>
+              {% for val, label in ITEM_TYPES %}
+              <option value="{{ val }}">{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">File</label>
+            <input type="file" name="file" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Thumbnail</label>
+            <input type="file" name="thumbnail" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Folder</label>
+            <input type="text" name="folder" class="form-control" list="folderList">
+            <datalist id="folderList">
+              {% for fo in folders %}
+              <option value="{{ fo }}">
+              {% endfor %}
+            </datalist>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Tags</label>
+            <input type="text" name="tags" class="form-control" placeholder="tag1, tag2, tag3">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Request</label>
+            <select name="request" class="form-select">
+              <option value="">None</option>
+              {% for r in active_requests %}
+              <option value="{{ r.id }}">{{ r.title }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <button type="submit" class="btn btn-success w-100">Add Asset</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-header"><h5 class="mb-0">Assets</h5></div>
+      <div class="card-body">
+        {% if items %}
+        <div class="row g-3">
+          {% for item in items %}
+          <div class="col-md-4">
+            <div class="card h-100">
+              {% if item.thumbnail %}
+              <img src="{{ item.thumbnail.url }}" class="card-img-top" alt="{{ item.name }}" style="height:140px;object-fit:cover;">
+              {% else %}
+              <div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height:140px;">
+                <i class="fa-solid fa-file fa-2x text-muted"></i>
+              </div>
+              {% endif %}
+              <div class="card-body p-2">
+                <h6 class="card-title mb-1">{{ item.name }}</h6>
+                <span class="badge bg-secondary mb-1">{{ item.item_type }}</span>
+                <small class="text-muted d-block">{{ item.folder|default:"No folder" }}</small>
+                <div class="mt-1">
+                  {% for t in item.tags_list %}
+                  <span class="badge bg-light text-dark">{{ t }}</span>
+                  {% endfor %}
+                </div>
+                <small class="text-muted d-block mt-1">{{ item.created_at|date:"M d, Y" }}</small>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-muted mb-0">No assets found.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

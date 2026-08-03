@@ -1,0 +1,617 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>{{ request.request_number }} — Project Summary</title>
+<style>
+  @page {
+    size: A4;
+    margin: 20mm 18mm 22mm 18mm;
+
+    @bottom-center {
+      content: "Page " counter(page) " of " counter(pages);
+      font-size: 8pt;
+      color: #94a3b8;
+      font-family: 'Segoe UI', Arial, sans-serif;
+    }
+    @bottom-right {
+      content: "{{ request.request_number }}";
+      font-size: 8pt;
+      color: #94a3b8;
+      font-family: 'Segoe UI', Arial, sans-serif;
+    }
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 10pt;
+    color: #1e293b;
+    line-height: 1.55;
+  }
+
+  /* ── Cover header ──────────────────────────────────────────────── */
+  .cover {
+    margin-bottom: 28px;
+    border-bottom: 3px solid #6366f1;
+    padding-bottom: 20px;
+  }
+  .cover-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  .cover-logo {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #6366f1, #818cf8);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24pt;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+  .cover-info h1 {
+    font-size: 18pt;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 4px;
+  }
+  .cover-info .subtitle {
+    font-size: 10pt;
+    color: #64748b;
+  }
+  .cover-meta {
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .cover-meta .badge {
+    display: inline-block;
+    background: #6366f1;
+    color: #fff;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 8pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .cover-meta .date {
+    display: block;
+    font-size: 9pt;
+    color: #64748b;
+    margin-top: 6px;
+  }
+
+  /* ── Section headers ───────────────────────────────────────────── */
+  .section-title {
+    font-size: 12pt;
+    font-weight: 800;
+    color: #6366f1;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 6px;
+    margin: 22px 0 12px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+
+  /* ── Info grid ─────────────────────────────────────────────────── */
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 24px;
+    margin-bottom: 10px;
+  }
+  .info-item {
+    padding: 6px 0;
+  }
+  .info-label {
+    font-size: 7.5pt;
+    text-transform: uppercase;
+    color: #94a3b8;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+  }
+  .info-value {
+    font-size: 10pt;
+    color: #1e293b;
+    font-weight: 500;
+  }
+  .info-full {
+    grid-column: 1 / -1;
+  }
+
+  /* ── Description blocks ────────────────────────────────────────── */
+  .desc-block {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+  }
+  .desc-block p {
+    margin: 0;
+    color: #334155;
+    font-size: 9.5pt;
+  }
+
+  /* ── Tags ──────────────────────────────────────────────────────── */
+  .tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .tag {
+    display: inline-block;
+    background: #eef2ff;
+    color: #6366f1;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 8pt;
+    font-weight: 600;
+  }
+
+  /* ── Collection card ───────────────────────────────────────────── */
+  .collection-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 10px;
+    page-break-inside: avoid;
+  }
+  .collection-card h3 {
+    font-size: 11pt;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 4px;
+  }
+  .collection-card .meta {
+    font-size: 8pt;
+    color: #94a3b8;
+    margin-bottom: 6px;
+  }
+  .collection-card .desc {
+    font-size: 9pt;
+    color: #475569;
+  }
+
+  /* ── Color palette ─────────────────────────────────────────────── */
+  .palette-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .palette-swatch {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+  }
+
+  /* ── Timeline ──────────────────────────────────────────────────── */
+  .timeline {
+    margin: 0 0 10px 0;
+    padding: 0;
+    list-style: none;
+    position: relative;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #e2e8f0;
+  }
+  .timeline-item {
+    position: relative;
+    padding: 0 0 12px 28px;
+    page-break-inside: avoid;
+  }
+  .timeline-dot {
+    position: absolute;
+    left: 3px;
+    top: 2px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #6366f1;
+    border: 2px solid #fff;
+  }
+  .timeline-dot.status { background: #3b82f6; }
+  .timeline-dot.note { background: #f59e0b; }
+  .timeline-dot.upload { background: #10b981; }
+  .timeline-dot.create { background: #8b5cf6; }
+  .timeline-action {
+    font-weight: 700;
+    font-size: 9pt;
+    color: #1e293b;
+  }
+  .timeline-desc {
+    font-size: 8.5pt;
+    color: #64748b;
+    margin-top: 2px;
+  }
+  .timeline-meta {
+    font-size: 7.5pt;
+    color: #94a3b8;
+    margin-top: 2px;
+  }
+
+  /* ── Asset table ───────────────────────────────────────────────── */
+  .asset-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 10px;
+  }
+  .asset-table th {
+    background: #f1f5f9;
+    font-size: 7.5pt;
+    text-transform: uppercase;
+    color: #64748b;
+    font-weight: 700;
+    padding: 6px 10px;
+    text-align: left;
+    border-bottom: 2px solid #e2e8f0;
+  }
+  .asset-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 9pt;
+  }
+  .asset-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  /* ── Feedback box ──────────────────────────────────────────────── */
+  .feedback-box {
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 10px;
+    background: #fefce8;
+  }
+  .feedback-box .stars {
+    color: #f59e0b;
+    font-size: 12pt;
+    margin-bottom: 4px;
+  }
+  .feedback-box .comment {
+    font-size: 9pt;
+    color: #475569;
+    font-style: italic;
+  }
+  .feedback-box .meta {
+    font-size: 7.5pt;
+    color: #94a3b8;
+    margin-top: 6px;
+  }
+
+  /* ── Notes block ───────────────────────────────────────────────── */
+  .notes-block {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+  }
+  .notes-block h4 {
+    font-size: 9pt;
+    font-weight: 700;
+    color: #92400e;
+    margin-bottom: 4px;
+  }
+  .notes-block p {
+    font-size: 9pt;
+    color: #78350f;
+    margin: 0;
+  }
+
+  /* ── Page break helper ─────────────────────────────────────────── */
+  .page-break {
+    page-break-before: always;
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- Cover Header                                                    -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="cover">
+  <div class="cover-row">
+    <div style="display:flex;align-items:center;gap:14px;">
+      <div class="cover-logo">{{ company_initial }}</div>
+      <div class="cover-info">
+        <h1>{{ request.company_name|default:"Untitled Project" }}</h1>
+        <div class="subtitle">Branding Project Summary Report</div>
+      </div>
+    </div>
+    <div class="cover-meta">
+      <span class="badge">{{ request.get_status_display }}</span>
+      <span class="date">Generated {{ generated_at|date:"F j, Y \a\t g:i A" }}</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- Project Overview                                                -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="section-title">Project Overview</div>
+<div class="info-grid">
+  <div class="info-item">
+    <div class="info-label">Request Number</div>
+    <div class="info-value">{{ request.request_number }}</div>
+  </div>
+  <div class="info-item">
+    <div class="info-label">Status</div>
+    <div class="info-value">{{ request.get_status_display }}</div>
+  </div>
+  <div class="info-item">
+    <div class="info-label">Priority</div>
+    <div class="info-value">{{ request.get_priority_display }}</div>
+  </div>
+  <div class="info-item">
+    <div class="info-label">Industry</div>
+    <div class="info-value">{{ request.industry_display_value }}</div>
+  </div>
+  <div class="info-item">
+    <div class="info-label">Client</div>
+    <div class="info-value">{{ request.user.get_full_name|default:request.user.username }}</div>
+  </div>
+  <div class="info-item">
+    <div class="info-label">Designer</div>
+    <div class="info-value">{{ request.designer.get_full_name|default:request.designer.username|default:"Unassigned" }}</div>
+  </div>
+  <div class="info-item">
+    <div class="info-label">Country</div>
+    <div class="info-value">{{ request.country|default:"—" }}</div>
+  </div>
+  <div class="info-item">
+    <div class="info-label">Website</div>
+    <div class="info-value">{{ request.website|default:"—" }}</div>
+  </div>
+  <div class="info-item">
+    <div class="info-label">Date Created</div>
+    <div class="info-value">{{ request.created_at|date:"F j, Y" }}</div>
+  </div>
+  <div class="info-item">
+    <div class="info-label">Completed</div>
+    <div class="info-value">{{ request.completed_at|date:"F j, Y"|default:"—" }}</div>
+  </div>
+  <div class="info-item">
+    <div class="info-label">Delivery Date</div>
+    <div class="info-value">{{ request.estimated_delivery_date|date:"F j, Y"|default:"—" }}</div>
+  </div>
+  <div class="info-item">
+    <div class="info-label">Duration</div>
+    <div class="info-value">{{ request.completion_time_display|default:"—" }}</div>
+  </div>
+</div>
+
+{% if request.business_description %}
+<div class="section-title">Business Description</div>
+<div class="desc-block">
+  <p>{{ request.business_description|linebreaksbr }}</p>
+</div>
+{% endif %}
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- Brand Identity                                                  -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="section-title">Brand Identity</div>
+
+{% if request.company_description %}
+<div class="desc-block">
+  <p>{{ request.company_description|linebreaksbr }}</p>
+</div>
+{% endif %}
+
+<div class="info-grid">
+  <div class="info-item info-full">
+    <div class="info-label">Target Audience</div>
+    <div class="info-value">{{ request.target_audience|default:"—" }}</div>
+  </div>
+</div>
+
+<div class="info-item">
+  <div class="info-label">Brand Values</div>
+  <div class="tag-list">
+    {% for v in request.brand_values %}
+    <span class="tag">{{ v }}</span>
+    {% empty %}
+    <span class="tag">—</span>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="info-item">
+  <div class="info-label">Preferred Colors</div>
+  <div class="tag-list">
+    {% for c in request.preferred_colors %}
+    <span class="tag">{{ c }}</span>
+    {% empty %}
+    <span class="tag">—</span>
+    {% endfor %}
+  </div>
+</div>
+
+{% if request.current_branding %}
+<div class="info-item">
+  <div class="info-label">Current Branding Assets</div>
+  <div class="tag-list">
+    {% for b in request.current_branding %}
+    <span class="tag">{{ b }}</span>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- Selected Collection                                             -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+{% if collection %}
+<div class="section-title">Selected Collection</div>
+<div class="collection-card">
+  <h3>{{ collection.name }}</h3>
+  <div class="meta">{{ collection.get_category_display }}{% if collection.industry %} · {{ collection.industry }}{% endif %}</div>
+  {% if collection.description %}
+  <div class="desc">{{ collection.description|linebreaksbr }}</div>
+  {% endif %}
+  {% if collection.style_tags %}
+  <div class="tag-list" style="margin-top:8px;">
+    {% for tag in collection.style_tags %}
+    <span class="tag">{{ tag }}</span>
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% if collection.color_palette %}
+  <div style="margin-top:8px;">
+    <div class="info-label">Color Palette</div>
+    <div class="palette-row">
+      {% for color in collection.color_palette %}
+      <div class="palette-swatch" style="background:{{ color }};" title="{{ color }}"></div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+  {% if collection.fonts %}
+  <div style="margin-top:6px;">
+    <div class="info-label">Fonts</div>
+    <div class="tag-list">
+      {% for font in collection.fonts %}
+      <span class="tag">{{ font }}</span>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endif %}
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- Deliverables / Assets                                           -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<div class="section-title">Deliverables</div>
+
+{% if assets %}
+<table class="asset-table">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>File Name</th>
+      <th>Type</th>
+      <th>Size</th>
+      <th>Uploaded</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for asset in assets %}
+    <tr>
+      <td>{{ forloop.counter }}</td>
+      <td>{{ asset.original_name|default:asset.file.name }}</td>
+      <td>{{ asset.get_asset_type_display }}</td>
+      <td>{{ asset.size_display }}</td>
+      <td>{{ asset.uploaded_at|date:"M j, Y H:i" }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<div class="desc-block">
+  <p>No assets uploaded for this project.</p>
+</div>
+{% endif %}
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- Internal Notes                                                  -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+{% if request.internal_notes %}
+<div class="section-title">Designer Notes</div>
+<div class="notes-block">
+  <h4><i class="fa-solid fa-pen-nib"></i> Internal Notes</h4>
+  <p>{{ request.internal_notes|linebreaksbr }}</p>
+</div>
+{% endif %}
+
+{% if request.additional_notes %}
+<div class="section-title">Additional Notes</div>
+<div class="desc-block">
+  <p>{{ request.additional_notes|linebreaksbr }}</p>
+</div>
+{% endif %}
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- Project Timeline                                                -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="section-title">Project Timeline</div>
+
+{% if timeline %}
+<ul class="timeline">
+  {% for entry in timeline %}
+  <li class="timeline-item">
+    <div class="timeline-dot
+      {% if entry.event_type == 'STATUS_CHANGE' %}status
+      {% elif entry.event_type == 'NOTE' %}note
+      {% elif entry.event_type == 'UPLOAD' or entry.event_type == 'FILE_UPDATE' %}upload
+      {% elif entry.event_type == 'CREATED' %}create
+      {% endif %}"></div>
+    <div class="timeline-action">{{ entry.action }}</div>
+    {% if entry.description %}
+    <div class="timeline-desc">{{ entry.description|linebreaksbr }}</div>
+    {% endif %}
+    <div class="timeline-meta">
+      {{ entry.get_event_type_display }}
+      {% if entry.actor %} · by {{ entry.actor.get_full_name|default:entry.actor.username }}{% endif %}
+      · {{ entry.created_at|date:"M j, Y g:i A" }}
+    </div>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<div class="desc-block">
+  <p>No timeline events recorded.</p>
+</div>
+{% endif %}
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- Client Feedback                                                 -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+{% if feedback %}
+<div class="section-title">Client Feedback</div>
+<div class="feedback-box">
+  <div class="stars">
+    {% for i in "12345" %}
+      {% if forloop.counter <= feedback.rating %}&#9733;{% else %}&#9734;{% endif %}
+    {% endfor %}
+    <span style="font-size:9pt;color:#64748b;margin-left:6px;">{{ feedback.rating }}/5</span>
+  </div>
+  {% if feedback.comment %}
+  <div class="comment">"{{ feedback.comment }}"</div>
+  {% endif %}
+  <div class="meta">
+    Submitted by {{ feedback.request.user.get_full_name|default:feedback.request.user.username }}
+    on {{ feedback.created_at|date:"F j, Y" }}
+    {% if feedback.would_recommend %} · Would recommend{% endif %}
+  </div>
+  {% if feedback.staff_response %}
+  <div style="margin-top:10px;padding-top:10px;border-top:1px solid #e2e8f0;">
+    <div style="font-size:8pt;font-weight:700;color:#6366f1;">Staff Response</div>
+    <div style="font-size:9pt;color:#475569;margin-top:2px;">{{ feedback.staff_response|linebreaksbr }}</div>
+    <div class="meta">by {{ feedback.responded_by.get_full_name|default:feedback.responded_by.username }} on {{ feedback.responded_at|date:"M j, Y" }}</div>
+  </div>
+  {% endif %}
+</div>
+{% endif %}
+
+</body>
+</html>

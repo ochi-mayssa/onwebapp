@@ -1,0 +1,667 @@
+{% extends 'base.html' %}
+{% block title %}Admin Projects{% endblock %}
+{% block content %}
+<div class="container-fluid py-4 px-4 fade-in">
+  <!-- Header with Breadcrumb -->
+  <div class="d-flex flex-column gap-3 mb-5">
+    <nav aria-label="breadcrumb" class="bg-light rounded-3 p-3">
+      <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="#" class="text-decoration-none"><i class="bi bi-house-door"></i></a></li>
+        <li class="breadcrumb-item"><a href="#" class="text-decoration-none">Dashboard</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Project Management</li>
+      </ol>
+    </nav>
+    
+    <!-- Header Row -->
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-4">
+      <div>
+        <h1 class="h2 fw-bold text-dark mb-2">Project Administration</h1>
+        <p class="text-muted mb-0">Manage all client projects, track progress, and oversee delivery</p>
+      </div>
+      
+      <div class="d-flex flex-wrap gap-3 align-items-center">
+        <!-- Search with Advanced Options -->
+        <div class="position-relative">
+          <form method="get" class="d-flex">
+            <div class="input-group input-group-lg shadow-sm rounded-pill" style="width: 320px;">
+              <span class="input-group-text bg-white border-0 ps-4">
+                <i class="bi bi-search text-muted"></i>
+              </span>
+              <input type="text" 
+                     name="q" 
+                     value="{{ q }}" 
+                     class="form-control border-0 ps-0" 
+                     placeholder="Search projects, clients, or phases..."
+                     aria-label="Search projects">
+              <button type="button" 
+                      class="btn btn-light border-0 rounded-start-0" 
+                      data-bs-toggle="collapse" 
+                      data-bs-target="#advancedFilters" 
+                      aria-expanded="false" 
+                      aria-controls="advancedFilters">
+                <i class="bi bi-sliders"></i>
+              </button>
+              <button type="submit" 
+                      class="btn btn-primary rounded-end-pill px-4">
+                Search
+              </button>
+            </div>
+          </form>
+          
+          <!-- Advanced Filters Collapse -->
+          <div class="collapse position-absolute end-0 mt-2" id="advancedFilters" style="z-index: 1000; width: 400px;">
+            <div class="card shadow-lg border-0 rounded-3">
+              <div class="card-body p-4">
+                <h6 class="fw-semibold mb-3">Advanced Filters</h6>
+                <div class="row g-3">
+                  <div class="col-12">
+                    <label class="form-label small text-uppercase fw-semibold text-muted">Status</label>
+                    <select class="form-select" name="filter">
+                      <option value="">All Status</option>
+                      <option value="waiting" {% if filter == 'waiting' %}selected{% endif %}>Waiting for Client</option>
+                      <option value="in_progress" {% if filter == 'in_progress' %}selected{% endif %}>In Progress</option>
+                      <option value="completed" {% if filter == 'completed' %}selected{% endif %}>Completed</option>
+                    </select>
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label small text-uppercase fw-semibold text-muted">Date Range</label>
+                    <input type="text" class="form-control" placeholder="Select date range">
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label small text-uppercase fw-semibold text-muted">Priority</label>
+                    <select class="form-select">
+                      <option>All Priorities</option>
+                      <option>High</option>
+                      <option>Medium</option>
+                      <option>Low</option>
+                    </select>
+                  </div>
+                  <div class="col-12 d-flex justify-content-end gap-2 mt-3">
+                    <button type="button" class="btn btn-light" data-bs-toggle="collapse" data-bs-target="#advancedFilters">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Apply Filters</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="dropdown">
+          <button class="btn btn-outline-primary rounded-pill px-4 dropdown-toggle" type="button" data-bs-toggle="dropdown">
+            <i class="bi bi-plus-lg me-2"></i> Quick Actions
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 p-2">
+            <li><a class="dropdown-item rounded-2" href="#"><i class="bi bi-plus-circle me-2"></i> New Project</a></li>
+            <li><a class="dropdown-item rounded-2" href="#"><i class="bi bi-file-earmark-plus me-2"></i> Import Projects</a></li>
+            <li><a class="dropdown-item rounded-2" href="#"><i class="bi bi-gear me-2"></i> Project Settings</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item rounded-2" href="{% url 'projects:export_projects_csv' %}"><i class="bi bi-download me-2"></i> Export CSV</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stat Cards with Trends -->
+  <div class="row g-4 mb-5">
+    <div class="col-xxl-3 col-md-6">
+      <div class="card border-0 shadow-sm rounded-4 hover-lift transition-all">
+        <div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-start mb-3">
+            <div class="rounded-3 bg-danger-subtle p-3">
+              <i class="bi bi-exclamation-octagon fs-3 text-danger"></i>
+            </div>
+            <span class="badge bg-danger-subtle text-danger border-0 rounded-pill">Action Needed</span>
+          </div>
+          <h6 class="text-muted small text-uppercase fw-semibold mb-2">Delayed Phases</h6>
+          <div class="d-flex justify-content-between align-items-end">
+            <h2 class="fw-bold mb-0">{{ delayed_phases_count }}</h2>
+            <a href="?status=DELAYED" class="text-decoration-none small text-danger">View All →</a>
+          </div>
+          <div class="progress mt-3" style="height: 4px;">
+            <div class="progress-bar bg-danger" style="width: {% widthratio delayed_phases_count total_projects 100 %}%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-xxl-3 col-md-6">
+      <div class="card border-0 shadow-sm rounded-4 hover-lift transition-all">
+        <div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-start mb-3">
+            <div class="rounded-3 bg-warning-subtle p-3">
+              <i class="bi bi-hourglass-split fs-3 text-warning"></i>
+            </div>
+            <span class="badge bg-warning-subtle text-warning border-0 rounded-pill">Pending</span>
+          </div>
+          <h6 class="text-muted small text-uppercase fw-semibold mb-2">Pending Approvals</h6>
+          <div class="d-flex justify-content-between align-items-end">
+            <h2 class="fw-bold mb-0">{{ pending_phase_approvals }}</h2>
+            <a href="#" class="text-decoration-none small text-warning">View All →</a>
+          </div>
+          <div class="progress mt-3" style="height: 4px;">
+            <div class="progress-bar bg-warning" style="width: {% widthratio pending_phase_approvals total_projects 100 %}%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-xxl-3 col-md-6">
+      <div class="card border-0 shadow-sm rounded-4 hover-lift transition-all">
+        <div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-start mb-3">
+            <div class="rounded-3 bg-primary-subtle p-3">
+              <i class="bi bi-play-circle fs-3 text-primary"></i>
+            </div>
+            <span class="badge bg-primary-subtle text-primary border-0 rounded-pill">Active</span>
+          </div>
+          <h6 class="text-muted small text-uppercase fw-semibold mb-2">Active Projects</h6>
+          <div class="d-flex justify-content-between align-items-end">
+            <h2 class="fw-bold mb-0">{{ stats.active }}</h2>
+            <a href="?filter=in_progress" class="text-decoration-none small text-primary">View All →</a>
+          </div>
+          <div class="progress mt-3" style="height: 4px;">
+            <div class="progress-bar bg-primary" style="width: {% widthratio stats.active total_projects 100 %}%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-xxl-3 col-md-6">
+      <div class="card border-0 shadow-sm rounded-4 hover-lift transition-all">
+        <div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-start mb-3">
+            <div class="rounded-3 bg-success-subtle p-3">
+              <i class="bi bi-check-circle fs-3 text-success"></i>
+            </div>
+            <span class="badge bg-success-subtle text-success border-0 rounded-pill">Success</span>
+          </div>
+          <h6 class="text-muted small text-uppercase fw-semibold mb-2">Completed</h6>
+          <div class="d-flex justify-content-between align-items-end">
+            <h2 class="fw-bold mb-0">{{ completed_projects }}</h2>
+            <a href="?filter=completed" class="text-decoration-none small text-success">View All →</a>
+          </div>
+          <div class="progress mt-3" style="height: 4px;">
+            <div class="progress-bar bg-success" style="width: {% widthratio completed_projects total_projects 100 %}%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+    </div>
+    
+    <div class="col-xxl-3 col-md-6">
+      <div class="card border-0 shadow-sm rounded-4 hover-lift transition-all">
+        <div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-start mb-3">
+            <div class="rounded-3 bg-danger-subtle p-3">
+              <i class="bi bi-exclamation-triangle fs-3 text-danger"></i>
+            </div>
+            <span class="badge bg-danger-subtle text-danger border-0 rounded-pill">Requires attention</span>
+          </div>
+          <h6 class="text-muted small text-uppercase fw-semibold mb-2">Overdue</h6>
+          <div class="d-flex justify-content-between align-items-end">
+            <h2 class="fw-bold mb-0">{{ overdue_count }}</h2>
+            <a href="#" class="text-decoration-none small text-danger">Take Action →</a>
+          </div>
+          <div class="progress mt-3" style="height: 4px;">
+            <div class="progress-bar bg-danger" style="width: {% widthratio overdue_count total_projects 100 %}%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Area -->
+  <div class="row">
+    <div class="col-12">
+      <form action="{% url 'projects:bulk_projects_action' %}" method="post" id="bulkActionForm">
+        {% csrf_token %}
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+          <!-- Table Header with Actions -->
+          <div class="card-header bg-white border-bottom py-4 px-4 d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+            <div>
+              <h5 class="fw-bold mb-1">All Projects</h5>
+              <p class="text-muted small mb-0">{{ projects|length }} projects found</p>
+            </div>
+            
+            <div class="d-flex flex-wrap gap-2 align-items-center">
+              <!-- Bulk Action Select -->
+              <div class="input-group" style="min-width: 200px;">
+                <select class="form-select" id="bulkActionSelect" aria-label="Bulk actions">
+                  <option selected>Bulk Actions</option>
+                  <option value="ready">Mark as Ready</option>
+                  <option value="lock">Lock Projects</option>
+                  <option value="reopen">Reopen Projects</option>
+                  <option value="archive">Archive Selected</option>
+                  <option value="export">Export Selected</option>
+                </select>
+                <button class="btn btn-outline-secondary" type="button" onclick="applyBulkAction()">Apply</button>
+              </div>
+              
+              <!-- View Toggle -->
+              <div class="btn-group" role="group">
+                <input type="radio" class="btn-check" name="viewMode" id="viewTable" autocomplete="off" checked>
+                <label class="btn btn-outline-secondary" for="viewTable"><i class="bi bi-list"></i></label>
+                
+                <input type="radio" class="btn-check" name="viewMode" id="viewGrid" autocomplete="off">
+                <label class="btn btn-outline-secondary" for="viewGrid"><i class="bi bi-grid"></i></label>
+                
+                <input type="radio" class="btn-check" name="viewMode" id="viewKanban" autocomplete="off">
+                <label class="btn btn-outline-secondary" for="viewKanban"><i class="bi bi-kanban"></i></label>
+              </div>
+              
+              <!-- Refresh -->
+              <button type="button" class="btn btn-light border rounded-3" onclick="location.reload()">
+                <i class="bi bi-arrow-clockwise"></i>
+              </button>
+            </div>
+          </div>
+          
+          <!-- Tabs for Service Type -->
+          <ul class="nav nav-tabs mb-4" id="projectTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active fw-bold" id="full-platform-tab" data-bs-toggle="tab" data-bs-target="#full-platform" type="button" role="tab" aria-controls="full-platform" aria-selected="true">
+                <i class="bi bi-layers me-2"></i>Full Platform Projects
+                <span class="badge bg-primary-subtle text-primary rounded-pill ms-2">{{ full_platform_projects|length }}</span>
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link fw-bold text-success" id="community-tab" data-bs-toggle="tab" data-bs-target="#community" type="button" role="tab" aria-controls="community" aria-selected="false">
+                <i class="bi bi-people me-2"></i>Community Services
+                <span class="badge bg-success-subtle text-success rounded-pill ms-2">{{ community_projects|length }}</span>
+              </button>
+            </li>
+          </ul>
+
+          <div class="tab-content" id="projectTabsContent">
+            <!-- Full Platform Tab -->
+            <div class="tab-pane fade show active" id="full-platform" role="tabpanel" aria-labelledby="full-platform-tab">
+              <!-- Table -->
+              <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="bg-light">
+                <tr>
+                  <th style="width: 48px;" class="ps-4">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="selectAll" onclick="toggleSelectAll(this)">
+                    </div>
+                  </th>
+                  <th class="fw-semibold text-secondary small text-uppercase">Project Details</th>
+                  <th class="fw-semibold text-secondary small text-uppercase">Client</th>
+                  <th class="fw-semibold text-secondary small text-uppercase">Phase</th>
+                  <th class="fw-semibold text-secondary small text-uppercase">Status</th>
+                  <th class="fw-semibold text-secondary small text-uppercase">Progress</th>
+                  <th class="fw-semibold text-secondary small text-uppercase">Last Updated</th>
+                  <th class="text-end pe-4 fw-semibold text-secondary small text-uppercase">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for project in full_platform_projects %}
+                <tr class="transition-all hover-bg-light">
+                  <td class="ps-4">
+                    <div class="form-check">
+                      <input class="form-check-input row-select" type="checkbox" name="project_ids" value="{{ project.id }}">
+                    </div>
+                  </td>
+                  <td>
+                    <div class="d-flex align-items-center gap-3">
+                      <div class="rounded-2 bg-primary-subtle p-2">
+                        <i class="bi bi-folder text-primary"></i>
+                      </div>
+                      <div>
+                        <a href="{% url 'projects:admin_project_detail' project.id %}" class="fw-bold text-dark text-decoration-none d-block mb-1">
+                          {{ project.title }}
+                        </a>
+                        <div class="d-flex gap-2 align-items-center">
+                          {% if project.has_overdue %}
+                          <span class="badge bg-danger-subtle text-danger border-0 rounded-pill small">
+                            <i class="bi bi-clock me-1"></i>Overdue
+                          </span>
+                          {% endif %}
+                          <small class="text-muted">#{{ project.id }}</small>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="d-flex align-items-center gap-2">
+                      <div class="avatar-circle-sm bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center">
+                        {{ project.client.username|make_list|first|upper }}
+                      </div>
+                      <div>
+                        <div class="fw-medium">{{ project.client.username }}</div>
+                        <small class="text-muted">{{ project.client.email|truncatechars:20 }}</small>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge bg-light border text-dark rounded-pill px-3 py-1">
+                      {{ project.get_current_phase_display }}
+                    </span>
+                  </td>
+                  <td>
+                    {% if project.has_waiting_client %}
+                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-3 py-1">
+                      <i class="bi bi-hourglass-split me-1"></i>Waiting
+                    </span>
+                    {% elif project.current_status == 'COMPLETED' %}
+                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1">
+                      <i class="bi bi-check-circle me-1"></i>Completed
+                    </span>
+                    {% else %}
+                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-1">
+                      <i class="bi bi-play-circle me-1"></i>Active
+                    </span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <div class="d-flex align-items-center gap-3">
+                      <div class="flex-grow-1" style="max-width: 120px;">
+                        <div class="progress rounded-pill" style="height: 6px;">
+                          <div class="progress-bar rounded-pill bg-primary" 
+                               role="progressbar" 
+                               style="width: {{ project.progress_percentage }}%"
+                               aria-valuenow="{{ project.progress_percentage }}" 
+                               aria-valuemin="0" 
+                               aria-valuemax="100">
+                          </div>
+                        </div>
+                      </div>
+                      <span class="fw-medium">{{ project.progress_percentage }}%</span>
+                    </div>
+                  </td>
+                  <td>
+                    <small class="text-muted">2 hours ago</small>
+                  </td>
+                  <td class="text-end pe-4">
+                    <div class="btn-group" role="group">
+                      <a href="{% url 'projects:admin_project_detail' project.id %}" 
+                         class="btn btn-sm btn-outline-primary rounded-start-pill px-3">
+                         <i class="bi bi-eye me-1"></i>View
+                      </a>
+                      <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle dropdown-toggle-split rounded-end-pill" 
+                              data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="visually-hidden">Toggle Dropdown</span>
+                      </button>
+                      <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-3">
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-pencil me-2"></i>Edit</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-chat me-2"></i>Message Client</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-clock-history me-2"></i>View History</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash me-2"></i>Archive</a></li>
+                      </ul>
+                    </div>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="8" class="text-center py-5">
+                    <div class="py-5">
+                      <i class="bi bi-folder-x display-6 text-light mb-3"></i>
+                      <h5 class="text-muted mb-3">No projects found</h5>
+                      <p class="text-muted mb-4">Try adjusting your search or filter to find what you're looking for.</p>
+                      <a href="#" class="btn btn-primary">
+                        <i class="bi bi-plus-circle me-2"></i>Create New Project
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Community Tab -->
+        <div class="tab-pane fade" id="community" role="tabpanel" aria-labelledby="community-tab">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="bg-light">
+                <tr>
+                  <th style="width: 48px;" class="ps-4">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="selectAllCommunity" onclick="toggleSelectAll(this)">
+                    </div>
+                  </th>
+                  <th class="fw-semibold text-success small text-uppercase">Project Details</th>
+                  <th class="fw-semibold text-success small text-uppercase">Client</th>
+                  <th class="fw-semibold text-success small text-uppercase">Status</th>
+                  <th class="fw-semibold text-success small text-uppercase">Progress</th>
+                  <th class="text-end pe-4 fw-semibold text-success small text-uppercase">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for project in community_projects %}
+                <tr class="transition-all hover-bg-light">
+                  <td class="ps-4">
+                    <div class="form-check">
+                      <input class="form-check-input row-select" type="checkbox" name="project_ids" value="{{ project.id }}">
+                    </div>
+                  </td>
+                  <td>
+                    <div class="d-flex align-items-center gap-3">
+                      <div class="rounded-2 bg-success-subtle p-2">
+                        <i class="bi bi-globe text-success"></i>
+                      </div>
+                      <div>
+                        <a href="{% url 'projects:admin_project_detail' project.id %}" class="fw-bold text-dark text-decoration-none d-block mb-1">
+                          {{ project.title }}
+                        </a>
+                        <small class="text-muted">Community Service</small>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="d-flex align-items-center gap-2">
+                      <div class="avatar-circle-sm bg-success-subtle text-success rounded-circle d-flex align-items-center justify-content-center">
+                        {{ project.client.username|make_list|first|upper }}
+                      </div>
+                      <div>
+                        <div class="fw-medium">{{ project.client.username }}</div>
+                        <small class="text-muted">{{ project.client.email|truncatechars:20 }}</small>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge bg-light border text-dark rounded-pill px-3 py-1">
+                      {{ project.get_current_status_display }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="d-flex align-items-center gap-3">
+                      <div class="flex-grow-1" style="max-width: 120px;">
+                        <div class="progress rounded-pill" style="height: 6px;">
+                          <div class="progress-bar rounded-pill bg-success" 
+                               role="progressbar" 
+                               style="width: {{ project.progress_percentage }}%"
+                               aria-valuenow="{{ project.progress_percentage }}" 
+                               aria-valuemin="0" 
+                               aria-valuemax="100">
+                          </div>
+                        </div>
+                      </div>
+                      <span class="fw-medium">{{ project.progress_percentage }}%</span>
+                    </div>
+                  </td>
+                  <td class="text-end pe-4">
+                    <a href="{% url 'projects:admin_project_detail' project.id %}" 
+                       class="btn btn-sm btn-outline-success rounded-pill px-3">
+                       <i class="bi bi-eye me-1"></i>Manage
+                    </a>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="6" class="text-center py-5">
+                    <div class="py-5">
+                      <i class="bi bi-people display-6 text-muted mb-3"></i>
+                      <h5 class="text-muted mb-3">No community projects found</h5>
+                      <p class="text-muted mb-4">Community service requests will appear here.</p>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+          
+          <!-- Table Footer with Pagination -->
+          <div class="card-footer bg-white border-top py-3 px-4 d-flex flex-column flex-md-row justify-content-between align-items-center">
+            <div class="mb-3 mb-md-0">
+              <span class="text-muted small">Showing {{ projects|length }} of {{ total_projects }} projects</span>
+            </div>
+            <nav aria-label="Page navigation">
+              <ul class="pagination pagination-sm mb-0">
+                <li class="page-item disabled">
+                  <a class="page-link" href="#" tabindex="-1">Previous</a>
+                </li>
+                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                <li class="page-item">
+                  <a class="page-link" href="#">Next</a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<style>
+:root {
+  --saas-primary: #4f46e5;
+  --saas-light: #f8fafc;
+  --saas-border: #e2e8f0;
+}
+
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
+}
+
+.hover-bg-light:hover {
+  background-color: var(--saas-light) !important;
+}
+
+.avatar-circle-sm {
+  width: 36px;
+  height: 36px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.progress-bar {
+  transition: width 0.6s ease;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--saas-primary);
+  box-shadow: 0 0 0 0.25rem rgba(79, 70, 229, 0.1);
+}
+
+.dropdown-menu {
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.rounded-3 {
+  border-radius: 0.75rem !important;
+}
+.rounded-4 {
+  border-radius: 1rem !important;
+}
+
+.table th {
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.table td {
+  padding-top: 1.125rem;
+  padding-bottom: 1.125rem;
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--saas-primary);
+  color: white;
+}
+
+.badge {
+  font-weight: 500;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .input-group-lg {
+    width: 100% !important;
+  }
+  
+  .card-header, .card-footer {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+  
+  .table-responsive {
+    font-size: 0.875rem;
+  }
+}
+</style>
+
+<script>
+function toggleSelectAll(checkbox) {
+  const checkboxes = document.querySelectorAll('.row-select');
+  checkboxes.forEach(cb => cb.checked = checkbox.checked);
+}
+
+function applyBulkAction() {
+  const select = document.getElementById('bulkActionSelect');
+  const action = select.value;
+  
+  if (action && action !== 'Bulk Actions') {
+    const form = document.getElementById('bulkActionForm');
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'action';
+    input.value = action;
+    form.appendChild(input);
+    form.submit();
+  }
+}
+
+// Add visual feedback for row selection
+document.querySelectorAll('.row-select').forEach(checkbox => {
+  checkbox.addEventListener('change', function() {
+    const row = this.closest('tr');
+    if (this.checked) {
+      row.classList.add('table-primary');
+    } else {
+      row.classList.remove('table-primary');
+    }
+  });
+});
+
+// View mode toggle
+document.querySelectorAll('input[name="viewMode"]').forEach(radio => {
+  radio.addEventListener('change', function() {
+    // Add view mode switching logic here
+    console.log('View mode changed to:', this.id);
+  });
+});
+</script>
+{% endblock %}

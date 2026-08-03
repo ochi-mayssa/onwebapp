@@ -1,0 +1,382 @@
+{% extends "forum/base_forum.html" %}
+{% load static forum_tags %}
+
+{% block forum_title %}{{ post.title }}{% endblock %}
+
+{% block forum_content %}
+<!-- Post -->
+<div class="forum-card p-4 mb-3">
+    <!-- Meta row -->
+    <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+        {% if post.category %}
+        <a href="{% url 'forum:category' post.category.slug %}" class="badge rounded-pill text-decoration-none px-2 py-1 small" style="background:{{ post.category.color }}20;color:{{ post.category.color|default:'#6366f1' }};">
+            {{ post.category.name }}
+        </a>
+        {% endif %}
+        {% if post.is_pinned %}<span class="badge bg-warning bg-opacity-10 text-warning small px-2">Pinned</span>{% endif %}
+        {% if post.is_locked %}<span class="badge bg-danger bg-opacity-10 text-danger small px-2">Locked</span>{% endif %}
+        {% if post.is_hidden %}<span class="badge bg-secondary bg-opacity-10 text-secondary small px-2">Hidden</span>{% endif %}
+        {% if post.is_showcase %}<span class="badge bg-success bg-opacity-10 text-success small px-2">Showcase</span>{% endif %}
+        {% if is_owner %}
+            {% if post.moderation_status == 'pending' %}
+            <span class="badge bg-warning bg-opacity-10 text-warning small px-2"><i class="fas fa-clock me-1"></i>Pending Review</span>
+            {% elif post.moderation_status == 'reported' %}
+            <span class="badge bg-danger bg-opacity-10 text-danger small px-2"><i class="fas fa-flag me-1"></i>Reported</span>
+            {% if open_reports > 0 %}
+            <span class="badge bg-danger small px-2">{{ open_reports }} open report{{ open_reports|pluralize }}</span>
+            {% endif %}
+            {% endif %}
+        {% endif %}
+        {% for tag in post.tags.all %}
+        <a href="{% url 'forum:tag' tag.slug %}" class="badge rounded-pill text-decoration-none small px-2" style="background:{{ tag.color }}15;color:{{ tag.color }};">{{ tag.name }}</a>
+        {% endfor %}
+    </div>
+
+    <!-- Title -->
+    <h3 class="fw-800 mb-3">{{ post.title }}</h3>
+
+    <!-- Author bar -->
+    <div class="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom">
+        <a href="{% url 'forum:user_profile' post.author.username %}">
+            <img src="{{ post.author|user_avatar }}" class="rounded-circle" width="40" height="40" alt="">
+        </a>
+        <div>
+            <a href="{% url 'forum:user_profile' post.author.username %}" class="fw-700 text-body text-decoration-none">{{ post.author.username }}</a>
+            <div class="text-secondary small">
+                {% user_reputation post.author as rep %}
+                {{ rep }} rep &bull; {{ post.created_at|date:"M j, Y" }} &bull; {{ post.reading_time }} min read
+                {% if post.updated_at != post.created_at %}
+                &bull; <span title="Updated {{ post.updated_at|timesince }} ago">edited</span>
+                {% endif %}
+                {% user_forum_badges post.author as badges %}
+                {% for ub in badges|slice:":3" %}
+                <span class="forum-badge ms-1" style="background:{{ ub.badge.color }}15;color:{{ ub.badge.color }};" title="{{ ub.badge.name }}: {{ ub.badge.description }}">
+                    {% if ub.badge.icon %}<i class="{{ ub.badge.icon }}"></i>{% endif %}
+                    {{ ub.badge.name }}
+                </span>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="forum-content mb-4">
+        {{ post.content|linebreaks }}
+    </div>
+
+    <!-- Showcase extras -->
+    {% if post.is_showcase %}
+    <div class="p-3 rounded-3 mb-4" style="background:var(--bg-surface-secondary,#f8fafc);">
+        <h6 class="fw-700 mb-2"><i class="fas fa-rocket text-primary me-2"></i>Project Showcase</h6>
+        {% if post.project_name %}<div class="mb-1"><span class="fw-600 small">Project:</span> <span class="small">{{ post.project_name }}</span></div>{% endif %}
+        {% if post.tech_stack %}<div class="mb-1"><span class="fw-600 small">Tech Stack:</span> <span class="small">{{ post.tech_stack }}</span></div>{% endif %}
+        <div class="d-flex gap-2 mt-2">
+            {% if post.github_link %}<a href="{{ post.github_link }}" target="_blank" class="btn btn-sm btn-outline-secondary rounded-pill"><i class="fab fa-github me-1"></i>Source Code</a>{% endif %}
+            {% if post.live_demo %}<a href="{{ post.live_demo }}" target="_blank" class="btn btn-sm btn-primary rounded-pill"><i class="fas fa-external-link-alt me-1"></i>Live Demo</a>{% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Actions -->
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <div class="d-flex align-items-center gap-2">
+            <button class="forum-vote-btn vote-btn {% if user_vote == 'upvote' %}voted{% endif %}" data-slug="{{ post.slug }}" data-vote="upvote" title="Upvote">
+                <i class="fas fa-arrow-up fs-5"></i>
+            </button>
+            <span class="fw-700 {% if post.score > 0 %}text-primary{% elif post.score < 0 %}text-danger{% endif %} vote-score" id="score-{{ post.slug }}">{{ post.score }}</span>
+            <button class="forum-vote-btn vote-btn {% if user_vote == 'downvote' %}voted-down{% endif %}" data-slug="{{ post.slug }}" data-vote="downvote" title="Downvote">
+                <i class="fas fa-arrow-down fs-5"></i>
+            </button>
+            <span class="text-secondary small ms-2"><i class="far fa-eye me-1"></i>{{ post.views_count }}</span>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            {% if user.is_authenticated %}
+
+            <!-- PUBLIC: Vote, Bookmark, Share, Report -->
+            {% if not is_owner %}
+            <button class="btn btn-sm btn-outline-secondary rounded-pill bookmark-btn" data-slug="{{ post.slug }}">
+                <i class="fas {% if is_bookmarked %}fa-bookmark{% else %}fa-bookmark{% endif %} me-1"></i>
+                {% if is_bookmarked %}Saved{% else %}Save{% endif %}
+            </button>
+
+            <button class="btn btn-sm btn-outline-secondary rounded-pill" onclick="navigator.clipboard.writeText(window.location.href);alert('Link copied!');" title="Share">
+                <i class="fas fa-share-alt"></i>
+            </button>
+
+            <a href="{% url 'forum:report_create' post.slug %}" class="btn btn-sm btn-outline-danger rounded-pill" title="Report">
+                <i class="fas fa-flag me-1"></i>Report
+            </a>
+
+            {% if perm and perm.is_moderator %}
+            <button class="btn btn-sm btn-outline-warning rounded-pill pin-btn" data-slug="{{ post.slug }}">
+                <i class="fas fa-thumbtack me-1"></i>{% if post.is_pinned %}Unpin{% else %}Pin{% endif %}
+            </button>
+            <button class="btn btn-sm btn-outline-danger rounded-pill lock-btn" data-slug="{{ post.slug }}">
+                <i class="fas fa-lock me-1"></i>{% if post.is_locked %}Unlock{% else %}Lock{% endif %}
+            </button>
+            {% endif %}
+
+            <!-- OWNER: Edit, Delete, Analytics, Pin/Lock, Hide -->
+            {% else %}
+            <a href="{% url 'forum:post_edit' post.slug %}" class="btn btn-sm btn-primary rounded-pill">
+                <i class="fas fa-edit me-1"></i>Edit
+            </a>
+            <form method="post" action="{% url 'forum:post_delete' post.slug %}" class="d-inline" onsubmit="return confirm('Archive this post?')">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill">
+                    <i class="fas fa-trash-alt me-1"></i>Delete
+                </button>
+            </form>
+            <button class="btn btn-sm btn-outline-warning rounded-pill pin-btn" data-slug="{{ post.slug }}">
+                <i class="fas fa-thumbtack me-1"></i>{% if post.is_pinned %}Unpin{% else %}Pin{% endif %}
+            </button>
+            <button class="btn btn-sm btn-outline-danger rounded-pill lock-btn" data-slug="{{ post.slug }}">
+                <i class="fas fa-lock me-1"></i>{% if post.is_locked %}Unlock{% else %}Lock{% endif %}
+            </button>
+            <button class="btn btn-sm btn-outline-secondary rounded-pill hide-btn" data-slug="{{ post.slug }}">
+                <i class="fas fa-eye-slash me-1"></i>{% if post.is_hidden %}Unhide{% else %}Hide{% endif %}
+            </button>
+            {% endif %}
+
+            {% else %}
+            <!-- PUBLIC: Share (always visible) -->
+            <button class="btn btn-sm btn-outline-secondary rounded-pill" onclick="navigator.clipboard.writeText(window.location.href);alert('Link copied!');" title="Share">
+                <i class="fas fa-share-alt"></i>
+            </button>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- OWNER: Analytics Panel -->
+{% if analytics %}
+<div class="forum-card p-4 mb-3">
+    <h5 class="fw-800 mb-3"><i class="fas fa-chart-bar me-2"></i>Post Analytics</h5>
+    <div class="row g-3">
+        <div class="col-6 col-md-3">
+            <div class="text-center p-3 rounded-3" style="background:var(--bg-surface-secondary);">
+                <div class="fw-800 fs-4 text-primary">{{ analytics.views }}</div>
+                <div class="small text-secondary">Views</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="text-center p-3 rounded-3" style="background:var(--bg-surface-secondary);">
+                <div class="fw-800 fs-4 text-success">{{ analytics.upvotes }}</div>
+                <div class="small text-secondary">Upvotes</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="text-center p-3 rounded-3" style="background:var(--bg-surface-secondary);">
+                <div class="fw-800 fs-4 text-danger">{{ analytics.downvotes }}</div>
+                <div class="small text-secondary">Downvotes</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="text-center p-3 rounded-3" style="background:var(--bg-surface-secondary);">
+                <div class="fw-800 fs-4 text-info">{{ analytics.comments }}</div>
+                <div class="small text-secondary">Comments</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="text-center p-3 rounded-3" style="background:var(--bg-surface-secondary);">
+                <div class="fw-800 fs-4 text-warning">{{ analytics.bookmarks }}</div>
+                <div class="small text-secondary">Bookmarks</div>
+            </div>
+        </div>
+    </div>
+    {% if analytics.reactions %}
+    <div class="mt-3">
+        <div class="small text-secondary mb-2">Reaction Breakdown</div>
+        <div class="d-flex flex-wrap gap-2">
+            {% for r in analytics.reactions %}
+            <span class="badge rounded-pill px-3 py-2" style="background:var(--bg-surface-secondary);">
+                {{ r.reaction_type }}: {{ r.count }}
+            </span>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    {% if is_owner and open_reports > 0 %}
+    <div class="mt-3 p-3 rounded-3 bg-danger bg-opacity-10">
+        <div class="d-flex align-items-center gap-2">
+            <i class="fas fa-exclamation-triangle text-danger"></i>
+            <span class="small">This post has <strong>{{ open_reports }} open report{{ open_reports|pluralize }}</strong>.</span>
+            <a href="{% url 'forum:moderation' %}" class="btn btn-sm btn-outline-danger rounded-pill ms-auto">View Reports</a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+
+<!-- Comments -->
+<div class="mb-3">
+    <h5 class="fw-800 mb-3">
+        <i class="far fa-comment me-2"></i>Comments
+        <span class="text-secondary fw-600 small">({{ post.comment_count }})</span>
+    </h5>
+
+    <!-- Comment form -->
+    {% if user.is_authenticated %}
+    {% if not post.is_locked or is_owner or perm.is_moderator %}
+    <div class="forum-card p-3 mb-3">
+        <form method="post" action="{% url 'forum:comment_create' post.slug %}">
+            {% csrf_token %}
+            <div class="mb-2">
+                <textarea name="content" class="wizard-input" rows="3" placeholder="Share your thoughts..." required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm rounded-pill px-4">Comment</button>
+        </form>
+    </div>
+    {% else %}
+    <div class="alert alert-warning rounded-3">This post is locked. Comments are disabled.</div>
+    {% endif %}
+    {% else %}
+    <div class="alert alert-info rounded-3">
+        <a href="{% url 'users:login_view' %}" class="fw-600">Login</a> to leave a comment.
+    </div>
+    {% endif %}
+
+    <!-- Comments list -->
+    {% for comment in comments %}
+    {% include "forum/comment_item.html" with comment=comment %}
+    {% empty %}
+    <div class="text-center py-4 text-secondary">
+        <i class="far fa-comment-dots fs-2 mb-2"></i>
+        <p class="mb-0">No comments yet. Be the first to share your thoughts!</p>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Related -->
+{% if related %}
+<div>
+    <h5 class="fw-800 mb-3"><i class="fas fa-link me-2"></i>Related Posts</h5>
+    {% for r in related %}
+    <div class="forum-card d-flex align-items-start gap-3 p-3 mb-2">
+        <div class="vote-column text-center flex-shrink-0">
+            <div class="fw-700 small {% if r.score > 0 %}text-primary{% elif r.score < 0 %}text-danger{% endif %}">{{ r.score }}</div>
+        </div>
+        <div class="flex-grow-1 min-w-0">
+            <a href="{% url 'forum:post_detail' r.slug %}" class="forum-post-title small">{{ r.title }}</a>
+            <div class="small text-secondary mt-1">
+                <span><i class="far fa-comment me-1"></i>{{ r.comment_count }}</span>
+                <span class="ms-2">{{ r.reading_time }} min read</span>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}
+
+{% block forum_extra_js %}
+<script>
+/* Voting */
+document.querySelectorAll('.vote-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        fetch('/forum/post/' + this.dataset.slug + '/vote/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({reaction: this.dataset.vote}),
+        }).then(r => r.json()).then(d => {
+            document.getElementById('score-' + this.dataset.slug).textContent = d.score;
+            document.querySelectorAll('.vote-btn[data-slug="' + this.dataset.slug + '"]').forEach(b => {
+                b.classList.remove('voted', 'voted-down');
+                if ((b.dataset.vote === 'upvote' && d.action === 'voted' && d.upvotes > 0) || 
+                    (b.dataset.vote === 'upvote' && d.action === 'changed')) {
+                    b.classList.add('voted');
+                }
+                if ((b.dataset.vote === 'downvote' && d.action === 'voted' && d.downvotes > 0) ||
+                    (b.dataset.vote === 'downvote' && d.action === 'changed')) {
+                    b.classList.add('voted-down');
+                }
+            });
+        });
+    });
+});
+
+/* Bookmark */
+document.querySelectorAll('.bookmark-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        fetch('/forum/post/' + this.dataset.slug + '/bookmark/', {
+            method: 'POST',
+            headers: {'X-CSRFToken': '{{ csrf_token }}', 'Content-Type': 'application/json'},
+        }).then(r => r.json()).then(d => {
+            this.innerHTML = d.bookmarked ? '<i class="fas fa-bookmark me-1"></i>Saved' : '<i class="far fa-bookmark me-1"></i>Save';
+        });
+    });
+});
+
+/* Pin/Lock */
+document.querySelectorAll('.pin-btn, .lock-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const action = this.classList.contains('pin-btn') ? 'pin' : 'lock';
+        fetch('/forum/post/' + this.dataset.slug + '/' + action + '/', {
+            method: 'POST',
+            headers: {'X-CSRFToken': '{{ csrf_token }}', 'Content-Type': 'application/json'},
+        }).then(r => r.json()).then(d => {
+            if (d.pinned !== undefined) {
+                this.innerHTML = d.pinned ? '<i class="fas fa-thumbtack me-1"></i>Unpin' : '<i class="fas fa-thumbtack me-1"></i>Pin';
+                location.reload();
+            }
+            if (d.locked !== undefined) {
+                this.innerHTML = d.locked ? '<i class="fas fa-lock me-1"></i>Unlock' : '<i class="fas fa-lock me-1"></i>Lock';
+                location.reload();
+            }
+        });
+    });
+});
+
+/* Hide/Unhide */
+document.querySelectorAll('.hide-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        fetch('/forum/post/' + this.dataset.slug + '/hide/', {
+            method: 'POST',
+            headers: {'X-CSRFToken': '{{ csrf_token }}', 'Content-Type': 'application/json'},
+        }).then(r => r.json()).then(d => {
+            this.innerHTML = d.hidden ? '<i class="fas fa-eye-slash me-1"></i>Unhide' : '<i class="fas fa-eye-slash me-1"></i>Hide';
+            location.reload();
+        });
+    });
+});
+
+/* Comment voting */
+document.querySelectorAll('.comment-vote-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        fetch('/forum/comment/' + this.dataset.commentId + '/vote/', {
+            method: 'POST',
+            headers: {'X-CSRFToken': '{{ csrf_token }}', 'Content-Type': 'application/json'},
+            body: JSON.stringify({reaction: this.dataset.vote}),
+        }).then(r => r.json()).then(d => {
+            document.getElementById('comment-score-' + this.dataset.commentId).textContent = d.upvotes - d.downvotes;
+        });
+    });
+});
+
+/* Reply toggle */
+document.querySelectorAll('.reply-toggle').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.getElementById('reply-form-' + this.dataset.commentId).classList.toggle('d-none');
+    });
+});
+
+/* Solution toggle */
+document.querySelectorAll('.solution-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        fetch('/forum/comment/' + this.dataset.commentId + '/solution/', {
+            method: 'POST',
+            headers: {'X-CSRFToken': '{{ csrf_token }}', 'Content-Type': 'application/json'},
+        }).then(r => r.json()).then(d => {
+            if (d.is_solution) {
+                this.innerHTML = '<i class="fas fa-check-circle text-success me-1"></i>Solution';
+            } else {
+                this.innerHTML = '<i class="far fa-check-circle me-1"></i>Mark Solution';
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

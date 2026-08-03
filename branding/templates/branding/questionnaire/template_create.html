@@ -1,0 +1,121 @@
+{% extends 'branding/base.html' %}
+{% load branding_extras %}
+
+{% block title %}Create Template · Questionnaire{% endblock %}
+
+{% block branding_content %}
+<div class="detail-page">
+    <div class="container py-4 py-lg-5" style="max-width: 960px;">
+
+        <div class="d-flex align-items-center gap-2 mb-4">
+            <a href="{% url 'branding:questionnaire_templates_list' %}" class="btn btn-back btn-sm"><i class="fa-solid fa-arrow-left me-1"></i>Back</a>
+            <div>
+                <h1 class="fw-800 mb-0"><i class="fa-solid fa-plus-circle me-2 text-primary"></i>{{ page_title|default:"Create Template" }}</h1>
+                <p class="text-muted mb-0">Questionnaire Templates</p>
+            </div>
+        </div>
+
+        <form method="post" action="" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger d-flex align-items-start gap-2 rounded-4 border-0 shadow-sm mb-4">
+                <i class="fa-solid fa-circle-exclamation mt-1"></i>
+                <div>{{ form.non_field_errors }}</div>
+            </div>
+            {% endif %}
+
+            <div class="detail-card rounded-4 p-4 mb-4">
+                <h5 class="fw-800 section-heading"><i class="fa-solid fa-pen-nib me-2 text-primary"></i>Template Details</h5>
+                <div class="row g-3">
+                    <div class="col-12">
+                        {{ form.name.label_tag }}
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                        <div class="text-danger small mt-1">{{ form.name.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-12">
+                        {{ form.description.label_tag }}
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                        <div class="text-danger small mt-1">{{ form.description.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-card rounded-4 p-4 mb-4">
+                <h5 class="fw-800 section-heading"><i class="fa-solid fa-sliders me-2 text-primary"></i>Settings</h5>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        {{ form.phase.label_tag }}
+                        {{ form.phase }}
+                        {% if form.phase.errors %}
+                        <div class="text-danger small mt-1">{{ form.phase.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.industry.label_tag }}
+                        {{ form.industry }}
+                        {% if form.industry.errors %}
+                        <div class="text-danger small mt-1">{{ form.industry.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.collection.label_tag }}
+                        {{ form.collection }}
+                        {% if form.collection.errors %}
+                        <div class="text-danger small mt-1">{{ form.collection.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-12">
+                        <div class="form-check form-switch">
+                            {{ form.is_active }}
+                            {{ form.is_active.label_tag }}
+                        </div>
+                        {% if form.is_active.errors %}
+                        <div class="text-danger small mt-1">{{ form.is_active.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-card rounded-4 p-4 mb-4">
+                <h5 class="fw-800 section-heading"><i class="fa-solid fa-code me-2 text-primary"></i>Questions Data (JSON)</h5>
+                <div class="row g-3">
+                    <div class="col-12">
+                        {{ form.questions_data.label_tag }}
+                        {{ form.questions_data }}
+                        {% if form.questions_data.errors %}
+                        <div class="text-danger small mt-1">{{ form.questions_data.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="detail-card rounded-3 p-3 mt-3 border-primary border-opacity-25" style="border-width: 1px !important; border-style: dashed !important; background: var(--bs-primary-subtle, #e8f0fe);">
+                    <div class="d-flex align-items-start gap-3">
+                        <i class="fa-solid fa-lightbulb text-primary mt-1"></i>
+                        <div>
+                            <h6 class="fw-800 mb-1">Questions Data Format</h6>
+                            <p class="text-muted mb-2 small">Each question object should include:</p>
+                            <ul class="text-muted small mb-2 ps-3">
+                                <li><strong>text</strong> — The question text</li>
+                                <li><strong>type</strong> — short_text, long_text, multiple_choice, single_choice, rank_order, preference_scale, yes_no, color_picker</li>
+                                <li><strong>category</strong> — Category grouping (e.g., colors, typography, layout)</li>
+                                <li><strong>importance</strong> — critical, high, medium, low</li>
+                                <li><strong>required</strong> — true or false</li>
+                            </ul>
+                            <pre class="bg-dark text-light p-3 rounded-3 mb-0 x-small" style="overflow-x: auto;">[{"text": "Question text", "type": "short_text", "category": "colors", "importance": "important", "required": true}]</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 border-top pt-3">
+                <a href="{% url 'branding:questionnaire_templates_list' %}" class="btn btn-back">Cancel</a>
+                <button type="submit" class="btn btn-brand-primary px-4"><i class="fa-solid fa-floppy-disk me-2"></i>Create Template</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

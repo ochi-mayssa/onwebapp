@@ -1,0 +1,196 @@
+{% extends "branding/base.html" %}
+{% load branding_extras %}
+
+{% block title %}Figma Integration{% endblock %}
+
+{% block branding_content %}
+<div class="container py-4">
+
+    {# ── Header ── #}
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+        <div>
+            <nav aria-label="breadcrumb" class="mb-2">
+                <ol class="breadcrumb mb-0 small">
+                    <li class="breadcrumb-item"><a href="{% url 'branding:designer_dashboard' %}" class="text-decoration-none"><i class="fa-solid fa-palette me-1"></i>My Work</a></li>
+                    <li class="breadcrumb-item"><a href="#" class="text-decoration-none">Integrations</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Figma</li>
+                </ol>
+            </nav>
+            <h1 class="h4 fw-bold mb-1"><i class="fa-brands fa-figma me-2"></i>Figma Integration</h1>
+            <p class="text-muted mb-0 small">Import and sync design files from Figma.</p>
+        </div>
+    </div>
+
+    {# ── Connection Status Card ── #}
+    <div class="detail-card rounded-4 p-4 mb-4">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="rounded-circle d-flex align-items-center justify-content-center" style="width:48px;height:48px;background:var(--bs-tertiary-bg,#f1f5f9);">
+                    <i class="fa-brands fa-figma fa-lg"></i>
+                </div>
+                <div>
+                    <h6 class="fw-bold mb-0">Figma Account</h6>
+                    {% if connection %}
+                        <span class="x-small text-success"><i class="fa-solid fa-circle-check me-1"></i>Connected</span>
+                        <span class="x-small text-muted ms-2">{{ connection.figma_email }}</span>
+                        <span class="x-small text-muted ms-2"><i class="fa-regular fa-clock me-1"></i>Last synced: {{ connection.last_synced|date:"M j, Y g:i A"|default:"Never" }}</span>
+                    {% else %}
+                        <span class="x-small text-muted">Not connected</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div>
+                {% if connection %}
+                    <form method="post" action="{{ request.path }}" class="d-inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="disconnect">
+                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Disconnect from Figma?')">
+                            <i class="fa-solid fa-link-slash me-1"></i>Disconnect
+                        </button>
+                    </form>
+                {% else %}
+                    <button type="button" class="btn btn-sm btn-brand-primary" data-bs-toggle="collapse" data-bs-target="#connectForm">
+                        <i class="fa-solid fa-link me-1"></i>Connect Figma
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+
+        {# Connect Form #}
+        {% if not connection %}
+        <div class="collapse {% if connect_error %}show{% endif %} mt-3 pt-3 border-top" id="connectForm">
+            <form method="post" action="{{ request.path }}">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="connect">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-8">
+                        <label for="figma_token" class="form-label x-small fw-700">Personal Access Token <span class="text-danger">*</span></label>
+                        <input type="password" class="form-control form-control-sm" id="figma_token" name="access_token" required placeholder="Enter your Figma personal access token">
+                        <div class="form-text">Generate a token at <strong>Figma &gt; Settings &gt; Personal access tokens</strong>.</div>
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-brand-primary btn-sm w-100">
+                            <i class="fa-solid fa-plug me-1"></i>Connect
+                        </button>
+                    </div>
+                </div>
+                {% if connect_error %}
+                <div class="alert alert-danger mt-3 py-2 px-3 small mb-0"><i class="fa-solid fa-circle-exclamation me-1"></i>{{ connect_error }}</div>
+                {% endif %}
+            </form>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if connection %}
+    {# ── Import Design Form ── #}
+    <div class="collapse mb-4" id="importDesignForm">
+        <form method="post" action="{{ request.path }}" class="detail-card rounded-4 p-4">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="import_design">
+            <h6 class="fw-bold mb-3"><i class="fa-solid fa-cloud-arrow-down me-2 text-primary"></i>Import Figma Design</h6>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label for="figma_file_key" class="form-label x-small fw-700">File Key <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control form-control-sm" id="figma_file_key" name="file_key" required placeholder="e.g. abc123DEF456">
+                    <div class="form-text">The key from the Figma file URL.</div>
+                </div>
+                <div class="col-md-4">
+                    <label for="figma_file_name" class="form-label x-small fw-700">File Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control form-control-sm" id="figma_file_name" name="file_name" required placeholder="e.g. Brand Guidelines v2">
+                </div>
+                <div class="col-md-4">
+                    <label for="figma_url" class="form-label x-small fw-700">Figma URL</label>
+                    <input type="url" class="form-control form-control-sm" id="figma_url" name="figma_url" placeholder="https://www.figma.com/file/...">
+                </div>
+                <div class="col-md-6">
+                    <label for="figma_request" class="form-label x-small fw-700">Link to Request <span class="text-danger">*</span></label>
+                    <select class="form-select form-select-sm" id="figma_request" name="request_id" required>
+                        <option value="">Select a request...</option>
+                        {% for req in active_requests %}
+                        <option value="{{ req.pk }}">{{ req.request_number }} — {{ req.company_name|default:"Untitled" }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6 d-flex align-items-end">
+                    <button type="submit" class="btn btn-brand-primary btn-sm px-4">
+                        <i class="fa-solid fa-download me-1"></i>Import Design
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    {# ── Imported Designs ── #}
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <h5 class="fw-bold mb-0"><i class="fa-solid fa-layer-group me-2 text-muted"></i>Imported Designs</h5>
+        <button type="button" class="btn btn-sm btn-brand-primary" data-bs-toggle="collapse" data-bs-target="#importDesignForm">
+            <i class="fa-solid fa-plus me-1"></i>Import Design
+        </button>
+    </div>
+
+    {% if designs %}
+    <div class="row g-3">
+        {% for d in designs %}
+        <div class="col-md-6 col-xl-4">
+            <div class="detail-card rounded-4 p-4 h-100 design-card">
+                <div class="d-flex align-items-start justify-content-between mb-2">
+                    <h6 class="fw-bold mb-0 text-truncate me-2">
+                        <i class="fa-brands fa-figma me-1 text-muted"></i>
+                        {{ d.figma_file_name }}
+                    </h6>
+                    {% if d.sync_status == 'SYNCED' %}
+                        <span class="badge bg-success-subtle text-success rounded-pill x-small flex-shrink-0"><i class="fa-solid fa-check me-1"></i>Synced</span>
+                    {% elif d.sync_status == 'OUTDATED' %}
+                        <span class="badge bg-warning-subtle text-warning rounded-pill x-small flex-shrink-0"><i class="fa-solid fa-arrow-rotate-right me-1"></i>Outdated</span>
+                    {% elif d.sync_status == 'ERROR' %}
+                        <span class="badge bg-danger-subtle text-danger rounded-pill x-small flex-shrink-0"><i class="fa-solid fa-circle-exclamation me-1"></i>Error</span>
+                    {% endif %}
+                </div>
+                {% if d.figma_url %}
+                <a href="{{ d.figma_url }}" target="_blank" rel="noopener" class="x-small text-decoration-none mb-2 d-inline-block">
+                    <i class="fa-solid fa-arrow-up-right-from-square me-1"></i>Open in Figma
+                </a>
+                {% endif %}
+                <div class="d-flex align-items-center gap-3 mt-auto pt-2 border-top">
+                    {% if d.request %}
+                    <a href="{% url 'branding:request_detail' d.request.pk %}" class="x-small text-decoration-none">
+                        <i class="fa-solid fa-folder me-1"></i>{{ d.request.request_number }}
+                    </a>
+                    {% endif %}
+                    <span class="x-small text-muted">
+                        <i class="fa-regular fa-clock me-1"></i>{{ d.last_synced|date:"M j, Y"|default:"Never synced" }}
+                    </span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="detail-card rounded-4 p-5 text-center">
+        <div class="mx-auto mb-3" style="width:64px;height:64px;border-radius:50%;background:var(--bs-tertiary-bg,#f1f5f9);display:flex;align-items:center;justify-content:center;">
+            <i class="fa-brands fa-figma fa-2x text-muted"></i>
+        </div>
+        <h5 class="fw-bold">No designs imported</h5>
+        <p class="text-muted mb-3">Import your first Figma design to get started.</p>
+        <button type="button" class="btn btn-brand-primary btn-sm" data-bs-toggle="collapse" data-bs-target="#importDesignForm">
+            <i class="fa-solid fa-plus me-1"></i>Import Design
+        </button>
+    </div>
+    {% endif %}
+
+    {% endif %}
+
+</div>
+
+<style>
+    .design-card {
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+        border: 1px solid var(--bs-border-color, #e2e8f0);
+    }
+    .design-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+</style>
+{% endblock %}

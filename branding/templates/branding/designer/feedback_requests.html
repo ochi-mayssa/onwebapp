@@ -1,0 +1,168 @@
+{% extends "branding/base.html" %}
+{% load branding_extras %}
+
+{% block title %}Feedback Requests — {{ br.request_number|default:"BR-"|add:br.pk|stringformat:"s" }}{% endblock %}
+
+{% block branding_content %}
+<div class="container py-4">
+
+    {# ── Header ── #}
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+        <div>
+            <nav aria-label="breadcrumb" class="mb-1">
+                <ol class="breadcrumb small mb-0">
+                    <li class="breadcrumb-item"><a href="{% url 'branding:designer_dashboard' %}" class="text-decoration-none">My Work</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'branding:request_detail' br.pk %}" class="text-decoration-none">{{ br.request_number }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Feedback Requests</li>
+                </ol>
+            </nav>
+            <h1 class="h4 fw-bold mb-1"><i class="fa-solid fa-comments me-2 text-primary"></i>Feedback Requests</h1>
+            <p class="text-muted mb-0 small">{{ br.company_name|default:br.request_number }}</p>
+        </div>
+        <a href="{% url 'branding:designer_dashboard' %}" class="btn btn-sm btn-outline-secondary">
+            <i class="fa-solid fa-arrow-left me-1"></i>Dashboard
+        </a>
+    </div>
+
+    <div class="row g-4">
+
+        {# ── Left Column: Create Form ── #}
+        <div class="col-lg-5 order-lg-2">
+            <div class="designer-section mb-4">
+                <h6 class="fw-bold mb-3"><i class="fa-solid fa-plus-circle me-1 text-success"></i>New Feedback Request</h6>
+                <form method="post" action="{{ request.path }}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="create_frs">
+
+                    <div class="mb-3">
+                        <label for="frs-subject" class="form-label x-small fw-700">Subject</label>
+                        <input type="text" id="frs-subject" name="subject" class="form-control form-control-sm" placeholder="e.g. Logo feedback" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="frs-message" class="form-label x-small fw-700">Message</label>
+                        <textarea id="frs-message" name="message" class="form-control form-control-sm" rows="4" placeholder="Describe what feedback you need..." required></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label x-small fw-700 d-flex align-items-center justify-content-between">
+                            <span>Questions</span>
+                            <button type="button" class="btn btn-sm btn-outline-success py-0 px-2" id="add-question-btn">
+                                <i class="fa-solid fa-plus"></i> Add
+                            </button>
+                        </label>
+                        <div id="questions-container">
+                            <div class="input-group input-group-sm mb-2 question-row">
+                                <input type="text" name="questions" class="form-control" placeholder="e.g. Do you prefer option A or B?">
+                                <button type="button" class="btn btn-outline-danger remove-question-btn" title="Remove">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-text x-small">Ask specific questions to guide the client's response.</div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-sm w-100">
+                        <i class="fa-solid fa-paper-plane me-1"></i>Create Request
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        {# ── Right Column: Requests List ── #}
+        <div class="col-lg-7 order-lg-1">
+            {% if feedback_requests %}
+                {% for fr in feedback_requests %}
+                <a href="{% url 'branding:designer_feedback_detail' pk=br.pk fr_id=fr.id %}" class="text-decoration-none">
+                    <div class="designer-section mb-3 fr-card">
+                        <div class="d-flex align-items-start justify-content-between gap-3">
+                            <div class="flex-grow-1 min-w-0">
+                                <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
+                                    <span class="fw-bold text-dark">{{ fr.subject }}</span>
+                                    {% if fr.status == 'PENDING' %}
+                                        <span class="badge bg-warning text-dark rounded-pill x-small">Pending</span>
+                                    {% elif fr.status == 'RESPONDED' %}
+                                        <span class="badge bg-success rounded-pill x-small">Responded</span>
+                                    {% elif fr.status == 'CLOSED' %}
+                                        <span class="badge bg-secondary rounded-pill x-small">Closed</span>
+                                    {% endif %}
+                                </div>
+                                <p class="text-muted small mb-2 text-truncate-2" style="max-height:2.6em;overflow:hidden;">{{ fr.message|truncatechars:100 }}</p>
+                                <div class="d-flex align-items-center gap-3 x-small text-muted">
+                                    <span><i class="fa-solid fa-circle-question me-1"></i>{{ fr.questions.count }} question{{ fr.questions.count|pluralize }}</span>
+                                    <span><i class="fa-regular fa-clock me-1"></i>{{ fr.created_at|date:"M j, Y" }}</span>
+                                </div>
+                            </div>
+                            <div class="text-muted flex-shrink-0 mt-1">
+                                <i class="fa-solid fa-chevron-right small"></i>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            {% else %}
+                <div class="designer-section p-5 text-center">
+                    <div class="empty-state-icon mx-auto mb-3" style="width:64px;height:64px;border-radius:50%;background:var(--bs-tertiary-bg,#f1f5f9);display:flex;align-items:center;justify-content:center;">
+                        <i class="fa-regular fa-comments fa-2x text-muted"></i>
+                    </div>
+                    <h6 class="fw-bold">No feedback requests yet</h6>
+                    <p class="text-muted small mb-0">Create a feedback request to ask the client targeted questions about your design.</p>
+                </div>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+
+<style>
+    .text-truncate-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .fr-card { transition: box-shadow .15s ease, transform .15s ease; }
+    .fr-card:hover { box-shadow: 0 .25rem 1rem rgba(0,0,0,.08); transform: translateY(-1px); }
+</style>
+
+<script>
+(function() {
+    const container = document.getElementById('questions-container');
+    const addBtn = document.getElementById('add-question-btn');
+
+    addBtn.addEventListener('click', function() {
+        const row = document.createElement('div');
+        row.className = 'input-group input-group-sm mb-2 question-row';
+        row.innerHTML =
+            '<input type="text" name="questions" class="form-control" placeholder="e.g. What do you think about the color scheme?">' +
+            '<button type="button" class="btn btn-outline-danger remove-question-btn" title="Remove"><i class="fa-solid fa-xmark"></i></button>';
+        container.appendChild(row);
+        row.querySelector('input').focus();
+        updateRemoveButtons();
+    });
+
+    container.addEventListener('click', function(e) {
+        const btn = e.target.closest('.remove-question-btn');
+        if (btn) {
+            const row = btn.closest('.question-row');
+            if (row) {
+                row.remove();
+                updateRemoveButtons();
+            }
+        }
+    });
+
+    function updateRemoveButtons() {
+        const rows = container.querySelectorAll('.question-row');
+        rows.forEach(function(row, i) {
+            const removeBtn = row.querySelector('.remove-question-btn');
+            if (removeBtn) {
+                removeBtn.style.display = rows.length > 1 ? '' : 'none';
+            }
+        });
+    }
+
+    updateRemoveButtons();
+})();
+</script>
+{% endblock %}

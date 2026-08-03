@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% load i18n static %}
+{% block title %}{% trans 'Contact Us' %} - OnWebApp{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Design System Theme Integration */
+    .glass-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--border-color);
+        transition: all 0.3s ease;
+    }
+    
+    .glass-card:hover {
+        background: var(--glass-bg-hover);
+        transform: translateY(-5px);
+        border-color: var(--primary-color);
+        box-shadow: var(--card-shadow-hover);
+    }
+
+    .glass-panel {
+        background: var(--bg-surface);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--border-color);
+    }
+
+    .blur-3xl {
+        filter: blur(100px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="position-relative py-5 overflow-hidden" style="min-height: 100vh;">
+    <!-- Background Elements -->
+    
+    <div class="position-absolute top-0 start-50 translate-middle w-50 h-50 bg-primary opacity-10 rounded-circle blur-3xl"></div>
+    <div class="position-absolute bottom-0 end-0 w-25 h-25 bg-secondary opacity-10 rounded-circle blur-3xl"></div>
+
+    <div class="container position-relative z-1 py-5">
+        <div class="row g-5 align-items-center">
+            <!-- Contact Info -->
+            <div class="col-lg-5 animate-on-scroll slide-up">
+                <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 rounded-pill px-3 py-2 mb-3">
+                    <i class="fas fa-envelope me-2"></i>{% trans 'Get in Touch' %}
+                </span>
+                <h1 class="display-4 fw-bold mb-4 text-body">Let's Build Something <span class="text-gradient">Amazing</span></h1>
+                <p class="lead text-muted mb-5">Have a project in mind? We'd love to hear from you. Send us a message and we'll respond as soon as possible.</p>
+
+                <div class="d-flex flex-column gap-4">
+                    <div class="d-flex align-items-center p-4 rounded-4 glass-card hover-lift">
+                        <div class="icon-square bg-primary bg-opacity-10 text-primary rounded-circle p-3 me-3">
+                            <i class="fas fa-envelope fa-2x"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-1 text-body">{% trans 'Email Us' %}</h5>
+                            <p class="mb-0 text-muted">hello@onwebapp.com</p>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-center p-4 rounded-4 glass-card hover-lift" style="transition-delay: 0.1s;">
+                        <div class="icon-square bg-secondary bg-opacity-10 text-secondary rounded-circle p-3 me-3">
+                            <i class="fab fa-whatsapp fa-2x"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-1 text-body">{% trans 'WhatsApp' %}</h5>
+                            <p class="mb-0 text-muted">+1 (555) 123-4567</p>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center p-4 rounded-4 glass-card hover-lift" style="transition-delay: 0.2s;">
+                        <div class="icon-square bg-info bg-opacity-10 text-info rounded-circle p-3 me-3">
+                            <i class="fas fa-map-marker-alt fa-2x"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-1 text-body">{% trans 'Location' %}</h5>
+                            <p class="mb-0 text-muted">San Francisco, CA</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Form -->
+            <div class="col-lg-7 animate-on-scroll slide-up" style="transition-delay: 0.2s;">
+                <div class="card border-0 rounded-4 shadow-lg overflow-hidden glass-panel">
+                    <div class="card-body p-5">
+                        <h3 class="mb-4 text-body">{% trans 'Send a Message' %}</h3>
+                        
+                        {% if messages %}
+                            {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                            {% endfor %}
+                        {% endif %}
+
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3">
+                                        <input type="text" name="name" class="form-control" id="floatingName" placeholder="Name" required>
+                                        <label for="floatingName">{% trans 'Your Name' %}</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3">
+                                        <input type="email" name="email" class="form-control" id="floatingEmail" placeholder="name@example.com" required>
+                                        <label for="floatingEmail">{% trans 'Email Address' %}</label>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-floating mb-3">
+                                        <textarea name="message" class="form-control" id="floatingMessage" placeholder="Message" style="height: 150px" required></textarea>
+                                        <label for="floatingMessage">{% trans 'Your Message' %}</label>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-primary btn-lg w-100 py-3 rounded-pill position-relative overflow-hidden group">
+                                        <span class="position-relative z-1">{% trans 'Send Message' %} <i class="fas fa-paper-plane ms-2"></i></span>
+                                        <div class="position-absolute top-0 start-0 w-100 h-100 bg-gradient-primary opacity-0 group-hover-opacity-100 transition-all"></div>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<!-- Simple Intersection Observer for animations if not loaded from base -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof IntersectionObserver !== 'undefined') {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
+        }
+    });
+</script>
+{% endblock %}

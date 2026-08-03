@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans "Pricing Plans" %} | OnWebApp{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active">Pricing</li>
+{% endblock %}
+
+{% block page_title %}{% trans "Choose Your Plan" %}{% endblock %}
+{% block page_subtitle %}{% trans "Transparent pricing for companies. Select the plan that fits your needs." %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="row g-4">
+    <div class="col-12">
+
+{% if free_usage_items %}
+<div class="row justify-content-center mb-5">
+    <div class="col-lg-8">
+        <div class="card border-primary border-opacity-10 shadow-sm" style="background-color: #EEF2FF;">
+            <div class="card-body p-4 d-flex align-items-center gap-4">
+                <div class="p-3 rounded-circle bg-white text-primary">
+                    <i data-lucide="gift" style="width: 24px;"></i>
+                </div>
+                <div>
+                    <h6 class="fw-bold text-slate-900 mb-1">{% trans 'Start with a Free Plan' %}</h6>
+                    <p class="text-slate-600 small mb-0">{% trans 'Explore key platform tools with limited monthly usage:' %}</p>
+                    <div class="d-flex flex-wrap gap-2 mt-2">
+                        {% for item in free_usage_items %}
+                        <span class="badge bg-white text-primary border border-primary border-opacity-10">{{ item }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if message %}
+<div class="alert alert-success alert-dismissible fade show mb-5 border-0 shadow-sm rounded-4" role="alert">
+    <div class="d-flex align-items-center gap-2">
+        <i data-lucide="check-circle" style="width: 18px;"></i>
+        <span>{{ message }}</span>
+    </div>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endif %}
+
+<div class="row g-4 justify-content-center">
+    {% for plan in plans %}
+    <div class="col-lg-4 col-md-6">
+        <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden position-relative plan-card transition-all">
+            {% if plan.name == 'Growth' %}
+            <div class="position-absolute top-0 w-100 text-center py-2" style="background: linear-gradient(90deg, var(--primary), var(--secondary));">
+                <small class="text-white fw-bold text-uppercase tracking-wider" style="font-size: 10px;">{% trans 'Recommended' %}</small>
+            </div>
+            {% endif %}
+            
+            <div class="card-body p-5 d-flex flex-column {% if plan.name == 'Premium' or plan.name == 'Professional' %}pt-5{% endif %}">
+                <div class="mb-4">
+                    <h3 class="fw-bold text-slate-900 mb-2">{{ plan.name }}</h3>
+                    <p class="text-muted small mb-0">{{ plan.description }}</p>
+                </div>
+                
+                <div class="d-flex align-items-baseline mb-5">
+                    <span class="display-5 fw-bold text-slate-900">${{ plan.price|floatformat:0 }}</span>
+                    <span class="text-muted ms-2 fw-500">/ {% if plan.duration_days == 30 %}mo{% elif plan.duration_days == 365 %}yr{% else %}{{ plan.duration_days }}d{% endif %}</span>
+                </div>
+                
+                <div class="flex-grow-1">
+                    <h6 class="text-slate-900 fw-bold small uppercase mb-4" style="letter-spacing: 0.05em;">What's included</h6>
+                    <ul class="list-unstyled mb-5">
+                        {% for f in plan.features %}
+                        <li class="mb-3 d-flex align-items-start gap-3">
+                            <div class="p-1 rounded-circle bg-primary bg-opacity-10 text-primary">
+                                <i data-lucide="check" style="width: 12px; height: 12px;"></i>
+                            </div>
+                            <span class="text-slate-600 small fw-500">{{ f }}</span>
+                        </li>
+                        {% endfor %}
+
+                        {% if plan.plan_type == 'starter' or plan.plan_type == 'starter_pkg' %}
+                            {% with limits=usage_summary.basic %}
+                            {% if limits %}
+                                <li class="mb-3 d-flex align-items-start gap-3">
+                                    <div class="p-1 rounded-circle bg-primary bg-opacity-10 text-primary">
+                                        <i data-lucide="zap" style="width: 12px; height: 12px;"></i>
+                                    </div>
+                                    <span class="text-slate-600 small fw-500">
+                                        Plan-based usage:
+                                        <ul class="ps-3 mt-2 mb-0 opacity-75">
+                                            {% for item in limits %}
+                                            <li class="mb-1">{{ item }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </span>
+                                </li>
+                            {% endif %}
+                            {% endwith %}
+                        {% elif plan.plan_type == 'premium' or plan.plan_type == 'premium_pkg' or plan.plan_type == 'enterprise' %}
+                            <li class="mb-3 d-flex align-items-start gap-3">
+                                <div class="p-1 rounded-circle bg-primary bg-opacity-10 text-primary">
+                                    <i data-lucide="infinity" style="width: 12px; height: 12px;"></i>
+                                </div>
+                                <span class="text-slate-600 small fw-500">Unlimited analytics services.</span>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+                
+                <div class="mt-auto pt-4">
+                    {% if stripe_pk %}
+                    <button class="btn btn-primary w-100 py-3 fw-bold rounded-3 checkout-btn shadow-sm" data-plan-id="{{ plan.id }}">
+                        {% trans 'Get Started' %}
+                    </button>
+                    {% else %}
+                    <form method="post" class="demo-select-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="plan_id" value="{{ plan.id }}">
+                        <button type="submit" class="btn {% if plan.name == 'Premium' or plan.name == 'Professional' %}btn-primary{% else %}btn-outline-secondary{% endif %} w-100 py-3 fw-bold rounded-3">
+                            {% trans 'Select Plan' %}
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Trust Section -->
+<div class="row justify-content-center mt-5 pt-5">
+    <div class="col-lg-10 text-center">
+        <p class="text-muted mb-5 text-uppercase tracking-wider small fw-bold">{% trans 'Powering next-generation enterprises' %}</p>
+        <div class="d-flex flex-wrap justify-content-center gap-5 opacity-25 grayscale-logos">
+            <i data-lucide="cloud" style="width: 48px; height: 48px;"></i>
+            <i data-lucide="shield-check" style="width: 48px; height: 48px;"></i>
+            <i data-lucide="cpu" style="width: 48px; height: 48px;"></i>
+            <i data-lucide="database" style="width: 48px; height: 48px;"></i>
+            <i data-lucide="globe" style="width: 48px; height: 48px;"></i>
+        </div>
+    </div>
+</div>
+
+<style>
+    .plan-card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--shadow-lg) !important;
+        border: 1px solid var(--primary-subtle);
+    }
+    .transition-all {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .grayscale-logos i, .grayscale-logos svg {
+        transition: all 0.3s ease;
+    }
+    .grayscale-logos:hover {
+        opacity: 0.5;
+    }
+</style>
+
+{% if stripe_pk %}
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    document.querySelectorAll('.checkout-btn').forEach(function(btn){
+        btn.addEventListener('click', function(e){
+            e.preventDefault();
+            const planId = btn.getAttribute('data-plan-id');
+            btn.disabled = true;
+            btn.innerHTML = '<div class="spinner-border spinner-border-sm me-2"></div>Processing...';
+            
+            fetch(`/payments/create-checkout/${planId}/`, {
+                method: 'POST', 
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.checkout_url) {
+                    window.location.href = data.checkout_url;
+                } else if (data.error) {
+                    alert('Checkout error: ' + data.error);
+                    btn.disabled = false;
+                    btn.innerHTML = '{% trans "Get Started" %}';
+                } else {
+                    window.location.reload();
+                }
+            })
+            .catch(err => { 
+                console.error(err); 
+                btn.disabled = false; 
+                btn.innerHTML = '{% trans "Get Started" %}';
+            });
+        });
+    });
+});
+</script>
+{% endif %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        lucide.createIcons();
+    });
+</script>
+{% endblock %}

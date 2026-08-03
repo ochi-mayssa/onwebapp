@@ -1,0 +1,57 @@
+{% load static %}
+<div class="collection-card {% if selected and selected.id == collection.id %}is-selected{% endif %}" data-collection-id="{{ collection.id }}"
+     data-name="{{ collection.name }}" data-industry="{{ collection.industry }}"
+     data-description="{{ collection.description }}"
+     data-tags='{{ collection.style_tags|escapejs }}'
+     data-examples='{{ collection.examples|escapejs }}'
+     data-image="{% if collection.preview_image %}{{ collection.preview_image.url }}{% endif %}"
+     data-color="{{ collection.accent_color }}">
+    <div class="collection-cover">
+        {% if collection.preview_image %}
+        <img src="{{ collection.preview_image.url }}" alt="{{ collection.name }}" loading="lazy">
+        {% else %}
+        <div class="collection-cover-fallback" style="background: linear-gradient(135deg, {{ collection.accent_color }}33, {{ collection.accent_color }}88);">
+            <span>{{ collection.name|slice:":2"|upper }}</span>
+        </div>
+        {% endif %}
+        <div class="collection-cover-overlay">
+            <button type="button" class="btn btn-light btn-preview-collection" data-preview-name="{{ collection.name }}">
+                <i class="fa-solid fa-expand me-1"></i>Preview
+            </button>
+        </div>
+        {% if selected and selected.id == collection.id %}
+        <span class="collection-selected-badge"><i class="fa-solid fa-check"></i></span>
+        {% endif %}
+    </div>
+
+    <div class="collection-body">
+        <div class="d-flex align-items-start justify-content-between gap-2">
+            <div>
+                <h4 class="collection-name fw-800 mb-0">{{ collection.name }}</h4>
+                <span class="collection-industry">{{ collection.industry }}</span>
+            </div>
+            <span class="collection-cat">{{ collection.get_category_display }}</span>
+        </div>
+
+        <p class="collection-desc mb-3">{{ collection.description|truncatechars:110 }}</p>
+
+        <div class="collection-tags mb-3">
+            {% for tag in collection.style_tags %}<span class="style-tag">{{ tag }}</span>{% endfor %}
+        </div>
+
+        {% if collection.examples %}
+        <div class="collection-examples">
+            {% for ex in collection.examples|slice:":3" %}
+            <span><i class="fa-solid fa-circle-check"></i> {{ ex }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <label class="collection-choose">
+            <input type="radio" name="collection" value="{{ collection.id }}" {% if selected and selected.id == collection.id %}checked{% endif %}>
+            <span class="collection-choose-btn">
+                <i class="fa-solid fa-wand-magic-sparkles me-2"></i>Choose Collection
+            </span>
+        </label>
+    </div>
+</div>

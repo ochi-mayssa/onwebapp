@@ -1,0 +1,92 @@
+{% extends 'branding/base.html' %}
+{% load branding_extras %}
+
+{% block title %}Notifications{% endblock %}
+
+{% block branding_content %}
+<div class="dashboard-page">
+    <div class="container py-4 py-lg-5" style="max-width: 860px;">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+            <div>
+                <h1 class="fw-800 mb-1">Notifications</h1>
+                <p class="text-muted mb-0">Updates about your branding requests and assignments.</p>
+            </div>
+            <div class="d-flex gap-2">
+                {% if user.is_staff %}
+                <a href="{% url 'branding:dashboard' %}" class="btn btn-back"><i class="fa-solid fa-gauge-high me-2"></i>Dashboard</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="table-card rounded-4">
+            {% if notifications %}
+            <div class="notifications-list">
+                {% for n in notifications %}
+                <div class="notification-item {% if not n.is_read %}is-unread{% endif %}" data-id="{{ n.pk }}" data-url="{% url 'branding:mark_notification_read' n.pk %}">
+                    <div class="notification-icon ntype-{{ n.notification_type|lower }}">
+                        {% if n.notification_type == 'DESIGNER_ASSIGNED' %}<i class="fa-solid fa-user-pen"></i>
+                        {% elif n.notification_type == 'COMPLETED' %}<i class="fa-solid fa-truck-fast"></i>
+                        {% elif n.notification_type == 'STATUS_CHANGED' %}<i class="fa-solid fa-arrows-rotate"></i>
+                        {% elif n.notification_type == 'NEW_REQUEST' %}<i class="fa-solid fa-inbox"></i>
+                        {% elif n.notification_type == 'COMMENT' %}<i class="fa-solid fa-comment"></i>
+                        {% else %}<i class="fa-solid fa-circle-info"></i>{% endif %}
+                    </div>
+                    <div class="notification-body">
+                        <div class="d-flex justify-content-between align-items-start gap-2">
+                            <p class="notification-message mb-0">{{ n.message }}</p>
+                            <span class="x-small text-muted text-nowrap">{{ n.created_at|timesince }} ago</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2 mt-2">
+                            {% if n.request %}
+                            {% if user.is_staff %}
+                            <a href="{% url 'branding:request_detail' n.request.pk %}" class="btn btn-sm btn-brand-primary"><i class="fa-solid fa-eye me-1"></i>Open Request</a>
+                            {% elif n.notification_type == 'COMMENT' %}
+                            <a href="{% url 'branding:client_messages' n.request.pk %}" class="btn btn-sm btn-brand-primary"><i class="fa-solid fa-comment me-1"></i>Reply</a>
+                            {% else %}
+                            <a href="{% url 'branding:client_project_progress' n.request.pk %}" class="btn btn-sm btn-brand-primary"><i class="fa-solid fa-eye me-1"></i>View Progress</a>
+                            {% endif %}
+                            {% endif %}
+                            {% if not n.is_read %}
+                            <button type="button" class="btn btn-sm btn-back mark-read-btn"><i class="fa-regular fa-circle-check me-1"></i>Mark read</button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state p-5 text-center">
+                <div class="empty-state-icon"><i class="fa-regular fa-bell-slash"></i></div>
+                <h5 class="fw-800 mt-3">You're all caught up</h5>
+                <p class="text-muted">Notifications about assignments and status changes will appear here.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.mark-read-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const item = this.closest('.notification-item');
+            fetch(item.dataset.url, {
+                method: 'POST',
+                headers: { 'X-CSRFToken': getCookie('csrftoken') }
+            }).then(r => r.json()).then(data => {
+                if (data.ok) {
+                    item.classList.remove('is-unread');
+                    btn.remove();
+                }
+            });
+        });
+    });
+    function getCookie(name) {
+        const m = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+        return m ? m.pop() : '';
+    }
+});
+</script>
+{% endblock %}

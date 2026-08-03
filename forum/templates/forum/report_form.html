@@ -1,0 +1,29 @@
+{% extends "forum/base_forum.html" %}
+{% load static forum_tags %}
+
+{% block forum_title %}Report Post{% endblock %}
+
+{% block forum_content %}
+<div class="forum-card p-4">
+    <h4 class="fw-800 mb-1"><i class="fas fa-flag text-danger me-2"></i>Report Post</h4>
+    <p class="text-secondary small mb-4">
+        Reporting: <a href="{% url 'forum:post_detail' post.slug %}" class="fw-600">{{ post.title }}</a>
+    </p>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label class="form-label small fw-600">Reason</label>
+            {{ form.reason }}
+        </div>
+        <div class="mb-3">
+            <label class="form-label small fw-600">Additional Details</label>
+            {{ form.description }}
+        </div>
+        <div class="d-flex justify-content-between">
+            <a href="{% url 'forum:post_detail' post.slug %}" class="btn btn-outline-secondary rounded-pill px-4">Cancel</a>
+            <button type="submit" class="btn btn-danger rounded-pill px-5 fw-700">Submit Report</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,317 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Assignments{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleBtns = document.querySelectorAll('.task-toggle-btn');
+    
+    toggleBtns.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const url = this.getAttribute('href');
+            const taskId = this.dataset.taskId;
+            const icon = document.getElementById(`task-icon-${taskId}`);
+            const text = document.getElementById(`task-text-${taskId}`);
+            
+            // Optimistic update
+            const wasCompleted = icon.classList.contains('bi-check-circle-fill');
+            
+            // Toggle UI immediately
+            if (wasCompleted) {
+                icon.className = 'bi bi-circle text-secondary fs-5';
+                text.classList.remove('text-decoration-line-through', 'text-muted');
+            } else {
+                icon.className = 'bi bi-check-circle-fill text-success fs-5';
+                text.classList.add('text-decoration-line-through', 'text-muted');
+            }
+            
+            fetch(url, {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Verified
+                    if (data.new_status === 'COMPLETED') {
+                        icon.className = 'bi bi-check-circle-fill text-success fs-5';
+                        text.classList.add('text-decoration-line-through', 'text-muted');
+                    } else {
+                        icon.className = 'bi bi-circle text-secondary fs-5';
+                        text.classList.remove('text-decoration-line-through', 'text-muted');
+                    }
+                } else {
+                    // Revert on error
+                    console.error('Update failed', data);
+                    revertUI(wasCompleted, icon, text);
+                }
+            })
+            .catch(err => {
+                console.error('Network error:', err);
+                revertUI(wasCompleted, icon, text);
+            });
+        });
+    });
+
+    function revertUI(wasCompleted, icon, text) {
+        if (wasCompleted) {
+             icon.className = 'bi bi-check-circle-fill text-success fs-5';
+             text.classList.add('text-decoration-line-through', 'text-muted');
+        } else {
+             icon.className = 'bi bi-circle text-secondary fs-5';
+             text.classList.remove('text-decoration-line-through', 'text-muted');
+        }
+        alert('Failed to update task status. Please try again.');
+    }
+});
+</script>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* 
+     * Team Member Projects - Theme Extensions
+     * Inherits core variables from theme.css
+     */
+
+    .glass-card {
+        background: var(--bg-surface) !important;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid var(--border-color) !important;
+        box-shadow: var(--shadow-lg);
+    }
+
+    .accordion-item {
+        background: transparent !important;
+        border: 1px solid var(--border-color) !important;
+    }
+
+    .accordion-button {
+        background: var(--bg-surface) !important;
+        color: var(--text-primary) !important;
+        box-shadow: none !important;
+    }
+
+    .accordion-button:not(.collapsed) {
+        background: var(--bg-surface-secondary) !important;
+        color: var(--primary-color) !important;
+    }
+
+    .accordion-button::after {
+        /* Filter to adapt arrow color based on theme is handled by Bootstrap/Theme usually, 
+           but if needed we can use a specific filter or SVG. 
+           For now, let's reset the filter if it was inverting blindly */
+        filter: none;
+    }
+    
+    [data-theme="dark"] .accordion-button::after {
+        filter: invert(1);
+    }
+
+    .accordion-body {
+        background: var(--bg-surface-secondary) !important;
+        color: var(--text-secondary);
+    }
+
+    .list-group-item {
+        background: transparent !important;
+        border-color: var(--border-color) !important;
+        color: var(--text-primary);
+    }
+    
+    /* Ensure alerts are readable */
+    .alert-info {
+        background-color: var(--bg-surface-secondary) !important;
+        border: 1px solid var(--info) !important;
+        color: var(--info) !important;
+        border-opacity: 0.2 !important;
+    }
+    
+    .alert-secondary {
+        background-color: var(--bg-surface-tertiary) !important;
+        border: 1px solid var(--border-color) !important;
+        color: var(--text-secondary) !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 fw-bold mb-1">My Assignments</h1>
+            <p class="text-muted mb-0">Manage your assigned phases and tasks</p>
+        </div>
+        <a href="{% url 'users:dashboard' %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Back to Dashboard</a>
+    </div>
+
+    {% if projects %}
+    <div class="row g-4">
+        {% for item in projects %}
+        <div class="col-12">
+            <div class="card glass-card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-bottom px-4 py-3">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center gap-3">
+                            <h5 class="mb-0 fw-bold">{{ item.project.title }}</h5>
+                            <span class="badge bg-surface-secondary text-body border border-secondary border-opacity-10">{{ item.project.get_current_status_display }}</span>
+                        </div>
+                        {% if item.project.expected_delivery_date %}
+                            <small class="text-muted">Target Delivery: {{ item.project.expected_delivery_date|date:"M d, Y" }}</small>
+                        {% endif %}
+                    </div>
+                    {% if item.project.description %}
+                        <p class="small text-muted mt-2 mb-0">{{ item.project.description|truncatewords:30 }}</p>
+                    {% endif %}
+                </div>
+                <div class="card-body px-4 py-3">
+                    <div class="accordion" id="accordionProject{{ item.project.id }}">
+                        {% for ph in item.phases %}
+                        <div class="accordion-item border mb-3 rounded overflow-hidden">
+                            <h2 class="accordion-header" id="heading{{ ph.id }}">
+                                <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ ph.id }}" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}">
+                                    <div class="d-flex flex-column flex-md-row align-items-md-center w-100 me-3">
+                                        <div class="me-3 mb-1 mb-md-0">
+                                            <span class="fw-bold">{{ ph.get_phase_type_display }}</span>
+                                            {% if ph.assignee == member %}
+                                                <span class="badge bg-primary-subtle text-primary ms-2">Lead</span>
+                                            {% endif %}
+                                        </div>
+                                        <div class="text-muted small">
+                                            Status: {{ ph.get_status_display }}
+                                            {% if ph.due_date %} • Due: {{ ph.due_date|date:"M d" }}{% endif %}
+                                        </div>
+                                    </div>
+                                </button>
+                            </h2>
+                            <div id="collapse{{ ph.id }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" data-bs-parent="#accordionProject{{ item.project.id }}">
+                                <div class="accordion-body bg-surface-secondary">
+                                    
+                                    {% if ph.internal_notes %}
+                                    <div class="alert alert-info border-0 bg-info-soft text-info mb-3">
+                                        <i class="bi bi-info-circle me-2"></i><strong>Instructions:</strong> {{ ph.internal_notes }}
+                                    </div>
+                                    {% endif %}
+
+                                    {% if ph.client_visible_notes %}
+                                    <div class="alert alert-secondary border-0 bg-surface-tertiary text-secondary mb-3">
+                                        <i class="bi bi-person-lines-fill me-2"></i><strong>Client Notes:</strong> {{ ph.client_visible_notes }}
+                                    </div>
+                                    {% endif %}
+
+                                    <h6 class="fw-bold small text-muted text-uppercase mb-3">Tasks Checklist</h6>
+                                    <div class="list-group">
+                                        {% for t in ph.tasks.all %}
+                                            {% if t.assigned_to == member or ph.assignee == member %}
+                                            <div class="list-group-item d-flex justify-content-between align-items-center {% if t.is_completed %}bg-surface-secondary{% endif %}">
+                                                <div class="d-flex align-items-center">
+                                                    <a href="{% url 'projects:toggle_phase_task' item.project.id t.id %}" class="text-decoration-none me-3 task-toggle-btn" data-task-id="{{ t.id }}">
+                                                        <i class="bi {% if t.is_completed %}bi-check-circle-fill text-success{% else %}bi-circle text-secondary{% endif %} fs-5" id="task-icon-{{ t.id }}"></i>
+                                                    </a>
+                                                    <div>
+                                                        <span id="task-text-{{ t.id }}" class="{% if t.is_completed %}text-decoration-line-through text-muted{% endif %}">{{ t.name }}</span>
+                                                        {% if t.assigned_to != member %}
+                                                            <small class="text-muted ms-2">(Assigned to {{ t.assigned_to.username }})</small>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                                {% if t.completed_at %}
+                                                    <small class="text-muted">{{ t.completed_at|date:"M d" }}</small>
+                                                {% endif %}
+                                            </div>
+                                            {% endif %}
+                                        {% empty %}
+                                            <div class="text-muted small fst-italic">No tasks specifically assigned.</div>
+                                        {% endfor %}
+                                    </div>
+
+                                    {% if ph.deliverables.all %}
+                                    <div class="mt-4">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h6 class="fw-bold small text-muted text-uppercase mb-0">Deliverables</h6>
+                                            {% if ph.assignee == member or member in ph.assigned_team_members %}
+                                            <button class="btn btn-sm btn-outline-primary py-0" data-bs-toggle="modal" data-bs-target="#uploadDeliverableModal{{ ph.id }}">
+                                                <i class="bi bi-cloud-upload me-1"></i> Upload
+                                            </button>
+                                            {% endif %}
+                                        </div>
+                                        <ul class="list-unstyled mb-0">
+                                            {% for d in ph.deliverables.all %}
+                                            <li class="mb-1">
+                                                <i class="bi bi-file-earmark me-2 text-muted"></i>
+                                                {% if d.link %}
+                                                    <a href="{{ d.link }}" target="_blank" class="text-decoration-none">{{ d.name }}</a>
+                                                {% elif d.file %}
+                                                    <a href="{{ d.file.url }}" target="_blank" class="text-decoration-none">{{ d.name }}</a>
+                                                {% else %}
+                                                    {{ d.name }}
+                                                {% endif %}
+                                                <span class="badge bg-secondary-soft text-secondary border border-secondary border-opacity-25 ms-2">{{ d.version }}</span>
+                                            </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                    {% endif %}
+
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Upload Deliverable Modals -->
+        {% for ph in item.phases %}
+        <div class="modal fade" id="uploadDeliverableModal{{ ph.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content glass-card">
+                    <div class="modal-header border-bottom-0">
+                        <h5 class="modal-title">Upload Deliverable: {{ ph.get_phase_type_display }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form action="{% url 'projects:team_upload_deliverable' item.project.id ph.id %}" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label">Deliverable Name</label>
+                                <input type="text" class="form-control bg-surface-secondary border-secondary" name="name" required placeholder="e.g., Wireframes v1">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">File</label>
+                                <input type="file" class="form-control bg-surface-secondary border-secondary" name="file">
+                                <div class="form-text">Upload relevant files for this phase.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Or External Link</label>
+                                <input type="url" class="form-control bg-surface-secondary border-secondary" name="link" placeholder="https://...">
+                            </div>
+                        </div>
+                        <div class="modal-footer border-top-0">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Upload</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center p-5 border border-dashed rounded-3 glass-card">
+        <i class="bi bi-clipboard-check display-4 text-muted mb-3"></i>
+        <h5>No Assignments Found</h5>
+        <p class="text-muted">You don't have any active project phases or tasks assigned at the moment.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

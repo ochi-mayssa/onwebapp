@@ -1,0 +1,151 @@
+{% if topic_intelligence %}
+<div class="card shadow-sm border-0 mb-4" style="background: linear-gradient(135deg, #0F172A, #1E293B); color: #fff;">
+    <div class="card-body p-4">
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+            <div>
+                <div class="small text-uppercase fw-semibold" style="letter-spacing: 0.08em; color: #67E8F9;">Primary SEO Topic Intelligence</div>
+                <h3 class="h4 mt-2 mb-2 text-white">Strategic Search Positioning</h3>
+                <p class="mb-0" style="color: #CBD5E1;">Understand what this page is trying to rank for before reviewing technical execution.</p>
+            </div>
+            <div class="text-end">
+                <span class="badge {{ topic_intelligence.intent_badge_class }} fs-6">
+                    {{ topic_intelligence.search_intent }} {{ topic_intelligence.search_intent_confidence_pct }}%
+                </span>
+                <div class="mt-2">
+                    <span class="badge {{ topic_intelligence.visibility_badge_class }} fs-6">
+                        AI Visibility Potential: {{ topic_intelligence.ai_visibility_potential }}/100
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+            <div class="col-lg-3 col-md-6">
+                <div class="rounded-3 h-100 p-3" style="background: rgba(6, 182, 212, 0.12); border: 1px solid rgba(103, 232, 249, 0.25);">
+                    <div class="small text-uppercase fw-semibold mb-2" style="color: #67E8F9;">Primary Keyword</div>
+                    <div class="fw-semibold">{{ topic_intelligence.primary_keyword }}</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="rounded-3 h-100 p-3" style="background: rgba(139, 92, 246, 0.14); border: 1px solid rgba(196, 181, 253, 0.25);">
+                    <div class="small text-uppercase fw-semibold mb-2" style="color: #C4B5FD;">Detected Topic</div>
+                    <div class="fw-semibold">{{ topic_intelligence.detected_topic }}</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="rounded-3 h-100 p-3" style="background: rgba(6, 182, 212, 0.12); border: 1px solid rgba(103, 232, 249, 0.25);">
+                    <div class="small text-uppercase fw-semibold mb-2" style="color: #67E8F9;">Content Category</div>
+                    <div class="fw-semibold">{{ topic_intelligence.content_category }}</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="rounded-3 h-100 p-3" style="background: rgba(139, 92, 246, 0.14); border: 1px solid rgba(196, 181, 253, 0.25);">
+                    <div class="small text-uppercase fw-semibold mb-2" style="color: #C4B5FD;">Topic Cluster</div>
+                    <div class="fw-semibold">{{ topic_intelligence.topic_cluster }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+            <div class="col-lg-3 col-md-6">
+                <div class="rounded-3 p-3 h-100" style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(226, 232, 240, 0.1);">
+                    <div class="small text-uppercase fw-semibold mb-2" style="color: #94A3B8;">Primary H1</div>
+                    <div>{{ topic_intelligence.primary_h1 }}</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="rounded-3 p-3 h-100" style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(226, 232, 240, 0.1);">
+                    <div class="small text-uppercase fw-semibold mb-2" style="color: #94A3B8;">Page Title</div>
+                    <div>{{ topic_intelligence.page_title }}</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="rounded-3 p-3 h-100" style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(226, 232, 240, 0.1);">
+                    <div class="small text-uppercase fw-semibold mb-2" style="color: #94A3B8;">Meta Title</div>
+                    <div>{{ topic_intelligence.meta_title }}</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="rounded-3 p-3 h-100" style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(226, 232, 240, 0.1);">
+                    <div class="small text-uppercase fw-semibold mb-2" style="color: #94A3B8;">Meta Description</div>
+                    <div>{{ topic_intelligence.meta_description }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+            <div class="col-lg-4 col-md-6">
+                <div class="rounded-3 p-3 h-100" style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(226, 232, 240, 0.1);">
+                    <div class="small text-uppercase fw-semibold mb-2" style="color: #94A3B8;">Target Audience</div>
+                    <div>{{ topic_intelligence.target_audience }}</div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="rounded-3 p-3 h-100" style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(226, 232, 240, 0.1);">
+                    <div class="small text-uppercase fw-semibold mb-2" style="color: #94A3B8;">Primary H2 / Heading Support</div>
+                    <div>{{ topic_intelligence.primary_h2 }}</div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="rounded-3 p-3 h-100" style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(226, 232, 240, 0.1);">
+                    <div class="small text-uppercase fw-semibold mb-2" style="color: #94A3B8;">Intent Signals</div>
+                    <div>{{ topic_intelligence.intent_signal_summary }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+            <div class="col-lg-4">
+                <div class="rounded-3 p-3 h-100" style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(226, 232, 240, 0.1);">
+                    <div class="small text-uppercase fw-semibold mb-2" style="color: #94A3B8;">Secondary Keywords</div>
+                    <div>{{ topic_intelligence.secondary_keywords|join:", " }}</div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="rounded-3 p-3 h-100" style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(226, 232, 240, 0.1);">
+                    <div class="small text-uppercase fw-semibold mb-2" style="color: #94A3B8;">Long-tail Keywords</div>
+                    <div>{{ topic_intelligence.long_tail_keywords|join:", " }}</div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="rounded-3 p-3 h-100" style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(226, 232, 240, 0.1);">
+                    <div class="small text-uppercase fw-semibold mb-2" style="color: #94A3B8;">Semantic Keywords</div>
+                    <div>{{ topic_intelligence.semantic_keywords|join:", " }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+            <div class="col-md-3">
+                <div class="rounded-3 p-3 h-100" style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(226, 232, 240, 0.1);">
+                    <div class="small text-uppercase fw-semibold mb-2" style="color: #94A3B8;">Keyword Coverage</div>
+                    <div class="fw-semibold">{{ topic_intelligence.keyword_coverage_pct }}%</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="rounded-3 p-3 h-100" style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(226, 232, 240, 0.1);">
+                    <div class="small text-uppercase fw-semibold mb-2" style="color: #94A3B8;">Semantic Relevance</div>
+                    <div class="fw-semibold">{{ topic_intelligence.semantic_relevance_pct }}%</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="rounded-3 p-3 h-100" style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(226, 232, 240, 0.1);">
+                    <div class="small text-uppercase fw-semibold mb-2" style="color: #94A3B8;">Content Focus Score</div>
+                    <div class="fw-semibold">{{ topic_intelligence.content_focus_score }}/100</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="rounded-3 p-3 h-100" style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(226, 232, 240, 0.1);">
+                    <div class="small text-uppercase fw-semibold mb-2" style="color: #94A3B8;">Keyword Opportunity</div>
+                    <div class="fw-semibold">{{ topic_intelligence.keyword_intelligence.keyword_opportunity_score }}/100</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="rounded-3 p-3" style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(226, 232, 240, 0.1);">
+            <div class="small text-uppercase fw-semibold mb-2" style="color: #94A3B8;">AI Insight</div>
+            <p class="mb-0">{{ topic_intelligence.ai_insight }}</p>
+        </div>
+    </div>
+</div>
+{% endif %}

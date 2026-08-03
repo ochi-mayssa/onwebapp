@@ -1,0 +1,151 @@
+{% extends "branding/base.html" %}
+{% load branding_extras %}
+
+{% block title %}{{ project.title }} — Showcase{% endblock %}
+
+{% block branding_content %}
+<div class="container py-4">
+
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb mb-0 small">
+            <li class="breadcrumb-item"><a href="{% url 'branding:designer_dashboard' %}" class="text-decoration-none"><i class="fa-solid fa-palette me-1"></i>My Work</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'branding:showcase' %}" class="text-decoration-none">Showcase</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ project.title }}</li>
+        </ol>
+    </nav>
+
+    {# ── Cover Image ── #}
+    {% if project.cover_image %}
+    <div class="mb-4 rounded-4 overflow-hidden">
+        <img src="{{ project.cover_image.url }}" alt="{{ project.title }}" class="w-100" style="max-height:480px;object-fit:cover;">
+    </div>
+    {% endif %}
+
+    {# ── Project Header ── #}
+    <div class="d-flex align-items-start justify-content-between flex-wrap gap-3 mb-4">
+        <div>
+            <h3 class="fw-bold mb-1">{{ project.title }}</h3>
+            <div class="d-flex align-items-center flex-wrap gap-2 mb-2">
+                <span class="x-small text-muted"><i class="fa-solid fa-user me-1"></i>{{ project.designer.get_full_name|default:project.designer.username }}</span>
+                <span class="badge bg-primary-subtle text-primary rounded-pill x-small">{{ project.category }}</span>
+                {% if project.client_name %}
+                <span class="x-small text-muted"><i class="fa-solid fa-building me-1"></i>{{ project.client_name }}</span>
+                {% endif %}
+                {% if project.project_year %}
+                <span class="x-small text-muted"><i class="fa-regular fa-calendar me-1"></i>{{ project.project_year }}</span>
+                {% endif %}
+            </div>
+        </div>
+        <a href="{% url 'branding:showcase' %}" class="btn btn-sm btn-outline-secondary flex-shrink-0">
+            <i class="fa-solid fa-arrow-left me-1"></i>Back to Showcase
+        </a>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            {# ── Description ── #}
+            <div class="detail-card rounded-4 p-4 mb-4">
+                <h6 class="fw-bold mb-3"><i class="fa-solid fa-align-left me-2 text-muted"></i>Description</h6>
+                <div class="small text-muted" style="white-space:pre-wrap;">{{ project.description }}</div>
+            </div>
+
+            {# ── Tags ── #}
+            {% if project.tags_list %}
+            <div class="detail-card rounded-4 p-4 mb-4">
+                <h6 class="fw-bold mb-3"><i class="fa-solid fa-tags me-2 text-muted"></i>Tags</h6>
+                <div class="d-flex flex-wrap gap-1">
+                    {% for tag in project.tags_list %}
+                    <span class="badge bg-light text-dark rounded-pill">{{ tag }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {# ── Related Projects ── #}
+            {% if related %}
+            <div class="mb-4">
+                <h5 class="fw-bold mb-3"><i class="fa-solid fa-layer-group me-2 text-muted"></i>Related Projects</h5>
+                <div class="row g-3">
+                    {% for r in related %}
+                    <div class="col-md-6">
+                        <a href="{% url 'branding:showcase_detail' showcase_id=r.pk %}" class="text-decoration-none">
+                            <div class="detail-card rounded-4 p-0 h-100 showcase-card overflow-hidden">
+                                {% if r.cover_image %}
+                                <div class="showcase-cover" style="background-image:url('{{ r.cover_image.url }}');"></div>
+                                {% else %}
+                                <div class="showcase-cover showcase-cover-placeholder">
+                                    <i class="fa-solid fa-image fa-2x text-muted"></i>
+                                </div>
+                                {% endif %}
+                                <div class="p-3">
+                                    <h6 class="fw-bold mb-1 text-truncate">{{ r.title }}</h6>
+                                    <p class="x-small text-muted mb-2"><i class="fa-solid fa-user me-1"></i>{{ r.designer.get_full_name|default:r.designer.username }}</p>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <span class="x-small text-muted">
+                                            <i class="fa-solid fa-heart me-1"></i>{{ r.like_count }}
+                                        </span>
+                                        <span class="x-small text-muted">
+                                            <i class="fa-solid fa-eye me-1"></i>{{ r.view_count }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="col-lg-4">
+            {# ── Stats & Actions ── #}
+            <div class="detail-card rounded-4 p-4 mb-4">
+                <h6 class="fw-bold mb-3"><i class="fa-solid fa-chart-simple me-2 text-muted"></i>Stats</h6>
+                <div class="d-flex align-items-center gap-4 mb-3">
+                    <div class="text-center">
+                        <div class="fw-bold fs-5 mb-0">{{ project.view_count }}</div>
+                        <div class="x-small text-muted"><i class="fa-solid fa-eye me-1"></i>Views</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="fw-bold fs-5 mb-0">{{ project.like_count }}</div>
+                        <div class="x-small text-muted"><i class="fa-solid fa-heart me-1"></i>Likes</div>
+                    </div>
+                </div>
+                <form method="post" action="{{ request.path }}" class="d-grid">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="like">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                        <i class="fa-solid fa-heart me-1"></i>Like
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<style>
+    .showcase-card {
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+        border: 1px solid var(--bs-border-color, #e2e8f0);
+    }
+    .showcase-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    .showcase-cover {
+        width: 100%;
+        height: 140px;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+    .showcase-cover-placeholder {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--bs-tertiary-bg, #f1f5f9);
+    }
+</style>
+{% endblock %}

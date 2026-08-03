@@ -1,0 +1,192 @@
+{% extends 'branding/base.html' %}
+{% load branding_extras %}
+
+{% block branding_content %}
+<div class="container py-4">
+
+    {# ── Breadcrumb ── #}
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb small">
+            <li class="breadcrumb-item"><a href="{% url 'branding:supervisor_dashboard' %}">Supervisor</a></li>
+            <li class="breadcrumb-item active">Team Overview</li>
+        </ol>
+    </nav>
+
+    {# ── Header ── #}
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+        <div>
+            <h1 class="h4 fw-bold mb-1"><i class="fa-solid fa-users me-2"></i>Team Overview</h1>
+            <p class="text-muted mb-0">{{ team_data|length }} designer{{ team_data|length|pluralize }}</p>
+        </div>
+        <a href="{% url 'branding:supervisor_team_pdf' %}" class="btn btn-brand-primary btn-sm" target="_blank">
+            <i class="fa-solid fa-file-pdf me-1"></i>PDF Report
+        </a>
+    </div>
+
+    {# ── Summary Cards ── #}
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="supervisor-card">
+                <div class="supervisor-card-icon sc-active"><i class="fa-solid fa-users"></i></div>
+                <div class="supervisor-card-value">{{ team_data|length }}</div>
+                <div class="supervisor-card-label">Team Size</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="supervisor-card">
+                <div class="supervisor-card-icon sc-designers"><i class="fa-solid fa-spinner"></i></div>
+                <div class="supervisor-card-value">{% for d in team_data %}{% if forloop.first %}{{ d.active }}{% endif %}{% endfor %}</div>
+                <div class="supervisor-card-label">Most Active</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="supervisor-card">
+                <div class="supervisor-card-icon sc-completed"><i class="fa-solid fa-circle-check"></i></div>
+                <div class="supervisor-card-value">
+                    {% with total=0 %}{% for d in team_data %}{% widthratio d.completed 1 1 as x %}{% endfor %}{% endwith %}
+                    {% for d in team_data %}{% if forloop.counter == 1 %}{% endif %}{% endfor %}
+                    —
+                </div>
+                <div class="supervisor-card-label">Total Completed</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="supervisor-card">
+                <div class="supervisor-card-icon sc-satisfaction"><i class="fa-solid fa-star"></i></div>
+                <div class="supervisor-card-value">
+                    {% for d in team_data %}{% if forloop.first and d.satisfaction %}{{ d.satisfaction }}{% endif %}{% endfor %}
+                </div>
+                <div class="supervisor-card-label">Avg Satisfaction</div>
+            </div>
+        </div>
+    </div>
+
+    {# ── Team Comparison Table ── #}
+    <div class="supervisor-panel">
+        <div class="table-responsive">
+            <table class="table supervisor-table mb-0">
+                <thead>
+                    <tr>
+                        <th>Designer</th>
+                        <th class="text-center">Active</th>
+                        <th class="text-center">Completed</th>
+                        <th class="text-center">This Month</th>
+                        <th class="text-center">Avg Days</th>
+                        <th class="text-center">On-Time %</th>
+                        <th class="text-center">Rating</th>
+                        <th class="text-center">Workload</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for d in team_data %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="staff-avatar" style="width:36px;height:36px;font-size:0.75rem;">
+                                    {{ d.user.first_name|slice:":1"|upper }}{{ d.user.last_name|slice:":1"|upper|default:d.user.username|slice:":1" }}
+                                </div>
+                                <div>
+                                    <a href="{% url 'branding:supervisor_designer_detail' d.user.pk %}" class="fw-bold text-decoration-none">
+                                        {{ d.user.get_full_name|default:d.user.username }}
+                                    </a>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-center fw-bold">{{ d.active }}</td>
+                        <td class="text-center">{{ d.completed }}</td>
+                        <td class="text-center">{{ d.completed_month }}</td>
+                        <td class="text-center">{% if d.avg_days %}{{ d.avg_days }}d{% else %}—{% endif %}</td>
+                        <td class="text-center">
+                            {% if d.on_time_pct is not None %}
+                            <span class="on-time-badge {% if d.on_time_pct >= 90 %}on-time-good{% elif d.on_time_pct >= 70 %}on-time-warn{% else %}on-time-bad{% endif %}">
+                                {{ d.on_time_pct }}%
+                            </span>
+                            {% else %}—{% endif %}
+                        </td>
+                        <td class="text-center">
+                            {% if d.satisfaction %}
+                            <span class="text-warning">{{ d.satisfaction }}</span><span class="text-muted">/5</span>
+                            <small class="text-muted">({{ d.feedback_count }})</small>
+                            {% else %}—{% endif %}
+                        </td>
+                        <td class="text-center">
+                            {% if d.is_overloaded %}
+                            <span class="workload-badge workload-over">{{ d.active }}/{{ WORKLOAD_THRESHOLD }}</span>
+                            {% else %}
+                            <span class="workload-badge workload-ok">{{ d.active }}/{{ WORKLOAD_THRESHOLD }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'branding:supervisor_designer_detail' d.user.pk %}" class="btn-icon" title="View details">
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {# ── Workload Comparison Chart ── #}
+    <div class="supervisor-panel mt-4">
+        <h6 class="fw-bold mb-3"><i class="fa-solid fa-chart-bar me-1"></i>Workload Comparison</h6>
+        <canvas id="teamWorkloadChart" height="100"></canvas>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const labels = [{% for d in team_data %}'{{ d.user.get_full_name|default:d.user.username|escapejs }}'{% if not forloop.last %},{% endif %}{% endfor %}];
+    const active = [{% for d in team_data %}{{ d.active }}{% if not forloop.last %},{% endif %}{% endfor %}];
+    const completed = [{% for d in team_data %}{{ d.completed }}{% if not forloop.last %},{% endif %}{% endfor %}];
+    const threshold = {{ WORKLOAD_THRESHOLD }};
+
+    new Chart(document.getElementById('teamWorkloadChart'), {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Active',
+                    data: active,
+                    backgroundColor: active.map(v => v > threshold ? 'rgba(239,68,68,0.7)' : 'rgba(99,102,241,0.7)'),
+                    borderRadius: 4,
+                },
+                {
+                    label: 'Completed',
+                    data: completed,
+                    backgroundColor: 'rgba(34,197,94,0.5)',
+                    borderRadius: 4,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'top' },
+                annotation: {
+                    annotations: {
+                        thresholdLine: {
+                            type: 'line',
+                            yMin: threshold,
+                            yMax: threshold,
+                            borderColor: 'rgba(239,68,68,0.5)',
+                            borderWidth: 2,
+                            borderDash: [6,4],
+                            label: { content: 'Threshold', display: true }
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: { beginAtZero: true, ticks: { stepSize: 1 } }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

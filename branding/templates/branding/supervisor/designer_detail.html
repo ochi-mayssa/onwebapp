@@ -1,0 +1,278 @@
+{% extends 'branding/base.html' %}
+{% load branding_extras %}
+
+{% block branding_content %}
+<div class="container py-4">
+
+    {# ── Breadcrumb ── #}
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb small">
+            <li class="breadcrumb-item"><a href="{% url 'branding:supervisor_dashboard' %}">Supervisor</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'branding:supervisor_team' %}">Team</a></li>
+            <li class="breadcrumb-item active">{{ designer.get_full_name|default:designer.username }}</li>
+        </ol>
+    </nav>
+
+    {# ── Header ── #}
+    <div class="d-flex align-items-start justify-content-between flex-wrap gap-3 mb-4">
+        <div class="d-flex align-items-center gap-3">
+            <div class="staff-avatar" style="width:56px;height:56px;font-size:1.4rem;">
+                {{ designer.first_name|slice:":1"|upper }}{{ designer.last_name|slice:":1"|upper|default:designer.username|slice:":1" }}
+            </div>
+            <div>
+                <h1 class="h4 mb-0 fw-bold">{{ designer.get_full_name|default:designer.username }}</h1>
+                <div class="text-muted small">{{ designer.email }}</div>
+                <div class="text-muted small">Joined {{ designer.date_joined|date:"M j, Y" }}</div>
+            </div>
+        </div>
+        <div class="d-flex gap-2">
+            {% if is_overloaded %}
+            <span class="workload-badge workload-over"><i class="fa-solid fa-triangle-exclamation me-1"></i>Overloaded</span>
+            {% else %}
+            <span class="workload-badge workload-ok"><i class="fa-solid fa-check-circle me-1"></i>Capacity OK</span>
+            {% endif %}
+        </div>
+    </div>
+
+    {# ── Metrics Row ── #}
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="supervisor-card">
+                <div class="supervisor-card-icon sc-active"><i class="fa-solid fa-layer-group"></i></div>
+                <div class="supervisor-card-value">{{ total_assigned }}</div>
+                <div class="supervisor-card-label">Total Assigned</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="supervisor-card">
+                <div class="supervisor-card-icon sc-designers"><i class="fa-solid fa-spinner"></i></div>
+                <div class="supervisor-card-value">{{ active_count }}</div>
+                <div class="supervisor-card-label">Active</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="supervisor-card">
+                <div class="supervisor-card-icon sc-completed"><i class="fa-solid fa-circle-check"></i></div>
+                <div class="supervisor-card-value">{{ completed_count }}</div>
+                <div class="supervisor-card-label">Completed</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="supervisor-card">
+                <div class="supervisor-card-icon sc-time"><i class="fa-solid fa-clock"></i></div>
+                <div class="supervisor-card-value">{% if avg_days %}{{ avg_days }}d{% else %}—{% endif %}</div>
+                <div class="supervisor-card-label">Avg Completion</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="supervisor-card">
+                <div class="supervisor-card-icon sc-satisfaction"><i class="fa-solid fa-star"></i></div>
+                <div class="supervisor-card-value">{% if satisfaction_avg %}{{ satisfaction_avg }}/5{% else %}—{% endif %}</div>
+                <div class="supervisor-card-label">Client Rating</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="supervisor-card">
+                <div class="supervisor-card-icon sc-workload"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                <div class="supervisor-card-value">{% if on_time_pct %}{{ on_time_pct }}%{% else %}—{% endif %}</div>
+                <div class="supervisor-card-label">On-Time Rate</div>
+            </div>
+        </div>
+    </div>
+
+    {# ── Workload Bar ── #}
+    <div class="supervisor-panel mb-4">
+        <h6 class="fw-bold mb-2">Workload Capacity</h6>
+        <div class="d-flex align-items-center gap-3">
+            <div class="flex-grow-1">
+                <div class="rating-bar-track" style="height:12px;">
+                    {% widthratio active_count WORKLOAD_THRESHOLD 100 as pct %}
+                    <div class="rating-bar-fill" style="width:{% if active_count > WORKLOAD_THRESHOLD %}100{% else %}{% widthratio active_count WORKLOAD_THRESHOLD 100 %}{% endif %}%; background:{% if is_overloaded %}linear-gradient(90deg,#ef4444,#dc2626){% else %}linear-gradient(90deg,#6366f1,#4f46e5){% endif %};"></div>
+                </div>
+            </div>
+            <span class="fw-bold small" style="min-width:70px;">{{ active_count }} / {{ WORKLOAD_THRESHOLD }}</span>
+        </div>
+        <div class="text-muted small mt-1">
+            {% if is_overloaded %}
+            <i class="fa-solid fa-triangle-exclamation text-danger me-1"></i>Overloaded — consider redistributing projects
+            {% else %}
+            <i class="fa-solid fa-check-circle text-success me-1"></i>Within capacity
+            {% endif %}
+        </div>
+    </div>
+
+    {# ── Tabs ── #}
+    <ul class="nav supervisor-tabs mb-4" role="tablist">
+        <li class="nav-item">
+            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-current" type="button">
+                <i class="fa-solid fa-spinner me-1"></i>Current Projects
+                <span class="badge bg-primary ms-1">{{ active_count }}</span>
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-completed" type="button">
+                <i class="fa-solid fa-circle-check me-1"></i>Completed
+                <span class="badge bg-success ms-1">{{ completed_count }}</span>
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-status" type="button">
+                <i class="fa-solid fa-chart-pie me-1"></i>Status Breakdown
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-notes" type="button">
+                <i class="fa-solid fa-sticky-note me-1"></i>Notes
+                <span class="badge bg-secondary ms-1">{{ notes.count }}</span>
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+
+        {# ── Current Projects Tab ── #}
+        <div class="tab-pane fade show active" id="tab-current">
+            {% if current_projects %}
+            <div class="supervisor-panel">
+                <table class="table supervisor-table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Request</th>
+                            <th>Company</th>
+                            <th>Status</th>
+                            <th>Priority</th>
+                            <th>EDD</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in current_projects %}
+                        <tr{% if r.estimated_delivery_date and r.estimated_delivery_date < today %} class="table-danger"{% endif %}>
+                            <td><a href="{% url 'branding:request_detail' r.pk %}" class="fw-bold text-decoration-none">{{ r.request_number }}</a></td>
+                            <td>{{ r.company_name|truncatechars:30 }}</td>
+                            <td><span class="status-pill status-{{ r.status|lower }}">{{ r.get_status_display }}</span></td>
+                            <td><span class="priority-badge priority-{{ r.priority|lower }}">{{ r.get_priority_display }}</span></td>
+                            <td class="small">{% if r.estimated_delivery_date %}{{ r.estimated_delivery_date|date:"M j" }}{% else %}—{% endif %}</td>
+                            <td><a href="{% url 'branding:request_detail' r.pk %}" class="btn-icon" title="View"><i class="fa-solid fa-arrow-right"></i></a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center text-muted py-5">
+                <i class="fa-solid fa-inbox fa-2x mb-2 d-block"></i>No active projects assigned.
+            </div>
+            {% endif %}
+        </div>
+
+        {# ── Completed Tab ── #}
+        <div class="tab-pane fade" id="tab-completed">
+            {% if completed_projects %}
+            <div class="supervisor-panel">
+                <table class="table supervisor-table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Request</th>
+                            <th>Company</th>
+                            <th>Completed</th>
+                            <th>Client Rating</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in completed_projects %}
+                        <tr>
+                            <td><a href="{% url 'branding:request_detail' r.pk %}" class="fw-bold text-decoration-none">{{ r.request_number }}</a></td>
+                            <td>{{ r.company_name|truncatechars:30 }}</td>
+                            <td class="small">{% if r.completed_at %}{{ r.completed_at|date:"M j, Y" }}{% else %}—{% endif %}</td>
+                            <td>
+                                {% with rating=feedback_map|get_item:r.pk %}
+                                {% if rating %}
+                                <span class="text-warning">{{ rating }}</span><span class="text-muted">/5</span>
+                                {% else %}
+                                <span class="text-muted">No feedback</span>
+                                {% endif %}
+                                {% endwith %}
+                            </td>
+                            <td><a href="{% url 'branding:request_detail' r.pk %}" class="btn-icon" title="View"><i class="fa-solid fa-arrow-right"></i></a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center text-muted py-5">
+                <i class="fa-solid fa-inbox fa-2x mb-2 d-block"></i>No completed projects yet.
+            </div>
+            {% endif %}
+        </div>
+
+        {# ── Status Breakdown Tab ── #}
+        <div class="tab-pane fade" id="tab-status">
+            <div class="supervisor-panel">
+                {% if status_dist %}
+                <div class="row g-3">
+                    {% for s in status_dist %}
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <div class="text-center p-3 border rounded-3">
+                            <div class="fw-bold fs-4">{{ s.c }}</div>
+                            <div class="text-muted small">{{ s.status }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-5">
+                    <i class="fa-solid fa-chart-pie fa-2x mb-2 d-block"></i>No status data available.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {# ── Notes Tab ── #}
+        <div class="tab-pane fade" id="tab-notes">
+            {# Add Note Form #}
+            <div class="supervisor-panel mb-4">
+                <h6 class="fw-bold mb-3"><i class="fa-solid fa-plus me-1"></i>Add Supervisor Note</h6>
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="add_note">
+                    <div class="mb-3">
+                        <textarea name="content" class="form-control" rows="3" placeholder="Write a note about this designer..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-brand-primary btn-sm">
+                        <i class="fa-solid fa-paper-plane me-1"></i>Save Note
+                    </button>
+                </form>
+            </div>
+
+            {# Notes List #}
+            {% if notes %}
+            <div class="supervisor-panel">
+                <h6 class="fw-bold mb-3"><i class="fa-solid fa-sticky-note me-1"></i>Notes ({{ notes.count }})</h6>
+                {% for note in notes %}
+                <div class="d-flex gap-3 mb-3 pb-3{% if not forloop.last %} border-bottom{% endif %}">
+                    <div class="staff-avatar" style="width:32px;height:32px;font-size:0.7rem;flex-shrink:0;">
+                        {{ note.author.first_name|slice:":1"|upper }}{{ note.author.last_name|slice:":1"|upper|default:note.author.username|slice:":1" }}
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="fw-bold small">{{ note.author.get_full_name|default:note.author.username }}</span>
+                            <span class="text-muted small">{{ note.created_at|date:"M j, Y H:i" }}</span>
+                        </div>
+                        <div class="small">{{ note.content|linebreaksbr }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center text-muted py-4">
+                <i class="fa-solid fa-sticky-note fa-2x mb-2 d-block"></i>No notes yet.
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+{% endblock %}

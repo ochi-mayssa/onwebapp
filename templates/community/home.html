@@ -1,0 +1,257 @@
+{% extends 'community/base_community.html' %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    .hero-section {
+        background: transparent;
+        position: relative;
+        overflow: hidden;
+    }
+    .hero-pattern {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: radial-gradient(var(--text-tertiary) 1px, transparent 1px);
+        background-size: 20px 20px;
+        opacity: 0.2;
+    }
+    .service-card {
+        border-radius: 1rem;
+        overflow: hidden;
+    }
+    .service-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--card-shadow-hover) !important;
+        border-color: var(--community-primary);
+    }
+    .step-icon {
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        background-color: var(--bg-surface-secondary);
+        color: var(--community-primary);
+    }
+    .feature-check {
+        color: var(--community-primary);
+        margin-right: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block community_content %}
+<!-- Hero Section -->
+<div class="hero-section py-5 mb-5">
+    <div class="hero-pattern"></div>
+    <div class="container position-relative py-5">
+        <div class="row align-items-center">
+            <div class="col-lg-7">
+                <span class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill mb-3 fw-bold">
+                    <i class="fas fa-star me-1"></i> Professional Digital Services
+                </span>
+                <h1 class="display-3 fw-bold mb-3 lh-sm text-gradient-cyan">Elevate Your Community Project</h1>
+                <p class="lead mb-4 opacity-90 text-secondary" style="font-size: 1.25rem;">
+                    We provide premium website building and branding services exclusively for community initiatives. 
+                    Let us handle the tech so you can focus on the impact.
+                </p>
+                <div class="d-flex gap-3 flex-wrap">
+                    <a href="{% url 'community:wizard_start' %}?new=1" class="btn btn-success btn-lg px-4 fw-bold rounded-pill shadow-sm text-white">
+                        Start Your Project <i class="fas fa-arrow-right ms-2"></i>
+                    </a>
+                    <a href="{% url 'community:dashboard' %}" class="btn btn-outline-secondary btn-lg px-4 fw-bold rounded-pill">
+                        Go to Dashboard
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-5 d-none d-lg-block text-center">
+                <!-- Abstract Hero Graphic -->
+                <div class="position-relative">
+                    <div class="bg-success bg-opacity-10 rounded-circle position-absolute top-50 start-50 translate-middle" style="width: 400px; height: 400px; filter: blur(40px);"></div>
+                    <i class="fas fa-layer-group text-success opacity-75" style="font-size: 15rem;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Key Benefits -->
+<div class="container mb-5">
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="d-flex align-items-start">
+                <div class="flex-shrink-0">
+                    <div class="bg-success bg-opacity-10 text-success rounded-3 p-3">
+                        <i class="fas fa-rocket fa-lg"></i>
+                    </div>
+                </div>
+                <div class="flex-grow-1 ms-3">
+                    <h5 class="fw-bold mb-1">Fast Delivery</h5>
+                    <p class="text-muted small">Get your project online quickly with our streamlined process.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="d-flex align-items-start">
+                <div class="flex-shrink-0">
+                    <div class="bg-primary bg-opacity-10 text-primary rounded-3 p-3">
+                        <i class="fas fa-check-circle fa-lg"></i>
+                    </div>
+                </div>
+                <div class="flex-grow-1 ms-3">
+                    <h5 class="fw-bold mb-1">Professional Quality</h5>
+                    <p class="text-muted small">Industry-standard design and development practices.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="d-flex align-items-start">
+                <div class="flex-shrink-0">
+                    <div class="bg-info bg-opacity-10 text-info rounded-3 p-3">
+                        <i class="fas fa-headset fa-lg"></i>
+                    </div>
+                </div>
+                <div class="flex-grow-1 ms-3">
+                    <h5 class="fw-bold mb-1">Dedicated Support</h5>
+                    <p class="text-muted small">Direct communication with our support team anytime.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Services Section -->
+<div id="services" class="py-5" style="background: transparent;">
+    <div class="container py-4">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold display-6 mb-3">Our Core Services</h2>
+            <p class="text-secondary lead mx-auto" style="max-width: 600px;">
+                Everything you need to establish a strong digital presence for your organization.
+            </p>
+        </div>
+
+        <div class="row g-4 justify-content-center">
+            <!-- Website Building Card -->
+            <div class="col-lg-4">
+                <div class="card service-card h-100 glass-card">
+                    <div class="card-body p-5">
+                        <div class="step-icon bg-success bg-opacity-10 text-success mb-4">
+                            <i class="fas fa-laptop-code"></i>
+                        </div>
+                        <h3 class="fw-bold mb-3">Website Building</h3>
+                        <p class="text-secondary mb-4">
+                            Custom-designed websites that look great on any device. We handle everything from the initial layout to the final launch.
+                        </p>
+                        <ul class="list-unstyled mb-4 text-secondary">
+                            <li class="mb-2"><i class="fas fa-check feature-check"></i> Responsive Mobile Design</li>
+                            <li class="mb-2"><i class="fas fa-check feature-check"></i> SEO Optimization</li>
+                            <li class="mb-2"><i class="fas fa-check feature-check"></i> Content Management System</li>
+                            <li class="mb-2"><i class="fas fa-check feature-check"></i> Secure Hosting Setup</li>
+                        </ul>
+                        <a href="{% url 'community:wizard_start' %}?new=1" class="btn btn-success w-100 fw-bold py-2">
+                            Start Project <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Brand Assist Card -->
+            <div class="col-lg-4">
+                <div class="card service-card h-100 glass-card">
+                    <div class="card-body p-5">
+                        <div class="step-icon bg-primary bg-opacity-10 text-primary mb-4">
+                            <i class="fas fa-paint-brush"></i>
+                        </div>
+                        <h3 class="fw-bold mb-3">Brand Assist</h3>
+                        <p class="text-secondary mb-4">
+                            Create a memorable identity that resonates with your audience. We help define your visual language and voice.
+                        </p>
+                        <ul class="list-unstyled mb-4 text-secondary">
+                            <li class="mb-2"><i class="fas fa-check feature-check"></i> Logo Design & Refinement</li>
+                            <li class="mb-2"><i class="fas fa-check feature-check"></i> Color Palette Selection</li>
+                            <li class="mb-2"><i class="fas fa-check feature-check"></i> Typography Guidelines</li>
+                            <li class="mb-2"><i class="fas fa-check feature-check"></i> Social Media Assets</li>
+                        </ul>
+                        <a href="{% url 'community:brand_assist' %}" class="btn btn-primary w-100 fw-bold py-2">
+                            Get Branding
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Forum Card -->
+            <div class="col-lg-4">
+                <div class="card service-card h-100 glass-card">
+                    <div class="card-body p-5">
+                        <div class="step-icon bg-info bg-opacity-10 text-info mb-4">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <h3 class="fw-bold mb-3">Community Forum</h3>
+                        <p class="text-secondary mb-4">
+                            Connect with other members, share knowledge, ask questions, and showcase your projects in our community forum.
+                        </p>
+                        <ul class="list-unstyled mb-4 text-secondary">
+                            <li class="mb-2"><i class="fas fa-check feature-check"></i> Discussions & Q&amp;A</li>
+                            <li class="mb-2"><i class="fas fa-check feature-check"></i> Project Showcase</li>
+                            <li class="mb-2"><i class="fas fa-check feature-check"></i> Trending Topics</li>
+                            <li class="mb-2"><i class="fas fa-check feature-check"></i> Community Events</li>
+                        </ul>
+                        <a href="{% url 'forum:home' %}" class="btn btn-info w-100 fw-bold py-2 text-white">
+                            Visit Forum <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Process Section -->
+<div class="container py-5 my-5">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold">How It Works</h2>
+        <p class="text-secondary">Simple steps to get your project moving</p>
+    </div>
+    
+    <div class="row g-4 text-center position-relative">
+        <div class="col-md-4">
+            <div class="p-3">
+                <div class="d-inline-flex align-items-center justify-content-center bg-success bg-opacity-10 border border-success border-2 rounded-circle text-success fw-bold fs-4 mb-3" style="width: 50px; height: 50px;">1</div>
+                <h4 class="fw-bold">Request Service</h4>
+                <p class="text-secondary">Choose a service from your dashboard and fill out a simple brief about your needs.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="p-3">
+                <div class="d-inline-flex align-items-center justify-content-center bg-success bg-opacity-10 border border-success border-2 rounded-circle text-success fw-bold fs-4 mb-3" style="width: 50px; height: 50px;">2</div>
+                <h4 class="fw-bold">We Collaborate</h4>
+                <p class="text-secondary">Our team works with you, providing updates and gathering feedback through the platform.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="p-3">
+                <div class="d-inline-flex align-items-center justify-content-center bg-success bg-opacity-10 border border-success border-2 rounded-circle text-success fw-bold fs-4 mb-3" style="width: 50px; height: 50px;">3</div>
+                <h4 class="fw-bold">Launch & Grow</h4>
+                <p class="text-secondary">Receive your final assets or live website and start making a bigger impact.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CTA Section -->
+<div class="container mb-5">
+    <div class="bg-success bg-opacity-10 rounded-4 p-5 text-center glass-card">
+        <h2 class="fw-bold mb-3">Ready to transform your digital presence?</h2>
+        <p class="lead text-secondary mb-4">Join other community projects that trust OnWebApp.</p>
+        <a href="{% url 'community:dashboard' %}" class="btn btn-success btn-lg px-5 fw-bold rounded-pill shadow-sm">
+            Go to Your Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,501 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans "ERP Command Center" %} | OnWebApp{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'users:dashboard' %}">Dashboard</a></li>
+<li class="breadcrumb-item active">ERP Center</li>
+{% endblock %}
+
+{% block page_title %}{% trans "ERP Intelligence Matrix" %}{% endblock %}
+{% block page_subtitle %}{% trans "Consolidated view of enterprise resources, financials, and operations." %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="erp-dashboard-modern">
+    {% if not result %}
+        <div class="card border-0 shadow-xl text-center py-5 reveal">
+            <div class="card-body py-5">
+                <div class="mb-5">
+                    <div class="p-4 bg-primary bg-opacity-10 text-primary rounded-circle d-inline-block mb-4">
+                        <i data-lucide="factory" style="width: 64px; height: 64px;"></i>
+                    </div>
+                    <h2 class="fw-800 text-slate-900 mb-3">Awaiting Enterprise Link</h2>
+                    <p class="text-slate-500 fs-5 mx-auto mb-5" style="max-width: 500px;">
+                        Enter your organization identifier to initialize the premium ERP command center and access real-time intelligence.
+                    </p>
+                    <div class="row justify-content-center">
+                        <div class="col-md-6 col-lg-4">
+                            <form method="POST" class="d-flex gap-3">
+                                {% csrf_token %}
+                                <input type="text" name="company" class="form-control py-3 px-4 rounded-4 border-slate-200 shadow-sm" placeholder="e.g. GlobalCorp" required>
+                                <button type="submit" class="btn btn-primary px-4 rounded-4 fw-800">Link</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <!-- Top KPI Strip -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-6 col-lg-3 reveal">
+                <div class="card kpi-card">
+                    <div class="kpi-icon"><i data-lucide="trending-up"></i></div>
+                    <div class="kpi-value text-primary">{{ result.finance.revenue_growth }}</div>
+                    <div class="kpi-label">Revenue Growth</div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3 reveal" style="animation-delay: 0.1s;">
+                <div class="card kpi-card">
+                    <div class="kpi-icon"><i data-lucide="package"></i></div>
+                    <div class="kpi-value text-success">{{ result.operations.inventory_health }}%</div>
+                    <div class="kpi-label">Inventory Health</div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3 reveal" style="animation-delay: 0.2s;">
+                <div class="card kpi-card">
+                    <div class="kpi-icon"><i data-lucide="activity"></i></div>
+                    <div class="kpi-value text-warning">{{ result.hr.employee_efficiency }}%</div>
+                    <div class="kpi-label">Workforce Efficiency</div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3 reveal" style="animation-delay: 0.3s;">
+                <div class="card kpi-card">
+                    <div class="kpi-icon"><i data-lucide="alert-circle"></i></div>
+                    <div class="kpi-value text-danger">{{ result.operations.unresolved_tickets }}</div>
+                    <div class="kpi-label">Critical Tickets</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-5">
+            <!-- Left Content -->
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-xl mb-5 reveal">
+                    <div class="card-header bg-white p-4 border-bottom border-light">
+                        <ul class="nav nav-pills gap-2" id="erpTabs" role="tablist">
+                            <li class="nav-item">
+                                <button class="nav-link active rounded-pill fw-800" data-bs-toggle="pill" data-bs-target="#financials">Financials</button>
+                            </li>
+                            <li class="nav-item">
+                                <button class="nav-link rounded-pill fw-800" data-bs-toggle="pill" data-bs-target="#operations">Operations</button>
+                            </li>
+                            <li class="nav-item">
+                                <button class="nav-link rounded-pill fw-800" data-bs-toggle="pill" data-bs-target="#hr">Workforce</button>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="tab-content">
+                            <div class="tab-pane fade show active" id="financials">
+                                <div class="chart-box" style="height: 350px;">
+                                    <canvas id="financeChart"></canvas>
+                                </div>
+                            </div>
+                            <!-- Other tabs... -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-xl reveal">
+                    <div class="card-header bg-white p-4 border-bottom border-light">
+                        <h5 class="mb-0 fw-800">Operational Log</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="command-log p-4 bg-slate-900 text-slate-300 font-monospace small" style="height: 250px; border-radius: 0 0 40px 40px;">
+                            <div class="mb-2"><span class="text-success">[OK]</span> Core ERP Engine Initialized...</div>
+                            <div class="mb-2"><span class="text-primary">[SYNC]</span> Data feed from {{ result.company_name }} active...</div>
+                            <div id="logContent"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Content -->
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-xl mb-5 reveal">
+                    <div class="card-header bg-white p-4 border-bottom border-light">
+                        <h5 class="mb-0 fw-800">System Alerts</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="vstack gap-3">
+                            {% for alert in result.alerts %}
+                            <div class="alert-item p-3 rounded-4 bg-opacity-10 d-flex align-items-center gap-3
+                                {% if alert.type == 'danger' %}bg-danger text-danger border-start border-4 border-danger
+                                {% elif alert.type == 'warning' %}bg-warning text-warning border-start border-4 border-warning
+                                {% else %}bg-success text-success border-start border-4 border-success{% endif %}">
+                                <i data-lucide="{% if alert.type == 'danger' %}alert-octagon{% elif alert.type == 'warning' %}alert-triangle{% else %}check-circle{% endif %}" style="width: 20px;"></i>
+                                <span class="fw-700 small">{{ alert.message }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-xl reveal">
+                    <div class="card-header bg-white p-4 border-bottom border-light">
+                        <h5 class="mb-0 fw-800">Quick Controls</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="vstack gap-3">
+                            <button class="btn btn-slate-50 w-100 text-start p-3 rounded-4 d-flex align-items-center gap-3" onclick="logAction('Syncing ledgers...')">
+                                <i data-lucide="refresh-cw" class="text-primary"></i>
+                                <span class="fw-700">Sync Financial Ledgers</span>
+                            </button>
+                            <button class="btn btn-slate-50 w-100 text-start p-3 rounded-4 d-flex align-items-center gap-3" onclick="logAction('Updating stock...')">
+                                <i data-lucide="package" class="text-success"></i>
+                                <span class="fw-700">Update Stock Matrix</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        lucide.createIcons();
+        
+        {% if result %}
+        const ctx = document.getElementById('financeChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Revenue Growth',
+                    data: [12, 19, 15, 25, 22, 30],
+                    borderColor: '#6366F1',
+                    borderWidth: 4,
+                    tension: 0.4,
+                    fill: true,
+                    backgroundColor: 'rgba(99, 102, 241, 0.1)'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { 
+                    y: { grid: { color: 'rgba(241, 245, 249, 0.5)' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+        {% endif %}
+    });
+
+    function logAction(msg) {
+        const log = document.getElementById('logContent');
+        const entry = document.createElement('div');
+        entry.className = 'mb-2 animate__animated animate__fadeIn';
+        entry.innerHTML = `<span class="text-info">[ACTION]</span> ${msg}`;
+        log.prepend(entry);
+    }
+</script>
+
+<style>
+    .erp-dashboard-modern { padding: 0 0 40px; }
+    .nav-pills .nav-link { color: var(--slate-600); transition: all 0.3s ease; }
+    .nav-pills .nav-link.active { background: var(--primary); color: white; }
+    .btn-slate-50 { background: var(--slate-50); border: 1px solid transparent; transition: all 0.3s ease; }
+    .btn-slate-50:hover { background: white; border-color: var(--primary); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .glass-badge { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.3); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); }
+    .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease; }
+    .reveal.active { opacity: 1; transform: translateY(0); }
+</style>
+{% endblock %}
+                    <div class="kpi-value">{{ result.manufacturing.material_yield }}</div>
+                    <div class="kpi-label">{% trans "Material Yield" %}</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-value">{{ result.manufacturing.efficiency_score }}%</div>
+                    <div class="kpi-label">{% trans "Overall Efficiency" %}</div>
+                </div>
+            </div>
+
+            <!-- Role-Based Navigation -->
+            <ul class="nav nav-tabs nav-tabs-cyber" id="erpTabs" role="tablist">
+                <li class="nav-item">
+                    <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview">{% trans "Overview" %}</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" id="finance-tab" data-bs-toggle="tab" data-bs-target="#finance">{% trans "Finance" %}</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" id="ops-tab" data-bs-toggle="tab" data-bs-target="#ops">{% trans "Operations" %}</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" id="control-tab" data-bs-toggle="tab" data-bs-target="#control">{% trans "Control" %}</button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="erpTabContent">
+                <!-- Overview Tab -->
+                <div class="tab-pane fade show active" id="overview">
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <div class="holographic-card">
+                                <h3 class="h6 neon-text mb-4">{% trans "System Health & Risks" %}</h3>
+                                {% for alert in result.alerts %}
+                                <div class="alert-item alert-{{ alert.type }}">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <i class="fas fa-exclamation-circle me-2"></i>
+                                            <strong>{{ alert.msg }}</strong>
+                                        </div>
+                                        <span class="small opacity-75">{% trans "Action:" %} {{ alert.action }}</span>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                                
+                                <div class="mt-5">
+                                    <h3 class="h6 neon-text mb-4">{% trans "Resource Allocation" %}</h3>
+                                    <div class="chart-box">
+                                        <canvas id="radarChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="holographic-card">
+                                <h3 class="h6 neon-text mb-4">{% trans "Recent Sync Log" %}</h3>
+                                <div class="command-log">
+                                    <div class="log-entry text-success small">[{{ result.last_sync }}] {% trans "Connection established" %}</div>
+                                    <div class="log-entry text-info small">{% trans "Fetching financial ledgers..." %}</div>
+                                    <div class="log-entry text-info small">{% trans "Inventory audit complete." %}</div>
+                                    <div class="log-entry text-warning small">{% trans "Latency detected on Line 4." %}</div>
+                                    <div class="log-entry text-white-50 small">{% trans "Ready for commands." %}</div>
+                                </div>
+                                <div class="mt-4 p-3 bg-white bg-opacity-5 rounded">
+                                    <p class="small text-white-50 mb-0">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        {{ result.summary }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Finance Tab -->
+                <div class="tab-pane fade" id="finance">
+                    <div class="row">
+                        <div class="col-lg-7">
+                            <div class="holographic-card">
+                                <h3 class="h6 neon-text mb-4">{% trans "Revenue vs Expenses (6M Trend)" %}</h3>
+                                <div class="chart-box">
+                                    <canvas id="financeTrendChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-5">
+                            <div class="holographic-card">
+                                <h3 class="h6 neon-text mb-4">{% trans "Finance KPIs" %}</h3>
+                                <table class="table drill-down-table table-borderless">
+                                    <thead>
+                                        <tr>
+                                            <th>{% trans "Metric" %}</th>
+                                            <th class="text-end">{% trans "Value" %}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>{% trans "Gross Profit Margin" %}</td>
+                                            <td class="text-end text-white">{{ result.finance.gross_margin }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans "Days Sales Outstanding" %}</td>
+                                            <td class="text-end text-white">{{ result.finance.dso }} {% trans "days" %}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans "Budget Utilization" %}</td>
+                                            <td class="text-end text-white">{{ result.finance.budget_usage }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <button class="btn btn-cyber w-100 mt-3">{% trans "Drill Down to Ledger" %}</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Operations Tab -->
+                <div class="tab-pane fade" id="ops">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="holographic-card">
+                                <h3 class="h6 neon-text mb-4">{% trans "Supply Chain Status" %}</h3>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="small text-white-50">{% trans "Inventory Health" %}</span>
+                                    <span class="small text-white">{{ result.operations.inventory_health }}%</span>
+                                </div>
+                                <div class="progress mb-4" style="height: 6px; background: rgba(255,255,255,0.05);">
+                                    <div class="progress-bar bg-info" style="width: {{ result.operations.inventory_health }}%"></div>
+                                </div>
+
+                                <div class="row mt-4 text-center">
+                                    <div class="col-6">
+                                        <div class="h4 mb-0 text-white">{{ result.operations.inventory_turnover }}</div>
+                                        <div class="x-small text-white-50 uppercase">{% trans "Inv. Turnover" %}</div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="h4 mb-0 text-white">{{ result.operations.pending_orders }}</div>
+                                        <div class="x-small text-white-50 uppercase">{% trans "Open Orders" %}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="holographic-card">
+                                <h3 class="h6 neon-text mb-4">{% trans "Machine Uptime" %}</h3>
+                                <div class="text-center py-4">
+                                    <div class="display-3 fw-bold text-success">{{ result.operations.machine_uptime }}</div>
+                                    <div class="text-white-50 small uppercase">{% trans "Average Facility Uptime" %}</div>
+                                </div>
+                                <button class="btn btn-cyber w-100 mt-2">{% trans "View Maintenance Schedule" %}</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Control Tab -->
+                <div class="tab-pane fade" id="control">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="holographic-card">
+                                <h3 class="h6 neon-text mb-4">{% trans "Factory Direct Control" %}</h3>
+                                <div class="d-grid gap-3">
+                                    <form method="POST">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="company" value="{{ result.company }}">
+                                        <input type="hidden" name="command" value="start_production">
+                                        <button type="submit" class="btn btn-outline-success w-100 p-3">
+                                            <i class="fas fa-play me-2"></i> {% trans "Initiate Production" %}
+                                        </button>
+                                    </form>
+                                    <form method="POST">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="company" value="{{ result.company }}">
+                                        <input type="hidden" name="command" value="stop_production">
+                                        <button type="submit" class="btn btn-outline-danger w-100 p-3">
+                                            <i class="fas fa-stop me-2"></i> {% trans "Safe Shutdown" %}
+                                        </button>
+                                    </form>
+                                    <form method="POST">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="company" value="{{ result.company }}">
+                                        <input type="hidden" name="command" value="emergency_reset">
+                                        <button type="submit" class="btn btn-danger w-100 p-3 fw-bold">
+                                            <i class="fas fa-exclamation-triangle me-2"></i> {% trans "EMERGENCY RESET" %}
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-8">
+                            <div class="holographic-card">
+                                <h3 class="h6 neon-text mb-4">{% trans "Command Response History" %}</h3>
+                                <div class="command-log" style="height: 315px;">
+                                    {% for log in action_log %}
+                                    <div class="log-entry d-flex align-items-center">
+                                        <div class="me-3 p-2 rounded bg-white bg-opacity-5">
+                                            <i class="{{ log.icon }}"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-white small">{{ log.message }}</div>
+                                            <div class="text-white-25 x-small">{% trans "Status:" %} {{ log.status|upper }}</div>
+                                        </div>
+                                    </div>
+                                    {% empty %}
+                                    <div class="text-center py-5 text-white-25 small">
+                                        {% trans "Awaiting initial command sequence..." %}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{% if result %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 1. Resource Radar Chart
+        const radarCtx = document.getElementById('radarChart').getContext('2d');
+        new Chart(radarCtx, {
+            type: 'radar',
+            data: {
+                labels: {{ result.operations.allocation.labels|safe }},
+                datasets: [{
+                    label: '{% trans "Allocation %" %}',
+                    data: {{ result.operations.allocation.values|safe }},
+                    backgroundColor: 'rgba(0, 243, 255, 0.2)',
+                    borderColor: '#00f3ff',
+                    borderWidth: 2,
+                    pointBackgroundColor: '#00f3ff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                        angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
+                        pointLabels: { color: 'rgba(255, 255, 255, 0.5)' },
+                        ticks: { display: false }
+                    }
+                },
+                plugins: { legend: { display: false } }
+            }
+        });
+
+        // 2. Finance Trend Line Chart
+        const financeCtx = document.getElementById('financeTrendChart').getContext('2d');
+        new Chart(financeCtx, {
+            type: 'line',
+            data: {
+                labels: {{ result.finance.trends.labels|safe }},
+                datasets: [
+                    {
+                        label: '{% trans "Revenue" %}',
+                        data: {{ result.finance.trends.revenue|safe }},
+                        borderColor: '#00ff9d',
+                        backgroundColor: 'rgba(0, 255, 157, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    },
+                    {
+                        label: '{% trans "Expenses" %}',
+                        data: {{ result.finance.trends.expenses|safe }},
+                        borderColor: '#ff4d4d',
+                        backgroundColor: 'rgba(255, 77, 77, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: 'rgba(255, 255, 255, 0.5)' } },
+                    x: { grid: { display: false }, ticks: { color: 'rgba(255, 255, 255, 0.5)' } }
+                },
+                plugins: { legend: { labels: { color: 'white' } } }
+            }
+        });
+    });
+</script>
+{% endif %}
+{% endblock %}

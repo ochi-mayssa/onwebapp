@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>My Projects Workflow</h2>
+        <span class="badge bg-primary">{{ projects|length }} Active Projects</span>
+    </div>
+
+    <!-- Notifications Section -->
+    {% if alerts %}
+    <div class="card mb-4 border-warning">
+        <div class="card-header bg-warning text-dark">
+            <h5 class="mb-0"><i class="fas fa-bell"></i> Alerts & Notifications</h5>
+        </div>
+        <div class="list-group list-group-flush">
+            {% for notification in alerts %}
+            <div class="list-group-item d-flex justify-content-between align-items-center {% if not notification.is_read %}bg-light fw-bold{% endif %}">
+                <div>
+                    <span class="badge bg-{{ notification.notification_type|yesno:'danger,info,warning' }} me-2">
+                        {{ notification.get_notification_type_display }}
+                    </span>
+                    {{ notification.message }}
+                    <small class="text-muted d-block">{{ notification.sent_at|timesince }} ago</small>
+                </div>
+                {% if not notification.is_read %}
+                <button class="btn btn-sm btn-outline-secondary mark-read-btn" data-id="{{ notification.id }}">
+                    Mark Read
+                </button>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Projects Grid -->
+    <div class="row">
+        {% for project in projects %}
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">{{ project.name }}</h5>
+                    <div>
+                        <span class="badge bg-secondary me-1">{{ project.get_project_type_display }}</span>
+                        <span class="badge bg-{{ project.current_status|yesno:'success,secondary,warning' }}">
+                            {{ project.get_current_status_display }}
+                        </span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">{{ project.description|truncatechars:100 }}</p>
+                    
+                    {% if project.project_type in 'WEBSITE,BRANDING' %}
+                        <!-- Community Client View: Phase Progress -->
+                        <div class="mb-3 border-start border-4 border-info ps-3">
+                            <h6 class="text-info"><i class="fas fa-users"></i> Community Project Tracking</h6>
+                            {% with current_phase=project.current_phase %}
+                            <div class="mb-2">
+                                <label class="form-label small text-muted">Current Phase: <strong>{{ current_phase.name }}</strong></label>
+                            </div>
+                            <div class="progress" style="height: 15px;">
+                                <div class="progress-bar bg-info" role="progressbar" 
+                                     style="width: {{ current_phase.progress }}%;" 
+                                     aria-valuenow="{{ current_phase.progress }}" 
+                                     aria-valuemin="0" aria-valuemax="100">
+                                     {{ current_phase.progress }}%
+                                </div>
+                            </div>
+                            <small class="text-muted d-block mt-1">
+                                Due: {{ current_phase.end_date|default:"Not set" }}
+                                {% if current_phase.status == 'DELAYED' %}
+                                <span class="text-danger ms-2"><i class="fas fa-exclamation-triangle"></i> Delayed</span>
+                                {% endif %}
+                            </small>
+                            {% endwith %}
+                        </div>
+
+                    {% else %}
+                        <!-- Full Platform User View: Workflow Completion & Tool Usage -->
+                        <div class="mb-3 border-start border-4 border-success ps-3">
+                            <h6 class="text-success"><i class="fas fa-cogs"></i> Platform Service Tracking</h6>
+                            <div class="row mb-3">
+                                <div class="col-6">
+                                    <label class="form-label small text-muted">Workflow Completion</label>
+                                    <div class="position-relative text-center">
+                                        <div style="font-size: 1.5rem; font-weight: bold; color: #28a745;">
+                                            {{ project.progress_percentage }}%
+                                        </div>
+                                        <small class="text-success">Overall Progress</small>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label small text-muted">Tool Usage</label>
+                                    <div class="text-center">
+                                        <div style="font-size: 1.5rem; font-weight: bold; color: #17a2b8;">
+                                            {% if project.project_type == 'AUTOMATION' %}
+                                                <i class="fas fa-robot"></i> Running
+                                            {% elif project.project_type == 'IOT' %}
+                                                <i class="fas fa-wifi"></i> Connected
+                                            {% elif project.project_type == 'SOCIAL' %}
+                                                <i class="fas fa-chart-line"></i> Tracking
+                                            {% else %}
+                                                Active
+                                            {% endif %}
+                                        </div>
+                                        <small class="text-info">
+                                            {% if project.project_type == 'AUTOMATION' %}
+                                                PLC/SCADA Online
+                                            {% elif project.project_type == 'IOT' %}
+                                                Sensors Active
+                                            {% elif project.project_type == 'SOCIAL' %}
+                                                Analytics Live
+                                            {% else %}
+                                                System Online
+                                            {% endif %}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="progress mb-2" style="height: 5px;">
+                                <div class="progress-bar bg-success" role="progressbar" 
+                                     style="width: {{ project.progress_percentage }}%;" 
+                                     aria-valuenow="{{ project.progress_percentage }}" 
+                                     aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <!-- Pending Approvals (Common) -->
+                    {% if project.current_phase.status == 'PENDING_APPROVAL' or project.current_phase.approval_status == 'AWAITING_CLIENT' %}
+                    <div class="alert alert-warning d-flex align-items-center mt-3" role="alert">
+                        <i class="fas fa-signature me-2"></i>
+                        <div class="small">
+                            <strong>Action Required:</strong> Please review {{ project.current_phase.get_phase_type_display }}.
+                            <a href="{% url 'projects:project_detail' project.id %}" class="btn btn-sm btn-warning ms-2 py-0">Review</a>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer bg-transparent border-top-0">
+                    <a href="{% url 'projects:project_detail' project.id %}" class="btn btn-outline-primary w-100">View Project Dashboard</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">No active projects found.</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+document.querySelectorAll('.mark-read-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const notifId = this.dataset.id;
+        fetch(`/projects/api/notifications/${notifId}/read/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            if (response.ok) {
+                // Animate removal
+                const item = this.closest('.list-group-item');
+                item.style.transition = 'all 0.3s ease';
+                item.style.opacity = '0';
+                setTimeout(() => item.remove(), 300);
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

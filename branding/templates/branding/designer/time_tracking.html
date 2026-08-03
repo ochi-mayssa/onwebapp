@@ -1,0 +1,314 @@
+{% extends "branding/base.html" %}
+{% load branding_extras %}
+{% block title %}Time Tracking{% endblock %}
+{% block branding_content %}
+
+{% csrf_token %}
+
+<div class="container-fluid px-4">
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'branding:designer_dashboard' %}">Dashboard</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Time Tracking</li>
+    </ol>
+  </nav>
+
+  <div class="row g-4">
+    <!-- Left Column -->
+    <div class="col-lg-8">
+      <!-- Running Timer Card -->
+      {% if running %}
+      <div class="card border-success mb-4">
+        <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+          <h5 class="mb-0"><i class="fas fa-stopwatch me-2"></i>Running Timer</h5>
+          <span class="badge bg-white text-success" id="timer-status">Active</span>
+        </div>
+        <div class="card-body">
+          <div class="row align-items-center">
+            <div class="col-md-6">
+              <p class="mb-1 text-muted">Project</p>
+              <h4 class="mb-0">{{ running.request.request_number }} &mdash; {{ running.request.company_name }}</h4>
+              <p class="text-muted mb-0">Phase: <strong>{{ running.get_phase_display }}</strong></p>
+            </div>
+            <div class="col-md-4 text-center">
+              <p class="mb-1 text-muted">Elapsed Time</p>
+              <h2 class="text-success mb-0" id="live-timer" data-start="{{ running.start_time|date:'c' }}">00:00:00</h2>
+            </div>
+            <div class="col-md-2 text-end">
+              <form method="post" class="d-inline">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="stop_timer">
+                <input type="hidden" name="entry_id" value="{{ running.pk }}">
+                <button type="submit" class="btn btn-danger btn-lg">
+                  <i class="fas fa-stop me-1"></i>Stop
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Today's Summary -->
+      <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0"><i class="fas fa-calendar-day me-2"></i>Today's Summary</h5>
+          <span class="badge bg-primary fs-6">{{ today_total|format_minutes }}</span>
+        </div>
+        <div class="card-body p-0">
+          {% if today_entries %}
+          <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>Phase</th>
+                  <th>Description</th>
+                  <th class="text-center">Duration</th>
+                  <th class="text-center">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for entry in today_entries %}
+                <tr>
+                  <td><span class="badge bg-secondary">{{ entry.get_phase_display }}</span></td>
+                  <td>{{ entry.description|default:"-" }}</td>
+                  <td class="text-center fw-semibold">{{ entry.duration_display }}</td>
+                  <td class="text-center">
+                    {% if entry.end_time %}
+                    <span class="badge bg-success"><i class="fas fa-check me-1"></i>Complete</span>
+                    {% else %}
+                    <span class="badge bg-warning text-dark"><i class="fas fa-play me-1"></i>Running</span>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="text-center text-muted py-5">
+            <i class="fas fa-clock fa-3x mb-3 opacity-25"></i>
+            <p>No time entries logged today.</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Recent Entries -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="fas fa-history me-2"></i>Recent Entries</h5>
+        </div>
+        <div class="card-body p-0">
+          {% if recent %}
+          <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>Date</th>
+                  <th>Project</th>
+                  <th>Phase</th>
+                  <th class="text-center">Duration</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for entry in recent %}
+                <tr>
+                  <td class="text-nowrap">{{ entry.start_time|date:"M d, Y" }}</td>
+                  <td>{{ entry.request.request_number }}</td>
+                  <td><span class="badge bg-secondary">{{ entry.get_phase_display }}</span></td>
+                  <td class="text-center fw-semibold">{{ entry.duration_display }}</td>
+                  <td>{{ entry.description|default:"-" }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="text-center text-muted py-5">
+            <i class="fas fa-inbox fa-3x mb-3 opacity-25"></i>
+            <p>No recent entries found.</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column -->
+    <div class="col-lg-4">
+      <!-- Quick Actions -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+        </div>
+        <div class="card-body">
+          {% if not running %}
+          <!-- Start Timer -->
+          <h6 class="text-muted mb-3">Start Timer</h6>
+          <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="start_timer">
+            <div class="mb-3">
+              <label for="start_request_id" class="form-label">Project</label>
+              <select name="request_id" id="start_request_id" class="form-select" required>
+                <option value="">Select project...</option>
+                {% for req in active_requests %}
+                <option value="{{ req.pk }}">{{ req.request_number }} &mdash; {{ req.company_name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="start_phase" class="form-label">Phase</label>
+              <select name="phase" id="start_phase" class="form-select" required>
+                <option value="">Select phase...</option>
+                {% for value, label in PHASES %}
+                <option value="{{ value }}">{{ label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <button type="submit" class="btn btn-success w-100">
+              <i class="fas fa-play me-1"></i>Start Timer
+            </button>
+          </form>
+          <hr>
+          {% endif %}
+
+          <!-- Add Manual Entry -->
+          <h6 class="text-muted mb-3">Add Manual Entry</h6>
+          <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add_entry">
+            <div class="mb-3">
+              <label for="manual_request_id" class="form-label">Project</label>
+              <select name="request_id" id="manual_request_id" class="form-select" required>
+                <option value="">Select project...</option>
+                {% for req in active_requests %}
+                <option value="{{ req.pk }}">{{ req.request_number }} &mdash; {{ req.company_name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="manual_phase" class="form-label">Phase</label>
+              <select name="phase" id="manual_phase" class="form-select" required>
+                <option value="">Select phase...</option>
+                {% for value, label in PHASES %}
+                <option value="{{ value }}">{{ label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="manual_date" class="form-label">Date</label>
+              <input type="date" name="date" id="manual_date" class="form-control" value="{{ today|date:'Y-m-d' }}" required>
+            </div>
+            <div class="row g-2 mb-3">
+              <div class="col">
+                <label for="manual_hours" class="form-label">Hours</label>
+                <input type="number" name="hours" id="manual_hours" class="form-control" min="0" max="23" value="0" required>
+              </div>
+              <div class="col">
+                <label for="manual_minutes" class="form-label">Minutes</label>
+                <input type="number" name="minutes" id="manual_minutes" class="form-control" min="0" max="59" value="0" required>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="manual_description" class="form-label">Description</label>
+              <textarea name="description" id="manual_description" class="form-control" rows="2" placeholder="Optional description..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">
+              <i class="fas fa-plus me-1"></i>Add Entry
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- This Week -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="fas fa-calendar-week me-2"></i>This Week</h5>
+        </div>
+        <div class="card-body">
+          <div class="text-center mb-4">
+            <p class="text-muted mb-1">{{ week_start|date:"M d" }} &ndash; {{ week_end|date:"M d, Y" }}</p>
+            <h2 class="text-primary mb-0">{{ week_total|format_minutes }}</h2>
+            <p class="text-muted">Total hours logged</p>
+          </div>
+
+          {% if by_phase %}
+          <h6 class="text-muted mb-3">By Phase</h6>
+          <div class="mb-4">
+            {% for item in by_phase %}
+            <div class="mb-2">
+              <div class="d-flex justify-content-between mb-1">
+                <span class="small fw-semibold">{{ item.phase }}</span>
+                <span class="small text-muted">{{ item.total|format_minutes }}</span>
+              </div>
+              <div class="progress" style="height: 8px;">
+                <div class="progress-bar bg-primary" role="progressbar" style="width: {% widthratio item.total week_total 100 %}%" aria-valuenow="{{ item.total }}" aria-valuemin="0" aria-valuemax="{{ week_total }}"></div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+
+          {% if by_request %}
+          <h6 class="text-muted mb-3">By Project</h6>
+          <div class="list-group list-group-flush">
+            {% for item in by_request %}
+            <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+              <div>
+                <span class="fw-semibold">{{ item.request__request_number }}</span>
+                <br>
+                <small class="text-muted">{{ item.request__company_name }}</small>
+              </div>
+              <span class="badge bg-primary rounded-pill">{{ item.total|format_minutes }}</span>
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Export -->
+      <div class="card">
+        <div class="card-body">
+          <a href="{% url 'branding:designer_export_timesheet' %}?from={{ week_start }}&to={{ week_end }}" class="btn btn-outline-secondary w-100">
+            <i class="fas fa-download me-1"></i>Export Timesheet ({{ week_start|date:"M d" }} &ndash; {{ week_end|date:"M d" }})
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Live Timer Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var timerEl = document.getElementById('live-timer');
+  if (!timerEl) return;
+
+  var startStr = timerEl.getAttribute('data-start');
+  var startTime = new Date(startStr);
+
+  function updateTimer() {
+    var now = new Date();
+    var diff = Math.floor((now - startTime) / 1000);
+    if (diff < 0) diff = 0;
+
+    var hours = Math.floor(diff / 3600);
+    var minutes = Math.floor((diff % 3600) / 60);
+    var seconds = diff % 60;
+
+    timerEl.textContent =
+      String(hours).padStart(2, '0') + ':' +
+      String(minutes).padStart(2, '0') + ':' +
+      String(seconds).padStart(2, '0');
+  }
+
+  updateTimer();
+  setInterval(updateTimer, 1000);
+});
+</script>
+
+{% endblock %}

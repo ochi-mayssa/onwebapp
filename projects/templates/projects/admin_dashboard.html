@@ -1,0 +1,236 @@
+{% extends 'base.html' %}
+
+{% block title %}Project Operations Dashboard{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="display-5 fw-bold mb-1">Project Operations Dashboard</h1>
+            <p class="text-muted mb-0">Monitor projects, client approvals, and requests in one place.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'projects:platform_dashboard' %}" class="btn btn-outline-primary">
+                <i class="bi bi-graph-up-arrow me-2"></i>Platform KPIs
+            </a>
+            <a href="{% url 'projects:admin_team_management' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-people-fill me-2"></i>Team Management
+            </a>
+        </div>
+    </div>
+
+    <!-- Summary Metrics -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-muted small">Total Projects</span>
+                        <i class="bi bi-folder2-open text-primary fs-4"></i>
+                    </div>
+                    <h3 class="fw-bold mb-0">{{ total_projects }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-muted small">Delayed Projects</span>
+                        <i class="bi bi-exclamation-triangle-fill text-danger fs-4"></i>
+                    </div>
+                    <h3 class="fw-bold mb-0">{{ delayed_projects }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-muted small">Pending Client Approvals</span>
+                        <i class="bi bi-check2-square text-warning fs-4"></i>
+                    </div>
+                    <h3 class="fw-bold mb-0">{{ pending_approvals }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-muted small">Open CRM Requests</span>
+                        <i class="bi bi-life-preserver text-info fs-4"></i>
+                    </div>
+                    <h3 class="fw-bold mb-0">{{ open_requests }}</h3>
+                    <small class="text-muted">{{ total_customers }} customers</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Left: Projects & Website Requests -->
+        <div class="col-lg-8">
+            <!-- Status Filters -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="mb-0">Projects</h5>
+                <div class="btn-group btn-group-sm" role="group" aria-label="Status filter">
+                    <a href="{% url 'projects:admin_dashboard' %}" class="btn btn-outline-secondary {% if not request.GET.status %}active{% endif %}">All</a>
+                    <a href="?status=PLANNING" class="btn btn-outline-secondary {% if request.GET.status == 'PLANNING' %}active{% endif %}">Planning</a>
+                    <a href="?status=DESIGN" class="btn btn-outline-secondary {% if request.GET.status == 'DESIGN' %}active{% endif %}">Design</a>
+                    <a href="?status=DEVELOPMENT" class="btn btn-outline-secondary {% if request.GET.status == 'DEVELOPMENT' %}active{% endif %}">Development</a>
+                    <a href="?status=DELIVERY" class="btn btn-outline-secondary {% if request.GET.status == 'DELIVERY' %}active{% endif %}">Delivery</a>
+                    <a href="?status=DELAYED" class="btn btn-outline-danger {% if request.GET.status == 'DELAYED' %}active{% endif %}">Delayed</a>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Project</th>
+                                    <th>Client</th>
+                                    <th>Status</th>
+                                    <th>Agile</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for project in projects %}
+                                <tr>
+                                    <td>
+                                        <div class="fw-bold">{{ project.title }}</div>
+                                        <small class="text-muted">{{ project.get_project_type_display }}</small>
+                                    </td>
+                                    <td>{{ project.client.username }}</td>
+                                    <td>
+                                        <span class="badge
+                                            {% if project.current_status == 'DELAYED' %} bg-danger
+                                            {% elif project.current_status == 'ON_HOLD' %} bg-warning text-dark
+                                            {% elif project.current_status == 'COMPLETED' %} bg-success
+                                            {% else %} bg-secondary
+                                            {% endif %}">
+                                            {{ project.get_current_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge
+                                            {% if project.agile_status == 'APPROVED' %} bg-success
+                                            {% elif project.agile_status == 'AWAITING_APPROVAL' %} bg-warning text-dark
+                                            {% elif project.agile_status == 'CHANGES_REQUESTED' %} bg-danger
+                                            {% else %} bg-secondary
+                                            {% endif %}">
+                                            {{ project.get_agile_status_display }}
+                                        </span>
+                                        {% if project.needs_client_action %}
+                                            <span class="badge bg-info text-dark ms-1">Needs Client Action</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end">
+                                        <a href="{% url 'projects:admin_project_detail' project.id %}" class="btn btn-sm btn-outline-primary">View</a>
+                                        <a href="{% url 'projects:admin_kanban' %}" class="btn btn-sm btn-outline-secondary">Kanban</a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted py-4">
+                                        No projects found for this filter.
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Website Build Requests -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom-0 pt-4 pb-2 d-flex justify-content-between align-items-center">
+                    <h5 class="card-title fw-bold mb-0">Website Build Requests</h5>
+                    <span class="badge bg-primary rounded-pill">{{ website_requests|length }} pending</span>
+                </div>
+                <div class="card-body">
+                    {% if website_requests %}
+                    <div class="list-group list-group-flush">
+                        {% for req in website_requests %}
+                        <div class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="fw-bold">{{ req.business_name }}</div>
+                                <small class="text-muted">{{ req.email }}</small>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <a href="{% url 'projects:accept_website_request' req.id %}" class="btn btn-sm btn-success">Accept</a>
+                                <a href="{% url 'projects:reject_website_request' req.id %}" class="btn btn-sm btn-outline-danger">Reject</a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted mb-0">No pending website build requests.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Alerts & Shortcuts -->
+        <div class="col-lg-4">
+            <!-- Alerts from workflow/finance/projects -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-bottom-0 pt-4 pb-2 d-flex justify-content-between align-items-center">
+                    <h5 class="card-title fw-bold mb-0">Alerts</h5>
+                    <small class="text-muted">Last 8</small>
+                </div>
+                <div class="card-body">
+                    {% if alerts %}
+                    <div class="list-group list-group-flush">
+                        {% for alert in alerts %}
+                        <div class="list-group-item px-0 py-2">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge 
+                                    {% if alert.severity == 'CRITICAL' %}bg-danger
+                                    {% elif alert.severity == 'HIGH' %}bg-warning text-dark
+                                    {% else %}bg-secondary
+                                    {% endif %}">
+                                    {{ alert.severity|title }}
+                                </span>
+                                <small class="text-muted">{{ alert.time|timesince }} ago</small>
+                            </div>
+                            <div class="mt-1 small">{{ alert.message }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted mb-0">No active alerts.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom-0 pt-4 pb-2">
+                    <h5 class="card-title fw-bold mb-0">Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <a href="{% url 'projects:admin_team_management' %}" class="list-group-item list-group-item-action px-0">
+                            <i class="bi bi-people-fill me-2 text-primary"></i>Manage team assignments
+                        </a>
+                        <a href="{% url 'projects:admin_kanban' %}" class="list-group-item list-group-item-action px-0">
+                            <i class="bi bi-kanban me-2 text-primary"></i>Open Kanban board
+                        </a>
+                        <a href="{% url 'projects:admin_consultations' %}" class="list-group-item list-group-item-action px-0">
+                            <i class="bi bi-chat-dots me-2 text-primary"></i>View consultation requests
+                        </a>
+                        <a href="{% url 'crm:dashboard' %}" class="list-group-item list-group-item-action px-0">
+                            <i class="bi bi-person-workspace me-2 text-primary"></i>CRM dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

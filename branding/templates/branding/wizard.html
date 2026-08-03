@@ -1,0 +1,77 @@
+{% extends 'branding/base.html' %}
+{% load static %}
+
+{% block title %}Branding Wizard{% endblock %}
+
+{% block branding_content %}
+<div class="wizard-page">
+    <div class="container py-4 py-lg-5">
+
+        <!-- Progress bar -->
+        <div class="wizard-progress mx-auto mb-4 mb-lg-5" id="wizardProgress">
+            {% for i in wizard_steps %}
+            <div class="wizard-step-indicator {% if i < step %}is-complete{% elif i == step %}is-active{% endif %}" data-step-target="{{ i }}">
+                <span class="wizard-step-dot">
+                    {% if i < step %}<i class="fa-solid fa-check"></i>{% else %}{{ i }}{% endif %}
+                </span>
+                <span class="wizard-step-label d-none d-sm-inline">{{ step_labels|slice:forloop.counter|last|default:"" }}</span>
+            </div>
+            {% if not forloop.last %}
+            <div class="wizard-progress-line {% if forloop.counter < step %}is-filled{% endif %}"></div>
+            {% endif %}
+            {% endfor %}
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-xl-9">
+                <div class="wizard-card">
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-4">
+                        <div class="wizard-card-title">
+                            <span class="wizard-card-icon"><i class="fa-solid {{ step_icon }}"></i></span>
+                            <div>
+                                <h2 class="h4 fw-800 mb-0">{{ step_title }}</h2>
+                                <p class="text-muted small mb-0">{{ step_subtitle }}</p>
+                            </div>
+                        </div>
+                        <span class="autosave-status" id="autosaveStatus">
+                            <i class="fa-solid fa-cloud-arrow-up me-1"></i><span>Saved</span>
+                        </span>
+                    </div>
+
+                    {% if errors %}
+                    <div class="alert alert-danger d-flex align-items-start gap-2 rounded-4 border-0 shadow-sm">
+                        <i class="fa-solid fa-circle-exclamation mt-1"></i>
+                        <div>
+                            <strong>Please fix the following:</strong>
+                            <ul class="mb-0 mt-1 ps-3">
+                                {% for e in errors %}<li>{{ e }}</li>{% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <form id="wizardForm" method="post" action="{% url 'branding:wizard_step' step %}" data-step="{{ step }}" novalidate>
+                        {% csrf_token %}
+                        <div id="wizardPanel">
+                            {% include 'branding/partials/wizard_step.html' %}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Collection preview modal -->
+<div class="modal fade" id="collectionPreviewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content rounded-5 border-0 overflow-hidden">
+            <div class="modal-body p-0" id="collectionPreviewBody"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/branding.js' %}"></script>
+{% endblock %}

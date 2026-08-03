@@ -1,0 +1,138 @@
+{% extends 'services/futuristic_service_base.html' %}
+{% load static %}
+
+{% block service_content %}
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card border-0 rounded-4 holographic-card p-4 mb-4 animate-on-scroll slide-up">
+            <h5 class="mb-3 text-cyan neon-text">Filters</h5>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label text-light">Platform</label>
+                    <select class="form-select cyber-input bg-transparent text-light" id="siPlatform">
+                        <option value="all" selected>All</option>
+                        <option value="Twitter">Twitter</option>
+                        <option value="LinkedIn">LinkedIn</option>
+                        <option value="YouTube">YouTube</option>
+                        <option value="Instagram">Instagram</option>
+                        <option value="Facebook">Facebook</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label text-light">Timeframe</label>
+                    <select class="form-select cyber-input bg-transparent text-light" id="siTimeframe">
+                        <option value="4w" selected>Last 4 Weeks</option>
+                        <option value="8w">Last 8 Weeks</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label text-light">Metrics</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="siLikes" checked>
+                        <label class="form-check-label text-light" for="siLikes">Likes</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="siComments" checked>
+                        <label class="form-check-label text-light" for="siComments">Comments</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card border-0 rounded-4 holographic-card p-4 mb-4 animate-on-scroll slide-up" style="animation-delay: 0.1s;">
+            <h5 class="mb-3 text-cyan neon-text">Engagement by Platform</h5>
+            <div style="height: 300px;">
+                <canvas id="engagementChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="card border-0 rounded-4 holographic-card p-4 animate-on-scroll slide-up" style="animation-delay: 0.2s;">
+            <h5 class="mb-3 text-cyan neon-text">Campaign Performance</h5>
+            <div style="height: 300px;">
+                <canvas id="campaignChart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card border-0 rounded-4 holographic-card p-4 mb-4 animate-on-scroll slide-up">
+            <h5 class="mb-3 text-cyan neon-text">Live Mentions</h5>
+            <ul id="mentionsList" class="list-unstyled mb-0">
+                <li class="mb-2 text-light"><span class="badge bg-cyan text-dark me-2">Twitter</span> New product launch trending</li>
+                <li class="mb-2 text-light"><span class="badge bg-purple text-white me-2">LinkedIn</span> Case study shared by industry leader</li>
+                <li class="mb-2 text-light"><span class="badge bg-pink text-white me-2">YouTube</span> Tutorial video surpasses 10k views</li>
+            </ul>
+        </div>
+        
+        <div class="card border-0 rounded-4 holographic-card p-4 animate-on-scroll slide-up" style="animation-delay: 0.1s;">
+            <h5 class="mb-3 text-cyan neon-text">Quick Actions</h5>
+            <div class="d-grid gap-2">
+                <a href="{% url 'services:detail' page='engagement-analytics' %}" class="btn holographic-btn">View Engagement</a>
+                <a href="{% url 'services:detail' page='campaign-performance' %}" class="btn holographic-btn">Campaign Monitoring</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function(){
+        // Chart Config
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.1)';
+
+        const engCtx = document.getElementById('engagementChart');
+        const engChart = new Chart(engCtx, {
+            type: 'radar',
+            data: {
+                labels: ['Twitter', 'LinkedIn', 'YouTube', 'Instagram', 'Facebook'],
+                datasets: [
+                    { label: 'Likes', data: [65, 59, 80, 81, 56], borderColor: '#06b6d4', backgroundColor: 'rgba(6, 182, 212, 0.2)', pointBackgroundColor: '#06b6d4' },
+                    { label: 'Comments', data: [28, 48, 40, 19, 86], borderColor: '#d946ef', backgroundColor: 'rgba(217, 70, 239, 0.2)', pointBackgroundColor: '#d946ef' }
+                ]
+            },
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false, 
+                plugins: { 
+                    legend: { position: 'bottom', labels: { color: '#e2e8f0' } }, 
+                    title: { display: false } 
+                },
+                scales: {
+                    r: {
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                        angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
+                        pointLabels: { color: '#e2e8f0' },
+                        ticks: { backdropColor: 'transparent', color: 'rgba(255, 255, 255, 0.5)' }
+                    }
+                }
+            }
+        });
+
+        const campCtx = document.getElementById('campaignChart');
+        const campChart = new Chart(campCtx, {
+            type: 'line',
+            data: {
+                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                datasets: [
+                    { label: 'Reach', data: [1200, 1800, 2300, 3100], borderColor: '#06b6d4', backgroundColor: '#06b6d4', tension: 0.3, fill: false },
+                    { label: 'CTR', data: [1.2, 1.6, 1.9, 2.3], borderColor: '#d946ef', backgroundColor: '#d946ef', tension: 0.3, yAxisID: 'y1', fill: false }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { 
+                    legend: { position: 'bottom', labels: { color: '#e2e8f0' } }, 
+                    title: { display: false } 
+                },
+                scales: { 
+                    y: { beginAtZero: true, grid: { color: 'rgba(255, 255, 255, 0.1)' }, ticks: { color: '#94a3b8' } }, 
+                    y1: { beginAtZero: true, position: 'right', grid: { drawOnChartArea: false }, ticks: { color: '#94a3b8' } }, 
+                    x: { grid: { display: false }, ticks: { color: '#94a3b8' } } 
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

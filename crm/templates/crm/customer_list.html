@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% load static i18n %}
+
+{% block title %}{% trans "Customer Directory" %} | OnWebApp{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'crm:dashboard' %}">CRM</a></li>
+<li class="breadcrumb-item active">Directory</li>
+{% endblock %}
+
+{% block page_title %}{% trans "Enterprise Directory" %}{% endblock %}
+{% block page_subtitle %}{% trans "Comprehensive registry of all enterprise clients, leads, and partners." %}{% endblock %}
+
+{% block page_actions %}
+<div class="d-flex gap-2">
+    <button class="btn btn-outline-secondary">
+        <i data-lucide="download"></i>
+        <span>Export</span>
+    </button>
+    <button class="btn btn-primary">
+        <i data-lucide="user-plus"></i>
+        <span>Add Customer</span>
+    </button>
+</div>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="card">
+    <div class="card-header bg-white p-4 border-bottom d-flex justify-content-between align-items-center">
+        <div class="search-bar" style="max-width: 320px;">
+            <i data-lucide="search" style="width: 14px;"></i>
+            <input type="text" class="search-input py-2" placeholder="Search directory...">
+        </div>
+        <div class="d-flex gap-3 align-items-center">
+            <span class="text-muted small fw-600">{{ customers.count }} Total Records</span>
+            <div class="vr bg-slate-200"></div>
+            <button class="btn btn-outline-secondary btn-sm border-0"><i data-lucide="sliders-horizontal" class="me-2" style="width: 14px;"></i>Filter</button>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Customer Name</th>
+                        <th>Contact Email</th>
+                        <th>Type</th>
+                        <th>Lifecycle Stage</th>
+                        <th>Account Owner</th>
+                        <th class="text-end">Last Update</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for customer in customers %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="user-avatar" style="background-color: var(--slate-100); color: var(--slate-600);">
+                                    {{ customer.name|slice:":1"|upper }}
+                                </div>
+                                <div>
+                                    <a href="{% url 'crm:customer_detail' customer.id %}" class="text-decoration-none fw-bold text-slate-900 d-block">{{ customer.name }}</a>
+                                    {% if customer.company_name %}
+                                    <span class="text-muted small" style="font-size: 11px;">{{ customer.company_name }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-slate-600">{{ customer.email }}</td>
+                        <td>
+                            <span class="badge bg-slate-100 text-slate-600 border border-slate-200">{{ customer.get_customer_type_display }}</span>
+                        </td>
+                        <td>
+                            <span class="badge {% if customer.lifecycle_stage == 'ACTIVE_CLIENT' %}bg-success-subtle text-success{% elif customer.lifecycle_stage == 'LEAD' %}bg-primary-subtle text-primary{% elif customer.lifecycle_stage == 'QUALIFIED_LEAD' %}bg-secondary-subtle text-secondary{% else %}bg-slate-100 text-slate-500{% endif %}">
+                                {{ customer.get_lifecycle_stage_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="rounded-circle bg-slate-200" style="width: 20px; height: 20px;"></div>
+                                <span class="small text-slate-700">
+                                    {% if customer.assigned_to %}
+                                    {{ customer.assigned_to.get_full_name|default:customer.assigned_to.username }}
+                                    {% else %}
+                                    <span class="text-slate-400 italic">Unassigned</span>
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </td>
+                        <td class="text-end text-muted small">
+                            {{ customer.updated_at|date:"M d, Y" }}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5">
+                            <div class="py-5">
+                                <div class="bg-slate-50 d-inline-flex p-4 rounded-circle mb-3">
+                                    <i data-lucide="users" class="text-slate-300" style="width: 40px; height: 40px;"></i>
+                                </div>
+                                <h6 class="text-slate-900 fw-bold">No customers found</h6>
+                                <p class="text-muted small">Try adjusting your filters or add a new record</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

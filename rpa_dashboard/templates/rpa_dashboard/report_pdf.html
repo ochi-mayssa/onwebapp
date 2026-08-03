@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>RPA Execution Report</title>
+    <style>
+        @page { size: A4; margin: 2cm; }
+        body { font-family: sans-serif; font-size: 12px; }
+        h1 { color: #2c3e50; border-bottom: 2px solid #2c3e50; padding-bottom: 10px; }
+        .meta-table { width: 100%; margin-bottom: 20px; }
+        .meta-table td { padding: 5px; }
+        .steps-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .steps-table th, .steps-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        .steps-table th { background-color: #f2f2f2; }
+        .badge { padding: 3px 8px; border-radius: 4px; color: white; font-weight: bold; }
+        .bg-success { background-color: #28a745; }
+        .bg-danger { background-color: #dc3545; }
+        .bg-warning { background-color: #ffc107; color: black; }
+        .bg-secondary { background-color: #6c757d; }
+        .footer { position: fixed; bottom: 0; width: 100%; text-align: center; font-size: 10px; color: #777; }
+        /* Print-specific styles for fallback view */
+        @media print {
+            .no-print { display: none; }
+            body { font-size: 10pt; }
+        }
+        .fallback-banner {
+            background-color: #fff3cd; color: #856404; padding: 15px; text-align: center; border: 1px solid #ffeeba; margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="fallback-banner no-print">
+        <strong>Note:</strong> PDF generation libraries missing. Please use <code>Ctrl+P</code> (Cmd+P) to save as PDF.
+    </div>
+
+    <h1>RPA Workflow Execution Report</h1>
+    
+    <table class="meta-table">
+        <tr>
+            <td><strong>Workflow:</strong> {{ workflow.title }} ({{ workflow.wf_id }})</td>
+            <td><strong>Run ID:</strong> #{{ run.id }}</td>
+        </tr>
+        <tr>
+            <td><strong>Status:</strong> <span class="badge bg-{{ run.status|yesno:'warning,info,success,danger' }}">{{ run.get_status_display }}</span></td>
+            <td><strong>Triggered By:</strong> {{ run.triggered_by.username|default:"System" }}</td>
+        </tr>
+        <tr>
+            <td><strong>Started:</strong> {{ run.started_at }}</td>
+            <td><strong>Duration:</strong> {{ run.duration_ms }} ms</td>
+        </tr>
+    </table>
+
+    <h3>Execution Steps</h3>
+    <table class="steps-table">
+        <thead>
+            <tr>
+                <th>Step ID</th>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Duration (ms)</th>
+                <th>Message</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for step in steps %}
+            <tr>
+                <td>{{ step.step_id }}</td>
+                <td>{{ step.name }}</td>
+                <td>
+                    <span class="badge bg-{{ step.status|yesno:'warning,success,danger,secondary' }}">
+                        {{ step.status }}
+                    </span>
+                </td>
+                <td>{{ step.duration_ms }}</td>
+                <td style="color: #dc3545;">{{ step.error_message }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="footer">
+        Generated on {{ generated_at }} | OnWebApp RPA Dashboard
+    </div>
+</body>
+</html>

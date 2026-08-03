@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Upgrade Required{% endblock %}
+
+{% block content %}
+<section class="py-5 d-flex align-items-center justify-content-center" style="min-height: 100vh; background: radial-gradient(circle at top, rgba(13,110,253,0.12), transparent 50%), radial-gradient(circle at bottom, rgba(111,66,193,0.12), transparent 55%);">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="card border-0 shadow-lg rounded-4 overflow-hidden" style="backdrop-filter: blur(10px); background: rgba(15,23,42,0.96);">
+                    <div class="card-body p-4 p-md-5 text-center text-white">
+                        <div class="d-flex justify-content-center mb-3">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 3.25rem; height: 3.25rem; background: linear-gradient(135deg, rgba(255,193,7,0.2), rgba(13,110,253,0.35));">
+                                <i class="fas fa-lock-upgrade text-warning"></i>
+                            </div>
+                        </div>
+                        {% if plan_code == 'free' %}
+                            <div class="mb-2">
+                                <span class="badge bg-warning text-dark px-3 py-2">Free Result Used</span>
+                            </div>
+                            <h1 class="h4 fw-bold mb-2">
+                                {{ service.name|default:"This service" }}
+                            </h1>
+                            <p class="text-white-50 mb-4">
+                                You have used your free result. Upgrade to continue.
+                            </p>
+                        {% else %}
+                            <div class="mb-2">
+                                <span class="badge bg-danger px-3 py-2">Usage Limit Reached</span>
+                            </div>
+                            <h1 class="h4 fw-bold mb-2">
+                                Upgrade required for {{ service.name|default:"this service" }}
+                            </h1>
+                            <p class="text-white-50 mb-3">
+                                You have used your {{ plan.name|default:plan_code|title }} quota for
+                                <strong>{{ service.name|default:service.code }}</strong>.
+                            </p>
+                            <p class="text-white-50 mb-4">
+                                Usage: {{ current_usage }} / {{ max_usage }}.
+                            </p>
+                            <div class="mb-4">
+                                {% if recommended_plan %}
+                                <p class="mb-1 text-white-50">
+                                    Consider upgrading to
+                                    <strong>{{ recommended_plan.name }}</strong>
+                                    for higher or unlimited usage.
+                                </p>
+                                <p class="text-white-50 small mb-0">
+                                    {{ recommended_plan.description }}
+                                </p>
+                                {% else %}
+                                <p class="text-white-50 mb-0">
+                                    Upgrade your plan to continue using this service.
+                                </p>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                        <div class="d-grid gap-2 mt-3">
+                            <a href="{% url 'payments:plans' %}" class="btn btn-primary btn-lg rounded-pill">
+                                View plans and upgrade
+                            </a>
+                            {% if plan_code == 'free' %}
+                                <a href="{% url 'users:profile_dashboard' %}" class="btn btn-outline-light rounded-pill">
+                                    Close
+                                </a>
+                            {% else %}
+                                <a href="{% url 'users:profile_dashboard' %}" class="btn btn-outline-light rounded-pill">
+                                    Back to dashboard
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

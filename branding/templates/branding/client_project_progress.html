@@ -1,0 +1,446 @@
+{% extends 'branding/base.html' %}
+{% load branding_extras %}
+
+{% block title %}Project Progress · {{ br.request_number }}{% endblock %}
+
+{% block branding_content %}
+<style>
+.cp-hero{background:linear-gradient(135deg,#4f46e5,#7c3aed);border-radius:1rem;padding:2rem;color:#fff;position:relative;overflow:hidden}
+.cp-hero::after{content:'';position:absolute;top:-50%;right:-20%;width:300px;height:300px;background:rgba(255,255,255,.08);border-radius:50%}
+.cp-metric{background:var(--surface-card,#fff);border:1px solid var(--border-color,#e5e7eb);border-radius:.75rem;padding:1rem;text-align:center;transition:all .2s}
+.cp-metric:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.cp-metric-icon{width:40px;height:40px;border-radius:.5rem;display:inline-flex;align-items:center;justify-content:center;font-size:1rem;margin-bottom:.5rem}
+.cp-metric-icon.mi-progress{background:#eef2ff;color:#4f46e5}
+.cp-metric-icon.mi-deadline{background:#fef3c7;color:#d97706}
+.cp-metric-icon.mi-version{background:#e0e7ff;color:#4f46e5}
+.cp-metric-icon.mi-feedback{background:#fef2f2;color:#ef4444}
+.cp-metric-icon.mi-questions{background:#f0fdf4;color:#16a34a}
+.cp-metric-icon.mi-messages{background:#dbeafe;color:#2563eb}
+.cp-metric-value{font-size:1.4rem;font-weight:800;color:var(--bs-body-color)}
+.cp-metric-label{font-size:.7rem;color:#6b7280;font-weight:600;margin-top:.15rem}
+.cp-progress{display:flex;gap:3px;margin:1.5rem 0}
+.cp-step{flex:1;text-align:center;padding:.6rem .25rem;border-radius:.5rem;font-size:.7rem;font-weight:700;color:#fff;transition:all .3s;position:relative}
+.cp-step.done{opacity:.75}
+.cp-step.active{transform:scale(1.05);box-shadow:0 4px 12px rgba(0,0,0,.2)}
+.cp-step.future{opacity:.35}
+.cp-panel{background:var(--surface-card,#fff);border:1px solid var(--border-color,#e5e7eb);border-radius:.75rem;overflow:hidden}
+.cp-panel-header{padding:.85rem 1.1rem;border-bottom:1px solid var(--border-color,#e5e7eb);display:flex;align-items:center;justify-content:space-between;background:var(--surface-muted,#f9fafb)}
+.cp-panel-header h6{margin:0;font-size:.85rem;font-weight:700}
+.cp-panel-body{padding:1.1rem}
+.cp-item{padding:.75rem;border:1px solid var(--border-color,#e5e7eb);border-radius:.5rem;margin-bottom:.5rem;transition:all .15s}
+.cp-item:hover{border-color:#c7d2fe}
+.cp-item.answered{border-color:#22c55e;background:#f0fdf4}
+.cp-item.resolved{border-color:#22c55e;background:#f9fafb}
+.cp-version{padding:.75rem;border:1px solid var(--border-color,#e5e7eb);border-radius:.5rem;margin-bottom:.5rem;display:flex;gap:.75rem;align-items:center;transition:all .15s}
+.cp-version:hover{border-color:#c7d2fe}
+.cp-version.current{border-color:#4f46e5;background:#eef2ff}
+.cp-timeline-item{display:flex;gap:.75rem;padding:.75rem 0;border-bottom:1px solid var(--border-color,#f3f4f6)}
+.cp-timeline-dot{width:8px;height:8px;border-radius:50%;margin-top:.35rem;flex-shrink:0}
+.cp-badge{font-size:.6rem;padding:.15rem .45rem;border-radius:1rem;font-weight:600}
+.cp-decision{padding:.75rem;border:1px solid var(--border-color,#e5e7eb);border-radius:.5rem;margin-bottom:.5rem}
+.cp-decision.confirmed{background:#f0fdf4;border-color:#22c55e}
+.cp-concept{padding:.75rem;border:1px solid var(--border-color,#e5e7eb);border-radius:.5rem;margin-bottom:.5rem;display:flex;gap:.75rem;align-items:center}
+.cp-concept:hover{border-color:#c7d2fe}
+.cp-quick-link{display:flex;align-items:center;gap:.65rem;padding:.6rem .75rem;border-radius:.5rem;text-decoration:none;color:var(--bs-body-color);transition:all .15s;border:1px solid transparent}
+.cp-quick-link:hover{background:var(--surface-muted,#f9fafb);border-color:var(--border-color,#e5e7eb)}
+.cp-overdue{background:#fef2f2;border:1px solid #fecaca}
+.cp-alert-badge{background:#ef4444;color:#fff;font-size:.55rem;padding:.15rem .4rem;border-radius:1rem;font-weight:700;position:absolute;top:-4px;right:-4px}
+</style>
+
+<div class="container py-4 py-lg-5">
+
+    {# ── Hero Header ── #}
+    <div class="cp-hero mb-4">
+        <div class="d-flex align-items-start justify-content-between flex-wrap gap-3" style="position:relative;z-index:1">
+            <div>
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <a href="{% url 'branding:my_requests' %}" class="text-white-50 text-decoration-none small"><i class="fa-solid fa-arrow-left me-1"></i>Dashboard</a>
+                    <span class="badge bg-white bg-opacity-20 rounded-pill px-3 py-1">{{ br.request_number }}</span>
+                </div>
+                <h3 class="fw-800 mb-1">{{ br.company_name }}</h3>
+                <p class="mb-0 opacity-75 small">{{ br.get_industry_display }} · Created {{ br.created_at|date:"M j, Y" }}</p>
+            </div>
+            <div class="text-end">
+                <span class="badge bg-white bg-opacity-20 rounded-pill px-3 py-2 mb-2">{{ br.get_status_display }}</span>
+                {% if br.priority %}
+                <div><span class="badge {% if br.priority == 'URGENT' %}bg-danger{% elif br.priority == 'HIGH' %}bg-warning{% elif br.priority == 'MEDIUM' %}bg-info{% else %}bg-secondary{% endif %} rounded-pill">{{ br.priority }}</span></div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {# ── Metrics Cards ── #}
+    {% if workflow %}
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="cp-metric">
+                <div class="cp-metric-icon mi-progress"><i class="fa-solid fa-chart-line"></i></div>
+                <div class="cp-metric-value">{{ workflow.progress_percent }}%</div>
+                <div class="cp-metric-label">Complete</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="cp-metric {% if days_remaining is not None and days_remaining < 0 %}cp-overdue{% endif %}">
+                <div class="cp-metric-icon mi-deadline"><i class="fa-solid fa-calendar-check"></i></div>
+                <div class="cp-metric-value">
+                    {% if days_remaining is not None %}
+                        {% if days_remaining < 0 %}<span class="text-danger">{{ days_remaining|absolute }}d late</span>{% elif days_remaining == 0 %}Today{% else %}{{ days_remaining }}d{% endif %}
+                    {% else %}—{% endif %}
+                </div>
+                <div class="cp-metric-label">Est. Delivery</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="cp-metric">
+                <div class="cp-metric-icon mi-version"><i class="fa-solid fa-code-branch"></i></div>
+                <div class="cp-metric-value">{{ iterations|length }}</div>
+                <div class="cp-metric-label">Design Versions</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="cp-metric" style="position:relative">
+                <div class="cp-metric-icon mi-feedback"><i class="fa-solid fa-comment-dots"></i></div>
+                <div class="cp-metric-value">{{ feedback_pending }}</div>
+                <div class="cp-metric-label">Pending Feedback</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="cp-metric">
+                <div class="cp-metric-icon mi-questions"><i class="fa-solid fa-circle-question"></i></div>
+                <div class="cp-metric-value">{{ questions|length }}</div>
+                <div class="cp-metric-label">Questions Done</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="cp-metric" style="position:relative">
+                <div class="cp-metric-icon mi-messages"><i class="fa-solid fa-envelope"></i></div>
+                <div class="cp-metric-value">{% if unread_messages %}{{ unread_messages }}{% else %}0{% endif %}</div>
+                <div class="cp-metric-label">Unread Messages</div>
+                {% if unread_messages %}<span class="cp-alert-badge"></span>{% endif %}
+            </div>
+        </div>
+    </div>
+
+    {# ── Progress Stepper ── #}
+    <div class="cp-progress">
+        {% for sk, sl in stages %}
+        <div class="cp-step {% if sk in workflow.completed_stages %}done{% endif %} {% if sk == workflow.current_stage %}active{% endif %}" style="background:{% if sk == workflow.current_stage %}#4f46e5{% elif sk in workflow.completed_stages %}#22c55e{% else %}#d1d5db{% endif %}" title="{{ sl }}">
+            {% if sk == workflow.current_stage %}<i class="fa-solid fa-play" style="font-size:.5rem"></i> {% endif %}{{ sl|truncatechars:14 }}
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="row g-4">
+        {# ── Left Column ── #}
+        <div class="col-lg-8">
+
+            {# ── Design Versions ── #}
+            <div class="cp-panel mb-4">
+                <div class="cp-panel-header">
+                    <h6><i class="fa-solid fa-code-branch me-2 text-primary"></i>Design Versions</h6>
+                    <span class="badge bg-primary rounded-pill">{{ iterations|length }}</span>
+                </div>
+                <div class="cp-panel-body">
+                    {% for it in iterations %}
+                    <div class="cp-version {% if it.is_current %}current{% endif %}">
+                        <div style="min-width:48px;text-align:center">
+                            <div class="fw-bold text-primary">v{{ it.version_number }}</div>
+                            {% if it.is_current %}<span class="cp-badge" style="background:#eef2ff;color:#4f46e5">Current</span>{% endif %}
+                        </div>
+                        <div style="min-width:0;flex:1">
+                            <div class="small fw-600">{{ it.title }}</div>
+                            {% if it.description %}<div class="x-small text-muted">{{ it.description|truncatechars:150 }}</div>{% endif %}
+                            {% if it.change_notes %}<div class="x-small text-muted mt-1"><i class="fa-solid fa-pen me-1"></i>{{ it.change_notes|truncatechars:150 }}</div>{% endif %}
+                            <div class="x-small text-muted mt-1">{{ it.created_at|timesince }} ago</div>
+                        </div>
+                        {% if it.file %}<a href="{{ it.file.url }}" class="btn btn-sm btn-outline-primary" target="_blank"><i class="fa-solid fa-download"></i></a>{% endif %}
+                    </div>
+                    {% empty %}
+                    <div class="text-center text-muted py-4 small">
+                        <i class="fa-solid fa-hourglass-half fa-2x mb-2 d-block opacity-25"></i>No design versions uploaded yet.
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            {# ── Design Concepts ── #}
+            {% if concepts %}
+            <div class="cp-panel mb-4">
+                <div class="cp-panel-header">
+                    <h6><i class="fa-solid fa-palette me-2 text-primary"></i>Design Concepts</h6>
+                    <a href="{% url 'branding:concept_list' request_pk=br.pk %}" class="x-small text-primary text-decoration-none fw-700">View All <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                </div>
+                <div class="cp-panel-body">
+                    {% for concept in concepts %}
+                    <a href="{% url 'branding:concept_detail' pk=concept.pk %}" class="cp-concept text-decoration-none">
+                        {% if concept.preview_image %}
+                        <img src="{{ concept.preview_image.url }}" alt="" style="width:48px;height:48px;object-fit:cover;border-radius:.5rem">
+                        {% else %}
+                        <div class="d-flex align-items-center justify-content-center rounded" style="width:48px;height:48px;background:linear-gradient(135deg,#667eea22,#764ba222);flex-shrink:0">
+                            <i class="fa-solid fa-image text-muted opacity-25"></i>
+                        </div>
+                        {% endif %}
+                        <div style="min-width:0;flex:1">
+                            <div class="small fw-600 text-truncate">{{ concept.title }}</div>
+                            <div class="x-small text-muted">{{ concept.get_status_display|default:concept.status }}</div>
+                        </div>
+                        {% if concept.overall_score %}
+                        <span class="cp-badge" style="background:#eef2ff;color:#4f46e5">{{ concept.overall_score|floatformat:1 }}</span>
+                        {% endif %}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {# ── Questions & Answers ── #}
+            {% if questions %}
+            <div class="cp-panel mb-4">
+                <div class="cp-panel-header">
+                    <h6><i class="fa-solid fa-circle-question me-2 text-info"></i>Questions & Answers</h6>
+                    <span class="badge bg-success rounded-pill">{{ questions|length }} answered</span>
+                </div>
+                <div class="cp-panel-body">
+                    {% for q in questions %}
+                    <div class="cp-item answered">
+                        <div class="d-flex justify-content-between align-items-start mb-1">
+                            <span class="cp-badge" style="background:#e0e7ff;color:#4f46e5">{{ q.get_category_display }}</span>
+                            <span class="x-small text-muted">{{ q.answered_at|timesince }} ago</span>
+                        </div>
+                        <p class="small fw-600 mt-2 mb-1">{{ q.question }}</p>
+                        <div class="small text-success mt-1"><i class="fa-solid fa-check-circle me-1"></i>{{ q.answer }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {# ── Your Feedback ── #}
+            {% if feedback_items %}
+            <div class="cp-panel mb-4">
+                <div class="cp-panel-header">
+                    <h6><i class="fa-solid fa-comment-dots me-2 text-warning"></i>Your Feedback</h6>
+                    <div class="d-flex gap-1">
+                        {% if feedback_pending %}<span class="cp-badge" style="background:#fef2f2;color:#ef4444">{{ feedback_pending }} pending</span>{% endif %}
+                        {% if feedback_resolved %}<span class="cp-badge" style="background:#f0fdf4;color:#16a34a">{{ feedback_resolved }} resolved</span>{% endif %}
+                    </div>
+                </div>
+                <div class="cp-panel-body">
+                    {% for fb in feedback_items %}
+                    <div class="cp-item {% if fb.status == 'resolved' %}resolved{% endif %}">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <span class="cp-badge" style="background:#fef3c7;color:#92400e">{{ fb.get_category_display }}</span>
+                                <span class="cp-badge" style="background:{% if fb.status == 'new' %}#fef2f2;color:#ef4444{% elif fb.status == 'in_review' %}#dbeafe;color:#1d4ed8{% elif fb.status == 'addressed' %}#e0e7ff;color:#4f46e5{% else %}#f0fdf4;color:#16a34a{% endif %}">{{ fb.get_status_display }}</span>
+                            </div>
+                            <span class="x-small text-muted">{{ fb.created_at|timesince }} ago</span>
+                        </div>
+                        <p class="small fw-600 mt-2 mb-1">{{ fb.title }}</p>
+                        <p class="small text-muted mb-0">{{ fb.content|truncatechars:200 }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        {# ── Right Column ── #}
+        <div class="col-lg-4">
+
+            {# ── Project Info ── #}
+            <div class="cp-panel mb-4">
+                <div class="cp-panel-header">
+                    <h6><i class="fa-solid fa-circle-info me-2 text-secondary"></i>Project Info</h6>
+                </div>
+                <div class="cp-panel-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="x-small text-muted fw-600">Industry</span>
+                        <span class="x-small fw-700">{{ br.get_industry_display }}</span>
+                    </div>
+                    {% if br.collection %}
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="x-small text-muted fw-600">Collection</span>
+                        <span class="x-small fw-700">{{ br.collection.name|truncatechars:25 }}</span>
+                    </div>
+                    {% endif %}
+                    {% if br.estimated_delivery_date %}
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="x-small text-muted fw-600">Est. Delivery</span>
+                        <span class="x-small fw-700 {% if days_remaining is not None and days_remaining < 0 %}text-danger fw-bold{% elif days_remaining == 0 %}text-warning fw-bold{% endif %}">{{ br.estimated_delivery_date|date:"M j, Y" }}</span>
+                    </div>
+                    {% endif %}
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="x-small text-muted fw-600">Status</span>
+                        <span class="status-pill status-{{ br.status|lower }}">{{ br.get_status_display }}</span>
+                    </div>
+                    {% if workflow %}
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="x-small text-muted fw-600">Current Stage</span>
+                        <span class="x-small fw-700">{{ workflow.get_current_stage_display }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="x-small text-muted fw-600">Stage Days</span>
+                        <span class="x-small fw-700">{{ workflow.stage_days }}</span>
+                    </div>
+                    {% if workflow.is_overdue %}
+                    <div class="mt-2 p-2 rounded cp-overdue">
+                        <span class="x-small fw-700 text-danger"><i class="fa-solid fa-triangle-exclamation me-1"></i>This stage is overdue</span>
+                    </div>
+                    {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+
+            {# ── Quick Actions ── #}
+            <div class="cp-panel mb-4">
+                <div class="cp-panel-header">
+                    <h6><i class="fa-solid fa-bolt me-2 text-warning"></i>Quick Actions</h6>
+                </div>
+                <div class="cp-panel-body">
+                    <div class="d-grid gap-1">
+                        <a href="{% url 'branding:my_requests' %}" class="cp-quick-link">
+                            <i class="fa-solid fa-envelope" style="color:#3b82f6;width:20px;text-align:center"></i>
+                            <span class="small">Messages{% if unread_messages %} <span class="badge bg-danger rounded-pill" style="font-size:.55rem">{{ unread_messages }}</span>{% endif %}</span>
+                        </a>
+                        {% if br.status != 'COMPLETED' and br.status != 'APPROVED' %}
+                        <a href="{% url 'branding:wizard' %}" class="cp-quick-link">
+                            <i class="fa-solid fa-plus" style="color:#22c55e;width:20px;text-align:center"></i>
+                            <span class="small">New Request</span>
+                        </a>
+                        {% endif %}
+                        <a href="{% url 'branding:client_profile' %}" class="cp-quick-link">
+                            <i class="fa-solid fa-sliders" style="color:#8b5cf6;width:20px;text-align:center"></i>
+                            <span class="small">My Profile</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            {# ── Stage History ── #}
+            {% if stage_logs %}
+            <div class="cp-panel mb-4">
+                <div class="cp-panel-header">
+                    <h6><i class="fa-solid fa-timeline me-2 text-primary"></i>Stage History</h6>
+                </div>
+                <div class="cp-panel-body" style="max-height:280px;overflow-y:auto">
+                    {% for log in stage_logs %}
+                    <div class="cp-timeline-item">
+                        <div class="cp-timeline-dot" style="background:#4f46e5"></div>
+                        <div style="min-width:0;flex:1">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="small fw-600">
+                                    {% if log.from_stage %}{{ log.from_stage }} → {% endif %}{{ log.to_stage }}
+                                </span>
+                                <span class="x-small text-muted">{{ log.moved_at|timesince }} ago</span>
+                            </div>
+                            {% if log.notes %}<div class="x-small text-muted mt-1">{{ log.notes }}</div>{% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {# ── Decisions ── #}
+            {% if decisions %}
+            <div class="cp-panel mb-4">
+                <div class="cp-panel-header">
+                    <h6><i class="fa-solid fa-gavel me-2 text-success"></i>Decisions</h6>
+                </div>
+                <div class="cp-panel-body">
+                    {% for d in decisions %}
+                    <div class="cp-decision {% if d.is_confirmed %}confirmed{% endif %}">
+                        <span class="cp-badge" style="background:#dcfce7;color:#166534">{{ d.get_category_display }}</span>
+                        <p class="small fw-600 mt-2 mb-1">{{ d.decision }}</p>
+                        {% if d.rationale %}<div class="x-small text-muted">{{ d.rationale|truncatechars:100 }}</div>{% endif %}
+                        <div class="x-small text-muted mt-1">{{ d.created_at|timesince }} ago</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {# ── Activity Timeline ── #}
+            <div class="cp-panel mb-4">
+                <div class="cp-panel-header">
+                    <h6><i class="fa-solid fa-stream me-2 text-secondary"></i>Activity</h6>
+                </div>
+                <div class="cp-panel-body" style="max-height:300px;overflow-y:auto">
+                    {% for c in communications %}
+                    <div class="cp-timeline-item">
+                        <div class="cp-timeline-dot" style="background:{% if c.interaction_type == 'message' %}#3b82f6{% elif c.interaction_type == 'question' %}#06b6d4{% elif c.interaction_type == 'feedback' %}#f59e0b{% elif c.interaction_type == 'approval' %}#22c55e{% elif c.interaction_type == 'revision' %}#f97316{% else %}#9ca3af{% endif %}"></div>
+                        <div style="min-width:0;flex:1">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="small fw-600">{{ c.title|truncatechars:50 }}</span>
+                            </div>
+                            <div class="x-small text-muted">{{ c.get_interaction_type_display }} · {{ c.created_at|timesince }} ago</div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center text-muted py-3 small">No activity yet.</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    {# ── No Workflow Yet ── #}
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="cp-metric">
+                <div class="cp-metric-icon mi-progress"><i class="fa-solid fa-hourglass-half"></i></div>
+                <div class="cp-metric-value">—</div>
+                <div class="cp-metric-label">Progress</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="cp-metric">
+                <div class="cp-metric-icon mi-deadline"><i class="fa-solid fa-calendar-check"></i></div>
+                <div class="cp-metric-value">
+                    {% if days_remaining is not None %}
+                        {% if days_remaining < 0 %}<span class="text-danger">{{ days_remaining|absolute }}d</span>{% elif days_remaining == 0 %}Today{% else %}{{ days_remaining }}d{% endif %}
+                    {% else %}—{% endif %}
+                </div>
+                <div class="cp-metric-label">Est. Delivery</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="cp-metric">
+                <div class="cp-metric-icon mi-version"><i class="fa-solid fa-code-branch"></i></div>
+                <div class="cp-metric-value">0</div>
+                <div class="cp-metric-label">Design Versions</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="cp-metric">
+                <div class="cp-metric-icon mi-feedback"><i class="fa-solid fa-comment-dots"></i></div>
+                <div class="cp-metric-value">0</div>
+                <div class="cp-metric-label">Pending Feedback</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="cp-metric">
+                <div class="cp-metric-icon mi-questions"><i class="fa-solid fa-circle-question"></i></div>
+                <div class="cp-metric-value">0</div>
+                <div class="cp-metric-label">Questions Done</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="cp-metric">
+                <div class="cp-metric-icon mi-messages"><i class="fa-solid fa-envelope"></i></div>
+                <div class="cp-metric-value">{% if unread_messages %}{{ unread_messages }}{% else %}0{% endif %}</div>
+                <div class="cp-metric-label">Unread Messages</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center py-5">
+        <div class="mb-3"><i class="fa-solid fa-hourglass-half fa-3x text-muted opacity-25"></i></div>
+        <h5 class="fw-800">Project Not Yet Started</h5>
+        <p class="text-muted mx-auto" style="max-width:400px">Your project is being prepared. You'll see progress tracking here once the design team begins working on your brand.</p>
+        <a href="{% url 'branding:my_requests' %}" class="btn btn-brand-primary mt-2"><i class="fa-solid fa-arrow-left me-2"></i>Back to Dashboard</a>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

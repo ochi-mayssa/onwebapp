@@ -1,0 +1,286 @@
+{% extends 'base.html' %}
+{% block title %}SEO Audit - {{ task.domain }}{% endblock %}
+{% block global_cta %}{% endblock %}
+{% block content %}
+<div class="container mt-4 mb-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'seo_analyzer:index' %}">SEO</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'seo_analyzer:checker' %}">Website Checker</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ task.domain }}</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
+        <div>
+            <h1 class="mb-2">{% if audit_failed %}Audit Failed: {{ task.domain }}{% else %}Enterprise SEO Audit Report{% endif %}</h1>
+            <p class="text-muted mb-0">Professional SEO performance review for {{ task.domain }} using the existing analyzer outputs.</p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <a href="{% url 'seo_analyzer:checker' %}" class="btn btn-primary btn-sm">Website Checker</a>
+            <a href="{% url 'seo_analyzer:url_intelligence' %}" class="btn btn-outline-secondary btn-sm">URL Intelligence</a>
+            <a href="{% url 'seo_analyzer:link_checker' %}" class="btn btn-outline-success btn-sm">Link Checker</a>
+            <a href="{% url 'seo_analyzer:sitemap' %}" class="btn btn-outline-primary btn-sm">Sitemap Intelligence</a>
+            <a href="{% url 'seo_analyzer:backlinks' %}" class="btn btn-outline-warning btn-sm">Backlink Analyzer</a>
+            {% if not audit_failed %}
+            <a href="{% url 'seo_analyzer:download_report' 'website' task.id %}" class="btn btn-success btn-sm">Download SEO Report</a>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if audit_failed %}
+    <div class="alert alert-danger shadow-sm" role="alert">
+        <h4 class="alert-heading mb-2">Audit Failed</h4>
+        <p class="mb-0"><strong>Reason:</strong> {{ task.error_message|default:"The website audit could not be completed." }}</p>
+    </div>
+    {% else %}
+
+    <div class="card shadow-sm border-0 mb-4" style="background: linear-gradient(135deg, #0f172a, #1e293b); color: #fff;">
+        <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+                <div>
+                    <div class="small text-uppercase fw-semibold" style="letter-spacing: 0.08em; color: #67E8F9;">Executive Summary</div>
+                    <h2 class="h4 mt-2 mb-2 text-white">Enterprise SEO Performance Overview</h2>
+                    <p class="mb-0" style="color: #cbd5e1;">This report presents the latest verified findings from the existing SEO analysis modules in a professional, executive-friendly structure.</p>
+                </div>
+                <div class="text-end">
+                    <div class="badge bg-light text-dark fs-6">{{ overview_kpis.0.score }}</div>
+                    <div class="small mt-2" style="color: #cbd5e1;">Overall SEO Score</div>
+                </div>
+            </div>
+            <div class="row g-3">
+                {% for card in overview_kpis %}
+                <div class="col-xl-2 col-lg-4 col-md-6">
+                    <div class="rounded-3 p-3 h-100" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);">
+                        <div class="small text-uppercase fw-semibold mb-2" style="color: #94a3b8;">{{ card.label }}</div>
+                        <div class="h4 mb-1 text-white">{{ card.score }}</div>
+                        <div class="badge bg-{{ card.progress_class }}-subtle text-{{ card.progress_class }} border border-{{ card.progress_class }}-subtle">{{ card.status }}</div>
+                        <div class="small mt-2" style="color: #cbd5e1;">{{ card.description }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-xl-3 col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="small text-uppercase text-muted fw-semibold mb-2">Website Health</div>
+                    <div class="d-flex flex-wrap gap-2 mb-3">
+                        {% for item in health_breakdown %}
+                        <span class="badge bg-{{ item.class }}-subtle text-{{ item.class }} border border-{{ item.class }}-subtle">{{ item.label }} {{ item.count }}</span>
+                        {% endfor %}
+                    </div>
+                    <p class="text-muted small mb-0">Summary of health states detected in the audit.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="small text-uppercase text-muted fw-semibold mb-2">Issue Priority</div>
+                    <div class="d-flex flex-column gap-2">
+                        {% for item in issue_priority %}
+                        <a href="#{{ item.anchor }}" class="d-flex justify-content-between align-items-center text-decoration-none text-dark border rounded-3 p-2">
+                            <span>{{ item.label }}</span>
+                            <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">{{ item.count }}</span>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="small text-uppercase text-muted fw-semibold mb-2">Technical SEO Intelligence</div>
+                    <div class="d-flex flex-column gap-2">
+                        {% for item in technical_seo_cards %}
+                        <div class="d-flex justify-content-between align-items-center border rounded-3 p-2">
+                            <span>{{ item.label }}</span>
+                            <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">{{ item.status }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="small text-uppercase text-muted fw-semibold mb-2">Content Analysis</div>
+                    <div class="d-flex flex-column gap-2">
+                        <div class="d-flex justify-content-between align-items-center border rounded-3 p-2"><span>Pages Crawled</span><span class="fw-semibold">{{ content_analysis.pages_crawled }}</span></div>
+                        <div class="d-flex justify-content-between align-items-center border rounded-3 p-2"><span>Missing H1</span><span class="fw-semibold">{{ content_analysis.missing_h1 }}</span></div>
+                        <div class="d-flex justify-content-between align-items-center border rounded-3 p-2"><span>Missing Meta Title</span><span class="fw-semibold">{{ content_analysis.missing_meta_title }}</span></div>
+                        <div class="d-flex justify-content-between align-items-center border rounded-3 p-2"><span>Content Score</span><span class="fw-semibold">{{ content_analysis.content_score }}</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% include 'seo_analyzer/partials/topic_intelligence_card.html' with topic_intelligence=topic_intelligence %}
+    {% include 'seo_analyzer/partials/intelligence_dashboard_sections.html' with topic_intelligence=topic_intelligence %}
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white"><h5 class="mb-0">URL Intelligence</h5></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        {% for item in url_cards %}
+                        <div class="col-md-6">
+                            <div class="border rounded-3 p-3 h-100">
+                                <div class="small text-uppercase text-muted fw-semibold mb-2">{{ item.label }}</div>
+                                <div class="h4 mb-1">{{ item.value }}</div>
+                                <div class="small text-muted">{{ item.description }}</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white"><h5 class="mb-0">Link Analysis</h5></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        {% for item in link_health_cards %}
+                        <div class="col-md-6">
+                            <div class="border rounded-3 p-3 h-100">
+                                <div class="small text-uppercase text-muted fw-semibold mb-2">{{ item.label }}</div>
+                                <div class="h4 mb-1">{{ item.value }}</div>
+                                <div class="small text-muted">{{ item.description }}</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white"><h5 class="mb-0">Broken Links Table</h5></div>
+        <div class="card-body">
+            {% if broken_links_rows %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Broken URL</th>
+                            <th>Status</th>
+                            <th>Found On</th>
+                            <th>Issue Type</th>
+                            <th>Recommendation</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in broken_links_rows %}
+                        <tr>
+                            <td><a href="{{ row.url }}" target="_blank" rel="noopener noreferrer">{{ row.url }}</a></td>
+                            <td><span class="badge bg-warning-subtle text-warning border border-warning-subtle">{{ row.status }}</span></td>
+                            <td>{{ row.found_on }}</td>
+                            <td>{{ row.issue_type }}</td>
+                            <td>{{ row.recommendation }}</td>
+                            <td><button class="btn btn-sm btn-outline-primary" type="button">Review</button></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-success mb-0">No Broken Links Found</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        {% for chart in chart_sections %}
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white"><h5 class="mb-0">{{ chart.title }}</h5></div>
+                <div class="card-body">
+                    {% if historical_data_available %}
+                    <div class="d-flex flex-column gap-3">
+                        {% for label, value in chart.values %}
+                        <div>
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span>{{ label }}</span>
+                                <span class="fw-semibold">{{ value }}</span>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar bg-primary" role="progressbar" style="width: {% if chart.title == 'Health Breakdown' %}{{ value|floatformat:0 }}{% else %}{{ value|floatformat:0 }}{% endif %}%;"></div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info mb-0">No historical trend available yet.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white"><h5 class="mb-0">Executive Recommendations</h5></div>
+        <div class="card-body">
+            <ol class="mb-0">
+                {% for recommendation in recommendations %}
+                <li class="mb-2">{{ recommendation }}</li>
+                {% endfor %}
+            </ol>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white"><h5 class="mb-0">Issue Inventory</h5></div>
+        <div class="card-body">
+            <ul class="nav nav-tabs mb-3" id="issueTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab">All ({{ result.total_issues }})</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="critical-tab" data-bs-toggle="tab" data-bs-target="#critical" type="button" role="tab">Critical ({{ result.critical_issues }})</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="high-tab" data-bs-toggle="tab" data-bs-target="#high" type="button" role="tab">High ({{ result.high_issues }})</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="medium-tab" data-bs-toggle="tab" data-bs-target="#medium" type="button" role="tab">Medium ({{ result.medium_issues }})</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="low-tab" data-bs-toggle="tab" data-bs-target="#low" type="button" role="tab">Low ({{ result.low_issues }})</button>
+                </li>
+            </ul>
+            <div class="tab-content" id="issueTabsContent">
+                <div class="tab-pane fade show active" id="all" role="tabpanel">
+                    {% include 'seo_analyzer/partials/issue_table.html' with issues=issues %}
+                </div>
+                <div class="tab-pane fade" id="critical" role="tabpanel">
+                    {% include 'seo_analyzer/partials/issue_table.html' with issues=critical_issues %}
+                </div>
+                <div class="tab-pane fade" id="high" role="tabpanel">
+                    {% include 'seo_analyzer/partials/issue_table.html' with issues=high_issues %}
+                </div>
+                <div class="tab-pane fade" id="medium" role="tabpanel">
+                    {% include 'seo_analyzer/partials/issue_table.html' with issues=medium_issues %}
+                </div>
+                <div class="tab-pane fade" id="low" role="tabpanel">
+                    {% include 'seo_analyzer/partials/issue_table.html' with issues=low_issues %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-muted small border-top pt-3 text-center">Export and sharing actions remain available from the toolbar above.</div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+
+{% block title %}AI Chatbot - OnWebApp{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background-color: var(--bg-body);
+        color: var(--text-primary);
+    }
+    .chat-container {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    .message {
+        margin-bottom: 1rem;
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+    }
+    .user-message {
+        background-color: var(--primary-color);
+        color: white;
+        margin-left: 2rem;
+    }
+    .bot-message {
+        background-color: var(--bg-surface-secondary);
+        color: var(--text-primary);
+        margin-right: 2rem;
+        border: 1px solid var(--border-color);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="display-5 fw-bold text-heading mb-3">AI Chat Assistant</h1>
+        <p class="lead text-muted">Get instant answers to your questions about our services</p>
+    </div>
+
+    <div class="card shadow-lg border-0" style="background-color: var(--bg-surface); border: 1px solid var(--border-color) !important;">
+        <div class="card-body p-4">
+            <!-- Chat Interface -->
+            <div class="chat-container mb-4 p-3 rounded" style="background-color: var(--bg-surface-secondary); border: 1px solid var(--border-color);">
+                <div class="message bot-message">
+                    <strong>OnWebApp Bot:</strong> Hello! I'm here to help you with information about our web development services. What would you like to know?
+                </div>
+                
+                <!-- Example conversation -->
+                <div class="message user-message">
+                    <strong>You:</strong> What services do you offer?
+                </div>
+                <div class="message bot-message">
+                    <strong>OnWebApp Bot:</strong> We offer industrial automation monitoring, competitor tracking, and custom web development solutions. Would you like details about any specific service?
+                </div>
+            </div>
+
+            <!-- Input Form -->
+            <form id="chatbot-form" class="d-flex gap-2">
+                <input 
+                    id="chatbot-message-input"
+                    type="text" 
+                    placeholder="Type your message here..."
+                    class="form-control"
+                    style="background-color: var(--bg-surface); color: var(--text-primary); border-color: var(--border-color);"
+                >
+                <button 
+                    type="submit"
+                    class="btn btn-primary px-4"
+                >
+                    <i class="fas fa-paper-plane me-2"></i> Send
+                </button>
+            </form>
+
+            <!-- Quick Actions -->
+            <div class="mt-4 quick-actions">
+                <h3 class="h5 fw-semibold text-heading mb-3">Quick Questions</h3>
+                <div class="row g-2">
+                    <div class="col-6 col-md-3">
+                        <button class="btn btn-outline-secondary w-100 text-start text-truncate" style="border-color: var(--border-color); color: var(--text-secondary);">
+                            What is industrial automation?
+                        </button>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <button class="btn btn-outline-secondary w-100 text-start text-truncate" style="border-color: var(--border-color); color: var(--text-secondary);">
+                            How does competitor tracking work?
+                        </button>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <button class="btn btn-outline-secondary w-100 text-start text-truncate" style="border-color: var(--border-color); color: var(--text-secondary);">
+                            Pricing information
+                        </button>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <button class="btn btn-outline-secondary w-100 text-start text-truncate" style="border-color: var(--border-color); color: var(--text-secondary);">
+                            Contact support
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Enhanced chat functionality with context-aware suggestions
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('chatbot-form');
+        const input = document.getElementById('chatbot-message-input');
+        const chatContainer = document.querySelector('.chat-container');
+        const quickActions = document.querySelector('.quick-actions');
+        
+        // Function to get context-aware suggestions
+        async function getBotResponse(message) {
+            try {
+                const response = await fetch('/chatbot/suggestions/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({ message: message })
+                });
+                
+                if (response.ok) {
+                    return await response.json();
+                }
+            } catch (error) {
+                console.error('Error fetching bot response:', error);
+            }
+            return { reply: 'Sorry, something went wrong.', suggestions: [] };
+        }
+        
+        // Function to display suggestions
+        function displaySuggestions(suggestions) {
+            if (suggestions && suggestions.length > 0) {
+                // Clear existing quick actions
+                quickActions.innerHTML = '<h3 class="h5 fw-semibold text-heading mb-3">Suggested Actions</h3>';
+                
+                const row = document.createElement('div');
+                row.className = 'row g-2';
+                
+                suggestions.forEach(suggestion => {
+                    const col = document.createElement('div');
+                    col.className = 'col-6 col-md-3';
+
+                    const button = document.createElement('button');
+                    button.className = 'btn btn-outline-primary w-100 text-start text-truncate btn-sm';
+                    button.innerHTML = suggestion.title;
+                    button.onclick = () => {
+                        handleUserAction(suggestion.title, suggestion.content);
+                    };
+                    col.appendChild(button);
+                    row.appendChild(col);
+                });
+                
+                quickActions.appendChild(row);
+            }
+        }
+        
+        // Helper to handle user action
+        async function handleUserAction(messageText, directResponseContent = null) {
+            // Add user message
+            const userMessage = document.createElement('div');
+            userMessage.className = 'message user-message';
+            userMessage.innerHTML = `<strong>You:</strong> ${messageText}`;
+            chatContainer.appendChild(userMessage);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            if (directResponseContent) {
+                 // If we already have the content (from suggestion), display it immediately
+                 const botMessage = document.createElement('div');
+                 botMessage.className = 'message bot-message';
+                 botMessage.innerHTML = `<strong>OnWebApp Bot:</strong> ${directResponseContent}`;
+                 chatContainer.appendChild(botMessage);
+                 chatContainer.scrollTop = chatContainer.scrollHeight;
+                 return;
+            }
+
+            // Show typing indicator
+            const typingIndicator = document.createElement('div');
+            typingIndicator.className = 'message bot-message text-muted fst-italic';
+            typingIndicator.id = 'typing-indicator';
+            typingIndicator.innerHTML = '<small>Typing...</small>';
+            chatContainer.appendChild(typingIndicator);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            
+            // Get bot response from server
+            const data = await getBotResponse(messageText);
+            
+            // Remove typing indicator
+            const typingEl = document.getElementById('typing-indicator');
+            if (typingEl) typingEl.remove();
+            
+            // Display Bot Reply
+            const botMessage = document.createElement('div');
+            botMessage.className = 'message bot-message';
+            botMessage.innerHTML = `<strong>OnWebApp Bot:</strong> ${data.reply || 'I am not sure how to help with that.'}`;
+            chatContainer.appendChild(botMessage);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            // Display Suggestions
+            displaySuggestions(data.suggestions);
+        }
+        
+        // CSRF token helper function
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const message = input.value.trim();
+            if (message) {
+                input.value = '';
+                await handleUserAction(message);
+            }
+        });
+        
+        // Initialize static quick action buttons
+        if (quickActions) {
+            const staticButtons = quickActions.querySelectorAll('button');
+            staticButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    handleUserAction(btn.innerText.trim());
+                });
+            });
+        }
+    });
+    </script>
+{% endblock %}

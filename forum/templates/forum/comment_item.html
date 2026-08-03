@@ -1,0 +1,52 @@
+{% load forum_tags %}
+<div class="forum-card p-3 mb-2 {% if comment.is_solution %}border-success border-2{% endif %}" id="comment-{{ comment.pk }}" style="margin-left:{{ comment|indent_level }}px;">
+    <div class="d-flex align-items-start gap-2">
+        <div class="text-center flex-shrink-0" style="width:40px;">
+            <button class="forum-vote-btn comment-vote-btn" data-comment-id="{{ comment.pk }}" data-vote="upvote" title="Upvote"><i class="fas fa-arrow-up"></i></button>
+            <div class="fw-700 small" id="comment-score-{{ comment.pk }}">{{ comment.upvotes|add:comment.downvotes|yesno:"1,0" }}</div>
+        </div>
+        <div class="flex-grow-1 min-w-0">
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <a href="{% url 'forum:user_profile' comment.author.username %}" class="fw-600 small text-body text-decoration-none">
+                    <img src="{{ comment.author|user_avatar }}" class="rounded-circle me-1" width="18" height="18" alt="">
+                    {{ comment.author.username }}
+                </a>
+                <span class="text-secondary" style="font-size:0.7rem;">{{ comment.created_at|timesince }} ago</span>
+                {% if comment.is_solution %}
+                <span class="badge bg-success bg-opacity-10 text-success small"><i class="fas fa-check-circle me-1"></i>Solution</span>
+                {% endif %}
+            </div>
+            <div class="small mb-2">{{ comment.content|linebreaks }}</div>
+            <div class="d-flex align-items-center gap-2">
+                <button class="forum-vote-btn comment-vote-btn small" data-comment-id="{{ comment.pk }}" data-vote="downvote" title="Downvote"><i class="fas fa-arrow-down"></i></button>
+                {% if user.is_authenticated %}
+                <button class="btn btn-sm btn-link text-secondary text-decoration-none p-0 small reply-toggle" data-comment-id="{{ comment.pk }}">Reply</button>
+                {% if user == post.author or perm.is_moderator %}
+                <button class="btn btn-sm btn-link text-decoration-none p-0 small text-success solution-btn" data-comment-id="{{ comment.pk }}">
+                    {% if comment.is_solution %}<i class="fas fa-check-circle me-1"></i>Solution{% else %}<i class="far fa-check-circle me-1"></i>Mark Solution{% endif %}
+                </button>
+                {% endif %}
+                {% endif %}
+            </div>
+            <!-- Reply form -->
+            {% if user.is_authenticated and not post.is_locked %}
+            <div class="d-none mt-2" id="reply-form-{{ comment.pk }}">
+                <form method="post" action="{% url 'forum:comment_create' post.slug %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="parent_id" value="{{ comment.pk }}">
+                    <textarea name="content" class="wizard-input" rows="2" placeholder="Write a reply..." required></textarea>
+                    <div class="mt-1">
+                        <button type="submit" class="btn btn-primary btn-sm rounded-pill">Reply</button>
+                        <button type="button" class="btn btn-sm btn-link text-secondary text-decoration-none reply-cancel" data-comment-id="{{ comment.pk }}">Cancel</button>
+                    </div>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% for reply in comment.replies.all %}
+{% if reply.is_active %}
+{% include "forum/comment_item.html" with comment=reply %}
+{% endif %}
+{% endfor %}

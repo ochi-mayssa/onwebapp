@@ -1,0 +1,104 @@
+{% extends "community/wizard/base_wizard.html" %}
+{% load static i18n %}
+
+{% block wizard_content %}
+<div class="wizard-card">
+    <div class="wizard-section-label mb-1">Step 12 of 13</div>
+    <h2 class="mb-2">Secure Payment</h2>
+    <p class="lead mb-4">Complete your payment to start building.</p>
+
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="card rounded-3 border-0 mb-4" style="background:var(--bg-surface-secondary,#f8fafc);">
+                <div class="card-body p-4">
+                    <h6 class="fw-700 mb-3"><i class="fas fa-credit-card me-2 text-primary"></i>Payment Method</h6>
+
+                    <form method="post" id="paymentForm">
+                        {% csrf_token %}
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-12">
+                                <label class="form-label fw-600 small">Cardholder Name</label>
+                                <input type="text" name="card_name" class="wizard-input" placeholder="John Doe" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-600 small">Card Number</label>
+                                <input type="text" name="card_number" class="wizard-input" placeholder="4242 4242 4242 4242" maxlength="19" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-600 small">Expiry</label>
+                                <input type="text" name="card_expiry" class="wizard-input" placeholder="MM/YY" maxlength="5" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-600 small">CVC</label>
+                                <input type="text" name="card_cvc" class="wizard-input" placeholder="123" maxlength="4" required>
+                            </div>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="savePayment" name="save_payment" checked>
+                            <label class="form-check-label small" for="savePayment">Save payment method for future invoices</label>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card rounded-3 border-0" style="background:var(--bg-surface-secondary,#f8fafc);">
+                <div class="card-body p-4">
+                    <h6 class="fw-700 mb-3"><i class="fas fa-receipt me-2 text-primary"></i>Order Summary</h6>
+
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between small mb-1">
+                            <span class="text-secondary">Package</span>
+                            <span class="fw-600">{{ session.get_package_display|default:"—" }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between small mb-1">
+                            <span class="text-secondary">Services</span>
+                            <span class="fw-600">${{ services_cost|default:"0" }}</span>
+                        </div>
+                        {% for addon in session.get_addons_list %}
+                        <div class="d-flex justify-content-between small mb-1">
+                            <span class="text-secondary">+ {{ addon }}</span>
+                            <span class="fw-600">${{ addon_cost|default:"0" }}</span>
+                        </div>
+                        {% endfor %}
+                        <hr>
+                        <div class="d-flex justify-content-between fw-800">
+                            <span>Due Today</span>
+                            <span class="text-primary">${{ total_due|default:"—" }}</span>
+                        </div>
+                        <div class="text-secondary small mt-1">
+                            {{ payment_schedule|default:"50% upfront, 50% on completion" }}
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2 text-success small mb-3">
+                        <i class="fas fa-shield-halved"></i>
+                        <span>256-bit SSL encrypted. Powered by Stripe.</span>
+                    </div>
+
+                    <button type="submit" class="btn-wizard-next w-100 py-3" onclick="document.getElementById('paymentForm').submit();">
+                        <i class="fas fa-lock me-2"></i>Pay ${{ total_due|default:"—" }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block wizard_js %}
+<script>
+document.querySelector('[name="card_number"]')?.addEventListener('input', function(e) {
+    let v = e.target.value.replace(/\D/g, '').substring(0, 16);
+    e.target.value = v.replace(/(.{4})/g, '$1 ').trim();
+});
+document.querySelector('[name="card_expiry"]')?.addEventListener('input', function(e) {
+    let v = e.target.value.replace(/\D/g, '').substring(0, 4);
+    if(v.length > 2) v = v.substring(0,2) + '/' + v.substring(2);
+    e.target.value = v;
+});
+</script>
+{% endblock %}

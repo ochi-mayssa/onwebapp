@@ -1,0 +1,11 @@
+{% load humanize %}
+<div class="card h-100 shadow-sm border-{{ color }}">
+    <div class="card-body text-center d-flex flex-column justify-content-center">
+        {% with rounded_score=score|floatformat:0 %}
+        <div class="display-4 mb-2 {% if rounded_score >= 90 %}text-success{% elif rounded_score >= 70 %}text-warning{% elif rounded_score >= 50 %}text-orange{% else %}text-danger{% endif %}">
+            {{ rounded_score }}
+        </div>
+        {% endwith %}
+        <h6 class="text-muted mb-0">{{ label }}</h6>
+    </div>
+</div>

@@ -1,0 +1,192 @@
+{% extends 'branding/base.html' %}
+{% load branding_extras %}
+
+{% block title %}Dashboard | Branding Studio{% endblock %}
+
+{% block branding_content %}
+<div class="dashboard-page">
+    <div class="container py-4 py-lg-5">
+
+        <!-- Header -->
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+            <div>
+                <h1 class="fw-800 mb-1">Dashboard</h1>
+                <p class="text-muted mb-0">Track and manage your branding projects.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{% url 'branding:wizard' %}" class="btn btn-brand-primary"><i class="fa-solid fa-plus me-2"></i>New Request</a>
+            </div>
+        </div>
+
+        <!-- Stat cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-md-4 col-lg-3">
+                <a href="{% url 'branding:my_requests' %}" class="stat-card text-decoration-none {% if not current_status %}is-active{% endif %}">
+                    <div class="stat-card-icon stat-metric-1"><i class="fa-solid fa-layer-group"></i></div>
+                    <div class="stat-card-value">{{ total_count }}</div>
+                    <div class="stat-card-label">All Requests</div>
+                </a>
+            </div>
+            {% for code, label, icon in card_statuses %}
+            {% with cnt=status_counts|get_item:code %}
+            {% if cnt %}
+            <div class="col-6 col-md-4 col-lg-3">
+                <a href="{% url 'branding:my_requests' %}?status={{ code }}" class="stat-card text-decoration-none {% if current_status == code %}is-active{% endif %}">
+                    <div class="stat-card-icon stat-{{ forloop.counter }}"><i class="fa-solid fa-{{ icon }}"></i></div>
+                    <div class="stat-card-value">{{ cnt }}</div>
+                    <div class="stat-card-label">{{ label }}</div>
+                </a>
+            </div>
+            {% endif %}
+            {% endwith %}
+            {% endfor %}
+        </div>
+
+        <!-- Filter bar -->
+        <div class="dashboard-toolbar rounded-4 mb-4">
+            <form method="get" class="row g-2 align-items-end">
+                <div class="col-12 col-md-4">
+                    <label class="filter-label">Status</label>
+                    <select name="status" class="form-select">
+                        <option value="">All statuses</option>
+                        {% for code, label in status_choices %}
+                        <option value="{{ code }}" {% if current_status == code %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-6 col-md-3">
+                    <label class="filter-label">From</label>
+                    <input type="date" name="date_from" value="{{ date_from }}" class="form-control">
+                </div>
+                <div class="col-6 col-md-3">
+                    <label class="filter-label">To</label>
+                    <input type="date" name="date_to" value="{{ date_to }}" class="form-control">
+                </div>
+                <div class="col-12 col-md-auto d-flex gap-2">
+                    <button class="btn btn-brand-primary flex-fill" type="submit"><i class="fa-solid fa-filter me-2"></i>Apply</button>
+                    {% if current_status or date_from or date_to %}
+                    <a href="{% url 'branding:my_requests' %}" class="btn btn-back"><i class="fa-solid fa-xmark me-1"></i>Clear</a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+
+        <!-- Request cards grid -->
+        {% if requests %}
+        <div class="row g-4">
+            {% for r in requests %}
+            <div class="col-md-6 col-lg-4">
+                <div class="detail-card rounded-4 p-0 h-100 d-flex flex-column overflow-hidden">
+                    <!-- Card header with collection preview -->
+                    <div class="position-relative" style="min-height: 140px;">
+                        {% if r.collection and r.collection.preview_image %}
+                        <img src="{{ r.collection.preview_image.url }}" alt="" class="w-100 h-100" style="object-fit: cover; min-height: 140px;">
+                        {% else %}
+                        <div class="w-100 h-100 d-flex align-items-center justify-content-center" style="min-height: 140px; background: linear-gradient(135deg, var(--bs-primary, #6366f1)22, var(--bs-primary, #6366f1)08);">
+                            <span class="display-6 fw-800 text-primary opacity-25">{{ r.company_name|slice:":2"|upper }}</span>
+                        </div>
+                        {% endif %}
+                        <span class="status-pill status-{{ r.status|lower }}" style="position: absolute; top: 0.75rem; left: 0.75rem;">{{ r.get_status_display }}</span>
+                        {% if r.unread_count %}
+                        <span class="notification-badge" style="position: absolute; top: 0.75rem; right: 0.75rem;">{{ r.unread_count }} new</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Card body -->
+                    <div class="p-3 flex-grow-1 d-flex flex-column">
+                        <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
+                            <div>
+                                <span class="fw-800 text-primary x-small">{{ r.request_number }}</span>
+                                <h5 class="fw-800 mb-0 mt-1">{{ r.company_name }}</h5>
+                            </div>
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-2 mb-3 small text-muted">
+                            <span><i class="fa-solid fa-industry me-1"></i>{{ r.get_industry_display }}</span>
+                            {% if r.collection %}
+                            <span><i class="fa-solid fa-folder-open me-1"></i>{{ r.collection.name|truncatechars:20 }}</span>
+                            {% endif %}
+                        </div>
+
+                        {% if user.is_staff and r.designer %}
+                        <div class="d-flex align-items-center gap-2 mb-2 small">
+                            <span class="message-avatar message-avatar-sm message-avatar-staff">{{ r.designer.username|slice:":1"|upper }}</span>
+                            <span class="text-muted">Designer: <strong>{{ r.designer.get_full_name|default:r.designer.username }}</strong></span>
+                        </div>
+                        {% endif %}
+
+                        <div class="d-flex align-items-center justify-content-between mt-auto pt-2 border-top">
+                            <span class="x-small text-muted"><i class="fa-regular fa-calendar me-1"></i>{{ r.created_at|date:"M j, Y" }}</span>
+                            {% if r.msg_count %}
+                            <span class="x-small text-muted"><i class="fa-regular fa-comment me-1"></i>{{ r.msg_count }}</span>
+                            {% endif %}
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="d-flex gap-2 mt-3">
+                            <a href="{% url 'branding:client_project_progress' r.pk %}" class="btn btn-brand-primary btn-sm flex-fill">
+                                <i class="fa-solid fa-eye me-1"></i>View
+                            </a>
+                            <a href="{% url 'branding:client_messages' r.pk %}" class="btn btn-back btn-sm" title="Messages">
+                                <i class="fa-regular fa-comment"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if requests.has_other_pages %}
+        <nav class="mt-4">
+            <ul class="pagination pagination-sm justify-content-center mb-0">
+                {% if requests.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page={{ requests.previous_page_number }}{% for k, v in request.GET.items %}{% if k != 'page' %}&amp;{{ k }}={{ v }}{% endif %}{% endfor %}"><i class="fa-solid fa-chevron-left"></i></a></li>
+                {% endif %}
+                {% for num in requests.paginator.page_range %}
+                {% if requests.number == num %}
+                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                {% elif num > requests.number|add:'-3' and num < requests.number|add:'3' %}
+                <li class="page-item"><a class="page-link" href="?page={{ num }}{% for k, v in request.GET.items %}{% if k != 'page' %}&amp;{{ k }}={{ v }}{% endif %}{% endfor %}">{{ num }}</a></li>
+                {% endif %}
+                {% endfor %}
+                {% if requests.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ requests.next_page_number }}{% for k, v in request.GET.items %}{% if k != 'page' %}&amp;{{ k }}={{ v }}{% endif %}{% endfor %}"><i class="fa-solid fa-chevron-right"></i></a></li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+
+        {% else %}
+        <!-- Empty state -->
+        <div class="empty-state p-5 text-center">
+            <div class="empty-state-icon"><i class="fa-regular fa-folder-open"></i></div>
+            <h5 class="fw-800 mt-3">
+                {% if current_status or date_from or date_to %}
+                No requests match your filters
+                {% else %}
+                No branding requests yet
+                {% endif %}
+            </h5>
+            <p class="text-muted mx-auto" style="max-width: 420px;">
+                {% if current_status or date_from or date_to %}
+                Try adjusting your filters or clear them to see all requests.
+                {% else %}
+                Start your first branding project and our team will craft a brand your customers will never forget.
+                {% endif %}
+            </p>
+            <div class="d-flex gap-2 justify-content-center mt-3">
+                {% if current_status or date_from or date_to %}
+                <a href="{% url 'branding:my_requests' %}" class="btn btn-back"><i class="fa-solid fa-xmark me-1"></i>Clear Filters</a>
+                {% endif %}
+                <a href="{% url 'branding:wizard' %}" class="btn btn-brand-primary px-4">
+                    <i class="fa-solid fa-wand-magic-sparkles me-2"></i>Start a Project
+                </a>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

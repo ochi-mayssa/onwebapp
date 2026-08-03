@@ -1,0 +1,449 @@
+{% extends 'branding/base.html' %}
+{% load branding_extras %}
+
+{% block branding_content %}
+<div class="container py-4">
+
+    {# ── Header ── #}
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+        <div>
+            <h1 class="h4 fw-bold mb-1"><i class="fa-solid fa-palette me-2"></i>My Dashboard</h1>
+            <p class="text-muted mb-0 small">Welcome back, {{ user.get_full_name|default:user.username }}</p>
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+            <a href="{% url 'branding:designer_time_tracking' %}" class="btn btn-sm btn-outline-success">
+                <i class="fa-solid fa-stopwatch me-1"></i>Timer
+            </a>
+            <a href="{% url 'branding:designer_resources' %}" class="btn btn-sm btn-outline-info">
+                <i class="fa-solid fa-book me-1"></i>Resources
+            </a>
+            <a href="{% url 'branding:designer_templates' %}" class="btn btn-sm btn-outline-secondary">
+                <i class="fa-solid fa-file-lines me-1"></i>Templates
+            </a>
+        </div>
+    </div>
+
+    {# ── Metrics Cards ── #}
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="designer-metric-card">
+                <div class="d-icon d-active"><i class="fa-solid fa-layer-group"></i></div>
+                <div class="d-value">{{ active_count }}</div>
+                <div class="d-label">Active Projects</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="designer-metric-card">
+                <div class="d-icon d-today"><i class="fa-solid fa-calendar-check"></i></div>
+                <div class="d-value">{{ today_deadline_count }}</div>
+                <div class="d-label">Due Today</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="designer-metric-card {% if overdue_count > 0 %}d-alert{% endif %}">
+                <div class="d-icon d-overdue"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                <div class="d-value">{{ overdue_count }}</div>
+                <div class="d-label">Overdue</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="designer-metric-card">
+                <div class="d-icon d-feedback"><i class="fa-solid fa-clock"></i></div>
+                <div class="d-value">{{ waiting_feedback_count }}</div>
+                <div class="d-label">Awaiting Feedback</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="designer-metric-card">
+                <div class="d-icon d-avg"><i class="fa-solid fa-stopwatch"></i></div>
+                <div class="d-value">{% if avg_days %}{{ avg_days }}d{% else %}—{% endif %}</div>
+                <div class="d-label">Avg Completion</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="designer-metric-card">
+                <div class="d-icon d-next"><i class="fa-solid fa-arrow-right"></i></div>
+                <div class="d-value">{% if days_to_next is not None %}{{ days_to_next }}d{% else %}—{% endif %}</div>
+                <div class="d-label">Next Deadline</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+
+        {# ── Left Column: Projects ── #}
+        <div class="col-lg-8">
+
+            {# ── Today's Priority ── #}
+            {% if priority_projects %}
+            <div class="designer-section mb-4">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h6 class="fw-bold mb-0"><i class="fa-solid fa-bolt me-1 text-warning"></i>Today's Priority</h6>
+                    <span class="text-muted small">{{ priority_projects|length }} project{{ priority_projects|length|pluralize }}</span>
+                </div>
+                <div class="row g-2">
+                    {% for r in priority_projects|slice:":4" %}
+                    <div class="col-md-6">
+                        <div class="designer-priority-card {% if r.estimated_delivery_date and r.estimated_delivery_date < today %}dp-overdue{% elif r.estimated_delivery_date and r.estimated_delivery_date == today %}dp-today{% endif %}">
+                            <div class="d-flex align-items-start justify-content-between mb-2">
+                                <div>
+                                    <a href="{% url 'branding:request_detail' r.pk %}" class="fw-bold text-decoration-none small">{{ r.request_number }}</a>
+                                    <div class="text-muted x-small">{{ r.company_name|truncatechars:25 }}</div>
+                                </div>
+                                <span class="priority-badge priority-{{ r.priority|lower }}">{{ r.priority }}</span>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between">
+                                <span class="status-pill status-{{ r.status|lower }}">{{ r.get_status_display }}</span>
+                                {% if r.estimated_delivery_date %}
+                                <span class="x-small {% if r.estimated_delivery_date < today %}text-danger fw-bold{% elif r.estimated_delivery_date == today %}text-warning fw-bold{% else %}text-muted{% endif %}">
+                                    {% if r.estimated_delivery_date < today %}Overdue{% elif r.estimated_delivery_date == today %}Due today{% else %}{{ r.estimated_delivery_date|timeuntil }} left{% endif %}
+                                </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {# ── Project Tabs ── #}
+            <div class="designer-section">
+                <ul class="nav supervisor-tabs mb-3" role="tablist">
+                    <li class="nav-item">
+                        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-active" type="button">
+                            <i class="fa-solid fa-spinner me-1"></i>Active
+                            <span class="badge bg-primary ms-1">{{ active_projects|length }}</span>
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-feedback" type="button">
+                            <i class="fa-solid fa-clock me-1"></i>Feedback
+                            <span class="badge bg-warning text-dark ms-1">{{ waiting_projects|length }}</span>
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-completed" type="button">
+                            <i class="fa-solid fa-circle-check me-1"></i>Completed
+                            <span class="badge bg-success ms-1">{{ completed_total }}</span>
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-upcoming" type="button">
+                            <i class="fa-solid fa-hourglass-half me-1"></i>Upcoming
+                            <span class="badge bg-secondary ms-1">{{ upcoming_projects|length }}</span>
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content">
+
+                    {# ── Active Tab ── #}
+                    <div class="tab-pane fade show active" id="tab-active">
+                        {% if active_projects %}
+                        {% for r in active_projects %}
+                        <div class="designer-project-card mb-2">
+                            <div class="row align-items-center g-3">
+                                <div class="col-auto">
+                                    {% if r.collection and r.collection.preview_image %}
+                                    <img src="{{ r.collection.preview_image.url }}" alt="" class="designer-collection-thumb">
+                                    {% else %}
+                                    <div class="designer-collection-thumb placeholder">
+                                        <i class="fa-solid fa-palette"></i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col">
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <a href="{% url 'branding:request_detail' r.pk %}" class="fw-bold text-decoration-none">{{ r.request_number }}</a>
+                                        <span class="status-pill status-{{ r.status|lower }}">{{ r.get_status_display }}</span>
+                                        <span class="priority-badge priority-{{ r.priority|lower }}">{{ r.priority }}</span>
+                                    </div>
+                                    <div class="text-muted small">{{ r.company_name|truncatechars:40 }}</div>
+                                    <div class="text-muted x-small mt-1">
+                                        Client: {{ r.user.get_full_name|default:r.user.username }}
+                                        {% if r.estimated_delivery_date %}
+                                        · Due {{ r.estimated_delivery_date|date:"M j" }}
+                                        <span class="{% if r.estimated_delivery_date < today %}text-danger fw-bold{% elif r.estimated_delivery_date == today %}text-warning fw-bold{% endif %}">
+                                            ({% if r.estimated_delivery_date < today %}Overdue{% elif r.estimated_delivery_date == today %}Today{% else %}{{ r.estimated_delivery_date|timeuntil }}{% endif %})
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="d-flex gap-1 flex-wrap justify-content-end">
+                                        {% if r.status == 'ASSIGNED' %}
+                                        <form method="post" action="{% url 'branding:designer_dashboard' %}" class="d-inline">{% csrf_token %}
+                                            <input type="hidden" name="action" value="start_working">
+                                            <input type="hidden" name="request_pk" value="{{ r.pk }}">
+                                            <button type="submit" class="btn btn-sm btn-primary" title="Start Working">
+                                                <i class="fa-solid fa-play me-1"></i>Start
+                                            </button>
+                                        </form>
+                                        {% endif %}
+                                        {% if r.status == 'DESIGNING' or r.status == 'REVISION' %}
+                                        <form method="post" action="{% url 'branding:designer_dashboard' %}" class="d-inline">{% csrf_token %}
+                                            <input type="hidden" name="action" value="update_status">
+                                            <input type="hidden" name="request_pk" value="{{ r.pk }}">
+                                            <input type="hidden" name="new_status" value="WAITING_CLIENT">
+                                            <button type="submit" class="btn btn-sm btn-outline-primary" title="Request Feedback">
+                                                <i class="fa-solid fa-paper-plane me-1"></i>Request Feedback
+                                            </button>
+                                        </form>
+                                        <form method="post" action="{% url 'branding:designer_dashboard' %}" class="d-inline">{% csrf_token %}
+                                            <input type="hidden" name="action" value="mark_complete">
+                                            <input type="hidden" name="request_pk" value="{{ r.pk }}">
+                                            <button type="submit" class="btn btn-sm btn-outline-success" title="Mark Complete">
+                                                <i class="fa-solid fa-check me-1"></i>Complete
+                                            </button>
+                                        </form>
+                                        {% endif %}
+                                        <a href="{% url 'branding:request_detail' r.pk %}" class="btn btn-sm btn-outline-secondary" title="View Details">
+                                            <i class="fa-solid fa-arrow-right"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <div class="text-center text-muted py-5">
+                            <i class="fa-solid fa-inbox fa-2x mb-2 d-block"></i>No active projects. Great work!
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    {# ── Waiting Feedback Tab ── #}
+                    <div class="tab-pane fade" id="tab-feedback">
+                        {% if waiting_projects %}
+                        {% for r in waiting_projects %}
+                        <div class="designer-project-card mb-2">
+                            <div class="row align-items-center g-3">
+                                <div class="col-auto">
+                                    {% if r.collection and r.collection.preview_image %}
+                                    <img src="{{ r.collection.preview_image.url }}" alt="" class="designer-collection-thumb">
+                                    {% else %}
+                                    <div class="designer-collection-thumb placeholder">
+                                        <i class="fa-solid fa-palette"></i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col">
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <a href="{% url 'branding:request_detail' r.pk %}" class="fw-bold text-decoration-none">{{ r.request_number }}</a>
+                                        <span class="status-pill status-waiting_client">Waiting Client</span>
+                                    </div>
+                                    <div class="text-muted small">{{ r.company_name|truncatechars:40 }}</div>
+                                    <div class="text-muted x-small mt-1">Sent to client for review</div>
+                                </div>
+                                <div class="col-auto">
+                                    <a href="{% url 'branding:request_detail' r.pk %}" class="btn btn-sm btn-outline-secondary">
+                                        <i class="fa-solid fa-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <div class="text-center text-muted py-5">
+                            <i class="fa-solid fa-inbox fa-2x mb-2 d-block"></i>No projects awaiting feedback.
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    {# ── Completed Tab ── #}
+                    <div class="tab-pane fade" id="tab-completed">
+                        {% if completed_projects %}
+                        {% for r in completed_projects %}
+                        <div class="designer-project-card mb-2 dp-completed">
+                            <div class="row align-items-center g-3">
+                                <div class="col-auto">
+                                    {% if r.collection and r.collection.preview_image %}
+                                    <img src="{{ r.collection.preview_image.url }}" alt="" class="designer-collection-thumb">
+                                    {% else %}
+                                    <div class="designer-collection-thumb placeholder">
+                                        <i class="fa-solid fa-palette"></i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col">
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <a href="{% url 'branding:request_detail' r.pk %}" class="fw-bold text-decoration-none">{{ r.request_number }}</a>
+                                        <span class="status-pill status-completed">Completed</span>
+                                    </div>
+                                    <div class="text-muted small">{{ r.company_name|truncatechars:40 }}</div>
+                                    <div class="text-muted x-small mt-1">
+                                        Completed {{ r.completed_at|date:"M j, Y" }}
+                                        {% if r.completion_time_display %} · {{ r.completion_time_display }}{% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <a href="{% url 'branding:request_detail' r.pk %}" class="btn btn-sm btn-outline-secondary">
+                                        <i class="fa-solid fa-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <div class="text-center text-muted py-5">
+                            <i class="fa-solid fa-inbox fa-2x mb-2 d-block"></i>No completed projects yet.
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    {# ── Upcoming Tab ── #}
+                    <div class="tab-pane fade" id="tab-upcoming">
+                        {% if upcoming_projects %}
+                        {% for r in upcoming_projects %}
+                        <div class="designer-project-card mb-2">
+                            <div class="row align-items-center g-3">
+                                <div class="col-auto">
+                                    {% if r.collection and r.collection.preview_image %}
+                                    <img src="{{ r.collection.preview_image.url }}" alt="" class="designer-collection-thumb">
+                                    {% else %}
+                                    <div class="designer-collection-thumb placeholder">
+                                        <i class="fa-solid fa-palette"></i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col">
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <a href="{% url 'branding:request_detail' r.pk %}" class="fw-bold text-decoration-none">{{ r.request_number }}</a>
+                                        <span class="status-pill status-{{ r.status|lower }}">{{ r.get_status_display }}</span>
+                                        <span class="priority-badge priority-{{ r.priority|lower }}">{{ r.priority }}</span>
+                                    </div>
+                                    <div class="text-muted small">{{ r.company_name|truncatechars:40 }}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <a href="{% url 'branding:request_detail' r.pk %}" class="btn btn-sm btn-outline-secondary">
+                                        <i class="fa-solid fa-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <div class="text-center text-muted py-5">
+                            <i class="fa-solid fa-inbox fa-2x mb-2 d-block"></i>No upcoming projects.
+                        </div>
+                        {% endif %}
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        {# ── Right Column: Sidebar ── #}
+        <div class="col-lg-4">
+
+            {# ── Weekly Calendar ── #}
+            <div class="designer-section mb-4">
+                <h6 class="fw-bold mb-3"><i class="fa-solid fa-calendar me-1"></i>Deadlines</h6>
+                <div class="designer-calendar">
+                    {% for day in calendar_days %}
+                    <div class="dc-day {% if day.is_today %}dc-today{% endif %} {% if day.is_weekend %}dc-weekend{% endif %} {% if day.count > 0 %}dc-has-deadline{% endif %}">
+                        <div class="dc-date">{{ day.date|date:"D" }}</div>
+                        <div class="dc-num">{{ day.date|date:"j" }}</div>
+                        {% if day.count > 0 %}
+                        <div class="dc-count">{{ day.count }}</div>
+                        {% for p in day.projects|slice:":2" %}
+                        <div class="dc-project">
+                            <a href="{% url 'branding:request_detail' p.pk %}" class="text-decoration-none">{{ p.request_number }}</a>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            {# ── Workload Distribution ── #}
+            <div class="designer-section mb-4">
+                <h6 class="fw-bold mb-3"><i class="fa-solid fa-chart-bar me-1"></i>Workload</h6>
+                <div class="designer-workload-bars">
+                    {% for day_name, count in workload_by_day.items %}
+                    <div class="dw-row">
+                        <span class="dw-day">{{ day_name }}</span>
+                        <div class="dw-bar-track">
+                            <div class="dw-bar-fill" style="width: {% widthratio count 5 100 %}%;"></div>
+                        </div>
+                        <span class="dw-count">{{ count }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            {# ── Quick Tools ── #}
+            <div class="designer-section mb-4">
+                <h6 class="fw-bold mb-3"><i class="fa-solid fa-toolbox me-1"></i>Quick Tools</h6>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'branding:designer_time_tracking' %}" class="d-flex align-items-center gap-2 text-decoration-none" style="color: #22c55e;">
+                        <i class="fa-solid fa-stopwatch"></i>
+                        <span class="small">Time Tracking</span>
+                    </a>
+                    <a href="{% url 'branding:designer_resources' %}" class="d-flex align-items-center gap-2 text-decoration-none" style="color: #06b6d4;">
+                        <i class="fa-solid fa-book"></i>
+                        <span class="small">Resource Library</span>
+                    </a>
+                    <a href="{% url 'branding:designer_templates' %}" class="d-flex align-items-center gap-2 text-decoration-none" style="color: #f59e0b;">
+                        <i class="fa-solid fa-file-lines"></i>
+                        <span class="small">Templates</span>
+                    </a>
+                    <a href="{% url 'branding:knowledge_base' %}" class="d-flex align-items-center gap-2 text-decoration-none" style="color: #a78bfa;">
+                        <i class="fa-solid fa-lightbulb"></i>
+                        <span class="small">Knowledge Base</span>
+                    </a>
+                    <a href="{% url 'branding:showcase' %}" class="d-flex align-items-center gap-2 text-decoration-none" style="color: #f472b6;">
+                        <i class="fa-solid fa-trophy"></i>
+                        <span class="small">Showcase</span>
+                    </a>
+                    <hr class="my-1 border-secondary">
+                    <a href="{% url 'branding:figma_integration' %}" class="d-flex align-items-center gap-2 text-decoration-none" style="color: #a259ff;">
+                        <i class="fa-brands fa-figma"></i>
+                        <span class="small">Figma</span>
+                    </a>
+                    <a href="{% url 'branding:adobe_integration' %}" class="d-flex align-items-center gap-2 text-decoration-none" style="color: #ff0000;">
+                        <i class="fa-solid fa-palette"></i>
+                        <span class="small">Adobe CC</span>
+                    </a>
+                    <a href="{% url 'branding:slack_integration' %}" class="d-flex align-items-center gap-2 text-decoration-none" style="color: #e01e5a;">
+                        <i class="fa-brands fa-slack"></i>
+                        <span class="small">Slack</span>
+                    </a>
+                    <a href="{% url 'branding:calendar_integration' %}" class="d-flex align-items-center gap-2 text-decoration-none" style="color: #3b82f6;">
+                        <i class="fa-solid fa-calendar-days"></i>
+                        <span class="small">Calendar</span>
+                    </a>
+                </div>
+            </div>
+
+            {# ── Notifications ── #}
+            <div class="designer-section">
+                <h6 class="fw-bold mb-3"><i class="fa-solid fa-bell me-1"></i>Notifications</h6>
+                {% if recent_notifications %}
+                {% for n in recent_notifications %}
+                <div class="designer-notif">
+                    <div class="dn-icon">
+                        {% if n.notification_type == 'DESIGNER_ASSIGNED' %}<i class="fa-solid fa-user-plus"></i>
+                        {% elif n.notification_type == 'STATUS_CHANGED' %}<i class="fa-solid fa-arrows-rotate"></i>
+                        {% elif n.notification_type == 'COMMENT' %}<i class="fa-solid fa-comment"></i>
+                        {% elif n.notification_type == 'COMPLETED' %}<i class="fa-solid fa-circle-check"></i>
+                        {% else %}<i class="fa-solid fa-info-circle"></i>{% endif %}
+                    </div>
+                    <div class="dn-content">
+                        <div class="small">{{ n.message|truncatechars:80 }}</div>
+                        <div class="text-muted x-small">{{ n.created_at|timesince }} ago</div>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="text-center text-muted py-3 small">No new notifications</div>
+                {% endif %}
+            </div>
+
+        </div>
+
+    </div>
+</div>
+{% endblock %}

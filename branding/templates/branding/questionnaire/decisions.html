@@ -1,0 +1,139 @@
+{% extends 'branding/base.html' %}
+{% load branding_extras %}
+
+{% block title %}Decision Points · {{ request_obj.request_number }}{% endblock %}
+
+{% block branding_content %}
+<div class="detail-page">
+    <div class="container py-4 py-lg-5">
+
+        <div class="d-flex align-items-start justify-content-between flex-wrap gap-3 mb-4">
+            <div>
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <a href="{% url 'branding:questionnaire_list' request_pk=request_obj.pk %}" class="btn btn-back btn-sm"><i class="fa-solid fa-arrow-left me-1"></i>All Questionnaires</a>
+                    <span class="request-number-display">{{ request_obj.request_number }}</span>
+                </div>
+                <h1 class="fw-800 mb-1"><i class="fa-solid fa-code-branch me-2 text-primary"></i>Decision Points</h1>
+                <p class="text-muted mb-0">{{ request_obj.company_name }} · {{ decision_points|length }} decision{{ decision_points|length|pluralize }}</p>
+            </div>
+        </div>
+
+        {% if pending_decisions %}
+        <div class="mb-4">
+            <h6 class="fw-800 mb-3"><i class="fa-solid fa-clock me-2 text-warning"></i>Pending</h6>
+            <div class="row g-3">
+                {% for dp in pending_decisions %}
+                <div class="col-12 col-md-6">
+                    <div class="detail-card rounded-4 p-4 h-100">
+                        <div class="d-flex align-items-start justify-content-between mb-2">
+                            <h6 class="fw-800 mb-0">{{ dp.title }}</h6>
+                            <span class="badge bg-warning-subtle text-warning rounded-pill x-small">Pending</span>
+                        </div>
+                        {% if dp.description %}
+                        <p class="text-muted small mb-3">{{ dp.description|truncatechars:150 }}</p>
+                        {% endif %}
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            {% if dp.options %}
+                            {% for option in dp.options %}
+                            <span class="badge bg-light text-dark rounded-pill px-3 py-2">{{ option }}</span>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            {% if dp.deadline %}
+                            <span class="x-small text-muted"><i class="fa-regular fa-calendar me-1"></i>{{ dp.deadline|date:"M j, Y" }}</span>
+                            {% else %}
+                            <span class="x-small text-muted">No deadline</span>
+                            {% endif %}
+                            {% if is_designer %}
+                            <a href="{% url 'branding:decision_point_update' pk=dp.pk %}" class="btn btn-back btn-sm">
+                                <i class="fa-solid fa-pen me-1"></i>Update
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if completed_decisions %}
+        <div class="mb-4">
+            <h6 class="fw-800 mb-3"><i class="fa-solid fa-check-circle me-2 text-success"></i>Completed</h6>
+            <div class="d-flex flex-column gap-2">
+                {% for dp in completed_decisions %}
+                <div class="detail-card rounded-4 p-4">
+                    <div class="d-flex align-items-start justify-content-between gap-3">
+                        <div class="flex-grow-1 min-width-0">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <h6 class="fw-800 mb-0 text-truncate">{{ dp.title }}</h6>
+                                <span class="badge bg-success-subtle text-success rounded-pill x-small flex-shrink-0">Completed</span>
+                            </div>
+                            {% if dp.decision %}
+                            <div class="mt-2">
+                                <span class="x-small text-muted fw-700">Decision:</span>
+                                <span class="badge bg-primary-subtle text-primary rounded-pill x-small ms-1">{{ dp.decision }}</span>
+                            </div>
+                            {% endif %}
+                            {% if dp.notes %}
+                            <p class="text-muted small mb-0 mt-1">{{ dp.notes|truncatechars:120 }}</p>
+                            {% endif %}
+                        </div>
+                        {% if dp.completed_at %}
+                        <span class="x-small text-muted flex-shrink-0">{{ dp.completed_at|date:"M j, Y" }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if not pending_decisions and not completed_decisions %}
+        <div class="detail-card rounded-4 p-5 text-center">
+            <div class="empty-state-icon mb-3" style="font-size: 4rem; color: var(--bs-primary); opacity: .3;">
+                <i class="fa-solid fa-code-branch"></i>
+            </div>
+            <h4 class="fw-800 mb-2">No Decision Points</h4>
+            <p class="text-muted mb-0" style="max-width: 480px; margin: 0 auto;">
+                Decision points allow clients to make key choices during the branding process.
+            </p>
+        </div>
+        {% endif %}
+
+        {% if is_designer %}
+        <div class="detail-card rounded-4 p-4 mt-4">
+            <h6 class="fw-800 mb-3"><i class="fa-solid fa-plus-circle me-2 text-primary"></i>Add Decision Point</h6>
+            <form method="post" action="" novalidate>
+                {% csrf_token %}
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label fw-700 small" for="dp_title">Title</label>
+                        <input type="text" name="title" id="dp_title" class="form-control" required placeholder="e.g. Choose primary brand color">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-700 small" for="dp_description">Description</label>
+                        <textarea name="description" id="dp_description" class="form-control" rows="2" placeholder="Explain what the client needs to decide..."></textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-700 small" for="dp_options">Options (one per line)</label>
+                        <textarea name="options" id="dp_options" class="form-control" rows="3" placeholder="Option 1&#10;Option 2&#10;Option 3"></textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-700 small" for="dp_deadline">Deadline</label>
+                        <input type="date" name="deadline" id="dp_deadline" class="form-control">
+                    </div>
+                    <div class="col-12 text-end">
+                        <button type="submit" class="btn btn-brand-primary px-4">
+                            <i class="fa-solid fa-plus me-2"></i>Add Decision Point
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

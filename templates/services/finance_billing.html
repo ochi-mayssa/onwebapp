@@ -1,0 +1,102 @@
+{% extends "services/futuristic_service_base.html" %}
+{% load i18n static %}
+{% block title %}{% trans 'Finance & Billing' %} - OnWebApp{% endblock %}
+
+{% block service_content %}
+<div class="text-center mb-8 reveal">
+    <div class="glass-badge d-inline-flex align-items-center px-4 py-2 rounded-pill mb-4 mx-auto">
+        <span class="x-small fw-800 text-primary uppercase tracking-widest">Finance Matrix — WF-007</span>
+    </div>
+    <h1 class="display-3 fw-800 text-slate-900 mb-4">Finance & Billing</h1>
+    <p class="fs-5 text-slate-500 mx-auto" style="max-width: 700px; font-weight: 500;">
+        Complete payment lifecycle management with automated intelligence, real-time invoicing, and predictive cash flow analysis.
+    </p>
+</div>
+
+<div class="row g-5">
+    <!-- Invoicing -->
+    <div class="col-lg-6 reveal">
+        <div class="premium-card">
+            <div class="card-icon">
+                <i data-lucide="file-text"></i>
+            </div>
+            <h4 class="fw-800 text-slate-900 mb-4">Smart Invoicing</h4>
+            <form onsubmit="event.preventDefault(); alert('Simulation: Invoice sent!');">
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <label class="form-label fw-700 text-slate-600 small uppercase">Client Name</label>
+                        <input type="text" class="cyber-input" placeholder="e.g. Acme Corp">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-700 text-slate-600 small uppercase">Amount (USD)</label>
+                        <input type="number" class="cyber-input" placeholder="0.00">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-700 text-slate-600 small uppercase">Billing Description</label>
+                        <textarea class="cyber-input" rows="3" placeholder="Services rendered..."></textarea>
+                    </div>
+                    <div class="col-12">
+                        <button class="holographic-btn w-100 justify-content-center py-3">
+                            <i data-lucide="send" style="width: 18px;"></i>
+                            <span>Generate & Send Invoice</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Financial Health -->
+    <div class="col-lg-6 reveal" style="animation-delay: 0.1s;">
+        <div class="premium-card">
+            <div class="card-icon">
+                <i data-lucide="pie-chart"></i>
+            </div>
+            <h4 class="fw-800 text-slate-900 mb-4">Financial Intelligence</h4>
+            <div class="row text-center mb-5">
+                <div class="col-6">
+                    <h6 class="text-slate-500 fw-700 small uppercase mb-2">Outstanding</h6>
+                    <h2 class="text-warning fw-800">$12,450</h2>
+                </div>
+                <div class="col-6">
+                    <h6 class="text-slate-500 fw-700 small uppercase mb-2">Paid (MTD)</h6>
+                    <h2 class="text-success fw-800">$45,200</h2>
+                </div>
+            </div>
+            
+            <div class="vstack gap-3 p-4 rounded-4 bg-slate-50 border border-white shadow-sm">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="fw-700 text-slate-900">Project Alpha</span>
+                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3">Paid</span>
+                </div>
+                <hr class="my-0 border-slate-200 opacity-50">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="fw-700 text-slate-900">Project Beta</span>
+                    <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3">Pending</span>
+                </div>
+                <hr class="my-0 border-slate-200 opacity-50">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="fw-700 text-slate-900">Project Gamma</span>
+                    <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-3">Overdue</span>
+                </div>
+            </div>
+            
+            <div class="mt-5">
+                <button class="btn btn-outline-slate w-100 rounded-4 py-3 fw-800 border-2">
+                    <i data-lucide="download" class="me-2" style="width: 18px;"></i>
+                    Download Financial Report
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .mb-8 { margin-bottom: 80px; }
+    .glass-badge { background: rgba(99, 102, 241, 0.05); border: 1px solid rgba(99, 102, 241, 0.1); }
+    .btn-outline-slate { color: var(--slate-600); border-color: var(--slate-200); transition: all 0.3s ease; }
+    .btn-outline-slate:hover { background: var(--slate-900); color: white; border-color: var(--slate-900); transform: translateY(-3px); }
+</style>
+{% endblock %}

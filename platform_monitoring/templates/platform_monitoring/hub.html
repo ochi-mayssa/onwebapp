@@ -1,0 +1,506 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "Platform Monitoring — Operations Dashboard" %} · OnWebApp{% endblock %}
+
+{% block content %}
+<style>
+  .bg-indigo-soft { background-color: rgba(99, 102, 241, 0.10); color: #4338ca; }
+  .bg-purple-soft { background-color: rgba(147, 51, 234, 0.10); color: #7e22ce; }
+  .bg-teal-soft { background-color: rgba(13, 148, 136, 0.10); color: #0f766e; }
+  .bg-rose-soft { background-color: rgba(244, 63, 94, 0.10); color: #be123c; }
+  .bg-amber-soft { background-color: rgba(217, 119, 6, 0.10); color: #b45309; }
+  .bg-sky-soft { background-color: rgba(14, 165, 233, 0.10); color: #0369a1; }
+  .bg-success-soft { background-color: rgba(16, 185, 129, 0.10); color: #047857; }
+  .bg-warning-soft { background-color: rgba(245, 158, 11, 0.10); color: #b45309; }
+  .bg-danger-soft { background-color: rgba(239, 68, 68, 0.10); color: #b91c1c; }
+  .bg-secondary-soft { background-color: rgba(100, 116, 139, 0.10); color: #475569; }
+  .bg-primary-soft { background-color: rgba(79, 70, 229, 0.10); color: #4338ca; }
+  .text-indigo { color: #4338ca; } .text-purple { color: #7e22ce; } .text-teal { color: #0f766e; }
+  .text-rose { color: #be123c; } .text-amber { color: #b45309; } .text-sky { color: #0369a1; }
+  .bg-primary-gradient { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); }
+
+  .transition-hover { transition: all .25s cubic-bezier(.2,.8,.2,1); }
+  .transition-hover-slow { transition: all .35s cubic-bezier(.2,.8,.2,1); }
+
+  .pm-header-meta-badge {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    padding: 0.45rem 0.85rem; border-radius: 0.75rem;
+    background: #ffffff; border: 1px solid #e2e8f0;
+    font-size: 0.75rem; font-weight: 600; color: #475569;
+  }
+
+  .pm-core-card {
+    position: relative;
+    display: flex; flex-direction: column;
+    height: 100%;
+    background: #fff;
+    border: 1px solid #eef2f7;
+    border-radius: 1.125rem;
+    padding: 1.75rem;
+    box-shadow: 0 1px 2px 0 rgba(15, 23, 42, 0.04), 0 1px 3px 0 rgba(15, 23, 42, 0.03);
+    overflow: hidden;
+    cursor: pointer;
+    text-decoration: none !important;
+    color: inherit !important;
+  }
+  .pm-core-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, rgba(79,70,229,0.0), transparent);
+    transition: all .25s ease;
+    opacity: 0;
+  }
+  .pm-core-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 18px 40px -18px rgba(15, 23, 42, 0.18), 0 6px 16px -8px rgba(79, 70, 229, 0.15);
+    border-color: rgba(79, 70, 229, 0.25);
+  }
+  .pm-core-card:hover::before {
+    opacity: 1;
+    background: linear-gradient(90deg, transparent, rgba(79,70,229,0.55), transparent);
+  }
+  .pm-core-card:hover .pm-core-icon {
+    transform: scale(1.06);
+  }
+  .pm-core-card:hover .pm-core-cta {
+    transform: translateX(2px);
+  }
+
+  .pm-core-icon {
+    display: flex; align-items: center; justify-content: center;
+    width: 54px; height: 54px;
+    border-radius: 1rem;
+    transition: transform .25s ease;
+    flex-shrink: 0;
+  }
+  .pm-core-badge {
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+  }
+  .pm-core-cta {
+    display: inline-flex; align-items: center; gap: 0.25rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-top: auto;
+    padding-top: 0.5rem;
+    transition: transform .25s ease;
+  }
+  .pm-core-card-body {
+    display: flex; flex-direction: column; flex-grow: 1; gap: 0;
+  }
+
+  .pm-intel-card {
+    position: relative;
+    display: flex; flex-direction: column;
+    height: 100%;
+    min-height: 220px;
+    background: #fff;
+    border: 1px solid #eef2f7;
+    border-radius: 1.125rem;
+    padding: 1.75rem;
+    box-shadow: 0 1px 2px 0 rgba(15, 23, 42, 0.04), 0 1px 3px 0 rgba(15, 23, 42, 0.03);
+    overflow: hidden;
+    cursor: pointer;
+    text-decoration: none !important;
+    color: inherit !important;
+  }
+  .pm-intel-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 18px 40px -18px rgba(15, 23, 42, 0.18), 0 6px 16px -8px rgba(14, 165, 233, 0.15);
+    border-color: rgba(14, 165, 233, 0.25);
+  }
+  .pm-intel-card:hover .pm-core-icon { transform: scale(1.06); }
+  .pm-intel-card:hover .pm-core-cta { transform: translateX(2px); }
+
+  .pm-intel-card .pm-core-cta { color: #0369a1; }
+
+  .ops-empty {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center;
+    padding: 2.25rem 1.5rem;
+    border: 1px dashed #cbd5e1;
+    border-radius: 14px;
+    background: linear-gradient(180deg, #fff 0%, #fafbfc 100%);
+    min-height: 150px;
+  }
+  .ops-empty-icon-wrap {
+    display: flex; align-items: center; justify-content: center;
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    margin-bottom: 0.85rem;
+  }
+
+  .pm-hub-kpi-card {
+    background: #fff;
+    border: 1px solid #eef2f7;
+    border-radius: 1rem;
+    padding: 1.25rem 1.25rem;
+    box-shadow: 0 1px 2px 0 rgba(15,23,42,0.04);
+    transition: all .25s ease;
+  }
+  .pm-hub-kpi-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 25px -14px rgba(15,23,42,0.15);
+    border-color: rgba(79,70,229,0.12);
+  }
+
+  .card-hover-border:hover { transform: translateY(-2px); box-shadow: 0 12px 28px -12px rgba(15, 23, 42, 0.18) !important; border-color: rgba(79, 70, 229, 0.2); }
+  .text-900 { color: #0f172a; } .text-700 { color: #334155; } .text-600 { color: #475569; } .text-500 { color: #64748b; } .bg-300 { background: #cbd5e1; }
+</style>
+
+<div class="d-flex">
+  {% include "platform_monitoring/_sidebar.html" %}
+
+  <main class="flex-grow-1 min-vh-100 bg-light">
+    <div class="px-4 py-4 px-lg-6 py-lg-5">
+      <!-- HEADER -->
+      <header class="mb-5">
+        <div class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-4">
+          <div>
+            <div class="x-small fw-800 text-primary uppercase tracking-widest mb-2">
+              <i data-lucide="activity" style="width:12px;height:12px;"></i> {% trans "Operations Dashboard" %}
+            </div>
+            <h1 class="h1 fw-900 text-900 mb-2">{% trans "Platform Health Overview" %}</h1>
+            <p class="text-600 mb-0" style="font-size: 1rem; max-width: 640px;">
+              {% trans "Monitor every OnWebApp service from a single operational dashboard." %}
+            </p>
+          </div>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2 mb-1">
+          {% if counts.error > 0 %}
+            {% with overall_class="bg-danger-soft text-danger" overall_label=_("Degraded") overall_icon="alert-triangle" %}
+              <span class="pm-header-meta-badge {{ overall_class }}">
+                <i data-lucide="{{ overall_icon }}" style="width:13px;height:13px;"></i>
+                {% trans "Overall Status" %}: <span class="fw-800">{{ overall_label }}</span>
+              </span>
+            {% endwith %}
+          {% elif counts.warning > 0 %}
+            {% with overall_class="bg-warning-soft text-warning" overall_label=_("Warning") overall_icon="alert-triangle" %}
+              <span class="pm-header-meta-badge {{ overall_class }}">
+                <i data-lucide="{{ overall_icon }}" style="width:13px;height:13px;"></i>
+                {% trans "Overall Status" %}: <span class="fw-800">{{ overall_label }}</span>
+              </span>
+            {% endwith %}
+          {% elif counts.healthy > 0 %}
+            {% with overall_class="bg-success-soft text-success" overall_label=_("Healthy") overall_icon="check-circle" %}
+              <span class="pm-header-meta-badge {{ overall_class }}">
+                <i data-lucide="{{ overall_icon }}" style="width:13px;height:13px;"></i>
+                {% trans "Overall Status" %}: <span class="fw-800">{{ overall_label }}</span>
+              </span>
+            {% endwith %}
+          {% else %}
+            {% with overall_class="bg-secondary-soft text-secondary" overall_label=_("Not Configured") overall_icon="settings" %}
+              <span class="pm-header-meta-badge {{ overall_class }}">
+                <i data-lucide="{{ overall_icon }}" style="width:13px;height:13px;"></i>
+                {% trans "Overall Status" %}: <span class="fw-800">{{ overall_label }}</span>
+              </span>
+            {% endwith %}
+          {% endif %}
+
+          <span class="pm-header-meta-badge">
+            <i data-lucide="boxes" style="width:13px;height:13px;"></i>
+            {% trans "Registered Services" %}: <span class="fw-800 text-900">{{ total_modules }}</span>
+          </span>
+
+          <span class="pm-header-meta-badge">
+            <i data-lucide="clock" style="width:13px;height:13px;"></i>
+            {% trans "Last Update" %}: <span class="fw-800 text-900">{{ generated_at|date:"Y-m-d H:i" }}</span>
+          </span>
+        </div>
+      </header>
+
+      <!-- 1) PLATFORM HEALTH SUMMARY -->
+      <section id="platform-health-summary" class="mb-6">
+        <div class="d-flex align-items-end justify-content-between mb-3">
+          <h2 class="h4 fw-900 text-900 mb-0">
+            <i data-lucide="heart-pulse" style="width:20px;height:20px;"></i> {% trans "Platform Health Summary" %}
+          </h2>
+          <span class="small text-muted">{{ total_modules }} {% trans "services registered" %}</span>
+        </div>
+        <div class="row g-3">
+          <div class="col-sm-6 col-xl-3">
+            <div class="pm-hub-kpi-card h-100">
+              <div class="d-flex align-items-center gap-3">
+                <div class="d-flex align-items-center justify-content-center rounded-14 bg-success-soft text-success" style="width:48px;height:48px;">
+                  <i data-lucide="check-circle" style="width:22px;height:22px;"></i>
+                </div>
+                <div>
+                  <div class="x-small fw-800 text-success uppercase tracking-wider">{% trans "Healthy" %}</div>
+                  <div class="h3 fw-900 mb-0 text-900">{{ counts.healthy }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-xl-3">
+            <div class="pm-hub-kpi-card h-100">
+              <div class="d-flex align-items-center gap-3">
+                <div class="d-flex align-items-center justify-content-center rounded-14 bg-warning-soft text-warning" style="width:48px;height:48px;">
+                  <i data-lucide="alert-triangle" style="width:22px;height:22px;"></i>
+                </div>
+                <div>
+                  <div class="x-small fw-800 text-warning uppercase tracking-wider">{% trans "Warning" %}</div>
+                  <div class="h3 fw-900 mb-0 text-900">{{ counts.warning }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-xl-3">
+            <div class="pm-hub-kpi-card h-100">
+              <div class="d-flex align-items-center gap-3">
+                <div class="d-flex align-items-center justify-content-center rounded-14 bg-danger-soft text-danger" style="width:48px;height:48px;">
+                  <i data-lucide="alert-circle" style="width:22px;height:22px;"></i>
+                </div>
+                <div>
+                  <div class="x-small fw-800 text-danger uppercase tracking-wider">{% trans "Error" %}</div>
+                  <div class="h3 fw-900 mb-0 text-900">{{ counts.error }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-xl-3">
+            <div class="pm-hub-kpi-card h-100">
+              <div class="d-flex align-items-center gap-3">
+                <div class="d-flex align-items-center justify-content-center rounded-14 bg-secondary-soft text-secondary" style="width:48px;height:48px;">
+                  <i data-lucide="settings" style="width:22px;height:22px;"></i>
+                </div>
+                <div>
+                  <div class="x-small fw-800 text-secondary uppercase tracking-wider">{% trans "Not Configured" %}</div>
+                  <div class="h3 fw-900 mb-0 text-900">{{ counts.not_configured }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2) CORE SERVICES -->
+      <section id="core-services" class="mb-6">
+        <div class="d-flex align-items-end justify-content-between mb-4">
+          <h2 class="h4 fw-900 text-900 mb-0">
+            <i data-lucide="layers" style="width:20px;height:20px;"></i> {% trans "Core Services" %}
+          </h2>
+          <span class="small text-muted">{% trans "Click a card to open its section" %}</span>
+        </div>
+        <div class="row g-4">
+          {% for sec in core_services %}
+            <div class="col-md-6 col-xl-4 col-xxl-4">
+              <a href="{{ sec.route }}" class="pm-core-card d-block transition-hover-slow">
+                <div class="d-flex align-items-start justify-content-between mb-4">
+                  <div class="pm-core-icon bg-{{ sec.accent }}-soft text-{{ sec.accent }}">
+                    <i data-lucide="{{ sec.icon }}" style="width:24px;height:24px;"></i>
+                  </div>
+                  <span class="pm-core-badge {{ sec.badge.class }}">
+                    <span class="d-inline-block rounded-circle {{ sec.badge.dot }}" style="width:8px;height:8px;"></span>
+                    {{ sec.badge.label }}
+                  </span>
+                </div>
+                <div class="pm-core-card-body">
+                  <h3 class="h5 fw-900 text-900 mb-1">{{ sec.name }}</h3>
+                  <p class="small text-muted mb-4">{{ sec.count }} {% trans "modules" %}</p>
+                  <div class="pm-core-cta text-{{ sec.accent }}">
+                    {% trans "Open section" %}
+                    <i data-lucide="arrow-right" style="width:14px;height:14px;" class="ms-1"></i>
+                  </div>
+                </div>
+              </a>
+            </div>
+          {% endfor %}
+        </div>
+      </section>
+
+      <!-- 3) INTELLIGENCE MODULES -->
+      <section id="intelligence" class="mb-6">
+        <div class="d-flex align-items-end justify-content-between mb-4">
+          <h2 class="h4 fw-900 text-900 mb-0">
+            <i data-lucide="sparkles" style="width:20px;height:20px;"></i> {% trans "Intelligence Modules" %}
+          </h2>
+        </div>
+        <div class="row g-4">
+          {% for mod in standalone_modules %}
+            <div class="col-md-6 col-xl-4">
+              {% if mod.pm_route %}<a href="{{ mod.pm_route }}" class="pm-intel-card d-block transition-hover-slow">{% else %}<div class="pm-intel-card d-block">{% endif %}
+                <div class="d-flex align-items-start justify-content-between mb-4">
+                  <div class="pm-core-icon bg-sky-soft text-sky">
+                    <i data-lucide="{{ mod.icon }}" style="width:24px;height:24px;"></i>
+                  </div>
+                  <span class="pm-core-badge {{ mod.badge.class }}">
+                    <span class="d-inline-block rounded-circle {{ mod.badge.dot }}" style="width:8px;height:8px;"></span>
+                    {{ mod.badge.label }}
+                  </span>
+                </div>
+                <div class="pm-core-card-body">
+                  <h3 class="h5 fw-900 text-900 mb-1">{{ mod.name }}</h3>
+                  <p class="small text-muted mb-4" style="flex-grow: 1;">{{ mod.description }}</p>
+                  <div class="pm-core-cta">
+                    {% if mod.pm_route %}{% trans "Open module" %}{% else %}{% trans "Open" %}{% endif %}
+                    <i data-lucide="arrow-right" style="width:14px;height:14px;" class="ms-1"></i>
+                  </div>
+                </div>
+              {% if mod.pm_route %}</a>{% else %}</div>{% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      </section>
+
+      <!-- 4) OPERATIONAL AREA -->
+      <section id="operational-area" class="mb-3">
+        <div class="d-flex align-items-end justify-content-between mb-4">
+          <h2 class="h4 fw-900 text-900 mb-0">
+            <i data-lucide="terminal" style="width:20px;height:20px;"></i> {% trans "Operational Area" %}
+          </h2>
+        </div>
+        <div class="row g-4">
+          <div id="ops-alerts" class="col-lg-6">
+            <div class="card h-100 border-0 shadow-sm rounded-18 overflow-hidden">
+              <div class="card-header bg-white border-light-subtle py-3 d-flex align-items-center gap-2">
+                <i data-lucide="bell-ring" style="width:16px;height:16px;" class="text-danger"></i>
+                <h6 class="fw-800 text-900 mb-0">{% trans "Recent Alerts" %}</h6>
+                <span class="badge rounded-pill bg-danger-soft text-danger ms-auto x-small">{{ operational.alerts|length }}</span>
+              </div>
+              <div class="card-body p-4">
+                {% if operational.alerts %}
+                  <ul class="list-unstyled mb-0">
+                    {% for a in operational.alerts %}
+                      <li class="d-flex gap-3 py-2 border-bottom border-light last:border-bottom-0">
+                        <span class="badge rounded-pill bg-danger-soft text-danger x-small align-self-start mt-1">{{ a.severity }}</span>
+                        <div class="flex-grow-1 small">
+                          <div class="fw-700 text-900">{{ a.message }}</div>
+                          {% if a.time %}<div class="x-small text-muted">{{ a.time|date:"Y-m-d H:i" }}</div>{% endif %}
+                        </div>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                {% else %}
+                  <div class="ops-empty text-center">
+                    <div class="ops-empty-icon-wrap bg-success-soft text-success">
+                      <i data-lucide="shield-check" style="width:22px;height:22px;"></i>
+                    </div>
+                    <div class="fw-800 text-700 mb-1">{% trans "No alerts detected yet." %}</div>
+                    <div class="small text-500">{% trans "Alerts will appear automatically when monitored services report incidents." %}</div>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <div id="ops-activity" class="col-lg-6">
+            <div class="card h-100 border-0 shadow-sm rounded-18 overflow-hidden">
+              <div class="card-header bg-white border-light-subtle py-3 d-flex align-items-center gap-2">
+                <i data-lucide="activity" style="width:16px;height:16px;" class="text-success"></i>
+                <h6 class="fw-800 text-900 mb-0">{% trans "System Activity" %}</h6>
+                <span class="badge rounded-pill bg-success-soft text-success ms-auto x-small">{{ operational.activity|length }}</span>
+              </div>
+              <div class="card-body p-4">
+                {% if operational.activity %}
+                  <ul class="list-unstyled mb-0">
+                    {% for a in operational.activity %}
+                      <li class="d-flex gap-3 py-2 border-bottom border-light last:border-bottom-0">
+                        <span class="badge rounded-pill bg-success-soft text-success x-small align-self-start mt-1">{{ a.type }}</span>
+                        <div class="flex-grow-1 small">
+                          <div class="fw-700 text-900">{{ a.detail }}</div>
+                          {% if a.time %}<div class="x-small text-muted">{{ a.time|date:"Y-m-d H:i" }}</div>{% endif %}
+                        </div>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                {% else %}
+                  <div class="ops-empty text-center">
+                    <div class="ops-empty-icon-wrap bg-success-soft text-success">
+                      <i data-lucide="bar-chart-2" style="width:22px;height:22px;"></i>
+                    </div>
+                    <div class="fw-800 text-700 mb-1">{% trans "No platform activity recorded yet." %}</div>
+                    <div class="small text-500">{% trans "Activity events will surface automatically as services begin interacting with the platform." %}</div>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <div id="ops-logs" class="col-lg-6">
+            <div class="card h-100 border-0 shadow-sm rounded-18 overflow-hidden">
+              <div class="card-header bg-white border-light-subtle py-3 d-flex align-items-center gap-2">
+                <i data-lucide="file-text" style="width:16px;height:16px;" class="text-indigo"></i>
+                <h6 class="fw-800 text-900 mb-0">{% trans "Logs" %}</h6>
+                <span class="badge rounded-pill bg-indigo-soft text-indigo ms-auto x-small">{{ operational.logs|length }}</span>
+              </div>
+              <div class="card-body p-4">
+                {% if operational.logs %}
+                  <ul class="list-unstyled mb-0">
+                    {% for l in operational.logs %}
+                      <li class="d-flex gap-3 py-2 border-bottom border-light last:border-bottom-0">
+                        <span class="badge rounded-pill bg-indigo-soft text-indigo x-small align-self-start mt-1">{{ l.source }}</span>
+                        <div class="flex-grow-1 small">
+                          <div class="fw-700 text-900">{{ l.message }}</div>
+                          {% if l.time %}<div class="x-small text-muted">{{ l.time|date:"Y-m-d H:i" }}</div>{% endif %}
+                        </div>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                {% else %}
+                  <div class="ops-empty text-center">
+                    <div class="ops-empty-icon-wrap bg-indigo-soft text-indigo">
+                      <i data-lucide="file-text" style="width:22px;height:22px;"></i>
+                    </div>
+                    <div class="fw-800 text-700 mb-1">{% trans "Logs will be generated as services begin reporting." %}</div>
+                    <div class="small text-500">{% trans "System logs, audit trails and service events will populate this panel automatically." %}</div>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <div id="ops-upcoming" class="col-lg-6">
+            <div class="card h-100 border-0 shadow-sm rounded-18 overflow-hidden">
+              <div class="card-header bg-white border-light-subtle py-3 d-flex align-items-center gap-2">
+                <i data-lucide="calendar-clock" style="width:16px;height:16px;" class="text-amber"></i>
+                <h6 class="fw-800 text-900 mb-0">{% trans "Upcoming Tasks" %}</h6>
+                <span class="badge rounded-pill bg-amber-soft text-amber ms-auto x-small">{{ operational.upcoming_tasks|length }}</span>
+              </div>
+              <div class="card-body p-4">
+                {% if operational.upcoming_tasks %}
+                  <ul class="list-unstyled mb-0">
+                    {% for t in operational.upcoming_tasks %}
+                      <li class="d-flex gap-3 py-2 border-bottom border-light last:border-bottom-0 small">
+                        <div class="flex-grow-1">
+                          <div class="fw-700 text-900">{{ t.name }}</div>
+                          {% if t.scheduled_at %}<div class="x-small text-muted">{{ t.scheduled_at|date:"Y-m-d H:i" }}</div>{% endif %}
+                        </div>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                {% else %}
+                  <div class="ops-empty text-center">
+                    <div class="ops-empty-icon-wrap bg-amber-soft text-amber">
+                      <i data-lucide="calendar" style="width:22px;height:22px;"></i>
+                    </div>
+                    <div class="fw-800 text-700 mb-1">{% trans "No scheduled automation tasks." %}</div>
+                    <div class="small text-500">{% trans "Scheduled crawls, audits and automations will appear here once configured." %}</div>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    if (window.lucide) { window.lucide.createIcons(); }
+  });
+</script>
+{% endblock %}

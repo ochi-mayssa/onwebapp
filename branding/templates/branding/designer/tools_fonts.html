@@ -1,0 +1,110 @@
+{% extends "branding/base.html" %}
+{% load branding_extras %}
+
+{% block title %}Font Finder{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'branding:designer_dashboard' %}">My Work</a></li>
+    <li class="breadcrumb-item">Tools</li>
+    <li class="breadcrumb-item active">Font Finder</li>
+  </ol>
+</nav>
+
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-header"><h5 class="mb-0">Search Fonts</h5></div>
+      <div class="card-body">
+        <form method="get">
+          <div class="input-group">
+            <input type="text" name="q" class="form-control" placeholder="Search by name, family..." value="{{ q|default:'' }}">
+            <button class="btn btn-outline-primary" type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="card mt-3">
+      <div class="card-header"><h5 class="mb-0">Add Font</h5></div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="add_font">
+          <div class="mb-3">
+            <label class="form-label">Name</label>
+            <input type="text" name="name" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Family</label>
+            <input type="text" name="family" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Weights</label>
+            <input type="text" name="weights" class="form-control" placeholder="400, 700, 900">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Styles</label>
+            <input type="text" name="styles" class="form-control" placeholder="normal, italic">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Source URL</label>
+            <input type="url" name="source_url" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Request</label>
+            <select name="request" class="form-select">
+              <option value="">None</option>
+              {% for r in active_requests %}
+              <option value="{{ r.id }}">{{ r.title }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" name="is_public" id="isPublic">
+            <label class="form-check-label" for="isPublic">Public</label>
+          </div>
+          <button type="submit" class="btn btn-success w-100">Add Font</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-header"><h5 class="mb-0">Fonts</h5></div>
+      <div class="card-body">
+        {% if fonts %}
+        <div class="row g-3">
+          {% for f in fonts %}
+          <div class="col-md-6">
+            <div class="card h-100">
+              <div class="card-body">
+                <h6 class="card-title">{{ f.name }}</h6>
+                <p class="mb-2"><strong>Family:</strong> {{ f.family }}</p>
+                <div class="mb-2">
+                  {% for w in f.weights_list %}
+                  <span class="badge bg-secondary">{{ w }}</span>
+                  {% endfor %}
+                  {% for s in f.styles_list %}
+                  <span class="badge bg-info text-dark">{{ s }}</span>
+                  {% endfor %}
+                </div>
+                {% if f.source_url %}
+                <a href="{{ f.source_url }}" target="_blank" class="small">Source <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                {% endif %}
+                <p class="small text-muted mt-2 mb-0">{{ f.owner }}</p>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-muted mb-0">No fonts found.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

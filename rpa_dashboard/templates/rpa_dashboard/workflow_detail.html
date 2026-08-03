@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'rpa_dashboard' %}">RPA Dashboard</a></li>
+            <li class="breadcrumb-item active">{{ workflow.wf_id }}</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>{{ workflow.title }} <span class="badge bg-{{ workflow.status|yesno:'success,danger,warning,secondary' }}">{{ workflow.get_status_display }}</span></h2>
+        <div>
+            <button class="btn btn-primary" id="triggerBtn">
+                <i class="fas fa-play"></i> Run Workflow
+            </button>
+            <button class="btn btn-outline-secondary">
+                <i class="fas fa-file-pdf"></i> Download Report
+            </button>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <!-- KPI Cards -->
+        <div class="col-md-4">
+            <div class="card text-center h-100 border-primary">
+                <div class="card-body">
+                    <h3 class="text-primary">{{ workflow.pass_rate }}%</h3>
+                    <small class="text-muted">Pass Rate</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center h-100 border-info">
+                <div class="card-body">
+                    <h3 class="text-info">{{ workflow.runs.count }}</h3>
+                    <small class="text-muted">Total Runs</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center h-100 border-success">
+                <div class="card-body">
+                    <h3 class="text-success">{{ avg_duration }} ms</h3>
+                    <small class="text-muted">Avg Duration</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Runs Table -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Execution History</h5>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Run ID</th>
+                        <th>Status</th>
+                        <th>Started At</th>
+                        <th>Duration</th>
+                        <th>Triggered By</th>
+                        <th>Steps Analysis</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for run in recent_runs %}
+                    <tr>
+                        <td>#{{ run.id }}</td>
+                        <td>
+                            <span class="badge bg-{{ run.status|yesno:'warning,info,success,danger' }}">
+                                {{ run.get_status_display }}
+                            </span>
+                        </td>
+                        <td>{{ run.started_at|date:"Y-m-d H:i:s" }}</td>
+                        <td>{{ run.duration_ms }} ms</td>
+                        <td>{{ run.triggered_by.username|default:"System" }}</td>
+                        <td>
+                            {% for step in run.steps.all %}
+                                <span class="badge bg-{{ step.status|yesno:'warning,success,danger,secondary' }}" 
+                                      title="{{ step.name }}: {{ step.duration_ms }}ms"
+                                      data-bs-toggle="tooltip">
+                                    {{ step.name }}
+                                </span>
+                                {% if step.status != 'PASS' and step.status != 'SKIPPED' %}
+                                <button class="btn btn-sm btn-link p-0 ms-1 run-step-btn" 
+                                        data-step-id="{{ step.id }}" 
+                                        title="Rerun {{ step.name }}">
+                                    <i class="fas fa-redo text-muted"></i>
+                                </button>
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{% url 'export_run_csv' run.id %}" class="btn btn-outline-secondary" title="Export CSV">
+                                    <i class="fas fa-file-csv"></i>
+                                </a>
+                                <a href="{% url 'export_run_pdf' run.id %}" target="_blank" class="btn btn-outline-secondary" title="Export PDF">
+                                    <i class="fas fa-file-pdf"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="7" class="text-center">No runs recorded.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Notification -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+  <div id="liveToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header">
+      <strong class="me-auto" id="toastTitle">Notification</strong>
+      <small>Just now</small>
+      <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body" id="toastBody"></div>
+  </div>
+</div>
+
+<script>
+// Initialize Tooltips
+var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+  return new bootstrap.Tooltip(tooltipTriggerEl)
+})
+
+function showToast(title, message, type) {
+    const toastEl = document.getElementById('liveToast');
+    const toast = new bootstrap.Toast(toastEl);
+    document.getElementById('toastTitle').textContent = title;
+    document.getElementById('toastTitle').className = `me-auto text-${type}`;
+    document.getElementById('toastBody').textContent = message;
+    toast.show();
+}
+
+// Run Full Workflow Logic (Background Execution)
+document.getElementById('triggerBtn').addEventListener('click', async function() {
+    const btn = this;
+    const wfId = '{{ workflow.wf_id }}';
+    const originalText = btn.innerHTML;
+    
+    try {
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Starting...';
+        btn.disabled = true;
+        
+        // 1. Start Background Task
+        const startRes = await fetch(`/rpa/workflow/${wfId}/start/`, {
+            method: 'POST', headers: {'X-CSRFToken': '{{ csrf_token }}', 'Content-Type': 'application/json'}
+        });
+        const startData = await startRes.json();
+        
+        if (startData.status !== 'success') throw new Error(startData.message);
+        
+        showToast('Success', 'Workflow execution started in background.', 'success');
+        
+        // Reload after 2 seconds to show the running state
+        setTimeout(() => location.reload(), 2000);
+        
+    } catch (err) {
+        showToast('Error', err.message, 'danger');
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+});
+
+// Run Single Step Logic
+document.querySelectorAll('.run-step-btn').forEach(btn => {
+    btn.addEventListener('click', async function() {
+        const stepId = this.dataset.stepId;
+        const icon = this.querySelector('i');
+        icon.className = 'fas fa-spinner fa-spin text-primary';
+        
+        try {
+            const res = await fetch(`/rpa/step/${stepId}/run/`, {
+                method: 'POST', headers: {'X-CSRFToken': '{{ csrf_token }}', 'Content-Type': 'application/json'}
+            });
+            const data = await res.json();
+            
+            if (data.status === 'success') {
+                showToast('Step Completed', `Status: ${data.step_status}`, data.step_status === 'PASS' ? 'success' : 'danger');
+                setTimeout(() => location.reload(), 1000);
+            } else {
+                throw new Error(data.message);
+            }
+        } catch (err) {
+            showToast('Error', err.message, 'danger');
+            icon.className = 'fas fa-redo text-muted';
+        }
+    });
+});
+</script>
+{% endblock %}

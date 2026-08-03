@@ -1,0 +1,286 @@
+{% extends "branding/base.html" %}
+{% load branding_extras %}
+
+{% block title %}{{ handoff.title }} — Handoffs{% endblock %}
+
+{% block branding_content %}
+<div class="container py-4">
+
+    {# ── Breadcrumb & Header ── #}
+    <nav aria-label="breadcrumb" class="mb-2">
+        <ol class="breadcrumb mb-0 small">
+            <li class="breadcrumb-item"><a href="{% url 'branding:designer_dashboard' %}" class="text-decoration-none"><i class="fa-solid fa-palette me-1"></i>My Work</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'branding:request_detail' br.pk %}" class="text-decoration-none">{{ br.request_number }}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'branding:design_handoffs' pk=br.pk %}" class="text-decoration-none">Handoffs</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ handoff.title }}</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+        <div>
+            <h1 class="h4 fw-bold mb-1"><i class="fa-solid fa-handshake me-2"></i>{{ handoff.title }}</h1>
+            <p class="text-muted mb-0 small">{{ br.company_name|default:br.request_number }}</p>
+        </div>
+        <a href="{% url 'branding:design_handoffs' pk=br.pk %}" class="btn btn-sm btn-outline-secondary">
+            <i class="fa-solid fa-arrow-left me-1"></i>Back to Handoffs
+        </a>
+    </div>
+
+    <div class="row g-4">
+
+        {# ── Left Column ── #}
+        <div class="col-lg-8">
+
+            {# ── Handoff Info Card ── #}
+            <div class="detail-card rounded-4 p-4 mb-4">
+                <div class="d-flex align-items-start justify-content-between mb-3">
+                    <h6 class="fw-bold mb-0"><i class="fa-solid fa-circle-info me-2 text-primary"></i>Handoff Information</h6>
+                    {% if handoff.status == 'DRAFT' %}
+                        <span class="badge bg-secondary-subtle text-secondary rounded-pill"><i class="fa-solid fa-pencil me-1"></i>Draft</span>
+                    {% elif handoff.status == 'READY' %}
+                        <span class="badge bg-info-subtle text-info rounded-pill"><i class="fa-solid fa-check me-1"></i>Ready</span>
+                    {% elif handoff.status == 'HANDED_OFF' %}
+                        <span class="badge bg-success-subtle text-success rounded-pill"><i class="fa-solid fa-paper-plane me-1"></i>Handed Off</span>
+                    {% elif handoff.status == 'ACKNOWLEDGED' %}
+                        <span class="badge bg-primary-subtle text-primary rounded-pill"><i class="fa-solid fa-check-double me-1"></i>Acknowledged</span>
+                    {% endif %}
+                </div>
+                <dl class="row mb-0">
+                    <dt class="col-sm-3 x-small fw-700 text-muted">Title</dt>
+                    <dd class="col-sm-9 small mb-2">{{ handoff.title }}</dd>
+
+                    {% if handoff.description %}
+                    <dt class="col-sm-3 x-small fw-700 text-muted">Description</dt>
+                    <dd class="col-sm-9 small mb-2">{{ handoff.description }}</dd>
+                    {% endif %}
+
+                    <dt class="col-sm-3 x-small fw-700 text-muted">Designer</dt>
+                    <dd class="col-sm-9 small mb-2">{{ handoff.designer.get_full_name|default:handoff.designer.username }}</dd>
+
+                    {% if handoff.handoff_notes %}
+                    <dt class="col-sm-3 x-small fw-700 text-muted">Handoff Notes</dt>
+                    <dd class="col-sm-9 small mb-2">{{ handoff.handoff_notes|linebreaksbr }}</dd>
+                    {% endif %}
+
+                    {% if handoff.handed_off_to %}
+                    <dt class="col-sm-3 x-small fw-700 text-muted">Handed Off To</dt>
+                    <dd class="col-sm-9 small mb-2">{{ handoff.handed_off_to.get_full_name|default:handoff.handed_off_to.username }}</dd>
+                    {% endif %}
+
+                    {% if handoff.handed_off_at %}
+                    <dt class="col-sm-3 x-small fw-700 text-muted">Handed Off At</dt>
+                    <dd class="col-sm-9 small mb-0">{{ handoff.handed_off_at|date:"M d, Y H:i" }}</dd>
+                    {% endif %}
+                </dl>
+            </div>
+
+            {# ── Action Buttons ── #}
+            {% if handoff.status == 'DRAFT' or handoff.status == 'READY' %}
+            <div class="d-flex gap-2 mb-4">
+                {% if handoff.status == 'DRAFT' %}
+                <form method="post" action="{{ request.path }}" class="d-inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="mark_ready">
+                    <button type="submit" class="btn btn-sm btn-info">
+                        <i class="fa-solid fa-check me-1"></i>Mark Ready
+                    </button>
+                </form>
+                {% endif %}
+                {% if handoff.status == 'READY' %}
+                <form method="post" action="{{ request.path }}" class="d-inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="handoff">
+                    <button type="submit" class="btn btn-sm btn-success">
+                        <i class="fa-solid fa-paper-plane me-1"></i>Handoff
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            {# ── Deliverables Section ── #}
+            <div class="detail-card rounded-4 p-4 mb-4">
+                <h6 class="fw-bold mb-3"><i class="fa-solid fa-cloud-arrow-up me-2 text-primary"></i>Deliverables</h6>
+
+                {# Upload Form #}
+                <form method="post" action="{{ request.path }}" enctype="multipart/form-data" class="mb-4 p-3 rounded-3" style="background:var(--bs-tertiary-bg,#f8fafc);">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="add_deliverable">
+                    <div class="row g-3">
+                        <div class="col-md-5">
+                            <label for="del_files" class="form-label x-small fw-700">Files <span class="text-danger">*</span></label>
+                            <input type="file" class="form-control form-control-sm" id="del_files" name="files" multiple required>
+                            <div class="form-text">Select one or more files</div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="del_type" class="form-label x-small fw-700">Type <span class="text-danger">*</span></label>
+                            <select class="form-select form-select-sm" id="del_type" name="deliverable_type" required>
+                                <option value="">Select type...</option>
+                                {% for value, label in DELIVERABLE_TYPES %}
+                                <option value="{{ value }}">{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button type="submit" class="btn btn-brand-primary btn-sm w-100">
+                                <i class="fa-solid fa-upload me-1"></i>Upload
+                            </button>
+                        </div>
+                        <div class="col-12">
+                            <label for="del_desc" class="form-label x-small fw-700">Description</label>
+                            <input type="text" class="form-control form-control-sm" id="del_desc" name="description" placeholder="Brief description of the deliverable">
+                        </div>
+                    </div>
+                </form>
+
+                {# Deliverables List #}
+                {% if deliverables %}
+                <div class="row g-3">
+                    {% for d in deliverables %}
+                    <div class="col-md-6">
+                        <div class="detail-card rounded-3 p-3 h-100">
+                            <div class="d-flex align-items-start justify-content-between mb-2">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="fa-solid fa-file-arrow-down text-primary"></i>
+                                    <span class="fw-bold small text-truncate" style="max-width:180px;">{{ d.original_name }}</span>
+                                </div>
+                                <span class="badge bg-primary-subtle text-primary rounded-pill x-small flex-shrink-0">{{ d.deliverable_type }}</span>
+                            </div>
+                            {% if d.description %}
+                            <p class="text-muted x-small mb-2">{{ d.description|truncatechars:80 }}</p>
+                            {% endif %}
+                            <div class="d-flex align-items-center justify-content-between mt-auto pt-2 border-top">
+                                <div class="d-flex align-items-center gap-2 x-small text-muted">
+                                    <span><i class="fa-solid fa-hard-drive me-1"></i>{{ d.size_display }}</span>
+                                    <span><i class="fa-solid fa-user me-1"></i>{{ d.uploaded_by.get_full_name|default:d.uploaded_by.username }}</span>
+                                </div>
+                                <a href="{{ d.file.url }}" class="btn btn-sm btn-outline-primary py-0 px-2" download title="Download">
+                                    <i class="fa-solid fa-download"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fa-regular fa-folder-open fa-2x text-muted mb-2"></i>
+                    <p class="text-muted small mb-0">No deliverables uploaded yet.</p>
+                </div>
+                {% endif %}
+            </div>
+
+            {# ── Notes Section ── #}
+            <div class="detail-card rounded-4 p-4">
+                <h6 class="fw-bold mb-3"><i class="fa-solid fa-sticky-note me-2 text-warning"></i>Notes</h6>
+
+                {# Add Note Form #}
+                <form method="post" action="{{ request.path }}" class="mb-4 p-3 rounded-3" style="background:var(--bs-tertiary-bg,#f8fafc);">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="add_note">
+                    <div class="row g-3">
+                        <div class="col-md-5">
+                            <label for="note_title" class="form-label x-small fw-700">Title <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control form-control-sm" id="note_title" name="title" required placeholder="Note title">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="note_type" class="form-label x-small fw-700">Type <span class="text-danger">*</span></label>
+                            <select class="form-select form-select-sm" id="note_type" name="note_type" required>
+                                <option value="">Select type...</option>
+                                {% for value, label in NOTE_TYPES %}
+                                <option value="{{ value }}">{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button type="submit" class="btn btn-brand-primary btn-sm w-100">
+                                <i class="fa-solid fa-plus me-1"></i>Add Note
+                            </button>
+                        </div>
+                        <div class="col-12">
+                            <label for="note_content" class="form-label x-small fw-700">Content <span class="text-danger">*</span></label>
+                            <textarea class="form-control form-control-sm" id="note_content" name="content" rows="3" required placeholder="Write your note..."></textarea>
+                        </div>
+                    </div>
+                </form>
+
+                {# Notes List #}
+                {% if notes %}
+                {% for n in notes %}
+                <div class="detail-card rounded-3 p-3 mb-3">
+                    <div class="d-flex align-items-start justify-content-between mb-2">
+                        <h6 class="fw-bold mb-0 small">{{ n.title }}</h6>
+                        <span class="badge bg-secondary-subtle text-secondary rounded-pill x-small flex-shrink-0">{{ n.note_type }}</span>
+                    </div>
+                    <p class="text-muted small mb-2">{{ n.content|linebreaksbr }}</p>
+                    <div class="d-flex align-items-center gap-3 x-small text-muted pt-2 border-top">
+                        <span><i class="fa-solid fa-user me-1"></i>{{ n.author.get_full_name|default:n.author.username }}</span>
+                        <span><i class="fa-regular fa-clock me-1"></i>{{ n.created_at|date:"M j, Y" }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fa-regular fa-sticky-note fa-2x text-muted mb-2"></i>
+                    <p class="text-muted small mb-0">No notes yet.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {# ── Right Column: Sidebar ── #}
+        <div class="col-lg-4">
+            <div class="detail-card rounded-4 p-4 mb-4">
+                <h6 class="fw-bold mb-3"><i class="fa-solid fa-circle-info me-2 text-primary"></i>Quick Info</h6>
+                <ul class="list-unstyled mb-0 small">
+                    <li class="d-flex justify-content-between py-2 border-bottom">
+                        <span class="text-muted">Status</span>
+                        {% if handoff.status == 'DRAFT' %}
+                            <span class="badge bg-secondary-subtle text-secondary rounded-pill">Draft</span>
+                        {% elif handoff.status == 'READY' %}
+                            <span class="badge bg-info-subtle text-info rounded-pill">Ready</span>
+                        {% elif handoff.status == 'HANDED_OFF' %}
+                            <span class="badge bg-success-subtle text-success rounded-pill">Handed Off</span>
+                        {% elif handoff.status == 'ACKNOWLEDGED' %}
+                            <span class="badge bg-primary-subtle text-primary rounded-pill">Acknowledged</span>
+                        {% endif %}
+                    </li>
+                    <li class="d-flex justify-content-between py-2 border-bottom">
+                        <span class="text-muted">Deliverables</span>
+                        <span>{{ deliverables|length }}</span>
+                    </li>
+                    <li class="d-flex justify-content-between py-2 border-bottom">
+                        <span class="text-muted">Notes</span>
+                        <span>{{ notes|length }}</span>
+                    </li>
+                    <li class="d-flex justify-content-between py-2">
+                        <span class="text-muted">Created</span>
+                        <span>{{ handoff.created_at|date:"M j, Y" }}</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="detail-card rounded-4 p-4">
+                <h6 class="fw-bold mb-3"><i class="fa-solid fa-arrow-up-right-from-square me-2 text-primary"></i>Actions</h6>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'branding:design_handoffs' pk=br.pk %}" class="btn btn-sm btn-outline-secondary">
+                        <i class="fa-solid fa-list me-1"></i>All Handoffs
+                    </a>
+                    <a href="{% url 'branding:request_detail' br.pk %}" class="btn btn-sm btn-outline-secondary">
+                        <i class="fa-solid fa-folder me-1"></i>Back to Request
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .text-truncate-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+</style>
+{% endblock %}

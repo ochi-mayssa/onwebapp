@@ -1,0 +1,148 @@
+{% extends "services/service_detail.html" %}
+{% load humanize static %}
+
+{% block service_hero %}{% endblock %}
+
+{% block extra_head %}
+{{ block.super }}
+<!-- No extra styles needed, using futuristic base styles -->
+{% endblock %}
+
+{% block service_demo %}
+<div class="holographic-card mb-4 animate-on-scroll slide-up">
+    <div class="card-body p-4">
+        <h5 class="card-title mb-3 text-gradient-cyan">Track Brand or Handle</h5>
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label text-white">{{ form.handle.label }}</label>
+                {{ form.handle }}
+            </div>
+            <div class="mb-3">
+                <label class="form-label text-white">{{ form.platforms.label }}</label>
+                <div class="text-secondary">
+                    {{ form.platforms }}
+                </div>
+            </div>
+            <div class="mb-3 text-white">
+                <label class="form-label">{{ form.days.label }}</label>
+                {{ form.days }}
+            </div>
+            <button class="holographic-btn w-100">Run Tracking</button>
+        </form>
+    </div>
+</div>
+
+{% if result %}
+<div class="holographic-card mb-4 animate-on-scroll slide-up">
+    <div class="card-body p-4">
+        <h5 class="card-title text-gradient-cyan">Overview for {{ result.handle }}</h5>
+        <p class="text-secondary">{{ result.summary }}</p>
+
+        <div class="row g-3 mb-3">
+            <div class="col-md-6">
+                <div class="p-3 border border-secondary border-opacity-25 rounded-3 bg-dark bg-opacity-50">
+                    <small class="text-secondary">Total Likes</small>
+                    <div class="h4 mt-1 text-white">{{ result.platform_totals|dictsortreversed }}</div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="p-3 border border-secondary border-opacity-25 rounded-3 bg-dark bg-opacity-50">
+                    <small class="text-secondary">Total Conversions</small>
+                    <div class="h4 mt-1 text-white">{% with total=0 %}{% for p,v in result.platform_totals.items %}{% with total=total|add:v.conversions %}{% endwith %}{% endfor %}{{ total }}{% endwith %}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-md-6">
+                <h6 class="text-white">Sentiment</h6>
+                <div style="height:180px;">
+                    <canvas id="sentimentChart" aria-label="Sentiment distribution pie chart"></canvas>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h6 class="text-white">Referral Traffic</h6>
+                <div style="height:180px;">
+                    <canvas id="referralChart" aria-label="Referral traffic bar chart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <h6 class="text-white">Top Content</h6>
+            <div class="row g-2">
+                {% for c in result.top_content %}
+                <div class="col-sm-6">
+                    <div class="p-3 border border-secondary border-opacity-25 rounded-3 h-100 bg-dark bg-opacity-50">
+                        <small class="text-secondary">{{ c.platform }}</small>
+                        <div class="fw-bold text-white">{{ c.text }}</div>
+                        <div class="small text-secondary">❤️ {{ c.likes }} • 🔁 {{ c.shares }} • 💬 {{ c.comments }} • Conversions: {{ c.conversions }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <h6 class="text-white">Trending Topics</h6>
+            <div>
+                {% for t in result.trending_topics %}
+                <span class="badge bg-primary bg-opacity-25 text-white border border-primary me-2 mb-2">{{ t.topic }} ({{ t.count }})</span>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <h6 class="text-white">Recommendations</h6>
+            <ul class="text-secondary">
+                {% for r in result.recommendations %}
+                <li>{{ r }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="mt-4">
+            <h6 class="text-white">SEO & Keyword Alignment</h6>
+            <div>
+                <strong class="text-white">Suggested keywords from top topic:</strong>
+                <div>
+                    {% for k in result.alignment.top_topic_keywords %}
+                    <span class="badge bg-secondary bg-opacity-25 text-white border border-secondary border-opacity-25 me-1">{{ k }}</span>
+                    {% endfor %}
+                </div>
+                <div class="mt-2">
+                    <strong class="text-white">Landing page SEO checks:</strong>
+                    <ul class="text-secondary">
+                        {% for s in result.alignment.landing_seo %}
+                        <li>{{ s.url }} — Score: {{ s.seo_score }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function(){
+        {% if result %}
+        try {
+            if(typeof initChartFromJSON === 'function'){
+                // Sentiment Chart
+                {{ result.charts.sentiment|json_script:"chart-data-sentiment" }}
+                initChartFromJSON('sentimentChart', 'chart-data-sentiment', {type: 'doughnut'});
+                
+                // Referral Chart
+                {{ result.charts.referral|json_script:"chart-data-referral" }}
+                initChartFromJSON('referralChart', 'chart-data-referral', {type: 'bar'});
+            }
+        } catch(e){ console.warn('Chart init error:', e); }
+        {% endif %}
+    });
+</script>
+{% endblock %}

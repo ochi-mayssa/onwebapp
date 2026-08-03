@@ -1,0 +1,588 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans "OnWebApp — All-in-one Business Automation Platform" %}{% endblock %}
+
+{% block navbar_class %}fixed-top navbar-expand-lg{% endblock %}
+
+{% block extra_head %}
+<!-- Lucide Icons -->
+<script src="https://unpkg.com/lucide@latest"></script>
+<!-- Animate.css for entrance animations -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+<style>
+    /* Premium Hero */
+    .hero-section {
+        padding: 180px 0 120px;
+        position: relative;
+        background: radial-gradient(circle at 70% 30%, rgba(99, 102, 241, 0.05) 0%, transparent 50%),
+                    radial-gradient(circle at 10% 70%, rgba(6, 182, 212, 0.05) 0%, transparent 50%);
+    }
+
+    .hero-title {
+        font-size: clamp(3rem, 8vw, 4.5rem);
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        line-height: 1.1;
+        margin-bottom: 24px;
+    }
+
+    .hero-subtitle {
+        font-size: 1.25rem;
+        color: var(--text-secondary);
+        margin-bottom: 40px;
+        max-width: 600px;
+        font-weight: 450;
+    }
+
+    .hero-preview-container {
+        position: relative;
+        perspective: 1000px;
+    }
+
+    .hero-preview {
+        border-radius: 24px;
+        box-shadow: var(--card-shadow-xl);
+        border: 1px solid var(--glass-border);
+        background: var(--glass-bg);
+        transform: rotateY(-10deg) rotateX(5deg);
+        transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .hero-preview:hover {
+        transform: rotateY(0) rotateX(0);
+    }
+
+    /* Dashboard Preview Section */
+    .dashboard-preview-section {
+        background: var(--bg-surface-secondary);
+        border-radius: 48px;
+        margin: 0 24px;
+        padding: 80px 0;
+    }
+
+    /* Comparison Table */
+    .comp-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
+    .comp-row { background: var(--bg-surface-secondary); border-radius: 12px; transition: all 0.3s ease; }
+    .comp-row:hover { background: var(--bg-surface-tertiary); transform: translateX(8px); }
+    .comp-cell { padding: 20px; border-top: 1px solid transparent; border-bottom: 1px solid transparent; }
+    .comp-cell:first-child { border-left: 1px solid transparent; border-top-left-radius: 12px; border-bottom-left-radius: 12px; }
+    .comp-cell:last-child { border-right: 1px solid transparent; border-top-right-radius: 12px; border-bottom-right-radius: 12px; }
+
+    .x-small { font-size: 0.8rem; }
+    .uppercase { text-transform: uppercase; }
+    .tracking-widest { letter-spacing: 0.15em; }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- 1. Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-7 reveal-up">
+                <h1 class="hero-title"><span class="text-gradient">All-in-one</span> <br>Business Automation Platform.</h1>
+                <p class="hero-subtitle">Unified CRM, ERP, Analytics, and RPA in one beautiful system. Streamline your enterprise intelligence and automate growth.</p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="{% url 'users:signup' %}" class="btn btn-primary btn-lg px-5 py-3 rounded-pill shadow-lg">{% trans "Get Started" %}</a>
+                    <a href="{% url 'chatbot:chatbot' %}" class="btn btn-outline-primary btn-lg px-5 py-3 rounded-pill"> {% trans "View Demo" %}</a>
+                </div>
+            </div>
+            <div class="col-lg-5 d-none d-lg-block reveal-up delay-200">
+                <div class="hero-preview p-2">
+                    <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80" alt="OnWebApp Dashboard Preview" class="img-fluid rounded-4">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 2. Problem -> Solution Section -->
+<section class="section-padding bg-surface position-relative">
+    <div class="container">
+        <div class="text-center mb-5 reveal-up">
+            <h6 class="text-primary fw-800 uppercase x-small tracking-widest mb-3">Unified Operations</h6>
+            <h2 class="fw-800 display-5 mb-3">Stop juggling <span class="text-danger">scattered tools</span>.</h2>
+            <p class="text-secondary fs-5 mx-auto" style="max-width: 600px;">OnWebApp unifies your entire business operations into a single source of truth.</p>
+        </div>
+        <div class="row g-5 align-items-center">
+            <div class="col-lg-6 reveal-up delay-100">
+                <div class="p-5 rounded-4 bg-surface-secondary border border-color">
+                    <div class="d-flex align-items-center gap-3 mb-4">
+                        <div class="p-3 rounded-3 bg-danger-soft text-danger">
+                            <i data-lucide="alert-circle"></i>
+                        </div>
+                        <h4 class="fw-800 mb-0">The Problem</h4>
+                    </div>
+                    <ul class="list-unstyled vstack gap-4 mb-0">
+                        <li class="d-flex gap-3">
+                            <i data-lucide="x" class="text-danger opacity-50" style="width: 20px;"></i>
+                            <div>
+                                <span class="fw-bold d-block">Fragmented Data</span>
+                                <small class="text-secondary">Data scattered across multiple disconnected apps and spreadsheets.</small>
+                            </div>
+                        </li>
+                        <li class="d-flex gap-3">
+                            <i data-lucide="x" class="text-danger opacity-50" style="width: 20px;"></i>
+                            <div>
+                                <span class="fw-bold d-block">Subscription Fatigue</span>
+                                <small class="text-secondary">High costs for 5+ different software subscriptions and API connectors.</small>
+                            </div>
+                        </li>
+                        <li class="d-flex gap-3">
+                            <i data-lucide="x" class="text-danger opacity-50" style="width: 20px;"></i>
+                            <div>
+                                <span class="fw-bold d-block">Manual Overhead</span>
+                                <small class="text-secondary">Manual data entry causing human errors and operational delays.</small>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-6 reveal-up delay-200">
+                <div class="p-5 rounded-4 bg-primary text-white shadow-lg position-relative overflow-hidden">
+                    <div class="position-absolute top-0 end-0 p-5 opacity-10">
+                        <i data-lucide="zap" style="width: 120px; height: 120px;"></i>
+                    </div>
+                    <div class="d-flex align-items-center gap-3 mb-4">
+                        <div class="p-3 rounded-3 bg-white bg-opacity-20 text-white">
+                            <i data-lucide="check-circle"></i>
+                        </div>
+                        <h4 class="fw-800 mb-0">The OnWebApp Solution</h4>
+                    </div>
+                    <ul class="list-unstyled vstack gap-4 mb-0">
+                        <li class="d-flex gap-3">
+                            <i data-lucide="plus" class="text-white" style="width: 20px;"></i>
+                            <div>
+                                <span class="fw-bold d-block">100% Unified Architecture</span>
+                                <small class="text-white text-opacity-75">Every module shares the same database for instant consistency.</small>
+                            </div>
+                        </li>
+                        <li class="d-flex gap-3">
+                            <i data-lucide="plus" class="text-white" style="width: 20px;"></i>
+                            <div>
+                                <span class="fw-bold d-block">Consolidated Cost</span>
+                                <small class="text-white text-opacity-75">One transparent subscription for CRM, ERP, Analytics, and RPA.</small>
+                            </div>
+                        </li>
+                        <li class="d-flex gap-3">
+                            <i data-lucide="plus" class="text-white" style="width: 20px;"></i>
+                            <div>
+                                <span class="fw-bold d-block">Industrial Automation</span>
+                                <small class="text-white text-opacity-75">Intelligent workflows built into every core business process.</small>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 3. Core Features Section -->
+<section class="section-padding bg-surface-secondary">
+    <div class="container">
+        <div class="text-center mb-5 reveal-up">
+            <h6 class="text-primary fw-800 uppercase x-small tracking-widest mb-3">Enterprise Suite</h6>
+            <h2 class="fw-800 display-5">Intelligence, <span class="text-primary">Simplified</span>.</h2>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4 reveal-up delay-100">
+                <div class="card h-100 border-0 shadow-sm hover-lift">
+                    <div class="card-body p-4">
+                        <div class="bg-primary-soft text-primary p-3 rounded-3 d-inline-block mb-4">
+                            <i data-lucide="users"></i>
+                        </div>
+                        <h4 class="fw-bold">CRM System</h4>
+                        <p class="text-secondary small mb-4">Track leads, monitor customer health, and automate engagement with AI-driven insights.</p>
+                        <div class="rounded-3 overflow-hidden border">
+                            <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&q=80" class="img-fluid opacity-75" alt="CRM UI Preview">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4 reveal-up delay-200">
+                <div class="card h-100 border-0 shadow-sm hover-lift">
+                    <div class="card-body p-4">
+                        <div class="bg-success-soft text-success p-3 rounded-3 d-inline-block mb-4">
+                            <i data-lucide="package"></i>
+                        </div>
+                        <h4 class="fw-bold">ERP Integration</h4>
+                        <p class="text-secondary small mb-4">Manage stock, orders, and enterprise invoicing with full ERPNext cloud synchronization.</p>
+                        <div class="rounded-3 overflow-hidden border">
+                            <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=400&q=80" class="img-fluid opacity-75" alt="ERP UI Preview">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4 reveal-up delay-300">
+                <div class="card h-100 border-0 shadow-sm hover-lift">
+                    <div class="card-body p-4">
+                        <div class="bg-info-soft text-info p-3 rounded-3 d-inline-block mb-4">
+                            <i data-lucide="bar-chart-3"></i>
+                        </div>
+                        <h4 class="fw-bold">Live Analytics</h4>
+                        <p class="text-secondary small mb-4">Real-time business intelligence with interactive charts and market distribution mapping.</p>
+                        <div class="rounded-3 overflow-hidden border">
+                            <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&q=80" class="img-fluid opacity-75" alt="Analytics UI Preview">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- More features... -->
+        </div>
+    </div>
+</section>
+            <div class="col-md-6 col-lg-4 reveal-up delay-100">
+                <div class="card h-100 border-0 shadow-sm hover-lift">
+                    <div class="card-body p-4">
+                        <div class="bg-accent-purple text-white p-3 rounded-3 d-inline-block mb-4" style="--accent-purple: #8b5cf6;">
+                            <i data-lucide="cpu"></i>
+                        </div>
+                        <h4 class="fw-bold">Automation Engine</h4>
+                        <p class="text-secondary small mb-4">Deploy custom RPA workflows that handle repetitive tasks with industrial-grade reliability.</p>
+                        <div class="rounded-3 overflow-hidden border">
+                            <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&q=80" class="img-fluid opacity-75" alt="RPA UI Preview">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4 reveal-up delay-200">
+                <div class="card h-100 border-0 shadow-sm hover-lift">
+                    <div class="card-body p-4">
+                        <div class="bg-accent-cyan text-white p-3 rounded-3 d-inline-block mb-4" style="--accent-cyan: #06b6d4;">
+                            <i data-lucide="activity"></i>
+                        </div>
+                        <h4 class="fw-bold">Platform Monitoring</h4>
+                        <p class="text-secondary small mb-4">Global uptime checks, Core Web Vitals, and security audits for your entire digital ecosystem.</p>
+                        <div class="rounded-3 overflow-hidden border">
+                            <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&q=80" class="img-fluid opacity-75" alt="Monitoring UI Preview">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4 reveal-up delay-300">
+                <div class="card h-100 border-0 shadow-sm hover-lift">
+                    <div class="card-body p-4">
+                        <div class="bg-accent-pink text-white p-3 rounded-3 d-inline-block mb-4" style="--accent-pink: #ec4899;">
+                            <i data-lucide="share-2"></i>
+                        </div>
+                        <h4 class="fw-bold">Social Tracking</h4>
+                        <p class="text-secondary small mb-4">Monitor brand sentiment and social engagement across all platforms in real-time.</p>
+                        <div class="rounded-3 overflow-hidden border">
+                            <img src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=400&q=80" class="img-fluid opacity-75" alt="Social UI Preview">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 4. How It Works Section -->
+<section class="section-padding bg-surface overflow-hidden">
+    <div class="container">
+        <div class="text-center mb-5 reveal-up">
+            <h6 class="text-primary fw-800 uppercase x-small tracking-widest mb-3">Workflow</h6>
+            <h2 class="fw-800 display-5">A Seamless Business Flow.</h2>
+            <p class="text-secondary">From lead capture to revenue analytics in one automated loop.</p>
+        </div>
+        <div class="position-relative">
+            <!-- Connection Line -->
+            <div class="d-none d-lg-block position-absolute top-50 start-0 end-0 translate-middle-y" style="height: 2px; background: linear-gradient(90deg, transparent, var(--border-color), transparent); z-index: 0;"></div>
+            
+            <div class="row g-4 justify-content-center position-relative" style="z-index: 1;">
+                <div class="col-md-4 col-lg-2 reveal-up delay-100">
+                    <div class="text-center">
+                        <div class="mx-auto mb-4 d-flex align-items-center justify-content-center bg-surface border border-color shadow-sm rounded-circle" style="width: 80px; height: 80px;">
+                            <i data-lucide="user-plus" class="text-primary"></i>
+                        </div>
+                        <h6 class="fw-bold mb-2">Lead In</h6>
+                        <p class="x-small text-secondary mb-0">CRM captures & qualifies leads.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 col-lg-2 reveal-up delay-200">
+                    <div class="text-center">
+                        <div class="mx-auto mb-4 d-flex align-items-center justify-content-center bg-surface border border-color shadow-sm rounded-circle" style="width: 80px; height: 80px;">
+                            <i data-lucide="shopping-cart" class="text-primary"></i>
+                        </div>
+                        <h6 class="fw-bold mb-2">ERP Order</h6>
+                        <p class="x-small text-secondary mb-0">Syncs to inventory & sales.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 col-lg-2 reveal-up delay-300">
+                    <div class="text-center">
+                        <div class="mx-auto mb-4 d-flex align-items-center justify-content-center bg-surface border border-color shadow-sm rounded-circle" style="width: 80px; height: 80px;">
+                            <i data-lucide="file-text" class="text-primary"></i>
+                        </div>
+                        <h6 class="fw-bold mb-2">Invoice</h6>
+                        <p class="x-small text-secondary mb-0">Auto-generated & sent.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 col-lg-2 reveal-up delay-400">
+                    <div class="text-center">
+                        <div class="mx-auto mb-4 d-flex align-items-center justify-content-center bg-surface border border-color shadow-sm rounded-circle" style="width: 80px; height: 80px;">
+                            <i data-lucide="credit-card" class="text-primary"></i>
+                        </div>
+                        <h6 class="fw-bold mb-2">Payment</h6>
+                        <p class="x-small text-secondary mb-0">Securely processed.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 col-lg-2 reveal-up delay-500">
+                    <div class="text-center">
+                        <div class="mx-auto mb-4 d-flex align-items-center justify-content-center bg-surface border border-color shadow-sm rounded-circle" style="width: 80px; height: 80px;">
+                            <i data-lucide="pie-chart" class="text-primary"></i>
+                        </div>
+                        <h6 class="fw-bold mb-2">Insights</h6>
+                        <p class="x-small text-secondary mb-0">Data feeds analytics.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 5. Live Demo / Preview Section -->
+<section class="section-padding bg-slate-900 text-white position-relative overflow-hidden" style="border-radius: 0 0 64px 64px;">
+    <!-- Abstract Glow -->
+    <div class="position-absolute top-50 start-50 translate-middle w-100 h-100" style="background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%); z-index: 0;"></div>
+    
+    <div class="container position-relative" style="z-index: 1;">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-5 reveal-up">
+                <h6 class="text-primary fw-800 uppercase x-small tracking-widest mb-3">Live Interface</h6>
+                <h2 class="fw-800 display-5 mb-4">Experience the <span class="text-white">Command Center</span>.</h2>
+                <p class="text-white text-opacity-60 mb-5 fs-5">Our high-performance interface is designed for decision-makers. Get instant clarity on your business health with our integrated command center.</p>
+                <div class="vstack gap-4">
+                    <div class="p-4 rounded-4 bg-white bg-opacity-5 border border-white border-opacity-10 d-flex align-items-center gap-4">
+                        <div class="p-3 rounded-3 bg-primary bg-opacity-20 text-primary"><i data-lucide="zap"></i></div>
+                        <div>
+                            <h6 class="fw-bold mb-1">Real-time Synchronization</h6>
+                            <p class="small text-white text-opacity-50 mb-0">Zero delay between ERPNext and OnWebApp.</p>
+                        </div>
+                    </div>
+                    <div class="p-4 rounded-4 bg-white bg-opacity-5 border border-white border-opacity-10 d-flex align-items-center gap-4">
+                        <div class="p-3 rounded-3 bg-primary bg-opacity-20 text-primary"><i data-lucide="shield"></i></div>
+                        <div>
+                            <h6 class="fw-bold mb-1">JWT-Encrypted Security</h6>
+                            <p class="small text-white text-opacity-50 mb-0">Your enterprise data is protected by industry standards.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-7 reveal-up delay-200">
+                <div class="hero-preview-container">
+                    <div class="p-2 bg-white bg-opacity-10 rounded-4 border border-white border-opacity-10">
+                        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1000&q=80" alt="OnWebApp UI Preview" class="img-fluid rounded-3 shadow-2xl">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 6. Why OnWebApp Section (Comparison) -->
+<section class="section-padding bg-surface">
+    <div class="container">
+        <div class="text-center mb-5 reveal-up">
+            <h6 class="text-primary fw-800 uppercase x-small tracking-widest mb-3">Why Us?</h6>
+            <h2 class="fw-800 display-5">The smarter alternative to fragmented software stacks.</h2>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="p-4 p-md-5 rounded-4 bg-surface-secondary border border-color">
+                    <div class="table-responsive">
+                        <table class="comp-table">
+                            <thead>
+                                <tr>
+                                    <th class="p-4 fw-800 fs-5">Feature</th>
+                                    <th class="p-4 fw-800 fs-5 text-secondary">Traditional Stack</th>
+                                    <th class="p-4 fw-800 fs-5 text-primary">OnWebApp</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="comp-row reveal-up">
+                                    <td class="comp-cell fw-bold">Data Architecture</td>
+                                    <td class="comp-cell text-secondary">Siloed / Scattered</td>
+                                    <td class="comp-cell fw-bold text-primary">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <i data-lucide="check-circle-2" class="text-primary" style="width: 18px;"></i>
+                                            100% Unified
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="comp-row reveal-up">
+                                    <td class="comp-cell fw-bold">Automation</td>
+                                    <td class="comp-cell text-secondary">Manual / Plugins</td>
+                                    <td class="comp-cell fw-bold text-primary">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <i data-lucide="check-circle-2" class="text-primary" style="width: 18px;"></i>
+                                            Native RPA Engine
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="comp-row reveal-up">
+                                    <td class="comp-cell fw-bold">Setup Time</td>
+                                    <td class="comp-cell text-secondary">Weeks of Integration</td>
+                                    <td class="comp-cell fw-bold text-primary">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <i data-lucide="check-circle-2" class="text-primary" style="width: 18px;"></i>
+                                            Instant Sync
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="comp-row reveal-up">
+                                    <td class="comp-cell fw-bold">Enterprise Cost</td>
+                                    <td class="comp-cell text-secondary">Multiple Subscriptions</td>
+                                    <td class="comp-cell fw-bold text-primary">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <i data-lucide="check-circle-2" class="text-primary" style="width: 18px;"></i>
+                                            One Fixed Fee
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 7. Pricing Section -->
+<section class="section-padding bg-surface-secondary">
+    <div class="container">
+        <div class="text-center mb-5 reveal-up">
+            <h6 class="text-primary fw-800 uppercase x-small tracking-widest mb-3">Pricing</h6>
+            <h2 class="fw-800 display-5">Plans for Every Stage.</h2>
+            <p class="text-secondary">Transparent pricing that scales with your business.</p>
+        </div>
+        <div class="row g-4 align-items-stretch">
+            <div class="col-lg-4 reveal-up delay-100">
+                <div class="card h-100 border-0 shadow-sm d-flex flex-column">
+                    <div class="card-body p-5 d-flex flex-column">
+                        <h4 class="fw-800 mb-1">Starter</h4>
+                        <p class="text-secondary small mb-4">Perfect for startups.</p>
+                        <div class="display-5 fw-800 mb-4">$0<span class="fs-6 text-secondary fw-normal">/mo</span></div>
+                        <ul class="list-unstyled vstack gap-3 mb-5 text-secondary small flex-grow-1">
+                            <li class="d-flex align-items-center gap-2"><i data-lucide="check" class="text-success" style="width: 16px;"></i> Basic CRM Dashboard</li>
+                            <li class="d-flex align-items-center gap-2"><i data-lucide="check" class="text-success" style="width: 16px;"></i> 1 ERP Sync Module</li>
+                            <li class="d-flex align-items-center gap-2"><i data-lucide="check" class="text-success" style="width: 16px;"></i> Up to 500 Leads</li>
+                            <li class="d-flex align-items-center gap-2"><i data-lucide="check" class="text-success" style="width: 16px;"></i> Standard Support</li>
+                        </ul>
+                        <a href="{% url 'users:signup' %}" class="btn btn-outline-primary w-100 py-3 rounded-pill">Start Free Trial</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 reveal-up delay-200">
+                <div class="card h-100 border-primary border-2 shadow-lg d-flex flex-column position-relative">
+                    <div class="position-absolute top-0 start-50 translate-middle">
+                        <span class="badge bg-primary text-white rounded-pill px-4 py-2">Most Popular</span>
+                    </div>
+                    <div class="card-body p-5 d-flex flex-column">
+                        <h4 class="fw-800 mb-1">Professional</h4>
+                        <p class="text-secondary small mb-4">For growing enterprises.</p>
+                        <div class="display-5 fw-800 text-primary mb-4">$49<span class="fs-6 text-secondary fw-normal">/mo</span></div>
+                        <ul class="list-unstyled vstack gap-3 mb-5 small flex-grow-1">
+                            <li class="d-flex align-items-center gap-2"><i data-lucide="check" class="text-success" style="width: 16px;"></i> Advanced CRM + Analytics</li>
+                            <li class="d-flex align-items-center gap-2"><i data-lucide="check" class="text-success" style="width: 16px;"></i> Full ERPNext Integration</li>
+                            <li class="d-flex align-items-center gap-2"><i data-lucide="check" class="text-success" style="width: 16px;"></i> 5 RPA Automations</li>
+                            <li class="d-flex align-items-center gap-2"><i data-lucide="check" class="text-success" style="width: 16px;"></i> Priority Email Support</li>
+                        </ul>
+                        <a href="{% url 'users:signup' %}" class="btn btn-primary w-100 py-3 rounded-pill">Get Pro Now</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 reveal-up delay-300">
+                <div class="card h-100 border-0 bg-slate-900 text-white d-flex flex-column">
+                    <div class="card-body p-5 d-flex flex-column">
+                        <h4 class="fw-800 mb-1">Enterprise</h4>
+                        <p class="text-white text-opacity-50 small mb-4">Full-scale power.</p>
+                        <div class="display-5 fw-800 mb-4">Custom</div>
+                        <ul class="list-unstyled vstack gap-3 mb-5 text-white text-opacity-75 small flex-grow-1">
+                            <li class="d-flex align-items-center gap-2"><i data-lucide="check" class="text-primary" style="width: 16px;"></i> Unlimited Everything</li>
+                            <li class="d-flex align-items-center gap-2"><i data-lucide="check" class="text-primary" style="width: 16px;"></i> Custom RPA Development</li>
+                            <li class="d-flex align-items-center gap-2"><i data-lucide="check" class="text-primary" style="width: 16px;"></i> Dedicated Account Manager</li>
+                            <li class="d-flex align-items-center gap-2"><i data-lucide="check" class="text-primary" style="width: 16px;"></i> 24/7 Phone Support</li>
+                        </ul>
+                        <a href="{% url 'contact:contact' %}" class="btn btn-white w-100 py-3 rounded-pill">Contact Sales</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 8. Trust Section -->
+<section class="py-5 bg-surface border-top border-bottom">
+    <div class="container">
+        <div class="row g-5 align-items-center justify-content-center text-center">
+            <div class="col-6 col-md-3 reveal-up">
+                <div class="mx-auto mb-3 text-primary"><i data-lucide="shield-check" style="width: 40px; height: 40px;"></i></div>
+                <h6 class="fw-bold small mb-1">Enterprise Security</h6>
+                <p class="x-small text-secondary mb-0">JWT & AES-256 Encryption</p>
+            </div>
+            <div class="col-6 col-md-3 reveal-up delay-100">
+                <div class="mx-auto mb-3 text-primary"><i data-lucide="zap" style="width: 40px; height: 40px;"></i></div>
+                <h6 class="fw-bold small mb-1">99.9% Uptime</h6>
+                <p class="x-small text-secondary mb-0">SLA-backed infrastructure</p>
+            </div>
+            <div class="col-6 col-md-3 reveal-up delay-200">
+                <div class="mx-auto mb-3 text-primary"><i data-lucide="database" style="width: 40px; height: 40px;"></i></div>
+                <h6 class="fw-bold small mb-1">Daily Backups</h6>
+                <p class="x-small text-secondary mb-0">Redundant cloud storage</p>
+            </div>
+            <div class="col-6 col-md-3 reveal-up delay-300">
+                <div class="mx-auto mb-3 text-primary"><i data-lucide="users" style="width: 40px; height: 40px;"></i></div>
+                <h6 class="fw-bold small mb-1">Global Support</h6>
+                <p class="x-small text-secondary mb-0">24/7 technical assistance</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 9. Final CTA Section -->
+<section class="section-padding bg-primary position-relative overflow-hidden">
+    <!-- Abstract Pattern -->
+    <div class="position-absolute top-0 start-0 w-100 h-100 opacity-10" style="background-image: radial-gradient(#fff 1px, transparent 1px); background-size: 32px 32px;"></div>
+    
+    <div class="container position-relative text-center text-white" style="z-index: 1;">
+        <div class="reveal-up">
+            <h2 class="fw-800 display-4 mb-4">Start managing your business smarter today.</h2>
+            <p class="text-white text-opacity-75 fs-5 mb-5 mx-auto" style="max-width: 600px;">Join 500+ companies that have unified their operations with OnWebApp. Deploy in minutes, scale for years.</p>
+            <div class="d-flex flex-wrap gap-3 justify-content-center">
+                <a href="{% url 'users:signup' %}" class="btn btn-lg btn-white px-5 py-3 fw-800 rounded-pill shadow-lg">Start Your Free Trial</a>
+                <a href="{% url 'contact:contact' %}" class="btn btn-lg btn-outline-white px-5 py-3 fw-800 rounded-pill">Request a Demo</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    // Scroll Reveal Animation
+    function reveal() {
+        var reveals = document.querySelectorAll(".reveal-up");
+        for (var i = 0; i < reveals.length; i++) {
+            var windowHeight = window.innerHeight;
+            var elementTop = reveals[i].getBoundingClientRect().top;
+            var elementVisible = 100;
+            if (elementTop < windowHeight - elementVisible) {
+                reveals[i].classList.add("animate__animated", "animate__fadeInUp");
+                reveals[i].style.opacity = "1";
+            }
+        }
+    }
+    window.addEventListener("scroll", reveal);
+    window.addEventListener("load", reveal);
+</script>
+
+<style>
+    .x-small { font-size: 0.8rem; }
+    .uppercase { text-transform: uppercase; }
+</style>
+
+{% endblock %}

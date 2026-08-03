@@ -1,0 +1,96 @@
+{% extends "services/futuristic_service_base.html" %}
+{% load static %}
+{% block title %}Keyword Analyzer - Services{% endblock %}
+
+{% block service_content %}
+<div class="row g-4">
+    <div class="col-lg-5">
+      <div class="card border-0 rounded-4 holographic-card h-100 animate-on-scroll slide-up">
+        <div class="card-body p-4">
+          <h5 class="card-title mb-3 text-cyan neon-text">Keyword Analyzer</h5>
+          <div class="mb-4 text-cyan opacity-75 small">
+              <p class="mb-2">The Keyword Analyzer identifies opportunities: it analyzes what users are searching for on Google (volume, competition, difficulty, intent) to determine which keywords to target.</p>
+              <p class="mb-2">The Keyword Checker validates feasibility: it verifies if a site can realistically rank for these keywords (domain authority, existing competition, page quality, backlinks, etc.).</p>
+              <p class="mb-0 text-theme-primary p-2 border border-secondary border-opacity-25 rounded soft-surface mt-2"><strong>In summary:</strong><br>Keyword Analyzer = what to target<br>Keyword Checker = can we win with these keywords now</p>
+          </div>
+          
+          <form method="post" id="keywordResearchForm">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label text-theme-primary">Keyword Query</label>
+                {{ form.query }}
+            </div>
+            <div class="mb-3">
+                <label class="form-label text-theme-primary">Email Address</label>
+                {{ form.email }}
+            </div>
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn holographic-btn">
+                  <span class="spinner-border spinner-border-sm me-2 d-none" id="krSpinner" role="status" aria-hidden="true"></span>
+                  Get Suggestions
+                </button>
+                <a href="{% url 'services:keyword_checker' %}" class="btn btn-outline-secondary border-secondary border-opacity-25 hover-bg-secondary text-theme-primary">Open Keyword Checker</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-7">
+      <div class="card border-0 rounded-4 holographic-card h-100 animate-on-scroll slide-up" style="transition-delay: 0.1s;">
+        <div class="card-body p-4">
+          <h5 class="card-title mb-4 text-cyan neon-text">Results</h5>
+          {% if result %}
+            <p class="text-cyan opacity-75 mb-3">Keyword suggestions for <strong class="text-theme-primary">{{ result.query }}</strong></p>
+            <div class="d-flex flex-wrap gap-2 mb-4">
+              {% for k in result.suggested_keywords %}
+                <span class="badge bg-cyan bg-opacity-10 text-cyan border border-cyan border-opacity-25 p-2 rounded-pill">{{ k }}</span>
+              {% endfor %}
+            </div>
+            {% if result.chart %}
+              <div class="mt-4 p-3 border border-secondary border-opacity-25 rounded-3 soft-surface">
+                <h6 class="text-theme-primary mb-3">Keyword Trend</h6>
+                <div style="position: relative; height: 200px;">
+                  <canvas id="keywordChart"></canvas>
+                </div>
+                {{ result.chart|json_script:"chart-data-keyword" }}
+              </div>
+            {% endif %}
+          {% else %}
+            <div class="alert alert-info bg-cyan bg-opacity-10 border-cyan border-opacity-25 text-cyan">
+                <i class="fas fa-search me-2"></i>Submit a keyword to get suggestions.
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Disable form on submit and show spinner
+  const krForm = document.getElementById('keywordResearchForm');
+  if (krForm) {
+    krForm.addEventListener('submit', function(e) {
+      const btn = krForm.querySelector('button[type="submit"]');
+      const spinner = document.getElementById('krSpinner');
+      if(btn) btn.setAttribute('disabled', 'disabled');
+      if (spinner) spinner.classList.remove('d-none');
+    });
+  }
+
+  // Add theme-aware input styling
+  document.querySelectorAll('#keywordResearchForm input, #keywordResearchForm select, #keywordResearchForm textarea').forEach(el => {
+    el.classList.add('form-control','cyber-input','bg-transparent');
+  });
+
+  // Initialize chart if data is present
+  const keywordScript = document.getElementById('chart-data-keyword');
+  if (keywordScript && typeof initChartFromJSON === 'function') {
+    const getThemeColor = (varName) => getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+    const primaryColor = getThemeColor('--neon-blue') || '#06b6d4';
+    try { initChartFromJSON('keywordChart','chart-data-keyword',{type:'bar', color: primaryColor}); } catch (err) { console.warn('Chart init error', err); }
+  }
+</script>
+{% endblock %}

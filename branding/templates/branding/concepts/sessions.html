@@ -1,0 +1,149 @@
+{% extends 'branding/base.html' %}
+{% load branding_extras %}
+
+{% block title %}Presentation Sessions · {{ request_obj.request_number }}{% endblock %}
+
+{% block branding_content %}
+<div class="detail-page">
+    <div class="container py-4 py-lg-5">
+
+        <div class="d-flex align-items-start justify-content-between flex-wrap gap-3 mb-4">
+            <div>
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <a href="{% url 'branding:concept_list' request_pk=request_obj.pk %}" class="btn btn-back btn-sm"><i class="fa-solid fa-arrow-left me-1"></i>All Concepts</a>
+                    <span class="request-number-display">{{ request_obj.request_number }}</span>
+                </div>
+                <h1 class="fw-800 mb-1"><i class="fa-solid fa-desktop me-2 text-primary"></i>Presentation Sessions</h1>
+                <p class="text-muted mb-0">{{ request_obj.company_name }} · {{ upcoming|length }} upcoming, {{ past|length }} past</p>
+            </div>
+        </div>
+
+        {% if is_designer %}
+        <div class="detail-card rounded-4 p-4 mb-4">
+            <h6 class="fw-800 mb-3"><i class="fa-solid fa-calendar-plus me-2 text-primary"></i>Schedule New Session</h6>
+            <form method="post" action="{% url 'branding:concept_session_update' pk=request_obj.pk session_id=0 %}">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="create">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label fw-700 small">Title</label>
+                        <input type="text" name="title" class="form-control" placeholder="e.g. Concept Review #1" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-700 small">Date & Time</label>
+                        <input type="datetime-local" name="scheduled_at" class="form-control" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-700 small">Meeting Link</label>
+                        <input type="url" name="meeting_link" class="form-control" placeholder="https://...">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-700 small">Notes</label>
+                        <textarea name="notes" class="form-control" rows="2" placeholder="Session description or agenda…"></textarea>
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-brand-primary"><i class="fa-solid fa-plus me-2"></i>Schedule Session</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        {% endif %}
+
+        {% if upcoming %}
+        <div class="mb-4">
+            <h5 class="fw-800 mb-3"><i class="fa-solid fa-calendar-days me-2 text-primary"></i>Upcoming Sessions</h5>
+            <div class="d-flex flex-column gap-3">
+                {% for session in upcoming %}
+                <div class="detail-card rounded-4 p-4">
+                    <div class="d-flex align-items-start justify-content-between flex-wrap gap-3">
+                        <div class="d-flex gap-3">
+                            <div class="flex-shrink-0 text-center" style="min-width: 56px;">
+                                <div class="fw-800 text-primary" style="font-size: 1.4rem; line-height: 1;">{{ session.scheduled_at|date:"d" }}</div>
+                                <div class="x-small text-muted fw-700">{{ session.scheduled_at|date:"M Y" }}</div>
+                                <div class="x-small text-muted">{{ session.scheduled_at|date:"H:i" }}</div>
+                            </div>
+                            <div>
+                                <h6 class="fw-800 mb-1">{{ session.title }}</h6>
+                                <div class="d-flex align-items-center gap-2 flex-wrap mb-2">
+                                    <span class="badge rounded-pill px-2 py-1 status-pill status-{{ session.status|lower }}">{{ session.get_status_display|default:session.status }}</span>
+                                    {% if session.meeting_link %}
+                                    <a href="{{ session.meeting_link }}" target="_blank" class="x-small text-primary text-decoration-none"><i class="fa-solid fa-video me-1"></i>Join Meeting</a>
+                                    {% endif %}
+                                </div>
+                                {% if session.notes %}
+                                <p class="x-small text-muted mb-0">{{ session.notes|truncatewords:30 }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% if is_designer %}
+                        <div class="d-flex gap-2 flex-wrap">
+                            <form method="post" action="{% url 'branding:concept_session_update' pk=request_obj.pk session_id=session.pk %}" class="d-inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="start">
+                                <button type="submit" class="btn btn-sm btn-success"><i class="fa-solid fa-play me-1"></i>Start</button>
+                            </form>
+                            <form method="post" action="{% url 'branding:concept_session_update' pk=request_obj.pk session_id=session.pk %}" class="d-inline" onsubmit="return confirm('Cancel this session?');">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="cancel">
+                                <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-xmark me-1"></i>Cancel</button>
+                            </form>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if past %}
+        <div>
+            <h5 class="fw-800 mb-3"><i class="fa-solid fa-clock-rotate-left me-2 text-muted"></i>Past Sessions</h5>
+            <div class="d-flex flex-column gap-3">
+                {% for session in past %}
+                <div class="detail-card rounded-4 p-4" style="opacity: .85;">
+                    <div class="d-flex align-items-start justify-content-between flex-wrap gap-3">
+                        <div class="d-flex gap-3">
+                            <div class="flex-shrink-0 text-center" style="min-width: 56px;">
+                                <div class="fw-800 text-muted" style="font-size: 1.4rem; line-height: 1;">{{ session.scheduled_at|date:"d" }}</div>
+                                <div class="x-small text-muted fw-700">{{ session.scheduled_at|date:"M Y" }}</div>
+                                <div class="x-small text-muted">{{ session.scheduled_at|date:"H:i" }}</div>
+                            </div>
+                            <div>
+                                <h6 class="fw-800 mb-1">{{ session.title }}</h6>
+                                <div class="d-flex align-items-center gap-2 flex-wrap mb-2">
+                                    <span class="badge rounded-pill px-2 py-1 status-pill status-{{ session.status|lower }}">{{ session.get_status_display|default:session.status }}</span>
+                                    {% if session.recording_link %}
+                                    <a href="{{ session.recording_link }}" target="_blank" class="x-small text-primary text-decoration-none"><i class="fa-solid fa-circle-play me-1"></i>Watch Recording</a>
+                                    {% endif %}
+                                </div>
+                                {% if session.notes %}
+                                <p class="x-small text-muted mb-0">{{ session.notes|truncatewords:30 }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <span class="x-small text-muted">{{ session.scheduled_at|date:"M j, Y" }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if not upcoming and not past %}
+        <div class="detail-card rounded-4 p-5 text-center">
+            <div class="empty-state-icon mb-3" style="font-size: 4rem; color: var(--bs-primary); opacity: .3;">
+                <i class="fa-solid fa-desktop"></i>
+            </div>
+            <h4 class="fw-800 mb-2">No Sessions Yet</h4>
+            <p class="text-muted mb-0" style="max-width: 420px; margin: 0 auto;">
+                {% if is_designer %}Schedule a presentation session to review concepts with the client.{% else %}Your designer will schedule presentation sessions soon.{% endif %}
+            </p>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

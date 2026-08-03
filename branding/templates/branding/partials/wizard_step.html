@@ -1,0 +1,283 @@
+{% load branding_extras %}
+{% if step == 1 %}
+<!-- ============================ STEP 1 — COMPANY INFORMATION ============================ -->
+<div class="wizard-panel" data-step="1">
+    <div class="row g-4">
+        <div class="col-md-6">
+            <label class="brand-field-label" for="id_company_name">Company Name <span class="text-danger">*</span></label>
+            <div class="brand-input-wrap">
+                <i class="fa-solid fa-building brand-input-icon"></i>
+                <input type="text" id="id_company_name" name="company_name" class="brand-input"
+                       value="{{ draft.company_name }}" placeholder="e.g. Nova Manufacturing" required autocomplete="organization">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <label class="brand-field-label" for="id_industry">Industry <span class="text-danger">*</span></label>
+            <div class="brand-input-wrap">
+                <i class="fa-solid fa-industry brand-input-icon"></i>
+                <select id="id_industry" name="industry" class="brand-input brand-select" required>
+                    <option value="" disabled {% if not draft.industry %}selected{% endif %}>Select your industry</option>
+                    {% for value, label in industries %}
+                    <option value="{{ value }}" {% if draft.industry == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <label class="brand-field-label" for="id_website">Website <span class="text-muted">(optional)</span></label>
+            <div class="brand-input-wrap">
+                <i class="fa-solid fa-globe brand-input-icon"></i>
+                <input type="url" id="id_website" name="website" class="brand-input"
+                       value="{{ draft.website }}" placeholder="https://yourcompany.com" autocomplete="url">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <label class="brand-field-label" for="id_country">Country</label>
+            <div class="brand-input-wrap">
+                <i class="fa-solid fa-map-location-dot brand-input-icon"></i>
+                <input type="text" id="id_country" name="country" class="brand-input"
+                       value="{{ draft.country }}" placeholder="e.g. United States" list="countryList" autocomplete="country-name">
+                <datalist id="countryList">
+                    <option value="United States"><option value="Canada"><option value="United Kingdom">
+                    <option value="France"><option value="Germany"><option value="Spain"><option value="Italy">
+                    <option value="UAE"><option value="Saudi Arabia"><option value="Egypt"><option value="Morocco">
+                    <option value="Australia"><option value="India"><option value="China"><option value="Japan">
+                    <option value="Brazil"><option value="Mexico"><option value="Nigeria"><option value="South Africa">
+                </datalist>
+            </div>
+        </div>
+        <div class="col-12">
+            <label class="brand-field-label" for="id_business_description">Business Description</label>
+            <textarea id="id_business_description" name="business_description" class="brand-input brand-textarea"
+                      rows="5" placeholder="Describe what your company does, your products or services, and what makes you unique...">{{ draft.business_description }}</textarea>
+        </div>
+    </div>
+
+    <!-- GDPR Consent -->
+    <div class="mt-4 pt-3 border-top">
+        <h6 class="fw-800 mb-3"><i class="fa-solid fa-shield-halved me-2 text-primary"></i>Data &amp; Privacy Consent</h6>
+        <div class="d-flex flex-column gap-3">
+            <label class="d-flex align-items-start gap-3 consent-check">
+                <input type="checkbox" name="consent_data_processing" value="on" class="form-check-input mt-1"
+                       {% if draft.consent_data_processing %}checked{% endif %} required>
+                <span>
+                    <span class="fw-700">Data Processing <span class="text-danger">*</span></span>
+                    <span class="d-block text-muted small">I consent to the collection and processing of my data for the purpose of this branding project. <a href="/branding/gdpr/privacy/accept/" target="_blank" class="text-primary">Privacy Policy</a></span>
+                </span>
+            </label>
+            <label class="d-flex align-items-start gap-3 consent-check">
+                <input type="checkbox" name="consent_analytics" value="on" class="form-check-input mt-1"
+                       {% if draft.consent_analytics %}checked{% endif %}>
+                <span>
+                    <span class="fw-700">Analytics</span>
+                    <span class="d-block text-muted small">I allow anonymous usage analytics to help improve the service.</span>
+                </span>
+            </label>
+            <label class="d-flex align-items-start gap-3 consent-check">
+                <input type="checkbox" name="consent_marketing" value="on" class="form-check-input mt-1"
+                       {% if draft.consent_marketing %}checked{% endif %}>
+                <span>
+                    <span class="fw-700">Marketing</span>
+                    <span class="d-block text-muted small">I would like to receive updates about new features and services.</span>
+                </span>
+            </label>
+            <label class="d-flex align-items-start gap-3 consent-check">
+                <input type="checkbox" name="consent_third_party" value="on" class="form-check-input mt-1"
+                       {% if draft.consent_third_party %}checked{% endif %}>
+                <span>
+                    <span class="fw-700">Third-Party Sharing</span>
+                    <span class="d-block text-muted small">I allow my data to be shared with design partners strictly for project execution.</span>
+                </span>
+            </label>
+        </div>
+        {% if draft.consent_timestamp %}
+        <p class="text-muted x-small mt-2 mb-0"><i class="fa-solid fa-clock-rotate-left me-1"></i>Consent last updated: {{ draft.consent_timestamp|date:"M d, Y H:i" }}</p>
+        {% endif %}
+    </div>
+</div>
+
+{% elif step == 2 %}
+<!-- ============================ STEP 2 — BRAND IDENTITY ============================ -->
+<div class="wizard-panel" data-step="2">
+    <div class="row g-4">
+        <div class="col-md-6">
+            <label class="brand-field-label" for="id_company_description">Describe your company</label>
+            <textarea id="id_company_description" name="company_description" class="brand-input brand-textarea"
+                      rows="5" placeholder="What does your company do? What do you want to be known for?">{{ draft.company_description }}</textarea>
+        </div>
+        <div class="col-md-6">
+            <label class="brand-field-label" for="id_target_audience">Who is your target audience?</label>
+            <textarea id="id_target_audience" name="target_audience" class="brand-input brand-textarea"
+                      rows="5" placeholder="Describe your ideal customers, their needs, and what resonates with them...">{{ draft.target_audience }}</textarea>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <label class="brand-field-label">What values should your brand communicate?</label>
+        <div class="option-chip-grid">
+            {% for value, label in brand_values %}
+            <label class="option-chip {% if value in draft.brand_values %}selected{% endif %}">
+                <input type="checkbox" name="brand_values" value="{{ value }}" {% if value in draft.brand_values %}checked{% endif %}>
+                <i class="fa-solid fa-circle-check chip-check"></i>
+                <span class="chip-text">{{ label }}</span>
+            </label>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <label class="brand-field-label">Preferred Colors</label>
+        <p class="text-muted small mb-3">Pick up to 5 colors that represent your brand.</p>
+
+        <!-- Custom color picker -->
+        <div class="d-flex align-items-center gap-3">
+            <div class="position-relative">
+                <input type="color" id="customColorPicker" class="custom-color-input" value="#6366f1">
+                <span class="custom-color-preview" id="customColorPreview" style="background:#6366f1"></span>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3" id="addCustomColor">
+                <i class="fa-solid fa-plus me-1"></i>Add
+            </button>
+        </div>
+
+        <!-- Selected colors preview -->
+        <div class="selected-colors mt-3" id="selectedColors">
+            {% for hex in draft.preferred_colors %}
+            <span class="selected-color-chip" data-color="{{ hex }}">
+                <span class="selected-color-fill" style="background:{{ hex }}"></span>
+                <span class="selected-color-hex">{{ hex }}</span>
+                <button type="button" class="selected-color-remove" aria-label="Remove color"><i class="fa-solid fa-xmark"></i></button>
+            </span>
+            {% endfor %}
+        </div>
+
+        <!-- Hidden inputs for form submission -->
+        <div id="colorInputs">
+            {% for hex in draft.preferred_colors %}
+            <input type="hidden" name="preferred_colors" value="{{ hex }}">
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <label class="brand-field-label">Current Branding</label>
+        <div class="option-chip-grid">
+            {% for value, label in current_branding_choices %}
+            <label class="option-chip {% if value in draft.current_branding %}selected{% endif %}">
+                <input type="checkbox" name="current_branding" value="{{ value }}" {% if value in draft.current_branding %}checked{% endif %}>
+                <i class="fa-solid fa-circle-check chip-check"></i>
+                <span class="chip-text">{{ label }}</span>
+            </label>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% elif step == 3 %}
+<!-- ============================ STEP 3 — UPLOAD ASSETS ============================ -->
+<div class="wizard-panel" data-step="3">
+    <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Upload files">
+        <input type="file" id="fileInput" multiple hidden
+               accept=".png,.jpg,.jpeg,.gif,.webp,.svg,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.ai,.psd,.zip,.rar">
+        <div class="dropzone-inner">
+            <div class="dropzone-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+            <h4 class="fw-800 mb-1">Drag &amp; drop your files here</h4>
+            <p class="text-muted mb-2">or <span class="text-primary fw-bold">browse files</span> from your device</p>
+            <div class="dropzone-types d-flex flex-wrap justify-content-center gap-2">
+                <span class="type-pill"><i class="fa-solid fa-image me-1"></i>Images</span>
+                <span class="type-pill"><i class="fa-solid fa-file-pdf me-1"></i>PDF</span>
+                <span class="type-pill"><i class="fa-solid fa-file-word me-1"></i>Word</span>
+                <span class="type-pill"><i class="fa-solid fa-pen-nib me-1"></i>AI Files</span>
+                <span class="type-pill"><i class="fa-solid fa-code me-1"></i>SVG</span>
+                <span class="type-pill"><i class="fa-solid fa-file-zipper me-1"></i>ZIP</span>
+            </div>
+            <p class="text-muted x-small mt-2 mb-0"><i class="fa-solid fa-shield-halved me-1"></i>Maximum file size: {{ max_file_size_mb }}MB</p>
+        </div>
+    </div>
+
+    <div class="upload-list mt-4" id="uploadList">
+        {% for asset in assets %}
+        <div class="upload-item" data-asset-id="{{ asset.id }}">
+            {% if asset.is_image %}
+            <img src="{{ asset.file.url }}" alt="{{ asset.original_name }}" class="upload-thumb">
+            {% else %}
+            <div class="upload-thumb upload-thumb-file"><i class="fa-solid fa-file"></i></div>
+            {% endif %}
+            <div class="upload-meta">
+                <span class="upload-name">{{ asset.original_name }}</span>
+                <span class="upload-sub">{{ asset.get_asset_type_display }} · {{ asset.size_display }}</span>
+            </div>
+            <span class="upload-type-badge">{{ asset.get_asset_type_display }}</span>
+            <button type="button" class="upload-remove" data-asset-id="{{ asset.id }}" aria-label="Remove file">
+                <i class="fa-solid fa-trash-can"></i>
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="mt-4">
+        <label class="brand-field-label" for="id_additional_notes">Additional Notes</label>
+        <textarea id="id_additional_notes" name="additional_notes" class="brand-input brand-textarea"
+                  rows="4" placeholder="Anything else we should know? References, links, deadlines, or specific requirements...">{{ draft.additional_notes }}</textarea>
+    </div>
+</div>
+
+{% elif step == 4 %}
+<!-- ============================ STEP 4 — CHOOSE COLLECTION ============================ -->
+<div class="wizard-panel" data-step="4">
+    <div class="library-filter d-flex flex-wrap gap-2 mb-4" id="libraryFilter">
+        <button type="button" class="filter-chip is-active" data-filter="all"><i class="fa-solid fa-layer-group me-1"></i>All</button>
+        {% for value, label in categories %}
+        <button type="button" class="filter-chip" data-filter="{{ value }}">{{ label }}</button>
+        {% endfor %}
+    </div>
+
+    <div class="library-groups" id="libraryGroups">
+        {% for value, label in categories %}
+        <div class="library-group" data-category="{{ value }}">
+            <h3 class="library-group-title"><i class="fa-solid fa-tag me-2"></i>{{ label }}</h3>
+            <div class="collection-grid">
+                {% for c in collections %}
+                {% if c.category == value %}
+                {% include 'branding/partials/collection_card.html' with collection=c selected=draft.collection %}
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="collection-summary mt-4 {% if not draft.collection %}d-none{% endif %}" id="collectionSummary">
+        <div class="collection-summary-inner d-flex align-items-center gap-3">
+            <img id="summaryThumb" src="" alt="" class="summary-thumb">
+            <div class="flex-grow-1">
+                <div class="x-small fw-800 text-uppercase text-primary tracking-widest">Selected Collection</div>
+                <h5 class="fw-800 mb-0" id="summaryName">—</h5>
+                <span class="text-muted small" id="summaryIndustry"></span>
+            </div>
+            <span class="summary-check"><i class="fa-solid fa-check"></i></span>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- ============================ ACTIONS ============================ -->
+<div class="wizard-actions d-flex justify-content-between align-items-center mt-4 pt-4 border-top">
+    {% if step > 1 %}
+    <button type="submit" name="action" value="prev" class="btn btn-back">
+        <i class="fa-solid fa-arrow-left me-2"></i>Back
+    </button>
+    {% else %}
+    <span></span>
+    {% endif %}
+
+    {% if step < 4 %}
+    <button type="submit" name="action" value="next" class="btn btn-brand-primary btn-next px-4">
+        Save &amp; Continue <i class="fa-solid fa-arrow-right ms-2"></i>
+    </button>
+    {% else %}
+    <button type="submit" name="action" value="submit" class="btn btn-brand-primary btn-submit px-4">
+        <i class="fa-solid fa-paper-plane me-2"></i>Submit Request
+    </button>
+    {% endif %}
+</div>

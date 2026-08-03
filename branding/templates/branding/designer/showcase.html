@@ -1,0 +1,227 @@
+{% extends "branding/base.html" %}
+{% load branding_extras %}
+
+{% block title %}Design Showcase{% endblock %}
+
+{% block branding_content %}
+<div class="container py-4">
+
+    {# ── Header ── #}
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+        <div>
+            <nav aria-label="breadcrumb" class="mb-2">
+                <ol class="breadcrumb mb-0 small">
+                    <li class="breadcrumb-item"><a href="{% url 'branding:designer_dashboard' %}" class="text-decoration-none"><i class="fa-solid fa-palette me-1"></i>My Work</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Showcase</li>
+                </ol>
+            </nav>
+            <h1 class="h4 fw-bold mb-1"><i class="fa-solid fa-trophy me-2"></i>Design Showcase</h1>
+            <p class="text-muted mb-0 small">A curated portfolio of completed design work.</p>
+        </div>
+    </div>
+
+    {# ── Category Filter ── #}
+    <div class="d-flex flex-wrap gap-2 mb-4">
+        <a href="{{ request.path }}" class="btn btn-sm {% if not category_filter %}btn-brand-primary{% else %}btn-outline-secondary{% endif %} rounded-pill">
+            All
+        </a>
+        {% for value, label in categories %}
+        <a href="{{ request.path }}?category={{ value }}" class="btn btn-sm {% if category_filter == value %}btn-brand-primary{% else %}btn-outline-secondary{% endif %} rounded-pill">
+            {{ label }}
+        </a>
+        {% endfor %}
+    </div>
+
+    {# ── Featured Projects ── #}
+    {% if featured %}
+    <div class="mb-5">
+        <h5 class="fw-bold mb-3"><i class="fa-solid fa-star me-2 text-warning"></i>Featured Projects</h5>
+        <div class="row g-3">
+            {% for p in featured %}
+            <div class="col-md-6 col-lg-4">
+                <a href="{% url 'branding:showcase_detail' showcase_id=p.pk %}" class="text-decoration-none">
+                    <div class="detail-card rounded-4 p-0 h-100 showcase-card overflow-hidden">
+                        {% if p.cover_image %}
+                        <div class="showcase-cover" style="background-image:url('{{ p.cover_image.url }}');"></div>
+                        {% else %}
+                        <div class="showcase-cover showcase-cover-placeholder">
+                            <i class="fa-solid fa-image fa-2x text-muted"></i>
+                        </div>
+                        {% endif %}
+                        <div class="p-3">
+                            <div class="d-flex align-items-start justify-content-between mb-2">
+                                <h6 class="fw-bold mb-0 text-truncate me-2">{{ p.title }}</h6>
+                                <span class="badge bg-primary-subtle text-primary rounded-pill x-small flex-shrink-0">{{ p.category }}</span>
+                            </div>
+                            <p class="x-small text-muted mb-2"><i class="fa-solid fa-user me-1"></i>{{ p.designer.get_full_name|default:p.designer.username }}</p>
+                            <div class="d-flex align-items-center gap-3 pt-2 border-top">
+                                <span class="x-small text-muted">
+                                    <i class="fa-solid fa-heart me-1"></i>{{ p.like_count }}
+                                </span>
+                                <span class="x-small text-muted">
+                                    <i class="fa-solid fa-eye me-1"></i>{{ p.view_count }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {# ── Create Showcase Project Form ── #}
+    <div class="collapse mb-5" id="createShowcaseForm">
+        <form method="post" action="{{ request.path }}" enctype="multipart/form-data" class="detail-card rounded-4 p-4">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="create_showcase">
+            <h6 class="fw-bold mb-3"><i class="fa-solid fa-cloud-arrow-up me-2 text-primary"></i>Create Showcase Project</h6>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="cs_request" class="form-label x-small fw-700">Request <span class="text-danger">*</span></label>
+                    <select class="form-select form-select-sm" id="cs_request" name="request_id" required>
+                        <option value="">Select a completed request...</option>
+                        {% for req in completed_requests %}
+                        <option value="{{ req.pk }}">{{ req.request_number }} &mdash; {{ req.company_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="cs_title" class="form-label x-small fw-700">Title <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control form-control-sm" id="cs_title" name="title" required placeholder="e.g. Logo Redesign for Acme Co">
+                </div>
+                <div class="col-12">
+                    <label for="cs_description" class="form-label x-small fw-700">Description <span class="text-danger">*</span></label>
+                    <textarea class="form-control form-control-sm" id="cs_description" name="description" rows="4" required placeholder="Describe the project, process, and outcomes..."></textarea>
+                </div>
+                <div class="col-md-4">
+                    <label for="cs_category" class="form-label x-small fw-700">Category <span class="text-danger">*</span></label>
+                    <select class="form-select form-select-sm" id="cs_category" name="category" required>
+                        <option value="">Select category...</option>
+                        {% for value, label in categories %}
+                        <option value="{{ value }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="cs_client" class="form-label x-small fw-700">Client Name</label>
+                    <input type="text" class="form-control form-control-sm" id="cs_client" name="client_name" placeholder="e.g. Acme Corporation">
+                </div>
+                <div class="col-md-4">
+                    <label for="cs_year" class="form-label x-small fw-700">Project Year</label>
+                    <input type="number" class="form-control form-control-sm" id="cs_year" name="project_year" min="2000" max="2099" placeholder="2026">
+                </div>
+                <div class="col-md-6">
+                    <label for="cs_tags" class="form-label x-small fw-700">Tags</label>
+                    <input type="text" class="form-control form-control-sm" id="cs_tags" name="tags" placeholder="e.g. logo, branding, modern">
+                    <div class="form-text">Comma-separated tags.</div>
+                </div>
+                <div class="col-md-6">
+                    <label for="cs_cover" class="form-label x-small fw-700">Cover Image</label>
+                    <input type="file" class="form-control form-control-sm" id="cs_cover" name="cover_image" accept="image/*">
+                    <div class="form-text">JPEG, PNG, or WebP. Recommended 1200x800.</div>
+                </div>
+                <div class="col-12 text-end">
+                    <button type="submit" class="btn btn-brand-primary btn-sm px-4">
+                        <i class="fa-solid fa-plus me-1"></i>Create Project
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h5 class="fw-bold mb-0"><i class="fa-solid fa-grid-2 me-2 text-muted"></i>All Projects</h5>
+        <button type="button" class="btn btn-sm btn-brand-primary" data-bs-toggle="collapse" data-bs-target="#createShowcaseForm">
+            <i class="fa-solid fa-plus me-1"></i>New Project
+        </button>
+    </div>
+
+    {# ── All Projects Grid ── #}
+    {% if projects %}
+    <div class="row g-3">
+        {% for p in projects %}
+        <div class="col-md-6 col-lg-4">
+            <a href="{% url 'branding:showcase_detail' showcase_id=p.pk %}" class="text-decoration-none">
+                <div class="detail-card rounded-4 p-0 h-100 showcase-card overflow-hidden">
+                    {% if p.cover_image %}
+                    <div class="showcase-cover" style="background-image:url('{{ p.cover_image.url }}');"></div>
+                    {% else %}
+                    <div class="showcase-cover showcase-cover-placeholder">
+                        <i class="fa-solid fa-image fa-2x text-muted"></i>
+                    </div>
+                    {% endif %}
+                    <div class="p-3">
+                        <div class="d-flex align-items-start justify-content-between mb-2">
+                            <h6 class="fw-bold mb-0 text-truncate me-2">{{ p.title }}</h6>
+                            <span class="badge bg-primary-subtle text-primary rounded-pill x-small flex-shrink-0">{{ p.category }}</span>
+                        </div>
+                        <p class="x-small text-muted mb-1"><i class="fa-solid fa-user me-1"></i>{{ p.designer.get_full_name|default:p.designer.username }}</p>
+                        {% if p.client_name %}
+                        <p class="x-small text-muted mb-2"><i class="fa-solid fa-building me-1"></i>{{ p.client_name }}</p>
+                        {% endif %}
+                        <div class="d-flex flex-wrap gap-1 mb-2">
+                            {% for tag in p.tags_list %}
+                            <span class="badge bg-light text-dark rounded-pill x-small">{{ tag }}</span>
+                            {% endfor %}
+                        </div>
+                        <div class="d-flex align-items-center gap-3 pt-2 border-top">
+                            <span class="x-small text-muted">
+                                <i class="fa-solid fa-heart me-1"></i>{{ p.like_count }}
+                            </span>
+                            <span class="x-small text-muted">
+                                <i class="fa-solid fa-eye me-1"></i>{{ p.view_count }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="detail-card rounded-4 p-5 text-center">
+        <div class="mx-auto mb-3" style="width:64px;height:64px;border-radius:50%;background:var(--bs-tertiary-bg,#f1f5f9);display:flex;align-items:center;justify-content:center;">
+            <i class="fa-regular fa-folder-open fa-2x text-muted"></i>
+        </div>
+        <h5 class="fw-bold">No showcase projects yet</h5>
+        <p class="text-muted mb-3">Create your first showcase project to display your design work.</p>
+        <button type="button" class="btn btn-brand-primary btn-sm" data-bs-toggle="collapse" data-bs-target="#createShowcaseForm">
+            <i class="fa-solid fa-plus me-1"></i>Create Project
+        </button>
+    </div>
+    {% endif %}
+
+</div>
+
+<style>
+    .text-truncate-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .showcase-card {
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+        border: 1px solid var(--bs-border-color, #e2e8f0);
+    }
+    .showcase-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    .showcase-cover {
+        width: 100%;
+        height: 180px;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+    .showcase-cover-placeholder {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--bs-tertiary-bg, #f1f5f9);
+    }
+</style>
+{% endblock %}

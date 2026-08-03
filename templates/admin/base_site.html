@@ -1,0 +1,14 @@
+{% extends "admin/base.html" %}
+{% load i18n %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block branding %}
+<h1 id="site-name"><a href="{% url 'admin:index' %}">{{ site_header|default:_('Django administration') }}</a></h1>
+{% endblock %}
+
+{% block nav-global %}
+<div style="float: right; margin-right: 20px; padding-top: 10px;">
+    <a href="{% url 'crm:dashboard' %}" style="color: var(--header-link-color, var(--text-primary, #fff)); font-weight: bold; text-decoration: none; font-size: 14px;">CRM Dashboard</a>
+</div>
+{% endblock %}

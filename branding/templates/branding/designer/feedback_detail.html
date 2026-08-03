@@ -1,0 +1,101 @@
+{% extends "branding/base.html" %}
+{% load branding_extras %}
+{% block title %}{{ fr.subject }} — Feedback{% endblock %}
+{% block branding_content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'branding:designer_dashboard' %}">Dashboard</a></li>
+             <li class="breadcrumb-item"><a href="{% url 'branding:request_detail' pk=br.pk %}">{{ br.request_number }}</a></li>
+             <li class="breadcrumb-item"><a href="{% url 'branding:designer_feedback_requests' br.pk %}">Feedback Requests</a></li>
+            <li class="breadcrumb-item active">{{ fr.subject }}</li>
+        </ol>
+    </nav>
+
+    <a href="{% url 'branding:designer_feedback_requests' br.pk %}" class="btn btn-outline-secondary btn-sm mb-4">
+        <i class="fas fa-arrow-left me-1"></i> Back to Requests
+    </a>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white d-flex flex-wrap justify-content-between align-items-center">
+            <h4 class="mb-0">{{ fr.subject }}</h4>
+            <div class="mt-2 mt-md-0">
+                {% if fr.status == 'PENDING' %}
+                    <span class="badge bg-warning text-dark">Pending</span>
+                {% elif fr.status == 'RESPONDED' %}
+                    <span class="badge bg-success">Responded</span>
+                {% elif fr.status == 'CLOSED' %}
+                    <span class="badge bg-secondary">Closed</span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row text-muted small mb-3">
+                <div class="col-sm-4 mb-2">
+                    <i class="fas fa-user me-1"></i>
+                    <strong>Designer:</strong> {{ fr.designer.get_full_name|default:fr.designer.username }}
+                </div>
+                <div class="col-sm-4 mb-2">
+                    <i class="fas fa-calendar-plus me-1"></i>
+                    <strong>Created:</strong> {{ fr.created_at|date:"M d, Y H:i" }}
+                </div>
+                <div class="col-sm-4 mb-2">
+                    <i class="fas fa-calendar-check me-1"></i>
+                    <strong>Client Responded:</strong>
+                    {% if fr.client_responded_at %}
+                        {{ fr.client_responded_at|date:"M d, Y H:i" }}
+                    {% else %}
+                        —
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if fr.message %}
+                <div class="card bg-light border-0 mb-4">
+                    <div class="card-body">
+                        <h6 class="card-title text-muted mb-2"><i class="fas fa-envelope me-1"></i> Message</h6>
+                        <p class="card-text mb-0">{{ fr.message|linebreaksbr }}</p>
+                    </div>
+                </div>
+            {% endif %}
+
+            <h5 class="mb-3"><i class="fas fa-list-check me-1"></i> Questions</h5>
+            {% if questions %}
+                {% for q in questions %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <p class="fw-bold mb-2">Q{{ forloop.counter }}: {{ q.question_text }}</p>
+                            {% if q.is_answered %}
+                                <div class="alert alert-success py-2 px-3 mb-0">
+                                    <i class="fas fa-check-circle me-1"></i> {{ q.client_answer }}
+                                </div>
+                            {% else %}
+                                <div class="alert alert-warning py-2 px-3 mb-0">
+                                    <i class="fas fa-clock me-1"></i> Awaiting response
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-muted">No questions have been added to this request.</p>
+            {% endif %}
+
+            {% if fr.status == 'PENDING' %}
+                <hr>
+                <form method="POST" action="{{ request.path }}">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="mark_received">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-check me-1"></i> Mark as Received
+                    </button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+
+    <a href="{% url 'branding:request_detail' pk=br.pk %}" class="btn btn-primary">
+        <i class="fas fa-eye me-1"></i> View Request
+    </a>
+</div>
+{% endblock %}

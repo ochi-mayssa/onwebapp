@@ -1,0 +1,53 @@
+{% extends "community/wizard/base_wizard.html" %}
+{% load static i18n %}
+
+{% block wizard_content %}
+<div class="wizard-card">
+    <div class="wizard-section-label mb-1">Step 2 of 13</div>
+    <h2 class="mb-2">What do you need?</h2>
+    <p class="lead mb-4">Select one or more services. We'll tailor the onboarding to your choices.</p>
+
+    <form method="post" id="serviceForm">
+        {% csrf_token %}
+
+        <div class="row g-3">
+            {% for service in services %}
+            <div class="col-sm-6 col-lg-4">
+                <label class="wizard-option-card h-100" for="svc_{{ service.slug }}">
+                    <input type="checkbox" name="services" value="{{ service.slug }}" id="svc_{{ service.slug }}" class="wizard-check-input" {% if service.slug in selected_slugs %}checked{% endif %}>
+                    <div class="option-icon"><i class="{{ service.icon }}"></i></div>
+                    <h6>{{ service.name }}</h6>
+                    <p>{{ service.description|truncatechars:60 }}</p>
+                    <div class="mt-2">
+                        <span class="badge bg-light text-dark small"><i class="fas fa-clock me-1"></i>{{ service.estimated_duration }}</span>
+                        {% if service.base_price > 0 %}
+                        <span class="badge bg-light text-dark small ms-1">From ${{ service.base_price|floatformat:0 }}</span>
+                        {% endif %}
+                    </div>
+                </label>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="mt-5 text-center">
+            <button type="submit" class="btn-wizard-next px-5 py-3">
+                Continue <i class="fas fa-arrow-right ms-2"></i>
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block wizard_js %}
+<script>
+document.querySelectorAll('.wizard-option-card').forEach(card => {
+    const input = card.querySelector('input');
+    if (input && input.checked) card.classList.add('selected');
+    card.addEventListener('click', () => {
+        setTimeout(() => {
+            card.classList.toggle('selected', input.checked);
+        }, 10);
+    });
+});
+</script>
+{% endblock %}

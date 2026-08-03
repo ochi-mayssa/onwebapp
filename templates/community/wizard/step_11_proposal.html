@@ -1,0 +1,117 @@
+{% extends "community/wizard/base_wizard.html" %}
+{% load static i18n %}
+
+{% block wizard_content %}
+<div class="wizard-card">
+    <div class="wizard-section-label mb-1">Step 11 of 13</div>
+    <h2 class="mb-2">Your Proposal</h2>
+    <p class="lead mb-4">Review the AI-generated proposal for your project.</p>
+
+    <div id="proposalLoading" class="text-center py-5">
+        <div class="spinner-border text-primary mb-3" role="status" style="width:3rem;height:3rem;"></div>
+        <p class="text-secondary fw-600">Generating your proposal...</p>
+    </div>
+
+    <div id="proposalContent" class="d-none">
+        <div class="card rounded-3 border-0 mb-4" style="background:var(--bg-surface-secondary,#f8fafc);">
+            <div class="card-body p-4">
+                <h5 class="fw-800 mb-3">{{ session.project_name|default:"Your Project" }}</h5>
+                <p class="text-secondary mb-4">{{ session.project_goals|default:"Project goals will be defined here." }}</p>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3">
+                        <div class="text-center p-3 rounded-3" style="background:rgba(99,102,241,0.05);">
+                            <div class="fw-800 text-primary">${{ estimation.total_cost|default:"—" }}</div>
+                            <div class="text-secondary small">Total Cost</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center p-3 rounded-3" style="background:rgba(16,185,129,0.05);">
+                            <div class="fw-800 text-success">{{ estimation.total_days|default:"—" }} days</div>
+                            <div class="text-secondary small">Timeline</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center p-3 rounded-3" style="background:rgba(245,158,11,0.05);">
+                            <div class="fw-800 text-warning">{{ session.get_package_display|default:"—" }}</div>
+                            <div class="text-secondary small">Package</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center p-3 rounded-3" style="background:rgba(139,92,246,0.05);">
+                            <div class="fw-800" style="color:#8b5cf6;">{{ session.get_selected_services_list|length }}</div>
+                            <div class="text-secondary small">Services</div>
+                        </div>
+                    </div>
+                </div>
+
+                <h6 class="fw-700 mb-3"><i class="fas fa-list-check me-2 text-primary"></i>Scope of Work</h6>
+                <div class="row g-2 mb-4">
+                    {% for s in session.get_selected_services_list %}
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center gap-2 p-2 rounded-2" style="background:var(--bg-surface,#fff);">
+                            <i class="fas fa-check-circle text-success"></i>
+                            <span class="small fw-600">{{ s }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <h6 class="fw-700 mb-3"><i class="fas fa-cog me-2 text-primary"></i>Features Included</h6>
+                <div class="row g-2 mb-4">
+                    {% for f in session.get_features_list %}
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center gap-2 p-2 rounded-2" style="background:var(--bg-surface,#fff);">
+                            <i class="fas fa-puzzle-piece text-primary"></i>
+                            <span class="small fw-600">{{ f }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <h6 class="fw-700 mb-3"><i class="fas fa-calendar me-2 text-primary"></i>Milestone Timeline</h6>
+                <div class="position-relative ps-4" style="border-left:2px solid #e2e8f0;">
+                    <div class="mb-3 position-relative">
+                        <div class="position-absolute" style="left:-1.1rem;top:0;width:12px;height:12px;border-radius:50%;background:#6366f1;"></div>
+                        <div class="small fw-700">Week 1-2: Discovery & Planning</div>
+                        <div class="text-secondary small">Requirements finalization, wireframes, architecture</div>
+                    </div>
+                    <div class="mb-3 position-relative">
+                        <div class="position-absolute" style="left:-1.1rem;top:0;width:12px;height:12px;border-radius:50%;background:#8b5cf6;"></div>
+                        <div class="small fw-700">Week 3-4: Design & Prototyping</div>
+                        <div class="text-secondary small">UI/UX design, brand integration, approval</div>
+                    </div>
+                    <div class="mb-3 position-relative">
+                        <div class="position-absolute" style="left:-1.1rem;top:0;width:12px;height:12px;border-radius:50%;background:#a855f7;"></div>
+                        <div class="small fw-700">Week 5-6: Development</div>
+                        <div class="text-secondary small">Core build, integrations, content setup</div>
+                    </div>
+                    <div class="mb-3 position-relative">
+                        <div class="position-absolute" style="left:-1.1rem;top:0;width:12px;height:12px;border-radius:50%;background:#10b981;"></div>
+                        <div class="small fw-700">Week 7-8: QA & Launch</div>
+                        <div class="text-secondary small">Testing, optimization, deployment, training</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4 text-center">
+            <button type="post" class="btn-wizard-next px-5 py-3" onclick="document.getElementById('advanceStep11').submit();">
+                Proceed to Payment <i class="fas fa-lock ms-2"></i>
+            </button>
+            <form method="post" id="advanceStep11" class="d-none">
+                {% csrf_token %}
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block wizard_js %}
+<script>
+setTimeout(() => {
+    document.getElementById('proposalLoading').classList.add('d-none');
+    document.getElementById('proposalContent').classList.remove('d-none');
+}, 2200);
+</script>
+{% endblock %}

@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% block title %}Enterprise SEO KPI Dashboard - OnWebApp{% endblock %}
+{% block content %}
+<div class="container mt-4 mb-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'seo_analyzer:index' %}">SEO</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Executive KPI Dashboard</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+        <div>
+            <h1 class="mb-2">Enterprise SEO KPI Dashboard</h1>
+            <p class="text-muted mb-0">A decision-ready overview built from the existing SEO checker, URL intelligence, link, sitemap, and backlink modules.</p>
+        </div>
+        <div class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2">
+            {% if overall_score is not None %}Overall Score {{ overall_score|floatformat:1 }}{% else %}Overall Score Not Available{% endif %}
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-8">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Executive Overview</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-3">This dashboard aggregates the latest completed analyses from the real SEO modules already present in the platform. Missing integrations are shown as Not Connected or Not Available rather than fabricated.</p>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="border rounded-3 p-3 h-100">
+                                <div class="small text-muted">Primary Data Sources</div>
+                                <div class="fw-semibold">{{ data_sources|join:", " }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="border rounded-3 p-3 h-100">
+                                <div class="small text-muted">Monitoring Snapshots</div>
+                                <div class="fw-semibold">{{ snapshot_count }} captured</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card shadow-sm h-100 border-info">
+                <div class="card-body">
+                    <div class="small text-uppercase text-muted fw-semibold">Trend Signal</div>
+                    <div class="h4 mt-2 mb-2">{{ trend_summary }}</div>
+                    <div class="small text-muted">This view uses the most recent monitoring snapshots and completed audits for continuity.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        {% for card in module_cards %}
+        <div class="col-md-6 col-xl-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="small text-uppercase text-muted fw-semibold">{{ card.label }}</div>
+                            <div class="display-6 mt-2">{{ card.score }}</div>
+                        </div>
+                        <span class="badge {% if card.status == 'Connected' %}bg-success-subtle text-success border border-success-subtle{% else %}bg-secondary-subtle text-secondary border border-secondary-subtle{% endif %}">{{ card.status }}</span>
+                    </div>
+                    <div class="small text-muted mt-3">{{ card.detail }}</div>
+                    <div class="small text-primary mt-2">{{ card.source }}</div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Priority Issues</h5>
+                </div>
+                <div class="card-body">
+                    {% if priority_issues %}
+                    <div class="d-flex flex-column gap-3">
+                        {% for item in priority_issues %}
+                        <div class="border rounded-3 p-3">
+                            <div class="d-flex justify-content-between align-items-start gap-3">
+                                <div>
+                                    <div class="fw-semibold">{{ item.title }}</div>
+                                    <div class="small text-muted">{{ item.detail }}</div>
+                                </div>
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle">{{ item.severity }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-muted">No issue inventory is available from the latest completed datasets yet.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Recommended Actions</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0 ps-3">
+                        {% for item in recommendations %}
+                        <li class="mb-2">{{ item }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

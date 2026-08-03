@@ -1,0 +1,279 @@
+{% if topic_intelligence %}
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body p-4">
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-3">
+            <div>
+                <div class="small text-uppercase fw-semibold text-primary">Executive Summary</div>
+                <h3 class="h5 mt-2 mb-1">AI SEO Executive Summary</h3>
+                <p class="text-muted mb-0">Lead with business context before diving into technical execution details.</p>
+            </div>
+            {% if topic_intelligence.executive_summary.overall_health_score %}
+            <span class="badge bg-success-subtle text-success border border-success-subtle fs-6">
+                Overall Health Score: {{ topic_intelligence.executive_summary.overall_health_score }}/100
+            </span>
+            {% endif %}
+        </div>
+
+        <div class="row g-3">
+            <div class="col-lg-3 col-md-6">
+                <div class="rounded-3 border h-100 p-3 bg-light">
+                    <div class="small text-uppercase text-muted fw-semibold mb-2">Primary Keyword</div>
+                    <div class="fw-semibold">{{ topic_intelligence.executive_summary.primary_keyword }}</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="rounded-3 border h-100 p-3 bg-light">
+                    <div class="small text-uppercase text-muted fw-semibold mb-2">Search Intent</div>
+                    <div class="fw-semibold">{{ topic_intelligence.executive_summary.search_intent }}</div>
+                    <div class="small text-muted">{{ topic_intelligence.executive_summary.search_intent_confidence_pct }}% confidence</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="rounded-3 border h-100 p-3 bg-light">
+                    <div class="small text-uppercase text-muted fw-semibold mb-2">Detected Topic</div>
+                    <div class="fw-semibold">{{ topic_intelligence.executive_summary.detected_topic }}</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="rounded-3 border h-100 p-3 bg-light">
+                    <div class="small text-uppercase text-muted fw-semibold mb-2">AI Visibility Potential</div>
+                    <div class="fw-semibold">{{ topic_intelligence.executive_summary.ai_visibility_potential }}/100</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-3 mt-1">
+            <div class="col-lg-6">
+                <div class="rounded-3 border h-100 p-3">
+                    <div class="small text-uppercase text-muted fw-semibold mb-2">Top 3 Critical Issues</div>
+                    <ul class="mb-0">
+                        {% for issue in topic_intelligence.executive_summary.top_critical_issues %}
+                        <li>{{ issue }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="rounded-3 border h-100 p-3">
+                    <div class="small text-uppercase text-muted fw-semibold mb-2">Top 3 AI Recommendations</div>
+                    <ul class="mb-0">
+                        {% for recommendation in topic_intelligence.executive_summary.top_ai_recommendations %}
+                        <li>{{ recommendation }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    {% for card in topic_intelligence.visual_dashboard_cards %}
+    <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="card h-100 shadow-sm border-{{ card.color }}">
+            <div class="card-body">
+                <div class="small text-uppercase text-muted fw-semibold mb-2">{{ card.title }}</div>
+                <div class="display-6 text-{{ card.color }}">
+                    {% if card.value == "Not Measured" %}
+                    {{ card.value }}
+                    {% else %}
+                    {{ card.value }}
+                    {% endif %}
+                </div>
+                <p class="small text-muted mb-0 mt-2">{{ card.explanation }}</p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white">
+                <h4 class="card-title h6 mb-0">Keyword Intelligence</h4>
+            </div>
+            <div class="card-body">
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">Primary Keyword</div>
+                        <div class="fw-semibold">{{ topic_intelligence.keyword_intelligence.primary_keyword }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">Keyword Density</div>
+                        <div class="fw-semibold">{{ topic_intelligence.keyword_intelligence.keyword_density_pct }}%</div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="small text-uppercase text-muted fw-semibold mb-2">Secondary Keywords</div>
+                    <div>{{ topic_intelligence.keyword_intelligence.secondary_keywords|join:", " }}</div>
+                </div>
+                <div class="mb-3">
+                    <div class="small text-uppercase text-muted fw-semibold mb-2">Supporting Keywords</div>
+                    <div>{{ topic_intelligence.keyword_intelligence.supporting_keywords|join:", " }}</div>
+                </div>
+                <div class="mb-3">
+                    <div class="small text-uppercase text-muted fw-semibold mb-2">Long-tail Keywords</div>
+                    <div>{{ topic_intelligence.keyword_intelligence.long_tail_keywords|join:", " }}</div>
+                </div>
+                <div class="mb-3">
+                    <div class="small text-uppercase text-muted fw-semibold mb-2">Keyword Placement</div>
+                    <div>{{ topic_intelligence.keyword_intelligence.keyword_placement|join:", " }}</div>
+                </div>
+                <div class="mb-0">
+                    <div class="small text-uppercase text-muted fw-semibold mb-2">Missing Keywords</div>
+                    <div>{{ topic_intelligence.keyword_intelligence.missing_keywords|join:", " }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white">
+                <h4 class="card-title h6 mb-0">Content Quality</h4>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="rounded-3 border h-100 p-3">
+                            <div class="small text-uppercase text-muted fw-semibold mb-2">Content Focus Score</div>
+                            <div class="fw-semibold">{{ topic_intelligence.content_quality.content_focus_score }}/100</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="rounded-3 border h-100 p-3">
+                            <div class="small text-uppercase text-muted fw-semibold mb-2">Keyword Alignment</div>
+                            <div class="fw-semibold">{{ topic_intelligence.content_quality.keyword_alignment_pct }}%</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="rounded-3 border h-100 p-3">
+                            <div class="small text-uppercase text-muted fw-semibold mb-2">Semantic Coverage</div>
+                            <div class="fw-semibold">{{ topic_intelligence.content_quality.semantic_coverage_pct }}%</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="rounded-3 border h-100 p-3">
+                            <div class="small text-uppercase text-muted fw-semibold mb-2">Topical Authority</div>
+                            <div class="fw-semibold">{{ topic_intelligence.content_quality.topical_authority_pct }}%</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="rounded-3 border h-100 p-3">
+                            <div class="small text-uppercase text-muted fw-semibold mb-2">Content Readability</div>
+                            <div class="fw-semibold">{{ topic_intelligence.content_quality.content_readability_pct }}%</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="rounded-3 border h-100 p-3">
+                            <div class="small text-uppercase text-muted fw-semibold mb-2">Heading Structure</div>
+                            <div class="fw-semibold">{{ topic_intelligence.content_quality.heading_structure_pct }}%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-white">
+        <h4 class="card-title h6 mb-0">Technical SEO Intelligence</h4>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            {% for category in topic_intelligence.technical_seo_intelligence %}
+            <div class="col-xl-4 col-md-6">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                            <div class="small text-uppercase text-muted fw-semibold">{{ category.label }}</div>
+                            <span class="badge {{ category.badge_class }}">{{ category.health_score_display }}</span>
+                        </div>
+                        <p class="small text-muted mb-2">{{ category.why_it_matters }}</p>
+                        <p class="mb-2"><strong>Problems Found:</strong> {{ category.problems_found }}</p>
+                        <p class="mb-2"><strong>Business Impact:</strong> {{ category.business_impact }}</p>
+                        <p class="mb-2"><strong>Priority:</strong> <span class="badge {{ category.priority_badge_class }}">{{ category.priority }}</span></p>
+                        <p class="mb-0"><strong>Recommended Action:</strong> {{ category.recommended_action }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white">
+                <h4 class="card-title h6 mb-0">AI SEO Insights</h4>
+            </div>
+            <div class="card-body">
+                <p class="mb-3">{{ topic_intelligence.ai_seo_insights.executive_ai_summary }}</p>
+                <div class="rounded-3 border p-3 bg-light">
+                    <div class="small text-uppercase text-muted fw-semibold mb-2">Opportunity</div>
+                    <div>{{ topic_intelligence.ai_seo_insights.opportunity_statement }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white">
+                <h4 class="card-title h6 mb-0">Action Priority</h4>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    {% for label, items in topic_intelligence.action_priority.items %}
+                    <div class="col-md-6">
+                        <div class="rounded-3 border h-100 p-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div class="small text-uppercase text-muted fw-semibold">{{ label }}</div>
+                                <span class="badge {{ items.0.badge_class|default:'bg-light text-dark border' }}">{{ items|length }} actions</span>
+                            </div>
+                            {% if items %}
+                                {% for item in items|slice:":2" %}
+                                <div class="{% if not forloop.last %}mb-3 pb-3 border-bottom{% endif %}">
+                                    <div class="fw-semibold">{{ item.action }}</div>
+                                    <div class="small text-muted mt-1">{{ item.seo_impact }}</div>
+                                    <div class="small mt-1"><strong>Business Impact:</strong> {{ item.business_impact }}</div>
+                                    <div class="small"><strong>Difficulty:</strong> {{ item.estimated_difficulty }}</div>
+                                    <div class="small"><strong>Estimated Time:</strong> {{ item.estimated_time }}</div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                            <div class="small text-muted">No actions currently prioritized in this band.</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-white">
+        <h4 class="card-title h6 mb-0">Competitor Mode (Prepared)</h4>
+    </div>
+    <div class="card-body">
+        <p class="mb-1">{{ topic_intelligence.competitor_mode.headline }}</p>
+        <p class="text-muted">{{ topic_intelligence.competitor_mode.subheadline }}</p>
+        <div class="row g-3">
+            {% for card in topic_intelligence.competitor_mode.cards %}
+            <div class="col-lg-3 col-md-6">
+                <div class="rounded-3 border h-100 p-3 bg-light">
+                    <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                        <div class="fw-semibold">{{ card.title }}</div>
+                        <span class="badge {{ card.badge_class }}">{{ card.status }}</span>
+                    </div>
+                    <div class="small text-muted">{{ card.description }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}

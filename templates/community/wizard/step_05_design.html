@@ -1,0 +1,102 @@
+{% extends "community/wizard/base_wizard.html" %}
+{% load static i18n %}
+
+{% block wizard_content %}
+<div class="wizard-card">
+    <div class="wizard-section-label mb-1">Step 5 of 13</div>
+    <h2 class="mb-2">Design Preferences</h2>
+    <p class="lead mb-4">Help our designers understand your visual direction.</p>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="row g-4">
+            <div class="col-12">
+                <label class="form-label fw-700 small">Style Direction</label>
+                <div class="row g-2">
+                    {% for style in design_styles %}
+                    <div class="col-6 col-md-3">
+                        <label class="wizard-option-card">
+                            <input type="radio" name="design_style" value="{{ style.0 }}" class="wizard-radio-input" {% if session.design_style == style.0 %}checked{% endif %}>
+                            <span class="wizard-radio-label d-block">
+                                <strong class="small">{{ style.1 }}</strong>
+                            </span>
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-700 small">Primary Color</label>
+                <div class="d-flex gap-2">
+                    <input type="color" name="primary_color" value="{{ session.primary_color|default:'#6366f1' }}" class="form-control form-control-color" style="width:50px;height:45px;border-radius:10px;">
+                    <input type="text" name="primary_color_hex" class="wizard-input flex-grow-1" placeholder="#6366f1" value="{{ session.primary_color|default:'#6366f1' }}">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-700 small">Accent Color</label>
+                <div class="d-flex gap-2">
+                    <input type="color" name="accent_color" value="{{ session.accent_color|default:'#8b5cf6' }}" class="form-control form-control-color" style="width:50px;height:45px;border-radius:10px;">
+                    <input type="text" name="accent_color_hex" class="wizard-input flex-grow-1" placeholder="#8b5cf6" value="{{ session.accent_color|default:'#8b5cf6' }}">
+                </div>
+            </div>
+
+            <div class="col-12">
+                <label class="form-label fw-700 small">Typography Style</label>
+                <div class="row g-2">
+                    {% for typo in typography_styles %}
+                    <div class="col-6 col-md-3">
+                        <label class="wizard-option-card">
+                            <input type="radio" name="typography_style" value="{{ typo.0 }}" class="wizard-radio-input" {% if session.typography_style == typo.0 %}checked{% endif %}>
+                            <span class="wizard-radio-label d-block">
+                                <strong class="small">{{ typo.1 }}</strong>
+                            </span>
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="col-12">
+                <label class="form-label fw-700 small">Reference Websites (Inspiration)</label>
+                <textarea name="inspiration_sites" class="wizard-input" rows="2" placeholder="Paste URLs of websites you like the look of...">{{ session.inspiration_sites|default:'' }}</textarea>
+            </div>
+
+            <div class="col-12">
+                <label class="form-label fw-700 small">Logo Upload</label>
+                <div class="border rounded-3 p-4 text-center" style="border-style:dashed !important; border-color: #6366f1 !important;">
+                    <input type="file" name="logo_file" accept="image/*" class="d-none" id="logoUpload">
+                    <label for="logoUpload" class="cursor-pointer mb-0">
+                        <i class="fas fa-cloud-upload-alt text-primary fs-1 mb-2"></i>
+                        <p class="text-secondary small mb-0">Click to upload or drag & drop</p>
+                        <p class="text-muted small mb-0">PNG, SVG, or JPG (max 5MB)</p>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-5 text-center">
+            <button type="submit" class="btn-wizard-next px-5 py-3">
+                Continue <i class="fas fa-arrow-right ms-2"></i>
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block wizard_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('input[type="color"]').forEach(function(picker) {
+        var suffix = picker.name === 'primary_color' ? '_hex' : '_hex';
+        var group = picker.closest('.d-flex');
+        if (!group) return;
+        var textInput = group.querySelector('input[type="text"]');
+        if (!textInput) return;
+        picker.addEventListener('input', function() { textInput.value = picker.value; });
+        textInput.addEventListener('input', function() { if (/^#[0-9A-Fa-f]{6}$/.test(textInput.value)) picker.value = textInput.value; });
+    });
+});
+</script>
+{% endblock %}

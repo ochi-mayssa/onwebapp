@@ -1,0 +1,109 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="x-apple-disable-message-reformatting">
+    <title>{% block subject %}OnWebApp Branding{% endblock %}</title>
+    <!--[if mso]>
+    <noscript>
+        <xml>
+            <o:OfficeDocumentSettings>
+                <o:AllowPNG/>
+                <o:PixelsPerInch>96</o:PixelsPerInch>
+            </o:OfficeDocumentSettings>
+        </xml>
+    </noscript>
+    <![endif]-->
+    <style>
+        /* Reset */
+        body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+        table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+        img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+        body { margin: 0 !important; padding: 0 !important; width: 100% !important; background-color: #f4f5f7; }
+
+        /* Typography */
+        * { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; }
+
+        /* Responsive */
+        @media only screen and (max-width: 620px) {
+            .email-container { width: 100% !important; max-width: 100% !important; }
+            .fluid { max-width: 100% !important; height: auto !important; }
+            .stack-column { display: block !important; width: 100% !important; max-width: 100% !important; }
+            .center-on-narrow { text-align: center !important; display: block !important; margin-left: auto !important; margin-right: auto !important; float: none !important; }
+            .padding-mobile { padding-left: 20px !important; padding-right: 20px !important; }
+        }
+    </style>
+</head>
+<body style="margin:0; padding:0; background-color:#f4f5f7;">
+    <!-- Preview text (hidden) -->
+    {% block preview_text %}{% endblock %}
+
+    <!-- Full-width wrapper -->
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color:#f4f5f7;">
+        <tr>
+            <td align="center" style="padding: 40px 10px;">
+
+                <!-- Email container -->
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" class="email-container" style="max-width:600px; margin:0 auto;">
+
+                    <!-- Logo Header -->
+                    <tr>
+                        <td style="padding: 30px 40px 20px; text-align: center; background-color:#ffffff; border-radius:12px 12px 0 0;">
+                            <a href="{{ site_url|default:'https://onwebapp.com' }}" style="text-decoration:none;">
+                                <h1 style="margin:0; font-size:22px; font-weight:800; color:#4f46e5; letter-spacing:-0.5px;">
+                                    <span style="color:#4f46e5;">On</span><span style="color:#1e293b;">WebApp</span>
+                                    <span style="color:#94a3b8; font-weight:400; font-size:14px; display:block; margin-top:4px;">Branding Studio</span>
+                                </h1>
+                            </a>
+                        </td>
+                    </tr>
+
+                    <!-- Accent Bar -->
+                    <tr>
+                        <td style="background: linear-gradient(135deg, #4f46e5, #7c3aed); height:4px; font-size:0; line-height:0;">
+                            <!--[if mso]><v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:600px;height:4px;"><v:fill type="gradient" color="#4f46e5" color2="#7c3aed" angle="135"/></v:rect><![endif]-->
+                            &nbsp;
+                        </td>
+                    </tr>
+
+                    <!-- Body Content -->
+                    <tr>
+                        <td style="background-color:#ffffff; padding: 40px 40px 30px;" class="padding-mobile">
+                            {% block content %}{% endblock %}
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color:#f8fafc; padding: 30px 40px; border-top: 1px solid #e2e8f0; border-radius: 0 0 12px 12px;" class="padding-mobile">
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                                <tr>
+                                    <td style="text-align:center;">
+                                        <p style="margin:0 0 8px; font-size:12px; color:#94a3b8; line-height:1.5;">
+                                            OnWebApp Branding Studio &middot; {{ site_url|default:"https://onwebapp.com" }}
+                                        </p>
+                                        <p style="margin:0 0 8px; font-size:12px; color:#94a3b8; line-height:1.5;">
+                                            You're receiving this because of your activity on your branding project.
+                                        </p>
+                                        <p style="margin:0; font-size:11px; color:#cbd5e1; line-height:1.5;">
+                                            <a href="{{ site_url|default:'https://onwebapp.com' }}/branding/notifications/" style="color:#6366f1; text-decoration:underline;">Manage notifications</a>
+                                            &middot;
+                                            <a href="{{ site_url|default:'https://onwebapp.com' }}/branding/gdpr/consent/" style="color:#6366f1; text-decoration:underline;">Privacy settings</a>
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                </table>
+                <!-- /Email Container -->
+
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

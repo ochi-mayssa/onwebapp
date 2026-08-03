@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans "Admin Project Management" %} | OnWebApp{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'projects:platform_dashboard' %}">Admin</a></li>
+<li class="breadcrumb-item active">Project Details</li>
+{% endblock %}
+
+{% block page_title %}{{ project.title }}{% endblock %}
+{% block page_subtitle %}{% trans "Enterprise project oversight and milestone management." %}{% endblock %}
+
+{% block page_actions %}
+<div class="d-flex gap-2">
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPhaseModal">
+        <i data-lucide="plus"></i>
+        <span>Add Phase</span>
+    </button>
+</div>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="row g-5">
+    <!-- Main Admin Controls -->
+    <div class="col-lg-8">
+        <!-- Project Stats -->
+        <div class="card mb-5">
+            <div class="card-body p-4">
+                <div class="row g-4 text-center">
+                    <div class="col-6 col-md-3">
+                        <div class="text-muted x-small uppercase fw-600 mb-1">Overall Progress</div>
+                        <div class="fw-bold text-primary display-6">{{ project.progress_percentage }}%</div>
+                    </div>
+                    <div class="col-6 col-md-3 border-start">
+                        <div class="text-muted x-small uppercase fw-600 mb-1">Priority</div>
+                        <span class="badge {% if project.priority == 'HIGH' %}bg-danger text-white{% elif project.priority == 'MEDIUM' %}bg-warning text-dark{% else %}bg-primary text-white{% endif %} rounded-pill">
+                            {{ project.priority }}
+                        </span>
+                    </div>
+                    <div class="col-6 col-md-3 border-start">
+                        <div class="text-muted x-small uppercase fw-600 mb-1">Phases</div>
+                        <div class="fw-bold text-slate-900 fs-4">{{ phases|length }}</div>
+                    </div>
+                    <div class="col-6 col-md-3 border-start">
+                        <div class="text-muted x-small uppercase fw-600 mb-1">Status</div>
+                        <div class="fw-bold text-slate-700 small">{{ project.get_current_status_display }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Agile Plan Management -->
+        <div class="card mb-5">
+            <div class="card-header bg-white p-4 border-bottom d-flex justify-content-between align-items-center">
+                <h6 class="fw-bold text-slate-900 mb-0">Agile Plan Management</h6>
+                <span class="badge {% if project.agile_status == 'APPROVED' %}bg-success-subtle text-success{% elif project.agile_status == 'CHANGES_REQUESTED' %}bg-danger-subtle text-danger{% else %}bg-warning-subtle text-warning{% endif %}">
+                    {{ project.get_agile_status_display }}
+                </span>
+            </div>
+            <div class="card-body p-4">
+                <form action="{% url 'projects:upload_agile_plan' project.id %}" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="p-4 rounded-4 bg-slate-50 border border-dashed mb-4">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <i data-lucide="upload-cloud" class="text-slate-400"></i>
+                            <span class="small text-slate-600">Upload new PDF/Docx roadmap to notify client</span>
+                        </div>
+                        <input type="file" name="agile_plan_file" class="form-control border-slate-200" required>
+                    </div>
+                    <button type="submit" class="btn btn-outline-primary w-100">Upload & Reset Approval Status</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Phases Management -->
+        <div class="vstack gap-4">
+            <h6 class="text-slate-900 fw-bold small uppercase px-1" style="letter-spacing: 0.05em;">Manage Project Lifecycle</h6>
+            {% for phase in phases %}
+            <div class="card">
+                <div class="card-header bg-white p-4 border-bottom d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="fw-bold text-slate-900">{{ phase.get_phase_type_display }}</span>
+                        <span class="badge {% if phase.status == 'COMPLETED' %}bg-success-subtle text-success{% elif phase.status == 'IN_PROGRESS' %}bg-primary-subtle text-primary{% else %}bg-slate-100 text-slate-500{% endif %}">
+                            {{ phase.get_status_display }}
+                        </span>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#uploadDeliverable-{{ phase.id }}">
+                            <i data-lucide="plus" style="width: 14px;"></i> Deliverable
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <form action="{% url 'projects:update_phase_status' project.id phase.id %}" method="post" class="row g-3">
+                        {% csrf_token %}
+                        <div class="col-md-6">
+                            <label class="form-label x-small fw-bold text-muted uppercase">Set Status</label>
+                            <select name="status" class="form-select form-select-sm border-slate-200">
+                                {% for code,label in phase.PHASE_STATUS_CHOICES %}
+                                <option value="{{ code }}" {% if phase.status == code %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary btn-sm w-100">Update Phase</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Right Admin Sidebar -->
+    <div class="col-lg-4">
+        <div class="card mb-5">
+            <div class="card-header bg-white p-4 border-bottom">
+                <h6 class="fw-bold text-slate-900 mb-0">Project Settings</h6>
+            </div>
+            <div class="card-body p-4">
+                <form action="{% url 'projects:update_project_meta' project.id %}" method="post" class="vstack gap-4">
+                    {% csrf_token %}
+                    <div>
+                        <label class="form-label x-small fw-bold text-muted uppercase">Target Delivery</label>
+                        <input type="date" name="expected_delivery_date" class="form-control border-slate-200" value="{{ project.expected_delivery_date|date:'Y-m-d' }}">
+                    </div>
+                    <div>
+                        <label class="form-label x-small fw-bold text-muted uppercase">Assign Team</label>
+                        <input type="text" name="assigned_team" class="form-control border-slate-200" value="{{ project.assigned_team }}" placeholder="e.g. Design Team A">
+                    </div>
+                    <button type="submit" class="btn btn-slate-900 text-white w-100 py-3">Update Metadata</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card border-danger border-opacity-10 bg-danger-subtle bg-opacity-10 p-4 rounded-4">
+            <h6 class="fw-bold text-danger mb-3">Danger Zone</h6>
+            <p class="x-small text-danger opacity-75 mb-4">Deleting this project will permanently remove all associated data, phases, and messages.</p>
+            <button class="btn btn-danger w-100" onclick="if(confirm('Are you absolutely sure?')) alert('Contact superadmin to delete.')">Delete Project</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        lucide.createIcons();
+    });
+</script>
+<style>
+    .uppercase { text-transform: uppercase; }
+    .x-small { font-size: 0.75rem; }
+</style>
+{% endblock %}

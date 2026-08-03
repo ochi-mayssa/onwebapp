@@ -1,0 +1,50 @@
+{% extends "community/wizard/base_wizard.html" %}
+{% load static i18n %}
+
+{% block wizard_content %}
+<div class="wizard-card">
+    <div class="wizard-section-label mb-1">Step 4 of 13</div>
+    <h2 class="mb-2">Project Details</h2>
+    <p class="lead mb-4">Tell us about your goals, timeline, and budget.</p>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="row g-4">
+            <div class="col-12">
+                <label class="form-label fw-700 small">Project Name *</label>
+                <input type="text" name="project_name" class="wizard-input" placeholder="e.g. Company Rebrand, New E-commerce Store" value="{{ session.project_name|default:'' }}" required>
+            </div>
+            <div class="col-12">
+                <label class="form-label fw-700 small">Project Goals *</label>
+                <textarea name="project_goals" class="wizard-input" rows="3" placeholder="What do you want to achieve with this project?" required>{{ session.project_goals|default:'' }}</textarea>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-700 small">Target Launch Date</label>
+                <input type="date" name="target_launch_date" class="wizard-input" value="{{ session.target_launch_date|default:'' }}">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-700 small">Budget Range *</label>
+                <select name="budget_range" class="wizard-input" required>
+                    <option value="">Select budget range</option>
+                    <option value="under_5k" {% if session.budget_range == 'under_5k' %}selected{% endif %}>Under $5,000</option>
+                    <option value="5k_10k" {% if session.budget_range == '5k_10k' %}selected{% endif %}>$5,000 - $10,000</option>
+                    <option value="10k_25k" {% if session.budget_range == '10k_25k' %}selected{% endif %}>$10,000 - $25,000</option>
+                    <option value="25k_50k" {% if session.budget_range == '25k_50k' %}selected{% endif %}>$25,000 - $50,000</option>
+                    <option value="50k_plus" {% if session.budget_range == '50k_plus' %}selected{% endif %}>$50,000+</option>
+                </select>
+            </div>
+            <div class="col-12">
+                <label class="form-label fw-700 small">Additional Notes</label>
+                <textarea name="additional_notes" class="wizard-input" rows="2" placeholder="Any other context, constraints, or preferences...">{{ session.additional_notes|default:'' }}</textarea>
+            </div>
+        </div>
+
+        <div class="mt-5 text-center">
+            <button type="submit" class="btn-wizard-next px-5 py-3">
+                Continue <i class="fas fa-arrow-right ms-2"></i>
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

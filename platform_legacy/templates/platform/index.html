@@ -1,0 +1,159 @@
+{% extends 'platform/base_platform.html' %}
+{% load static %}
+
+{% block title %}Industrial Platform Dashboard{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1 class="h2">
+            <i class="fas fa-industry text-primary me-2"></i>
+            Industrial Platform Dashboard
+        </h1>
+        <p class="text-muted">Welcome to your industrial automation and analytics control center</p>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card platform-card border-primary">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-subtitle mb-2 text-muted">Website Analysis</h6>
+                        <h2 class="card-title">{{ stats.website_tools_count }}</h2>
+                        <p class="card-text small">Tools available</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-sitemap fa-2x text-primary"></i>
+                    </div>
+                </div>
+                <a href="#" class="btn btn-sm btn-outline-primary">Explore</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card platform-card border-success">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-subtitle mb-2 text-muted">IoT Devices</h6>
+                        <h2 class="card-title">12</h2>
+                        <p class="card-text small">Connected</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-microchip fa-2x text-success"></i>
+                    </div>
+                </div>
+                <a href="#" class="btn btn-sm btn-outline-success">Manage</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card platform-card border-info">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-subtitle mb-2 text-muted">Social Accounts</h6>
+                        <h2 class="card-title">8</h2>
+                        <p class="card-text small">Active tracking</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-share-alt fa-2x text-info"></i>
+                    </div>
+                </div>
+                <a href="#" class="btn btn-sm btn-outline-info">Analyze</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card platform-card border-warning">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-subtitle mb-2 text-muted">Security Score</h6>
+                        <h2 class="card-title">{{ stats.security_score }}%</h2>
+                        <p class="card-text small">All systems secure</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-shield-alt fa-2x text-warning"></i>
+                    </div>
+                </div>
+                <a href="#" class="btn btn-sm btn-outline-warning">Audit</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Access Sections -->
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-sitemap me-2"></i> Website Structure Tools
+                </h5>
+            </div>
+            <div class="card-body">
+                <p>Analyze and optimize your website's structure for better SEO and performance.</p>
+                <div class="list-group list-group-flush">
+                    {% for tool in website_tools %}
+                    <a href="{{ tool.url }}" class="list-group-item list-group-item-action">
+                        <i class="{{ tool.icon }} me-2"></i> {{ tool.name }}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-robot me-2"></i> Industrial Automation
+                </h5>
+            </div>
+            <div class="card-body">
+                <p>Monitor and control your IoT devices and industrial systems in real-time.</p>
+                <div class="list-group list-group-flush">
+                    <a href="#" class="list-group-item list-group-item-action">
+                        <i class="fas fa-microchip me-2"></i> IoT Device Dashboard
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action">
+                        <i class="fas fa-chart-line me-2"></i> Real-time Analytics
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action">
+                        <i class="fas fa-cogs me-2"></i> Automation Rules
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action">
+                        <i class="fas fa-bell me-2"></i> Alerts & Notifications
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Call to Action -->
+<div class="row mt-4">
+    <div class="col">
+        <div class="card border-0 bg-light">
+            <div class="card-body text-center py-5">
+                <h3 class="card-title mb-3">Ready to Optimize Your Digital Infrastructure?</h3>
+                <p class="card-text mb-4">Access advanced tools for website analysis, industrial automation, social media tracking, and security monitoring.</p>
+                <a href="#" class="btn btn-primary btn-lg me-2">
+                    <i class="fas fa-play-circle me-2"></i> Start Analysis
+                </a>
+                <a href="#" class="btn btn-outline-secondary btn-lg">
+                    <i class="fas fa-book me-2"></i> View Documentation
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

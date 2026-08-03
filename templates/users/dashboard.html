@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans "Enterprise Intelligence Dashboard" %} | OnWebApp{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active">Dashboard</li>
+{% endblock %}
+
+{% block page_title %}{% trans "Operational Command Center" %}{% endblock %}
+{% block page_subtitle %}{% trans "Unified overview of your enterprise intelligence and automation." %}{% endblock %}
+
+{% block page_actions %}
+<div class="d-flex gap-3">
+    <div class="p-1 rounded-pill bg-surface-secondary border border-color d-flex align-items-center px-3">
+        <div class="spinner-grow spinner-grow-sm text-success me-2" role="status" style="width: 8px; height: 8px;"></div>
+        <span class="small fw-800 text-secondary">System Live</span>
+    </div>
+    <a href="{% url 'home:build_website' %}" class="btn btn-primary rounded-pill px-4 shadow-lg">
+        <i data-lucide="plus" class="me-2"></i> Create Project
+    </a>
+</div>
+{% endblock %}
+
+{% block dashboard_content %}
+<!-- KPI Cards Row -->
+<div class="row g-4 mb-5">
+    <div class="col-md-6 col-lg-3">
+        <div class="card kpi-card border-0">
+            <div class="kpi-icon-wrapper" style="background-color: rgba(99, 102, 241, 0.1); color: #6366f1;">
+                <i data-lucide="users"></i>
+            </div>
+            <div class="kpi-value">1,284</div>
+            <div class="kpi-label">Active Customers</div>
+            <div class="position-absolute bottom-0 end-0 p-3 opacity-10">
+                <i data-lucide="users" style="width: 64px; height: 64px;"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+        <div class="card kpi-card border-0">
+            <div class="kpi-icon-wrapper" style="background-color: rgba(16, 185, 129, 0.1); color: #10b981;">
+                <i data-lucide="dollar-sign"></i>
+            </div>
+            <div class="kpi-value">$84,200</div>
+            <div class="kpi-label">Monthly Revenue</div>
+            <div class="position-absolute bottom-0 end-0 p-3 opacity-10">
+                <i data-lucide="dollar-sign" style="width: 64px; height: 64px;"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+        <div class="card kpi-card border-0">
+            <div class="kpi-icon-wrapper" style="background-color: rgba(14, 165, 233, 0.1); color: #0ea5e9;">
+                <i data-lucide="activity"></i>
+            </div>
+            <div class="kpi-value">24</div>
+            <div class="kpi-label">Live Workflows</div>
+            <div class="position-absolute bottom-0 end-0 p-3 opacity-10">
+                <i data-lucide="activity" style="width: 64px; height: 64px;"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+        <div class="card kpi-card border-0">
+            <div class="kpi-icon-wrapper" style="background-color: rgba(249, 115, 22, 0.1); color: #f97316;">
+                <i data-lucide="zap"></i>
+            </div>
+            <div class="kpi-value">98.2%</div>
+            <div class="kpi-label">System Health</div>
+            <div class="position-absolute bottom-0 end-0 p-3 opacity-10">
+                <i data-lucide="zap" style="width: 64px; height: 64px;"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Grid -->
+<div class="row g-4">
+    <!-- Projects Section -->
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm overflow-hidden">
+            <div class="card-header bg-transparent border-0 p-4 d-flex align-items-center justify-content-between">
+                <div>
+                    <h5 class="mb-0 fw-800">Active Projects</h5>
+                    <p class="text-secondary small mb-0">Manage and track your current assignments</p>
+                </div>
+                <a href="#" class="btn btn-light btn-sm rounded-pill px-3">View All</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-surface-secondary">
+                            <tr>
+                                <th class="ps-4 py-3 border-0 small text-uppercase fw-800 text-secondary">Project & Client</th>
+                                <th class="py-3 border-0 small text-uppercase fw-800 text-secondary">Status</th>
+                                <th class="py-3 border-0 small text-uppercase fw-800 text-secondary">Progress</th>
+                                <th class="pe-4 py-3 border-0 small text-uppercase fw-800 text-secondary text-end">Updated</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for project in projects %}
+                            <tr>
+                                <td class="ps-4 py-4">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="rounded-3 bg-primary-soft text-primary d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                            <i data-lucide="folder" style="width: 20px;"></i>
+                                        </div>
+                                        <div>
+                                            <a href="{% url 'projects:project_detail' project.id %}" class="text-decoration-none fw-bold text-primary-hover d-block mb-1">{{ project.title }}</a>
+                                            <span class="text-secondary small d-flex align-items-center gap-1">
+                                                <i data-lucide="user" style="width: 12px;"></i> {{ project.client.username }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge rounded-pill px-3 py-2 {% if project.current_status == 'COMPLETED' %}bg-success-soft text-success{% elif project.current_status == 'IN_PROGRESS' %}bg-primary-soft text-primary{% elif project.current_status == 'DELAYED' %}bg-danger-soft text-danger{% else %}bg-warning-soft text-warning{% endif %}">
+                                        {{ project.get_current_status_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div style="width: 140px;">
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <span class="fw-bold" style="font-size: 11px;">{{ project.progress_percentage }}%</span>
+                                        </div>
+                                        <div class="progress" style="height: 6px; border-radius: 10px; background: var(--bg-surface-secondary);">
+                                            <div class="progress-bar rounded-pill" style="width: {{ project.progress_percentage }}%; background: var(--accent-primary);"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="pe-4 text-end text-secondary small fw-500">
+                                    {{ project.updated_at|date:"M d" }}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-5">
+                                    <div class="py-4">
+                                        <div class="bg-surface-secondary d-inline-flex p-4 rounded-circle mb-3">
+                                            <i data-lucide="inbox" class="text-secondary opacity-50" style="width: 48px; height: 48px;"></i>
+                                        </div>
+                                        <h6 class="fw-800">No active projects</h6>
+                                        <p class="text-secondary small mb-4">Start by creating a new project request</p>
+                                        <a href="{% url 'home:build_website' %}" class="btn btn-primary rounded-pill px-4">
+                                            <i data-lucide="plus" class="me-2"></i> Create Project
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Activity Section -->
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-transparent border-0 p-4">
+                <h5 class="mb-0 fw-800">System Activity</h5>
+                <p class="text-secondary small mb-0">Real-time enterprise updates</p>
+            </div>
+            <div class="card-body p-0">
+                <div class="activity-feed">
+                    {% for log in activities|slice:":6" %}
+                    <div class="p-4 border-bottom border-light d-flex gap-3 transition-hover">
+                        <div class="rounded-circle bg-surface-secondary d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; flex-shrink: 0;">
+                            <i data-lucide="{% if 'login' in log.action %}log-in{% elif 'payment' in log.action %}credit-card{% elif 'update' in log.action %}refresh-cw{% else %}bell{% endif %}" class="text-secondary" style="width: 16px;"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                <p class="mb-0 fw-bold small text-primary">{{ log.action|title }}</p>
+                                <span class="text-secondary" style="font-size: 0.7rem;">{{ log.timestamp|timesince }}</span>
+                            </div>
+                            <p class="mb-0 text-secondary" style="font-size: 0.8rem;">{{ log.metadata|default:"System process updated" }}</p>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="p-5 text-center">
+                        <i data-lucide="activity" class="mb-3 text-secondary opacity-20" style="width: 48px; height: 48px;"></i>
+                        <p class="text-secondary small">No activity recorded yet</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-0 p-4 pt-0">
+                <a href="{% url 'users:profile_dashboard' %}" class="btn btn-outline-primary w-100 rounded-pill py-2 small fw-800">View Audit Log</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Any specific dashboard JS
+    });
+</script>
+{% endblock %}

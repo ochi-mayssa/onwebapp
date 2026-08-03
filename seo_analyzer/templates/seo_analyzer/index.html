@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block title %}SEO Checker - OnWebApp{% endblock %}
+{% block content %}
+<div class="container mt-5 mb-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home:home' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'seo_analyzer:index' %}">SEO</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Website Checker</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+        <div>
+            <h1 class="mb-2">Website SEO Checker</h1>
+            <p class="text-muted mb-0">Run the validated website audit flow and access reports from the active root-level SEO app.</p>
+        </div>
+        <div class="text-end">
+            <div class="small text-uppercase text-muted fw-semibold mb-2">SEO Tools</div>
+            <div class="d-flex gap-2 flex-wrap justify-content-end">
+                <a href="{% url 'seo_analyzer:checker' %}" class="btn btn-primary">Website Checker</a>
+                <a href="{% url 'seo_analyzer:url_intelligence' %}" class="btn btn-outline-secondary">URL Intelligence</a>
+                <a href="{% url 'seo_analyzer:link_checker' %}" class="btn btn-outline-success">Link Checker</a>
+                <a href="{% url 'seo_analyzer:sitemap' %}" class="btn btn-outline-primary">Sitemap Intelligence</a>
+                <a href="{% url 'seo_analyzer:backlinks' %}" class="btn btn-outline-warning">Backlink Analyzer</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <h4 class="card-title">Run a comprehensive SEO analysis</h4>
+            <p class="text-muted">Enter a site URL to run an in-depth SEO check.</p>
+            <form method="post">
+                {% csrf_token %}
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-8">
+                        {{ form.url.label_tag }}
+                        {{ form.url }}
+                    </div>
+                    <div class="col-md-2">
+                        {{ form.max_pages.label_tag }}
+                        {{ form.max_pages }}
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-primary w-100" type="submit">Analyze</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if recent_audits %}
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header">
+                <h5 class="mb-0">Recent Audits</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Domain</th>
+                                <th>Date</th>
+                                <th>Pages Crawled</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for audit in recent_audits %}
+                            <tr>
+                                <td>{{ audit.domain }}</td>
+                                <td>{{ audit.created_at|date:"d M Y, H:i" }}</td>
+                                <td>{% if audit.result %}{{ audit.result.pages_crawled }}{% else %}-{% endif %}</td>
+                                <td class="text-end">
+                                    <div class="d-flex gap-2 justify-content-end flex-wrap">
+                                        <a href="{% url 'seo_analyzer:dashboard' audit.id %}" class="btn btn-sm btn-outline-primary">View Results</a>
+                                        {% if audit.result %}
+                                        <a href="{% url 'seo_analyzer:download_report' 'website' audit.id %}" class="btn btn-sm btn-success">Download PDF Report</a>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

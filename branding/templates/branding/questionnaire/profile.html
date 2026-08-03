@@ -1,0 +1,160 @@
+{% extends 'branding/base.html' %}
+{% load branding_extras %}
+
+{% block title %}Client Profile · {{ client.username }}{% endblock %}
+
+{% block branding_content %}
+<div class="detail-page">
+    <div class="container py-4 py-lg-5">
+
+        <div class="d-flex align-items-start justify-content-between flex-wrap gap-3 mb-4">
+            <div>
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <a href="{% url 'branding:questionnaire_list' request_pk=request_obj.pk %}" class="btn btn-back btn-sm"><i class="fa-solid fa-arrow-left me-1"></i>All Questionnaires</a>
+                    <span class="request-number-display">{{ request_obj.request_number }}</span>
+                </div>
+                <h1 class="fw-800 mb-1"><i class="fa-solid fa-user-check me-2 text-primary"></i>Client Profile</h1>
+                <p class="text-muted mb-0">{{ client.get_full_name|default:client.username }} · {{ request_obj.company_name }}</p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-12 col-lg-4">
+                <div class="detail-card rounded-4 p-4 h-100">
+                    <div class="d-flex align-items-center gap-3 mb-4">
+                        <div class="branding-avatar" style="width: 56px; height: 56px; font-size: 1.5rem;">{{ client.username|slice:":1"|upper }}</div>
+                        <div>
+                            <h5 class="fw-800 mb-0">{{ client.get_full_name|default:client.username }}</h5>
+                            <span class="x-small text-muted">{{ client.email }}</span>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-column gap-3">
+                        <div>
+                            <span class="x-small text-muted fw-700">Questionnaires Completed</span>
+                            <div class="fw-800 text-primary" style="font-size: 1.5rem;">{{ questionnaires_completed }}</div>
+                        </div>
+                        <div>
+                            <span class="x-small text-muted fw-700">Total Answers</span>
+                            <div class="fw-800 text-primary" style="font-size: 1.5rem;">{{ total_answers }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-8">
+                {% if profile %}
+                <div class="detail-card rounded-4 p-4 mb-4">
+                    <h6 class="fw-800 mb-3"><i class="fa-solid fa-palette me-2 text-primary"></i>Preferred Colors</h6>
+                    {% if profile.preferred_colors %}
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for color in profile.preferred_colors %}
+                        <span class="d-inline-flex align-items-center gap-1 px-3 py-2 rounded-pill small border">
+                            <span class="rounded-circle d-inline-block" style="width: 18px; height: 18px; background: {{ color }};"></span>
+                            {{ color }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted mb-0">No color preferences recorded yet.</p>
+                    {% endif %}
+                </div>
+
+                <div class="detail-card rounded-4 p-4 mb-4">
+                    <h6 class="fw-800 mb-3"><i class="fa-solid fa-font me-2 text-primary"></i>Preferred Fonts</h6>
+                    {% if profile.preferred_fonts %}
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for font in profile.preferred_fonts %}
+                        <span class="badge bg-light text-dark rounded-pill px-3 py-2">{{ font }}</span>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted mb-0">No font preferences recorded yet.</p>
+                    {% endif %}
+                </div>
+
+                <div class="detail-card rounded-4 p-4 mb-4">
+                    <h6 class="fw-800 mb-3"><i class="fa-solid fa-wand-magic-sparkles me-2 text-primary"></i>Preferred Styles</h6>
+                    {% if profile.preferred_styles %}
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for style in profile.preferred_styles %}
+                        <span class="badge bg-light text-dark rounded-pill px-3 py-2">{{ style }}</span>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted mb-0">No style preferences recorded yet.</p>
+                    {% endif %}
+                </div>
+
+                {% if profile.scale_scores %}
+                <div class="detail-card rounded-4 p-4 mb-4">
+                    <h6 class="fw-800 mb-3"><i class="fa-solid fa-sliders me-2 text-primary"></i>Scale Score Breakdown</h6>
+                    <div class="d-flex flex-column gap-3">
+                        {% for label, score in profile.scale_scores.items %}
+                        <div>
+                            <div class="d-flex align-items-center justify-content-between mb-1">
+                                <span class="small fw-700">{{ label }}</span>
+                                <span class="x-small text-muted fw-700">{{ score }}/10</span>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar bg-primary" style="width: {% widthratio score 10 100 %}%;"></div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if profile.contradictions %}
+                <div class="detail-card rounded-4 p-4 mb-4 border-danger" style="border-width: 1px !important;">
+                    <h6 class="fw-800 mb-3"><i class="fa-solid fa-triangle-exclamation me-2 text-danger"></i>Alerts &amp; Contradictions</h6>
+                    <div class="d-flex flex-column gap-2">
+                        {% for alert in profile.contradictions %}
+                        <div class="d-flex align-items-start gap-2">
+                            <i class="fa-solid fa-circle-exclamation text-danger mt-1"></i>
+                            <span class="small">{{ alert }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% else %}
+                <div class="detail-card rounded-4 p-5 text-center">
+                    <div class="empty-state-icon mb-3" style="font-size: 4rem; color: var(--bs-primary); opacity: .3;">
+                        <i class="fa-solid fa-user-check"></i>
+                    </div>
+                    <h4 class="fw-800 mb-2">No Profile Data</h4>
+                    <p class="text-muted mb-0" style="max-width: 480px; margin: 0 auto;">
+                        The client preference profile will be built as answers are collected from questionnaires.
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if recent_answers %}
+        <div class="detail-card rounded-4 p-4 mt-4">
+            <h6 class="fw-800 mb-3"><i class="fa-solid fa-clock-rotate-left me-2 text-primary"></i>Recent Answers</h6>
+            <div class="d-flex flex-column gap-2">
+                {% for answer in recent_answers %}
+                <div class="d-flex align-items-center justify-content-between p-3 rounded-3 border" style="background: var(--bs-tertiary-bg);">
+                    <div class="flex-grow-1 min-width-0">
+                        <span class="fw-700 small text-truncate d-block">{{ answer.question.text|truncatechars:80 }}</span>
+                        <span class="x-small text-muted">
+                            {% if answer.value_text %}{{ answer.value_text|truncatechars:60 }}
+                            {% elif answer.value_choice %}{{ answer.value_choice }}
+                            {% elif answer.value_scale is not None %}Scale: {{ answer.value_scale }}
+                            {% elif answer.value_bool is not None %}{% if answer.value_bool %}Yes{% else %}No{% endif %}
+                            {% else %}—{% endif %}
+                        </span>
+                    </div>
+                    <span class="x-small text-muted flex-shrink-0 ms-3">{{ answer.created_at|date:"M j, H:i" }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

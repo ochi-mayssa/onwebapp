@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Payment Successful{% endblock %}
+{% block extra_head %}
+<style>
+    body {
+        background-color: var(--bg-body);
+        color: var(--text-primary);
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <div class="alert alert-success">
+        <h3>Payment completed</h3>
+        <p>Thank you — your payment was successful. This demo site may not record actual transactions.</p>
+        <a href="/" class="btn btn-primary">Return home</a>
+    </div>
+</div>
+{% endblock %}

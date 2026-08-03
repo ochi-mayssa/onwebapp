@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+{% block title %}SEO Tools - OnWebApp{% endblock %}
+{% block content %}
+<div class="container mt-5 mb-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home:home' %}">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">SEO</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+        <div>
+            <h1 class="mb-2">SEO Tools</h1>
+            <p class="text-muted mb-0">Choose the right OnWebApp SEO workflow before launching a detailed analysis.</p>
+        </div>
+        <div class="text-end">
+            <div class="small text-uppercase text-muted fw-semibold mb-2">SEO Tools Navigation</div>
+            <div class="d-flex gap-2 flex-wrap justify-content-end">
+                <a href="{% url 'seo_analyzer:free_pre_check' %}" class="btn btn-success">Free Pre-Check</a>
+                <a href="{% url 'seo_analyzer:checker' %}" class="btn btn-primary">Website Checker</a>
+                <a href="{% url 'seo_analyzer:url_intelligence' %}" class="btn btn-outline-secondary">URL Intelligence</a>
+                <a href="{% url 'seo_analyzer:link_checker' %}" class="btn btn-outline-success">Link Checker</a>
+                <a href="{% url 'seo_analyzer:sitemap' %}" class="btn btn-outline-primary">Sitemap Intelligence</a>
+                <a href="{% url 'seo_analyzer:backlinks' %}" class="btn btn-outline-warning">Backlink Analyzer</a>
+                <a href="{% url 'seo_analyzer:monitoring' %}" class="btn btn-outline-dark">SEO Monitoring</a>
+                <a href="{% url 'seo_analyzer:executive_kpi_dashboard' %}" class="btn btn-outline-info">Executive KPI Dashboard</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6 col-xl-3">
+            <div class="card h-100 shadow-lg border-success">
+                <div class="card-body p-4">
+                    <span class="badge bg-success-subtle text-success mb-3">FREE</span>
+                    <h3 class="h5">Website Pre-Check</h3>
+                    <p class="text-muted">Quickly check your website's basic health (accessibility, HTTPS, meta tags, and more) for free.</p>
+                    <a href="{% url 'seo_analyzer:free_pre_check' %}" class="btn btn-success w-100">Start Free Check</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 col-xl-3">
+            <div class="card h-100 shadow-sm border-primary">
+                <div class="card-body p-4">
+                    <span class="badge bg-primary-subtle text-primary mb-3">Premium • $50</span>
+                    <h3 class="h5">Website SEO Checker</h3>
+                    <p class="text-muted">Run the validated full-site audit with scoring, issues, recommendations, and PDF exports.</p>
+                    <a href="{% url 'seo_analyzer:checker' %}" class="btn btn-primary w-100">Open Website Checker</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 col-xl-3">
+            <div class="card h-100 shadow-sm border-success">
+                <div class="card-body p-4">
+                    <span class="badge bg-success-subtle text-success mb-3">Link Checker</span>
+                    <h3 class="h5">Link Checker</h3>
+                    <p class="text-muted">Audit internal links, external links, and operational link health from one workspace.</p>
+                    <a href="{% url 'seo_analyzer:link_checker' %}" class="btn btn-success w-100">Open Link Checker</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 col-xl-3">
+            <div class="card h-100 shadow-sm border-secondary">
+                <div class="card-body p-4">
+                    <span class="badge bg-secondary-subtle text-secondary mb-3">URL Intelligence</span>
+                    <h3 class="h5">URL Intelligence</h3>
+                    <p class="text-muted">Analyze a single URL for structure, canonical signals, indexability, and SEO-friendly optimization opportunities.</p>
+                    <a href="{% url 'seo_analyzer:url_intelligence' %}" class="btn btn-outline-secondary w-100">Open URL Intelligence</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 col-xl-3">
+            <div class="card h-100 shadow-sm border-info">
+                <div class="card-body p-4">
+                    <span class="badge bg-info-subtle text-info mb-3">Sitemap Intelligence</span>
+                    <h3 class="h5">Sitemap Intelligence</h3>
+                    <p class="text-muted">Review topic intelligence first, then confirm sitemap and robots.txt crawlability signals.</p>
+                    <a href="{% url 'seo_analyzer:sitemap' %}" class="btn btn-outline-primary w-100">Open Sitemap Intelligence</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 col-xl-3">
+            <div class="card h-100 shadow-sm border-warning">
+                <div class="card-body p-4">
+                    <span class="badge bg-warning-subtle text-warning mb-3">Backlink Analyzer</span>
+                    <h3 class="h5">Backlink Analyzer</h3>
+                    <p class="text-muted">Assess backlink intelligence availability and connect provider-driven authority workflows.</p>
+                    <a href="{% url 'seo_analyzer:backlinks' %}" class="btn btn-outline-warning w-100">Open Backlink Analyzer</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 col-xl-3">
+            <div class="card h-100 shadow-sm border-dark">
+                <div class="card-body p-4">
+                    <span class="badge bg-dark-subtle text-dark mb-3">SEO Monitoring</span>
+                    <h3 class="h5">SEO Monitoring</h3>
+                    <p class="text-muted">Compare SEO health over time, detect changes, chart trends, and export historical intelligence.</p>
+                    <a href="{% url 'seo_analyzer:monitoring' %}" class="btn btn-outline-dark w-100">Open SEO Monitoring</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if recent_audits %}
+    <div class="card shadow-sm">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">Recent Website Audits</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Domain</th>
+                            <th>Date</th>
+                            <th>Health Score</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for audit in recent_audits %}
+                        <tr>
+                            <td>{{ audit.domain }}</td>
+                            <td>{{ audit.created_at|date:"d M Y, H:i" }}</td>
+                            <td>{% if audit.result %}{{ audit.result.health_score|floatformat:0 }}{% else %}-{% endif %}</td>
+                            <td class="text-end">
+                                <a href="{% url 'seo_analyzer:dashboard' audit.id %}" class="btn btn-sm btn-outline-primary">View Report</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if recent_snapshots %}
+    <div class="card shadow-sm mt-4">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">Recent Monitoring Snapshots</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Domain</th>
+                            <th>Analysis Type</th>
+                            <th>Date</th>
+                            <th>Health Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for snapshot in recent_snapshots %}
+                        <tr>
+                            <td>{{ snapshot.domain }}</td>
+                            <td>{{ snapshot.get_analysis_type_display }}</td>
+                            <td>{{ snapshot.created_at|date:"d M Y, H:i" }}</td>
+                            <td>{{ snapshot.health_score|default:"Not Measured" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,63 @@
+{% load i18n %}
+{% load static %}
+<aside class="pm-sidebar d-none d-lg-flex flex-column bg-white border-end border-light-subtle" style="width: 280px; min-height: 100vh;">
+  <div class="px-4 py-4 border-bottom border-light-subtle">
+    <a href="{{ pm_hub }}" class="d-flex align-items-center gap-2 text-decoration-none">
+      <div class="d-flex align-items-center justify-content-center rounded-14 bg-primary-gradient text-white" style="width:38px;height:38px;">
+        <i data-lucide="heart-pulse" style="width:18px;height:18px;"></i>
+      </div>
+      <div>
+        <div class="fw-800 text-900 lh-1 small">{% trans "Platform" %}</div>
+        <div class="x-small text-muted lh-1">{% trans "Monitoring" %}</div>
+      </div>
+    </a>
+  </div>
+
+  <nav class="flex-grow-1 overflow-y-auto px-2 py-3 small">
+    {% for group in sidebar.groups %}
+      {% if group.label %}
+        <div class="px-3 pt-3 pb-1 x-small fw-800 uppercase tracking-widest text-muted">{{ group.label }}</div>
+      {% endif %}
+      {% for item in group.items %}
+        <div class="mb-0.5">
+          <a href="{{ item.route|default:'#' }}"
+             class="d-flex align-items-center gap-2 px-3 py-2 rounded-10 text-decoration-none transition-hover
+              {% if item.active %}fw-700 bg-primary-soft text-primary{% else %}text-700 hover:bg-light{% endif %}">
+            {% if item.icon %}<i data-lucide="{{ item.icon }}" style="width:15px;height:15px;"></i>{% endif %}
+            <span class="flex-grow-1">{{ item.label }}</span>
+            {% if item.expandable %}
+              <i data-lucide="chevron-{{ item.expanded|yesno:'down,right' }}" style="width:13px;height:13px;"></i>
+            {% endif %}
+            {% if item.coming %}
+              <span class="badge rounded-pill bg-secondary-soft text-secondary x-small px-2 py-0.5">{% trans "Soon" %}</span>
+            {% endif %}
+          </a>
+          {% if item.expandable and item.expanded and item.children %}
+            <div class="ms-3 mt-0.5 border-start border-light ps-2">
+              {% for child in item.children %}
+                <a href="{{ child.route|default:'#' }}"
+                   class="d-flex align-items-center gap-2 px-3 py-1.5 rounded-8 text-decoration-none transition-hover
+                    {% if child.active %}fw-700 text-primary{% else %}text-600 hover:bg-light{% endif %}">
+                  <span class="d-inline-block rounded-circle {% if child.active %}bg-primary{% else %}bg-light{% endif %}" style="width:6px;height:6px;"></span>
+                  <span>{{ child.label }}</span>
+                </a>
+                {% if child.expandable and child.expanded and child.children %}
+                  <div class="ms-3 mt-1 border-start border-light ps-2">
+                    {% for grand in child.children %}
+                      <a href="{{ grand.route|default:'#' }}"
+                         class="d-flex align-items-center gap-2 px-3 py-1 rounded-8 text-decoration-none transition-hover
+                          {% if grand.active %}fw-700 text-primary{% else %}text-600 hover:bg-light{% endif %}">
+                        <span class="d-inline-block rounded-circle {% if grand.active %}bg-primary{% else %}bg-300{% endif %}" style="width:5px;height:5px;"></span>
+                        <span>{{ grand.label }}</span>
+                      </a>
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    {% endfor %}
+  </nav>
+</aside>

@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Branding Analytics Report</title>
+<style>
+  @page {
+    size: A4;
+    margin: 18mm 16mm 20mm 16mm;
+    @bottom-center {
+      content: "Page " counter(page) " of " counter(pages);
+      font-size: 8pt;
+      color: #94a3b8;
+      font-family: 'Segoe UI', Arial, sans-serif;
+    }
+    @bottom-right {
+      content: "Analytics Report";
+      font-size: 8pt;
+      color: #94a3b8;
+      font-family: 'Segoe UI', Arial, sans-serif;
+    }
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 9.5pt;
+    color: #1e293b;
+    line-height: 1.5;
+  }
+
+  /* ── Cover ─────────────────────────────────────────────────────── */
+  .cover {
+    border-bottom: 3px solid #6366f1;
+    padding-bottom: 18px;
+    margin-bottom: 24px;
+  }
+  .cover h1 {
+    font-size: 22pt;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 4px;
+  }
+  .cover .subtitle {
+    font-size: 11pt;
+    color: #64748b;
+  }
+  .cover .meta {
+    margin-top: 10px;
+    font-size: 8.5pt;
+    color: #94a3b8;
+  }
+
+  /* ── Section ───────────────────────────────────────────────────── */
+  .section-title {
+    font-size: 12pt;
+    font-weight: 800;
+    color: #6366f1;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 5px;
+    margin: 20px 0 12px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+
+  /* ── KPI row ───────────────────────────────────────────────────── */
+  .kpi-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .kpi-card {
+    flex: 1;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 12px 14px;
+    text-align: center;
+  }
+  .kpi-value {
+    font-size: 20pt;
+    font-weight: 800;
+    color: #6366f1;
+    line-height: 1.1;
+  }
+  .kpi-value.green { color: #10b981; }
+  .kpi-value.amber { color: #f59e0b; }
+  .kpi-value.red { color: #ef4444; }
+  .kpi-label {
+    font-size: 7.5pt;
+    text-transform: uppercase;
+    color: #94a3b8;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-top: 4px;
+  }
+
+  /* ── Chart container ───────────────────────────────────────────── */
+  .chart-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 14px;
+  }
+  .chart-box {
+    flex: 1;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+    page-break-inside: avoid;
+  }
+  .chart-box img {
+    max-width: 100%;
+    height: auto;
+  }
+  .chart-full {
+    flex: none;
+    width: 100%;
+  }
+
+  /* ── Tables ────────────────────────────────────────────────────── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 14px;
+    page-break-inside: avoid;
+  }
+  th {
+    background: #f1f5f9;
+    font-size: 7.5pt;
+    text-transform: uppercase;
+    color: #64748b;
+    font-weight: 700;
+    padding: 6px 10px;
+    text-align: left;
+    border-bottom: 2px solid #e2e8f0;
+  }
+  td {
+    padding: 7px 10px;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 9pt;
+  }
+  tr:last-child td { border-bottom: none; }
+  .text-right { text-align: right; }
+  .text-center { text-align: center; }
+  .fw-bold { font-weight: 700; }
+
+  /* ── Bar indicator ─────────────────────────────────────────────── */
+  .bar-track {
+    display: inline-block;
+    height: 7px;
+    background: #e2e8f0;
+    border-radius: 999px;
+    overflow: hidden;
+    width: 80px;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+  .bar-fill {
+    display: block;
+    height: 100%;
+    background: linear-gradient(90deg, #6366f1, #818cf8);
+    border-radius: 999px;
+  }
+
+  /* ── Page break ────────────────────────────────────────────────── */
+  .page-break { page-break-before: always; }
+
+  /* ── No-data message ───────────────────────────────────────────── */
+  .no-data {
+    background: #f8fafc;
+    border: 1px dashed #e2e8f0;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    color: #94a3b8;
+    font-size: 9pt;
+    margin-bottom: 14px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- Cover                                                           -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="cover">
+  <h1>Branding Analytics Report</h1>
+  <div class="subtitle">Staff Dashboard — Performance &amp; Insights</div>
+  <div class="meta">
+    Period: {{ report_period }} &nbsp;·&nbsp; Generated {{ generated_at|date:"F j, Y \a\t g:i A" }}
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- KPI Summary                                                     -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="section-title">Key Metrics</div>
+<div class="kpi-row">
+  <div class="kpi-card">
+    <div class="kpi-value">{{ data.status_summary.total }}</div>
+    <div class="kpi-label">Total Requests</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-value green">{{ data.feedback_summary.avg_rating }}</div>
+    <div class="kpi-label">Avg Satisfaction</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-value green">{{ data.feedback_summary.recommend_pct }}</div>
+    <div class="kpi-label">Would Recommend</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-value amber">{{ data.feedback_summary.total }}</div>
+    <div class="kpi-label">Total Reviews</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- Status Distribution                                             -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="section-title">Status Distribution</div>
+<div class="chart-row">
+  {% if charts.status_distribution %}
+  <div class="chart-box chart-full">
+    <img src="data:image/png;base64,{{ charts.status_distribution }}" alt="Status Distribution">
+  </div>
+  {% else %}
+  <div class="no-data chart-full">No data available for status distribution.</div>
+  {% endif %}
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>Status</th>
+      <th class="text-right">Count</th>
+      <th class="text-right">Percentage</th>
+      <th>Bar</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in data.status_summary.rows %}
+    <tr>
+      <td class="fw-bold">{{ row.status }}</td>
+      <td class="text-right">{{ row.count }}</td>
+      <td class="text-right">{{ row.percentage }}</td>
+      <td>
+        <span class="bar-track"><span class="bar-fill" style="width:{{ row.percentage }}"></span></span>
+      </td>
+    </tr>
+    {% endfor %}
+    <tr style="background:#f8fafc;">
+      <td class="fw-bold">Total</td>
+      <td class="text-right fw-bold">{{ data.status_summary.total }}</td>
+      <td class="text-right">100%</td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- Monthly Trend                                                   -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<div class="section-title">Monthly Trend</div>
+{% if charts.monthly_trend %}
+<div class="chart-row">
+  <div class="chart-box chart-full">
+    <img src="data:image/png;base64,{{ charts.monthly_trend }}" alt="Monthly Trend">
+  </div>
+</div>
+<table>
+  <thead>
+    <tr><th>Month</th><th class="text-right">Requests</th></tr>
+  </thead>
+  <tbody>
+    {% for row in data.monthly_summary %}
+    <tr>
+      <td>{{ row.month }}</td>
+      <td class="text-right fw-bold">{{ row.count }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<div class="no-data">No monthly data available for this period.</div>
+{% endif %}
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- Staff Workload + Collection Popularity                          -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="section-title">Staff &amp; Collections</div>
+<div class="chart-row">
+  {% if charts.staff_workload %}
+  <div class="chart-box">
+    <img src="data:image/png;base64,{{ charts.staff_workload }}" alt="Staff Workload">
+  </div>
+  {% endif %}
+  {% if charts.collection_popularity %}
+  <div class="chart-box">
+    <img src="data:image/png;base64,{{ charts.collection_popularity }}" alt="Collection Popularity">
+  </div>
+  {% endif %}
+  {% if not charts.staff_workload and not charts.collection_popularity %}
+  <div class="no-data chart-full">No staff workload or collection data available.</div>
+  {% endif %}
+</div>
+
+<table>
+  <thead>
+    <tr><th>Designer</th><th class="text-right">Active Requests</th></tr>
+  </thead>
+  <tbody>
+    {% for row in data.top_designers %}
+    <tr>
+      <td>{{ row.name }}</td>
+      <td class="text-right fw-bold">{{ row.active }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="2" class="text-center" style="color:#94a3b8;">No designer data</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- Priority + Industry                                             -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<div class="section-title">Priority &amp; Industry</div>
+<div class="chart-row">
+  {% if charts.priority_distribution %}
+  <div class="chart-box">
+    <img src="data:image/png;base64,{{ charts.priority_distribution }}" alt="Priority Distribution">
+  </div>
+  {% endif %}
+  {% if charts.industry_breakdown %}
+  <div class="chart-box">
+    <img src="data:image/png;base64,{{ charts.industry_breakdown }}" alt="Industry Breakdown">
+  </div>
+  {% endif %}
+  {% if not charts.priority_distribution and not charts.industry_breakdown %}
+  <div class="no-data chart-full">No priority or industry data available.</div>
+  {% endif %}
+</div>
+
+<table>
+  <thead>
+    <tr><th>Industry</th><th class="text-right">Count</th><th class="text-right">Share</th></tr>
+  </thead>
+  <tbody>
+    {% for row in data.industry_summary %}
+    <tr>
+      <td>{{ row.industry }}</td>
+      <td class="text-right fw-bold">{{ row.count }}</td>
+      <td class="text-right">{{ row.percentage }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="3" class="text-center" style="color:#94a3b8;">No industry data</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- Satisfaction + Completion Time                                  -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="section-title">Satisfaction &amp; Completion Time</div>
+<div class="chart-row">
+  {% if charts.satisfaction %}
+  <div class="chart-box">
+    <img src="data:image/png;base64,{{ charts.satisfaction }}" alt="Client Satisfaction">
+  </div>
+  {% endif %}
+  {% if charts.completion_time %}
+  <div class="chart-box">
+    <img src="data:image/png;base64,{{ charts.completion_time }}" alt="Completion Time">
+  </div>
+  {% endif %}
+  {% if not charts.satisfaction and not charts.completion_time %}
+  <div class="no-data chart-full">No satisfaction or completion time data available yet.</div>
+  {% endif %}
+</div>
+
+<div style="margin-top:12px;padding:10px 14px;border:1px solid #e2e8f0;border-radius:8px;background:#f8fafc;">
+  <div style="font-size:8pt;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:4px;">Report Summary</div>
+  <div style="font-size:9pt;color:#475569;">
+    This report covers <strong>{{ data.status_summary.total }}</strong> total requests across all statuses.
+    {% if data.feedback_summary.total > 0 %}
+    Client satisfaction averages <strong>{{ data.feedback_summary.avg_rating }}/5</strong> with
+    <strong>{{ data.feedback_summary.recommend_pct }}</strong> of clients recommending the service.
+    {% else %}
+    No client feedback has been submitted yet.
+    {% endif %}
+  </div>
+</div>
+
+</body>
+</html>

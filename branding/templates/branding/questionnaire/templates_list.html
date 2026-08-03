@@ -1,0 +1,110 @@
+{% extends 'branding/base.html' %}
+{% load branding_extras %}
+
+{% block title %}Questionnaire Templates{% endblock %}
+
+{% block branding_content %}
+<div class="detail-page">
+    <div class="container py-4 py-lg-5">
+
+        <div class="d-flex align-items-start justify-content-between flex-wrap gap-3 mb-4">
+            <div>
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    {% if request_obj %}
+                    <a href="{% url 'branding:questionnaire_list' request_pk=request_obj.pk %}" class="btn btn-back btn-sm"><i class="fa-solid fa-arrow-left me-1"></i>All Questionnaires</a>
+                    {% endif %}
+                </div>
+                <h1 class="fw-800 mb-1"><i class="fa-solid fa-file-lines me-2 text-primary"></i>Questionnaire Templates</h1>
+                <p class="text-muted mb-0">{{ templates_list|length }} template{{ templates_list|length|pluralize }} available</p>
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="{% url 'branding:questionnaire_template_create' %}" class="btn btn-brand-primary">
+                    <i class="fa-solid fa-plus me-2"></i>Create Template
+                </a>
+            </div>
+        </div>
+
+        {% regroup templates_list by phase as phase_groups %}
+
+        {% for group in phase_groups %}
+        <div class="mb-5">
+            <h5 class="fw-800 mb-3">
+                <i class="fa-solid fa-folder-open me-2 text-muted"></i>{{ group.grouper|default:"General" }}
+            </h5>
+            <div class="row g-4">
+                {% for tpl in group.list %}
+                <div class="col-12 col-md-6 col-xl-4">
+                    <div class="branded-card detail-card rounded-4 p-4 h-100">
+                        <div class="d-flex align-items-start justify-content-between mb-2">
+                            <h6 class="fw-800 mb-0">{{ tpl.name }}</h6>
+                            <div class="d-flex gap-1">
+                                {% if tpl.is_system %}
+                                <span class="badge bg-info-subtle text-info rounded-pill x-small">System</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        {% if tpl.description %}
+                        <p class="text-muted small mb-3 text-truncate-2">{{ tpl.description|truncatechars:150 }}</p>
+                        {% endif %}
+
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            {% if tpl.question_count %}
+                            <span class="x-small text-muted"><i class="fa-solid fa-circle-question me-1"></i>{{ tpl.question_count }} question{{ tpl.question_count|pluralize }}</span>
+                            {% endif %}
+                            {% if tpl.industry %}
+                            <span class="badge bg-light text-dark rounded-pill x-small">{{ tpl.industry }}</span>
+                            {% endif %}
+                            {% if tpl.use_count %}
+                            <span class="x-small text-muted"><i class="fa-solid fa-users me-1"></i>Used {{ tpl.use_count }} time{{ tpl.use_count|pluralize }}</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-flex gap-2 pt-2 border-top">
+                            {% if request_obj %}
+                            <a href="{% url 'branding:questionnaire_from_template' request_pk=request_obj.pk template_id=tpl.pk %}" class="btn btn-brand-primary btn-sm flex-fill">
+                                <i class="fa-solid fa-play me-1"></i>Use Template
+                            </a>
+                            {% else %}
+                            <a href="{% url 'branding:questionnaire_template_edit' pk=tpl.pk %}" class="btn btn-brand-primary btn-sm flex-fill">
+                                <i class="fa-solid fa-eye me-1"></i>View
+                            </a>
+                            {% endif %}
+                            <a href="{% url 'branding:questionnaire_template_edit' pk=tpl.pk %}" class="btn btn-back btn-sm" title="Edit">
+                                <i class="fa-solid fa-pen"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% empty %}
+        <div class="detail-card rounded-4 p-5 text-center">
+            <div class="empty-state-icon mb-3" style="font-size: 4rem; color: var(--bs-primary); opacity: .3;">
+                <i class="fa-solid fa-file-lines"></i>
+            </div>
+            <h4 class="fw-800 mb-2">No Templates Yet</h4>
+            <p class="text-muted mb-4" style="max-width: 480px; margin: 0 auto;">
+                Create reusable questionnaire templates to speed up your workflow across projects.
+            </p>
+            <a href="{% url 'branding:questionnaire_template_create' %}" class="btn btn-brand-primary px-4">
+                <i class="fa-solid fa-plus me-2"></i>Create First Template
+            </a>
+        </div>
+        {% endfor %}
+
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<style>
+    .text-truncate-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+</style>
+{% endblock %}

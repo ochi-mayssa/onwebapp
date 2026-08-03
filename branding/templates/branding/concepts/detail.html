@@ -1,0 +1,831 @@
+{% extends 'branding/base.html' %}
+{% load branding_extras %}
+
+{% block title %}{{ concept.title }} · Concept Detail{% endblock %}
+
+{% block branding_content %}
+<div class="detail-page">
+    <div class="container py-4 py-lg-5">
+
+        <div class="d-flex align-items-start justify-content-between flex-wrap gap-3 mb-4">
+            <div>
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <a href="{% url 'branding:concept_list' request_pk=request_obj.pk %}" class="btn btn-back btn-sm"><i class="fa-solid fa-arrow-left me-1"></i>All Concepts</a>
+                    <span class="request-number-display">{{ request_obj.request_number }}</span>
+                    <span class="status-pill status-{{ concept.status|lower }}">{{ concept.get_status_display|default:concept.status }}</span>
+                </div>
+                <h1 class="fw-800 mb-1">{{ concept.title }}</h1>
+                <p class="text-muted mb-0">
+                    {{ request_obj.company_name }}
+                    {% if is_staff and concept.designer %} · Designed by {{ concept.designer.get_full_name|default:concept.designer.username }}{% endif %}
+                    {% if concept.presented_at %} · Presented {{ concept.presented_at|date:"M j, Y" }}{% endif %}
+                </p>
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+                {% if is_designer %}
+                <a href="{% url 'branding:concept_edit' pk=concept.pk %}" class="btn btn-back"><i class="fa-solid fa-pen me-2"></i>Edit</a>
+                {% if concept.status != 'PRESENTED' %}
+                <form method="post" action="{% url 'branding:concept_present' pk=concept.pk %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-brand-primary"><i class="fa-solid fa-eye me-2"></i>Present</button>
+                </form>
+                {% endif %}
+                {% if concept.status != 'ARCHIVED' %}
+                <form method="post" action="{% url 'branding:concept_recommend' pk=concept.pk %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-info"><i class="fa-solid fa-thumbs-up me-2"></i>Recommend</button>
+                </form>
+                {% endif %}
+                <form method="post" action="{% url 'branding:concept_archive' pk=concept.pk %}" class="d-inline" onsubmit="return confirm('Archive this concept?');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-danger"><i class="fa-solid fa-box-archive me-2"></i>Archive</button>
+                </form>
+                {% endif %}
+                {% if is_staff %}
+                <form method="post" action="{% url 'branding:concept_delete' pk=concept.pk %}" class="d-inline" onsubmit="return confirm('Permanently delete this concept? This cannot be undone.');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger"><i class="fa-solid fa-trash me-2"></i>Delete</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if concept.overall_score or concept.total_ratings %}
+        <div class="detail-card rounded-4 p-3 mb-4 d-flex align-items-center gap-4 flex-wrap">
+            {% if concept.overall_score %}
+            <div class="d-flex align-items-center gap-2">
+                <span class="display-6 fw-800 text-primary">{{ concept.overall_score|floatformat:1 }}</span>
+                <div class="small text-muted">Overall Score<br><span class="fw-700">{{ concept.total_ratings }} rating{{ concept.total_ratings|pluralize }}</span></div>
+            </div>
+            {% endif %}
+            {% if is_staff and concept.designer_ranking %}
+            <span class="badge bg-info bg-opacity-10 text-info rounded-pill px-3 py-2"><i class="fa-solid fa-crown me-1"></i>Designer Rank #{{ concept.designer_ranking }}</span>
+            {% endif %}
+            {% if concept.client_ranking %}
+            <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-3 py-2"><i class="fa-solid fa-heart me-1"></i>Client Rank #{{ concept.client_ranking }}</span>
+            {% endif %}
+            {% if is_staff and concept.is_designer_top_pick %}
+            <span class="badge bg-info rounded-pill px-3 py-2"><i class="fa-solid fa-star me-1"></i>Designer Top Pick</span>
+            {% endif %}
+            {% if concept.is_client_favorite %}
+            <span class="badge bg-danger rounded-pill px-3 py-2"><i class="fa-solid fa-heart me-1"></i>Client Favorite</span>
+            {% endif %}
+            {% if concept.decided_at %}
+            <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2"><i class="fa-solid fa-check-circle me-1"></i>Decided {{ concept.decided_at|date:"M j, Y" }}</span>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <div class="row g-4">
+
+            <div class="col-lg-8">
+
+                <div class="detail-card rounded-4 overflow-hidden mb-4">
+                    <div class="position-relative" id="imageContainer" style="cursor: crosshair; overflow: hidden; max-height: 600px; background: var(--bs-tertiary-bg);">
+                        {% if concept.preview_image %}
+                        <img src="{{ concept.preview_image.url }}" alt="{{ concept.title }}" id="mainImage" class="w-100" style="object-fit: contain; max-height: 600px; transition: transform 0.1s ease; transform-origin: center center;">
+                        {% else %}
+                        <div class="d-flex align-items-center justify-content-center" style="height: 400px;">
+                            <div class="text-center text-muted">
+                                <i class="fa-solid fa-image fa-4x mb-3 opacity-25"></i>
+                                <p>No preview image uploaded yet</p>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% for ann in annotations %}
+                        <div class="annotation-pin position-absolute" style="left: {{ ann.x_position }}%; top: {{ ann.y_position }}%; transform: translate(-50%, -50%); z-index: 10;" title="{{ ann.text }}">
+                            <span class="badge rounded-pill px-2 py-1 shadow-sm {% if ann.resolved_by %}bg-success{% else %}bg-warning text-dark{% endif %}" style="cursor: pointer; font-size: .7rem;">
+                                <i class="fa-solid fa-{% if ann.annotation_type == 'comment' %}comment{% elif ann.annotation_type == 'question' %}circle-question{% elif ann.annotation_type == 'suggestion' %}lightbulb{% else %}pencil{% endif %} me-1"></i>#{{ forloop.counter }}
+                            </span>
+                        </div>
+                        {% endfor %}
+
+                        {% for note in annotations %}
+                        <div class="sticky-note-badge position-absolute" style="left: {{ note.x_position }}%; top: calc({{ note.y_position }}% + 24px); z-index: 11;">
+                            <div class="bg-white rounded-2 shadow-lg p-2 border" style="max-width: 160px; font-size: .7rem; display: none;" id="annNote{{ note.pk }}">
+                                <div class="fw-700 mb-1">{{ note.client.username|default:"Anon" }} <span class="text-muted fw-400">· {{ note.created_at|timesince }} ago</span></div>
+                                <p class="mb-1">{{ note.text }}</p>
+                                {% if not note.resolved_by %}
+                                {% if is_designer or is_staff %}
+                                <form method="post" action="{% url 'branding:concept_resolve_annotation' pk=concept.pk ann_id=note.pk %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-success py-0"><i class="fa-solid fa-check me-1"></i>Resolve</button>
+                                </form>
+                                {% endif %}
+                                {% else %}
+                                <span class="text-success small"><i class="fa-solid fa-check-double me-1"></i>Resolved by {{ note.resolved_by.username }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="p-3 border-top d-flex align-items-center justify-content-between flex-wrap gap-2">
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-back" id="zoomIn" title="Zoom In"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
+                            <button class="btn btn-sm btn-back" id="zoomOut" title="Zoom Out"><i class="fa-solid fa-magnifying-glass-minus"></i></button>
+                            <button class="btn btn-sm btn-back" id="zoomReset" title="Reset"><i class="fa-solid fa-expand"></i></button>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-brand-primary" id="annotateModeBtn" title="Click image to annotate"><i class="fa-solid fa-comment-dots me-1"></i>Annotate</button>
+                            <button class="btn btn-sm btn-back" id="stickyModeBtn" title="Click image to add sticky note"><i class="fa-solid fa-note-sticky me-1"></i>Sticky Note</button>
+                        </div>
+                    </div>
+                </div>
+
+                {% if images %}
+                <div class="detail-card rounded-4 p-4 mb-4">
+                    <h6 class="fw-800 mb-3"><i class="fa-solid fa-images me-2 text-primary"></i>Supporting Images</h6>
+                    <div class="row g-3">
+                        {% for img in images %}
+                        <div class="col-6 col-md-4">
+                            <div class="rounded-3 overflow-hidden border position-relative gallery-thumb" style="cursor: pointer;" data-src="{{ img.image.url }}">
+                                <img src="{{ img.image.url }}" alt="{{ img.image_type|default:'Concept image' }}" class="w-100" style="height: 140px; object-fit: cover;">
+                                {% if img.image_type %}
+                                <span class="badge bg-dark bg-opacity-75 position-absolute bottom-0 start-0 m-1" style="font-size: .6rem;">{{ img.image_type|title }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if concept.description %}
+                <div class="detail-card rounded-4 p-4 mb-4">
+                    <h6 class="fw-800 mb-2"><i class="fa-solid fa-align-left me-2 text-primary"></i>Description</h6>
+                    <p class="text-muted mb-0">{{ concept.description }}</p>
+                </div>
+                {% endif %}
+
+                <div class="row g-4 mb-4">
+                    {% if concept.color_palette %}
+                    <div class="col-md-6">
+                        <div class="detail-card rounded-4 p-4 h-100">
+                            <h6 class="fw-800 mb-3"><i class="fa-solid fa-swatchbook me-2 text-primary"></i>Color Palette</h6>
+                            <div class="d-flex flex-wrap gap-3">
+                                {% for color in concept.color_palette %}
+                                <div class="text-center">
+                                    <div class="rounded-circle shadow-sm border mb-1" style="width: 48px; height: 48px; background-color: {{ color }};" title="{{ color }}"></div>
+                                    <span class="x-small text-muted fw-700">{{ color }}</span>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if concept.fonts %}
+                    <div class="col-md-6">
+                        <div class="detail-card rounded-4 p-4 h-100">
+                            <h6 class="fw-800 mb-3"><i class="fa-solid fa-font me-2 text-primary"></i>Typography</h6>
+                            <div class="d-flex flex-wrap gap-2">
+                                {% for font in concept.fonts %}
+                                <span class="badge bg-light text-dark rounded-pill px-3 py-2" style="font-size: .8rem;">{{ font }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                {% if concept.tags %}
+                <div class="detail-card rounded-4 p-4 mb-4">
+                    <h6 class="fw-800 mb-3"><i class="fa-solid fa-tags me-2 text-primary"></i>Tags</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for tag in concept.tags %}
+                        <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-3 py-2">{{ tag }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if concept.layout_description %}
+                <div class="detail-card rounded-4 p-4 mb-4">
+                    <h6 class="fw-800 mb-2"><i class="fa-solid fa-object-ungroup me-2 text-primary"></i>Layout Description</h6>
+                    <p class="text-muted mb-0">{{ concept.layout_description }}</p>
+                </div>
+                {% endif %}
+
+                <div class="row g-4 mb-4">
+                    {% if concept.pros %}
+                    <div class="col-md-6">
+                        <div class="detail-card rounded-4 p-4 h-100 border-success border-opacity-25">
+                            <h6 class="fw-800 mb-3 text-success"><i class="fa-solid fa-circle-check me-2"></i>Strengths</h6>
+                            <ul class="list-unstyled mb-0">
+                                {% for pro in concept.pros %}
+                                <li class="mb-2 d-flex align-items-start gap-2">
+                                    <i class="fa-solid fa-check text-success mt-1" style="font-size: .7rem;"></i>
+                                    <span class="text-muted small">{{ pro }}</span>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if concept.cons %}
+                    <div class="col-md-6">
+                        <div class="detail-card rounded-4 p-4 h-100 border-danger border-opacity-25">
+                            <h6 class="fw-800 mb-3 text-danger"><i class="fa-solid fa-circle-xmark me-2"></i>Considerations</h6>
+                            <ul class="list-unstyled mb-0">
+                                {% for con in concept.cons %}
+                                <li class="mb-2 d-flex align-items-start gap-2">
+                                    <i class="fa-solid fa-xmark text-danger mt-1" style="font-size: .7rem;"></i>
+                                    <span class="text-muted small">{{ con }}</span>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                {% if concept.feature_checklist %}
+                <div class="detail-card rounded-4 p-4 mb-4">
+                    <h6 class="fw-800 mb-3"><i class="fa-solid fa-list-check me-2 text-primary"></i>Feature Checklist</h6>
+                    <div class="row g-2">
+                        {% for feature in concept.feature_checklist %}
+                        <div class="col-sm-6 col-md-4">
+                            <div class="d-flex align-items-center gap-2 p-2 rounded-3" style="background: var(--bs-tertiary-bg);">
+                                <i class="fa-solid fa-square-check text-success" style="font-size: .9rem;"></i>
+                                <span class="small">{{ feature }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="detail-card rounded-4 p-4 mb-4">
+                    <ul class="nav nav-pills" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tabAnnotations" type="button" role="tab">
+                                <i class="fa-solid fa-comment-dots me-1"></i>Annotations <span class="badge bg-white text-dark ms-1" style="font-size: .65rem;">{{ annotations|length }}</span>
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tabFeedback" type="button" role="tab">
+                                <i class="fa-regular fa-comments me-1"></i>Feedback <span class="badge bg-white text-dark ms-1" style="font-size: .65rem;">{{ feedbacks|length }}</span>
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tabDecisions" type="button" role="tab">
+                                <i class="fa-solid fa-clipboard-check me-1"></i>Decision Trail <span class="badge bg-white text-dark ms-1" style="font-size: .65rem;">{{ trail|length }}</span>
+                            </button>
+                        </li>
+                    </ul>
+                    <div class="tab-content pt-4">
+                        <div class="tab-pane fade show active" id="tabAnnotations" role="tabpanel">
+                            {% if annotations %}
+                            <div class="d-flex flex-column gap-3">
+                                {% for ann in annotations %}
+                                <div class="d-flex gap-3 p-3 rounded-3" style="background: var(--bs-tertiary-bg);">
+                                    <div class="flex-shrink-0">
+                                        <span class="badge rounded-pill {% if ann.resolved_by %}bg-success{% else %}bg-warning text-dark{% endif %}">
+                                            <i class="fa-solid fa-{% if ann.annotation_type == 'comment' %}comment{% elif ann.annotation_type == 'question' %}circle-question{% elif ann.annotation_type == 'suggestion' %}lightbulb{% else %}pencil{% endif %} me-1"></i>{{ ann.get_annotation_type_display|default:ann.annotation_type }}
+                                        </span>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex align-items-center justify-content-between mb-1">
+                                            <span class="fw-700 small">{{ ann.client.username|default:"Anonymous" }}</span>
+                                            <span class="x-small text-muted">{{ ann.created_at|timesince }} ago</span>
+                                        </div>
+                                        <p class="mb-1 small">{{ ann.text }}</p>
+                                        <span class="x-small text-muted">Position: ({{ ann.x_position|floatformat:0 }}%, {{ ann.y_position|floatformat:0 }}%)</span>
+                                        {% if ann.resolved_by %}
+                                        <div class="mt-1"><span class="x-small text-success"><i class="fa-solid fa-check-double me-1"></i>Resolved by {{ ann.resolved_by.username }}</span></div>
+                                        {% elif is_designer or is_staff %}
+                                        <form method="post" action="{% url 'branding:concept_resolve_annotation' pk=concept.pk ann_id=ann.pk %}" class="mt-2">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-success"><i class="fa-solid fa-check me-1"></i>Resolve</button>
+                                        </form>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <p class="text-muted small text-center py-3 mb-0">No annotations yet. Click on the image to add one.</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="tab-pane fade" id="tabFeedback" role="tabpanel">
+                            {% if feedbacks %}
+                            <div class="d-flex flex-column gap-3">
+                                {% for fb in feedbacks %}
+                                <div class="p-3 rounded-3" style="background: var(--bs-tertiary-bg);">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="fw-700 small">{{ fb.client.username|default:"Anonymous" }}</span>
+                                            {% if fb.overall_rating %}
+                                            <span class="x-small">{% star_html_readonly fb.overall_rating %}</span>
+                                            {% endif %}
+                                        </div>
+                                        <span class="x-small text-muted">{{ fb.created_at|timesince }} ago</span>
+                                    </div>
+                                    {% if fb.title %}<h6 class="fw-700 mb-1">{{ fb.title }}</h6>{% endif %}
+                                    {% if fb.feedback_text %}<p class="small text-muted mb-2">{{ fb.feedback_text }}</p>{% endif %}
+                                    {% if fb.strengths %}
+                                    <div class="mb-1"><span class="x-small fw-700 text-success">Strengths:</span>
+                                        <p class="small text-muted mb-0">{{ fb.strengths }}</p>
+                                    </div>
+                                    {% endif %}
+                                    {% if fb.improvements %}
+                                    <div><span class="x-small fw-700 text-warning">Improvements:</span>
+                                        <p class="small text-muted mb-0">{{ fb.improvements }}</p>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <p class="text-muted small text-center py-3 mb-0">No feedback submitted yet.</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="tab-pane fade" id="tabDecisions" role="tabpanel">
+                            {% if trail %}
+                            <div class="timeline-list">
+                                {% for item in trail %}
+                                <div class="timeline-item d-flex gap-3 pb-4 position-relative {% if not forloop.last %}border-start border-2 ms-2{% endif %}" style="{% if not forloop.last %}margin-left: 7px; padding-left: 20px;{% endif %}">
+                                    <div class="timeline-dot position-absolute bg-primary rounded-circle" style="width: 12px; height: 12px; top: 4px; left: -6px; border: 2px solid var(--bs-body-bg);"></div>
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex align-items-center justify-content-between mb-1">
+                                            <span class="fw-700 small">{{ item.action }}</span>
+                                            <span class="x-small text-muted">{{ item.created_at|date:"M j, Y H:i" }}</span>
+                                        </div>
+                                        {% if item.details %}
+                                        <p class="x-small text-muted mb-1">{{ item.details }}</p>
+                                        {% endif %}
+                                        {% if item.performed_by %}
+                                        <span class="x-small text-muted">by {{ item.performed_by.username }}</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <p class="text-muted small text-center py-3 mb-0">No decision trail recorded.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="col-lg-4">
+
+                <div class="detail-card rounded-4 p-4 mb-4">
+                    <h6 class="fw-800 mb-3"><i class="fa-solid fa-star me-2 text-primary"></i>Element Ratings</h6>
+                    {% if is_client %}
+                    <form method="post" action="{% url 'branding:concept_rate_element' pk=concept.pk %}" id="ratingForm">
+                        {% csrf_token %}
+                        <input type="hidden" name="element" id="ratingElement" value="">
+                        <input type="hidden" name="score" id="ratingScore" value="">
+                        {% for key, label in RATING_ELEMENTS %}
+                        <div class="d-flex align-items-center justify-content-between py-2 {% if not forloop.last %}border-bottom{% endif %}">
+                            <span class="small fw-700">{{ label }}</span>
+                            <div class="d-flex align-items-center gap-1">
+                                {% for i in "12345" %}
+                                <button type="button" class="btn btn-sm p-0 star-rate" data-element="{{ key }}" data-score="{{ forloop.counter }}" title="{{ forloop.counter }} star{{ forloop.counter|pluralize }}">
+                                    <i class="fa-{% with val=forloop.counter %}{% for r in my_rating %}{% if r.element == key and r.score >= val %}solid{% else %}regular{% endif %}{% endfor %}{% endwith %} fa-star text-warning" style="font-size: 1rem;"></i>
+                                </button>
+                                {% endfor %}
+                                {% with avg_score=element_avg|get_item:key %}
+                                {% if avg_score %}
+                                <span class="x-small text-muted ms-1" title="Average: {{ avg_score.avg_score|floatformat:1 }} ({{ avg_score.count }} ratings)">{{ avg_score.avg_score|floatformat:1 }}</span>
+                                {% endif %}
+                                {% endwith %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </form>
+                    {% else %}
+                    {% for key, label in RATING_ELEMENTS %}
+                    <div class="d-flex align-items-center justify-content-between py-2 {% if not forloop.last %}border-bottom{% endif %}">
+                        <span class="small fw-700">{{ label }}</span>
+                        <div class="d-flex align-items-center gap-1">
+                            {% with avg_data=element_avg|get_item:key %}
+                            {% if avg_data %}
+                            {% for i in "12345" %}
+                            <i class="fa-{% if avg_data.avg_score >= forloop.counter %}solid{% else %}regular{% endif %} fa-star text-warning" style="font-size: .85rem;"></i>
+                            {% endfor %}
+                            <span class="x-small text-muted ms-1">{{ avg_data.avg_score|floatformat:1 }} <span class="text-muted">({{ avg_data.count }})</span></span>
+                            {% else %}
+                            <span class="x-small text-muted">No ratings</span>
+                            {% endif %}
+                            {% endwith %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+
+                <div class="detail-card rounded-4 p-4 mb-4">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <h6 class="fw-800 mb-0"><i class="fa-solid fa-note-sticky me-2 text-primary"></i>Sticky Notes</h6>
+                    </div>
+                    <div id="stickyNotesContainer" class="d-flex flex-column gap-2" style="max-height: 300px; overflow-y: auto;">
+                        <p class="text-muted small text-center mb-0" id="noStickyMsg">Click "Sticky Note" then click on the image to place.</p>
+                    </div>
+                </div>
+
+                <div class="detail-card rounded-4 p-4 mb-4">
+                    <h6 class="fw-800 mb-3"><i class="fa-solid fa-bolt me-2 text-primary"></i>Actions</h6>
+                    <div class="d-flex flex-column gap-2">
+                        <form method="post" action="{% url 'branding:concept_mark_favorite' pk=concept.pk %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn {% if concept.is_client_favorite %}btn-danger{% else %}btn-outline-danger{% endif %} w-100">
+                                <i class="fa-solid fa-heart me-2"></i>{% if concept.is_client_favorite %}Unfavorite{% else %}Mark as Favorite{% endif %}
+                            </button>
+                        </form>
+
+                        <button class="btn btn-brand-primary w-100" data-bs-toggle="modal" data-bs-target="#feedbackModal">
+                            <i class="fa-regular fa-comments me-2"></i>Submit Feedback
+                        </button>
+
+                        {% if is_client or is_staff %}
+                        <div class="border rounded-3 p-3 mt-1" style="background: var(--bs-tertiary-bg);">
+                            <p class="x-small fw-700 text-muted mb-2">Make a Decision</p>
+                            <form method="post" action="{% url 'branding:concept_decide' pk=concept.pk %}" id="decisionForm">
+                                {% csrf_token %}
+                                <input type="hidden" name="decision" id="decisionValue" value="">
+                                <div class="d-flex flex-column gap-2">
+                                    <button type="submit" class="btn btn-sm btn-success w-100" onclick="document.getElementById('decisionValue').value='approve';">
+                                        <i class="fa-solid fa-check me-1"></i>Approve
+                                    </button>
+                                    <button type="submit" class="btn btn-sm btn-outline-danger w-100" onclick="document.getElementById('decisionValue').value='reject';">
+                                        <i class="fa-solid fa-xmark me-1"></i>Reject
+                                    </button>
+                                    <div class="input-group input-group-sm">
+                                        <select name="combine_with" class="form-select" style="font-size: .8rem;">
+                                            <option value="">Combine with…</option>
+                                            <option value="">— None —</option>
+                                        </select>
+                                        <button type="submit" class="btn btn-outline-info" onclick="document.getElementById('decisionValue').value='combine';" style="font-size: .8rem;">
+                                            <i class="fa-solid fa-code-compare me-1"></i>Combine
+                                        </button>
+                                    </div>
+                                    <textarea name="notes" class="form-control form-control-sm" rows="2" placeholder="Decision notes (optional)…" style="font-size: .8rem;"></textarea>
+                                </div>
+                            </form>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if refinements %}
+                <div class="detail-card rounded-4 p-4 mb-4">
+                    <h6 class="fw-800 mb-3"><i class="fa-solid fa-arrows-rotate me-2 text-primary"></i>Refinements</h6>
+                    <div class="d-flex flex-column gap-2">
+                        {% for ref in refinements %}
+                        <div class="p-2 rounded-3 border" style="background: var(--bs-tertiary-bg);">
+                            <div class="d-flex align-items-center justify-content-between mb-1">
+                                <span class="badge bg-secondary rounded-pill" style="font-size: .65rem;">{{ ref.get_status_display|default:ref.status }}</span>
+                                <span class="x-small text-muted">{{ ref.created_at|date:"M j" }}</span>
+                            </div>
+                            {% if ref.description %}
+                            <p class="x-small text-muted mb-1">{{ ref.description|truncatewords:20 }}</p>
+                            {% endif %}
+                            {% with iter_count=ref.iterations.count %}
+                            {% if iter_count %}
+                            <span class="x-small text-muted"><i class="fa-solid fa-code-branch me-1"></i>{{ iter_count }} iteration{{ iter_count|pluralize }}</span>
+                            {% endif %}
+                            {% endwith %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <a href="{% url 'branding:concept_refinements' pk=concept.pk %}" class="btn btn-sm btn-back w-100 mt-2">
+                        <i class="fa-solid fa-arrow-right me-1"></i>View All Refinements
+                    </a>
+                </div>
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<div class="modal fade" id="annotationModal" tabindex="-1" aria-labelledby="annotationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow-xl">
+            <div class="modal-header border-0 pb-0">
+                <h6 class="modal-title fw-800" id="annotationModalLabel"><i class="fa-solid fa-comment-dots me-2 text-primary"></i>Add Annotation</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="{% url 'branding:concept_add_annotation' pk=concept.pk %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" name="x_position" id="annX">
+                    <input type="hidden" name="y_position" id="annY">
+                    <div class="mb-3">
+                        <label class="form-label fw-700 small">Type</label>
+                        <select name="annotation_type" class="form-select">
+                            <option value="comment">Comment</option>
+                            <option value="question">Question</option>
+                            <option value="suggestion">Suggestion</option>
+                            <option value="issue">Issue</option>
+                        </select>
+                    </div>
+                    <div class="mb-0">
+                        <label class="form-label fw-700 small">Text</label>
+                        <textarea name="text" class="form-control" rows="3" placeholder="Your annotation…" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-back btn-sm" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-brand-primary btn-sm"><i class="fa-solid fa-check me-1"></i>Save Annotation</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="feedbackModal" tabindex="-1" aria-labelledby="feedbackModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow-xl">
+            <div class="modal-header border-0 pb-0">
+                <h6 class="modal-title fw-800" id="feedbackModalLabel"><i class="fa-regular fa-comments me-2 text-primary"></i>Submit Feedback</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="{% url 'branding:concept_add_feedback' pk=concept.pk %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-700 small">Overall Rating</label>
+                        <div class="d-flex gap-1" id="feedbackStars">
+                            {% for i in "12345" %}
+                            <button type="button" class="btn btn-sm p-0 feedback-star" data-score="{{ forloop.counter }}" title="{{ forloop.counter }} star{{ forloop.counter|pluralize }}">
+                                <i class="fa-regular fa-star text-warning" style="font-size: 1.3rem;"></i>
+                            </button>
+                            {% endfor %}
+                        </div>
+                        <input type="hidden" name="overall_rating" id="feedbackRating" value="">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-700 small">Title</label>
+                        <input type="text" name="title" class="form-control" placeholder="Brief summary…">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-700 small">Feedback</label>
+                        <textarea name="feedback_text" class="form-control" rows="4" placeholder="Detailed feedback…" required></textarea>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-700 small text-success">Strengths</label>
+                            <textarea name="strengths" class="form-control" rows="3" placeholder="What works well…"></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-700 small text-warning">Areas for Improvement</label>
+                            <textarea name="improvements" class="form-control" rows="3" placeholder="What could be better…"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-back btn-sm" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-brand-primary btn-sm"><i class="fa-solid fa-paper-plane me-1"></i>Submit Feedback</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="stickyModal" tabindex="-1" aria-labelledby="stickyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow-xl">
+            <div class="modal-header border-0 pb-0">
+                <h6 class="modal-title fw-800" id="stickyModalLabel"><i class="fa-solid fa-note-sticky me-2 text-primary"></i>Add Sticky Note</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="{% url 'branding:concept_add_sticky_note' pk=concept.pk %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" name="x_position" id="stickyX">
+                    <input type="hidden" name="y_position" id="stickyY">
+                    <div class="mb-3">
+                        <label class="form-label fw-700 small">Note</label>
+                        <textarea name="text" class="form-control" rows="3" placeholder="Your note…" required></textarea>
+                    </div>
+                    <div class="mb-0">
+                        <label class="form-label fw-700 small">Color</label>
+                        <div class="d-flex gap-2">
+                            <label class="cursor-pointer"><input type="radio" name="color" value="#fff9c4" class="d-none" checked><span class="d-block rounded-circle border" style="width: 32px; height: 32px; background: #fff9c4; border-color: #e0e0e0;"></span></label>
+                            <label class="cursor-pointer"><input type="radio" name="color" value="#f8bbd0" class="d-none"><span class="d-block rounded-circle border" style="width: 32px; height: 32px; background: #f8bbd0; border-color: #e0e0e0;"></span></label>
+                            <label class="cursor-pointer"><input type="radio" name="color" value="#c8e6c9" class="d-none"><span class="d-block rounded-circle border" style="width: 32px; height: 32px; background: #c8e6c9; border-color: #e0e0e0;"></span></label>
+                            <label class="cursor-pointer"><input type="radio" name="color" value="#bbdefb" class="d-none"><span class="d-block rounded-circle border" style="width: 32px; height: 32px; background: #bbdefb; border-color: #e0e0e0;"></span></label>
+                            <label class="cursor-pointer"><input type="radio" name="color" value="#d1c4e9" class="d-none"><span class="d-block rounded-circle border" style="width: 32px; height: 32px; background: #d1c4e9; border-color: #e0e0e0;"></span></label>
+                            <label class="cursor-pointer"><input type="radio" name="color" value="#ffe0b2" class="d-none"><span class="d-block rounded-circle border" style="width: 32px; height: 32px; background: #ffe0b2; border-color: #e0e0e0;"></span></label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-back btn-sm" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-brand-primary btn-sm"><i class="fa-solid fa-check me-1"></i>Save Note</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+    'use strict';
+
+    var img = document.getElementById('mainImage');
+    var container = document.getElementById('imageContainer');
+    if (!img || !container) return;
+
+    var scale = 1, translateX = 0, translateY = 0, isDragging = false, startX, startY;
+    var mode = 'view';
+    var annotModal = new bootstrap.Modal(document.getElementById('annotationModal'));
+    var stickyModal = new bootstrap.Modal(document.getElementById('stickyModal'));
+
+    function applyTransform() {
+        img.style.transform = 'translate(' + translateX + 'px, ' + translateY + 'px) scale(' + scale + ')';
+    }
+
+    document.getElementById('zoomIn').addEventListener('click', function () {
+        scale = Math.min(scale + 0.25, 5);
+        applyTransform();
+    });
+
+    document.getElementById('zoomOut').addEventListener('click', function () {
+        scale = Math.max(scale - 0.25, 0.5);
+        applyTransform();
+    });
+
+    document.getElementById('zoomReset').addEventListener('click', function () {
+        scale = 1; translateX = 0; translateY = 0;
+        applyTransform();
+    });
+
+    container.addEventListener('mousedown', function (e) {
+        if (mode !== 'view' || e.target.closest('.annotation-pin, .sticky-note-badge')) return;
+        isDragging = true;
+        startX = e.clientX - translateX;
+        startY = e.clientY - translateY;
+        container.style.cursor = 'grabbing';
+    });
+
+    document.addEventListener('mousemove', function (e) {
+        if (!isDragging) return;
+        translateX = e.clientX - startX;
+        translateY = e.clientY - startY;
+        applyTransform();
+    });
+
+    document.addEventListener('mouseup', function () {
+        isDragging = false;
+        container.style.cursor = mode === 'view' ? 'grab' : 'crosshair';
+    });
+
+    container.addEventListener('wheel', function (e) {
+        e.preventDefault();
+        if (e.deltaY < 0) scale = Math.min(scale + 0.1, 5);
+        else scale = Math.max(scale - 0.1, 0.5);
+        applyTransform();
+    }, { passive: false });
+
+    container.addEventListener('click', function (e) {
+        if (e.target.closest('.annotation-pin, .sticky-note-badge')) return;
+        if (e.target.id === 'mainImage' || e.target === container) {
+            var rect = container.getBoundingClientRect();
+            var x = ((e.clientX - rect.left) / rect.width * 100).toFixed(1);
+            var y = ((e.clientY - rect.top) / rect.height * 100).toFixed(1);
+            if (mode === 'annotate') {
+                document.getElementById('annX').value = x;
+                document.getElementById('annY').value = y;
+                annotModal.show();
+            } else if (mode === 'sticky') {
+                document.getElementById('stickyX').value = x;
+                document.getElementById('stickyY').value = y;
+                stickyModal.show();
+            }
+        }
+    });
+
+    document.getElementById('annotateModeBtn').addEventListener('click', function () {
+        if (mode === 'annotate') { mode = 'view'; this.classList.remove('active'); container.style.cursor = 'grab'; }
+        else { mode = 'annotate'; document.getElementById('stickyModeBtn').classList.remove('active'); this.classList.add('active'); container.style.cursor = 'crosshair'; }
+    });
+
+    document.getElementById('stickyModeBtn').addEventListener('click', function () {
+        if (mode === 'sticky') { mode = 'view'; this.classList.remove('active'); container.style.cursor = 'grab'; }
+        else { mode = 'sticky'; document.getElementById('annotateModeBtn').classList.remove('active'); this.classList.add('active'); container.style.cursor = 'crosshair'; }
+    });
+
+    document.querySelectorAll('.annotation-pin').forEach(function (pin) {
+        pin.addEventListener('mouseenter', function () {
+            var note = this.nextElementSibling;
+            if (note) { var inner = note.querySelector('[id^="annNote"]'); if (inner) inner.style.display = 'block'; }
+        });
+        pin.addEventListener('mouseleave', function () {
+            var note = this.nextElementSibling;
+            if (note) { var inner = note.querySelector('[id^="annNote"]'); if (inner) inner.style.display = 'none'; }
+        });
+    });
+
+    var starBtns = document.querySelectorAll('.star-rate');
+    starBtns.forEach(function (btn) {
+        btn.addEventListener('mouseenter', function () {
+            var el = this.dataset.element, sc = parseInt(this.dataset.score);
+            starBtns.forEach(function (b) {
+                if (b.dataset.element === el) {
+                    b.querySelector('i').className = parseInt(b.dataset.score) <= sc ? 'fa-solid fa-star text-warning' : 'fa-regular fa-star text-warning';
+                }
+            });
+        });
+        btn.addEventListener('mouseleave', function () {
+            var el = this.dataset.element;
+            starBtns.forEach(function (b) {
+                if (b.dataset.element === el) {
+                    var myScore = b.dataset.myscore;
+                    if (myScore && parseInt(b.dataset.score) <= parseInt(myScore)) b.querySelector('i').className = 'fa-solid fa-star text-warning';
+                    else b.querySelector('i').className = 'fa-regular fa-star text-warning';
+                }
+            });
+        });
+        btn.addEventListener('click', function () {
+            document.getElementById('ratingElement').value = this.dataset.element;
+            document.getElementById('ratingScore').value = this.dataset.score;
+            document.getElementById('ratingForm').submit();
+        });
+    });
+
+    var fbStars = document.querySelectorAll('.feedback-star');
+    fbStars.forEach(function (btn) {
+        btn.addEventListener('mouseenter', function () {
+            var sc = parseInt(this.dataset.score);
+            fbStars.forEach(function (b) {
+                b.querySelector('i').className = parseInt(b.dataset.score) <= sc ? 'fa-solid fa-star text-warning' : 'fa-regular fa-star text-warning';
+            });
+        });
+        btn.addEventListener('mouseleave', function () {
+            var val = document.getElementById('feedbackRating').value;
+            fbStars.forEach(function (b) {
+                if (val && parseInt(b.dataset.score) <= parseInt(val)) b.querySelector('i').className = 'fa-solid fa-star text-warning';
+                else b.querySelector('i').className = 'fa-regular fa-star text-warning';
+            });
+        });
+        btn.addEventListener('click', function () {
+            document.getElementById('feedbackRating').value = this.dataset.score;
+            fbStars.forEach(function (b) {
+                if (parseInt(b.dataset.score) <= parseInt(btn.dataset.score)) b.querySelector('i').className = 'fa-solid fa-star text-warning';
+                else b.querySelector('i').className = 'fa-regular fa-star text-warning';
+            });
+        });
+    });
+
+    document.querySelectorAll('.gallery-thumb').forEach(function (thumb) {
+        thumb.addEventListener('click', function () {
+            var src = this.dataset.src;
+            if (src && img) {
+                img.src = src;
+                scale = 1; translateX = 0; translateY = 0;
+                applyTransform();
+                window.scrollTo({ top: container.offsetTop - 100, behavior: 'smooth' });
+            }
+        });
+    });
+
+    document.querySelectorAll('.star-rate').forEach(function (btn) {
+        var el = btn.dataset.element;
+        var myRating = null;
+        {% if my_rating %}
+        {% for r in my_rating %}
+        if ('{{ r.element }}' === el && {{ r.score }} > 0) myRating = {{ r.score }};
+        {% endfor %}
+        {% endif %}
+        if (myRating && parseInt(btn.dataset.score) <= myRating) {
+            btn.dataset.myscore = myRating;
+            btn.querySelector('i').className = 'fa-solid fa-star text-warning';
+        }
+    });
+
+    var stickyNotes = document.querySelectorAll('.sticky-note-badge');
+    if (stickyNotes.length > 0) {
+        document.getElementById('noStickyMsg').style.display = 'none';
+    }
+
+})();
+</script>
+<style>
+    .annotation-pin span { transition: transform 0.15s ease; }
+    .annotation-pin:hover span { transform: scale(1.15); }
+    .sticky-note-badge > div { animation: fadeIn 0.2s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+    .nav-pills .nav-link { border-radius: 12px; font-size: .85rem; padding: .5rem 1rem; color: var(--bs-secondary); }
+    .nav-pills .nav-link.active { background: var(--bs-primary); color: #fff; }
+    .gallery-thumb { transition: transform 0.15s ease, box-shadow 0.15s ease; }
+    .gallery-thumb:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,.15); }
+    .cursor-pointer { cursor: pointer; }
+    .timeline-item:last-child { border-left-color: transparent !important; }
+</style>
+{% endblock %}

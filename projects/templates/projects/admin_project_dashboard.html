@@ -1,0 +1,923 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Admin Dashboard: {{ project.title }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Admin Toolbar -->
+    <div class="d-flex justify-content-between align-items-center mb-4 p-3 bg-white shadow-sm rounded border-start border-5 border-primary">
+        <div>
+            <h5 class="mb-0 fw-bold"><i class="bi bi-shield-lock-fill me-2 text-primary"></i>Admin Project Dashboard</h5>
+            <span class="small text-muted">Full management access for {{ project.title }}</span>
+        </div>
+        <div>
+            <a href="{% url 'projects:admin_preview_client_project' project.id %}" class="btn btn-outline-dark" target="_blank">
+                <i class="bi bi-eye me-1"></i> Preview Client View
+            </a>
+        </div>
+    </div>
+
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'projects:admin_dashboard' %}" class="text-decoration-none">Admin Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'projects:admin_kanban' %}" class="text-decoration-none">Project Board</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ project.title }} (Admin)</li>
+        </ol>
+    </nav>
+
+    <!-- Header Section -->
+    <div class="row mb-5 align-items-center">
+        <div class="col-lg-8">
+            <h1 class="display-5 fw-bold mb-3">{{ project.title }}</h1>
+            <p class="lead text-muted">{{ project.description }}</p>
+            <div class="d-flex gap-2 mt-3">
+                <span class="badge bg-primary rounded-pill px-3 py-2">
+                    <i class="bi bi-circle-fill me-1 small"></i> {{ project.get_current_status_display }}
+                </span>
+                <span class="badge bg-info text-dark rounded-pill px-3 py-2">
+                    <i class="bi bi-flag-fill me-1 small"></i> {{ project.get_current_phase_display }}
+                </span>
+                <button type="button" class="btn btn-sm btn-outline-dark rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#editProjectModal">
+                    <i class="bi bi-pencil-fill me-1 small"></i> Edit Details
+                </button>
+            </div>
+        </div>
+        <div class="col-lg-4 mt-4 mt-lg-0">
+            <div class="card border-0 shadow-sm bg-light">
+                <div class="card-body p-4">
+                    <h6 class="text-uppercase text-muted fw-bold mb-3 small">Overall Progress</h6>
+                    <div class="progress" style="height: 10px;">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ project.progress_percentage }}%;" aria-valuenow="{{ project.progress_percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <div class="d-flex justify-content-between mt-2">
+                        <span class="fw-bold">{{ project.progress_percentage }}%</span>
+                        {% if project.expected_delivery_date %}
+                        <small class="text-muted">Target: {{ project.expected_delivery_date|date:"M d, Y" }}</small>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body py-3">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="text-muted small">Pending Approvals</span>
+                        <i class="bi bi-check2-square text-warning"></i>
+                    </div>
+                    <h5 class="fw-bold mb-0">{{ pending_approvals_count|default:0 }}</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body py-3">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="text-muted small">Delayed Phases</span>
+                        <i class="bi bi-exclamation-triangle-fill text-danger"></i>
+                    </div>
+                    <h5 class="fw-bold mb-0">{{ delayed_phases_count|default:0 }}</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body py-3">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="text-muted small">Overdue Phases</span>
+                        <i class="bi bi-clock-history text-danger"></i>
+                    </div>
+                    <h5 class="fw-bold mb-0">{{ overdue_phases_count|default:0 }}</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body py-3">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="text-muted small">Unassigned Phases</span>
+                        <i class="bi bi-person-dash text-muted"></i>
+                    </div>
+                    <h5 class="fw-bold mb-0">{{ unassigned_phases_count|default:0 }}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Main Content Column -->
+        <div class="col-lg-8">
+            {% if pending_approvals_count or delayed_phases_count or overdue_phases_count or unassigned_phases_count %}
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3"><i class="bi bi-exclamation-circle text-danger me-2"></i>Actions Needed</h5>
+                    <ul class="list-unstyled mb-0 small">
+                        {% if pending_approvals_count %}
+                        <li class="mb-1"><i class="bi bi-arrow-right-short me-1"></i>{{ pending_approvals_count }} phase(s) awaiting client approval.</li>
+                        {% endif %}
+                        {% if delayed_phases_count %}
+                        <li class="mb-1"><i class="bi bi-arrow-right-short me-1"></i>{{ delayed_phases_count }} delayed phase(s).</li>
+                        {% endif %}
+                        {% if overdue_phases_count %}
+                        <li class="mb-1"><i class="bi bi-arrow-right-short me-1"></i>{{ overdue_phases_count }} overdue phase(s) based on end date.</li>
+                        {% endif %}
+                        {% if unassigned_phases_count %}
+                        <li class="mb-1"><i class="bi bi-arrow-right-short me-1"></i>{{ unassigned_phases_count }} phase(s) without team assignment.</li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="card border-0 shadow-sm mb-5 border-start border-5 {% if project.agile_status == 'APPROVED' %}border-success{% elif project.agile_status == 'AWAITING_APPROVAL' %}border-warning{% elif project.agile_status == 'CHANGES_REQUESTED' %}border-danger{% else %}border-secondary{% endif %}">
+                <div class="card-header bg-white border-bottom-0 pt-4 pb-0 d-flex justify-content-between align-items-center">
+                    <h4 class="card-title fw-bold mb-0"><i class="bi bi-diagram-3 me-2 text-primary"></i>Agile Plan Management</h4>
+                    <span class="badge {% if project.agile_status == 'APPROVED' %}bg-success{% elif project.agile_status == 'AWAITING_APPROVAL' %}bg-warning text-dark{% elif project.agile_status == 'CHANGES_REQUESTED' %}bg-danger{% else %}bg-secondary{% endif %} rounded-pill">
+                        {{ project.get_agile_status_display }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    {% if project.agile_status == 'DRAFT' or project.agile_status == 'CHANGES_REQUESTED' %}
+                        <p class="text-muted">Build the project roadmap by adding phases/sprints below. When ready, send it to the client for approval.</p>
+                        
+                        {% if project.agile_status == 'CHANGES_REQUESTED' %}
+                        <div class="alert alert-danger">
+                            <h6 class="fw-bold"><i class="bi bi-exclamation-circle me-2"></i>Changes Requested by Client</h6>
+                            <p class="mb-0">{{ project.agile_plan_rejection_reason }}</p>
+                        </div>
+                        {% endif %}
+
+                        <div class="d-flex gap-2 flex-wrap">
+                            <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addPhaseModal">
+                                <i class="bi bi-plus-lg me-1"></i> Add Phase / Sprint
+                            </button>
+                            
+                            <form action="{% url 'projects:upload_agile_plan' project.id %}" method="post" class="d-inline" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary" onclick="return validateAgileSend({% if project.agile_plan_file %}true{% else %}false{% endif %});">
+                                    <i class="bi bi-send me-1"></i> Send Plan for Approval
+                                </button>
+                            </form>
+                        </div>
+                    {% elif project.agile_status == 'AWAITING_APPROVAL' %}
+                        <div class="alert alert-warning">
+                            <div class="d-flex">
+                                <i class="bi bi-lock-fill fs-4 me-3"></i>
+                                <div>
+                                    <h6 class="fw-bold">Plan Locked & Awaiting Approval</h6>
+                                    <p class="mb-0">The Agile Plan is currently with the client. You cannot add or remove phases until they approve or request changes.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <button class="btn btn-outline-secondary btn-sm" disabled>
+                                <i class="bi bi-pencil-slash me-1"></i> Editing Locked
+                            </button>
+                        </div>
+                    {% elif project.agile_status == 'APPROVED' %}
+                        <div class="alert alert-success">
+                            <div class="d-flex">
+                                <i class="bi bi-check-circle-fill fs-4 me-3"></i>
+                                <div>
+                                    <h6 class="fw-bold">Agile Plan Approved</h6>
+                                    <p class="mb-0">Client approved the plan on {{ project.agile_plan_approved_at|date:"M d, Y" }}. Development is authorized.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Optional: Allow adding phases post-approval as "Change Requests" or "Scope Extension" -->
+                        <div class="mt-3">
+                            <small class="text-muted d-block mb-2">Scope Extension</small>
+                            <button class="btn btn-sm btn-outline-dark" data-bs-toggle="modal" data-bs-target="#addPhaseModal">
+                                <i class="bi bi-plus-circle me-1"></i> Add New Phase
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Deliverables Section -->
+            <div class="card border-0 shadow-sm mb-5">
+                <div class="card-header bg-white border-bottom-0 pt-4 pb-0 d-flex justify-content-between align-items-center">
+                    <h4 class="card-title fw-bold mb-0"><i class="bi bi-folder2-open me-2 text-primary"></i>Project Deliverables</h4>
+                </div>
+                <div class="card-body">
+                    {% if deliverables %}
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Phase</th>
+                                    <th>Version</th>
+                                    <th>Visibility</th>
+                                    <th class="text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in deliverables %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-file-earmark-text fs-4 me-3 text-secondary"></i>
+                                            <span class="fw-medium">{{ item.name }}</span>
+                                            {% if not item.client_visible %}
+                                            <span class="badge bg-warning text-dark ms-2" style="font-size: 0.65rem;">Hidden</span>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    <td><span class="badge bg-light text-dark border">{{ item.phase.get_phase_type_display }}</span></td>
+                                    <td>{{ item.version }}</td>
+                                    <td>
+                                        <a href="{% url 'projects:toggle_deliverable_visibility' project.id item.id %}" class="btn btn-sm {% if item.client_visible %}btn-outline-success{% else %}btn-outline-secondary{% endif %}" title="Toggle Client Visibility">
+                                            <i class="bi {% if item.client_visible %}bi-eye-fill{% else %}bi-eye-slash-fill{% endif %}"></i>
+                                        </a>
+                                    </td>
+                                    <td class="text-end">
+                                        {% if item.file %}
+                                        <a href="{{ item.file.url }}" class="btn btn-sm btn-outline-primary" download>
+                                            <i class="bi bi-download me-1"></i> Download
+                                        </a>
+                                        {% elif item.link %}
+                                        <a href="{{ item.link }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-box-arrow-up-right me-1"></i> Open
+                                        </a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <div class="mb-3">
+                            <i class="bi bi-folder-x fs-1 text-muted opacity-50"></i>
+                        </div>
+                        <h6 class="text-muted">No deliverables uploaded</h6>
+                        <p class="small text-muted mb-0">Use the admin tools to add deliverables to phases.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Client Communication Section -->
+            <div class="card border-0 shadow-sm mb-5">
+                <div class="card-header bg-white border-bottom-0 pt-4 pb-0 d-flex justify-content-between align-items-center">
+                    <h4 class="card-title fw-bold mb-0"><i class="bi bi-chat-dots me-2 text-primary"></i>Client Communication</h4>
+                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#adminReplyModal">
+                        <i class="bi bi-send me-1"></i> Send Message
+                    </button>
+                </div>
+                <div class="card-body">
+                    {% if feedback_list %}
+                        <div class="list-group list-group-flush">
+                            {% for feedback in feedback_list %}
+                                <div class="list-group-item px-0">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">
+                                            {% if feedback.is_admin_response %}
+                                                <span class="badge bg-primary me-2">Admin (You)</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary me-2">Client</span>
+                                            {% endif %}
+                                            {{ feedback.created_at|date:"M d, Y H:i" }}
+                                        </h6>
+                                        {% if feedback.phase %}
+                                            <small class="text-muted">Re: {{ feedback.phase.get_phase_type_display }}</small>
+                                        {% endif %}
+                                    </div>
+                                    <p class="mb-1">{{ feedback.content }}</p>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center my-3">No messages yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Timeline Section -->
+            <div class="mb-5">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="fw-bold"><i class="bi bi-kanban me-2 text-primary"></i>Project Roadmap</h3>
+                </div>
+                
+                <div class="timeline-wrapper position-relative">
+                    {% for phase in phases %}
+                    <div class="card border-0 shadow-sm mb-4 {% if phase.status == 'COMPLETED' %}border-start border-5 border-success{% elif phase.status == 'IN_PROGRESS' %}border-start border-5 border-primary{% else %}border-start border-5 border-secondary{% endif %}">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <h5 class="fw-bold mb-0">{{ phase.get_phase_type_display }}</h5>
+                                        {% if project.agile_status != 'AWAITING_APPROVAL' %}
+                                        <button class="btn btn-link btn-sm p-0 text-muted" data-bs-toggle="modal" data-bs-target="#editPhaseModal{{ phase.id }}">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </button>
+                                        {% else %}
+                                        <span class="text-muted small ms-2"><i class="bi bi-lock-fill"></i> Locked</span>
+                                        {% endif %}
+                                    </div>
+                                    <span class="badge {% if phase.status == 'COMPLETED' %}bg-success{% elif phase.status == 'IN_PROGRESS' %}bg-primary{% else %}bg-secondary{% endif %} rounded-pill">
+                                        {{ phase.get_status_display }}
+                                    </span>
+                                </div>
+                                {% if phase.start_date or phase.end_date %}
+                                <div class="text-muted small text-end">
+                                    {% if phase.start_date %}<div>{{ phase.start_date|date:"M d" }}</div>{% endif %}
+                                    {% if phase.end_date %}<div>to {{ phase.end_date|date:"M d" }}</div>{% endif %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            {% if phase.client_visible_notes %}
+                            <p class="text-muted mb-3">{{ phase.client_visible_notes }}</p>
+                            {% endif %}
+                            
+                            <!-- Phase Progress -->
+                            {% if phase.status == 'IN_PROGRESS' %}
+                            <div class="mt-3">
+                                <div class="d-flex justify-content-between small mb-1">
+                                    <span class="text-muted">Phase Progress</span>
+                                    <span class="fw-bold">{{ phase.progress }}%</span>
+                                </div>
+                                <div class="progress" style="height: 6px;">
+                                    <div class="progress-bar" role="progressbar" style="width: {{ phase.progress }}%" aria-valuenow="{{ phase.progress }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            <div class="mt-3 pt-3 border-top">
+                                <small class="fw-bold text-muted d-block mb-2">Admin Actions</small>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <!-- Add Input/Deliverable Button -->
+                                    <button class="btn btn-sm btn-outline-dark" data-bs-toggle="modal" data-bs-target="#addDeliverableModal{{ phase.id }}">
+                                        <i class="bi bi-plus-circle me-1"></i> Add Input/Deliverable
+                                    </button>
+
+                                    {% if phase.is_locked %}
+                                        {% if project.agile_status == 'APPROVED' %}
+                                        <a href="{% url 'projects:unlock_phase' project.id phase.id %}" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-unlock-fill me-1"></i> Unlock Sprint
+                                        </a>
+                                        {% else %}
+                                        <button class="btn btn-sm btn-outline-secondary" disabled title="Agile Plan must be approved first">
+                                            <i class="bi bi-lock-fill me-1"></i> Locked
+                                        </button>
+                                        {% endif %}
+                                    {% else %}
+                                        <a href="{% url 'projects:lock_phase' project.id phase.id %}" class="btn btn-sm btn-outline-warning" title="Lock Sprint">
+                                            <i class="bi bi-lock-fill"></i>
+                                        </a>
+                                        
+                                        {% if phase.approval_status != 'AWAITING_CLIENT' and phase.approval_status != 'APPROVED' and phase.status != 'COMPLETED' %}
+                                        <a href="{% url 'projects:mark_phase_ready' project.id phase.id %}" class="btn btn-sm btn-outline-info">
+                                            <i class="bi bi-send me-1"></i> Request Approval
+                                        </a>
+                                        {% endif %}
+
+                                        {% if phase.status != 'COMPLETED' %}
+                                        <a href="{% url 'projects:force_approve_phase' project.id phase.id %}" class="btn btn-sm btn-success">
+                                            <i class="bi bi-check-circle-fill me-1"></i> Force Complete
+                                        </a>
+                                        {% else %}
+                                        <a href="{% url 'projects:reopen_phase' project.id phase.id %}" class="btn btn-sm btn-outline-warning">
+                                            <i class="bi bi-arrow-counterclockwise me-1"></i> Reopen
+                                        </a>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Add Deliverable Modal -->
+                    <div class="modal fade" id="addDeliverableModal{{ phase.id }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Add Deliverable / Input</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <form action="{% url 'projects:add_deliverable' project.id phase.id %}" method="post" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    <div class="modal-body">
+                                        <div class="mb-3">
+                                            <label class="form-label">Name</label>
+                                            <input type="text" class="form-control" name="name" required placeholder="e.g. Design Mockups v1">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">File</label>
+                                            <input type="file" class="form-control" name="file">
+                                        </div>
+                                        <div class="mb-3">
+                                            <div class="text-center text-muted small my-2">- OR -</div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">External Link</label>
+                                            <input type="url" class="form-control" name="link" placeholder="https://...">
+                                        </div>
+                                        <div class="alert alert-info small">
+                                            <i class="bi bi-info-circle me-1"></i> This will be visible to the client immediately.
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-primary">Add Deliverable</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Edit Phase Modal -->
+                    <div class="modal fade" id="editPhaseModal{{ phase.id }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Edit Phase: {{ phase.get_phase_type_display }}</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <form action="{% url 'projects:update_phase_meta' project.id phase.id %}" method="post">
+                                    {% csrf_token %}
+                                    <div class="modal-body">
+                                        <div class="mb-3">
+                                            <label class="form-label">Status</label>
+                                            <select class="form-select" name="status">
+                                                <option value="NOT_STARTED" {% if phase.status == 'NOT_STARTED' %}selected{% endif %}>Not Started</option>
+                                                <option value="IN_PROGRESS" {% if phase.status == 'IN_PROGRESS' %}selected{% endif %}>In Progress</option>
+                                                <option value="COMPLETED" {% if phase.status == 'COMPLETED' %}selected{% endif %}>Completed</option>
+                                                <option value="DELAYED" {% if phase.status == 'DELAYED' %}selected{% endif %}>Delayed</option>
+                                            </select>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Start Date</label>
+                                                <input type="date" class="form-control" name="start_date" value="{{ phase.start_date|date:'Y-m-d' }}">
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">End Date</label>
+                                                <input type="date" class="form-control" name="end_date" value="{{ phase.end_date|date:'Y-m-d' }}">
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Progress (%)</label>
+                                            <input type="number" class="form-control" name="progress" min="0" max="100" value="{{ phase.progress }}">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Description</label>
+                                            <textarea class="form-control" name="description" rows="3">{{ phase.client_visible_notes }}</textarea>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="alert alert-light text-center py-4">
+                        <p class="mb-0 text-muted">No phases defined for this project yet.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- Feedback Section -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-bottom-0 pt-4 pb-0 d-flex justify-content-between align-items-center">
+                    <h4 class="card-title fw-bold mb-0"><i class="bi bi-chat-left-text me-2 text-primary"></i>Feedback History</h4>
+                </div>
+                <div class="card-body">
+                    {% if feedback_list %}
+                    <div class="list-group list-group-flush">
+                        {% for feedback in feedback_list %}
+                        <div class="list-group-item px-0 py-3">
+                            <div class="d-flex w-100 justify-content-between mb-2">
+                                <h6 class="mb-1 fw-bold">
+                                    {% if feedback.phase %}On {{ feedback.phase.get_phase_type_display }}{% else %}General Feedback{% endif %}
+                                </h6>
+                                <small class="text-muted">{{ feedback.created_at|timesince }} ago</small>
+                            </div>
+                            <p class="mb-2 text-muted">{{ feedback.content|truncatechars:150 }}</p>
+                            <span class="badge {% if feedback.status == 'IMPLEMENTED' %}bg-success{% elif feedback.status == 'REVIEWED' %}bg-info{% else %}bg-warning text-dark{% endif %} rounded-pill small">
+                                {{ feedback.get_status_display }}
+                            </span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <div class="mb-3">
+                            <i class="bi bi-chat-square-dots fs-1 text-muted opacity-50"></i>
+                        </div>
+                        <h6 class="text-muted">No feedback history</h6>
+                        <p class="small text-muted mb-0">Client feedback will appear here.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Column -->
+        <div class="col-lg-4">
+
+            <!-- Agile Plan Management Card -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white pt-3 pb-2 border-bottom-0">
+                    <h5 class="fw-bold mb-0"><i class="bi bi-diagram-3 me-2 text-primary"></i>Agile Plan</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-muted">Status</span>
+                        <span class="badge {% if project.agile_status == 'APPROVED' %}bg-success{% elif project.agile_status == 'AWAITING_APPROVAL' %}bg-warning text-dark{% elif project.agile_status == 'CHANGES_REQUESTED' %}bg-danger{% else %}bg-secondary{% endif %} rounded-pill">
+                            {{ project.get_agile_status_display }}
+                        </span>
+                    </div>
+
+                    {% if project.agile_status == 'CHANGES_REQUESTED' and project.agile_plan_rejection_reason %}
+                    <div class="alert alert-danger small">
+                        <strong>Client Feedback:</strong><br>
+                        {{ project.agile_plan_rejection_reason }}
+                    </div>
+                    {% endif %}
+
+                    {% if project.agile_status == 'APPROVED' %}
+                        <div class="alert alert-success small mb-0">
+                            <i class="bi bi-check-circle-fill me-1"></i> Plan Approved on {{ project.agile_plan_approved_at|date:"M d, Y" }}
+                        </div>
+                        {% if project.agile_plan_file %}
+                        <div class="mt-2 text-center">
+                            <a href="{{ project.agile_plan_file.url }}" class="btn btn-sm btn-outline-primary" download>
+                                <i class="bi bi-download me-1"></i> Download Approved Plan
+                            </a>
+                        </div>
+                        {% endif %}
+                    {% else %}
+                        <p class="small text-muted">Upload the Agile Plan document and define sprints before sending for approval.</p>
+                        
+                        <form action="{% url 'projects:upload_agile_plan' project.id %}" method="post" enctype="multipart/form-data" data-require-file="{% if not project.agile_plan_file %}true{% else %}false{% endif %}">
+                            {% csrf_token %}
+                            
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-muted">Plan Document (PDF/Doc)</label>
+                                {% if project.agile_plan_file %}
+                                <div class="mb-2 small">
+                                    <a href="{{ project.agile_plan_file.url }}" target="_blank" class="text-decoration-none">
+                                        <i class="bi bi-file-earmark-text me-1"></i> View Current Plan
+                                    </a>
+                                </div>
+                                {% endif %}
+                                <input type="file" class="form-control form-control-sm" name="agile_plan_file" {% if not project.agile_plan_file %}required{% endif %}>
+                            </div>
+
+                            {% if project.agile_status == 'DRAFT' or project.agile_status == 'CHANGES_REQUESTED' %}
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="bi bi-send me-1"></i> Send Plan for Approval
+                            </button>
+                            {% else %}
+                            <button class="btn btn-secondary w-100" disabled>
+                                <i class="bi bi-hourglass-split me-1"></i> Awaiting Client
+                            </button>
+                            {% endif %}
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Live Preview Card -->
+            {% if project.preview_url %}
+            <div class="card border-0 shadow-sm mb-4 bg-primary text-white">
+                <div class="card-body p-4 text-center">
+                    <i class="bi bi-laptop fs-1 mb-3"></i>
+                    <h5 class="fw-bold">Live Preview Available</h5>
+                    <p class="small opacity-75 mb-4">Check out the latest deployed version of your project.</p>
+                    <a href="{{ project.preview_url }}" target="_blank" class="btn btn-light w-100 fw-bold text-primary">
+                        View Project <i class="bi bi-box-arrow-up-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Project Team Card -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white pt-3 pb-2">
+                    <h5 class="fw-bold mb-0">Project Team</h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if team_members %}
+                    <ul class="list-group list-group-flush">
+                        {% for member in team_members %}
+                        <li class="list-group-item px-3 py-3 border-0 d-flex align-items-center">
+                            <div class="avatar-circle bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; font-weight: bold;">
+                                {{ member.user.username|slice:":1"|upper }}
+                            </div>
+                            <div>
+                                <h6 class="mb-0 fw-bold">{{ member.user.first_name }} {{ member.user.last_name|default:member.user.username }}</h6>
+                                <small class="text-muted d-block">{{ member.role_display }}</small>
+                                <small class="text-muted">Phases: {{ member.phases_count }}</small>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    <div class="card-footer bg-light text-center py-2 border-0">
+                        <a href="{% url 'projects:project_team' project.id %}" class="small text-decoration-none fw-bold">View Full Team &rarr;</a>
+                        <div class="mt-2 border-top pt-2">
+                            <a href="{% url 'projects:admin_team_management' %}?project_id={{ project.id }}" class="btn btn-sm btn-outline-primary w-100 mb-2">
+                                <i class="bi bi-person-gear me-1"></i> Manage Team
+                            </a>
+                            <button type="button" class="btn btn-sm btn-outline-secondary w-100" data-bs-toggle="modal" data-bs-target="#bulkAssignModal">
+                                <i class="bi bi-people-fill me-1"></i> Bulk Assign Phase
+                            </button>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="p-4 text-center">
+                        <i class="bi bi-people fs-1 text-muted opacity-50 mb-2"></i>
+                        <p class="small text-muted mb-0">No team members assigned.</p>
+                        <div class="mt-3">
+                            <a href="{% url 'projects:admin_team_management' %}?project_id={{ project.id }}" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-plus-lg me-1"></i> Assign Team
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if unassigned_phases_count %}
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white pt-3 pb-2">
+                    <h5 class="fw-bold mb-0">Unassigned Phases</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0 small">
+                        {% for phase in unassigned_phases %}
+                        <li class="d-flex justify-content-between align-items-center mb-1">
+                            <span>{{ phase.get_phase_type_display }}</span>
+                            <button type="button"
+                                    class="btn btn-link text-decoration-none p-0"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#bulkAssignModal"
+                                    data-phase-id="{{ phase.id }}">
+                                Assign
+                            </button>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Quick Actions -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white pt-3 pb-2">
+                    <h5 class="fw-bold mb-0">Admin Actions</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <button type="button" class="list-group-item list-group-item-action py-3 border-0" data-bs-toggle="modal" data-bs-target="#uploadAssetModal">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-light rounded p-2 me-3 text-success"><i class="bi bi-cloud-upload"></i></div>
+                            <div>
+                                <h6 class="mb-0">Upload Assets</h6>
+                                <small class="text-muted">Share files with the client/team</small>
+                            </div>
+                        </div>
+                    </button>
+                    <!-- More admin actions can go here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Upload Asset Modal -->
+<div class="modal fade" id="uploadAssetModal" tabindex="-1" aria-labelledby="uploadAssetModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="uploadAssetModalLabel">Upload Project Asset</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{% url 'projects:add_client_asset' project.id %}" method="post" enctype="multipart/form-data" data-require-file="true">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="assetName" class="form-label">Asset Name</label>
+                        <input type="text" class="form-control" id="assetName" name="name" required placeholder="e.g., Logo Files, Content Doc">
+                    </div>
+                    <div class="mb-3">
+                        <label for="assetFile" class="form-label">File</label>
+                        <input type="file" class="form-control" id="assetFile" name="file" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Upload</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Bulk Assign Modal -->
+<div class="modal fade" id="bulkAssignModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Bulk Assign Team to Phase</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{% url 'projects:bulk_assign_phase' project.id %}" method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Select Phase</label>
+                        <select class="form-select" name="phase_id" required>
+                            <option value="">-- Choose Phase --</option>
+                            {% for phase in phases %}
+                            <option value="{{ phase.id }}">{{ phase.get_phase_type_display }} ({{ phase.get_status_display }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Select Team Members</label>
+                        <div class="border rounded p-2" style="max-height: 200px; overflow-y: auto;">
+                            {% for member in available_staff %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="user_ids" value="{{ member.id }}" id="user_{{ member.id }}">
+                                <label class="form-check-label" for="user_{{ member.id }}">
+                                    {{ member.first_name }} {{ member.last_name }} ({{ member.username }})
+                                </label>
+                            </div>
+                            {% empty %}
+                            <p class="text-muted small mb-0">No staff members found.</p>
+                            {% endfor %}
+                        </div>
+                        <small class="text-muted">Select multiple members to assign at once.</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Role for Selected Members</label>
+                        <input type="text" class="form-control" name="role" required placeholder="e.g. Developer, Designer">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Assign Selected</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Admin Reply -->
+    <div class="modal fade" id="adminReplyModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Send Message to Client</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{% url 'projects:add_admin_response' project.id %}" method="post">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Message</label>
+                            <textarea class="form-control" name="content" rows="4" required placeholder="Type your message here..."></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Send Message</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Edit Project Modal -->
+<div class="modal fade" id="editProjectModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Project Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{% url 'projects:update_project_meta' project.id %}" method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Project Title</label>
+                        <input type="text" class="form-control" name="title" value="{{ project.title }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" name="description" rows="3">{{ project.description }}</textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status">
+                                <option value="NOT_STARTED" {% if project.status == 'NOT_STARTED' %}selected{% endif %}>Not Started</option>
+                                <option value="IN_PROGRESS" {% if project.status == 'IN_PROGRESS' %}selected{% endif %}>In Progress</option>
+                                <option value="COMPLETED" {% if project.status == 'COMPLETED' %}selected{% endif %}>Completed</option>
+                                <option value="ON_HOLD" {% if project.status == 'ON_HOLD' %}selected{% endif %}>On Hold</option>
+                                <option value="CANCELLED" {% if project.status == 'CANCELLED' %}selected{% endif %}>Cancelled</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Target Delivery</label>
+                            <input type="date" class="form-control" name="expected_delivery_date" value="{{ project.expected_delivery_date|date:'Y-m-d' }}">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Preview URL</label>
+                        <input type="url" class="form-control" name="preview_url" value="{{ project.preview_url|default:'' }}" placeholder="https://...">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Add Phase Modal -->
+<div class="modal fade" id="addPhaseModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Phase / Sprint</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{% url 'projects:add_phase' project.id %}" method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Phase Type</label>
+                        <select class="form-select" name="phase_type" required>
+                            <option value="DISCOVERY">Discovery & Planning</option>
+                            <option value="DESIGN">Design & Prototyping</option>
+                            <option value="DEVELOPMENT" selected>Development Sprint</option>
+                            <option value="TESTING">Testing & QA</option>
+                            <option value="DEPLOYMENT">Deployment & Launch</option>
+                            <option value="MAINTENANCE">Maintenance</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description / Sprint Goal</label>
+                        <textarea class="form-control" name="description" rows="3" placeholder="What will be achieved in this phase?"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Start Date</label>
+                            <input type="date" class="form-control" name="start_date">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">End Date</label>
+                            <input type="date" class="form-control" name="end_date">
+                        </div>
+                    </div>
+                    <div class="alert alert-warning small mb-0">
+                        <i class="bi bi-lock-fill me-1"></i> New phases are created as <strong>Locked</strong> by default and require Agile Plan approval to be unlocked for development.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Phase</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var bulkAssignModal = document.getElementById('bulkAssignModal');
+    if (bulkAssignModal) {
+        bulkAssignModal.addEventListener('show.bs.modal', function (event) {
+            var trigger = event.relatedTarget;
+            if (!trigger) return;
+            var phaseId = trigger.getAttribute('data-phase-id');
+            var select = bulkAssignModal.querySelector('select[name="phase_id"]');
+            if (select) {
+                if (phaseId) {
+                    select.value = phaseId;
+                } else {
+                    select.value = '';
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

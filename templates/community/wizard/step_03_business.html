@@ -1,0 +1,47 @@
+{% extends "community/wizard/base_wizard.html" %}
+{% load static i18n %}
+
+{% block wizard_content %}
+<div class="wizard-card">
+    <div class="wizard-section-label mb-1">Step 3 of 13</div>
+    <h2 class="mb-2">Tell us about your business</h2>
+    <p class="lead mb-4">Help us understand what you do so we can recommend the right approach.</p>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="row g-4">
+            <div class="col-md-6">
+                <label class="form-label fw-700 small">Business Name *</label>
+                <input type="text" name="business_name" class="wizard-input" placeholder="e.g. Acme Corp" value="{{ session.business_name|default:'' }}" required>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-700 small">Industry / Sector *</label>
+                <input type="text" name="industry" class="wizard-input" placeholder="e.g. SaaS, E-commerce, Non-profit" value="{{ session.industry|default:'' }}" required>
+            </div>
+            <div class="col-12">
+                <label class="form-label fw-700 small">Business Description *</label>
+                <textarea name="business_description" class="wizard-input" rows="3" placeholder="What does your business do? Who are your customers?" required>{{ session.business_description|default:'' }}</textarea>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-700 small">Target Audience</label>
+                <input type="text" name="target_audience" class="wizard-input" placeholder="e.g. Small business owners, 25-45" value="{{ session.target_audience|default:'' }}">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-700 small">Current Website (if any)</label>
+                <input type="url" name="existing_website" class="wizard-input" placeholder="https://..." value="{{ session.existing_website|default:'' }}">
+            </div>
+            <div class="col-12">
+                <label class="form-label fw-700 small">Top 3 Competitors</label>
+                <input type="text" name="competitors" class="wizard-input" placeholder="competitor1.com, competitor2.com, competitor3.com" value="{{ session.competitors|default:'' }}">
+            </div>
+        </div>
+
+        <div class="mt-5 text-center">
+            <button type="submit" class="btn-wizard-next px-5 py-3">
+                Continue <i class="fas fa-arrow-right ms-2"></i>
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

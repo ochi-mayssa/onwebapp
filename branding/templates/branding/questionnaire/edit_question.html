@@ -1,0 +1,323 @@
+{% extends 'branding/base.html' %}
+{% load branding_extras %}
+
+{% block title %}Edit Question · {{ questionnaire.title }}{% endblock %}
+
+{% block branding_content %}
+<div class="detail-page">
+    <div class="container py-4 py-lg-5" style="max-width: 960px;">
+
+        <div class="d-flex align-items-center gap-2 mb-4">
+            <a href="{% url 'branding:questionnaire_detail' pk=questionnaire.pk %}" class="btn btn-back btn-sm"><i class="fa-solid fa-arrow-left me-1"></i>Back</a>
+            <div>
+                <h1 class="fw-800 mb-0"><i class="fa-solid fa-pen me-2 text-primary"></i>Edit Question</h1>
+                <p class="text-muted mb-0">{{ questionnaire.title }} · {{ request_obj.request_number }}</p>
+            </div>
+        </div>
+
+        <div class="detail-card rounded-4 p-4 mb-4">
+            <h6 class="fw-800 mb-3"><i class="fa-solid fa-shapes me-2 text-primary"></i>Question Type</h6>
+            <div class="row g-2" id="typeSelector">
+                <div class="col-6 col-md-4 col-lg-3">
+                    <button type="button" class="type-card btn w-100 p-3 rounded-3 border text-start" data-type="SHORT_TEXT">
+                        <i class="fa-solid fa-font text-primary mb-2 d-block" style="font-size: 1.5rem;"></i>
+                        <span class="fw-700 small d-block">Short Text</span>
+                        <span class="x-small text-muted">Single line answer</span>
+                    </button>
+                </div>
+                <div class="col-6 col-md-4 col-lg-3">
+                    <button type="button" class="type-card btn w-100 p-3 rounded-3 border text-start" data-type="LONG_TEXT">
+                        <i class="fa-solid fa-align-left text-success mb-2 d-block" style="font-size: 1.5rem;"></i>
+                        <span class="fw-700 small d-block">Long Text</span>
+                        <span class="x-small text-muted">Multi-line answer</span>
+                    </button>
+                </div>
+                <div class="col-6 col-md-4 col-lg-3">
+                    <button type="button" class="type-card btn w-100 p-3 rounded-3 border text-start" data-type="MULTIPLE_CHOICE">
+                        <i class="fa-solid fa-list-ul text-warning mb-2 d-block" style="font-size: 1.5rem;"></i>
+                        <span class="fw-700 small d-block">Multiple Choice</span>
+                        <span class="x-small text-muted">Pick one or more</span>
+                    </button>
+                </div>
+                <div class="col-6 col-md-4 col-lg-3">
+                    <button type="button" class="type-card btn w-100 p-3 rounded-3 border text-start" data-type="SINGLE_CHOICE">
+                        <i class="fa-solid fa-circle-dot text-info mb-2 d-block" style="font-size: 1.5rem;"></i>
+                        <span class="fw-700 small d-block">Single Choice</span>
+                        <span class="x-small text-muted">Pick one option</span>
+                    </button>
+                </div>
+                <div class="col-6 col-md-4 col-lg-3">
+                    <button type="button" class="type-card btn w-100 p-3 rounded-3 border text-start" data-type="RANK_ORDER">
+                        <i class="fa-solid fa-arrow-down-wide-short text-danger mb-2 d-block" style="font-size: 1.5rem;"></i>
+                        <span class="fw-700 small d-block">Rank Order</span>
+                        <span class="x-small text-muted">Rank options</span>
+                    </button>
+                </div>
+                <div class="col-6 col-md-4 col-lg-3">
+                    <button type="button" class="type-card btn w-100 p-3 rounded-3 border text-start" data-type="PREFERENCE_SCALE">
+                        <i class="fa-solid fa-sliders text-secondary mb-2 d-block" style="font-size: 1.5rem;"></i>
+                        <span class="fw-700 small d-block">Preference Scale</span>
+                        <span class="x-small text-muted">Scale rating</span>
+                    </button>
+                </div>
+                <div class="col-6 col-md-4 col-lg-3">
+                    <button type="button" class="type-card btn w-100 p-3 rounded-3 border text-start" data-type="YES_NO">
+                        <i class="fa-solid fa-toggle-on text-primary mb-2 d-block" style="font-size: 1.5rem;"></i>
+                        <span class="fw-700 small d-block">Yes / No</span>
+                        <span class="x-small text-muted">Binary choice</span>
+                    </button>
+                </div>
+                <div class="col-6 col-md-4 col-lg-3">
+                    <button type="button" class="type-card btn w-100 p-3 rounded-3 border text-start" data-type="COLOR_PICKER">
+                        <i class="fa-solid fa-swatchbook text-warning mb-2 d-block" style="font-size: 1.5rem;"></i>
+                        <span class="fw-700 small d-block">Color Picker</span>
+                        <span class="x-small text-muted">Select colors</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <form method="post" action="{% url 'branding:questionnaire_add_question' pk=questionnaire.pk %}" novalidate>
+            {% csrf_token %}
+            <input type="hidden" name="question_type" id="questionTypeInput" value="{{ question.question_type }}">
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger d-flex align-items-start gap-2 rounded-4 border-0 shadow-sm mb-4">
+                <i class="fa-solid fa-circle-exclamation mt-1"></i>
+                <div>{{ form.non_field_errors }}</div>
+            </div>
+            {% endif %}
+
+            <div class="detail-card rounded-4 p-4 mb-4">
+                <h5 class="fw-800 section-heading"><i class="fa-solid fa-pen-nib me-2 text-primary"></i>Question Content</h5>
+                <div class="row g-3">
+                    <div class="col-12">
+                        {{ form.text.label_tag }}
+                        {{ form.text }}
+                        {% if form.text.errors %}
+                        <div class="text-danger small mt-1">{{ form.text.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-12">
+                        {{ form.description.label_tag }}
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                        <div class="text-danger small mt-1">{{ form.description.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-card rounded-4 p-4 mb-4">
+                <h5 class="fw-800 section-heading"><i class="fa-solid fa-sliders me-2 text-primary"></i>Question Settings</h5>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        {{ form.category.label_tag }}
+                        {{ form.category }}
+                        {% if form.category.errors %}
+                        <div class="text-danger small mt-1">{{ form.category.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.phase.label_tag }}
+                        {{ form.phase }}
+                        {% if form.phase.errors %}
+                        <div class="text-danger small mt-1">{{ form.phase.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.importance.label_tag }}
+                        {{ form.importance }}
+                        {% if form.importance.errors %}
+                        <div class="text-danger small mt-1">{{ form.importance.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.sort_order.label_tag }}
+                        {{ form.sort_order }}
+                        {% if form.sort_order.errors %}
+                        <div class="text-danger small mt-1">{{ form.sort_order.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-12">
+                        <div class="form-check form-switch">
+                            {{ form.is_required }}
+                            {{ form.is_required.label_tag }}
+                        </div>
+                        {% if form.is_required.errors %}
+                        <div class="text-danger small mt-1">{{ form.is_required.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-card rounded-4 p-4 mb-4" id="typeOptionsCard">
+                <h5 class="fw-800 section-heading"><i class="fa-solid fa-gears me-2 text-primary"></i>Type-Specific Options</h5>
+
+                <div id="optionsGroup" class="mb-3" style="display: none;">
+                    {{ form.options.label_tag }}
+                    {{ form.options }}
+                    {% if form.options.errors %}
+                    <div class="text-danger small mt-1">{{ form.options.errors }}</div>
+                    {% endif %}
+                    <div class="form-text">Enter one option per line.</div>
+                </div>
+
+                <div id="scaleGroup" style="display: none;">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            {{ form.scale_min.label_tag }}
+                            {{ form.scale_min }}
+                            {% if form.scale_min.errors %}
+                            <div class="text-danger small mt-1">{{ form.scale_min.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.scale_max.label_tag }}
+                            {{ form.scale_max }}
+                            {% if form.scale_max.errors %}
+                            <div class="text-danger small mt-1">{{ form.scale_max.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.scale_labels.label_tag }}
+                            {{ form.scale_labels }}
+                            {% if form.scale_labels.errors %}
+                            <div class="text-danger small mt-1">{{ form.scale_labels.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div id="allowMultipleGroup" class="mb-3" style="display: none;">
+                    <div class="form-check form-switch">
+                        {{ form.allow_multiple }}
+                        {{ form.allow_multiple.label_tag }}
+                    </div>
+                    {% if form.allow_multiple.errors %}
+                    <div class="text-danger small mt-1">{{ form.allow_multiple.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        {{ form.placeholder.label_tag }}
+                        {{ form.placeholder }}
+                        {% if form.placeholder.errors %}
+                        <div class="text-danger small mt-1">{{ form.placeholder.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.help_text.label_tag }}
+                        {{ form.help_text }}
+                        {% if form.help_text.errors %}
+                        <div class="text-danger small mt-1">{{ form.help_text.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            {% if question.conditions %}
+            <div class="detail-card rounded-4 p-4 mb-4">
+                <h5 class="fw-800 section-heading"><i class="fa-solid fa-code-branch me-2 text-primary"></i>Conditions</h5>
+                <div class="d-flex flex-column gap-2">
+                    {% for condition in question.conditions %}
+                    <div class="d-flex align-items-center justify-content-between p-3 rounded-3 border" style="background: var(--bs-tertiary-bg);">
+                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                            <span class="badge bg-info-subtle text-info rounded-pill x-small">If Q{{ condition.source_question }}</span>
+                            <span class="x-small text-muted fw-700">{{ condition.operator|default:"equals" }}</span>
+                            <span class="x-small">{{ condition.value }}</span>
+                            <span class="x-small text-muted">→ Show this question</span>
+                        </div>
+                        <form method="post" action="{% url 'branding:questionnaire_delete_condition' cid=condition.pk %}" class="d-inline" onsubmit="return confirm('Delete this condition?');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-icon text-danger" title="Delete condition"><i class="fa-solid fa-trash"></i></button>
+                        </form>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="detail-card rounded-4 p-4 mb-4">
+                <h5 class="fw-800 section-heading"><i class="fa-solid fa-plus-circle me-2 text-primary"></i>Add Condition</h5>
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-4">
+                        <label class="form-label fw-700 x-small text-muted">Source Question</label>
+                        <select name="source_question" class="form-select form-select-sm">
+                            <option value="">-- Select Question --</option>
+                            {% for q in questions %}
+                            <option value="{{ q.pk }}">{{ forloop.counter }}. {{ q.text|truncatechars:60 }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-700 x-small text-muted">Operator</label>
+                        <select name="operator" class="form-select form-select-sm">
+                            <option value="equals">Equals</option>
+                            <option value="not_equals">Not Equals</option>
+                            <option value="contains">Contains</option>
+                            <option value="not_empty">Not Empty</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-700 x-small text-muted">Value</label>
+                        <input type="text" name="condition_value" class="form-control form-control-sm" placeholder="Expected value">
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" name="add_condition" value="1" class="btn btn-back btn-sm w-100"><i class="fa-solid fa-plus me-1"></i>Add</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 border-top pt-3">
+                <a href="{% url 'branding:questionnaire_detail' pk=questionnaire.pk %}" class="btn btn-back">Cancel</a>
+                <button type="submit" class="btn btn-brand-primary px-4"><i class="fa-solid fa-floppy-disk me-2"></i>Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+    'use strict';
+
+    var typeInput = document.getElementById('questionTypeInput');
+    var typeCards = document.querySelectorAll('.type-card');
+    var optionsGroup = document.getElementById('optionsGroup');
+    var scaleGroup = document.getElementById('scaleGroup');
+    var allowMultipleGroup = document.getElementById('allowMultipleGroup');
+
+    function updateTypeFields(type) {
+        typeInput.value = type;
+        var showOptions = (type === 'MULTIPLE_CHOICE' || type === 'RANK_ORDER' || type === 'SINGLE_CHOICE');
+        var showScale = (type === 'PREFERENCE_SCALE');
+        var showAllowMultiple = (type === 'MULTIPLE_CHOICE');
+        optionsGroup.style.display = showOptions ? '' : 'none';
+        scaleGroup.style.display = showScale ? '' : 'none';
+        allowMultipleGroup.style.display = showAllowMultiple ? '' : 'none';
+    }
+
+    typeCards.forEach(function (card) {
+        card.addEventListener('click', function () {
+            typeCards.forEach(function (c) { c.classList.remove('active', 'border-primary'); c.classList.add('border'); });
+            this.classList.add('active', 'border-primary');
+            this.classList.remove('border');
+            updateTypeFields(this.dataset.type);
+        });
+        if (card.dataset.type === typeInput.value) {
+            card.click();
+        }
+    });
+
+    updateTypeFields(typeInput.value);
+})();
+</script>
+<style>
+    .type-card { transition: all 0.15s ease; border-width: 2px !important; }
+    .type-card.active { border-color: var(--bs-primary) !important; background: var(--bs-primary-subtle, #e8f0fe); }
+    .type-card:hover { transform: translateY(-1px); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+</style>
+{% endblock %}

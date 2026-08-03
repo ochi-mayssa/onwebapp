@@ -1,0 +1,77 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark platform-nav shadow-sm">
+    <div class="container-fluid">
+        <!-- Logo / Brand -->
+        <a class="navbar-brand" href="{% url 'platform:index' %}">
+            <i class="fas fa-industry me-2"></i>
+            <span class="fw-bold">Industrial Platform</span>
+        </a>
+        
+        <!-- Burger menu pour mobile -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#platformNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <!-- Menu principal -->
+        <div class="collapse navbar-collapse" id="platformNavbar">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}" 
+                       href="{% url 'platform:index' %}">
+                        <i class="fas fa-home me-1"></i> Home
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'platform:website_structure' %}">
+                        <i class="fas fa-sitemap me-1"></i> Website
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'platform:industrial_automation' %}">
+                        <i class="fas fa-robot me-1"></i> Automation
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'platform:social_media' %}">
+                        <i class="fas fa-share-alt me-1"></i> Social Media
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'platform:security' %}">
+                        <i class="fas fa-shield-alt me-1"></i> Security
+                    </a>
+                </li>
+            </ul>
+            
+            <!-- Menu utilisateur -->
+            <div class="navbar-nav">
+                {% if user.is_authenticated %}
+                    <div class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" 
+                           data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle me-1"></i> {{ user.username }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#">
+                                <i class="fas fa-user me-2"></i> Profile
+                            </a></li>
+                            <li><a class="dropdown-item" href="#">
+                                <i class="fas fa-cog me-2"></i> Settings
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'home:index' %}">
+                                <i class="fas fa-external-link-alt me-2"></i> Main Site
+                            </a></li>
+                            <li><a class="dropdown-item text-danger" href="#">
+                                <i class="fas fa-sign-out-alt me-2"></i> Logout
+                            </a></li>
+                        </ul>
+                    </div>
+                {% else %}
+                    <a class="nav-link" href="#">
+                        <i class="fas fa-sign-in-alt me-1"></i> Login
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</nav>

@@ -1,0 +1,63 @@
+{% extends "community/wizard/base_wizard.html" %}
+{% load static i18n %}
+
+{% block wizard_content %}
+<div class="wizard-card">
+    <div class="wizard-section-label mb-1">Step 8 of 13</div>
+    <h2 class="mb-2">Choose Your Package</h2>
+    <p class="lead mb-4">Based on your requirements, we recommend one of these packages.</p>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="row g-4">
+            {% for pkg in packages %}
+            <div class="col-md-4">
+                <label for="pkg_{{ pkg.slug }}" class="wizard-option-card h-100 {% if pkg.recommended %}border-primary{% endif %}" style="{% if pkg.recommended %}border-color:#6366f1 !important;{% endif %}">
+                    <input type="radio" name="package" value="{{ pkg.slug }}" id="pkg_{{ pkg.slug }}" class="wizard-radio-input" {% if pkg.recommended %}checked{% endif %} {% if session.package == pkg.slug %}checked{% endif %}>
+
+                    {% if pkg.recommended %}
+                    <div class="mb-2"><span class="badge bg-primary rounded-pill px-3 py-1 small fw-700">Recommended</span></div>
+                    {% endif %}
+
+                    <span class="wizard-radio-label d-block" style="border:none;padding:0;background:none;box-shadow:none;">
+                        <h5 class="fw-800 mb-1">{{ pkg.name }}</h5>
+                        <div class="text-primary fw-800 fs-4 mb-2">${{ pkg.price|floatformat:0 }}<span class="text-secondary fw-400 small">/mo</span></div>
+                        <p class="text-secondary small mb-3">{{ pkg.description }}</p>
+                        <ul class="list-unstyled text-start small">
+                            {% for feat in pkg.features %}
+                            <li class="mb-1"><i class="fas fa-check text-success me-2 small"></i>{{ feat }}</li>
+                            {% endfor %}
+                        </ul>
+                        <div class="mt-2 text-secondary small">
+                            <i class="fas fa-clock me-1"></i>{{ pkg.timeline }}
+                        </div>
+                    </span>
+                </label>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="mt-5 text-center">
+            <button type="submit" class="btn-wizard-next px-5 py-3">
+                Continue <i class="fas fa-arrow-right ms-2"></i>
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block wizard_js %}
+<script>
+document.querySelectorAll('.wizard-option-card').forEach(card => {
+    const input = card.querySelector('input[type="radio"]');
+    if (input && input.checked) card.classList.add('selected');
+    card.addEventListener('click', () => {
+        setTimeout(() => {
+            document.querySelectorAll('.wizard-option-card').forEach(c => c.classList.remove('selected'));
+            if (input.checked) card.classList.add('selected');
+        }, 10);
+    });
+});
+</script>
+{% endblock %}

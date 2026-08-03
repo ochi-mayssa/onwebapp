@@ -1,0 +1,457 @@
+{% extends 'base.html' %}
+{% block title %}Link Checker - OnWebApp{% endblock %}
+{% block content %}
+<div class="container mt-5 mb-5">
+  <nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'home:home' %}">Home</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'seo_analyzer:index' %}">SEO</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{% if selected_analysis_type == 'backlinks' %}Backlink Analyzer{% else %}Link Checker{% endif %}</li>
+    </ol>
+  </nav>
+
+  <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+    <div>
+      <h1 class="mb-2">{% if selected_analysis_type == 'backlinks' %}Backlink Analyzer{% else %}Link Checker{% endif %}</h1>
+      <p class="text-muted mb-0">
+        {% if selected_analysis_type == 'backlinks' %}
+        Launch backlink analysis from the active root-level SEO app and keep report generation available.
+        {% else %}
+        Select Internal Links, External Links, or Backlinks from the active root-level SEO app.
+        {% endif %}
+      </p>
+    </div>
+    <div class="text-end">
+      <div class="small text-uppercase text-muted fw-semibold mb-2">SEO Tools</div>
+      <div class="d-flex gap-2 flex-wrap justify-content-end">
+        <a href="{% url 'seo_analyzer:checker' %}" class="btn btn-outline-primary">Website Checker</a>
+        <a href="{% url 'seo_analyzer:url_intelligence' %}" class="btn btn-outline-secondary">URL Intelligence</a>
+        <a href="{% url 'seo_analyzer:link_checker' %}" class="btn {% if selected_analysis_type != 'backlinks' %}btn-success{% else %}btn-outline-success{% endif %}">Link Checker</a>
+        <a href="{% url 'seo_analyzer:sitemap' %}" class="btn btn-outline-primary">Sitemap Intelligence</a>
+        <a href="{% url 'seo_analyzer:backlinks' %}" class="btn {% if selected_analysis_type == 'backlinks' %}btn-warning{% else %}btn-outline-warning{% endif %}">Backlink Analyzer</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-body p-4">
+      <h2 class="h4 mb-3">Analyze Links</h2>
+      <div id="linkCheckerError" class="alert alert-danger d-none" role="alert">
+        We could not start the link analysis. Please confirm the URL, check your connection, and try again.
+      </div>
+      <form method="post" id="linkCheckerForm" novalidate>
+        {% csrf_token %}
+        <div class="row g-3 align-items-end">
+          <div class="col-lg-7">
+            <label class="form-label" for="{{ form.url.id_for_label }}">Website URL</label>
+            {{ form.url }}
+          </div>
+          <div class="col-lg-3">
+            <label class="form-label" for="{{ form.analysis_type.id_for_label }}">Analysis Type</label>
+            {{ form.analysis_type }}
+          </div>
+          <div class="col-lg-2">
+            <button class="btn btn-success w-100" type="submit" id="linkCheckerSubmit">
+              <span class="submit-label">Analyze Links</span>
+              <span class="spinner-border spinner-border-sm ms-2 d-none" id="linkCheckerSpinner" role="status" aria-hidden="true"></span>
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <div id="linkCheckerLoadingState" class="d-none mt-4">
+        <div class="rounded-3 border p-4 bg-light">
+          <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+            <div class="fw-semibold">OnWebApp is analyzing your links</div>
+            <span class="badge bg-primary-subtle text-primary border border-primary-subtle" id="linkCheckerStageBadge">
+              Preparing analysis...
+            </span>
+          </div>
+          <p class="text-muted mb-3">
+            Large pages may take a few seconds while OnWebApp checks links in parallel.
+          </p>
+          <div class="progress mb-2" role="progressbar" aria-label="Link analysis progress" aria-valuemin="0" aria-valuemax="100">
+            <div
+              id="linkCheckerProgressBar"
+              class="progress-bar progress-bar-striped progress-bar-animated bg-success"
+              style="width: 3%;"
+              aria-valuenow="3"
+            >
+              3%
+            </div>
+          </div>
+          <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+            <div class="small text-muted" id="linkCheckerStageText">Preparing analysis...</div>
+            <div class="small fw-semibold" id="linkCheckerCheckedDisplay">Waiting for link inventory...</div>
+          </div>
+          <div class="small text-warning mt-2 d-none" id="linkCheckerSlowMessage">
+            Still working — checking redirects and unavailable links.
+          </div>
+          <div class="row g-3 mt-1 mb-3">
+            <div class="col-lg-6">
+              <div class="rounded-3 border bg-white p-3 h-100">
+                <div class="small text-uppercase text-muted fw-semibold mb-2">Real-Time Pipeline</div>
+                <div id="linkCheckerPipeline" class="small"></div>
+              </div>
+            </div>
+            <div class="col-lg-6">
+              <div class="rounded-3 border bg-white p-3 h-100">
+                <div class="small text-uppercase text-muted fw-semibold mb-2">Elapsed vs Remaining</div>
+                <div class="row g-3">
+                  <div class="col-sm-6">
+                    <div class="rounded-3 border p-3 h-100">
+                      <div class="small text-muted">Elapsed</div>
+                      <div class="fw-semibold" id="linkCheckerElapsed">0.0 sec</div>
+                    </div>
+                  </div>
+                  <div class="col-sm-6">
+                    <div class="rounded-3 border p-3 h-100">
+                      <div class="small text-muted">Estimated Remaining</div>
+                      <div class="fw-semibold" id="linkCheckerRemaining">Calculating...</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row g-3" id="linkCheckerMetrics">
+            <div class="col-md-4 col-lg-2">
+              <div class="rounded-3 border bg-white p-3 h-100">
+                <div class="small text-muted">Links Found</div>
+                <div class="fw-semibold" id="metricLinksFound">0</div>
+              </div>
+            </div>
+            <div class="col-md-4 col-lg-2">
+              <div class="rounded-3 border bg-white p-3 h-100">
+                <div class="small text-muted">Links Checked</div>
+                <div class="fw-semibold" id="metricLinksChecked">0</div>
+              </div>
+            </div>
+            <div class="col-md-4 col-lg-2">
+              <div class="rounded-3 border bg-white p-3 h-100">
+                <div class="small text-muted">Working</div>
+                <div class="fw-semibold text-success" id="metricWorkingLinks">0</div>
+              </div>
+            </div>
+            <div class="col-md-4 col-lg-2">
+              <div class="rounded-3 border bg-white p-3 h-100">
+                <div class="small text-muted">Broken</div>
+                <div class="fw-semibold text-danger" id="metricBrokenLinks">0</div>
+              </div>
+            </div>
+            <div class="col-md-4 col-lg-2">
+              <div class="rounded-3 border bg-white p-3 h-100">
+                <div class="small text-muted">Redirects</div>
+                <div class="fw-semibold text-warning" id="metricRedirectLinks">0</div>
+              </div>
+            </div>
+            <div class="col-md-4 col-lg-2">
+              <div class="rounded-3 border bg-white p-3 h-100">
+                <div class="small text-muted">Errors</div>
+                <div class="fw-semibold text-dark" id="metricErrorLinks">0</div>
+              </div>
+            </div>
+          </div>
+          <div id="linkCheckerFailureState" class="alert alert-danger d-none mt-3 mb-0" role="alert">
+            <div class="fw-semibold mb-1">Analysis Failed</div>
+            <div id="linkCheckerFailureReason" class="mb-3">Unexpected analysis error.</div>
+            <button type="button" class="btn btn-outline-danger btn-sm" id="linkCheckerRetryButton">Retry Analysis</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const form = document.getElementById("linkCheckerForm");
+  if (!form) return;
+
+  const submitButton = document.getElementById("linkCheckerSubmit");
+  const spinner = document.getElementById("linkCheckerSpinner");
+  const loadingState = document.getElementById("linkCheckerLoadingState");
+  const stageBadge = document.getElementById("linkCheckerStageBadge");
+  const stageText = document.getElementById("linkCheckerStageText");
+  const progressBar = document.getElementById("linkCheckerProgressBar");
+  const slowMessage = document.getElementById("linkCheckerSlowMessage");
+  const errorBox = document.getElementById("linkCheckerError");
+  const pipeline = document.getElementById("linkCheckerPipeline");
+  const checkedDisplay = document.getElementById("linkCheckerCheckedDisplay");
+  const elapsedText = document.getElementById("linkCheckerElapsed");
+  const remainingText = document.getElementById("linkCheckerRemaining");
+  const failureState = document.getElementById("linkCheckerFailureState");
+  const failureReason = document.getElementById("linkCheckerFailureReason");
+  const retryButton = document.getElementById("linkCheckerRetryButton");
+  const urlInput = document.getElementById("{{ form.url.id_for_label }}");
+  const analysisSelect = document.getElementById("{{ form.analysis_type.id_for_label }}");
+  const submitLabel = submitButton.querySelector(".submit-label");
+  const metricLinksFound = document.getElementById("metricLinksFound");
+  const metricLinksChecked = document.getElementById("metricLinksChecked");
+  const metricWorkingLinks = document.getElementById("metricWorkingLinks");
+  const metricBrokenLinks = document.getElementById("metricBrokenLinks");
+  const metricRedirectLinks = document.getElementById("metricRedirectLinks");
+  const metricErrorLinks = document.getElementById("metricErrorLinks");
+
+  let isSubmitting = false;
+  let pollTimer = null;
+  let activeProgressUrl = null;
+  let activeResultUrl = null;
+
+  function showClientError(message) {
+    errorBox.textContent = message;
+    errorBox.classList.remove("d-none");
+  }
+
+  function hideClientError() {
+    errorBox.classList.add("d-none");
+  }
+
+  function updateProgress(message, progress) {
+    stageBadge.textContent = message;
+    stageText.textContent = message;
+    progressBar.style.width = progress + "%";
+    progressBar.setAttribute("aria-valuenow", String(progress));
+    progressBar.textContent = progress + "%";
+  }
+
+  function formatSeconds(value) {
+    if (value === null || value === undefined || Number.isNaN(value)) {
+      return "Calculating...";
+    }
+    return Number(value).toFixed(1) + " sec";
+  }
+
+  function renderPipeline(stages, currentStage) {
+    if (!Array.isArray(stages) || stages.length === 0) {
+      pipeline.innerHTML = "";
+      return;
+    }
+
+    const currentIndex = stages.indexOf(currentStage);
+    pipeline.innerHTML = stages.map(function (stage, index) {
+      let badgeClass = "bg-light text-muted border";
+      if (index < currentIndex) {
+        badgeClass = "bg-success-subtle text-success border border-success-subtle";
+      } else if (index === currentIndex) {
+        badgeClass = "bg-primary-subtle text-primary border border-primary-subtle";
+      }
+      return '<div class="d-flex align-items-center gap-2 mb-2">'
+        + '<span class="badge ' + badgeClass + '">' + (index + 1) + '</span>'
+        + '<span>' + stage + '</span>'
+        + '</div>';
+    }).join("");
+  }
+
+  function populateMetrics(progress) {
+    metricLinksFound.textContent = progress.total_links_found ?? 0;
+    metricLinksChecked.textContent = progress.links_checked ?? 0;
+    metricWorkingLinks.textContent = progress.working_links_found ?? 0;
+    metricBrokenLinks.textContent = progress.broken_links_found ?? 0;
+    metricRedirectLinks.textContent = progress.redirects_found ?? 0;
+    metricErrorLinks.textContent = progress.errors_found ?? 0;
+    checkedDisplay.textContent = progress.links_checked_display || "Waiting for link inventory...";
+    elapsedText.textContent = formatSeconds(progress.elapsed_time_seconds);
+    remainingText.textContent = formatSeconds(progress.estimated_remaining_time_seconds);
+    renderPipeline(progress.stage_pipeline, progress.stage);
+  }
+
+  function stopPolling() {
+    if (pollTimer) {
+      window.clearInterval(pollTimer);
+      pollTimer = null;
+    }
+  }
+
+  function buildRequestPayload() {
+    const formData = new FormData();
+    const csrfInput = form.querySelector("input[name='csrfmiddlewaretoken']");
+
+    formData.append("url", (urlInput.value || "").trim());
+    formData.append("analysis_type", analysisSelect.value || "");
+    if (csrfInput && csrfInput.value) {
+      formData.append("csrfmiddlewaretoken", csrfInput.value);
+    }
+    return formData;
+  }
+
+  function lockForm() {
+    isSubmitting = true;
+    submitButton.disabled = true;
+    urlInput.setAttribute("readonly", "readonly");
+    analysisSelect.setAttribute("disabled", "disabled");
+    submitLabel.textContent = "Analyzing...";
+    spinner.classList.remove("d-none");
+    loadingState.classList.remove("d-none");
+    failureState.classList.add("d-none");
+    hideClientError();
+    updateProgress("Preparing Analysis", 3);
+    checkedDisplay.textContent = "Waiting for link inventory...";
+    elapsedText.textContent = "0.0 sec";
+    remainingText.textContent = "Calculating...";
+    metricLinksFound.textContent = "0";
+    metricLinksChecked.textContent = "0";
+    metricWorkingLinks.textContent = "0";
+    metricBrokenLinks.textContent = "0";
+    metricRedirectLinks.textContent = "0";
+    metricErrorLinks.textContent = "0";
+    renderPipeline([
+      "Preparing Analysis",
+      "Downloading HTML",
+      "Extracting Links",
+      "Deduplicating URLs",
+      "Checking Link Status",
+      "Analyzing Results",
+      "Generating AI Recommendations",
+      "Building Report",
+      "Completed"
+    ], "Preparing Analysis");
+  }
+
+  function unlockForm() {
+    isSubmitting = false;
+    submitButton.disabled = false;
+    urlInput.removeAttribute("readonly");
+    analysisSelect.removeAttribute("disabled");
+    submitLabel.textContent = "Analyze Links";
+    spinner.classList.add("d-none");
+    loadingState.classList.add("d-none");
+    slowMessage.classList.add("d-none");
+    updateProgress("Preparing Analysis", 3);
+    checkedDisplay.textContent = "Waiting for link inventory...";
+    elapsedText.textContent = "0.0 sec";
+    remainingText.textContent = "Calculating...";
+    stopPolling();
+    activeProgressUrl = null;
+    activeResultUrl = null;
+  }
+
+  async function pollProgress() {
+    if (!activeProgressUrl) return;
+
+    try {
+      const response = await fetch(activeProgressUrl, {
+        headers: {
+          "Accept": "application/json",
+          "X-Requested-With": "XMLHttpRequest"
+        },
+        credentials: "same-origin"
+      });
+
+      if (!response.ok) {
+        throw new Error("We could not retrieve the live analysis progress.");
+      }
+
+      const progress = await response.json();
+      updateProgress(progress.stage, progress.percentage_completed || 0);
+      populateMetrics(progress);
+
+      if ((progress.elapsed_time_seconds || 0) >= 10) {
+        slowMessage.classList.remove("d-none");
+      }
+
+      if (progress.status === "completed") {
+        stopPolling();
+        window.location.href = progress.result_url || activeResultUrl;
+        return;
+      }
+
+      if (progress.status === "failed") {
+        stopPolling();
+        failureReason.textContent = progress.failure_reason || "Unexpected analysis error.";
+        failureState.classList.remove("d-none");
+        showClientError("Analysis failed before the report could be completed.");
+        return;
+      }
+    } catch (error) {
+      stopPolling();
+      showClientError(error.message || "We lost the live analysis connection. Please try again.");
+      failureReason.textContent = error.message || "We lost the live analysis connection.";
+      failureState.classList.remove("d-none");
+    }
+  }
+
+  async function startRealtimeAnalysis(formData) {
+    const response = await fetch(window.location.href, {
+      method: "POST",
+      headers: {
+        "Accept": "application/json",
+        "X-Requested-With": "XMLHttpRequest"
+      },
+      body: formData,
+      credentials: "same-origin"
+    });
+
+    const payload = await response.json().catch(function () {
+      return {};
+    });
+
+    if (!response.ok) {
+      if (payload.errors) {
+        const firstField = Object.keys(payload.errors)[0];
+        const firstError = payload.errors[firstField] && payload.errors[firstField][0];
+        throw new Error(firstError || "Please review the form and try again.");
+      }
+      throw new Error(payload.message || "We could not start the link analysis. Please try again.");
+    }
+
+    activeProgressUrl = payload.progress_url;
+    activeResultUrl = payload.result_url;
+    pollTimer = window.setInterval(pollProgress, 1000);
+    await pollProgress();
+  }
+
+  form.addEventListener("submit", async function (event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (isSubmitting) {
+      return;
+    }
+
+    hideClientError();
+    failureState.classList.add("d-none");
+
+    if (!navigator.onLine) {
+      showClientError("You appear to be offline. Reconnect to the internet and try the link analysis again.");
+      return;
+    }
+
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      showClientError("Please enter a valid website URL before starting the analysis.");
+      return;
+    }
+
+    try {
+      const formData = buildRequestPayload();
+      if (!formData.get("url") || !formData.get("analysis_type") || !formData.get("csrfmiddlewaretoken")) {
+        showClientError("The analysis form is incomplete. Please refresh the page and try again.");
+        return;
+      }
+      lockForm();
+      await startRealtimeAnalysis(formData);
+    } catch (error) {
+      unlockForm();
+      showClientError(error.message || "We could not start the link analysis. Please try again.");
+    }
+  });
+
+  retryButton.addEventListener("click", function () {
+    unlockForm();
+    hideClientError();
+    failureState.classList.add("d-none");
+  });
+
+  window.addEventListener("pageshow", function () {
+    unlockForm();
+  });
+
+  window.addEventListener("beforeunload", function () {
+    if (isSubmitting) {
+      stopPolling();
+    }
+  });
+});
+</script>
+{% endblock %}

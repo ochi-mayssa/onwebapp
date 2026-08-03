@@ -1,0 +1,881 @@
+{% extends 'base.html' %}
+{% load i18n static %}
+{% block title %}{% trans 'Authentication' %}{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Modern Glassmorphism & Sliding Panel Styles */
+    :root {
+        --diorama-width: 1000px;
+        --diorama-height: 650px;
+    }
+
+    body {
+        background: var(--bg-body) !important;
+        overflow-x: hidden;
+    }
+
+    /* Dark overlay for better readability - Only in Dark Mode or if needed */
+    /*
+    body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(15, 23, 42, 0.4);
+        z-index: -1;
+    }
+    */
+
+    /* NAVBAR HEADER */
+    header .navbar {
+        padding-top: 0.3rem !important;
+        padding-bottom: 0.3rem !important;
+        min-height: 45px !important;
+        background: var(--glass-bg) !important;
+        backdrop-filter: blur(10px) !important;
+        -webkit-backdrop-filter: blur(10px) !important;
+        border-bottom: 1px solid var(--border-color) !important;
+    }
+    
+    header .navbar-brand {
+        font-size: 1rem !important;
+        padding: 0.1rem 0;
+        font-weight: 500;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        color: var(--text-primary) !important;
+    }
+    
+    header .navbar-brand img {
+        height: 28px !important;
+        width: auto;
+    }
+    
+    header .navbar-nav .nav-link {
+        font-size: 0.85rem !important;
+        padding: 0.25rem 0.7rem !important;
+        color: var(--text-secondary) !important;
+    }
+
+    header .navbar-nav .nav-link:hover {
+        color: var(--text-primary) !important;
+    }
+    
+    header .navbar-toggler {
+        padding: 0.2rem 0.45rem !important;
+        font-size: 0.85rem !important;
+        height: 32px;
+        border-color: var(--border-color) !important;
+    }
+
+    header .navbar-toggler-icon {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(100, 116, 139, 1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+    }
+
+    [data-theme="dark"] header .navbar-toggler-icon {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+    }
+
+    /* Main Container */
+    .auth-container {
+        position: relative;
+        width: 100%;
+        max-width: var(--diorama-width);
+        min-height: var(--diorama-height);
+        background: var(--bg-surface);
+        border-radius: 20px;
+        box-shadow: var(--shadow-lg);
+        overflow: hidden;
+        z-index: 10;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid var(--border-color);
+        margin: 0.8rem auto;
+    }
+
+    /* Forms Container */
+    .form-container {
+        position: absolute;
+        top: 0;
+        height: 100%;
+        transition: all 0.6s ease-in-out;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 0 40px;
+        text-align: center;
+    }
+
+    .form-container form {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    /* Sign In Container */
+    .sign-in-container {
+        left: 0;
+        width: 50%;
+        z-index: 2;
+    }
+
+    /* Sign Up Container - HIDDEN by default on desktop */
+    .sign-up-container {
+        left: 0;
+        width: 50%;
+        opacity: 0;
+        z-index: 1;
+        pointer-events: none;
+    }
+
+    /* Overlay Container - Keep dark theme for the image panel even in light mode, or adapt */
+    .overlay-container {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        width: 50%;
+        height: 100%;
+        overflow: hidden;
+        transition: transform 0.6s ease-in-out;
+        z-index: 100;
+        border-left: 1px solid var(--border-color);
+    }
+
+    .overlay {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark, #0f172a) 100%);
+        color: #FFFFFF; /* Keep white for contrast on primary color */
+        position: relative;
+        left: -100%;
+        height: 100%;
+        width: 200%;
+        transform: translateX(0);
+        transition: transform 0.6s ease-in-out;
+    }
+    
+    .overlay::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to right, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.2));
+        z-index: 0;
+    }
+    
+    .overlay-panel {
+        position: absolute;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        padding: 0 40px;
+        text-align: center;
+        top: 0;
+        height: 100%;
+        width: 50%;
+        transform: translateX(0);
+        transition: transform 0.6s ease-in-out;
+        z-index: 1;
+    }
+
+    .overlay-left {
+        transform: translateX(-20%);
+    }
+
+    .overlay-right {
+        right: 0;
+        transform: translateX(0);
+    }
+
+    /* Animation States - Only one form visible at a time */
+    .auth-container.right-panel-active .overlay-container {
+        transform: translateX(-100%);
+        border-left: none;
+        border-right: 1px solid var(--border-color);
+    }
+
+    .auth-container.right-panel-active .overlay {
+        transform: translateX(50%);
+    }
+
+    .auth-container.right-panel-active .overlay-left {
+        transform: translateX(0);
+    }
+
+    .auth-container.right-panel-active .overlay-right {
+        transform: translateX(20%);
+    }
+
+    .auth-container.right-panel-active .sign-in-container {
+        transform: translateX(100%);
+        opacity: 0;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .auth-container.right-panel-active .sign-up-container {
+        transform: translateX(100%);
+        opacity: 1;
+        pointer-events: all;
+        z-index: 5;
+    }
+
+    /* LARGER HEADERS */
+    .auth-container h1 {
+        font-size: 1.5rem; /* Increased from 1.1rem */
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        margin-bottom: 1.2rem;
+        color: var(--text-primary);
+        text-shadow: none;
+    }
+    
+    /* Overlay headers stay white */
+    .overlay-panel h1 {
+        font-size: 1.8rem; /* Larger overlay headers */
+        font-weight: 600;
+        margin-bottom: 0.8rem;
+        color: #ffffff;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    p {
+        font-size: 0.9rem; /* Increased paragraph text */
+        font-weight: 300;
+        line-height: 1.4;
+        letter-spacing: 0.2px;
+        margin: 12px 0 15px;
+        color: var(--text-secondary); /* Lighter color */
+    }
+    
+    .overlay-panel p {
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    span {
+        font-size: 0.8rem;
+        color: var(--text-tertiary); /* Lighter color */
+    }
+
+    a {
+        color: var(--primary-color);
+        font-size: 0.85rem; /* Slightly larger */
+        text-decoration: none;
+        margin: 8px 0;
+        font-weight: 500;
+    }
+
+    /* Form Styling - BETTER INPUT COLORS */
+    .form-control {
+        background-color: var(--bg-surface-secondary);
+        border: 1px solid var(--border-color);
+        padding: 12px 15px; /* Increased padding */
+        margin: 8px 0;
+        width: 100%;
+        color: var(--text-primary) !important; /* WHITE TEXT inside inputs */
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(5px);
+        font-size: 0.95rem; /* Larger font in inputs */
+        font-weight: 400;
+    }
+    
+    /* Placeholder color */
+    .form-control::placeholder {
+        color: var(--text-tertiary) !important;
+        font-weight: 300;
+    }
+    
+    .form-control:focus {
+        background-color: var(--bg-surface);
+        color: var(--text-primary) !important;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px var(--primary-light);
+        outline: none;
+    }
+
+    button {
+        border-radius: 50px;
+        border: none;
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+        color: #FFFFFF;
+        font-size: 0.9rem; /* Larger button text */
+        font-weight: 600;
+        padding: 12px 40px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        transition: all 0.3s ease;
+        margin-top: 1rem;
+        box-shadow: var(--card-shadow);
+        cursor: pointer;
+    }
+
+    button:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--card-shadow-hover);
+    }
+
+    button:active {
+        transform: scale(0.98);
+    }
+    
+    button.ghost {
+        background: transparent;
+        border: 2px solid #FFFFFF;
+        box-shadow: none;
+        font-size: 0.85rem;
+        padding: 10px 30px;
+        color: #FFFFFF;
+    }
+    
+    button.ghost:hover {
+        background: #FFFFFF;
+        color: var(--primary-color);
+        transform: translateY(-2px);
+        box-shadow: var(--card-shadow-hover);
+    }
+
+    /* Input Group Icons */
+    .input-wrapper {
+        position: relative;
+        width: 100%;
+        margin: 6px 0;
+    }
+    
+    .input-wrapper i {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+        pointer-events: none;
+        transition: color 0.3s ease;
+        z-index: 10;
+        font-size: 1rem; /* Larger icons */
+    }
+    
+    .input-wrapper input {
+        padding-left: 45px; /* More space for larger icons */
+        margin: 0;
+    }
+    
+    .input-wrapper input:focus + i {
+        color: var(--primary-color);
+    }
+    
+    /* PROMINENT ALERT MESSAGES - RED & POPPING */
+    .alert {
+        width: 100%;
+        padding: 14px 16px;
+        margin: 10px 0 15px;
+        border-radius: 10px;
+        font-size: 0.95rem; /* Larger font */
+        text-align: center;
+        border: none;
+        animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: var(--card-shadow);
+        position: relative;
+        z-index: 100;
+    }
+    
+    @keyframes popIn {
+        0% {
+            transform: scale(0.8);
+            opacity: 0;
+        }
+        70% {
+            transform: scale(1.05);
+        }
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+    
+    /* Error alerts - RED and prominent */
+    .alert-error, .alert-danger {
+        background: var(--bg-danger-soft) !important;
+        color: var(--danger) !important;
+        border-left: 4px solid var(--danger);
+        font-weight: 600;
+    }
+    
+    /* Success alerts */
+    .alert-success {
+        background: var(--bg-success-soft) !important;
+        color: var(--success) !important;
+        border-left: 4px solid var(--success);
+        font-weight: 600;
+    }
+    
+    /* Info alerts */
+    .alert-info {
+        background: var(--bg-info-soft) !important;
+        color: var(--info) !important;
+        border-left: 4px solid var(--info);
+        font-weight: 600;
+    }
+    
+    /* Warning alerts */
+    .alert-warning {
+        background: var(--bg-warning-soft) !important;
+        color: var(--warning) !important;
+        border-left: 4px solid var(--warning);
+        font-weight: 600;
+    }
+    
+    /* Form Errors list */
+    .errorlist {
+        list-style: none;
+        padding: 0;
+        margin: 8px 0 12px;
+        width: 100%;
+        text-align: left;
+    }
+    
+    .errorlist li {
+        font-size: 0.9rem; /* Larger error text */
+        color: var(--danger);
+        padding: 10px 12px;
+        background: var(--bg-danger-soft);
+        border-radius: 8px;
+        margin-bottom: 6px;
+        border-left: 3px solid var(--danger);
+        font-weight: 500;
+        animation: slideIn 0.3s ease;
+    }
+    
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    /* Checkbox styling */
+    .form-check {
+        display: flex;
+        align-items: center;
+        margin: 0;
+        padding-left: 0;
+        width: auto;
+    }
+    
+    .form-check-input {
+        margin-right: 8px;
+        margin-top: 0;
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+    }
+    
+    .form-check-label {
+        font-size: 0.9rem; /* Larger checkbox label */
+        color: var(--text-secondary);
+        cursor: pointer;
+        white-space: nowrap;
+        font-weight: 400;
+    }
+    
+    /* Links row in login form */
+    .login-links-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        margin: 12px 0 18px;
+    }
+    
+    /* Alternative signup link */
+    .signup-alternative {
+        font-size: 0.9rem; /* Larger */
+        color: var(--text-secondary);
+        margin-top: 15px;
+    }
+    
+    .signup-alternative a {
+        font-weight: 600;
+        margin-left: 5px;
+        font-size: 0.9rem;
+    }
+    
+    /* Terms text */
+    .terms-text {
+        font-size: 0.8rem;
+        color: var(--text-tertiary);
+        margin-top: 10px;
+        line-height: 1.4;
+    }
+    
+    /* Logo */
+    .form-container img {
+        margin-bottom: 1.5rem;
+        height: 35px !important;
+    }
+
+    /* Mobile Styles */
+    @media (max-width: 768px) {
+        /* Hide desktop overlay on mobile */
+        .overlay-container {
+            display: none;
+        }
+        
+        /* Mobile forms */
+        .form-container {
+            display: none;
+            width: 100%;
+            position: relative;
+            opacity: 1 !important;
+            transform: none !important;
+            left: 0 !important;
+            height: auto;
+            min-height: 320px;
+            padding: 1.8rem;
+            z-index: 5;
+            pointer-events: all;
+        }
+        
+        /* Show active mobile form */
+        .form-container.active-mobile {
+            display: flex;
+        }
+        
+        /* Mobile container adjustments */
+        .auth-container {
+            min-height: auto;
+            margin: 0.8rem;
+            padding-top: 55px;
+        }
+        
+        /* Mobile navigation tabs */
+        .mobile-nav {
+            display: flex;
+            justify-content: center;
+            gap: 0.6rem;
+            padding: 0.6rem;
+            background: var(--bg-surface);
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .mobile-nav button {
+            background: transparent;
+            border: 1px solid var(--glass-border);
+            padding: 6px 15px;
+            font-size: 0.85rem;
+            margin: 0;
+            width: 110px;
+        }
+        
+        .mobile-nav button.active {
+            background: #3b82f6;
+            border-color: #3b82f6;
+        }
+        
+        /* Adjust for mobile */
+        .auth-container h1 {
+            font-size: 1.3rem;
+        }
+        
+        .form-control {
+            padding: 10px 12px;
+            font-size: 0.9rem;
+        }
+        
+        button {
+            padding: 10px 30px;
+            font-size: 0.85rem;
+        }
+        
+        .alert {
+            font-size: 0.9rem;
+            padding: 12px 14px;
+        }
+    }
+    
+    /* Desktop only - hide mobile elements */
+    @media (min-width: 769px) {
+        .mobile-nav {
+            display: none;
+        }
+        
+        /* Ensure desktop forms are positioned correctly */
+        .form-container {
+            opacity: 1;
+        }
+        
+        .sign-up-container {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .auth-container.right-panel-active .sign-up-container {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .auth-container.right-panel-active .sign-in-container {
+            opacity: 0;
+            pointer-events: none;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="position-relative min-vh-100 d-flex align-items-center justify-content-center overflow-hidden py-2">
+    
+    <div class="auth-container" id="container">
+        
+        <!-- Mobile Navigation (Only shows on mobile) -->
+        <div class="mobile-nav">
+            <button id="mobile-login-btn" class="active">Sign In</button>
+            <button id="mobile-signup-btn">Sign Up</button>
+        </div>
+
+        <!-- Sign Up Form -->
+        <div class="form-container sign-up-container" id="signup-form-container">
+            <form method="post" action="{% url 'users:signup' %}">
+                {% csrf_token %}
+                <img src="{% static 'img/logo.png' %}" alt="Logo" class="mb-3">
+                <h1 class="mb-2">Create Account</h1>
+                
+                {% if messages and active_panel == 'signup' %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+
+                {% if form.errors %}
+                    <div class="alert alert-error">
+                        {% for field, errors in form.errors.items %}
+                            {% for error in errors %}
+                                {{ error }}<br>
+                            {% endfor %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <div class="input-wrapper">
+                    <input type="text" name="username" placeholder="Username" required class="form-control" 
+                           value="{% if form.username.value %}{{ form.username.value }}{% endif %}" />
+                    <i class="fas fa-user"></i>
+                </div>
+
+                <div class="input-wrapper">
+                    <input type="email" name="email" placeholder="Email" required class="form-control"
+                           value="{% if form.email.value %}{{ form.email.value }}{% endif %}" />
+                    <i class="fas fa-envelope"></i>
+                </div>
+
+                <div class="input-wrapper">
+                    <input type="password" name="password1" placeholder="Password" required class="form-control" />
+                    <i class="fas fa-lock"></i>
+                </div>
+                
+                <div class="input-wrapper">
+                    <input type="password" name="password2" placeholder="Confirm Password" required class="form-control" />
+                    <i class="fas fa-lock"></i>
+                </div>
+                
+                <button type="submit">Sign Up</button>
+                
+                <!-- Terms Agreement -->
+                <p class="terms-text">
+                    By signing up, you agree to our Terms & Privacy Policy
+                </p>
+            </form>
+        </div>
+
+        <!-- Sign In Form -->
+        <div class="form-container sign-in-container" id="login-form-container">
+            <form method="post" action="{% url 'users:login_view' %}">
+                {% csrf_token %}
+                <img src="{% static 'img/logo.png' %}" alt="Logo" class="mb-3">
+                <h1 class="mb-2">Sign in</h1>
+                
+                {% if messages and active_panel != 'signup' %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+
+                {% if form.non_field_errors %}
+                    <div class="alert alert-error">
+                        {% for error in form.non_field_errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+                <div class="input-wrapper">
+                    <input type="email" name="email" placeholder="Email" required class="form-control" />
+                    <i class="fas fa-envelope"></i>
+                </div>
+                
+                <div class="input-wrapper">
+                    <input type="password" name="password" placeholder="Password" required class="form-control" />
+                    <i class="fas fa-lock"></i>
+                </div>
+                
+                <div class="login-links-row">
+                    <div class="form-check">
+                        <input type="checkbox" name="remember" class="form-check-input" id="remember">
+                        <label class="form-check-label" for="remember">Remember me</label>
+                    </div>
+                    <a href="{% url 'users:password_reset' %}">Forgot password?</a>
+                </div>
+                
+                <button type="submit">Sign In</button>
+                
+                <p class="signup-alternative">
+                    Don't have an account?
+                    <a href="#" id="signUpLink">Sign Up</a>
+                </p>
+            </form>
+        </div>
+
+        <!-- Overlay / Slider (Desktop only) -->
+        <div class="overlay-container">
+            <div class="overlay">
+                <div class="overlay-panel overlay-left">
+                    <h1>Welcome Back!</h1>
+                    <p>To keep connected with us please login with your personal info</p>
+                    <button class="ghost" id="signIn">Sign In</button>
+                </div>
+                <div class="overlay-panel overlay-right">
+                    <h1>Hello, Friend!</h1>
+                    <p>Enter your personal details and start journey with us</p>
+                    <button class="ghost" id="signUp">Sign Up</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const container = document.getElementById('container');
+        const signUpBtn = document.getElementById('signUp');
+        const signInBtn = document.getElementById('signIn');
+        const signUpLink = document.getElementById('signUpLink');
+        
+        // Mobile elements
+        const mobileLoginBtn = document.getElementById('mobile-login-btn');
+        const mobileSignupBtn = document.getElementById('mobile-signup-btn');
+        const loginContainer = document.getElementById('login-form-container');
+        const signupContainer = document.getElementById('signup-form-container');
+
+        // Initial State from Server
+        const activePanel = "{{ active_panel|default:'login' }}";
+        
+        // Set initial state for BOTH desktop and mobile
+        if (activePanel === 'signup') {
+            // Desktop: show signup form
+            container.classList.add("right-panel-active");
+            
+            // Mobile: show signup form, hide login
+            if(mobileSignupBtn && mobileLoginBtn) {
+                mobileSignupBtn.classList.add('active');
+                mobileLoginBtn.classList.remove('active');
+                signupContainer.classList.add('active-mobile');
+                loginContainer.classList.remove('active-mobile');
+            }
+        } else {
+            // Desktop: show login form (default)
+            container.classList.remove("right-panel-active");
+            
+            // Mobile: show login form, hide signup
+            if(mobileLoginBtn) {
+                mobileLoginBtn.classList.add('active');
+                signupContainer.classList.remove('active-mobile');
+                loginContainer.classList.add('active-mobile');
+            }
+        }
+
+        // Desktop Slider Logic
+        if(signUpBtn) {
+            signUpBtn.addEventListener('click', () => {
+                container.classList.add("right-panel-active");
+            });
+        }
+
+        if(signInBtn) {
+            signInBtn.addEventListener('click', () => {
+                container.classList.remove("right-panel-active");
+            });
+        }
+        
+        // Sign up link in login form
+        if(signUpLink) {
+            signUpLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                if(window.innerWidth > 768) {
+                    // Desktop: use slider
+                    container.classList.add("right-panel-active");
+                } else {
+                    // Mobile: switch tabs
+                    if(mobileSignupBtn && mobileLoginBtn) {
+                        mobileSignupBtn.classList.add('active');
+                        mobileLoginBtn.classList.remove('active');
+                        signupContainer.classList.add('active-mobile');
+                        loginContainer.classList.remove('active-mobile');
+                    }
+                }
+            });
+        }
+
+        // Mobile Tab Logic
+        if(mobileLoginBtn) {
+            mobileLoginBtn.addEventListener('click', () => {
+                mobileLoginBtn.classList.add('active');
+                mobileSignupBtn.classList.remove('active');
+                loginContainer.classList.add('active-mobile');
+                signupContainer.classList.remove('active-mobile');
+            });
+        }
+
+        if(mobileSignupBtn) {
+            mobileSignupBtn.addEventListener('click', () => {
+                mobileSignupBtn.classList.add('active');
+                mobileLoginBtn.classList.remove('active');
+                signupContainer.classList.add('active-mobile');
+                loginContainer.classList.remove('active-mobile');
+            });
+        }
+        
+        // Add pop effect to alerts on load
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach((alert, index) => {
+            setTimeout(() => {
+                alert.style.animation = 'popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+            }, index * 100);
+        });
+        
+        // Ensure forms don't overlap on resize
+        window.addEventListener('resize', () => {
+            if(window.innerWidth <= 768) {
+                // On mobile: use tabbed view
+                container.classList.remove("right-panel-active");
+            }
+        });
+    });
+</script>
+{% endblock %}

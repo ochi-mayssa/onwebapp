@@ -1,0 +1,65 @@
+{% extends "emails/base.html" %}
+
+{% block subject %}How was your experience with {{ request_number }}?{% endblock %}
+
+{% block preview_text %}We'd love to hear your feedback on your branding project for {{ company_name }}.{% endblock %}
+
+{% block content %}
+<!-- Heading -->
+<h2 style="margin:0 0 8px; font-size:22px; font-weight:800; color:#1e293b; text-align:center;">
+    How did we do?
+</h2>
+<p style="margin:0 0 24px; font-size:15px; color:#64748b; text-align:center; line-height:1.5;">
+    Your feedback helps us improve. It only takes a minute.
+</p>
+
+<!-- Project Card -->
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color:#f8fafc; border-radius:10px; border:1px solid #e2e8f0;">
+    <tr>
+        <td style="padding:20px 24px;">
+            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                <tr>
+                    <td width="50%" style="padding:6px 0;">
+                        <span style="font-size:12px; color:#94a3b8; text-transform:uppercase; letter-spacing:0.5px; font-weight:600;">Request</span><br>
+                        <span style="font-size:15px; color:#1e293b; font-weight:700;">{{ request_number }}</span>
+                    </td>
+                    <td width="50%" style="padding:6px 0;">
+                        <span style="font-size:12px; color:#94a3b8; text-transform:uppercase; letter-spacing:0.5px; font-weight:600;">Company</span><br>
+                        <span style="font-size:15px; color:#1e293b; font-weight:700;">{{ company_name }}</span>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+<!-- Star Rating Visual -->
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-top:24px;">
+    <tr>
+        <td align="center" style="padding:16px 0; font-size:32px; letter-spacing:4px;">
+            &#x2B50;&#x2B50;&#x2B50;&#x2B50;&#x2B50;
+        </td>
+    </tr>
+</table>
+
+<!-- CTA Button -->
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+    <tr>
+        <td align="center">
+            <table role="presentation" cellspacing="0" cellpadding="0" border="0">
+                <tr>
+                    <td style="background-color:#4f46e5; border-radius:8px;">
+                        <a href="{{ action_url }}" style="display:inline-block; padding:14px 32px; font-size:15px; font-weight:700; color:#ffffff; text-decoration:none; border-radius:8px;">
+                            Leave Your Feedback &rarr;
+                        </a>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+<p style="margin:20px 0 0; font-size:13px; color:#94a3b8; text-align:center; line-height:1.5;">
+    Your feedback is anonymous and helps us serve you better.
+</p>
+{% endblock %}

@@ -1,0 +1,146 @@
+{% extends 'branding/base.html' %}
+
+{% block title %}Branding Board{% endblock %}
+
+{% block branding_content %}
+<div class="dashboard-page kanban-page">
+    <div class="container-fluid py-4 px-lg-4">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4 px-1">
+            <div>
+                <h1 class="fw-800 mb-1">Branding Board</h1>
+                <p class="text-muted mb-0">Drag &amp; drop requests to update their status.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{% url 'branding:dashboard' %}?status=ARCHIVED" class="btn btn-back"><i class="fa-solid fa-box-archive me-2"></i>Archived ({{ archived_count }})</a>
+                <a href="{% url 'branding:dashboard' %}" class="btn btn-brand-primary"><i class="fa-solid fa-table-list me-2"></i>List View</a>
+            </div>
+        </div>
+
+        <div class="kanban-board rounded-4">
+            <div class="kanban-scroll">
+                <div class="d-flex gap-3 kanban-row">
+                    {% for column in kanban_columns %}
+                    <div class="kanban-column rounded-4" data-status="{{ column.code }}">
+                        <div class="kanban-column-head">
+                            <span class="kanban-column-icon"><i class="fa-solid fa-{{ column.icon }}"></i></span>
+                            <span class="kanban-column-label">{{ column.label }}</span>
+                            <span class="kanban-count count-badge">{{ column.requests|length }}</span>
+                        </div>
+                        <div class="kanban-cards">
+                            {% for r in column.requests %}
+                            <a href="{% url 'branding:request_detail' r.pk %}" class="kanban-card text-decoration-none" draggable="true" data-request-id="{{ r.pk }}">
+                                <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                                    <span class="kanban-request-id">{{ r.request_number }}</span>
+                                    <span class="priority-badge priority-{{ r.priority|lower }}">{{ r.get_priority_display }}</span>
+                                </div>
+                                <div class="kanban-company">{{ r.company_name }}</div>
+                                <div class="kanban-meta">
+                                    <span><i class="fa-solid fa-industry me-1"></i>{{ r.get_industry_display }}</span>
+                                    <span><i class="fa-solid fa-folder-open me-1"></i>{{ r.collection.name|default:"—"|truncatechars:22 }}</span>
+                                </div>
+                                <div class="kanban-meta">
+                                    {% if r.designer %}
+                                    <span><i class="fa-solid fa-user-pen me-1"></i>{{ r.designer.username }}</span>
+                                    {% else %}
+                                    <span class="text-muted">Unassigned</span>
+                                    {% endif %}
+                                    <span><i class="fa-regular fa-clock me-1"></i>{{ r.updated_at|date:"M j" }}</span>
+                                </div>
+                                {% if r.estimated_delivery_date %}
+                                <div class="kanban-due"><i class="fa-regular fa-calendar-check me-1"></i>Due {{ r.estimated_delivery_date|date:"M j" }}</div>
+                                {% endif %}
+                            </a>
+                            {% empty %}
+                            <div class="kanban-empty"><i class="fa-regular fa-circle-dot"></i></div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const cards = document.querySelectorAll('.kanban-card');
+    const columns = document.querySelectorAll('.kanban-column');
+    let draggedCard = null;
+
+    cards.forEach(card => {
+        card.addEventListener('dragstart', function (e) {
+            draggedCard = this;
+            this.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', this.dataset.requestId);
+        });
+        card.addEventListener('dragend', function () {
+            this.classList.remove('dragging');
+            columns.forEach(col => col.classList.remove('drag-over'));
+            draggedCard = null;
+        });
+    });
+
+    columns.forEach(col => {
+        col.addEventListener('dragover', function (e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            this.classList.add('drag-over');
+        });
+        col.addEventListener('dragleave', function () {
+            this.classList.remove('drag-over');
+        });
+        col.addEventListener('drop', function (e) {
+            e.preventDefault();
+            this.classList.remove('drag-over');
+            if (!draggedCard) return;
+
+            const newStatus = this.dataset.status;
+            const requestId = draggedCard.dataset.requestId;
+            const targetContainer = this.querySelector('.kanban-cards');
+            const sourceContainer = draggedCard.parentElement;
+
+            if (targetContainer === sourceContainer) return;
+
+            targetContainer.appendChild(draggedCard);
+            updateCounts();
+
+            fetch('{% url "branding:kanban_update" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ request_id: requestId, status: newStatus })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (!data.success) {
+                    alert('Failed to update: ' + (data.error || 'Unknown error'));
+                    location.reload();
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                location.reload();
+            });
+        });
+    });
+
+    function updateCounts() {
+        columns.forEach(col => {
+            const count = col.querySelectorAll('.kanban-card').length;
+            col.querySelector('.count-badge').textContent = count;
+        });
+    }
+
+    function getCookie(name) {
+        const m = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+        return m ? m.pop() : '';
+    }
+});
+</script>
+{% endblock %}

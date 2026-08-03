@@ -1,0 +1,360 @@
+{% extends 'base.html' %}
+{% block title %}SEO Monitoring - OnWebApp{% endblock %}
+{% block content %}
+<div class="container mt-4 mb-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'seo_analyzer:index' %}">SEO</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Monitoring</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+        <div>
+            <h1 class="mb-2">SEO Monitoring</h1>
+            <p class="text-muted mb-0">Track SEO health over time, compare completed analyses, detect changes, and export historical intelligence.</p>
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+            <a href="{% url 'seo_analyzer:monitoring_export' 'pdf' %}?website={{ active_filters.website|urlencode }}&analysis_type={{ active_filters.analysis_type|urlencode }}&range_key={{ active_filters.range_key|urlencode }}{% if active_filters.start_date %}&start_date={{ active_filters.start_date|date:'Y-m-d' }}{% endif %}{% if active_filters.end_date %}&end_date={{ active_filters.end_date|date:'Y-m-d' }}{% endif %}" class="btn btn-outline-primary">Export PDF</a>
+            <a href="{% url 'seo_analyzer:monitoring_export' 'xlsx' %}?website={{ active_filters.website|urlencode }}&analysis_type={{ active_filters.analysis_type|urlencode }}&range_key={{ active_filters.range_key|urlencode }}{% if active_filters.start_date %}&start_date={{ active_filters.start_date|date:'Y-m-d' }}{% endif %}{% if active_filters.end_date %}&end_date={{ active_filters.end_date|date:'Y-m-d' }}{% endif %}" class="btn btn-outline-success">Export Excel</a>
+            <a href="{% url 'seo_analyzer:monitoring_export' 'csv' %}?website={{ active_filters.website|urlencode }}&analysis_type={{ active_filters.analysis_type|urlencode }}&range_key={{ active_filters.range_key|urlencode }}{% if active_filters.start_date %}&start_date={{ active_filters.start_date|date:'Y-m-d' }}{% endif %}{% if active_filters.end_date %}&end_date={{ active_filters.end_date|date:'Y-m-d' }}{% endif %}" class="btn btn-outline-secondary">Export CSV</a>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">Filters</h5>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-lg-4">
+                    <label class="form-label" for="{{ form.website.id_for_label }}">Website</label>
+                    {{ form.website }}
+                </div>
+                <div class="col-md-3 col-lg-2">
+                    <label class="form-label" for="{{ form.analysis_type.id_for_label }}">Analysis Type</label>
+                    {{ form.analysis_type }}
+                </div>
+                <div class="col-md-3 col-lg-2">
+                    <label class="form-label" for="{{ form.range_key.id_for_label }}">Date Range</label>
+                    {{ form.range_key }}
+                </div>
+                <div class="col-md-3 col-lg-2">
+                    <label class="form-label" for="{{ form.start_date.id_for_label }}">Start Date</label>
+                    {{ form.start_date }}
+                </div>
+                <div class="col-md-3 col-lg-2">
+                    <label class="form-label" for="{{ form.end_date.id_for_label }}">End Date</label>
+                    {{ form.end_date }}
+                </div>
+                <div class="col-lg-12 d-flex gap-2 flex-wrap">
+                    <button class="btn btn-primary" type="submit">Apply Filters</button>
+                    <a href="{% url 'seo_analyzer:monitoring' %}" class="btn btn-outline-secondary">Reset</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-6 col-xl-3">
+            <div class="card border-primary shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small text-uppercase fw-semibold">Current Health</div>
+                    <div class="display-6 text-primary">{{ dashboard.summary_cards.current_health }}</div>
+                    <div class="small text-muted">Latest monitoring snapshot in the selected filter scope.</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xl-3">
+            <div class="card border-secondary shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small text-uppercase fw-semibold">Previous Health</div>
+                    <div class="display-6 text-secondary">{{ dashboard.summary_cards.previous_health }}</div>
+                    <div class="small text-muted">Immediate benchmark for comparison against the current result.</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xl-2">
+            <div class="card border-success shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small text-uppercase fw-semibold">Weekly Change</div>
+                    <div class="h2 text-success">{{ dashboard.summary_cards.weekly_change }}</div>
+                    <div class="small text-muted">Trend over the last 7 days.</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xl-2">
+            <div class="card border-warning shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small text-uppercase fw-semibold">Monthly Change</div>
+                    <div class="h2 text-warning">{{ dashboard.summary_cards.monthly_change }}</div>
+                    <div class="small text-muted">Trend over the last 30 days.</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12 col-xl-2">
+            <div class="card border-info shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small text-uppercase fw-semibold">AI Trend</div>
+                    <div class="h3 text-info">{{ dashboard.summary_cards.ai_trend }}</div>
+                    <div class="small text-muted">Executive signal for change direction.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-7">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Executive Summary</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-3">{{ dashboard.weekly_summary }}</p>
+                    {% if dashboard.latest_snapshot %}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="rounded-3 border p-3 h-100">
+                                <div class="small text-muted">Primary Monitoring Scope</div>
+                                <div class="fw-semibold">{{ dashboard.latest_snapshot.domain }}</div>
+                                <div class="small text-muted">{{ dashboard.latest_snapshot.get_analysis_type_display }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="rounded-3 border p-3 h-100">
+                                <div class="small text-muted">Latest Snapshot Date</div>
+                                <div class="fw-semibold">{{ dashboard.latest_snapshot.created_at|date:"M d, Y H:i" }}</div>
+                                <div class="small text-muted">Total snapshots in view: {{ dashboard.filter_summary.total_snapshots }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info mb-0">No monitoring history matches the selected filters yet. Run a Website Checker or Link Checker analysis to start the timeline.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Website Timeline</h5>
+                </div>
+                <div class="card-body">
+                    {% if dashboard.timeline %}
+                    <div class="d-flex flex-column gap-3">
+                        {% for snapshot in dashboard.timeline %}
+                        <div class="d-flex gap-3">
+                            <div class="text-center" style="min-width: 90px;">
+                                <div class="fw-semibold">{{ snapshot.created_at|date:"M d" }}</div>
+                                <div class="small text-muted">{{ snapshot.created_at|date:"H:i" }}</div>
+                            </div>
+                            <div class="vr"></div>
+                            <div>
+                                <div class="fw-semibold">{{ snapshot.domain }}</div>
+                                <div class="small text-muted">{{ snapshot.get_analysis_type_display }}</div>
+                                <div class="small">Health Score {{ snapshot.health_score|default:"Not Measured" }}</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted mb-0">Timeline data will appear here once monitoring snapshots are available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">Current Analysis vs Previous Analysis</h5>
+        </div>
+        <div class="card-body">
+            {% if dashboard.current_vs_previous %}
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Metric</th>
+                            <th>Current</th>
+                            <th>Previous</th>
+                            <th>Difference</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in dashboard.current_vs_previous %}
+                        <tr>
+                            <td>{{ row.label }}</td>
+                            <td>{{ row.current }}</td>
+                            <td>{{ row.previous }}</td>
+                            <td>
+                                <span class="badge {% if row.trend == 'up' %}bg-success-subtle text-success border border-success-subtle{% elif row.trend == 'down' %}bg-danger-subtle text-danger border border-danger-subtle{% else %}bg-secondary-subtle text-secondary border border-secondary-subtle{% endif %}">
+                                    {{ row.delta }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted mb-0">At least two monitoring snapshots are required to compute comparisons.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        {% for chart in dashboard.chart_cards %}
+        <div class="col-lg-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <div class="small text-uppercase text-muted fw-semibold">{{ chart.label }}</div>
+                            <div class="h4 mb-0">{{ chart.latest }}</div>
+                        </div>
+                        <span class="badge bg-light text-dark border">{{ chart.delta }}</span>
+                    </div>
+                    {% if chart.empty %}
+                    <div class="text-muted small">Not enough measured data for this chart yet.</div>
+                    {% else %}
+                    <svg viewBox="0 0 280 90" class="w-100" style="height: 90px;">
+                        <polyline fill="none" stroke="{{ chart.color }}" stroke-width="3" points="{{ chart.points }}"></polyline>
+                    </svg>
+                    <div class="small text-muted">Trend range based on the selected monitoring filters.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-7">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">AI Change Detection</h5>
+                </div>
+                <div class="card-body">
+                    {% if dashboard.change_detection %}
+                    <div class="row g-3">
+                        {% for item in dashboard.change_detection %}
+                        <div class="col-md-6">
+                            <div class="rounded-3 border p-3 h-100">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="badge {% if item.status == 'NEW' %}bg-danger-subtle text-danger border border-danger-subtle{% elif item.status == 'FIXED' %}bg-success-subtle text-success border border-success-subtle{% elif item.status == 'REMOVED' %}bg-warning-subtle text-warning border border-warning-subtle{% else %}bg-info-subtle text-info border border-info-subtle{% endif %}">
+                                        {{ item.status }}
+                                    </span>
+                                    <span class="fw-semibold">{{ item.count }}</span>
+                                </div>
+                                <div class="fw-semibold">{{ item.label }}</div>
+                                <div class="small text-muted">{{ item.detail }}</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted mb-0">Change detection becomes active as soon as a previous snapshot is available for comparison.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">AI Priority</h5>
+                </div>
+                <div class="card-body">
+                    {% if dashboard.priority_items %}
+                    <div class="d-flex flex-column gap-3">
+                        {% for item in dashboard.priority_items %}
+                        <div class="rounded-3 border p-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge {% if item.status == 'NEW' %}bg-danger-subtle text-danger border border-danger-subtle{% else %}bg-success-subtle text-success border border-success-subtle{% endif %}">{{ item.status }}</span>
+                                <span class="fw-semibold">{{ item.count }}</span>
+                            </div>
+                            <div class="fw-semibold">{{ item.label }}</div>
+                            <div class="small text-muted">{{ item.detail }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted mb-0">Priority items will highlight only the newest problems and the most important fixes between snapshots.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-7">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Historical Snapshot Table</h5>
+                </div>
+                <div class="card-body">
+                    {% if dashboard.snapshots %}
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Website</th>
+                                    <th>Analysis Type</th>
+                                    <th>Health</th>
+                                    <th>Visibility</th>
+                                    <th>Issues</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for snapshot in dashboard.snapshots %}
+                                <tr>
+                                    <td>{{ snapshot.created_at|date:"Y-m-d H:i" }}</td>
+                                    <td>{{ snapshot.domain }}</td>
+                                    <td>{{ snapshot.get_analysis_type_display }}</td>
+                                    <td>{{ snapshot.health_score|default:"Not Measured" }}</td>
+                                    <td>{{ snapshot.visibility_score|default:"Not Measured" }}</td>
+                                    <td>{{ snapshot.issues_count|default:"Not Measured" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted mb-0">No historical snapshots are available yet for the selected filters.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Notifications Architecture</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Prepared for future alerting workflows. Sending is not active yet.</p>
+                    <div class="d-flex flex-column gap-2 mb-3">
+                        {% for channel in dashboard.notification_architecture.supported_channels %}
+                        <div class="rounded-3 border p-3 d-flex justify-content-between align-items-center">
+                            <span>{{ channel }}</span>
+                            <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">Architecture Ready</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% if dashboard.notification_architecture.channels %}
+                    <div class="small text-uppercase text-muted fw-semibold mb-2">Configured Endpoints</div>
+                    <div class="d-flex flex-column gap-2">
+                        {% for endpoint in dashboard.notification_architecture.channels %}
+                        <div class="rounded-3 border p-3">
+                            <div class="fw-semibold">{{ endpoint.label }}</div>
+                            <div class="small text-muted">{{ endpoint.destination }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

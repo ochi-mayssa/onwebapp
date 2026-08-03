@@ -1,0 +1,234 @@
+{% extends 'services/futuristic_service_base.html' %}
+{% load static %}
+
+{% block service_content %}
+<div class="row g-5">
+    <div class="col-lg-8">
+        <div class="premium-card mb-4 reveal">
+            <h5 class="mb-4 neon-text">Analysis Filters</h5>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <label class="form-label fw-700 text-slate-600 small uppercase tracking-wider">Date Range</label>
+                    <select class="form-select cyber-input" id="saDateRange">
+                        <option value="6m" selected>Last 6 months</option>
+                        <option value="12m">Last 12 months</option>
+                        <option value="24m">Last 24 months</option>
+                    </select>
+                </div>
+                <div class="col-md-8">
+                    <label class="form-label d-block fw-700 text-slate-600 small uppercase tracking-wider">Intelligence Datasets</label>
+                    <div class="d-flex flex-wrap gap-4 mt-2">
+                        <div class="form-check custom-check">
+                            <input class="form-check-input" type="checkbox" id="toggleTop10" checked>
+                            <label class="form-check-label fw-600 text-slate-900" for="toggleTop10">Top 10 Keywords</label>
+                        </div>
+                        <div class="form-check custom-check">
+                            <input class="form-check-input" type="checkbox" id="toggleTop50" checked>
+                            <label class="form-check-label fw-600 text-slate-900" for="toggleTop50">Top 50 Keywords</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="keyword-intelligence" class="premium-card mb-4 reveal">
+            <h5 class="mb-4 neon-text">Keyword Rankings</h5>
+            <div style="height: 350px;">
+                <canvas id="keywordChart"></canvas>
+            </div>
+        </div>
+        
+        <div id="backlink-analyzer" class="premium-card mb-4 reveal">
+            <h5 class="mb-4 neon-text">Backlink Growth</h5>
+            <div style="height: 350px;">
+                <canvas id="backlinkChart"></canvas>
+            </div>
+        </div>
+        
+        <div id="rank-tracking" class="premium-card reveal">
+            <h5 class="mb-4 neon-text">Rank Tracking</h5>
+            <div style="height: 350px;">
+                <canvas id="rankChart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="premium-card mb-4 reveal">
+            <h5 class="mb-4 neon-text">On-Page Score</h5>
+            <div class="text-center py-4">
+                <div class="display-3 fw-800 text-primary mb-2" id="onPageScore">82</div>
+                <p class="text-slate-500 fw-600">Overall optimization score</p>
+            </div>
+            <hr class="border-slate-100 my-4">
+            <ul class="list-unstyled vstack gap-3 mb-0">
+                <li class="d-flex align-items-center gap-3 fw-600 text-slate-700">
+                    <i data-lucide="check-circle" class="text-success" style="width: 20px;"></i>
+                    Meta tags optimized
+                </li>
+                <li class="d-flex align-items-center gap-3 fw-600 text-slate-700">
+                    <i data-lucide="check-circle" class="text-success" style="width: 20px;"></i>
+                    Internal links balanced
+                </li>
+                <li class="d-flex align-items-center gap-3 fw-600 text-slate-700">
+                    <i data-lucide="x-circle" class="text-danger" style="width: 20px;"></i>
+                    Missing alt attributes
+                </li>
+            </ul>
+        </div>
+        
+        <div class="premium-card reveal">
+            <h5 class="mb-4 neon-text">Quick Actions</h5>
+            <div class="vstack gap-3">
+                <a href="{% url 'seo_analyzer:index' %}" class="holographic-btn w-100 justify-content-center">
+                    <i data-lucide="sitemap" style="width: 18px;"></i>
+                    Run Sitemap Analyzer
+                </a>
+                <a href="{% url 'services:link_analyzer' %}" class="holographic-btn w-100 justify-content-center" style="filter: hue-rotate(45deg);">
+                    <i data-lucide="link" style="width: 18px;"></i>
+                    Scan Links
+                </a>
+                <a href="{% url 'services:keyword_research' %}" class="holographic-btn w-100 justify-content-center" style="filter: hue-rotate(90deg);">
+                    <i data-lucide="search" style="width: 18px;"></i>
+                    Keyword Research
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function(){
+        // Chart.js defaults for premium look
+        Chart.defaults.font.family = "'Inter', sans-serif";
+        Chart.defaults.color = '#94A3B8';
+        Chart.defaults.borderColor = 'rgba(241, 245, 249, 0.5)';
+
+        const kwCtx = document.getElementById('keywordChart').getContext('2d');
+        const kwChart = new Chart(kwCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [
+                    { 
+                        label: 'Top 10 Keywords', 
+                        data: [12, 18, 25, 33, 41, 48], 
+                        borderColor: '#6366F1', 
+                        borderWidth: 4,
+                        tension: 0.4, 
+                        fill: false,
+                        pointRadius: 0,
+                        pointHoverRadius: 6,
+                        pointHoverBackgroundColor: '#6366F1',
+                        pointHoverBorderColor: '#fff',
+                        pointHoverBorderWidth: 3
+                    },
+                    { 
+                        label: 'Top 50 Keywords', 
+                        data: [45, 52, 61, 70, 78, 90], 
+                        borderColor: '#0EA5E9', 
+                        borderWidth: 4,
+                        tension: 0.4, 
+                        fill: false,
+                        pointRadius: 0,
+                        pointHoverRadius: 6,
+                        pointHoverBackgroundColor: '#0EA5E9',
+                        pointHoverBorderColor: '#fff',
+                        pointHoverBorderWidth: 3
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { intersect: false, mode: 'index' },
+                plugins: { 
+                    legend: { position: 'top', align: 'end', labels: { usePointStyle: true, boxWidth: 10, padding: 20, font: { weight: '700' } } }
+                },
+                scales: { 
+                    y: { grid: { drawBorder: false }, ticks: { padding: 10 } }, 
+                    x: { grid: { display: false }, ticks: { padding: 10 } } 
+                }
+            }
+        });
+
+        const blCtx = document.getElementById('backlinkChart').getContext('2d');
+        new Chart(blCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [
+                    { label: 'Backlinks', data: [120, 180, 240, 300, 380, 460], backgroundColor: '#6366F1', borderRadius: 8 },
+                    { label: 'Domains', data: [55, 70, 90, 110, 140, 170], backgroundColor: '#0EA5E9', borderRadius: 8 }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { 
+                    legend: { position: 'top', align: 'end', labels: { usePointStyle: true, boxWidth: 10, padding: 20, font: { weight: '700' } } }
+                },
+                scales: { 
+                    y: { grid: { drawBorder: false }, ticks: { padding: 10 } }, 
+                    x: { grid: { display: false }, ticks: { padding: 10 } } 
+                }
+            }
+        });
+
+        const rankCtx = document.getElementById('rankChart').getContext('2d');
+        new Chart(rankCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [
+                    { 
+                        label: 'Avg Position', 
+                        data: [28, 26, 24, 21, 19, 17], 
+                        borderColor: '#10B981', 
+                        borderWidth: 4,
+                        tension: 0.4,
+                        pointRadius: 0,
+                        pointHoverRadius: 6,
+                        pointHoverBackgroundColor: '#10B981',
+                        pointHoverBorderColor: '#fff',
+                        pointHoverBorderWidth: 3
+                    },
+                    { 
+                        label: 'Visibility %', 
+                        data: [52, 56, 61, 65, 69, 73], 
+                        borderColor: '#F59E0B', 
+                        borderWidth: 4,
+                        tension: 0.4,
+                        yAxisID: 'y1',
+                        pointRadius: 0,
+                        pointHoverRadius: 6,
+                        pointHoverBackgroundColor: '#F59E0B',
+                        pointHoverBorderColor: '#fff',
+                        pointHoverBorderWidth: 3
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { intersect: false, mode: 'index' },
+                plugins: { 
+                    legend: { position: 'top', align: 'end', labels: { usePointStyle: true, boxWidth: 10, padding: 20, font: { weight: '700' } } }
+                },
+                scales: { 
+                    y: { grid: { drawBorder: false }, ticks: { padding: 10 } }, 
+                    y1: { position: 'right', suggestedMax: 100, grid: { display: false }, ticks: { padding: 10 } }, 
+                    x: { grid: { display: false }, ticks: { padding: 10 } } 
+                }
+            }
+        });
+    });
+</script>
+<style>
+    .uppercase { text-transform: uppercase; }
+    .tracking-wider { letter-spacing: 0.1em; }
+    .custom-check .form-check-input:checked { background-color: var(--primary); border-color: var(--primary); }
+</style>
+{% endblock %}
+{% endblock %}

@@ -1,0 +1,127 @@
+{% extends 'branding/base.html' %}
+{% load branding_extras %}
+
+{% block branding_content %}
+<style>
+.wf-stage-col{min-width:240px;max-width:320px;flex-shrink:0}
+.wf-stage-header{padding:.75rem 1rem;border-radius:.5rem .5rem 0 0;font-weight:700;font-size:.8rem;text-transform:uppercase;letter-spacing:.5px;color:#fff;display:flex;align-items:center;justify-content:space-between}
+.wf-stage-header .count{background:rgba(255,255,255,.3);padding:.1rem .5rem;border-radius:1rem;font-size:.7rem}
+.wf-stage-body{background:var(--surface-card,#fff);border:1px solid var(--border-color,#e5e7eb);border-top:none;border-radius:0 0 .5rem .5rem;padding:.5rem;min-height:120px}
+.wf-card{background:var(--surface-card,#fff);border:1px solid var(--border-color,#e5e7eb);border-radius:.5rem;padding:.75rem;margin-bottom:.5rem;cursor:pointer;transition:all .2s}
+.wf-card:hover{box-shadow:0 2px 8px rgba(0,0,0,.08);transform:translateY(-1px)}
+.wf-card-num{font-weight:700;font-size:.8rem;color:var(--brand-primary,#4f46e5)}
+.wf-card-company{font-size:.8rem;font-weight:600;margin:.25rem 0}
+.wf-card-meta{font-size:.7rem;color:var(--text-secondary,#6b7280)}
+.wf-card-progress{height:3px;background:#e5e7eb;border-radius:999px;margin-top:.5rem;overflow:hidden}
+.wf-card-progress-bar{height:100%;border-radius:999px;transition:width .3s}
+.wf-escalated{border-left:3px solid #ef4444}
+.wf-pill{display:inline-block;padding:.15rem .5rem;border-radius:1rem;font-size:.65rem;font-weight:600;line-height:1.4}
+.wf-legend{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1rem}
+.wf-legend-item{display:flex;align-items:center;gap:.4rem;font-size:.75rem}
+.wf-legend-dot{width:10px;height:10px;border-radius:50%}
+.wf-scroll{overflow-x:auto;padding-bottom:.5rem}
+.wf-scroll::-webkit-scrollbar{height:6px}
+.wf-scroll::-webkit-scrollbar-thumb{background:#d1d5db;border-radius:3px}
+</style>
+
+<div class="container-fluid py-3">
+  <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3">
+    <div>
+      <h1 class="h4 fw-bold mb-1"><i class="fa-solid fa-diagram-project me-2"></i>Workflow Dashboard</h1>
+      <p class="text-muted mb-0 small">{{ total_projects }} project{{ total_projects|pluralize }} in pipeline</p>
+    </div>
+  </div>
+
+  {# ── Stage Legend ── #}
+  <div class="wf-legend">
+    <div class="wf-legend-item"><div class="wf-legend-dot" style="background:#6366f1"></div>Brief</div>
+    <div class="wf-legend-item"><div class="wf-legend-dot" style="background:#8b5cf6"></div>Concept</div>
+    <div class="wf-legend-item"><div class="wf-legend-dot" style="background:#ec4899"></div>Present</div>
+    <div class="wf-legend-item"><div class="wf-legend-dot" style="background:#f59e0b"></div>Feedback</div>
+    <div class="wf-legend-item"><div class="wf-legend-dot" style="background:#f97316"></div>Revisions</div>
+    <div class="wf-legend-item"><div class="wf-legend-dot" style="background:#06b6d4"></div>Questions</div>
+    <div class="wf-legend-item"><div class="wf-legend-dot" style="background:#3b82f6"></div>Final</div>
+    <div class="wf-legend-item"><div class="wf-legend-dot" style="background:#22c55e"></div>Done</div>
+    {% if escalated %}
+    <div class="wf-legend-item"><div class="wf-legend-dot" style="background:#ef4444"></div>Escalated ({{ escalated|length }})</div>
+    {% endif %}
+  </div>
+
+  {# ── Stage Pipeline ── #}
+  <div class="wf-scroll">
+    <div class="d-flex gap-2" style="min-width:max-content">
+      {% for stage_key, stage_data in workflows_by_stage.items %}
+      {% with items=stage_data.items label=stage_data.label count=stage_counts|get_item:stage_key %}
+      <div class="wf-stage-col">
+        {% if stage_key == 'brief_review' %}
+        <div class="wf-stage-header" style="background:#6366f1">{{ label }} <span class="count">{{ count }}</span></div>
+        {% elif stage_key == 'concept' %}
+        <div class="wf-stage-header" style="background:#8b5cf6">{{ label }} <span class="count">{{ count }}</span></div>
+        {% elif stage_key == 'first_presentation' %}
+        <div class="wf-stage-header" style="background:#ec4899">{{ label }} <span class="count">{{ count }}</span></div>
+        {% elif stage_key == 'client_feedback' %}
+        <div class="wf-stage-header" style="background:#f59e0b">{{ label }} <span class="count">{{ count }}</span></div>
+        {% elif stage_key == 'revisions' %}
+        <div class="wf-stage-header" style="background:#f97316">{{ label }} <span class="count">{{ count }}</span></div>
+        {% elif stage_key == 'question_phase' %}
+        <div class="wf-stage-header" style="background:#06b6d4">{{ label }} <span class="count">{{ count }}</span></div>
+        {% elif stage_key == 'final_presentation' %}
+        <div class="wf-stage-header" style="background:#3b82f6">{{ label }} <span class="count">{{ count }}</span></div>
+        {% elif stage_key == 'completion' %}
+        <div class="wf-stage-header" style="background:#22c55e">{{ label }} <span class="count">{{ count }}</span></div>
+        {% endif %}
+        <div class="wf-stage-body">
+          {% for w in items %}
+          <a href="{% url 'branding:workflow_project' w.request.pk %}" class="wf-card d-block text-decoration-none {% if w.is_overdue %}wf-escalated{% endif %}">
+            <div class="d-flex justify-content-between align-items-start">
+              <span class="wf-card-num">{{ w.request.request_number }}</span>
+              {% if w.is_overdue %}
+              <span class="wf-pill" style="background:#fef2f2;color:#ef4444"><i class="fa-solid fa-triangle-exclamation me-1"></i>{{ w.stage_days }}d</span>
+              {% else %}
+              <span class="wf-pill" style="background:#f3f4f6;color:#6b7280">{{ w.stage_days }}d</span>
+              {% endif %}
+            </div>
+            <div class="wf-card-company">{{ w.request.company_name|truncatechars:25 }}</div>
+            <div class="wf-card-meta">{{ w.request.get_status_display }} &middot; {{ w.request.get_priority_display }}</div>
+            <div class="wf-card-progress">
+              <div class="wf-card-progress-bar" style="width:{{ w.progress_percent }}%;background:{% if w.progress_percent > 75 %}#22c55e{% elif w.progress_percent > 40 %}#f59e0b{% else %}#6366f1{% endif %}"></div>
+            </div>
+          </a>
+          {% empty %}
+          <div class="text-center text-muted py-3 small" style="opacity:.5">No projects</div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endwith %}
+      {% endfor %}
+    </div>
+  </div>
+
+  {# ── Recent Activity ── #}
+  {% if recent_comms %}
+  <div class="mt-4">
+    <h6 class="fw-bold mb-3"><i class="fa-solid fa-stream me-1"></i>Recent Activity</h6>
+    <div class="row g-2">
+      {% for c in recent_comms %}
+      <div class="col-12 col-md-6 col-lg-4">
+        <div class="d-flex gap-2 p-2 rounded-3" style="background:var(--surface-muted,#f9fafb)">
+          <div class="mt-1">
+            {% if c.interaction_type == 'message' %}<i class="fa-regular fa-comment text-primary"></i>
+            {% elif c.interaction_type == 'question' %}<i class="fa-solid fa-circle-question text-info"></i>
+            {% elif c.interaction_type == 'feedback' %}<i class="fa-solid fa-comment-dots text-warning"></i>
+            {% elif c.interaction_type == 'approval' %}<i class="fa-solid fa-circle-check text-success"></i>
+            {% elif c.interaction_type == 'revision' %}<i class="fa-solid fa-pen text-secondary"></i>
+            {% else %}<i class="fa-solid fa-note-sticky text-muted"></i>{% endif %}
+          </div>
+          <div style="min-width:0">
+            <div class="small fw-600 text-truncate">{{ c.title }}</div>
+            <div class="x-small text-muted">{{ c.workflow.request.request_number }} &middot; {{ c.created_at|timesince }} ago</div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

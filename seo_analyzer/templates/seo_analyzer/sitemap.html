@@ -1,0 +1,803 @@
+{% extends 'base.html' %}
+{% load modular_sitemap_tags %}
+{% block title %}Sitemap Intelligence - OnWebApp{% endblock %}
+{% block content %}
+<div class="container mt-5 mb-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home:home' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'seo_analyzer:index' %}">SEO</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Sitemap Intelligence</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+        <div>
+            <h1 class="mb-2">Sitemap Intelligence</h1>
+            <p class="text-muted mb-0">AI-powered platform for Google discovery, media analysis, and digital marketing insights.</p>
+        </div>
+        <div class="text-end">
+            <div class="small text-uppercase text-muted fw-semibold mb-2">SEO Tools</div>
+            <div class="d-flex gap-2 flex-wrap justify-content-end">
+                <a href="{% url 'seo_analyzer:checker' %}" class="btn btn-outline-primary">Website Checker</a>
+                <a href="{% url 'seo_analyzer:url_intelligence' %}" class="btn btn-outline-secondary">URL Intelligence</a>
+                <a href="{% url 'seo_analyzer:link_checker' %}" class="btn btn-outline-success">Link Checker</a>
+                <a href="{% url 'seo_analyzer:sitemap' %}" class="btn btn-primary">Sitemap Intelligence</a>
+                <a href="{% url 'seo_analyzer:backlinks' %}" class="btn btn-outline-warning">Backlink Analyzer</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h4 class="card-title">Sitemap Intelligence</h4>
+            <p class="text-muted">Analyze how Google discovers and understands your content (URL classification, sitemaps, media, mobile, and marketing insights).</p>
+            <form method="post">
+                {% csrf_token %}
+                <div class="row g-3 align-items-end">
+                    <div class="col-lg-4">
+                        <label class="form-label" for="{{ form.url.id_for_label }}">URL</label>
+                        {{ form.url }}
+                    </div>
+                    <div class="col-lg-4">
+                        <label class="form-label" for="{{ form.target_keyword.id_for_label }}">Target Keyword</label>
+                        {{ form.target_keyword }}
+                    </div>
+                    <div class="col-lg-3">
+                        <label class="form-label" for="{{ form.sitemap_url.id_for_label }}">Sitemap URL (optional)</label>
+                        {{ form.sitemap_url }}
+                    </div>
+                    <div class="col-lg-1">
+                        <button type="submit" class="btn btn-primary w-100">Analyze</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if report %}
+    {% include 'seo_analyzer/partials/topic_intelligence_card.html' with topic_intelligence=report.topic_intelligence %}
+
+    <!-- Sitemap Technical Snapshot (for backward compatibility) -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white">
+            <h4 class="card-title mb-0">Sitemap Technical Snapshot</h4>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="border rounded-3 p-3 h-100">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">Robots.txt</div>
+                        <div class="fw-semibold">{{ report.robots_status|default:"Not Checked" }}</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="border rounded-3 p-3 h-100">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">Sitemap.xml</div>
+                        <div class="fw-semibold">{{ report.sitemap_status|default:"Not Checked" }}</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="border rounded-3 p-3 h-100">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">Discovered Sitemap</div>
+                        <div class="fw-semibold">{{ report.discovered_sitemap|default:"None" }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Executive Summary (Phase 4 Enhanced) -->
+    {% if report.executive_summary %}
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white">
+            <h4 class="card-title mb-0">Executive Summary</h4>
+        </div>
+        <div class="card-body">
+            <div class="row g-3 mb-3">
+                <div class="col-md-3">
+                    <div class="border rounded-3 p-3 h-100">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">Overall Score</div>
+                        <div class="fw-semibold display-6">
+                            {% if report.executive_summary.overall_score is not None %}
+                                {{ report.executive_summary.overall_score }}/100
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="border rounded-3 p-3 h-100">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">Detected Content Type</div>
+                        <div class="fw-semibold">{{ report.executive_summary.detected_content_type|default:"N/A" }}</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="border rounded-3 p-3 h-100">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">Detected Industry</div>
+                        <div class="fw-semibold">{{ report.executive_summary.detected_industry|default:"N/A" }}</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="border rounded-3 p-3 h-100">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">Detected Audience</div>
+                        <div class="fw-semibold">{{ report.executive_summary.detected_audience|default:"N/A" }}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row g-3 mb-3">
+                <div class="col-md-4">
+                    <div class="border rounded-3 p-3 h-100">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">Target Keyword</div>
+                        <div class="fw-semibold">{{ report.executive_summary.target_keyword|default:"N/A" }}</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="border rounded-3 p-3 h-100">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">Topic Match</div>
+                        <div class="fw-semibold">{{ report.executive_summary.topic_match|default:"0" }}%</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="border rounded-3 p-3 h-100">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">Marketing Relevance</div>
+                        <div class="fw-semibold">{{ report.executive_summary.marketing_relevance|default:"N/A" }}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row g-3 mb-3">
+                <div class="col-md-4">
+                    <div class="border rounded-3 p-3 h-100">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">SEO Readiness</div>
+                        <div class="fw-semibold">
+                            {% if report.executive_summary.overall_seo_readiness is not None %}
+                                {{ report.executive_summary.overall_seo_readiness }}/100
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="border rounded-3 p-3 h-100">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">Marketing Readiness</div>
+                        <div class="fw-semibold">{{ report.executive_summary.overall_marketing_readiness|default:"0" }}/100</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="border rounded-3 p-3 h-100">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">Business Opportunity</div>
+                        <div class="fw-semibold">{{ report.executive_summary.business_opportunity|default:"N/A" }}</div>
+                    </div>
+                </div>
+            </div>
+
+            {% if report.executive_summary.critical_findings %}
+                <div class="border rounded-3 p-3 mb-3 border-danger">
+                    <div class="small text-uppercase text-danger fw-semibold mb-2">Critical Findings</div>
+                    <ul class="mb-0">
+                        {% for finding in report.executive_summary.critical_findings %}
+                        <li>{{ finding }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+            {% if report.executive_summary.highest_priority_actions %}
+                <div class="border rounded-3 p-3 mb-3">
+                    <div class="small text-uppercase text-muted fw-semibold mb-2">Highest Priority Actions</div>
+                    <ul class="mb-0">
+                        {% for action in report.executive_summary.highest_priority_actions %}
+                        <li>{{ action }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Content Alignment (Phase 4 Enhanced) -->
+    {% if report.content_alignment %}
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white">
+            <h4 class="card-title mb-0">Content Alignment Analysis</h4>
+        </div>
+        <div class="card-body">
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <div class="border rounded-3 p-3 h-100">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">Detected Topic</div>
+                        <div class="fw-semibold">{{ report.content_alignment.detected_topic|default:"N/A" }}</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="border rounded-3 p-3 h-100">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">Target Keyword</div>
+                        <div class="fw-semibold">{{ report.content_alignment.target_keyword|default:"N/A" }}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row g-3 mb-3">
+                <div class="col-md-2">
+                    <div class="border rounded-3 p-3">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">Topic Match</div>
+                        <div class="progress mb-1">
+                            <div class="progress-bar {% if report.content_alignment.topic_match_score > 70 %}bg-success{% elif report.content_alignment.topic_match_score > 30 %}bg-warning{% else %}bg-danger{% endif %}" 
+                                 role="progressbar" 
+                                 style="width: {{ report.content_alignment.topic_match_score }}%" 
+                                 aria-valuenow="{{ report.content_alignment.topic_match_score }}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="100"></div>
+                        </div>
+                        <div class="fw-semibold">{{ report.content_alignment.topic_match_score }}%</div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="border rounded-3 p-3">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">Semantic Match</div>
+                        <div class="progress mb-1">
+                            <div class="progress-bar {% if report.content_alignment.semantic_match_score > 70 %}bg-success{% elif report.content_alignment.semantic_match_score > 30 %}bg-warning{% else %}bg-danger{% endif %}" 
+                                 role="progressbar" 
+                                 style="width: {{ report.content_alignment.semantic_match_score }}%" 
+                                 aria-valuenow="{{ report.content_alignment.semantic_match_score }}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="100"></div>
+                        </div>
+                        <div class="fw-semibold">{{ report.content_alignment.semantic_match_score }}%</div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="border rounded-3 p-3">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">Intent Match</div>
+                        <div class="progress mb-1">
+                            <div class="progress-bar {% if report.content_alignment.intent_match_score > 70 %}bg-success{% elif report.content_alignment.intent_match_score > 30 %}bg-warning{% else %}bg-danger{% endif %}" 
+                                 role="progressbar" 
+                                 style="width: {{ report.content_alignment.intent_match_score }}%" 
+                                 aria-valuenow="{{ report.content_alignment.intent_match_score }}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="100"></div>
+                        </div>
+                        <div class="fw-semibold">{{ report.content_alignment.intent_match_score }}%</div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="border rounded-3 p-3">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">Industry Match</div>
+                        <div class="progress mb-1">
+                            <div class="progress-bar {% if report.content_alignment.industry_match_score > 70 %}bg-success{% elif report.content_alignment.industry_match_score > 30 %}bg-warning{% else %}bg-danger{% endif %}" 
+                                 role="progressbar" 
+                                 style="width: {{ report.content_alignment.industry_match_score }}%" 
+                                 aria-valuenow="{{ report.content_alignment.industry_match_score }}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="100"></div>
+                        </div>
+                        <div class="fw-semibold">{{ report.content_alignment.industry_match_score }}%</div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="border rounded-3 p-3">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">Audience Match</div>
+                        <div class="progress mb-1">
+                            <div class="progress-bar {% if report.content_alignment.audience_match_score > 70 %}bg-success{% elif report.content_alignment.audience_match_score > 30 %}bg-warning{% else %}bg-danger{% endif %}" 
+                                 role="progressbar" 
+                                 style="width: {{ report.content_alignment.audience_match_score }}%" 
+                                 aria-valuenow="{{ report.content_alignment.audience_match_score }}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="100"></div>
+                        </div>
+                        <div class="fw-semibold">{{ report.content_alignment.audience_match_score }}%</div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="border rounded-3 p-3">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">Final Alignment</div>
+                        <div class="progress mb-1">
+                            <div class="progress-bar {% if report.content_alignment.alignment_score > 70 %}bg-success{% elif report.content_alignment.alignment_score > 30 %}bg-warning{% else %}bg-danger{% endif %}" 
+                                 role="progressbar" 
+                                 style="width: {{ report.content_alignment.alignment_score }}%" 
+                                 aria-valuenow="{{ report.content_alignment.alignment_score }}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="100"></div>
+                        </div>
+                        <div class="fw-semibold">{{ report.content_alignment.alignment_score }}%</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border rounded-3 p-3 mb-3">
+                <div class="small text-uppercase text-muted fw-semibold mb-2">Marketing Relevance</div>
+                <div class="fw-semibold">{{ report.content_alignment.marketing_relevance|default:"N/A" }}</div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Google Discovery Intelligence (Phase 4 Enhanced) -->
+    {% if report.module_results and report.module_results.google_discovery %}
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white">
+            <h4 class="card-title mb-0">Google Discovery Intelligence</h4>
+        </div>
+        <div class="card-body">
+            <div class="row g-3 mb-3">
+                <div class="col-md-12">
+                    <div class="border rounded-3 p-3">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">Discovery Score</div>
+                        <div class="fw-semibold display-4">
+                            {% if report.module_results.google_discovery.score is not None %}
+                                {{ report.module_results.google_discovery.score }}/100
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            {% if report.module_results.google_discovery.analysis and report.module_results.google_discovery.analysis.stages %}
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Stage</th>
+                                <th>Status</th>
+                                <th>Explanation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for stage in report.module_results.google_discovery.analysis.stages %}
+                                <tr>
+                                    <td>{{ stage.name }}</td>
+                                    <td>
+                                        <span class="badge {% if stage.status == 'PASS' %}bg-success{% elif stage.status == 'WARNING' %}bg-warning{% else %}bg-danger{% endif %}">
+                                            {{ stage.status }}
+                                        </span>
+                                    </td>
+                                    <td>{{ stage.explanation }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Video Intelligence (Phase 4 Enhanced) -->
+    {% if report.module_results and report.module_results.video %}
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white">
+            <h4 class="card-title mb-0">Video Intelligence</h4>
+        </div>
+        <div class="card-body">
+            <div class="row g-3 mb-3">
+                <div class="col-md-3">
+                    <div class="border rounded-3 p-3 h-100">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">Videos Found</div>
+                        <div class="fw-semibold">{{ report.module_results.video.analysis.videos_found|default:"0" }}</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="border rounded-3 p-3 h-100">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">Video SEO Score</div>
+                        <div class="fw-semibold">
+                            {% if report.module_results.video.score is not None %}
+                                {{ report.module_results.video.score }}/100
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="border rounded-3 p-3 h-100">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">Video Schema</div>
+                        <div class="fw-semibold">{{ report.module_results.video.analysis.rich_result_eligible|yesno:"Present,Missing" }}</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="border rounded-3 p-3 h-100">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">Marketing Relevance</div>
+                        <div class="fw-semibold">{{ report.module_results.video.analysis.marketing_relevance|default:"N/A" }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Video Intelligence Pipeline (Single Source of Truth) -->
+    {% if report.video_context %}
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white">
+            <h4 class="card-title mb-0">Video Intelligence Pipeline (Single Source of Truth)</h4>
+        </div>
+        <div class="card-body">
+            <div class="row g-3 mb-3">
+                <div class="col-md-4">
+                    <div class="border rounded-3 p-3 h-100">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">Original URL</div>
+                        <div class="fw-semibold text-break">{{ report.video_context.original_url|default:"N/A" }}</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="border rounded-3 p-3 h-100">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">Final URL</div>
+                        <div class="fw-semibold text-break">{{ report.video_context.final_url|default:"N/A" }}</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="border rounded-3 p-3 h-100">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">Platform</div>
+                        <div class="fw-semibold">{{ report.video_context.platform|default:"N/A" }}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row g-3 mb-3">
+                <div class="col-md-4">
+                    <div class="border rounded-3 p-3 h-100">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">Video Title</div>
+                        <div class="fw-semibold text-break">{{ report.video_context.title|default:"N/A" }}</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="border rounded-3 p-3 h-100">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">Channel/Publisher</div>
+                        <div class="fw-semibold">{{ report.video_context.channel|default:report.video_context.publisher|default:"N/A" }}</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="border rounded-3 p-3 h-100">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">Detected Topic</div>
+                        <div class="fw-semibold">{{ report.video_context.topic|default:"N/A" }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+                <div class="col-md-4">
+                    <div class="border rounded-3 p-3 h-100">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">Primary Keyword</div>
+                        <div class="fw-semibold">{{ report.video_context.primary_keyword|default:"N/A" }}</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="border rounded-3 p-3 h-100">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">Industry</div>
+                        <div class="fw-semibold">{{ report.video_context.industry|default:"N/A" }}</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="border rounded-3 p-3 h-100">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">Audience</div>
+                        <div class="fw-semibold">{{ report.video_context.audience|default:"N/A" }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+                <div class="col-md-4">
+                    <div class="border rounded-3 p-3 h-100">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">Marketing Score</div>
+                        <div class="fw-semibold">{{ report.video_context.marketing_score|default:"0" }}/100</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="border rounded-3 p-3 h-100">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">Business Opportunity</div>
+                        <div class="fw-semibold">{{ report.video_context.marketing_relevance|default:"N/A" }}</div>
+                    </div>
+                </div>
+            </div>
+
+            {% if report.video_context.recommendations %}
+            <div class="border rounded-3 p-3">
+                <div class="small text-uppercase text-muted fw-semibold mb-2">Video-Specific Recommendations</div>
+                <ul class="mb-0">
+                    {% for rec in report.video_context.recommendations %}
+                    <li>{{ rec.issue }} - {{ rec.recommended_action }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Image Intelligence (Phase 4 Enhanced) -->
+    {% if report.module_results and report.module_results.image %}
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white">
+            <h4 class="card-title mb-0">Image Intelligence</h4>
+        </div>
+        <div class="card-body">
+            <div class="row g-3 mb-3">
+                <div class="col-md-3">
+                    <div class="border rounded-3 p-3 h-100">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">Images Found</div>
+                        <div class="fw-semibold">{{ report.module_results.image.analysis.images_found|default:"0" }}</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="border rounded-3 p-3 h-100">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">Image SEO Score</div>
+                        <div class="fw-semibold">
+                            {% if report.module_results.image.score is not None %}
+                                {{ report.module_results.image.score }}/100
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="border rounded-3 p-3 h-100">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">Missing Alt Text</div>
+                        <div class="fw-semibold">{{ report.module_results.image.analysis.missing_alt|length|default:"0" }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Digital Marketing Intelligence (Phase 4 Enhanced) -->
+    {% if report.module_results and report.module_results.digital_marketing %}
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white">
+            <h4 class="card-title mb-0">Digital Marketing Intelligence</h4>
+        </div>
+        <div class="card-body">
+            {% if report.module_results.digital_marketing.analysis.ai_reasoning %}
+                <div class="border rounded-3 p-3 mb-3 border-info">
+                    <div class="small text-uppercase text-info fw-semibold mb-2">AI Reasoning</div>
+                    <div class="fw-semibold">{{ report.module_results.digital_marketing.analysis.ai_reasoning }}</div>
+                </div>
+            {% endif %}
+            
+            <div class="row g-3 mb-3">
+                <div class="col-md-4">
+                    <div class="border rounded-3 p-3 h-100">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">Primary Marketing Keyword</div>
+                        <div class="fw-semibold">{{ report.module_results.digital_marketing.analysis.primary_marketing_keyword|default:"N/A" }}</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="border rounded-3 p-3 h-100">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">Marketing Score</div>
+                        <div class="fw-semibold">
+                            {% if report.module_results.digital_marketing.score is not None %}
+                                {{ report.module_results.digital_marketing.score }}/100
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row g-3 mb-3">
+                <div class="col-md-2">
+                    <div class="border rounded-3 p-3">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">Topic Match</div>
+                        <div class="progress mb-1">
+                            <div class="progress-bar {% if report.module_results.digital_marketing.analysis.topic_match_score > 70 %}bg-success{% elif report.module_results.digital_marketing.analysis.topic_match_score > 30 %}bg-warning{% else %}bg-danger{% endif %}"
+                                 role="progressbar"
+                                 style="width: {{ report.module_results.digital_marketing.analysis.topic_match_score }}%"
+                                 aria-valuenow="{{ report.module_results.digital_marketing.analysis.topic_match_score }}"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"></div>
+                        </div>
+                        <div class="fw-semibold">{{ report.module_results.digital_marketing.analysis.topic_match_score }}%</div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="border rounded-3 p-3">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">Semantic Match</div>
+                        <div class="progress mb-1">
+                            <div class="progress-bar {% if report.module_results.digital_marketing.analysis.semantic_match_score > 70 %}bg-success{% elif report.module_results.digital_marketing.analysis.semantic_match_score > 30 %}bg-warning{% else %}bg-danger{% endif %}"
+                                 role="progressbar"
+                                 style="width: {{ report.module_results.digital_marketing.analysis.semantic_match_score }}%"
+                                 aria-valuenow="{{ report.module_results.digital_marketing.analysis.semantic_match_score }}"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"></div>
+                        </div>
+                        <div class="fw-semibold">{{ report.module_results.digital_marketing.analysis.semantic_match_score }}%</div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="border rounded-3 p-3">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">Intent Match</div>
+                        <div class="progress mb-1">
+                            <div class="progress-bar {% if report.module_results.digital_marketing.analysis.intent_match_score > 70 %}bg-success{% elif report.module_results.digital_marketing.analysis.intent_match_score > 30 %}bg-warning{% else %}bg-danger{% endif %}"
+                                 role="progressbar"
+                                 style="width: {{ report.module_results.digital_marketing.analysis.intent_match_score }}%"
+                                 aria-valuenow="{{ report.module_results.digital_marketing.analysis.intent_match_score }}"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"></div>
+                        </div>
+                        <div class="fw-semibold">{{ report.module_results.digital_marketing.analysis.intent_match_score }}%</div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="border rounded-3 p-3">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">Industry Match</div>
+                        <div class="progress mb-1">
+                            <div class="progress-bar {% if report.module_results.digital_marketing.analysis.industry_match_score > 70 %}bg-success{% elif report.module_results.digital_marketing.analysis.industry_match_score > 30 %}bg-warning{% else %}bg-danger{% endif %}"
+                                 role="progressbar"
+                                 style="width: {{ report.module_results.digital_marketing.analysis.industry_match_score }}%"
+                                 aria-valuenow="{{ report.module_results.digital_marketing.analysis.industry_match_score }}"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"></div>
+                        </div>
+                        <div class="fw-semibold">{{ report.module_results.digital_marketing.analysis.industry_match_score }}%</div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="border rounded-3 p-3">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">Audience Match</div>
+                        <div class="progress mb-1">
+                            <div class="progress-bar {% if report.module_results.digital_marketing.analysis.audience_match_score > 70 %}bg-success{% elif report.module_results.digital_marketing.analysis.audience_match_score > 30 %}bg-warning{% else %}bg-danger{% endif %}"
+                                 role="progressbar"
+                                 style="width: {{ report.module_results.digital_marketing.analysis.audience_match_score }}%"
+                                 aria-valuenow="{{ report.module_results.digital_marketing.analysis.audience_match_score }}"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"></div>
+                        </div>
+                        <div class="fw-semibold">{{ report.module_results.digital_marketing.analysis.audience_match_score }}%</div>
+                    </div>
+                </div>
+            </div>
+            
+            {% if report.module_results.digital_marketing.analysis.keyword_gaps %}
+                <div class="border rounded-3 p-3 mb-3 border-warning">
+                    <div class="small text-uppercase text-warning fw-semibold mb-2">Keyword Gaps</div>
+                    <ul class="mb-0">
+                        {% for gap in report.module_results.digital_marketing.analysis.keyword_gaps %}
+                        <li>{{ gap }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            
+            {% if report.module_results.digital_marketing.analysis.content_opportunities %}
+                <div class="border rounded-3 p-3 mb-3">
+                    <div class="small text-uppercase text-muted fw-semibold mb-2">Content Opportunities</div>
+                    <ul class="mb-0">
+                        {% for opportunity in report.module_results.digital_marketing.analysis.content_opportunities %}
+                        <li>{{ opportunity }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- AI Recommendations (Phase 4 Enhanced) -->
+    {% if report.all_recommendations %}
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white">
+            <h4 class="card-title mb-0">AI Recommendations</h4>
+        </div>
+        <div class="card-body">
+            {% if report.all_recommendations.Critical %}
+                <h5 class="mb-2 mt-3 text-danger">Critical</h5>
+                <div class="list-group mb-3">
+                    {% for rec in report.all_recommendations.Critical %}
+                    <div class="list-group-item">
+                        <h6 class="mb-1">{{ rec.issue }}</h6>
+                        <p class="mb-1 small">{{ rec.explanation }}</p>
+                        <div class="row g-2 small mb-2">
+                            <div class="col-md-6">
+                                <strong>SEO Impact:</strong> {{ rec.seo_impact }}
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Business Impact:</strong> {{ rec.business_impact }}
+                            </div>
+                        </div>
+                        <div class="mb-1">
+                            <strong>Recommended Action:</strong> {{ rec.recommended_action }}
+                        </div>
+                        <div class="text-muted small">
+                            <strong>Expected Improvement:</strong> {{ rec.expected_improvement }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            
+            {% if report.all_recommendations.High %}
+                <h5 class="mb-2 mt-3 text-warning">High</h5>
+                <div class="list-group mb-3">
+                    {% for rec in report.all_recommendations.High %}
+                    <div class="list-group-item">
+                        <h6 class="mb-1">{{ rec.issue }}</h6>
+                        <p class="mb-1 small">{{ rec.explanation }}</p>
+                        <div class="row g-2 small mb-2">
+                            <div class="col-md-6">
+                                <strong>SEO Impact:</strong> {{ rec.seo_impact }}
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Business Impact:</strong> {{ rec.business_impact }}
+                            </div>
+                        </div>
+                        <div class="mb-1">
+                            <strong>Recommended Action:</strong> {{ rec.recommended_action }}
+                        </div>
+                        <div class="text-muted small">
+                            <strong>Expected Improvement:</strong> {{ rec.expected_improvement }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            
+            {% if report.all_recommendations.Medium %}
+                <h5 class="mb-2 mt-3 text-primary">Medium</h5>
+                <div class="list-group mb-3">
+                    {% for rec in report.all_recommendations.Medium %}
+                    <div class="list-group-item">
+                        <h6 class="mb-1">{{ rec.issue }}</h6>
+                        <p class="mb-1 small">{{ rec.explanation }}</p>
+                        <div class="row g-2 small mb-2">
+                            <div class="col-md-6">
+                                <strong>SEO Impact:</strong> {{ rec.seo_impact }}
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Business Impact:</strong> {{ rec.business_impact }}
+                            </div>
+                        </div>
+                        <div class="mb-1">
+                            <strong>Recommended Action:</strong> {{ rec.recommended_action }}
+                        </div>
+                        <div class="text-muted small">
+                            <strong>Expected Improvement:</strong> {{ rec.expected_improvement }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            
+            {% if report.all_recommendations.Low %}
+                <h5 class="mb-2 mt-3 text-success">Low</h5>
+                <div class="list-group mb-3">
+                    {% for rec in report.all_recommendations.Low %}
+                    <div class="list-group-item">
+                        <h6 class="mb-1">{{ rec.issue }}</h6>
+                        <p class="mb-1 small">{{ rec.explanation }}</p>
+                        <div class="row g-2 small mb-2">
+                            <div class="col-md-6">
+                                <strong>SEO Impact:</strong> {{ rec.seo_impact }}
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Business Impact:</strong> {{ rec.business_impact }}
+                            </div>
+                        </div>
+                        <div class="mb-1">
+                            <strong>Recommended Action:</strong> {{ rec.recommended_action }}
+                        </div>
+                        <div class="text-muted small">
+                            <strong>Expected Improvement:</strong> {{ rec.expected_improvement }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            
+            {% if not report.all_recommendations.Critical and not report.all_recommendations.High and not report.all_recommendations.Medium and not report.all_recommendations.Low %}
+            <p class="text-muted mb-0">No recommendations at this time.</p>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+    {% endif %}
+</div>
+{% endblock %}

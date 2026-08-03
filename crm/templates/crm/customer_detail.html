@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+{% load static i18n %}
+
+{% block title %}{{ customer.name }} | {% trans "CRM Details" %}{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'crm:dashboard' %}">CRM</a></li>
+<li class="breadcrumb-item"><a href="{% url 'crm:customer_list' %}">Directory</a></li>
+<li class="breadcrumb-item active">Detail</li>
+{% endblock %}
+
+{% block page_title %}{{ customer.name }}{% endblock %}
+{% block page_subtitle %}{% trans "Deep-dive intelligence and history for this enterprise record." %}{% endblock %}
+
+{% block page_actions %}
+<div class="d-flex gap-2">
+    <button class="btn btn-outline-secondary">
+        <i data-lucide="edit-3"></i>
+        <span>Edit Profile</span>
+    </button>
+    <div class="dropdown">
+        <button class="btn btn-primary" data-bs-toggle="dropdown">
+            <i data-lucide="zap"></i>
+            <span>Actions</span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 p-2 rounded-4">
+            <li><a class="dropdown-item rounded-3 py-2" href="#"><i data-lucide="mail" class="me-2" style="width: 16px;"></i> Send Email</a></li>
+            <li><a class="dropdown-item rounded-3 py-2" href="#"><i data-lucide="phone" class="me-2" style="width: 16px;"></i> Log Call</a></li>
+            <li><hr class="dropdown-divider opacity-50"></li>
+            <li><a class="dropdown-item rounded-3 py-2 text-danger" href="#"><i data-lucide="trash-2" class="me-2" style="width: 16px;"></i> Delete Record</a></li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="row g-5">
+    <!-- Left Column: Details & Projects -->
+    <div class="col-lg-4">
+        <div class="card mb-5">
+            <div class="card-header bg-white p-4 border-bottom">
+                <h6 class="fw-bold mb-0">Customer Intelligence</h6>
+            </div>
+            <div class="card-body p-4">
+                <div class="mb-4">
+                    <label class="text-muted small fw-600 uppercase mb-1 d-block" style="letter-spacing: 0.05em;">Lifecycle Stage</label>
+                    <span class="badge {% if customer.lifecycle_stage == 'ACTIVE_CLIENT' %}bg-success-subtle text-success{% elif customer.lifecycle_stage == 'LEAD' %}bg-primary-subtle text-primary{% else %}bg-slate-100 text-slate-600{% endif %} px-3 py-2">
+                        {{ customer.get_lifecycle_stage_display }}
+                    </span>
+                </div>
+
+                <div class="vstack gap-4">
+                    <div class="d-flex gap-3">
+                        <div class="p-2 rounded-3 bg-slate-50 text-slate-500"><i data-lucide="mail" style="width: 18px;"></i></div>
+                        <div>
+                            <div class="small text-muted">Email Address</div>
+                            <div class="fw-bold text-slate-900">{{ customer.email }}</div>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-3">
+                        <div class="p-2 rounded-3 bg-slate-50 text-slate-500"><i data-lucide="phone" style="width: 18px;"></i></div>
+                        <div>
+                            <div class="small text-muted">Phone Number</div>
+                            <div class="fw-bold text-slate-900">{{ customer.phone|default:"Not provided" }}</div>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-3">
+                        <div class="p-2 rounded-3 bg-slate-50 text-slate-500"><i data-lucide="building-2" style="width: 18px;"></i></div>
+                        <div>
+                            <div class="small text-muted">Organization</div>
+                            <div class="fw-bold text-slate-900">{{ customer.company_name|default:"Individual" }}</div>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-3">
+                        <div class="p-2 rounded-3 bg-slate-50 text-slate-500"><i data-lucide="user-check" style="width: 18px;"></i></div>
+                        <div>
+                            <div class="small text-muted">Account Owner</div>
+                            <div class="fw-bold text-slate-900">{{ customer.assigned_to.get_full_name|default:"Unassigned" }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header bg-white p-4 border-bottom d-flex justify-content-between align-items-center">
+                <h6 class="fw-bold mb-0">Linked Projects</h6>
+                <span class="badge bg-slate-100 text-slate-600">{{ projects.count }}</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    {% for project in projects %}
+                    <a href="{% url 'projects:admin_project_detail' project.id %}" class="list-group-item list-group-item-action p-4 border-0 border-bottom">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="fw-bold text-slate-900">{{ project.title }}</span>
+                            <i data-lucide="chevron-right" style="width: 14px; color: var(--slate-300);"></i>
+                        </div>
+                        <div class="badge bg-primary-subtle text-primary small" style="font-size: 10px;">{{ project.current_status }}</div>
+                    </a>
+                    {% empty %}
+                    <div class="p-5 text-center">
+                        <p class="text-muted small mb-0">No active projects</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Interaction Log & Timeline -->
+    <div class="col-lg-8">
+        <!-- Quick Log -->
+        <div class="card mb-5 border-primary border-opacity-10 shadow-sm">
+            <div class="card-body p-4">
+                <h6 class="fw-bold text-slate-900 mb-4">Quick Interaction Log</h6>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <input type="text" name="summary" class="form-control border-slate-200 p-3 rounded-3" placeholder="Log summary (e.g., Q2 Strategy Call)" required>
+                    </div>
+                    <div class="mb-4">
+                        <textarea name="details" class="form-control border-slate-200 p-3 rounded-3" rows="3" placeholder="Detailed notes..."></textarea>
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i data-lucide="save"></i>
+                            <span>Save Entry</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- History Tabs -->
+        <div class="card">
+            <div class="card-header bg-white p-0 border-bottom">
+                <ul class="nav nav-pills p-2" id="crmTabs" role="tablist">
+                    <li class="nav-item flex-grow-1" role="presentation">
+                        <button class="nav-link active w-100 fw-bold small py-3" id="interactions-tab" data-bs-toggle="tab" data-bs-target="#interactions" type="button">Engagement History</button>
+                    </li>
+                    <li class="nav-item flex-grow-1" role="presentation">
+                        <button class="nav-link w-100 fw-bold small py-3" id="requests-tab" data-bs-toggle="tab" data-bs-target="#requests" type="button">Service Pipeline</button>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="card-body p-0">
+                <div class="tab-content" id="crmTabsContent">
+                    <!-- Interactions -->
+                    <div class="tab-pane fade show active" id="interactions" role="tabpanel">
+                        {% for interaction in interactions %}
+                        <div class="p-4 border-bottom hover-bg-slate-50 transition-colors">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div class="d-flex gap-3 align-items-center">
+                                    <div class="p-2 rounded-circle bg-slate-100 text-slate-500">
+                                        <i data-lucide="{% if interaction.interaction_type == 'EMAIL' %}mail{% elif interaction.interaction_type == 'CALL' %}phone{% else %}message-square{% endif %}" style="width: 16px;"></i>
+                                    </div>
+                                    <h6 class="fw-bold text-slate-900 mb-0">{{ interaction.summary }}</h6>
+                                </div>
+                                <span class="text-slate-400 small">{{ interaction.date|date:"M d, H:i" }}</span>
+                            </div>
+                            <p class="text-slate-600 small mb-3 ps-5">{{ interaction.details|linebreaksbr }}</p>
+                            <div class="d-flex align-items-center gap-2 ps-5">
+                                <span class="badge bg-slate-100 text-slate-500">{{ interaction.get_interaction_type_display }}</span>
+                                <span class="text-slate-300">/</span>
+                                <span class="text-muted small">Log by {{ interaction.agent.get_full_name|default:interaction.agent.username }}</span>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="p-5 text-center text-muted">
+                            <i data-lucide="history" class="mb-3 opacity-25" style="width: 40px; height: 40px;"></i>
+                            <p class="small">No interactions recorded yet.</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Service Requests -->
+                    <div class="tab-pane fade" id="requests" role="tabpanel">
+                        {% for req in service_requests %}
+                        <div class="p-4 border-bottom">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h6 class="fw-bold text-slate-900 mb-0">{{ req.service_type }}</h6>
+                                <span class="badge bg-info-subtle text-info">{{ req.get_status_display }}</span>
+                            </div>
+                            <p class="text-slate-600 small mb-3">{{ req.description }}</p>
+                            <div class="text-slate-400 small">Requested on {{ req.created_at|date:"M d, Y" }}</div>
+                        </div>
+                        {% empty %}
+                        <div class="p-5 text-center text-muted">
+                            <p class="small">No service requests found.</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .nav-pills .nav-link {
+        color: var(--slate-500);
+        border-radius: var(--radius-md);
+        border: 1px solid transparent;
+    }
+    .nav-pills .nav-link.active {
+        background-color: var(--slate-50);
+        color: var(--primary);
+        border-color: var(--primary-subtle);
+    }
+    .hover-bg-slate-50:hover {
+        background-color: var(--slate-50);
+    }
+</style>
+{% endblock %}

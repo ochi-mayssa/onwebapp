@@ -1,0 +1,130 @@
+{% extends 'branding/base.html' %}
+{% load branding_extras %}
+
+{% block title %}Smart Suggest · {{ questionnaire.title }}{% endblock %}
+
+{% block branding_content %}
+<div class="detail-page">
+    <div class="container py-4 py-lg-5" style="max-width: 960px;">
+
+        <div class="d-flex align-items-center gap-2 mb-4">
+            <a href="{% url 'branding:questionnaire_detail' pk=questionnaire.pk %}" class="btn btn-back btn-sm"><i class="fa-solid fa-arrow-left me-1"></i>Back</a>
+            <div>
+                <h1 class="fw-800 mb-0"><i class="fa-solid fa-wand-magic-sparkles me-2 text-primary"></i>Smart Suggest</h1>
+                <p class="text-muted mb-0">{{ questionnaire.title }} · {{ request_obj.request_number }}</p>
+            </div>
+        </div>
+
+        <div class="detail-card rounded-4 p-4 mb-4">
+            <h6 class="fw-800 mb-3"><i class="fa-solid fa-sliders me-2 text-primary"></i>Suggestion Criteria</h6>
+            <form method="post" action="" novalidate>
+                {% csrf_token %}
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label fw-700 small" for="industry">Industry</label>
+                        <select name="industry" id="industry" class="form-select">
+                            <option value="">Select industry...</option>
+                            {% for value, label in form.fields.industry.choices %}
+                            <option value="{{ value }}" {% if form.industry.value == value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-700 small" for="collection">Collection Phase</label>
+                        <select name="collection" id="collection" class="form-select">
+                            <option value="">Select phase...</option>
+                            {% for value, label in form.fields.collection.choices %}
+                            <option value="{{ value }}" {% if form.collection.value == value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-700 small" for="phase">Project Phase</label>
+                        <select name="phase" id="phase" class="form-select">
+                            <option value="">Select phase...</option>
+                            {% for value, label in form.fields.phase.choices %}
+                            <option value="{{ value }}" {% if form.phase.value == value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-12 text-end">
+                        <button type="submit" class="btn btn-brand-primary px-4">
+                            <i class="fa-solid fa-wand-magic-sparkles me-2"></i>Get Suggestions
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        {% if suggestions %}
+        <div class="mb-4">
+            <h6 class="fw-800 mb-3"><i class="fa-solid fa-lightbulb me-2 text-primary"></i>Suggested Questions</h6>
+            <p class="text-muted small mb-3">Click "Add to Questionnaire" to include any suggested question.</p>
+
+            <div class="d-flex flex-column gap-3">
+                {% for suggestion in suggestions %}
+                <div class="detail-card rounded-4 p-4">
+                    <div class="d-flex align-items-start justify-content-between flex-wrap gap-3">
+                        <div class="flex-grow-1 min-width-0">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <span class="badge rounded-pill x-small status-pill status-{{ suggestion.question_type|lower }}">{{ suggestion.question_type_display|default:suggestion.question_type }}</span>
+                                {% if suggestion.category %}
+                                <span class="badge bg-light text-dark rounded-pill x-small">{{ suggestion.category }}</span>
+                                {% endif %}
+                                {% if suggestion.importance %}
+                                <span class="badge rounded-pill x-small
+                                    {% if suggestion.importance == 'CRITICAL' %}bg-danger-subtle text-danger
+                                    {% elif suggestion.importance == 'HIGH' %}bg-warning-subtle text-warning
+                                    {% elif suggestion.importance == 'MEDIUM' %}bg-info-subtle text-info
+                                    {% else %}bg-secondary-subtle text-secondary{% endif %}">
+                                    {{ suggestion.importance }}
+                                </span>
+                                {% endif %}
+                            </div>
+                            <p class="fw-700 mb-1">{{ suggestion.text }}</p>
+                            {% if suggestion.description %}
+                            <p class="text-muted small mb-0">{{ suggestion.description }}</p>
+                            {% endif %}
+                            {% if suggestion.options %}
+                            <div class="d-flex flex-wrap gap-1 mt-2">
+                                {% for opt in suggestion.options %}
+                                <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill x-small">{{ opt }}</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="flex-shrink-0">
+                            <form method="post" action="{% url 'branding:questionnaire_add_question' pk=questionnaire.pk %}" class="d-inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="text" value="{{ suggestion.text }}">
+                                <input type="hidden" name="question_type" value="{{ suggestion.question_type }}">
+                                <input type="hidden" name="category" value="{{ suggestion.category|default:'' }}">
+                                <input type="hidden" name="importance" value="{{ suggestion.importance|default:'MEDIUM' }}">
+                                {% if suggestion.description %}
+                                <input type="hidden" name="description" value="{{ suggestion.description }}">
+                                {% endif %}
+                                <button type="submit" class="btn btn-brand-primary btn-sm">
+                                    <i class="fa-solid fa-plus me-1"></i>Add to Questionnaire
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% else %}
+        <div class="detail-card rounded-4 p-5 text-center">
+            <div class="empty-state-icon mb-3" style="font-size: 4rem; color: var(--bs-primary); opacity: .3;">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+            </div>
+            <h4 class="fw-800 mb-2">No Suggestions Yet</h4>
+            <p class="text-muted mb-0" style="max-width: 480px; margin: 0 auto;">
+                Select your industry and project phase above to get smart question suggestions tailored to your project.
+            </p>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

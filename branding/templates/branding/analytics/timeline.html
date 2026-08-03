@@ -1,0 +1,125 @@
+{% extends "branding/analytics/base.html" %}
+
+{% block analytics_content %}
+<!-- Summary KPIs -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="bg-primary bg-opacity-10 rounded-3 p-3"><i class="fa-solid fa-folder-open text-primary fa-lg"></i></div>
+                <div>
+                    <div class="text-muted small">Total Requests</div>
+                    <h4 class="fw-800 mb-0">{{ overview.total_requests }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="bg-success bg-opacity-10 rounded-3 p-3"><i class="fa-solid fa-comments text-success fa-lg"></i></div>
+                <div>
+                    <div class="text-muted small">Messages</div>
+                    <h4 class="fw-800 mb-0">{{ overview.total_messages }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="bg-info bg-opacity-10 rounded-3 p-3"><i class="fa-solid fa-cloud-arrow-up text-info fa-lg"></i></div>
+                <div>
+                    <div class="text-muted small">Uploads</div>
+                    <h4 class="fw-800 mb-0">{{ overview.total_uploads }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Monthly Trend Chart -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-transparent border-0 pt-3">
+        <h6 class="fw-800 mb-0"><i class="fa-solid fa-chart-area me-2 text-primary"></i>Monthly Trends</h6>
+    </div>
+    <div class="card-body">
+        <canvas id="monthlyChart" height="320"></canvas>
+    </div>
+</div>
+
+<!-- Satisfaction Trend -->
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-transparent border-0 pt-3">
+        <h6 class="fw-800 mb-0"><i class="fa-solid fa-star me-2 text-primary"></i>Satisfaction Over Time</h6>
+    </div>
+    <div class="card-body">
+        <canvas id="satisfactionChart" height="240"></canvas>
+    </div>
+</div>
+{% endblock %}
+
+{% block chart_js %}
+<script>
+const timeline = {{ timeline|safe }};
+
+// Monthly Trends — Area Chart
+new Chart(document.getElementById('monthlyChart'), {
+    type: 'line',
+    data: {
+        labels: timeline.labels,
+        datasets: [{
+            label: 'New Requests',
+            data: timeline.new,
+            borderColor: BRAND_PRIMARY,
+            backgroundColor: BRAND_PRIMARY + '15',
+            fill: true,
+            tension: 0.4,
+            pointRadius: 4,
+            pointBackgroundColor: BRAND_PRIMARY,
+        }, {
+            label: 'Completed',
+            data: timeline.completed,
+            borderColor: BRAND_SUCCESS,
+            backgroundColor: BRAND_SUCCESS + '15',
+            fill: true,
+            tension: 0.4,
+            pointRadius: 4,
+            pointBackgroundColor: BRAND_SUCCESS,
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: 'top' } },
+        scales: {
+            y: { beginAtZero: true, ticks: { stepSize: 1 } },
+            x: { grid: { display: false } }
+        }
+    }
+});
+
+// Satisfaction Trend
+new Chart(document.getElementById('satisfactionChart'), {
+    type: 'bar',
+    data: {
+        labels: timeline.labels,
+        datasets: [{
+            label: 'Avg Satisfaction',
+            data: timeline.satisfaction,
+            backgroundColor: BRAND_WARNING,
+            borderRadius: 6,
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+            y: { beginAtZero: true, max: 5, ticks: { stepSize: 1 } },
+            x: { grid: { display: false } }
+        }
+    }
+});
+</script>
+{% endblock %}

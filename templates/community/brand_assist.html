@@ -1,0 +1,239 @@
+{% extends "community/base_community.html" %}
+{% load static i18n %}
+
+{% block title %}Brand Assist | OnWebApp Community{% endblock %}
+
+{% block community_content %}
+<div class="container py-5">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-5">
+        <div>
+            <span class="badge bg-success-soft text-success rounded-pill px-3 py-1 fw-700 mb-2">Community Tool</span>
+            <h1 class="fw-800 mb-1">Brand Assist</h1>
+            <p class="text-secondary mb-0">Define your brand identity and generate a complete brand kit.</p>
+        </div>
+        <div class="d-flex gap-2 align-items-center">
+            {% if is_staff and clients %}
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary rounded-pill px-4 fw-700 dropdown-toggle" data-bs-toggle="dropdown">
+                    <i class="fas fa-user me-1"></i> {{ selected_client.get_full_name|default:selected_client.username }}
+                </button>
+                <ul class="dropdown-menu shadow-sm border-0 rounded-4 p-2" style="max-height: 300px; overflow-y: auto;">
+                    {% for c in clients %}
+                    <li>
+                        <a class="dropdown-item rounded-3 py-2 fw-600 {% if selected_client.id == c.id %}active{% endif %}" href="?client={{ c.id }}">
+                            <span class="d-inline-block rounded-circle me-2 bg-surface-secondary" style="width: 8px; height: 8px;"></span>
+                            {{ c.get_full_name|default:c.username }}
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            {% if profiles %}
+            <div class="dropdown">
+                <button class="btn btn-outline-primary rounded-pill px-4 fw-700 dropdown-toggle" data-bs-toggle="dropdown">
+                    <i class="fas fa-bookmark me-1"></i> Saved Profiles
+                </button>
+                <ul class="dropdown-menu shadow-sm border-0 rounded-4 p-2">
+                    {% for p in profiles %}
+                    <li>
+                        <a class="dropdown-item rounded-3 py-2 fw-600 {% if active_profile.id == p.id %}active{% endif %}" href="?profile={{ p.id }}{% if is_staff and selected_client %}&client={{ selected_client.id }}{% endif %}">
+                            <span class="d-inline-block rounded-circle me-2" style="width: 12px; height: 12px; background: {{ p.primary_color }};"></span>
+                            {{ p.name }}
+                        </a>
+                    </li>
+                    {% endfor %}
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item rounded-3 py-2 fw-600" href="{% url 'community:brand_assist' %}{% if is_staff and selected_client %}?client={{ selected_client.id }}{% endif %}"><i class="fas fa-plus me-2"></i>New Profile</a></li>
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if is_staff and selected_client %}
+    <div class="alert alert-info border-0 rounded-4 py-3 mb-4 d-flex align-items-center gap-3">
+        <i class="fas fa-pen-fancy text-info"></i>
+        <span class="fw-600">Designing brand for <strong>{{ selected_client.get_full_name|default:selected_client.username }}</strong></span>
+        <a href="{% url 'community:brand_assist' %}" class="ms-auto btn btn-sm btn-outline-info rounded-pill px-3 fw-700">My Brands</a>
+    </div>
+    {% endif %}
+
+    <div class="row g-4">
+        <!-- Form Panel -->
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-0 p-4 pb-0">
+                    <h5 class="fw-800 mb-0">
+                        {% if active_profile %}<i class="fas fa-pen text-primary me-2"></i>{% if is_staff %}Edit{% else %}Edit{% endif %} Profile{% else %}<i class="fas fa-plus-circle text-primary me-2"></i>New Profile{% endif %}
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post">
+                        {% csrf_token %}
+                        {% if is_staff and selected_client %}
+                        <input type="hidden" name="client_user" value="{{ selected_client.id }}">
+                        {% endif %}
+                        {% if active_profile %}
+                        <input type="hidden" name="profile_id" value="{{ active_profile.id }}">
+                        {% endif %}
+
+                        {% for field in form %}
+                        <div class="mb-3">
+                            <label class="form-label fw-700 small">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                            <div class="text-danger small fw-600 mt-1">{{ field.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary flex-grow-1 rounded-pill py-2 fw-800">
+                                <i class="fas fa-wand-magic-sparkles me-2"></i>{% if active_profile %}Update & Regenerate{% else %}Generate Brand Kit{% endif %}
+                            </button>
+                            {% if active_profile %}
+                            <button type="submit" name="delete" value="{{ active_profile.id }}" class="btn btn-outline-danger rounded-pill px-4 fw-700" onclick="return confirm('Delete this brand profile?')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            {% endif %}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Brand Kit Preview -->
+        <div class="col-lg-7">
+            {% if active_profile and active_profile.generated_palette %}
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-transparent border-0 p-4 pb-0 d-flex justify-content-between align-items-center">
+                    <h5 class="fw-800 mb-0"><i class="fas fa-palette text-primary me-2"></i>{{ active_profile.name }}</h5>
+                    <span class="small text-secondary fw-600">{{ active_profile.updated_at|date:"M d, Y" }}</span>
+                </div>
+                <div class="card-body p-4">
+
+                    <!-- Tagline -->
+                    {% if active_profile.tagline %}
+                    <div class="mb-4 p-3 rounded-4 bg-surface-secondary">
+                        <small class="text-secondary fw-700 uppercase tracking-widest x-small">Tagline</small>
+                        <p class="fw-700 mb-0 mt-1" style="font-size: 1.1rem;">{{ active_profile.tagline }}</p>
+                    </div>
+                    {% endif %}
+
+                    <!-- Color Palette -->
+                    <h6 class="fw-700 mb-3">Color Palette</h6>
+                    <div class="row g-2 mb-4">
+                        {% with palette=active_profile.generated_palette %}
+                        <div class="col-4 col-md-2">
+                            <div class="rounded-3 mb-1" style="height: 60px; background: {{ palette.primary }}; border: 2px solid var(--border-color);"></div>
+                            <span class="x-small text-secondary fw-600 d-block text-truncate">Primary</span>
+                            <span class="x-small text-secondary">{{ palette.primary }}</span>
+                        </div>
+                        <div class="col-4 col-md-2">
+                            <div class="rounded-3 mb-1" style="height: 60px; background: {{ palette.secondary }}; border: 2px solid var(--border-color);"></div>
+                            <span class="x-small text-secondary fw-600 d-block text-truncate">Secondary</span>
+                            <span class="x-small text-secondary">{{ palette.secondary }}</span>
+                        </div>
+                        <div class="col-4 col-md-2">
+                            <div class="rounded-3 mb-1" style="height: 60px; background: {{ palette.accent }}; border: 2px solid var(--border-color);"></div>
+                            <span class="x-small text-secondary fw-600 d-block text-truncate">Accent</span>
+                            <span class="x-small text-secondary">{{ palette.accent }}</span>
+                        </div>
+                        <div class="col-4 col-md-2">
+                            <div class="rounded-3 mb-1" style="height: 60px; background: {{ palette.background }}; border: 2px solid var(--border-color);"></div>
+                            <span class="x-small text-secondary fw-600 d-block text-truncate">Background</span>
+                            <span class="x-small text-secondary">{{ palette.background }}</span>
+                        </div>
+                        <div class="col-4 col-md-2">
+                            <div class="rounded-3 mb-1" style="height: 60px; background: {{ palette.text }}; border: 2px solid var(--border-color);"></div>
+                            <span class="x-small text-secondary fw-600 d-block text-truncate">Text</span>
+                            <span class="x-small text-secondary">{{ palette.text }}</span>
+                        </div>
+                        <div class="col-4 col-md-2">
+                            <div class="rounded-3 mb-1" style="height: 60px; background: {{ palette.muted }}; border: 2px solid var(--border-color);"></div>
+                            <span class="x-small text-secondary fw-600 d-block text-truncate">Muted</span>
+                            <span class="x-small text-secondary">{{ palette.muted }}</span>
+                        </div>
+                        {% endwith %}
+                    </div>
+
+                    <!-- Typography -->
+                    <h6 class="fw-700 mb-3">Typography</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="p-3 rounded-4 bg-surface-secondary">
+                                <small class="text-secondary fw-700 uppercase tracking-widest x-small">Headings</small>
+                                <p class="fw-800 mb-0 mt-1" style="font-size: 1.3rem;">{{ active_profile.generated_typography.headings }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 rounded-4 bg-surface-secondary">
+                                <small class="text-secondary fw-700 uppercase tracking-widest x-small">Body</small>
+                                <p class="mb-0 mt-1" style="font-size: 1rem;">{{ active_profile.generated_typography.body }}</p>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="p-3 rounded-4 bg-surface-secondary">
+                                <small class="text-secondary fw-700 uppercase tracking-widest x-small">Style</small>
+                                <p class="fw-600 mb-0 mt-1">{{ active_profile.generated_typography.style }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Brand Voice -->
+                    <h6 class="fw-700 mb-3">Brand Voice</h6>
+                    <div class="mb-4">
+                        {% for example in active_profile.generated_voice_examples %}
+                        <div class="p-3 rounded-4 bg-surface-secondary mb-2">
+                            <i class="fas fa-quote-left text-primary opacity-50 me-2"></i>
+                            <span class="fw-600">{{ example }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Logo Description -->
+                    {% if active_profile.logo_description %}
+                    <h6 class="fw-700 mb-3">Logo Direction</h6>
+                    <div class="p-3 rounded-4 bg-surface-secondary">
+                        <p class="fw-600 mb-0">{{ active_profile.logo_description }}</p>
+                    </div>
+                    {% endif %}
+
+                    <!-- Personality & Voice Tags -->
+                    <div class="d-flex gap-2 flex-wrap mt-4">
+                        <span class="badge rounded-pill px-3 py-2 fw-700 bg-primary-soft text-primary border border-primary">
+                            <i class="fas fa-brain me-1"></i> {{ active_profile.get_personality_display }}
+                        </span>
+                        <span class="badge rounded-pill px-3 py-2 fw-700 bg-success-soft text-success border border-success">
+                            <i class="fas fa-volume-up me-1"></i> {{ active_profile.get_brand_voice_display }}
+                        </span>
+                        {% if active_profile.industry %}
+                        <span class="badge rounded-pill px-3 py-2 fw-700 bg-surface-secondary text-secondary border">
+                            <i class="fas fa-building me-1"></i> {{ active_profile.industry }}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-5 text-center">
+                    <div class="p-4 rounded-circle bg-surface-secondary d-inline-flex mb-4">
+                        <i class="fas fa-palette text-secondary opacity-50" style="font-size: 2.5rem;"></i>
+                    </div>
+                    <h4 class="fw-800 text-secondary">No Brand Kit Yet</h4>
+                    <p class="text-secondary mb-0">Fill out the form and click "Generate Brand Kit" to see your brand identity preview here.</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .uppercase { text-transform: uppercase; }
+    .tracking-widest { letter-spacing: 0.05em; }
+    input[type="color"] { cursor: pointer; }
+</style>
+{% endblock %}

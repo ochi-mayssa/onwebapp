@@ -1,0 +1,122 @@
+{% extends 'services/futuristic_service_base.html' %}
+{% load static %}
+
+{% block service_content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card border-0 rounded-4 holographic-card mb-4 animate-on-scroll slide-up">
+            <div class="card-body p-4">
+                <h5 class="card-title mb-4 text-cyan neon-text">Company Benchmark</h5>
+                <form method="post" id="benchmark-form">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label text-light">Company</label>
+                        {{ form.company }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-light">Email Address</label>
+                        {{ form.email }}
+                        <div class="form-text text-cyan opacity-75">Optional: We'll email the results to you.</div>
+                    </div>
+                    <button type="submit" class="btn holographic-btn w-100" id="benchmark-btn">
+                        <span class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true" id="submit-spinner"></span>
+                        Get Snapshot
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        {% if result %}
+        <div class="card border-0 rounded-4 holographic-card mb-4 animate-on-scroll slide-up" style="animation-delay: 0.1s;">
+            <div class="card-body p-4">
+                <h5 class="card-title mb-4 text-cyan neon-text">Benchmark Results: {{ result.company }}</h5>
+                
+                <div class="row g-4 mb-4">
+                    <div class="col-md-6">
+                        <div class="p-3 border border-cyan border-opacity-25 rounded-3 bg-black bg-opacity-25">
+                            <h6 class="text-cyan mb-2">Market Share</h6>
+                            <div class="display-6 text-white">{{ result.market_share }}%</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 border border-purple border-opacity-25 rounded-3 bg-black bg-opacity-25">
+                            <h6 class="text-purple mb-2">Growth Rate</h6>
+                            <div class="display-6 text-white">{{ result.growth_rate }}%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-container position-relative" style="height:300px;">
+                    <canvas id="benchmarkChart"></canvas>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add cyber-input class to form fields
+        document.querySelectorAll('input, select, textarea').forEach(el => {
+            el.classList.add('form-control', 'cyber-input', 'bg-transparent', 'text-light');
+        });
+
+        // Form handling
+        const form = document.getElementById('benchmark-form');
+        if(form) {
+            form.addEventListener('submit', function() {
+                const btn = document.getElementById('benchmark-btn');
+                const spinner = document.getElementById('submit-spinner');
+                btn.disabled = true;
+                spinner.classList.remove('d-none');
+            });
+        }
+
+        {% if result %}
+        // Chart
+        const ctx = document.getElementById('benchmarkChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: ['SEO', 'Social', 'Content', 'Paid Ads', 'Email', 'Brand'],
+                datasets: [{
+                    label: '{{ result.company }}',
+                    data: {{ result.scores|safe }},
+                    backgroundColor: 'rgba(6, 182, 212, 0.2)',
+                    borderColor: '#06b6d4',
+                    pointBackgroundColor: '#06b6d4',
+                    pointBorderColor: '#fff',
+                    borderWidth: 2
+                },
+                {
+                    label: 'Industry Avg',
+                    data: [65, 59, 70, 61, 56, 55],
+                    backgroundColor: 'rgba(139, 92, 246, 0.2)',
+                    borderColor: '#8b5cf6',
+                    pointBackgroundColor: '#8b5cf6',
+                    pointBorderColor: '#fff',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                        pointLabels: { color: '#e2e8f0' },
+                        ticks: { backdropColor: 'transparent', color: 'rgba(255, 255, 255, 0.5)' }
+                    }
+                },
+                plugins: {
+                    legend: { labels: { color: '#e2e8f0' } }
+                }
+            }
+        });
+        {% endif %}
+    });
+</script>
+{% endblock %}

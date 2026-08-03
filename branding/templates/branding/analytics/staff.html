@@ -1,0 +1,99 @@
+{% extends "branding/analytics/base.html" %}
+
+{% block analytics_content %}
+<!-- Staff Workload Chart -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-transparent border-0 pt-3">
+        <h6 class="fw-800 mb-0"><i class="fa-solid fa-users me-2 text-primary"></i>Staff Workload Comparison</h6>
+    </div>
+    <div class="card-body">
+        <canvas id="staffChart" height="300"></canvas>
+    </div>
+</div>
+
+<!-- Staff Table -->
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-transparent border-0 pt-3">
+        <h6 class="fw-800 mb-0"><i class="fa-solid fa-table me-2 text-primary"></i>Performance Details</h6>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-3">Staff Member</th>
+                        <th class="text-center">Assigned</th>
+                        <th class="text-center">In Progress</th>
+                        <th class="text-center">Completed</th>
+                        <th class="text-center">Messages</th>
+                        <th class="text-center pe-3">Efficiency</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for m in staff_metrics %}
+                    <tr>
+                        <td class="ps-3">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="avatar-sm bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-700" style="width:36px;height:36px;font-size:14px;">
+                                    {{ m.user.first_name|first|default:m.user.username|first|upper }}
+                                </div>
+                                <div>
+                                    <div class="fw-700">{{ m.user.get_full_name|default:m.user.username }}</div>
+                                    <div class="text-muted small">{{ m.user.email }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-center">{{ m.assigned }}</td>
+                        <td class="text-center"><span class="badge bg-warning text-dark">{{ m.in_progress }}</span></td>
+                        <td class="text-center"><span class="badge bg-success">{{ m.completed }}</span></td>
+                        <td class="text-center">{{ m.messages }}</td>
+                        <td class="text-center pe-3">
+                            {% widthratio m.completed m.assigned 100 as eff %}
+                            <div class="progress" style="height:8px; width:80px;">
+                                <div class="progress-bar bg-primary" style="width:{% if m.assigned %}{% widthratio m.completed m.assigned 100 %}{% else %}0{% endif %}%"></div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="text-center text-muted py-4">No staff data for this period.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block chart_js %}
+<script>
+const chartData = {{ chart_data|safe }};
+new Chart(document.getElementById('staffChart'), {
+    type: 'bar',
+    data: {
+        labels: chartData.labels,
+        datasets: [{
+            label: 'Assigned',
+            data: chartData.assigned,
+            backgroundColor: BRAND_INFO,
+            borderRadius: 4,
+        }, {
+            label: 'Completed',
+            data: chartData.completed,
+            backgroundColor: BRAND_SUCCESS,
+            borderRadius: 4,
+        }, {
+            label: 'Messages',
+            data: chartData.messages,
+            backgroundColor: BRAND_PURPLE + '80',
+            borderRadius: 4,
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: 'top' } },
+        scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,1323 @@
+{% extends 'branding/base.html' %}
+{% load branding_extras %}
+
+{% block title %}{{ branding_request.request_number }} · {{ branding_request.company_name }}{% endblock %}
+
+{% block branding_content %}
+<div class="detail-page">
+
+    <!-- Hero Header -->
+    <div class="rd-hero">
+        <div class="container py-4 py-lg-5">
+            <div class="d-flex align-items-start justify-content-between flex-wrap gap-3">
+                <div>
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <a href="{% url 'branding:dashboard' %}" class="btn btn-sm" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.25);backdrop-filter:blur(4px);"><i class="fa-solid fa-arrow-left me-1"></i>Dashboard</a>
+                        <span class="rd-hero-num">{{ branding_request.request_number }}</span>
+                        <span class="rd-hero-status">{{ branding_request.get_status_display }}</span>
+                    </div>
+                    <h1 class="rd-hero-title">{{ branding_request.company_name }}</h1>
+                    <div class="rd-hero-meta">
+                        <span><i class="fa-solid fa-industry me-1"></i>{{ branding_request.get_industry_display }}</span>
+                        <span><i class="fa-solid fa-user me-1"></i>{{ branding_request.user.get_full_name|default:branding_request.user.username }}</span>
+                        <span><i class="fa-solid fa-calendar me-1"></i>{{ branding_request.created_at|date:"M j, Y" }}</span>
+                        {% if branding_request.designer %}
+                        <span><i class="fa-solid fa-pen-ruler me-1"></i>{{ branding_request.designer.get_full_name|default:branding_request.designer.username }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="d-flex gap-2 flex-wrap">
+                    <a href="{% url 'branding:edit_request' branding_request.pk %}" class="btn btn-sm" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.25);"><i class="fa-solid fa-pen me-1"></i>Edit</a>
+                    <a href="{% url 'branding:download_project_pdf' branding_request.pk %}" class="btn btn-sm" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.25);"><i class="fa-solid fa-file-pdf me-1"></i>PDF</a>
+                    <form method="post" action="{% url 'branding:archive_request' branding_request.pk %}" class="d-inline" onsubmit="return confirm('{% if branding_request.status == "ARCHIVED" %}Unarchive?{% else %}Archive this request?{% endif %}');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm" style="background:rgba(239,68,68,.2);color:#fca5a5;border:1px solid rgba(239,68,68,.3);">
+                            {% if branding_request.status == 'ARCHIVED' %}<i class="fa-solid fa-box-open me-1"></i>Unarchive
+                            {% else %}<i class="fa-solid fa-box-archive me-1"></i>Archive{% endif %}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" style="margin-top: -2rem; position: relative; z-index: 10;">
+
+        <!-- Progress Stepper -->
+        <div class="rd-stepper-card rounded-4 shadow-sm mb-4">
+            <div class="d-flex justify-content-between align-items-center px-4 pt-3 pb-2">
+                <h6 class="fw-800 mb-0" style="font-size:.85rem;"><i class="fa-solid fa-route me-2 text-primary"></i>Project Progress</h6>
+                <span class="x-small text-muted">Updated {{ branding_request.updated_at|timesince }} ago</span>
+            </div>
+            {% if milestone_stages %}
+            <div class="rd-stepper">
+                {% for ms in milestone_stages %}
+                <div class="rd-step is-{{ ms.state }}">
+                    <div class="rd-step-line{% if not forloop.first %} rd-step-line-done{% endif %}"></div>
+                    <div class="rd-step-dot">
+                        {% if ms.state == 'done' %}<i class="fa-solid fa-check"></i>
+                        {% elif ms.state == 'active' %}<i class="fa-solid fa-{{ ms.icon }}"></i>
+                        {% else %}<i class="fa-solid fa-{{ ms.icon }}"></i>{% endif %}
+                    </div>
+                    <div class="rd-step-label">{{ ms.label }}</div>
+                    {% if ms.timestamp %}<div class="rd-step-time">{{ ms.timestamp|date:"M j" }}</div>{% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-muted small px-4 pb-3 mb-0">No milestones defined.</p>
+            {% endif %}
+        </div>
+
+        <!-- Quick Actions Bar -->
+        <div class="rd-actions-card rounded-4 shadow-sm mb-4">
+            <div class="row g-0">
+                <div class="col-lg-3 col-md-6 rd-action-cell">
+                    <div class="rd-action-label"><i class="fa-solid fa-arrows-rotate me-1"></i>Status</div>
+                    <form method="post" action="{% url 'branding:update_status' branding_request.pk %}" class="d-flex align-items-center gap-1">
+                        {% csrf_token %}
+                        <select name="status" class="form-select form-select-sm" style="font-size:.8rem;">
+                            {% for code, label in status_choices %}
+                            <option value="{{ code }}" {% if branding_request.status == code %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-brand-primary" style="font-size:.75rem;padding:.25rem .6rem;">Set</button>
+                    </form>
+                </div>
+                <div class="col-lg-2 col-md-6 rd-action-cell">
+                    <div class="rd-action-label"><i class="fa-solid fa-flag me-1"></i>Priority</div>
+                    <form method="post" action="{% url 'branding:update_priority' branding_request.pk %}" class="d-flex align-items-center gap-1">
+                        {% csrf_token %}
+                        <select name="priority" class="form-select form-select-sm" style="font-size:.8rem;">
+                            {% for code, label in priorities %}
+                            <option value="{{ code }}" {% if branding_request.priority == code %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-back" style="font-size:.75rem;padding:.25rem .6rem;">Set</button>
+                    </form>
+                </div>
+                <div class="col-lg-3 col-md-6 rd-action-cell">
+                    <div class="rd-action-label"><i class="fa-regular fa-calendar-check me-1"></i>Delivery</div>
+                    <form method="post" action="{% url 'branding:update_delivery' branding_request.pk %}" class="d-flex align-items-center gap-1">
+                        {% csrf_token %}
+                        <input type="date" name="estimated_delivery_date" value="{{ branding_request.estimated_delivery_date|date:'Y-m-d' }}" class="form-control form-control-sm" style="font-size:.8rem;">
+                        <button type="submit" class="btn btn-sm btn-back" style="font-size:.75rem;padding:.25rem .6rem;">Set</button>
+                    </form>
+                </div>
+                <div class="col-lg-4 col-md-6 rd-action-cell" style="border-right:none;">
+                    <div class="rd-action-label"><i class="fa-solid fa-user-pen me-1"></i>Designer</div>
+                    <form method="post" action="{% url 'branding:assign_designer' branding_request.pk %}" class="d-flex align-items-center gap-1">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{% url 'branding:request_detail' branding_request.pk %}">
+                        <select name="designer" class="form-select form-select-sm" style="font-size:.8rem;">
+                            <option value="">Unassigned</option>
+                            {% for d in designers %}{% if d.groups.all %}
+                            <option value="{{ d.id }}" {% if branding_request.designer_id == d.id %}selected{% endif %}>{{ d.get_full_name|default:d.username }}</option>
+                            {% endif %}{% endfor %}
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-back" style="font-size:.75rem;padding:.25rem .6rem;">Assign</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="rd-tabs-card rounded-4 shadow-sm">
+            <ul class="nav nav-pills rd-tab-nav p-2 gap-1" id="detailTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tab-company" type="button" role="tab"><i class="fa-solid fa-building me-1"></i>Company</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-identity" type="button" role="tab"><i class="fa-solid fa-brush me-1"></i>Brand</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-uploads" type="button" role="tab"><i class="fa-solid fa-cloud-arrow-up me-1"></i>Uploads{% if branding_request.assets.count %} <span class="tab-count">{{ branding_request.assets.count }}</span>{% endif %}</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-collection" type="button" role="tab"><i class="fa-solid fa-folder-open me-1"></i>Collection</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-notes" type="button" role="tab"><i class="fa-solid fa-note-sticky me-1"></i>Notes</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-timeline" type="button" role="tab"><i class="fa-solid fa-clock-rotate-left me-1"></i>Timeline</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-history" type="button" role="tab"><i class="fa-solid fa-list-check me-1"></i>History</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-messages" type="button" role="tab">
+                        <i class="fa-solid fa-comments me-1"></i>Messages
+                        {% if unread_msg_count %}<span class="tab-count">{{ unread_msg_count }}</span>{% endif %}
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-feedback" type="button" role="tab">
+                        <i class="fa-solid fa-star me-1"></i>Feedback
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-concepts" type="button" role="tab">
+                        <i class="fa-solid fa-layer-group me-1"></i>Concepts
+                        {% if branding_request.concepts.count %}<span class="tab-count">{{ branding_request.concepts.count }}</span>{% endif %}
+                    </button>
+                </li>
+                {% if user.is_staff %}
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-review" type="button" role="tab">
+                        <i class="fa-solid fa-clipboard-check me-1"></i>Review
+                        {% if review and review.status != 'PENDING' %}
+                        <span class="badge {% if review.status == 'APPROVED' %}bg-success{% elif review.status == 'REJECTED' %}bg-danger{% else %}bg-warning text-dark{% endif %} ms-1" style="font-size:.6rem;">{{ review.get_status_display }}</span>
+                        {% endif %}
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-tools" type="button" role="tab">
+                        <i class="fa-solid fa-toolbox me-1"></i>Tools
+                    </button>
+                </li>
+                {% endif %}
+            </ul>
+
+            <div class="tab-content p-4">
+                <!-- Company Information -->
+                <div class="tab-pane fade show active" id="tab-company" role="tabpanel">
+                    <div class="row g-3">
+                        <div class="col-md-6 info-item"><div class="info-label">Company Name</div><div class="info-value">{{ branding_request.company_name }}</div></div>
+                        <div class="col-md-6 info-item"><div class="info-label">Industry</div><div class="info-value">{{ branding_request.get_industry_display }}</div></div>
+                        <div class="col-md-6 info-item"><div class="info-label">Website</div><div class="info-value">{% if branding_request.website %}<a href="{{ branding_request.website }}" target="_blank" rel="noopener">{{ branding_request.website }}</a>{% else %}—{% endif %}</div></div>
+                        <div class="col-md-6 info-item"><div class="info-label">Country</div><div class="info-value">{{ branding_request.country|default:"—" }}</div></div>
+                        <div class="col-12 info-item"><div class="info-label">Business Description</div><div class="info-value">{{ branding_request.business_description|default:"—" }}</div></div>
+                    </div>
+                </div>
+
+                <!-- Brand Identity -->
+                <div class="tab-pane fade" id="tab-identity" role="tabpanel">
+                    <div class="row g-3">
+                        <div class="col-md-6 info-item"><div class="info-label">Company Description</div><div class="info-value">{{ branding_request.company_description|default:"—" }}</div></div>
+                        <div class="col-md-6 info-item"><div class="info-label">Target Audience</div><div class="info-value">{{ branding_request.target_audience|default:"—" }}</div></div>
+                        <div class="col-md-4 info-item"><div class="info-label">Brand Values</div><div class="info-value tag-cloud">{% for v in branding_request.brand_values %}<span class="style-tag">{{ v|title }}</span>{% empty %}—{% endfor %}</div></div>
+                        <div class="col-md-4 info-item"><div class="info-label">Preferred Colors</div><div class="info-value tag-cloud">{% for c in branding_request.preferred_colors %}<span class="style-tag color-tag">{{ c|title }}</span>{% empty %}—{% endfor %}</div></div>
+                        <div class="col-md-4 info-item"><div class="info-label">Current Branding</div><div class="info-value tag-cloud">{% for b in branding_request.current_branding %}<span class="style-tag">{{ b|title }}</span>{% empty %}—{% endfor %}</div></div>
+                    </div>
+                </div>
+
+                <!-- Uploads -->
+                <div class="tab-pane fade" id="tab-uploads" role="tabpanel">
+                    {% if assets_with_versions %}
+                    <div class="row g-3">
+                        {% for item in assets_with_versions %}
+                        <div class="col-md-6 col-lg-4">
+                            <div class="asset-card">
+                                {% if item.asset.is_image %}<img src="{{ item.asset.file.url }}" alt="{{ item.asset.original_name }}" class="asset-card-img">
+                                {% else %}<div class="asset-card-img asset-card-file"><i class="fa-solid fa-file fa-2x"></i></div>{% endif %}
+                                <div class="asset-card-body">
+                                    <div class="fw-700 small text-truncate" title="{{ item.asset.original_name }}">{{ item.asset.original_name }}</div>
+                                    <div class="x-small text-muted mb-2">{{ item.asset.get_asset_type_display }} · {{ item.asset.size_display }}</div>
+                                    <div class="d-flex align-items-center gap-1 flex-wrap">
+                                        <a href="{{ item.asset.file.url }}" target="_blank" rel="noopener" class="btn btn-sm btn-icon" title="View"><i class="fa-solid fa-eye"></i></a>
+                                        <a href="{% url 'branding:download_asset' item.asset.pk %}" class="btn btn-sm btn-icon" title="Download"><i class="fa-solid fa-download"></i></a>
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-icon" data-bs-toggle="dropdown" title="Versions"><i class="fa-solid fa-clock-rotate-left"></i></button>
+                                            <ul class="dropdown-menu dropdown-menu-end shadow p-2 border-0 rounded-3">
+                                                <li><span class="dropdown-header small fw-bold">Versions ({{ item.versions|length }})</span></li>
+                                                {% for v in item.versions %}
+                                                <li>
+                                                    <a class="dropdown-item small rounded-2" href="{% url 'branding:download_asset_version' v.pk %}">
+                                                        <i class="fa-solid fa-file-arrow-down me-2"></i>v{{ v.version_number }} · {{ v.created_at|date:"M j, Y" }}
+                                                        {% if v.note %}<span class="text-muted">— {{ v.note }}</span>{% endif %}
+                                                    </a>
+                                                </li>
+                                                {% empty %}
+                                                <li><span class="dropdown-item text-muted small">No versions yet</span></li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                        <form method="post" action="{% url 'branding:replace_asset' item.asset.pk %}" enctype="multipart/form-data" class="d-inline">
+                                            {% csrf_token %}
+                                            <label class="btn btn-sm btn-icon mb-0" title="Replace"><i class="fa-solid fa-arrow-up-from-bracket"></i>
+                                                <input type="file" name="file" class="d-none" onchange="this.form.submit()" accept="image/*">
+                                            </label>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-state p-4 text-center"><i class="fa-solid fa-cloud-arrow-up fs-3 text-muted"></i><p class="text-muted mb-0 mt-2">No files uploaded.</p></div>
+                    {% endif %}
+                </div>
+
+                <!-- Selected Collection -->
+                <div class="tab-pane fade" id="tab-collection" role="tabpanel">
+                    {% if branding_request.collection %}
+                    <div class="row g-4 align-items-center">
+                        <div class="col-md-6">
+                            {% if branding_request.collection.preview_image %}
+                            <img src="{{ branding_request.collection.preview_image.url }}" alt="{{ branding_request.collection.name }}" class="rounded-4 w-100 shadow">
+                            {% else %}
+                            <div class="collection-cover-fallback rounded-4" style="min-height: 260px; display:flex; align-items:center; justify-content:center; font-size: 3rem;">{{ branding_request.collection.name|slice:":2"|upper }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <span class="collection-cat">{{ branding_request.collection.get_category_display }}</span>
+                            <h3 class="fw-800">{{ branding_request.collection.name }}</h3>
+                            <p class="text-muted">{{ branding_request.collection.industry }}</p>
+                            <p>{{ branding_request.collection.description }}</p>
+                            <div class="collection-tags mb-3">{% for t in branding_request.collection.style_tags %}<span class="style-tag">{{ t }}</span>{% endfor %}</div>
+                            {% if branding_request.collection.examples %}
+                            <div class="info-label">What's included</div>
+                            <ul class="mt-2">{% for ex in branding_request.collection.examples %}<li>{{ ex }}</li>{% endfor %}</ul>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="empty-state p-4 text-center"><i class="fa-solid fa-folder-open fs-3 text-muted"></i><p class="text-muted mb-0 mt-2">No collection selected.</p></div>
+                    {% endif %}
+                </div>
+
+                <!-- Internal Notes -->
+                <div class="tab-pane fade" id="tab-notes" role="tabpanel">
+                    <form method="post" action="{% url 'branding:update_internal_notes' branding_request.pk %}" class="mb-4">
+                        {% csrf_token %}
+                        <label class="brand-field-label" for="internal-notes">Private notes for the team</label>
+                        <textarea name="internal_notes" id="internal-notes" rows="4" class="form-control mb-2" placeholder="Design direction, client quirks, blockers...">{{ branding_request.internal_notes }}</textarea>
+                        <button class="btn btn-brand-primary btn-sm" type="submit"><i class="fa-solid fa-floppy-disk me-1"></i>Save Notes</button>
+                    </form>
+                    <hr class="my-4">
+                    <form method="post" action="{% url 'branding:add_note' branding_request.pk %}" class="mb-4">
+                        {% csrf_token %}
+                        <div class="input-group">
+                            <textarea name="note" rows="2" class="form-control" placeholder="Add a timeline note..." required></textarea>
+                            <button class="btn btn-brand-primary" type="submit"><i class="fa-solid fa-plus me-1"></i>Add Note</button>
+                        </div>
+                    </form>
+                    {% for t in timeline %}
+                    {% if t.event_type == 'NOTE' %}
+                    <div class="note-item">
+                        <div class="note-avatar">{{ t.actor.username|default:"?"|slice:":1"|upper }}</div>
+                        <div class="note-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-700 small">{{ t.actor.username|default:"System" }}</span>
+                                <span class="x-small text-muted">{{ t.created_at|date:"M j, Y H:i" }}</span>
+                            </div>
+                            <p class="mb-0 mt-1">{{ t.action }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% empty %}
+                    <div class="empty-state p-4 text-center"><p class="text-muted mb-0">No notes yet.</p></div>
+                    {% endfor %}
+                </div>
+
+                <!-- Timeline -->
+                <div class="tab-pane fade" id="tab-timeline" role="tabpanel">
+                    <div class="timeline">
+                        {% for t in timeline reversed %}
+                        <div class="timeline-item">
+                            <div class="timeline-dot event-{{ t.event_type|lower }}"></div>
+                            <div class="timeline-content">
+                                <div class="d-flex justify-content-between align-items-start gap-2">
+                                    <div>
+                                        <span class="timeline-action">{{ t.action }}</span>
+                                        {% if t.description %}<p class="timeline-desc mb-0">{{ t.description }}</p>{% endif %}
+                                    </div>
+                                    <span class="x-small text-muted text-nowrap">{{ t.created_at|date:"M j, H:i" }}</span>
+                                </div>
+                                <span class="x-small text-muted"><i class="fa-solid fa-user me-1"></i>{{ t.actor.username|default:"System" }}</span>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="empty-state p-4 text-center"><p class="text-muted mb-0">No timeline events yet.</p></div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Status History -->
+                <div class="tab-pane fade" id="tab-history" role="tabpanel">
+                    <div class="timeline">
+                        {% for t in timeline %}
+                        {% if t.event_type == 'STATUS_CHANGE' or t.event_type == 'CREATED' %}
+                        <div class="timeline-item">
+                            <div class="timeline-dot event-{{ t.event_type|lower }}"></div>
+                            <div class="timeline-content">
+                                <span class="timeline-action">{{ t.action }}</span>
+                                <div class="x-small text-muted mt-1">{{ t.actor.username|default:"System" }} · {{ t.created_at|date:"M j, Y H:i" }}</div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% empty %}
+                        <div class="empty-state p-4 text-center"><p class="text-muted mb-0">No status changes yet.</p></div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Messages -->
+                <div class="tab-pane fade" id="tab-messages" role="tabpanel">
+                    <!-- Polling status bar -->
+                    <div class="messages-poll-bar d-flex align-items-center justify-content-between mb-3 px-1">
+                        <span class="x-small text-muted d-flex align-items-center gap-1" id="pollStatus">
+                            <span class="poll-dot"></span>Live updates active
+                        </span>
+                        <span class="x-small text-muted" id="lastPollTime"></span>
+                    </div>
+
+                    <!-- Thread -->
+                    <div id="messagesThread" class="messages-thread mb-4" data-last-id="{{ messages.0.pk|default:'0' }}">
+                        {% for msg in messages %}
+                        <div class="message-item msg-animate {% if msg.sender.is_staff %}message-staff{% else %}message-client{% endif %}" data-message-id="{{ msg.pk }}" data-sender-id="{{ msg.sender_id }}">
+                            <div class="message-header d-flex align-items-center gap-2 mb-1">
+                                <span class="message-avatar{% if msg.sender.is_staff %} message-avatar-staff{% endif %}">{{ msg.sender.username|slice:":1"|upper }}</span>
+                                <div class="d-flex align-items-center gap-1 flex-wrap">
+                                    <span class="fw-700 small">{{ msg.sender.get_full_name|default:msg.sender.username }}</span>
+                                    {% if msg.sender.is_staff %}<span class="message-role-badge">Staff</span>{% endif %}
+                                    {% if msg.sender_id == branding_request.user_id %}<span class="message-role-badge message-role-client">Client</span>{% endif %}
+                                </div>
+                                <span class="x-small text-muted ms-auto message-time">{{ msg.created_at|date:"M j, Y H:i" }}</span>
+                            </div>
+                            <div class="message-body">{{ msg.content|linebreaksbr }}</div>
+                            {% if msg.replies.all %}
+                            <div class="message-replies mt-2">
+                                {% for reply in msg.replies.all %}
+                                <div class="message-reply msg-animate {% if reply.sender.is_staff %}message-staff{% else %}message-client{% endif %}" data-message-id="{{ reply.pk }}" data-sender-id="{{ reply.sender_id }}">
+                                    <div class="message-header d-flex align-items-center gap-2 mb-1">
+                                        <span class="message-avatar message-avatar-sm{% if reply.sender.is_staff %} message-avatar-staff{% endif %}">{{ reply.sender.username|slice:":1"|upper }}</span>
+                                        <div class="d-flex align-items-center gap-1">
+                                            <span class="fw-700 small">{{ reply.sender.get_full_name|default:reply.sender.username }}</span>
+                                            {% if reply.sender.is_staff %}<span class="message-role-badge">Staff</span>{% endif %}
+                                            {% if reply.sender_id == branding_request.user_id %}<span class="message-role-badge message-role-client">Client</span>{% endif %}
+                                        </div>
+                                        <span class="x-small text-muted ms-auto message-time">{{ reply.created_at|date:"M j, H:i" }}</span>
+                                    </div>
+                                    <div class="message-body">{{ reply.content|linebreaksbr }}</div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            <div class="message-actions mt-2">
+                                <button type="button" class="btn btn-sm btn-back reply-btn" data-parent-id="{{ msg.pk }}" data-sender="{{ msg.sender.username }}">
+                                    <i class="fa-solid fa-reply me-1"></i>Reply
+                                </button>
+                            </div>
+                        </div>
+                        {% endfor %}
+
+                        <!-- Empty state -->
+                        <div class="empty-state p-4 text-center" id="messagesEmpty" {% if messages %}style="display:none"{% endif %}>
+                            <div class="empty-state-icon"><i class="fa-regular fa-comments"></i></div>
+                            <h5 class="fw-800 mt-3">No messages yet</h5>
+                            <p class="text-muted">Start a conversation about this request below.</p>
+                        </div>
+
+                        <!-- New messages divider (shown by JS) -->
+                        <div class="new-messages-divider d-none" id="newMsgDivider">
+                            <span>New messages</span>
+                        </div>
+                    </div>
+
+                    <!-- Compose -->
+                    <div class="messages-compose detail-card rounded-4 p-3">
+                        <div id="replyPreview" class="reply-preview d-none mb-2">
+                            <span class="x-small text-muted"><i class="fa-solid fa-reply me-1"></i>Replying to <strong id="replyToName"></strong></span>
+                            <button type="button" class="btn btn-sm btn-icon ms-1" id="cancelReply" aria-label="Cancel reply"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                        <form id="messageForm" class="d-flex align-items-end gap-2" onsubmit="return false;">
+                            <div class="flex-grow-1 position-relative">
+                                <textarea id="messageInput" class="form-control" rows="2" placeholder="Type a message... (Enter to send, Shift+Enter for newline)" maxlength="5000" aria-label="Message input"></textarea>
+                                <span class="char-count x-small text-muted d-none" id="charCount">0/5000</span>
+                            </div>
+                            <button type="submit" id="sendMessageBtn" class="btn btn-brand-primary btn-sm px-3" aria-label="Send message">
+                                <i class="fa-solid fa-paper-plane me-1"></i><span class="d-none d-sm-inline">Send</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Feedback Tab -->
+                <div class="tab-pane fade" id="tab-feedback" role="tabpanel">
+                    <div class="d-flex align-items-center justify-content-between mb-4">
+                        <h6 class="fw-800 mb-0"><i class="fa-solid fa-star me-2 text-brand-primary"></i>Client Feedback</h6>
+                        {% if branding_request.status == 'COMPLETED' %}
+                            {% if feedback %}
+                                <span class="badge bg-success rounded-pill px-3 py-2"><i class="fa-solid fa-check me-1"></i>Feedback received</span>
+                            {% elif is_owner %}
+                                <span class="badge bg-warning text-dark rounded-pill px-3 py-2"><i class="fa-solid fa-clock me-1"></i>Awaiting your feedback</span>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+
+                    {% if feedback %}
+                        <!-- Existing feedback display -->
+                        <div class="feedback-card detail-card rounded-4 p-4">
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <div class="feedback-avatar">{{ feedback.request.user.username|slice:":1"|upper }}</div>
+                                <div>
+                                    <div class="fw-700">{{ feedback.request.user.get_full_name|default:feedback.request.user.username }}</div>
+                                    <div class="x-small text-muted">{{ feedback.created_at|date:"F j, Y" }}</div>
+                                </div>
+                                <div class="ms-auto">
+                                    {% star_html_readonly feedback.rating %}
+                                </div>
+                            </div>
+
+                            {% if feedback.comment %}
+                                <p class="mb-3">{{ feedback.comment|linebreaksbr }}</p>
+                            {% endif %}
+
+                            <div class="d-flex align-items-center gap-3">
+                                {% if feedback.would_recommend %}
+                                    <span class="badge bg-success-subtle text-success rounded-pill"><i class="fa-solid fa-thumbs-up me-1"></i>Would recommend</span>
+                                {% else %}
+                                    <span class="badge bg-danger-subtle text-danger rounded-pill"><i class="fa-solid fa-thumbs-down me-1"></i>Would not recommend</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Staff response -->
+                        {% if feedback.staff_response %}
+                            <div class="staff-response-card detail-card rounded-4 p-4 mt-3">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <i class="fa-solid fa-reply text-brand-primary"></i>
+                                    <span class="fw-700 small">Staff Response</span>
+                                    <span class="x-small text-muted ms-auto">{{ feedback.responded_at|date:"M j, Y H:i" }}</span>
+                                </div>
+                                <p class="mb-0 text-muted">{{ feedback.staff_response|linebreaksbr }}</p>
+                            </div>
+                        {% elif user.is_staff %}
+                            <!-- Staff response form -->
+                            <form method="post" action="{% url 'branding:feedback_update' feedback.pk %}" class="mt-3">
+                                {% csrf_token %}
+                                <div class="detail-card rounded-4 p-4">
+                                    <label for="staff_response" class="form-label fw-700 small"><i class="fa-solid fa-reply me-1"></i>Respond to Feedback</label>
+                                    <textarea name="staff_response" id="staff_response" class="form-control mb-3" rows="3" placeholder="Write a response to this feedback...">{{ feedback.staff_response }}</textarea>
+                                    <div class="text-end">
+                                        <button type="submit" class="btn btn-brand-primary btn-sm px-3">
+                                            <i class="fa-solid fa-paper-plane me-1"></i>Save Response
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        {% endif %}
+
+                    {% elif branding_request.status == 'COMPLETED' and is_owner %}
+                        <!-- Feedback submission form for client -->
+                        <div class="feedback-form-wrap">
+                            <div class="text-center mb-4">
+                                <div class="feedback-form-icon mx-auto mb-3">
+                                    <i class="fa-solid fa-star"></i>
+                                </div>
+                                <h6 class="fw-800">How was your experience?</h6>
+                                <p class="text-muted small">Your feedback helps us improve our services.</p>
+                            </div>
+
+                            <form method="post" action="{% url 'branding:feedback_create' branding_request.pk %}" id="feedbackForm">
+                                {% csrf_token %}
+
+                                <div class="text-center mb-4">
+                                    <div class="star-rating-input" id="starRatingInput">
+                                        <i class="fa-regular fa-star star-input" data-rating="1"></i>
+                                        <i class="fa-regular fa-star star-input" data-rating="2"></i>
+                                        <i class="fa-regular fa-star star-input" data-rating="3"></i>
+                                        <i class="fa-regular fa-star star-input" data-rating="4"></i>
+                                        <i class="fa-regular fa-star star-input" data-rating="5"></i>
+                                    </div>
+                                    <input type="hidden" name="rating" id="ratingInput" value="">
+                                    <p class="x-small text-muted mt-1" id="ratingText"></p>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="feedbackComment" class="form-label fw-700 small">Your comments <span class="text-muted">(optional)</span></label>
+                                    <textarea name="comment" id="feedbackComment" class="form-control" rows="4" placeholder="Tell us about your experience with this project..."></textarea>
+                                </div>
+
+                                <div class="mb-4">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="would_recommend" id="wouldRecommend" checked>
+                                        <label class="form-check-label fw-700 small" for="wouldRecommend">I would recommend this service</label>
+                                    </div>
+                                </div>
+
+                                <div class="text-center">
+                                    <button type="submit" class="btn btn-brand-primary px-4" id="submitFeedbackBtn" disabled>
+                                        <i class="fa-solid fa-paper-plane me-1"></i>Submit Feedback
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                    {% elif branding_request.status != 'COMPLETED' %}
+                        <!-- Not completed yet -->
+                        <div class="empty-state p-4 text-center">
+                            <div class="empty-state-icon"><i class="fa-solid fa-hourglass-half"></i></div>
+                            <h6 class="fw-800 mt-3">Feedback not yet available</h6>
+                            <p class="text-muted small">Feedback can be submitted once the project is marked as completed.</p>
+                        </div>
+
+                    {% else %}
+                        <!-- No feedback and not the owner -->
+                        <div class="empty-state p-4 text-center">
+                            <div class="empty-state-icon"><i class="fa-regular fa-comment-dots"></i></div>
+                            <h6 class="fw-800 mt-3">No feedback yet</h6>
+                            <p class="text-muted small">The client has not submitted feedback for this project.</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                {% if user.is_staff %}
+                {# ── Supervisor Review Tab ── #}
+                <div class="tab-pane fade" id="tab-review" role="tabpanel">
+                    <div class="d-flex align-items-center justify-content-between mb-4">
+                        <h6 class="fw-800 mb-0"><i class="fa-solid fa-clipboard-check me-2"></i>Supervisor Review</h6>
+                        {% if review %}
+                            {% if review.status == 'APPROVED' %}
+                                <span class="badge bg-success rounded-pill px-3 py-2"><i class="fa-solid fa-check me-1"></i>Approved</span>
+                            {% elif review.status == 'REJECTED' %}
+                                <span class="badge bg-danger rounded-pill px-3 py-2"><i class="fa-solid fa-times me-1"></i>Rejected</span>
+                            {% elif review.status == 'REVISION_REQUESTED' %}
+                                <span class="badge bg-warning text-dark rounded-pill px-3 py-2"><i class="fa-solid fa-rotate-left me-1"></i>Revision Requested</span>
+                            {% else %}
+                                <span class="badge bg-secondary rounded-pill px-3 py-2"><i class="fa-solid fa-hourglass-half me-1"></i>Pending</span>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+
+                    {# ── Quality Checklist ── #}
+                    <div class="detail-card rounded-4 p-4 mb-4">
+                        <h6 class="fw-700 mb-3"><i class="fa-solid fa-list-check me-1"></i>Quality Checklist</h6>
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="update_checklist">
+                            <div class="row g-2">
+                                {% for key, label in quality_checklist %}
+                                <div class="col-12 col-md-6">
+                                    <div class="form-check d-flex align-items-center gap-2 p-2 rounded-3 border{% if review.quality_checklist|get_item:key %} border-success bg-success-subtle{% endif %}">
+                                        <input class="form-check-input" type="checkbox" name="cl_{{ key }}" id="cl_{{ key }}" {% if review.quality_checklist|get_item:key %}checked{% endif %}>
+                                        <label class="form-check-label small fw-600" for="cl_{{ key }}">{{ label }}</label>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div class="mt-3 text-end">
+                                <button type="submit" class="btn btn-outline-primary btn-sm">
+                                    <i class="fa-solid fa-save me-1"></i>Save Checklist
+                                </button>
+                            </div>
+                        </form>
+
+                        {# Progress bar #}
+                        {% with checked=review.checklist_progress.0 total=review.checklist_progress.1 %}
+                        {% if total %}
+                        <div class="mt-3">
+                            <div class="d-flex justify-content-between small mb-1">
+                                <span class="fw-600">Progress</span>
+                                <span>{{ checked }}/{{ total }} ({{ review.checklist_percentage }}%)</span>
+                            </div>
+                            <div class="rating-bar-track">
+                                <div class="rating-bar-fill" style="width:{{ review.checklist_percentage }}%;"></div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% endwith %}
+                    </div>
+
+                    {# ── Review Actions ── #}
+                    <div class="detail-card rounded-4 p-4 mb-4">
+                        <h6 class="fw-700 mb-3"><i class="fa-solid fa-gavel me-1"></i>Review Decision</h6>
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="approve_review">
+                            {# Pass checklist state along #}
+                            {% for key, label in quality_checklist %}
+                            <input type="hidden" name="cl_{{ key }}" value="">
+                            {% endfor %}
+                            <div class="mb-3">
+                                <label for="review_notes" class="form-label fw-600 small">Review Notes</label>
+                                <textarea name="review_notes" id="review_notes" class="form-control" rows="3" placeholder="Add notes about this review...">{{ review.notes }}</textarea>
+                            </div>
+                            <div class="d-flex gap-2 flex-wrap">
+                                <button type="submit" name="action" value="approve_review" class="btn btn-success btn-sm px-3">
+                                    <i class="fa-solid fa-check me-1"></i>Approve
+                                </button>
+                                <button type="submit" name="action" value="request_revision" class="btn btn-warning btn-sm px-3">
+                                    <i class="fa-solid fa-rotate-left me-1"></i>Request Revision
+                                </button>
+                                <button type="submit" name="action" value="reject_review" class="btn btn-danger btn-sm px-3"
+                                    onclick="return confirm('Are you sure you want to reject this project?');">
+                                    <i class="fa-solid fa-times me-1"></i>Reject
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    {# ── Review History ── #}
+                    {% if review.updated_at != review.created_at %}
+                    <div class="detail-card rounded-4 p-4">
+                        <h6 class="fw-700 mb-2"><i class="fa-solid fa-clock-rotate-left me-1"></i>Review History</h6>
+                        <div class="small text-muted">
+                            <div>Created: {{ review.created_at|date:"M j, Y H:i" }}</div>
+                            <div>Last updated: {{ review.updated_at|date:"M j, Y H:i" }}</div>
+                            {% if review.reviewer %}
+                            <div>Reviewed by: {{ review.reviewer.get_full_name|default:review.reviewer.username }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <!-- Concepts Tab -->
+                <div class="tab-pane fade" id="tab-concepts" role="tabpanel">
+                    <div class="d-flex align-items-center justify-content-between mb-4">
+                        <h6 class="fw-800 mb-0"><i class="fa-solid fa-layer-group me-2 text-primary"></i>Design Concepts</h6>
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'branding:concept_list' request_pk=branding_request.pk %}" class="btn btn-sm btn-brand-primary"><i class="fa-solid fa-eye me-1"></i>View All</a>
+                            {% if user.is_staff %}
+                            <a href="{% url 'branding:concept_create' request_pk=branding_request.pk %}" class="btn btn-sm btn-back"><i class="fa-solid fa-plus me-1"></i>New Concept</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% with concept_count=branding_request.concepts.count %}
+                    {% if concept_count %}
+                    <div class="row g-3">
+                        {% for c in branding_request.concepts.all|slice:":6" %}
+                        <div class="col-md-4">
+                            <a href="{% url 'branding:concept_detail' pk=c.pk %}" class="d-block text-decoration-none" style="color: inherit;">
+                                <div class="detail-card overflow-hidden">
+                                    {% if c.preview_image %}
+                                    <img src="{{ c.preview_image.url }}" alt="{{ c.title }}" class="w-100" style="height: 140px; object-fit: cover;">
+                                    {% else %}
+                                    <div class="w-100 d-flex align-items-center justify-content-center" style="height: 140px; background: linear-gradient(135deg, #667eea22, #764ba222);">
+                                        <i class="fa-solid fa-palette fa-2x text-muted"></i>
+                                    </div>
+                                    {% endif %}
+                                    <div class="p-3">
+                                        <div class="d-flex align-items-center justify-content-between mb-1">
+                                            <span class="fw-bold small">{{ c.title }}</span>
+                                            <span class="badge rounded-pill status-pill status-{{ c.status|lower }}" style="font-size:.6rem;">{{ c.get_status_display|default:c.status }}</span>
+                                        </div>
+                                        {% if c.color_palette %}
+                                        <div class="d-flex gap-1 mt-2">
+                                            {% for color in c.color_palette|slice:":5" %}
+                                            <span class="cp-palette-dot" style="background: {{ color }};"></span>
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="{% url 'branding:concept_list' request_pk=branding_request.pk %}" class="btn btn-back btn-sm">View All {{ concept_count }} Concept{{ concept_count|pluralize }}</a>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fa-solid fa-layer-group fa-3x text-muted mb-3 d-block"></i>
+                        <h6 class="fw-800 mb-2">No Concepts Yet</h6>
+                        <p class="text-muted small mb-3">Design concepts will appear here once uploaded by the designer.</p>
+                        {% if user.is_staff %}
+                        <a href="{% url 'branding:concept_create' request_pk=branding_request.pk %}" class="btn btn-brand-primary btn-sm"><i class="fa-solid fa-plus me-1"></i>Create First Concept</a>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    {% endwith %}
+                </div>
+
+                <!-- Designer Tools Tab -->
+                {% if user.is_staff %}
+                <div class="tab-pane fade" id="tab-tools" role="tabpanel">
+                    <h6 class="fw-800 mb-3"><i class="fa-solid fa-toolbox me-2 text-info"></i>Designer Tools</h6>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <a href="{% url 'branding:designer_drafts' pk=branding_request.pk %}" class="d-block text-decoration-none" style="color: inherit;">
+                                <div class="detail-card text-center py-4">
+                                    <i class="fa-solid fa-cloud-arrow-up fa-2x mb-2 d-block" style="color: #818cf8;"></i>
+                                    <div class="fw-bold small">Design Drafts</div>
+                                    <div class="text-muted x-small">{{ branding_request.design_drafts.count }} draft{{ branding_request.design_drafts.count|pluralize }}</div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{% url 'branding:designer_feedback_requests' pk=branding_request.pk %}" class="d-block text-decoration-none" style="color: inherit;">
+                                <div class="detail-card text-center py-4">
+                                    <i class="fa-solid fa-comments fa-2x mb-2 d-block" style="color: #06b6d4;"></i>
+                                    <div class="fw-bold small">Feedback Requests</div>
+                                    <div class="text-muted x-small">{{ branding_request.feedback_requests.count }} request{{ branding_request.feedback_requests.count|pluralize }}</div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{% url 'branding:designer_notes' pk=branding_request.pk %}" class="d-block text-decoration-none" style="color: inherit;">
+                                <div class="detail-card text-center py-4">
+                                    <i class="fa-solid fa-note-sticky fa-2x mb-2 d-block" style="color: #f59e0b;"></i>
+                                    <div class="fw-bold small">Design Notes</div>
+                                    <div class="text-muted x-small">{{ branding_request.design_notes.count }} note{{ branding_request.design_notes.count|pluralize }}</div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{% url 'branding:designer_time_tracking' %}" class="d-block text-decoration-none" style="color: inherit;">
+                                <div class="detail-card text-center py-4">
+                                    <i class="fa-solid fa-stopwatch fa-2x mb-2 d-block" style="color: #22c55e;"></i>
+                                    <div class="fw-bold small">Time Tracking</div>
+                                    <div class="text-muted x-small">Track hours</div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{% url 'branding:designer_resources' %}" class="d-block text-decoration-none" style="color: inherit;">
+                                <div class="detail-card text-center py-4">
+                                    <i class="fa-solid fa-book fa-2x mb-2 d-block" style="color: #0ea5e9;"></i>
+                                    <div class="fw-bold small">Resources</div>
+                                    <div class="text-muted x-small">Library</div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{% url 'branding:designer_templates' %}" class="d-block text-decoration-none" style="color: inherit;">
+                                <div class="detail-card text-center py-4">
+                                    <i class="fa-solid fa-file-lines fa-2x mb-2 d-block" style="color: #f97316;"></i>
+                                    <div class="fw-bold small">Templates</div>
+                                    <div class="text-muted x-small">Reusable</div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{% url 'branding:concept_list' request_pk=branding_request.pk %}" class="d-block text-decoration-none" style="color: inherit;">
+                                <div class="detail-card text-center py-4">
+                                    <i class="fa-solid fa-layer-group fa-2x mb-2 d-block" style="color: #8b5cf6;"></i>
+                                    <div class="fw-bold small">Concepts</div>
+                                    <div class="text-muted x-small">{{ branding_request.concepts.count }} concept{{ branding_request.concepts.count|pluralize }}</div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{% url 'branding:concept_compare' request_pk=branding_request.pk %}" class="d-block text-decoration-none" style="color: inherit;">
+                                <div class="detail-card text-center py-4">
+                                    <i class="fa-solid fa-code-compare fa-2x mb-2 d-block" style="color: #06b6d4;"></i>
+                                    <div class="fw-bold small">Compare</div>
+                                    <div class="text-muted x-small">Side by side</div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{% url 'branding:concept_sessions' request_pk=branding_request.pk %}" class="d-block text-decoration-none" style="color: inherit;">
+                                <div class="detail-card text-center py-4">
+                                    <i class="fa-solid fa-video fa-2x mb-2 d-block" style="color: #22c55e;"></i>
+                                    <div class="fw-bold small">Presentations</div>
+                                    <div class="text-muted x-small">Sessions</div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{% url 'branding:peer_reviews' pk=branding_request.pk %}" class="d-block text-decoration-none" style="color: inherit;">
+                                <div class="detail-card text-center py-4">
+                                    <i class="fa-solid fa-users fa-2x mb-2 d-block" style="color: #a78bfa;"></i>
+                                    <div class="fw-bold small">Peer Reviews</div>
+                                    <div class="text-muted x-small">{{ branding_request.peer_reviews.count }} review{{ branding_request.peer_reviews.count|pluralize }}</div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{% url 'branding:design_comments' pk=branding_request.pk %}" class="d-block text-decoration-none" style="color: inherit;">
+                                <div class="detail-card text-center py-4">
+                                    <i class="fa-solid fa-message fa-2x mb-2 d-block" style="color: #f472b6;"></i>
+                                    <div class="fw-bold small">Comments</div>
+                                    <div class="text-muted x-small">{{ branding_request.design_comments.count }} comment{{ branding_request.design_comments.count|pluralize }}</div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{% url 'branding:design_handoffs' pk=branding_request.pk %}" class="d-block text-decoration-none" style="color: inherit;">
+                                <div class="detail-card text-center py-4">
+                                    <i class="fa-solid fa-handshake fa-2x mb-2 d-block" style="color: #34d399;"></i>
+                                    <div class="fw-bold small">Handoffs</div>
+                                    <div class="text-muted x-small">{{ branding_request.handoffs.count }} handoff{{ branding_request.handoffs.count|pluralize }}</div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{% url 'branding:design_tools_color' %}" class="d-block text-decoration-none" style="color: inherit;">
+                                <div class="detail-card text-center py-4">
+                                    <i class="fa-solid fa-droplet fa-2x mb-2 d-block" style="color: #818cf8;"></i>
+                                    <div class="fw-bold small">Color Picker</div>
+                                    <div class="text-muted x-small">Palettes</div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{% url 'branding:design_tools_fonts' %}" class="d-block text-decoration-none" style="color: inherit;">
+                                <div class="detail-card text-center py-4">
+                                    <i class="fa-solid fa-font fa-2x mb-2 d-block" style="color: #f59e0b;"></i>
+                                    <div class="fw-bold small">Font Finder</div>
+                                    <div class="text-muted x-small">Typography</div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{% url 'branding:design_tools_organizer' %}" class="d-block text-decoration-none" style="color: inherit;">
+                                <div class="detail-card text-center py-4">
+                                    <i class="fa-solid fa-folder-open fa-2x mb-2 d-block" style="color: #06b6d4;"></i>
+                                    <div class="fw-bold small">Asset Organizer</div>
+                                    <div class="text-muted x-small">Files</div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{% url 'branding:design_tools_brand_check' %}" class="d-block text-decoration-none" style="color: inherit;">
+                                <div class="detail-card text-center py-4">
+                                    <i class="fa-solid fa-clipboard-check fa-2x mb-2 d-block" style="color: #22c55e;"></i>
+                                    <div class="fw-bold small">Brand Check</div>
+                                    <div class="text-muted x-small">Compliance</div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{% url 'branding:figma_integration' %}" class="d-block text-decoration-none" style="color: inherit;">
+                                <div class="detail-card text-center py-4">
+                                    <i class="fa-brands fa-figma fa-2x mb-2 d-block" style="color: #a259ff;"></i>
+                                    <div class="fw-bold small">Figma</div>
+                                    <div class="text-muted x-small">Import designs</div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{% url 'branding:adobe_integration' %}" class="d-block text-decoration-none" style="color: inherit;">
+                                <div class="detail-card text-center py-4">
+                                    <i class="fa-solid fa-palette fa-2x mb-2 d-block" style="color: #ff0000;"></i>
+                                    <div class="fw-bold small">Adobe CC</div>
+                                    <div class="text-muted x-small">Libraries</div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{% url 'branding:slack_integration' %}" class="d-block text-decoration-none" style="color: inherit;">
+                                <div class="detail-card text-center py-4">
+                                    <i class="fa-brands fa-slack fa-2x mb-2 d-block" style="color: #e01e5a;"></i>
+                                    <div class="fw-bold small">Slack</div>
+                                    <div class="text-muted x-small">Notifications</div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{% url 'branding:calendar_integration' %}" class="d-block text-decoration-none" style="color: inherit;">
+                                <div class="detail-card text-center py-4">
+                                    <i class="fa-solid fa-calendar-days fa-2x mb-2 d-block" style="color: #3b82f6;"></i>
+                                    <div class="fw-bold small">Calendar</div>
+                                    <div class="text-muted x-small">Deadlines</div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+    'use strict';
+
+    /* ── Bootstrap tab init ─────────────────────────────────────────── */
+    if (typeof bootstrap !== 'undefined') {
+        document.querySelectorAll('#detailTabs [data-bs-toggle="pill"]').forEach(function (tab) {
+            new bootstrap.Tab(tab);
+        });
+    }
+
+    /* ── Constants ──────────────────────────────────────────────────── */
+    var CSRF_TOKEN = (document.querySelector('[name=csrfmiddlewaretoken]') || {}).value
+        || (document.cookie.match(/csrftoken=([^;]+)/) || [])[1] || '';
+    var REQUEST_PK = '{{ branding_request.pk }}';
+    var CURRENT_USER_ID = {{ user.pk }};
+    var IS_STAFF = {{ user.is_staff|yesno:"true,false,false" }};
+    var POLL_INTERVAL = 8000;
+    var URLS = {
+        send:    '/branding/requests/' + REQUEST_PK + '/messages/send/',
+        poll:    '/branding/requests/' + REQUEST_PK + '/messages/poll/',
+        read:    '/branding/requests/' + REQUEST_PK + '/messages/read/',
+        markOne: '/branding/messages/',
+    };
+
+    /* ── DOM refs ───────────────────────────────────────────────────── */
+    var thread       = document.getElementById('messagesThread');
+    var msgInput     = document.getElementById('messageInput');
+    var sendBtn      = document.getElementById('sendMessageBtn');
+    var messageForm  = document.getElementById('messageForm');
+    var emptyState   = document.getElementById('messagesEmpty');
+    var replyPreview = document.getElementById('replyPreview');
+    var replyToName  = document.getElementById('replyToName');
+    var cancelReplyBtn = document.getElementById('cancelReply');
+    var pollStatus   = document.getElementById('pollStatus');
+    var lastPollEl   = document.getElementById('lastPollTime');
+    var charCount    = document.getElementById('charCount');
+    var newMsgDivider = document.getElementById('newMsgDivider');
+    var messagesTab  = document.getElementById('tab-messages');
+
+    var replyParentId = null;
+    var pollTimer = null;
+    var lastMessageId = parseInt(thread.dataset.lastId || '0', 10);
+    var isMessagesTabActive = false;
+    var hasScrolledToBottom = false;
+
+    /* ── Helpers ────────────────────────────────────────────────────── */
+    function ajax(url, opts) {
+        var defaults = {
+            method: 'GET',
+            headers: {
+                'X-CSRFToken': CSRF_TOKEN,
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+        };
+        var cfg = Object.assign({}, defaults, opts || {});
+        if (opts && opts.body && typeof opts.body === 'object') {
+            cfg.headers['Content-Type'] = 'application/json';
+            cfg.body = JSON.stringify(opts.body);
+        }
+        return fetch(url, cfg).then(function (r) { return r.json(); });
+    }
+
+    function escapeHTML(str) {
+        var d = document.createElement('div');
+        d.appendChild(document.createTextNode(str));
+        return d.innerHTML;
+    }
+
+    function scrollToBottom(smooth) {
+        if (smooth) {
+            thread.scrollTo({ top: thread.scrollHeight, behavior: 'smooth' });
+        } else {
+            thread.scrollTop = thread.scrollHeight;
+        }
+    }
+
+    function isNearBottom() {
+        var threshold = 120;
+        return thread.scrollHeight - thread.scrollTop - thread.clientHeight < threshold;
+    }
+
+    function updatePollTime() {
+        var now = new Date();
+        var h = now.getHours().toString().padStart(2, '0');
+        var m = now.getMinutes().toString().padStart(2, '0');
+        var s = now.getSeconds().toString().padStart(2, '0');
+        lastPollEl.textContent = 'Last check: ' + h + ':' + m + ':' + s;
+    }
+
+    /* ── Build message HTML ─────────────────────────────────────────── */
+    function buildMessageHTML(msg) {
+        var roleClass = msg.sender_is_staff ? 'message-staff' : 'message-client';
+        var roleBadge = msg.sender_is_staff
+            ? '<span class="message-role-badge">Staff</span>'
+            : '';
+        var avatarClass = msg.sender_is_staff ? ' message-avatar-staff' : '';
+        var initial = (msg.sender || '?').charAt(0).toUpperCase();
+        var time = msg.created_at || '';
+        var content = escapeHTML(msg.content).replace(/\n/g, '<br>');
+
+        return '<div class="message-item msg-animate msg-unread ' + roleClass + '" '
+            + 'data-message-id="' + msg.id + '" data-sender-id="' + (msg.sender_id || 0) + '">'
+            + '<div class="message-header d-flex align-items-center gap-2 mb-1">'
+            + '<span class="message-avatar' + avatarClass + '">' + initial + '</span>'
+            + '<div class="d-flex align-items-center gap-1 flex-wrap">'
+            + '<span class="fw-700 small">' + escapeHTML(msg.sender) + '</span>'
+            + roleBadge
+            + '</div>'
+            + '<span class="x-small text-muted ms-auto message-time">' + time + '</span>'
+            + '</div>'
+            + '<div class="message-body">' + content + '</div>'
+            + '<div class="message-actions mt-2">'
+            + '<button type="button" class="btn btn-sm btn-back reply-btn" '
+            + 'data-parent-id="' + msg.id + '" data-sender="' + escapeHTML(msg.sender) + '">'
+            + '<i class="fa-solid fa-reply me-1"></i>Reply</button>'
+            + '</div>'
+            + '</div>';
+    }
+
+    function buildReplyHTML(msg) {
+        var roleClass = msg.sender_is_staff ? 'message-staff' : 'message-client';
+        var roleBadge = msg.sender_is_staff
+            ? '<span class="message-role-badge">Staff</span>'
+            : '';
+        var avatarClass = msg.sender_is_staff ? ' message-avatar-staff' : '';
+        var initial = (msg.sender || '?').charAt(0).toUpperCase();
+        var content = escapeHTML(msg.content).replace(/\n/g, '<br>');
+
+        return '<div class="message-reply msg-animate msg-unread ' + roleClass + '" '
+            + 'data-message-id="' + msg.id + '" data-sender-id="' + (msg.sender_id || 0) + '">'
+            + '<div class="message-header d-flex align-items-center gap-2 mb-1">'
+            + '<span class="message-avatar message-avatar-sm' + avatarClass + '">' + initial + '</span>'
+            + '<div class="d-flex align-items-center gap-1">'
+            + '<span class="fw-700 small">' + escapeHTML(msg.sender) + '</span>'
+            + roleBadge
+            + '</div>'
+            + '<span class="x-small text-muted ms-auto message-time">' + (msg.created_at || '') + '</span>'
+            + '</div>'
+            + '<div class="message-body">' + content + '</div>'
+            + '</div>';
+    }
+
+    /* ── Send message ───────────────────────────────────────────────── */
+    function sendMessage() {
+        var content = msgInput.value.trim();
+        if (!content) return;
+
+        sendBtn.disabled = true;
+        sendBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i><span class="d-none d-sm-inline">Sending</span>';
+
+        ajax(URLS.send, {
+            method: 'POST',
+            body: { content: content, parent_id: replyParentId },
+        })
+        .then(function (data) {
+            if (data.ok) {
+                if (emptyState) emptyState.style.display = 'none';
+                var msg = data.message;
+                msg.sender_id = CURRENT_USER_ID;
+
+                if (msg.parent_id) {
+                    var parent = thread.querySelector('[data-message-id="' + msg.parent_id + '"]');
+                    if (parent) {
+                        var replies = parent.querySelector('.message-replies');
+                        if (!replies) {
+                            replies = document.createElement('div');
+                            replies.className = 'message-replies mt-2';
+                            parent.appendChild(replies);
+                        }
+                        replies.insertAdjacentHTML('beforeend', buildReplyHTML(msg));
+                    }
+                } else {
+                    newMsgDivider.insertAdjacentHTML('beforebegin', buildMessageHTML(msg));
+                }
+
+                lastMessageId = Math.max(lastMessageId, msg.id);
+                thread.dataset.lastId = lastMessageId;
+                msgInput.value = '';
+                cancelReply();
+                scrollToBottom(true);
+                updateCharCount();
+            } else {
+                alert(data.error || 'Failed to send message.');
+            }
+        })
+        .catch(function () { alert('Network error. Please try again.'); })
+        .finally(function () {
+            sendBtn.disabled = false;
+            sendBtn.innerHTML = '<i class="fa-solid fa-paper-plane me-1"></i><span class="d-none d-sm-inline">Send</span>';
+            msgInput.focus();
+        });
+    }
+
+    /* ── Poll for new messages ──────────────────────────────────────── */
+    function poll() {
+        if (!isMessagesTabActive) return;
+
+        ajax(URLS.poll + '?since=' + lastMessageId)
+        .then(function (data) {
+            if (!data.ok || !data.messages || data.messages.length === 0) {
+                updatePollTime();
+                return;
+            }
+
+            var wasAtBottom = isNearBottom();
+            var newCount = 0;
+
+            data.messages.forEach(function (msg) {
+                if (thread.querySelector('[data-message-id="' + msg.id + '"]')) return;
+
+                if (emptyState) emptyState.style.display = 'none';
+
+                if (msg.parent_id) {
+                    var parent = thread.querySelector('[data-message-id="' + msg.parent_id + '"]');
+                    if (parent) {
+                        var replies = parent.querySelector('.message-replies');
+                        if (!replies) {
+                            replies = document.createElement('div');
+                            replies.className = 'message-replies mt-2';
+                            parent.appendChild(replies);
+                        }
+                        replies.insertAdjacentHTML('beforeend', buildReplyHTML(msg));
+                    }
+                } else {
+                    newMsgDivider.insertAdjacentHTML('beforebegin', buildMessageHTML(msg));
+                }
+
+                lastMessageId = Math.max(lastMessageId, msg.id);
+                newCount++;
+            });
+
+            if (newCount > 0) {
+                thread.dataset.lastId = lastMessageId;
+                if (wasAtBottom) scrollToBottom(true);
+                updateTabBadge(-newCount);
+            }
+
+            updatePollTime();
+        })
+        .catch(function () {})
+        .finally(function () {
+            pollTimer = setTimeout(poll, POLL_INTERVAL);
+        });
+    }
+
+    function startPolling() {
+        if (pollTimer) clearTimeout(pollTimer);
+        pollTimer = setTimeout(poll, POLL_INTERVAL);
+    }
+
+    function stopPolling() {
+        if (pollTimer) { clearTimeout(pollTimer); pollTimer = null; }
+    }
+
+    /* ── Mark messages as read ──────────────────────────────────────── */
+    function markAllRead() {
+        ajax(URLS.read, { method: 'POST' }).then(function (data) {
+            if (data.ok && data.marked > 0) {
+                thread.querySelectorAll('.msg-unread').forEach(function (el) {
+                    el.classList.remove('msg-unread');
+                });
+                updateTabBadge(0);
+            }
+        });
+    }
+
+    function updateTabBadge(delta) {
+        var badge = document.querySelector('[data-bs-target="#tab-messages"] .tab-count');
+        if (delta === 0) {
+            if (badge) badge.remove();
+            return;
+        }
+        var current = badge ? parseInt(badge.textContent, 10) : 0;
+        var next = Math.max(0, current + delta);
+        if (next <= 0) {
+            if (badge) badge.remove();
+        } else {
+            if (!badge) {
+                badge = document.createElement('span');
+                badge.className = 'tab-count';
+                document.querySelector('[data-bs-target="#tab-messages"]').appendChild(badge);
+            }
+            badge.textContent = next;
+        }
+    }
+
+    /* ── Tab activation tracking ────────────────────────────────────── */
+    var msgTabBtn = document.querySelector('[data-bs-target="#tab-messages"]');
+    if (msgTabBtn) {
+        msgTabBtn.addEventListener('shown.bs.tab', function () {
+            isMessagesTabActive = true;
+            if (!hasScrolledToBottom) {
+                scrollToBottom(false);
+                hasScrolledToBottom = true;
+            }
+            markAllRead();
+            startPolling();
+        });
+        msgTabBtn.addEventListener('hidden.bs.tab', function () {
+            isMessagesTabActive = false;
+            stopPolling();
+        });
+    }
+
+    /* ── Reply handling ─────────────────────────────────────────────── */
+    thread.addEventListener('click', function (e) {
+        var btn = e.target.closest('.reply-btn');
+        if (!btn) return;
+        replyParentId = parseInt(btn.dataset.parentId, 10);
+        replyToName.textContent = btn.dataset.sender;
+        replyPreview.classList.remove('d-none');
+        msgInput.focus();
+    });
+
+    cancelReplyBtn.addEventListener('click', cancelReply);
+
+    function cancelReply() {
+        replyParentId = null;
+        replyPreview.classList.add('d-none');
+    }
+
+    /* ── Input events ───────────────────────────────────────────────── */
+    messageForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        sendMessage();
+    });
+
+    msgInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+
+    msgInput.addEventListener('input', updateCharCount);
+
+    function updateCharCount() {
+        var len = msgInput.value.length;
+        if (len > 4500) {
+            charCount.textContent = len + '/5000';
+            charCount.classList.remove('d-none');
+        } else {
+            charCount.classList.add('d-none');
+        }
+    }
+
+    /* ── Initial scroll + mark-read if tab is already active ────────── */
+    if (messagesTab && messagesTab.classList.contains('show')) {
+        isMessagesTabActive = true;
+        scrollToBottom(false);
+        hasScrolledToBottom = true;
+        markAllRead();
+        startPolling();
+    }
+})();
+
+/* ── Feedback star rating ─────────────────────────────────────────── */
+(function () {
+    'use strict';
+    var container = document.getElementById('starRatingInput');
+    var ratingInput = document.getElementById('ratingInput');
+    var ratingText = document.getElementById('ratingText');
+    var submitBtn = document.getElementById('submitFeedbackBtn');
+    if (!container || !ratingInput) return;
+
+    var stars = container.querySelectorAll('.star-input');
+    var labels = ['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'];
+    var currentRating = 0;
+
+    stars.forEach(function (star) {
+        star.addEventListener('mouseenter', function () {
+            var val = parseInt(this.dataset.rating, 10);
+            stars.forEach(function (s) {
+                s.classList.toggle('hover-preview', parseInt(s.dataset.rating, 10) <= val);
+            });
+        });
+
+        star.addEventListener('mouseleave', function () {
+            stars.forEach(function (s) {
+                s.classList.remove('hover-preview');
+            });
+        });
+
+        star.addEventListener('click', function () {
+            currentRating = parseInt(this.dataset.rating, 10);
+            ratingInput.value = currentRating;
+            stars.forEach(function (s) {
+                var isActive = parseInt(s.dataset.rating, 10) <= currentRating;
+                s.classList.toggle('active', isActive);
+                s.className = s.className.replace('fa-regular', isActive ? 'fa-solid' : 'fa-regular');
+            });
+            ratingText.textContent = labels[currentRating] + ' (' + currentRating + '/5)';
+            if (submitBtn) submitBtn.disabled = false;
+        });
+    });
+})();
+</script>
+{% endblock %}

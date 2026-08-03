@@ -1,0 +1,62 @@
+{% extends "forum/base_forum.html" %}
+{% load static forum_tags %}
+
+{% block forum_title %}Events{% endblock %}
+
+{% block forum_content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <h4 class="fw-800 mb-0"><i class="fas fa-calendar-alt text-primary me-2"></i>Community Events</h4>
+</div>
+
+{% if upcoming %}
+<h5 class="fw-700 mb-3"><i class="fas fa-play-circle text-success me-2"></i>Upcoming</h5>
+<div class="row g-3 mb-5">
+    {% for event in upcoming %}
+    <div class="col-md-6">
+        <div class="forum-card p-4 h-100">
+            <div class="d-flex align-items-start gap-2 mb-2">
+                <span class="badge rounded-pill {% if event.event_type == 'hackathon' %}bg-danger{% elif event.event_type == 'webinar' %}bg-primary{% elif event.event_type == 'workshop' %}bg-success{% else %}bg-info{% endif %} bg-opacity-10 text-white px-3 py-1">
+                    {{ event.get_event_type_display }}
+                </span>
+                {% if event.is_online %}<span class="badge bg-info bg-opacity-10 text-info small">Online</span>{% endif %}
+            </div>
+            <h5 class="fw-700 mb-1">{{ event.title }}</h5>
+            <p class="text-secondary small mb-2">{{ event.description|truncatechars:150 }}</p>
+            <div class="small text-secondary mb-2">
+                <div><i class="far fa-clock me-1"></i>{{ event.start_date|date:"M j, Y H:i" }} - {{ event.end_date|date:"M j, Y H:i" }}</div>
+                {% if event.location %}<div><i class="fas fa-map-marker-alt me-1"></i>{{ event.location }}</div>{% endif %}
+            </div>
+            {% if event.registration_link %}
+            <a href="{{ event.registration_link }}" target="_blank" class="btn btn-primary btn-sm rounded-pill">Register Now</a>
+            {% endif %}
+            {% if event.meeting_link %}
+            <a href="{{ event.meeting_link }}" target="_blank" class="btn btn-outline-secondary btn-sm rounded-pill">Join Meeting</a>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if past %}
+<h5 class="fw-700 mb-3"><i class="fas fa-history text-secondary me-2"></i>Past Events</h5>
+<div class="row g-3">
+    {% for event in past %}
+    <div class="col-md-4">
+        <div class="forum-card p-3 h-100 opacity-75">
+            <span class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary small px-2 mb-1">{{ event.get_event_type_display }}</span>
+            <h6 class="fw-700 mb-1">{{ event.title }}</h6>
+            <div class="small text-secondary">{{ event.start_date|date:"M j, Y" }}</div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if not upcoming and not past %}
+<div class="text-center py-5 text-secondary">
+    <i class="fas fa-calendar fs-1 mb-2"></i>
+    <p class="mb-0">No events scheduled.</p>
+</div>
+{% endif %}
+{% endblock %}

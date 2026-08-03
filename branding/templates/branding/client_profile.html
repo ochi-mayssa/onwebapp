@@ -1,0 +1,331 @@
+{% extends 'branding/base.html' %}
+{% load branding_extras %}
+
+{% block title %}My Profile | Branding Studio{% endblock %}
+
+{% block branding_content %}
+<style>
+.cp-hero{background:linear-gradient(135deg,#4f46e5,#7c3aed);border-radius:1rem;padding:2rem;color:#fff;position:relative;overflow:hidden}
+.cp-hero::after{content:'';position:absolute;top:-50%;right:-20%;width:300px;height:300px;background:rgba(255,255,255,.08);border-radius:50%}
+.cp-stat-card{background:var(--surface-card,#fff);border:1px solid var(--border-color,#e5e7eb);border-radius:.75rem;padding:1rem;text-align:center;transition:all .2s}
+.cp-stat-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.cp-stat-icon{width:40px;height:40px;border-radius:.5rem;display:inline-flex;align-items:center;justify-content:center;font-size:1rem;margin-bottom:.5rem}
+.cp-stat-icon.si-requests{background:#eef2ff;color:#4f46e5}
+.cp-stat-icon.si-completed{background:#f0fdf4;color:#16a34a}
+.cp-stat-icon.si-drafts{background:#fef3c7;color:#d97706}
+.cp-stat-icon.si-favorites{background:#fef2f2;color:#ef4444}
+.cp-panel{background:var(--surface-card,#fff);border:1px solid var(--border-color,#e5e7eb);border-radius:.75rem;overflow:hidden}
+.cp-panel-header{padding:.85rem 1.1rem;border-bottom:1px solid var(--border-color,#e5e7eb);display:flex;align-items:center;justify-content:space-between;background:var(--surface-muted,#f9fafb)}
+.cp-panel-header h6{margin:0;font-size:.85rem;font-weight:700}
+.cp-panel-body{padding:1.1rem}
+.cp-info-row{display:flex;justify-content:space-between;padding:.5rem 0;border-bottom:1px solid var(--border-color,#f3f4f6)}
+.cp-info-row:last-child{border-bottom:none}
+.cp-info-label{font-size:.75rem;color:#6b7280;font-weight:600}
+.cp-info-value{font-size:.8rem;font-weight:600}
+.cp-collection{border:1px solid var(--border-color,#e5e7eb);border-radius:.5rem;overflow:hidden;transition:all .15s}
+.cp-collection:hover{border-color:#c7d2fe;transform:translateY(-1px)}
+.cp-collection.is-fav{border-color:#fca5a5;background:#fef2f2}
+.cp-draft-item{display:flex;align-items:center;justify-content:space-between;padding:.75rem;border:1px solid var(--border-color,#e5e7eb);border-radius:.5rem;margin-bottom:.5rem;transition:all .15s}
+.cp-draft-item:hover{border-color:#c7d2fe}
+.cp-form-section{background:var(--surface-card,#fff);border:1px solid var(--border-color,#e5e7eb);border-radius:.75rem;padding:1.25rem;margin-bottom:1rem}
+.cp-form-section h6{font-size:.85rem;font-weight:700;margin-bottom:1rem}
+</style>
+
+<div class="container py-4 py-lg-5" style="max-width:960px;">
+
+    {# ── Hero Header ── #}
+    <div class="cp-hero mb-4">
+        <div class="d-flex align-items-center gap-4" style="position:relative;z-index:1">
+            <div class="flex-shrink-0">
+                <div style="width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:1.8rem;font-weight:800">
+                    {{ user.username|slice:":1"|upper }}
+                </div>
+            </div>
+            <div>
+                <h3 class="fw-800 mb-1">{{ user.get_full_name|default:user.username }}</h3>
+                <p class="mb-1 opacity-75 small">{{ user.email|default:"No email set" }}</p>
+                <p class="mb-0 opacity-50" style="font-size:.7rem">Member since {{ user.date_joined|date:"M j, Y" }}</p>
+            </div>
+            <div class="ms-auto text-end d-none d-md-block">
+                <a href="{% url 'branding:my_requests' %}" class="btn btn-sm btn-white btn-opacity-20 text-white"><i class="fa-solid fa-folder-open me-1"></i>My Projects</a>
+            </div>
+        </div>
+    </div>
+
+    {# ── Stats Row ── #}
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <a href="{% url 'branding:my_requests' %}" class="cp-stat-card text-decoration-none">
+                <div class="cp-stat-icon si-requests"><i class="fa-solid fa-folder-open"></i></div>
+                <div class="cp-stat-value" style="font-size:1.3rem;font-weight:800;color:var(--bs-body-color)">{{ total_requests }}</div>
+                <div style="font-size:.7rem;color:#6b7280;font-weight:600">Total Projects</div>
+            </a>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="cp-stat-card">
+                <div class="cp-stat-icon si-completed"><i class="fa-solid fa-circle-check"></i></div>
+                <div class="cp-stat-value" style="font-size:1.3rem;font-weight:800;color:#16a34a">{{ completed_requests }}</div>
+                <div style="font-size:.7rem;color:#6b7280;font-weight:600">Completed</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="cp-stat-card">
+                <div class="cp-stat-icon si-drafts"><i class="fa-solid fa-pen-to-square"></i></div>
+                <div class="cp-stat-value" style="font-size:1.3rem;font-weight:800;color:#d97706">{{ drafts|length }}</div>
+                <div style="font-size:.7rem;color:#6b7280;font-weight:600">Drafts</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="cp-stat-card">
+                <div class="cp-stat-icon si-favorites"><i class="fa-solid fa-heart"></i></div>
+                <div class="cp-stat-value" style="font-size:1.3rem;font-weight:800;color:#ef4444">{{ favorite_ids|length }}</div>
+                <div style="font-size:.7rem;color:#6b7280;font-weight:600">Favorites</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        {# ── Left Column ── #}
+        <div class="col-lg-8">
+
+            {# ── Default Preferences ── #}
+            <form method="post" class="mb-4" id="profileForm">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="save_profile">
+                <div class="cp-panel">
+                    <div class="cp-panel-header">
+                        <h6><i class="fa-solid fa-sliders me-2 text-primary"></i>Default Preferences</h6>
+                    </div>
+                    <div class="cp-panel-body">
+                        <p class="x-small text-muted mb-3">These defaults will pre-fill the wizard when you start a new project.</p>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label" style="font-size:.75rem;font-weight:600">Default Industry</label>
+                                <select name="default_industry" class="form-select form-select-sm">
+                                    <option value="">No preference</option>
+                                    {% for value, label in industries %}
+                                    <option value="{{ value }}" {% if profile.default_industry == value %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" style="font-size:.75rem;font-weight:600">Default Country</label>
+                                <input type="text" name="default_country" class="form-control form-control-sm"
+                                       value="{{ profile.default_country }}" placeholder="e.g. United States" list="countryList">
+                                <datalist id="countryList">
+                                    <option value="United States"><option value="Canada"><option value="United Kingdom">
+                                    <option value="France"><option value="Germany"><option value="Spain"><option value="Italy">
+                                    <option value="UAE"><option value="Saudi Arabia"><option value="Egypt"><option value="Morocco">
+                                    <option value="Australia"><option value="India"><option value="China"><option value="Japan">
+                                    <option value="Brazil"><option value="Mexico"><option value="Nigeria"><option value="South Africa">
+                                </datalist>
+                            </div>
+                        </div>
+
+                        <h6 class="fw-700 mt-4 mb-2" style="font-size:.8rem">Email Notifications</h6>
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" name="email_on_status" id="emailStatus"
+                                           {% if profile.notification_preferences.email_on_status|default:True %}checked{% endif %}>
+                                    <label class="form-check-label" style="font-size:.75rem" for="emailStatus">Status changes on my requests</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" name="email_on_message" id="emailMessage"
+                                           {% if profile.notification_preferences.email_on_message|default:True %}checked{% endif %}>
+                                    <label class="form-check-label" style="font-size:.75rem" for="emailMessage">New messages from staff</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" name="email_on_assignment" id="emailAssignment"
+                                           {% if profile.notification_preferences.email_on_assignment|default:True %}checked{% endif %}>
+                                    <label class="form-check-label" style="font-size:.75rem" for="emailAssignment">Designer assignment</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" name="email_marketing" id="emailMarketing"
+                                           {% if profile.notification_preferences.email_marketing %}checked{% endif %}>
+                                    <label class="form-check-label" style="font-size:.75rem" for="emailMarketing">Product updates & tips</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end mt-3 pt-3 border-top">
+                            <button type="submit" class="btn btn-brand-primary btn-sm px-3"><i class="fa-solid fa-floppy-disk me-1"></i>Save Preferences</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            {# ── Favorite Collections ── #}
+            <div class="cp-panel mb-4">
+                <div class="cp-panel-header">
+                    <h6><i class="fa-solid fa-heart me-2 text-danger"></i>Favorite Collections</h6>
+                    <span class="x-small text-muted">{{ favorite_ids|length }} saved</span>
+                </div>
+                <div class="cp-panel-body">
+                    {% if collections %}
+                    <div class="row g-3">
+                        {% for c in collections %}
+                        <div class="col-6 col-md-4">
+                            <div class="cp-collection {% if c.pk in favorite_ids %}is-fav{% endif %}">
+                                <div style="min-height:80px;overflow:hidden">
+                                    {% if c.preview_image %}
+                                    <img src="{{ c.preview_image.url }}" alt="{{ c.name }}" class="w-100" style="object-fit:cover;height:80px" loading="lazy">
+                                    {% else %}
+                                    <div class="w-100 d-flex align-items-center justify-content-center" style="height:80px;background:linear-gradient(135deg,{{ c.accent_color }}33,{{ c.accent_color }}88)">
+                                        <span class="fw-800 text-white">{{ c.name|slice:":2"|upper }}</span>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="p-2">
+                                    <div class="fw-700 small text-truncate">{{ c.name }}</div>
+                                    <div class="x-small text-muted text-truncate">{{ c.industry }}</div>
+                                    <form method="post" class="mt-1">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="toggle_favorite">
+                                        <input type="hidden" name="collection_id" value="{{ c.pk }}">
+                                        <button type="submit" class="btn btn-sm w-100 {% if c.pk in favorite_ids %}btn-outline-danger{% else %}btn-outline-primary{% endif %}" style="font-size:.7rem">
+                                            {% if c.pk in favorite_ids %}
+                                            <i class="fa-solid fa-heart-crack me-1"></i>Remove
+                                            {% else %}
+                                            <i class="fa-regular fa-heart me-1"></i>Save
+                                            {% endif %}
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center text-muted py-4 small">No collections available yet.</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {# ── Draft Requests ── #}
+            <div class="cp-panel mb-4">
+                <div class="cp-panel-header">
+                    <h6><i class="fa-solid fa-pen-to-square me-2 text-primary"></i>Draft Requests</h6>
+                    <span class="x-small text-muted">{{ drafts|length }} active</span>
+                </div>
+                <div class="cp-panel-body">
+                    {% if drafts %}
+                    {% for d in drafts %}
+                    <div class="cp-draft-item">
+                        <div class="d-flex align-items-center gap-3">
+                            <div style="width:36px;height:36px;border-radius:.5rem;background:#eef2ff;color:#4f46e5;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.75rem">
+                                {{ d.company_name|slice:":1"|upper|default:"?" }}
+                            </div>
+                            <div>
+                                <div class="fw-700 small">{{ d.company_name|default:"Untitled request" }}</div>
+                                <div class="x-small text-muted">
+                                    Step {{ d.current_step }} of 4
+                                    {% if d.industry %} · {{ d.get_industry_display }}{% endif %}
+                                    {% if d.collection %} · {{ d.collection.name }}{% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <a href="{% url 'branding:wizard_step' step=d.current_step %}" class="btn btn-sm btn-brand-primary">
+                            <i class="fa-solid fa-play me-1"></i>Continue
+                        </a>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="text-center py-4">
+                        <p class="text-muted mb-2 small">No drafts in progress.</p>
+                        <a href="{% url 'branding:wizard' %}" class="btn btn-brand-primary btn-sm">
+                            <i class="fa-solid fa-plus me-1"></i>Start New Project
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        {# ── Right Column ── #}
+        <div class="col-lg-4">
+
+            {# ── Account Info ── #}
+            <div class="cp-panel mb-4">
+                <div class="cp-panel-header">
+                    <h6><i class="fa-solid fa-user me-2 text-secondary"></i>Account Info</h6>
+                </div>
+                <div class="cp-panel-body">
+                    <div class="cp-info-row">
+                        <span class="cp-info-label">Username</span>
+                        <span class="cp-info-value">{{ user.username }}</span>
+                    </div>
+                    <div class="cp-info-row">
+                        <span class="cp-info-label">Email</span>
+                        <span class="cp-info-value">{{ user.email|default:"—" }}</span>
+                    </div>
+                    <div class="cp-info-row">
+                        <span class="cp-info-label">Full Name</span>
+                        <span class="cp-info-value">{{ user.get_full_name|default:"—" }}</span>
+                    </div>
+                    <div class="cp-info-row">
+                        <span class="cp-info-label">Member Since</span>
+                        <span class="cp-info-value">{{ user.date_joined|date:"M j, Y" }}</span>
+                    </div>
+                    <div class="cp-info-row">
+                        <span class="cp-info-label">Last Login</span>
+                        <span class="cp-info-value">{{ user.last_login|date:"M j, Y H:i"|default:"—" }}</span>
+                    </div>
+                    <div class="mt-3 pt-3 border-top">
+                        <a href="{% url 'users:profile_edit' %}" class="btn btn-back btn-sm w-100">
+                            <i class="fa-solid fa-pen me-1"></i>Edit Account
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            {# ── Quick Links ── #}
+            <div class="cp-panel mb-4">
+                <div class="cp-panel-header">
+                    <h6><i class="fa-solid fa-bolt me-2 text-warning"></i>Quick Links</h6>
+                </div>
+                <div class="cp-panel-body">
+                    <div class="d-grid gap-1">
+                        <a href="{% url 'branding:my_requests' %}" class="cp-quick-link text-decoration-none" style="display:flex;align-items:center;gap:.65rem;padding:.6rem .75rem;border-radius:.5rem;color:var(--bs-body-color);transition:all .15s;border:1px solid transparent">
+                            <i class="fa-solid fa-folder-open" style="color:#3b82f6;width:18px;text-align:center"></i>
+                            <span class="small">My Projects</span>
+                        </a>
+                        <a href="{% url 'branding:wizard' %}" class="cp-quick-link text-decoration-none" style="display:flex;align-items:center;gap:.65rem;padding:.6rem .75rem;border-radius:.5rem;color:var(--bs-body-color);transition:all .15s;border:1px solid transparent">
+                            <i class="fa-solid fa-plus" style="color:#22c55e;width:18px;text-align:center"></i>
+                            <span class="small">Start New Project</span>
+                        </a>
+                        <a href="{% url 'branding:notifications' %}" class="cp-quick-link text-decoration-none" style="display:flex;align-items:center;gap:.65rem;padding:.6rem .75rem;border-radius:.5rem;color:var(--bs-body-color);transition:all .15s;border:1px solid transparent">
+                            <i class="fa-solid fa-bell" style="color:#f59e0b;width:18px;text-align:center"></i>
+                            <span class="small">Notifications</span>
+                        </a>
+                        <a href="{% url 'users:logout' %}" class="cp-quick-link text-decoration-none" style="display:flex;align-items:center;gap:.65rem;padding:.6rem .75rem;border-radius:.5rem;color:#ef4444;transition:all .15s;border:1px solid transparent">
+                            <i class="fa-solid fa-arrow-right-from-bracket" style="color:#ef4444;width:18px;text-align:center"></i>
+                            <span class="small">Log Out</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            {# ── Security ── #}
+            <div class="cp-panel">
+                <div class="cp-panel-header">
+                    <h6><i class="fa-solid fa-shield-halved me-2 text-success"></i>Security</h6>
+                </div>
+                <div class="cp-panel-body">
+                    <p class="x-small text-muted mb-2">Manage your password and account security settings.</p>
+                    <a href="{% url 'users:profile_edit' %}" class="btn btn-back btn-sm w-100">
+                        <i class="fa-solid fa-key me-1"></i>Change Password
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

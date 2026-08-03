@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block title %}URL Intelligence - OnWebApp{% endblock %}
+{% block content %}
+<div class="container mt-5 mb-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home:home' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'seo_analyzer:index' %}">SEO</a></li>
+            <li class="breadcrumb-item active" aria-current="page">URL Intelligence</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+        <div>
+            <h1 class="mb-2">URL Intelligence</h1>
+            <p class="text-muted mb-0">Analyze one URL at a time for technical URL quality, SEO clarity, canonical consistency, and indexability risks.</p>
+        </div>
+        <div class="text-end">
+            <div class="small text-uppercase text-muted fw-semibold mb-2">SEO Tools</div>
+            <div class="d-flex gap-2 flex-wrap justify-content-end">
+                <a href="{% url 'seo_analyzer:checker' %}" class="btn btn-outline-primary">Website Checker</a>
+                <a href="{% url 'seo_analyzer:url_intelligence' %}" class="btn btn-primary">URL Intelligence</a>
+                <a href="{% url 'seo_analyzer:link_checker' %}" class="btn btn-outline-success">Link Checker</a>
+                <a href="{% url 'seo_analyzer:sitemap' %}" class="btn btn-outline-primary">Sitemap Intelligence</a>
+                <a href="{% url 'seo_analyzer:backlinks' %}" class="btn btn-outline-warning">Backlinks</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-4">
+            <div class="row g-4 align-items-center">
+                <div class="col-lg-7">
+                    <span class="badge bg-primary-subtle text-primary mb-3">Standalone URL Analysis</span>
+                    <h2 class="h4">Analyze a Single URL</h2>
+                    <p class="text-muted">Detect URL structure problems, technical accessibility issues, canonical conflicts, indexability signals, and SEO-friendly optimization opportunities without running a site-wide crawl.</p>
+                    <ul class="text-muted mb-0">
+                        <li>Checks original URL and final resolved URL.</li>
+                        <li>Separates functional parameters from tracking and potentially unnecessary parameters.</li>
+                        <li>Generates a transparent URL Health Score based only on URL-related factors.</li>
+                    </ul>
+                </div>
+                <div class="col-lg-5">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label" for="{{ form.url.id_for_label }}">URL</label>
+                            {{ form.url }}
+                            {% if form.url.errors %}
+                            <div class="text-danger small mt-1">{{ form.url.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label" for="{{ form.target_keyword.id_for_label }}">Target Keyword <span class="text-muted">(Optional)</span></label>
+                            {{ form.target_keyword }}
+                            {% if form.target_keyword.errors %}
+                            <div class="text-danger small mt-1">{{ form.target_keyword.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">{{ form.non_field_errors|join:", " }}</div>
+                        {% endif %}
+                        <button type="submit" class="btn btn-primary w-100">Analyze URL</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

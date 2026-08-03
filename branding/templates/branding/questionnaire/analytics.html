@@ -1,0 +1,165 @@
+{% extends 'branding/base.html' %}
+{% load branding_extras %}
+
+{% block title %}Analytics · Questionnaires{% endblock %}
+
+{% block branding_content %}
+<div class="detail-page">
+    <div class="container py-4 py-lg-5">
+
+        <div class="d-flex align-items-start justify-content-between flex-wrap gap-3 mb-4">
+            <div>
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <a href="{% url 'branding:questionnaire_list' request_pk=request_obj.pk %}" class="btn btn-back btn-sm"><i class="fa-solid fa-arrow-left me-1"></i>All Questionnaires</a>
+                    <span class="request-number-display">{{ request_obj.request_number }}</span>
+                </div>
+                <h1 class="fw-800 mb-1"><i class="fa-solid fa-chart-line me-2 text-primary"></i>Analytics</h1>
+                <p class="text-muted mb-0">{{ request_obj.company_name }} · {{ total_questionnaires }} questionnaire{{ total_questionnaires|pluralize }}</p>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-xl-3">
+                <div class="detail-card rounded-4 p-4 text-center h-100">
+                    <div class="x-small text-muted fw-700 mb-1">Total Questionnaires</div>
+                    <div class="fw-800 display-6 text-primary">{{ total_questionnaires }}</div>
+                </div>
+            </div>
+            <div class="col-6 col-xl-3">
+                <div class="detail-card rounded-4 p-4 text-center h-100">
+                    <div class="x-small text-muted fw-700 mb-1">Completed</div>
+                    <div class="fw-800 display-6 text-success">{{ completed_count }}</div>
+                </div>
+            </div>
+            <div class="col-6 col-xl-3">
+                <div class="detail-card rounded-4 p-4 text-center h-100">
+                    <div class="x-small text-muted fw-700 mb-1">Avg. Completion</div>
+                    <div class="fw-800 display-6 text-primary">{{ avg_completion }}%</div>
+                </div>
+            </div>
+            <div class="col-6 col-xl-3">
+                <div class="detail-card rounded-4 p-4 text-center h-100">
+                    <div class="x-small text-muted fw-700 mb-1">Avg. Response Time</div>
+                    <div class="fw-800 display-6 text-primary">{{ avg_response_time }}</div>
+                </div>
+            </div>
+        </div>
+
+        {% if category_stats %}
+        <div class="detail-card rounded-4 p-4 mb-4">
+            <h6 class="fw-800 mb-3"><i class="fa-solid fa-shapes me-2 text-primary"></i>Category Completion</h6>
+            <div class="d-flex flex-column gap-3">
+                {% for category, stats in category_stats.items %}
+                <div>
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                        <span class="small fw-700">{{ category|default:"Uncategorized" }}</span>
+                        <span class="x-small text-muted fw-700">{{ stats.answered }}/{{ stats.total }} ({{ stats.percent }}%)</span>
+                    </div>
+                    <div class="progress" style="height: 8px;">
+                        <div class="progress-bar bg-primary" style="width: {{ stats.percent }}%;"></div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if common_preferences %}
+        <div class="detail-card rounded-4 p-4 mb-4">
+            <h6 class="fw-800 mb-3"><i class="fa-solid fa-palette me-2 text-primary"></i>Common Preferences</h6>
+            <div class="row g-4">
+                {% if common_preferences.colors %}
+                <div class="col-md-4">
+                    <div class="small fw-700 mb-2 text-muted">Colors</div>
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for color in common_preferences.colors %}
+                        <span class="d-inline-flex align-items-center gap-1 px-2 py-1 rounded-pill x-small border">
+                            <span class="rounded-circle d-inline-block" style="width: 14px; height: 14px; background: {{ color }};"></span>
+                            {{ color }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                {% if common_preferences.fonts %}
+                <div class="col-md-4">
+                    <div class="small fw-700 mb-2 text-muted">Fonts</div>
+                    <div class="d-flex flex-wrap gap-1">
+                        {% for font in common_preferences.fonts %}
+                        <span class="badge bg-light text-dark rounded-pill px-3 py-2">{{ font }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                {% if common_preferences.styles %}
+                <div class="col-md-4">
+                    <div class="small fw-700 mb-2 text-muted">Styles</div>
+                    <div class="d-flex flex-wrap gap-1">
+                        {% for style in common_preferences.styles %}
+                        <span class="badge bg-light text-dark rounded-pill px-3 py-2">{{ style }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if question_stats %}
+        <div class="detail-card rounded-4 p-4 mb-4">
+            <h6 class="fw-800 mb-3"><i class="fa-solid fa-chart-bar me-2 text-primary"></i>Question Performance</h6>
+            <div class="table-responsive">
+                <table class="table table-sm table-hover align-middle mb-0">
+                    <thead>
+                        <tr class="x-small text-muted fw-700">
+                            <th>Question</th>
+                            <th>Answers</th>
+                            <th>Avg. Scale</th>
+                            <th>Completion</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for stat in question_stats %}
+                        <tr>
+                            <td class="fw-600 small">{{ stat.question.text|truncatechars:60 }}</td>
+                            <td><span class="badge bg-primary-subtle text-primary rounded-pill x-small">{{ stat.total_answers }}</span></td>
+                            <td>{% if stat.avg_scale is not None %}<span class="fw-700">{{ stat.avg_scale }}</span>{% else %}<span class="text-muted">—</span>{% endif %}</td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="progress flex-grow-1" style="height: 4px; min-width: 60px;">
+                                        <div class="progress-bar bg-primary" style="width: {{ stat.completion_rate }}%;"></div>
+                                    </div>
+                                    <span class="x-small text-muted fw-700">{{ stat.completion_rate }}%</span>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if confusion_questions %}
+        <div class="detail-card rounded-4 p-4 mb-4 border-warning" style="border-width: 1px !important;">
+            <h6 class="fw-800 mb-3"><i class="fa-solid fa-triangle-exclamation me-2 text-warning"></i>Needs Attention</h6>
+            <p class="x-small text-muted mb-3">These questions have low completion rates and may need revision.</p>
+            <div class="d-flex flex-column gap-2">
+                {% for q in confusion_questions %}
+                <div class="d-flex align-items-center justify-content-between p-3 rounded-3 border" style="background: var(--bs-tertiary-bg);">
+                    <div class="flex-grow-1 min-width-0">
+                        <span class="fw-700 small text-truncate d-block">{{ q.text }}</span>
+                        <span class="x-small text-muted">{{ q.get_question_type_display|default:q.question_type }}</span>
+                    </div>
+                    <span class="badge bg-warning-subtle text-warning rounded-pill x-small flex-shrink-0 ms-3">
+                        <i class="fa-solid fa-circle-exclamation me-1"></i>Low completion
+                    </span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

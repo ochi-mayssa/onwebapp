@@ -1,0 +1,607 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ project.title }} | OnWebApp{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'projects:dashboard' %}" class="text-decoration-none">My Projects</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ project.title }}</li>
+        </ol>
+    </nav>
+
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-5">
+        <div>
+            <h1 class="fw-800 mb-2">{{ project.title }}</h1>
+            <p class="text-secondary mb-3">{{ project.description }}</p>
+            <div class="d-flex gap-2 flex-wrap">
+                <span class="badge bg-primary rounded-pill px-3 py-2 fw-700">
+                    <i class="fas fa-circle small me-1"></i> {{ project.get_current_status_display }}
+                </span>
+                <span class="badge bg-info-soft text-info rounded-pill px-3 py-2 fw-700">
+                    <i class="fas fa-flag me-1"></i> {{ project.get_current_phase_display }}
+                </span>
+            </div>
+        </div>
+        <div class="card border-0 shadow-sm" style="min-width: 200px;">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="x-small text-secondary fw-800 uppercase">Progress</span>
+                    <span class="x-small fw-800 text-primary">{{ project.progress_percentage }}%</span>
+                </div>
+                <div class="progress rounded-pill mb-2" style="height: 8px; background-color: var(--bg-surface-secondary);">
+                    <div class="progress-bar bg-success rounded-pill" style="width: {{ project.progress_percentage }}%"></div>
+                </div>
+                {% if project.expected_delivery_date %}
+                <div class="x-small text-secondary fw-600">
+                    <i class="fas fa-calendar-alt me-1"></i> Target: {{ project.expected_delivery_date|date:"M d, Y" }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="row g-3 mb-5">
+        <div class="col-4 col-md-2">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-3 text-center">
+                    <h4 class="fw-800 mb-0">{{ total_phases }}</h4>
+                    <span class="x-small text-secondary fw-600">Total Phases</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-4 col-md-2">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-3 text-center">
+                    <h4 class="fw-800 mb-0 text-success">{{ completed_phases }}</h4>
+                    <span class="x-small text-secondary fw-600">Completed</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-4 col-md-2">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-3 text-center">
+                    <h4 class="fw-800 mb-0 text-primary">{{ in_progress_phases }}</h4>
+                    <span class="x-small text-secondary fw-600">In Progress</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-3 text-center">
+                    <h4 class="fw-800 mb-0">{{ deliverables|length }}</h4>
+                    <span class="x-small text-secondary fw-600">Deliverables</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-3 text-center">
+                    <h4 class="fw-800 mb-0">{{ team_members|length }}</h4>
+                    <span class="x-small text-secondary fw-600">Team Members</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+
+            <!-- Agile Plan Status -->
+            <div class="card border-0 shadow-sm mb-4 border-start border-5
+                {% if project.agile_status == 'APPROVED' %}border-success
+                {% elif project.agile_status == 'AWAITING_APPROVAL' %}border-warning
+                {% elif project.agile_status == 'CHANGES_REQUESTED' %}border-danger
+                {% else %}border-secondary{% endif %}">
+                <div class="card-header bg-transparent border-0 p-4 pb-0 d-flex justify-content-between align-items-center">
+                    <h5 class="fw-800 mb-0"><i class="fas fa-diagram-project text-primary me-2"></i>Agile Plan</h5>
+                    <span class="badge rounded-pill px-3 py-2 fw-700
+                        {% if project.agile_status == 'APPROVED' %}bg-success-soft text-success
+                        {% elif project.agile_status == 'AWAITING_APPROVAL' %}bg-warning-soft text-warning
+                        {% elif project.agile_status == 'CHANGES_REQUESTED' %}bg-danger-soft text-danger
+                        {% else %}bg-surface-secondary text-secondary{% endif %}">
+                        {{ project.get_agile_status_display }}
+                    </span>
+                </div>
+                <div class="card-body p-4">
+                    {% if project.agile_status == 'AWAITING_APPROVAL' %}
+                        <div class="alert alert-warning border-0 rounded-4 d-flex align-items-center gap-3">
+                            <i class="fas fa-exclamation-triangle fs-4 text-warning"></i>
+                            <div>
+                                <h6 class="fw-800 mb-1">Action Required: Review & Approve Agile Plan</h6>
+                                <p class="mb-0 small">Development will start only after your approval.</p>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2 mt-3">
+                            <form action="{% url 'projects:review_agile_plan' project.id %}" method="post" class="flex-grow-1">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="approve">
+                                <button type="submit" class="btn btn-success w-100 rounded-pill py-2 fw-800" onclick="return confirm('Approve the Agile Plan? Development will begin shortly.')">
+                                    <i class="fas fa-check me-2"></i>Approve Plan
+                                </button>
+                            </form>
+                            <button type="button" class="btn btn-outline-danger flex-grow-1 rounded-pill py-2 fw-800" data-bs-toggle="modal" data-bs-target="#requestChangesModal">
+                                <i class="fas fa-pen me-2"></i>Request Changes
+                            </button>
+                        </div>
+
+                    {% elif project.agile_status == 'APPROVED' %}
+                        <div class="alert alert-success border-0 rounded-4 d-flex align-items-center gap-3">
+                            <i class="fas fa-check-circle fs-4 text-success"></i>
+                            <div>
+                                <h6 class="fw-800 mb-1">Agile Plan Approved</h6>
+                                <p class="mb-0 small">Approved on {{ project.agile_plan_approved_at|date:"M d, Y" }}. Development is in progress.</p>
+                            </div>
+                        </div>
+                        {% if project.agile_plan_file %}
+                        <a href="{{ project.agile_plan_file.url }}" class="btn btn-outline-primary btn-sm rounded-pill px-4 fw-700" download>
+                            <i class="fas fa-download me-1"></i> Download Approved Plan
+                        </a>
+                        {% endif %}
+
+                    {% elif project.agile_status == 'CHANGES_REQUESTED' %}
+                        <div class="alert alert-info border-0 rounded-4">
+                            <h6 class="fw-800"><i class="fas fa-info-circle me-2"></i>Changes Requested</h6>
+                            <p class="small mb-0">Our team is reviewing your feedback and will update the plan shortly.</p>
+                            {% if project.agile_plan_rejection_reason %}
+                            <hr class="my-2">
+                            <p class="small text-secondary mb-0"><strong>Your Feedback:</strong> {{ project.agile_plan_rejection_reason }}</p>
+                            {% endif %}
+                        </div>
+
+                    {% else %}
+                        <div class="text-center py-3 text-secondary">
+                            <i class="fas fa-hourglass-half me-2"></i>The team is preparing your Agile Plan. You will be notified when it's ready for review.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Deliverables -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-transparent border-0 p-4 pb-0">
+                    <h5 class="fw-800 mb-0"><i class="fas fa-folder-open text-primary me-2"></i>Deliverables</h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if deliverables %}
+                    <div class="list-group list-group-flush border-0">
+                        {% for item in deliverables %}
+                        <div class="list-group-item p-4 bg-transparent border-bottom border-light d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="p-2 rounded-3 bg-primary-soft text-primary">
+                                    <i class="fas fa-file-alt"></i>
+                                </div>
+                                <div>
+                                    <h6 class="fw-700 mb-0">{{ item.name }}</h6>
+                                    <span class="x-small text-secondary fw-600">{{ item.phase.get_phase_type_display }} &bull; v{{ item.version }}</span>
+                                </div>
+                            </div>
+                            {% if item.file %}
+                            <a href="{{ item.file.url }}" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-700" download>
+                                <i class="fas fa-download me-1"></i> Download
+                            </a>
+                            {% elif item.link %}
+                            <a href="{{ item.link }}" target="_blank" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-700">
+                                <i class="fas fa-external-link-alt me-1"></i> Open
+                            </a>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="p-5 text-center">
+                        <div class="p-3 rounded-circle bg-surface-secondary d-inline-flex mb-3">
+                            <i class="fas fa-folder-open text-secondary opacity-50" style="font-size: 1.5rem;"></i>
+                        </div>
+                        <h6 class="text-secondary fw-800">No deliverables yet</h6>
+                        <p class="small text-secondary mb-0">Files shared by the team will appear here.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Communication -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-transparent border-0 p-4 pb-0 d-flex justify-content-between align-items-center">
+                    <h5 class="fw-800 mb-0"><i class="fas fa-comments text-primary me-2"></i>Communication</h5>
+                    <button class="btn btn-primary btn-sm rounded-pill px-3 fw-700" data-bs-toggle="modal" data-bs-target="#sendMessageModal">
+                        <i class="fas fa-paper-plane me-1"></i> Send Message
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    {% if feedback_list %}
+                    <div class="list-group list-group-flush border-0">
+                        {% for feedback in feedback_list %}
+                        <div class="list-group-item p-4 bg-transparent border-bottom border-light">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="badge rounded-pill px-3 py-1 fw-700
+                                    {% if feedback.is_admin_response %}bg-primary-soft text-primary
+                                    {% else %}bg-surface-secondary text-secondary{% endif %}">
+                                    {% if feedback.is_admin_response %}Project Manager{% else %}You{% endif %}
+                                </span>
+                                <small class="text-secondary fw-600">{{ feedback.created_at|date:"M d, Y H:i" }}</small>
+                            </div>
+                            <p class="mb-1 small fw-600">{{ feedback.content }}</p>
+                            {% if feedback.phase %}
+                            <small class="text-secondary">Re: {{ feedback.phase.get_phase_type_display }}</small>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="p-5 text-center">
+                        <p class="text-secondary small fw-600 mb-0">No messages yet.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Timeline / Phases -->
+            <div class="mb-4">
+                <h5 class="fw-800 mb-4">
+                    <i class="fas fa-road text-primary me-2"></i>
+                    {% if project.agile_status == 'APPROVED' %}Project Roadmap{% else %}Proposed Plan{% endif %}
+                </h5>
+
+                <div class="timeline-wrapper">
+                    {% for phase in phases %}
+                    <div class="card border-0 shadow-sm mb-3 phase-card border-start border-5
+                        {% if phase.status == 'COMPLETED' %}border-success
+                        {% elif phase.status == 'IN_PROGRESS' %}border-primary
+                        {% else %}border-secondary{% endif %}">
+                        <div class="card-body p-4">
+                            <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+                                <div>
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <h5 class="fw-800 mb-0">{{ phase.get_phase_type_display }}</h5>
+                                    </div>
+                                    <span class="badge rounded-pill px-3 py-1 fw-700
+                                        {% if phase.status == 'COMPLETED' %}bg-success-soft text-success
+                                        {% elif phase.status == 'IN_PROGRESS' %}bg-primary-soft text-primary
+                                        {% else %}bg-surface-secondary text-secondary{% endif %}">
+                                        {{ phase.get_status_display }}
+                                    </span>
+                                </div>
+                                {% if phase.start_date or phase.end_date %}
+                                <div class="text-secondary small fw-600 text-end">
+                                    {% if phase.start_date %}<i class="fas fa-calendar-alt me-1"></i>{{ phase.start_date|date:"M d" }}{% endif %}
+                                    {% if phase.end_date %} &mdash; {{ phase.end_date|date:"M d" }}{% endif %}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            {% if phase.client_visible_notes %}
+                            <p class="text-secondary small fw-600 mb-3">{{ phase.client_visible_notes }}</p>
+                            {% endif %}
+
+                            {% if phase.status == 'IN_PROGRESS' %}
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between small mb-1">
+                                    <span class="text-secondary fw-600">Phase Progress</span>
+                                    <span class="fw-800">{{ phase.progress }}%</span>
+                                </div>
+                                <div class="progress rounded-pill" style="height: 6px; background-color: var(--bg-surface-secondary);">
+                                    <div class="progress-bar bg-primary rounded-pill" style="width: {{ phase.progress }}%"></div>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <div class="pt-3 border-top d-flex flex-wrap justify-content-between align-items-center gap-2">
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 fw-700" data-bs-toggle="modal" data-bs-target="#phaseFeedbackModal{{ phase.id }}">
+                                        <i class="fas fa-comment me-1"></i> Message
+                                    </button>
+                                    {% if phase.approval_status == 'AWAITING_CLIENT' %}
+                                    <form action="{% url 'projects:approve_phase' project.id phase.id %}" method="post" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-success rounded-pill px-3 fw-700" onclick="return confirm('Approve this phase?')">
+                                            <i class="fas fa-check me-1"></i> Approve
+                                        </button>
+                                    </form>
+                                    <button class="btn btn-sm btn-outline-danger rounded-pill px-3 fw-700" data-bs-toggle="modal" data-bs-target="#requestPhaseChangesModal{{ phase.id }}">
+                                        <i class="fas fa-pen me-1"></i> Changes
+                                    </button>
+                                    {% endif %}
+                                </div>
+                                {% if phase.approval_status == 'AWAITING_CLIENT' %}
+                                <span class="badge bg-warning-soft text-warning rounded-pill px-3 py-1 fw-700">
+                                    <i class="fas fa-exclamation-circle me-1"></i> Approval Required
+                                </span>
+                                {% elif phase.is_locked %}
+                                <span class="badge bg-surface-secondary text-secondary rounded-pill px-3 py-1 fw-700">
+                                    <i class="fas fa-lock me-1"></i> Locked
+                                </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Phase Feedback Modal -->
+                    <div class="modal fade" id="phaseFeedbackModal{{ phase.id }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title fw-800">Message: {{ phase.get_phase_type_display }}</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <form action="{% url 'projects:add_client_phase_feedback' project.id phase.id %}" method="post">
+                                    {% csrf_token %}
+                                    <div class="modal-body">
+                                        <div class="mb-3">
+                                            <label class="form-label fw-700">Your Message</label>
+                                            <textarea class="form-control" name="content" rows="4" required placeholder="Question or feedback about this phase..."></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary rounded-pill px-4 fw-700" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-primary rounded-pill px-4 fw-700">Send</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Request Phase Changes Modal -->
+                    <div class="modal fade" id="requestPhaseChangesModal{{ phase.id }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title fw-800">Request Changes: {{ phase.get_phase_type_display }}</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <form action="{% url 'projects:request_changes_phase' project.id phase.id %}" method="post">
+                                    {% csrf_token %}
+                                    <div class="modal-body">
+                                        <div class="alert alert-info border-0 rounded-4 small">
+                                            <i class="fas fa-info-circle me-1"></i> Development on this phase will be paused until changes are resolved.
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-700">Reason for Changes</label>
+                                            <textarea class="form-control" name="reason" rows="4" required placeholder="Describe what needs to be changed..."></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary rounded-pill px-4 fw-700" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-danger rounded-pill px-4 fw-700">Submit Request</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-4 text-secondary bg-surface-secondary rounded-4">
+                        <i class="fas fa-road me-2"></i>No phases defined yet.
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+
+            <!-- Project Info -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-transparent border-0 p-4 pb-0">
+                    <h6 class="fw-800 mb-0"><i class="fas fa-info-circle text-primary me-2"></i>Project Info</h6>
+                </div>
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="small text-secondary fw-600">Created</span>
+                        <span class="small fw-700">{{ project.created_at|date:"M d, Y" }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="small text-secondary fw-600">Updated</span>
+                        <span class="small fw-700">{{ project.updated_at|date:"M d, Y" }}</span>
+                    </div>
+                    {% if project.expected_delivery_date %}
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="small text-secondary fw-600">Delivery</span>
+                        <span class="small fw-700 text-primary">{{ project.expected_delivery_date|date:"M d, Y" }}</span>
+                    </div>
+                    {% endif %}
+                    <div class="d-flex justify-content-between">
+                        <span class="small text-secondary fw-600">Status</span>
+                        <span class="badge rounded-pill px-3 py-1 fw-700
+                            {% if project.current_status == 'COMPLETED' %}bg-success-soft text-success
+                            {% elif project.current_status == 'IN_PROGRESS' %}bg-primary-soft text-primary
+                            {% else %}bg-surface-secondary text-secondary{% endif %}">
+                            {{ project.get_current_status_display }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Team -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-transparent border-0 p-4 pb-0">
+                    <h6 class="fw-800 mb-0"><i class="fas fa-users text-primary me-2"></i>Team</h6>
+                </div>
+                <div class="card-body p-0">
+                    {% if team_members %}
+                    <div class="list-group list-group-flush border-0">
+                        {% for member, roles in team_members.items %}
+                        <div class="list-group-item p-4 bg-transparent border-bottom border-light d-flex align-items-center gap-3">
+                            <div class="p-2 rounded-circle bg-primary-soft text-primary d-flex align-items-center justify-content-center fw-800" style="width: 40px; height: 40px;">
+                                {{ member.username|first|upper }}
+                            </div>
+                            <div>
+                                <h6 class="fw-700 mb-0 small">{{ member.get_full_name|default:member.username }}</h6>
+                                <small class="text-secondary fw-600">{{ roles|join:", " }}</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="p-4 text-center">
+                        <i class="fas fa-users text-secondary opacity-50 mb-2" style="font-size: 1.5rem;"></i>
+                        <p class="small text-secondary mb-0">Team assignments being finalized.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-transparent border-0 p-4 pb-0">
+                    <h6 class="fw-800 mb-0"><i class="fas fa-bolt text-primary me-2"></i>Quick Actions</h6>
+                </div>
+                <div class="list-group list-group-flush border-0">
+                    <button type="button" class="list-group-item list-group-item-action p-4 bg-transparent border-bottom border-light d-flex align-items-center gap-3 transition-hover" data-bs-toggle="modal" data-bs-target="#uploadAssetModal">
+                        <div class="p-2 rounded-3 bg-success-soft text-success">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-700 mb-0 small">Upload Assets</h6>
+                            <small class="text-secondary fw-600">Share files with the team</small>
+                        </div>
+                    </button>
+                    <a href="{% url 'contact:contact' %}" class="list-group-item list-group-item-action p-4 bg-transparent border-bottom border-light d-flex align-items-center gap-3 transition-hover">
+                        <div class="p-2 rounded-3 bg-primary-soft text-primary">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-700 mb-0 small">Contact Manager</h6>
+                            <small class="text-secondary fw-600">Send a message to the team</small>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Upload Asset Modal -->
+<div class="modal fade" id="uploadAssetModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-800">Upload Project Asset</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{% url 'projects:add_client_asset' project.id %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-700">Asset Name</label>
+                        <input type="text" class="form-control" name="name" required placeholder="e.g., Logo Files, Content Doc">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-700">File</label>
+                        <input type="file" class="form-control" name="file" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary rounded-pill px-4 fw-700" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-700">Upload</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Send Message Modal -->
+<div class="modal fade" id="sendMessageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-800">Send Message</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{% url 'projects:add_client_general_feedback' project.id %}" method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-700">Message</label>
+                        <textarea class="form-control" name="content" rows="4" required placeholder="Type your message here..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary rounded-pill px-4 fw-700" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-700">Send</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Request Changes Modal -->
+<div class="modal fade" id="requestChangesModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-800">Request Changes to Plan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{% url 'projects:review_agile_plan' project.id %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="reject">
+                <div class="modal-body">
+                    <div class="alert alert-info border-0 rounded-4 small">
+                        <i class="fas fa-info-circle me-1"></i> Please describe the changes you'd like to see in the project plan/timeline.
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-700">Reason for Changes</label>
+                        <textarea class="form-control" name="reason" rows="4" required placeholder="E.g., We need to move the payment integration to Sprint 1..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary rounded-pill px-4 fw-700" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger rounded-pill px-4 fw-700">Submit Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .timeline-wrapper {
+        position: relative;
+        padding-left: 2rem;
+    }
+    .timeline-wrapper::before {
+        content: '';
+        position: absolute;
+        left: 8px;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: var(--bs-primary, #6366f1);
+        border-radius: 10px;
+        opacity: 0.3;
+    }
+    .phase-card {
+        position: relative;
+    }
+    .phase-card::before {
+        content: '';
+        position: absolute;
+        left: -1.65rem;
+        top: 2rem;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: var(--bg-surface, #fff);
+        border: 3px solid var(--bs-primary, #6366f1);
+        z-index: 2;
+    }
+    .phase-card.border-success::before { border-color: var(--bs-success, #10b981); }
+    .phase-card.border-primary::before { border-color: var(--bs-primary, #6366f1); }
+    .phase-card.border-secondary::before { border-color: var(--bs-secondary, #6c757d); }
+    .transition-hover { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+    .transition-hover:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.08); }
+    @media (max-width: 768px) {
+        .timeline-wrapper { padding-left: 1.5rem; }
+        .phase-card::before { left: -1.15rem; }
+    }
+</style>
+{% endblock %}

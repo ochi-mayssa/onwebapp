@@ -1,0 +1,87 @@
+{% extends "services/futuristic_service_base.html" %}
+{% load i18n static %}
+{% block title %}Case Studies - Services{% endblock %}
+
+{% block service_content %}
+<div class="container position-relative z-2">
+  <nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'home:index' %}" class="text-decoration-none text-secondary">Home</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'services:index' %}" class="text-decoration-none text-secondary">Services</a></li>
+      <li class="breadcrumb-item active text-primary" aria-current="page">Case Studies</li>
+    </ol>
+  </nav>
+  
+  <div class="text-center mb-5 animate-on-scroll slide-up">
+    <h1 class="display-4 fw-bold mb-3 neon-text">Success Stories</h1>
+    <p class="lead text-secondary mx-auto" style="max-width: 700px;">
+        See how leading companies use our platform to drive growth and efficiency.
+    </p>
+  </div>
+
+  <div class="row g-4">
+    <!-- Case Study 1 -->
+    <div class="col-md-6 col-lg-4 animate-on-scroll slide-up">
+        <div class="holographic-card h-100 p-4">
+            <div class="mb-4">
+                <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 rounded-pill px-3 py-2">
+                    Manufacturing
+                </span>
+            </div>
+            <h3 class="card-title fw-bold mb-3">Smart Factory Transformation</h3>
+            <p class="card-text text-secondary mb-4">
+                How a leading automotive parts manufacturer reduced downtime by 40% using our Predictive Maintenance suite.
+            </p>
+            <div class="mt-auto pt-3 border-top border-secondary border-opacity-10">
+                <div class="d-flex align-items-center justify-content-between">
+                    <span class="fw-bold">Read Case Study</span>
+                    <i class="fas fa-arrow-right text-primary"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Case Study 2 -->
+    <div class="col-md-6 col-lg-4 animate-on-scroll slide-up" style="transition-delay: 0.1s;">
+        <div class="holographic-card h-100 p-4">
+            <div class="mb-4">
+                <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 rounded-pill px-3 py-2">
+                    E-Commerce
+                </span>
+            </div>
+            <h3 class="card-title fw-bold mb-3">SEO Dominance</h3>
+            <p class="card-text text-secondary mb-4">
+                Scaling organic traffic by 250% in 6 months with our Keyword Research and SEO Analytics tools.
+            </p>
+            <div class="mt-auto pt-3 border-top border-secondary border-opacity-10">
+                <div class="d-flex align-items-center justify-content-between">
+                    <span class="fw-bold">Read Case Study</span>
+                    <i class="fas fa-arrow-right text-secondary"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Case Study 3 -->
+    <div class="col-md-6 col-lg-4 animate-on-scroll slide-up" style="transition-delay: 0.2s;">
+        <div class="holographic-card h-100 p-4">
+            <div class="mb-4">
+                <span class="badge bg-info bg-opacity-10 text-info border border-info border-opacity-25 rounded-pill px-3 py-2">
+                    Retail
+                </span>
+            </div>
+            <h3 class="card-title fw-bold mb-3">Market Intelligence</h3>
+            <p class="card-text text-secondary mb-4">
+                Leveraging Competitor Tracking to identify gaps and capture 15% more market share in a crowded sector.
+            </p>
+            <div class="mt-auto pt-3 border-top border-secondary border-opacity-10">
+                <div class="d-flex align-items-center justify-content-between">
+                    <span class="fw-bold">Read Case Study</span>
+                    <i class="fas fa-arrow-right text-info"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

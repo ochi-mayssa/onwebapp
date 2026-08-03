@@ -1,0 +1,233 @@
+{% extends "branding/base.html" %}
+{% load branding_extras %}
+
+{% block title %}Calendar Integration{% endblock %}
+
+{% block branding_content %}
+<div class="container py-4">
+
+    {# ── Header ── #}
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+        <div>
+            <nav aria-label="breadcrumb" class="mb-2">
+                <ol class="breadcrumb mb-0 small">
+                    <li class="breadcrumb-item"><a href="{% url 'branding:designer_dashboard' %}" class="text-decoration-none"><i class="fa-solid fa-palette me-1"></i>My Work</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'branding:designer_dashboard' %}" class="text-decoration-none">Integrations</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Calendar</li>
+                </ol>
+            </nav>
+            <h1 class="h4 fw-bold mb-1"><i class="fa-solid fa-calendar-days me-2 text-primary"></i>Calendar Integration</h1>
+            <p class="text-muted mb-0 small">Sync your deadlines and manage events from your calendar.</p>
+        </div>
+    </div>
+
+    {# ── Connection Status ── #}
+    {% if connection %}
+    <div class="detail-card rounded-4 p-4 mb-4">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="d-flex align-items-center justify-content-center rounded-3" style="width:48px;height:48px;background:#f0fdf4;">
+                    <i class="fa-solid fa-link fa-lg" style="color:#16a34a;"></i>
+                </div>
+                <div>
+                    <h6 class="fw-bold mb-0">Connected to {{ connection.get_provider_display }}</h6>
+                    <p class="text-muted small mb-0">{{ connection.calendar_name }} &bull; Last synced {{ connection.last_synced|date:"M d, Y g:i A" }}</p>
+                </div>
+            </div>
+            <form method="post" class="d-inline">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="disconnect">
+                <button type="submit" class="btn btn-sm btn-outline-danger">
+                    <i class="fa-solid fa-link-slash me-1"></i>Disconnect
+                </button>
+            </form>
+        </div>
+    </div>
+
+    {# ── Sync & Add Event Row ── #}
+    <div class="row g-4 mb-4">
+
+        {# ── Sync Deadlines ── #}
+        <div class="col-lg-4">
+            <div class="detail-card rounded-4 p-4 h-100">
+                <h6 class="fw-bold mb-3"><i class="fa-solid fa-rotate me-2 text-primary"></i>Sync</h6>
+                <p class="text-muted small mb-3">Pull all current project deadlines into your calendar.</p>
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="sync_deadlines">
+                    <button type="submit" class="btn btn-brand-primary w-100">
+                        <i class="fa-solid fa-cloud-arrow-down me-1"></i>Sync Deadlines
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        {# ── Add Event ── #}
+        <div class="col-lg-8">
+            <div class="detail-card rounded-4 p-4 h-100">
+                <h6 class="fw-bold mb-3"><i class="fa-solid fa-plus-circle me-2 text-success"></i>Add Event</h6>
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="add_event">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="event_title" class="form-label x-small fw-700">Title <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control form-control-sm" id="event_title" name="title" required placeholder="e.g. Logo Review">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="event_type" class="form-label x-small fw-700">Event Type <span class="text-danger">*</span></label>
+                            <select class="form-select form-select-sm" id="event_type" name="event_type" required>
+                                <option value="">Select type...</option>
+                                {% for value, label in EVENT_TYPES %}
+                                <option value="{{ value }}">{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label for="event_description" class="form-label x-small fw-700">Description</label>
+                            <textarea class="form-control form-control-sm" id="event_description" name="description" rows="2" placeholder="Optional details..."></textarea>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="event_start" class="form-label x-small fw-700">Start Time <span class="text-danger">*</span></label>
+                            <input type="datetime-local" class="form-control form-control-sm" id="event_start" name="start_time" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="event_end" class="form-label x-small fw-700">End Time <span class="text-danger">*</span></label>
+                            <input type="datetime-local" class="form-control form-control-sm" id="event_end" name="end_time" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="event_request" class="form-label x-small fw-700">Link to Request</label>
+                            <select class="form-select form-select-sm" id="event_request" name="request_id">
+                                <option value="">None</option>
+                                {% for req in active_requests %}
+                                <option value="{{ req.pk }}">{{ req.request_number }} &mdash; {{ req.company_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="text-end mt-3">
+                        <button type="submit" class="btn btn-brand-primary btn-sm px-4">
+                            <i class="fa-solid fa-plus me-1"></i>Add Event
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {# ── Upcoming Events ── #}
+    <div class="detail-card rounded-4 p-4 mb-4">
+        <h6 class="fw-bold mb-3"><i class="fa-solid fa-calendar-check me-2 text-success"></i>Upcoming Events</h6>
+        {% if upcoming %}
+        <div class="row g-3">
+            {% for event in upcoming %}
+            <div class="col-md-6 col-xl-4">
+                <div class="detail-card rounded-3 p-3 h-100">
+                    <div class="d-flex align-items-start justify-content-between mb-2">
+                        <h6 class="fw-bold mb-0 text-truncate me-2">{{ event.title }}</h6>
+                        <span class="badge rounded-pill bg-primary-subtle text-primary x-small flex-shrink-0">{{ event.get_event_type_display }}</span>
+                    </div>
+                    <p class="x-small text-muted mb-1"><i class="fa-regular fa-clock me-1"></i>{{ event.start_time|date:"M d, Y g:i A" }} &ndash; {{ event.end_time|date:"g:i A" }}</p>
+                    {% if event.request %}
+                    <a href="{% url 'branding:request_detail' event.request.pk %}" class="x-small text-decoration-none">
+                        <i class="fa-solid fa-arrow-up-right-from-square me-1"></i>{{ event.request.request_number }}
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center text-muted py-4">
+            <i class="fa-regular fa-calendar fa-2x mb-2 opacity-25"></i>
+            <p class="mb-0 small">No upcoming events.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    {# ── Past Events ── #}
+    <div class="detail-card rounded-4 p-4">
+        <h6 class="fw-bold mb-3"><i class="fa-solid fa-calendar-xmark me-2 text-muted"></i>Past Events</h6>
+        {% if past %}
+        <div class="row g-3">
+            {% for event in past %}
+            <div class="col-md-6 col-xl-4">
+                <div class="detail-card rounded-3 p-3 h-100 opacity-75">
+                    <div class="d-flex align-items-start justify-content-between mb-2">
+                        <h6 class="fw-bold mb-0 text-truncate me-2">{{ event.title }}</h6>
+                        <span class="badge rounded-pill bg-secondary-subtle text-secondary x-small flex-shrink-0">{{ event.get_event_type_display }}</span>
+                    </div>
+                    <p class="x-small text-muted mb-1"><i class="fa-regular fa-clock me-1"></i>{{ event.start_time|date:"M d, Y g:i A" }}</p>
+                    {% if event.request %}
+                    <a href="{% url 'branding:request_detail' event.request.pk %}" class="x-small text-decoration-none">
+                        <i class="fa-solid fa-arrow-up-right-from-square me-1"></i>{{ event.request.request_number }}
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center text-muted py-4">
+            <i class="fa-regular fa-calendar-xmark fa-2x mb-2 opacity-25"></i>
+            <p class="mb-0 small">No past events.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    {% else %}
+
+    {# ── Not Connected — Connect Form ── #}
+    <div class="detail-card rounded-4 p-5">
+        <div class="text-center mb-4">
+            <div class="mx-auto mb-3 d-flex align-items-center justify-content-center rounded-4" style="width:72px;height:72px;background:#eff6ff;">
+                <i class="fa-solid fa-calendar-days fa-2x text-primary"></i>
+            </div>
+            <h5 class="fw-bold">Connect Your Calendar</h5>
+            <p class="text-muted mb-0 small">Link a calendar to sync deadlines and manage events.</p>
+        </div>
+        <form method="post" class="mx-auto" style="max-width:480px;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="connect">
+            <div class="mb-3">
+                <label for="provider" class="form-label x-small fw-700">Provider <span class="text-danger">*</span></label>
+                <select class="form-select form-select-sm" id="provider" name="provider" required>
+                    <option value="">Select provider...</option>
+                    <option value="google">Google Calendar</option>
+                    <option value="outlook">Microsoft Outlook</option>
+                    <option value="apple">Apple Calendar</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="calendar_id" class="form-label x-small fw-700">Calendar ID <span class="text-danger">*</span></label>
+                <input type="text" class="form-control form-control-sm" id="calendar_id" name="calendar_id" required placeholder="e.g. primary or calendar@domain.com">
+            </div>
+            <div class="mb-3">
+                <label for="calendar_name" class="form-label x-small fw-700">Calendar Name <span class="text-danger">*</span></label>
+                <input type="text" class="form-control form-control-sm" id="calendar_name" name="calendar_name" required placeholder="e.g. Work Calendar">
+            </div>
+            <div class="mb-4">
+                <label for="access_token" class="form-label x-small fw-700">Access Token <span class="text-danger">*</span></label>
+                <input type="password" class="form-control form-control-sm" id="access_token" name="access_token" required placeholder="OAuth access token">
+                <div class="form-text">Your calendar provider OAuth access token.</div>
+            </div>
+            <button type="submit" class="btn btn-brand-primary w-100">
+                <i class="fa-solid fa-link me-2"></i>Connect Calendar
+            </button>
+        </form>
+    </div>
+
+    {% endif %}
+
+</div>
+
+<style>
+    .text-truncate-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+</style>
+
+{% endblock %}

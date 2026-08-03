@@ -1,0 +1,66 @@
+{% extends 'branding/base.html' %}
+{% load branding_extras %}
+
+{% block title %}Edit {{ branding_request.request_number }}{% endblock %}
+
+{% block branding_content %}
+<div class="detail-page">
+    <div class="container py-4 py-lg-5" style="max-width: 960px;">
+        <div class="d-flex align-items-center gap-2 mb-4">
+            <a href="{% url 'branding:request_detail' branding_request.pk %}" class="btn btn-back btn-sm"><i class="fa-solid fa-arrow-left me-1"></i>Back</a>
+            <div>
+                <h1 class="fw-800 mb-0">Edit Request</h1>
+                <p class="text-muted mb-0">{{ branding_request.request_number }} · {{ branding_request.company_name }}</p>
+            </div>
+        </div>
+
+        <form method="post" class="detail-card rounded-4 p-4">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger rounded-3">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            <h5 class="fw-800 section-heading"><i class="fa-solid fa-building me-2 text-primary"></i>Company Information</h5>
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">{{ form.company_name.label_tag }} {{ form.company_name }}</div>
+                <div class="col-md-6">{{ form.industry.label_tag }} {{ form.industry }}</div>
+                <div class="col-md-6">{{ form.website.label_tag }} {{ form.website }}</div>
+                <div class="col-md-6">{{ form.country.label_tag }} {{ form.country }}</div>
+                <div class="col-12">{{ form.business_description.label_tag }} {{ form.business_description }}</div>
+            </div>
+
+            <h5 class="fw-800 section-heading"><i class="fa-solid fa-brush me-2 text-primary"></i>Brand Identity</h5>
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">{{ form.company_description.label_tag }} {{ form.company_description }}</div>
+                <div class="col-md-6">{{ form.target_audience.label_tag }} {{ form.target_audience }}</div>
+                <div class="col-12">
+                    {{ form.brand_values.label_tag }}
+                    <div class="option-chip-grid mt-2">{% for cb in form.brand_values %}{{ cb }}{% endfor %}</div>
+                </div>
+                <div class="col-12">
+                    {{ form.preferred_colors.label_tag }}
+                    <div class="option-chip-grid mt-2">{% for cb in form.preferred_colors %}{{ cb }}{% endfor %}</div>
+                </div>
+                <div class="col-12">
+                    {{ form.current_branding.label_tag }}
+                    <div class="option-chip-grid mt-2">{% for cb in form.current_branding %}{{ cb }}{% endfor %}</div>
+                </div>
+            </div>
+
+            <h5 class="fw-800 section-heading"><i class="fa-solid fa-cloud-arrow-up me-2 text-primary"></i>Notes & Workflow</h5>
+            <div class="row g-3 mb-4">
+                <div class="col-12">{{ form.additional_notes.label_tag }} {{ form.additional_notes }}</div>
+                <div class="col-md-6">{{ form.collection.label_tag }} {{ form.collection }}</div>
+                <div class="col-md-3">{{ form.status.label_tag }} {{ form.status }}</div>
+                <div class="col-md-3">{{ form.designer.label_tag }} {{ form.designer }}</div>
+                <div class="col-12">{{ form.internal_notes.label_tag }} {{ form.internal_notes }}</div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 border-top pt-3">
+                <a href="{% url 'branding:request_detail' branding_request.pk %}" class="btn btn-back">Cancel</a>
+                <button type="submit" class="btn btn-brand-primary px-4"><i class="fa-solid fa-floppy-disk me-2"></i>Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

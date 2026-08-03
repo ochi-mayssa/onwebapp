@@ -1,0 +1,3252 @@
+{% extends 'base.html' %}
+{% block title %}{{ report.analysis_type_label }} Report - OnWebApp{% endblock %}
+
+{% block extra_head %}
+  {{ block.super }}
+  {% if report.analysis_type == 'internal' %}
+  <style>
+    .internal-links-shell {
+      --seo-navy: #0f172a;
+      --seo-blue: #1d4ed8;
+      --seo-cyan: #06b6d4;
+      --seo-green: #10b981;
+      --seo-amber: #f59e0b;
+      --seo-red: #ef4444;
+      --seo-muted: #64748b;
+      padding-bottom: 6rem;
+    }
+
+    .internal-links-shell .dashboard-hero {
+      background:
+        radial-gradient(circle at top right, rgba(6, 182, 212, 0.18), transparent 28%),
+        radial-gradient(circle at bottom left, rgba(29, 78, 216, 0.16), transparent 30%),
+        linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(30, 41, 59, 0.96));
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      border-radius: 28px;
+      box-shadow: 0 24px 60px rgba(15, 23, 42, 0.22);
+      color: #fff;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .internal-links-shell .dashboard-hero::after {
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0.06), transparent);
+      content: "";
+      inset: 0;
+      pointer-events: none;
+      position: absolute;
+    }
+
+    .internal-links-shell .eyebrow {
+      color: rgba(255, 255, 255, 0.72);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .internal-links-shell .hero-subtitle,
+    .internal-links-shell .hero-meta {
+      color: rgba(255, 255, 255, 0.76);
+    }
+
+    .internal-links-shell .hero-subtitle {
+      max-width: 46rem;
+    }
+
+    .internal-links-shell .hero-meta-grid {
+      display: grid;
+      gap: 0.85rem;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .internal-links-shell .executive-mini-card {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 18px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      min-height: 88px;
+      padding: 0.9rem 1rem;
+    }
+
+    .internal-links-shell .executive-meta-label {
+      color: rgba(255, 255, 255, 0.62);
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.45rem;
+      text-transform: uppercase;
+    }
+
+    .internal-links-shell .executive-meta-value {
+      color: #fff;
+      font-size: 0.98rem;
+      font-weight: 700;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+    }
+
+    .internal-links-shell .score-ring-card,
+    .internal-links-shell .dashboard-card,
+    .internal-links-shell .analytics-card,
+    .internal-links-shell .recommendation-card,
+    .internal-links-shell .enterprise-card,
+    .internal-links-shell .finding-card,
+    .internal-links-shell .insight-strip {
+      background: rgba(255, 255, 255, 0.96);
+      border: 1px solid rgba(148, 163, 184, 0.14);
+      border-radius: 24px;
+      box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .internal-links-shell .dashboard-card:hover,
+    .internal-links-shell .analytics-card:hover,
+    .internal-links-shell .recommendation-card:hover,
+    .internal-links-shell .enterprise-card:hover,
+    .internal-links-shell .finding-card:hover {
+      box-shadow: 0 20px 50px rgba(15, 23, 42, 0.12);
+      transform: translateY(-3px);
+    }
+
+    .internal-links-shell .score-ring-card {
+      height: 100%;
+      min-height: 100%;
+      padding: 1.5rem;
+    }
+
+    .internal-links-shell .score-ring-wrap {
+      align-items: center;
+      display: flex;
+      justify-content: center;
+      margin: 1.5rem 0;
+    }
+
+    .internal-links-shell .score-ring {
+      --score-angle: calc(var(--score-value, 0) * 3.6deg);
+      align-items: center;
+      aspect-ratio: 1 / 1;
+      background:
+        radial-gradient(closest-side, #ffffff 76%, transparent 77% 100%),
+        conic-gradient(var(--score-color, var(--seo-cyan)) var(--score-angle), rgba(148, 163, 184, 0.22) 0);
+      border-radius: 50%;
+      box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.12);
+      color: var(--seo-navy);
+      display: flex;
+      height: 188px;
+      justify-content: center;
+      position: relative;
+      width: 188px;
+    }
+
+    .internal-links-shell .score-ring::before {
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      border-radius: 50%;
+      content: "";
+      inset: 12px;
+      position: absolute;
+    }
+
+    .internal-links-shell .score-value {
+      font-size: 3rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .internal-links-shell .score-caption {
+      color: var(--seo-muted);
+      font-size: 0.92rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .internal-links-shell .score-grade {
+      color: var(--seo-blue);
+      font-size: 0.9rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      margin-top: 0.45rem;
+      text-transform: uppercase;
+    }
+
+    .internal-links-shell .score-status {
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .internal-links-shell .status-pill {
+      align-items: center;
+      border-radius: 999px;
+      display: inline-flex;
+      font-size: 0.82rem;
+      font-weight: 700;
+      gap: 0.45rem;
+      padding: 0.5rem 0.9rem;
+    }
+
+    .internal-links-shell .status-excellent {
+      background: rgba(16, 185, 129, 0.12);
+      color: #047857;
+    }
+
+    .internal-links-shell .status-good {
+      background: rgba(6, 182, 212, 0.12);
+      color: #0f766e;
+    }
+
+    .internal-links-shell .status-needs-attention {
+      background: rgba(245, 158, 11, 0.14);
+      color: #b45309;
+    }
+
+    .internal-links-shell .status-critical {
+      background: rgba(239, 68, 68, 0.14);
+      color: #b91c1c;
+    }
+
+    .internal-links-shell .kpi-grid {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .internal-links-shell .dashboard-card {
+      min-height: 172px;
+      padding: 1rem 1.05rem;
+    }
+
+    .internal-links-shell .dashboard-icon,
+    .internal-links-shell .finding-icon,
+    .internal-links-shell .enterprise-icon {
+      align-items: center;
+      border-radius: 16px;
+      display: inline-flex;
+      font-size: 1.2rem;
+      height: 48px;
+      justify-content: center;
+      width: 48px;
+    }
+
+    .internal-links-shell .icon-total {
+      background: rgba(29, 78, 216, 0.12);
+      color: var(--seo-blue);
+    }
+
+    .internal-links-shell .icon-healthy {
+      background: rgba(16, 185, 129, 0.12);
+      color: var(--seo-green);
+    }
+
+    .internal-links-shell .icon-broken {
+      background: rgba(239, 68, 68, 0.12);
+      color: var(--seo-red);
+    }
+
+    .internal-links-shell .icon-redirect {
+      background: rgba(245, 158, 11, 0.12);
+      color: var(--seo-amber);
+    }
+
+    .internal-links-shell .icon-error {
+      background: rgba(100, 116, 139, 0.14);
+      color: #334155;
+    }
+
+    .internal-links-shell .icon-crawl {
+      background: rgba(6, 182, 212, 0.12);
+      color: var(--seo-cyan);
+    }
+
+    .internal-links-shell .kpi-value {
+      color: var(--seo-navy);
+      font-size: 2rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .internal-links-shell .kpi-label {
+      color: var(--seo-muted);
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .internal-links-shell .kpi-trend {
+      align-items: center;
+      display: inline-flex;
+      font-size: 0.82rem;
+      font-weight: 700;
+      gap: 0.4rem;
+      margin-top: 0.45rem;
+    }
+
+    .internal-links-shell .trend-positive {
+      color: #047857;
+    }
+
+    .internal-links-shell .trend-warning {
+      color: #b45309;
+    }
+
+    .internal-links-shell .trend-danger {
+      color: #b91c1c;
+    }
+
+    .internal-links-shell .trend-neutral {
+      color: var(--seo-muted);
+    }
+
+    .internal-links-shell .section-title {
+      color: var(--seo-navy);
+      font-size: 1.15rem;
+      font-weight: 800;
+      margin-bottom: 0.35rem;
+    }
+
+    .internal-links-shell .section-copy {
+      color: var(--seo-muted);
+      margin-bottom: 0;
+    }
+
+    .internal-links-shell .analytics-card,
+    .internal-links-shell .finding-card,
+    .internal-links-shell .recommendation-card,
+    .internal-links-shell .enterprise-card {
+      padding: 1.5rem;
+    }
+
+    .internal-links-shell .analytics-card {
+      display: flex;
+      flex-direction: column;
+      height: auto;
+    }
+
+    .internal-links-shell .analytics-canvas {
+      height: 260px !important;
+      width: 100% !important;
+    }
+
+    .internal-links-shell .chart-stage {
+      height: 280px;
+      max-height: 320px;
+      min-height: 260px;
+      position: relative;
+    }
+
+    .internal-links-shell .chart-empty-state {
+      align-items: center;
+      background: linear-gradient(180deg, rgba(248, 250, 252, 0.92), rgba(255, 255, 255, 0.98));
+      border: 1px dashed rgba(148, 163, 184, 0.28);
+      border-radius: 20px;
+      color: var(--seo-muted);
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+      justify-content: center;
+      min-height: 260px;
+      padding: 1.5rem;
+      text-align: center;
+    }
+
+    .internal-links-shell .chart-empty-title {
+      color: var(--seo-navy);
+      font-size: 0.95rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .internal-links-shell .chart-empty-copy {
+      font-size: 0.92rem;
+      line-height: 1.55;
+      margin: 0;
+      max-width: 28rem;
+    }
+
+    .internal-links-shell .chart-center {
+      align-items: center;
+      display: flex;
+      flex-direction: column;
+      inset: 0;
+      justify-content: center;
+      pointer-events: none;
+      position: absolute;
+    }
+
+    .internal-links-shell .chart-center-score {
+      color: var(--seo-navy);
+      font-size: 2rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .internal-links-shell .chart-center-label {
+      color: var(--seo-muted);
+      font-size: 0.92rem;
+      font-weight: 700;
+      margin-top: 0.35rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .internal-links-shell .chart-center-kicker {
+      color: var(--seo-blue);
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      margin-top: 0.3rem;
+      text-transform: uppercase;
+    }
+
+    .internal-links-shell .insight-panel {
+      background: linear-gradient(180deg, rgba(248, 250, 252, 0.92), rgba(255, 255, 255, 0.98));
+      border: 1px solid rgba(148, 163, 184, 0.14);
+      border-radius: 18px;
+      display: grid;
+      gap: 0.55rem;
+      margin-top: 1rem;
+      min-height: 116px;
+      padding: 1rem 1rem 0.95rem;
+    }
+
+    .internal-links-shell .insight-title {
+      align-items: center;
+      color: var(--seo-navy);
+      display: inline-flex;
+      font-size: 0.82rem;
+      font-weight: 800;
+      gap: 0.45rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .internal-links-shell .insight-copy {
+      color: var(--seo-muted);
+      font-size: 0.9rem;
+      line-height: 1.55;
+      margin: 0;
+    }
+
+    .internal-links-shell .finding-card {
+      border-left: 4px solid transparent;
+    }
+
+    .internal-links-shell .finding-critical {
+      border-left-color: var(--seo-red);
+    }
+
+    .internal-links-shell .finding-warning {
+      border-left-color: var(--seo-amber);
+    }
+
+    .internal-links-shell .finding-info {
+      border-left-color: var(--seo-cyan);
+    }
+
+    .internal-links-shell .finding-meta {
+      color: var(--seo-muted);
+      font-size: 0.88rem;
+    }
+
+    .internal-links-shell .finding-grid {
+      display: grid;
+      gap: 0.8rem;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      margin-top: 1rem;
+    }
+
+    .internal-links-shell .finding-detail,
+    .internal-links-shell .recommendation-stat {
+      background: rgba(248, 250, 252, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.14);
+      border-radius: 18px;
+      padding: 0.9rem 1rem;
+    }
+
+    .internal-links-shell .finding-detail-label {
+      color: var(--seo-muted);
+      display: block;
+      font-size: 0.76rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.25rem;
+      text-transform: uppercase;
+    }
+
+    .internal-links-shell .finding-detail-value {
+      color: var(--seo-navy);
+      font-size: 0.92rem;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+
+    .internal-links-shell .finding-related-list,
+    .internal-links-shell .recommendation-related-list,
+    .internal-links-shell .analytics-detail-list {
+      display: grid;
+      gap: 0.7rem;
+      margin-top: 1rem;
+    }
+
+    .internal-links-shell .finding-related-item,
+    .internal-links-shell .recommendation-related-item,
+    .internal-links-shell .analytics-detail-item {
+      background: rgba(248, 250, 252, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.14);
+      border-radius: 16px;
+      padding: 0.8rem 0.95rem;
+    }
+
+    .internal-links-shell .detail-item-label {
+      color: var(--seo-muted);
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.2rem;
+      text-transform: uppercase;
+    }
+
+    .internal-links-shell .detail-item-value {
+      color: var(--seo-navy);
+      font-size: 0.88rem;
+      font-weight: 700;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+
+    .internal-links-shell .priority-badge,
+    .internal-links-shell .enterprise-badge {
+      border-radius: 999px;
+      display: inline-flex;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      padding: 0.35rem 0.75rem;
+      text-transform: uppercase;
+    }
+
+    .internal-links-shell .priority-high {
+      background: rgba(239, 68, 68, 0.12);
+      color: #b91c1c;
+    }
+
+    .internal-links-shell .priority-medium {
+      background: rgba(245, 158, 11, 0.14);
+      color: #b45309;
+    }
+
+    .internal-links-shell .priority-low {
+      background: rgba(6, 182, 212, 0.12);
+      color: #0f766e;
+    }
+
+    .internal-links-shell .recommendation-grid {
+      display: grid;
+      gap: 0.85rem;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      margin-top: 1rem;
+    }
+
+    .internal-links-shell .recommendation-stat-label {
+      color: var(--seo-muted);
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.3rem;
+      text-transform: uppercase;
+    }
+
+    .internal-links-shell .recommendation-stat-value {
+      color: var(--seo-navy);
+      font-weight: 700;
+    }
+
+    .internal-links-shell .enterprise-card {
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96));
+      position: relative;
+    }
+
+    .internal-links-shell .enterprise-icon {
+      background: rgba(15, 23, 42, 0.08);
+      color: var(--seo-navy);
+    }
+
+    .internal-links-shell .enterprise-badge {
+      background: rgba(15, 23, 42, 0.08);
+      color: var(--seo-navy);
+    }
+
+    .internal-links-shell .locked-note {
+      color: var(--seo-muted);
+      font-size: 0.86rem;
+      font-weight: 700;
+      margin-top: auto;
+    }
+
+    .internal-links-shell .enterprise-cta {
+      border-radius: 999px;
+      box-shadow: 0 14px 32px rgba(29, 78, 216, 0.22);
+      font-weight: 700;
+      padding: 0.9rem 1.5rem;
+    }
+
+    .internal-links-shell .collapse-toggle {
+      border-radius: 999px;
+      font-weight: 700;
+      padding: 0.9rem 1.25rem;
+    }
+
+    .internal-links-shell .accordion-shell .accordion-item {
+      background: rgba(255, 255, 255, 0.96);
+      border: 1px solid rgba(148, 163, 184, 0.14);
+      border-radius: 24px;
+      box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+      margin-bottom: 1rem;
+      overflow: hidden;
+    }
+
+    .internal-links-shell .accordion-shell .accordion-button {
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: none;
+      color: var(--seo-navy);
+      font-size: 1rem;
+      font-weight: 800;
+      gap: 0.75rem;
+      padding: 1.2rem 1.4rem;
+    }
+
+    .internal-links-shell .accordion-shell .accordion-collapse {
+      transition: height 0.28s ease;
+    }
+
+    .internal-links-shell .accordion-header-content {
+      align-items: center;
+      display: flex;
+      gap: 1rem;
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    .internal-links-shell .accordion-title {
+      color: var(--seo-navy);
+      display: block;
+      font-size: 1rem;
+      font-weight: 800;
+    }
+
+    .internal-links-shell .accordion-subtitle {
+      color: var(--seo-muted);
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      margin-top: 0.2rem;
+    }
+
+    .internal-links-shell .accordion-badge {
+      background: rgba(29, 78, 216, 0.08);
+      border: 1px solid rgba(29, 78, 216, 0.12);
+      border-radius: 999px;
+      color: var(--seo-blue);
+      display: inline-flex;
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      padding: 0.4rem 0.75rem;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .internal-links-shell .seo-intelligence-shell {
+      animation: fadeInUp 0.28s ease;
+    }
+
+    .internal-links-shell .seo-intelligence-shell .badge {
+      border-radius: 999px;
+      font-weight: 700;
+      padding: 0.45rem 0.7rem;
+    }
+
+    .internal-links-shell .accordion-shell .accordion-button:not(.collapsed) {
+      background: linear-gradient(180deg, rgba(248, 250, 252, 0.96), rgba(255, 255, 255, 0.98));
+      color: var(--seo-blue);
+    }
+
+    .internal-links-shell .accordion-shell .accordion-button:focus {
+      border-color: transparent;
+      box-shadow: inset 0 0 0 1px rgba(6, 182, 212, 0.2);
+    }
+
+    .internal-links-shell .accordion-shell .accordion-body {
+      background: rgba(255, 255, 255, 0.98);
+      padding: 1.4rem;
+    }
+
+    .internal-links-shell .accordion-shell .accordion-button::after {
+      background-size: 1rem;
+      height: 1rem;
+      width: 1rem;
+    }
+
+    .internal-links-shell .table-shell {
+      border-radius: 24px;
+      overflow: hidden;
+    }
+
+    .internal-links-shell .table-toolbar {
+      background: linear-gradient(180deg, rgba(248, 250, 252, 0.96), rgba(255, 255, 255, 0.98));
+      border: 1px solid rgba(148, 163, 184, 0.12);
+      border-radius: 20px;
+      margin-bottom: 1rem;
+      padding: 1rem;
+    }
+
+    .internal-links-shell .toolbar-input,
+    .internal-links-shell .toolbar-select {
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      border-radius: 14px;
+      color: var(--seo-navy);
+      min-height: 46px;
+    }
+
+    .internal-links-shell .toolbar-input:focus,
+    .internal-links-shell .toolbar-select:focus {
+      border-color: rgba(6, 182, 212, 0.36);
+      box-shadow: 0 0 0 0.22rem rgba(6, 182, 212, 0.12);
+    }
+
+    .internal-links-shell .toolbar-button {
+      border-radius: 14px;
+      font-weight: 700;
+      min-height: 46px;
+      padding-inline: 1rem;
+    }
+
+    .internal-links-shell .toolbar-filter-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+    }
+
+    .internal-links-shell .toolbar-filter {
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 999px;
+      color: var(--seo-muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      padding: 0.55rem 0.95rem;
+      transition: all 0.2s ease;
+    }
+
+    .internal-links-shell .toolbar-filter.active,
+    .internal-links-shell .toolbar-filter:hover {
+      background: rgba(29, 78, 216, 0.1);
+      border-color: rgba(29, 78, 216, 0.2);
+      color: var(--seo-blue);
+    }
+
+    .internal-links-shell .toolbar-summary {
+      color: var(--seo-muted);
+      font-size: 0.84rem;
+      font-weight: 600;
+    }
+
+    .internal-links-shell .table thead th {
+      background: rgba(15, 23, 42, 0.04);
+      color: var(--seo-navy);
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .internal-links-shell .table-shell .table td {
+      font-size: 0.94rem;
+      vertical-align: top;
+      white-space: normal;
+      word-break: break-word;
+    }
+
+    .internal-links-shell .table-shell .table td a {
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
+    .internal-links-shell .table-link-text {
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      display: -webkit-box;
+      line-clamp: 2;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .internal-links-shell .table-shell .table td:nth-child(1),
+    .internal-links-shell .table-shell .table td:nth-child(3) {
+      max-width: 18rem;
+    }
+
+    .internal-links-shell .table-filter-empty td {
+      color: var(--seo-muted);
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .internal-links-shell .empty-state {
+      background: rgba(248, 250, 252, 0.9);
+      border: 1px dashed rgba(148, 163, 184, 0.28);
+      border-radius: 20px;
+      color: var(--seo-muted);
+      padding: 1.4rem;
+      text-align: center;
+    }
+
+    @media (max-width: 991.98px) {
+      .internal-links-shell .score-ring {
+        height: 170px;
+        width: 170px;
+      }
+
+      .internal-links-shell .report-toolbar {
+        align-items: stretch !important;
+      }
+
+      .internal-links-shell .report-meta,
+      .internal-links-shell .report-actions-wrap {
+        width: 100%;
+      }
+
+      .internal-links-shell .report-actions {
+        justify-content: flex-start !important;
+      }
+
+      .internal-links-shell .report-actions .btn {
+        flex: 1 1 calc(50% - 0.5rem);
+      }
+
+      .internal-links-shell .hero-meta-grid,
+      .internal-links-shell .finding-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .internal-links-shell .kpi-grid,
+      .internal-links-shell .recommendation-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .internal-links-shell .accordion-header-content {
+        align-items: flex-start;
+        flex-direction: column;
+        padding-right: 1.5rem;
+      }
+
+      .internal-links-shell .toolbar-button {
+        width: 100%;
+      }
+
+      .internal-links-shell .table-shell .table th,
+      .internal-links-shell .table-shell .table td {
+        font-size: 0.82rem;
+        padding: 0.7rem 0.65rem;
+      }
+
+      .internal-links-shell .table-shell .table th {
+        white-space: normal;
+      }
+
+      .internal-links-shell .table-shell .table td:nth-child(1),
+      .internal-links-shell .table-shell .table td:nth-child(3) {
+        max-width: 10rem;
+      }
+
+      .internal-links-shell .table-link-text {
+        -webkit-line-clamp: 2;
+      }
+
+      .internal-links-shell .table-shell .table thead {
+        display: none;
+      }
+
+      .internal-links-shell .table-shell .table tbody tr[data-link-row="true"] {
+        border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+        display: grid;
+        gap: 0.7rem;
+        padding: 1rem 0.9rem;
+      }
+
+      .internal-links-shell .table-shell .table tbody tr[data-link-row="true"] td {
+        align-items: flex-start;
+        border: none;
+        display: flex;
+        gap: 0.9rem;
+        justify-content: space-between;
+        max-width: none !important;
+        padding: 0;
+      }
+
+      .internal-links-shell .table-shell .table tbody tr[data-link-row="true"] td::before {
+        color: var(--seo-muted);
+        content: attr(data-label);
+        flex: 0 0 96px;
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        line-height: 1.4;
+        text-transform: uppercase;
+      }
+
+      .internal-links-shell .table-shell .table tbody tr[data-link-row="true"] td > * {
+        flex: 1 1 auto;
+      }
+
+      .internal-links-shell .table-shell .table tbody tr[data-link-row="true"] td .badge {
+        align-self: flex-start;
+      }
+    }
+
+    @media (max-width: 575.98px) {
+      .internal-links-shell .report-actions .btn {
+        flex-basis: 100%;
+      }
+
+      .internal-links-shell .table-toolbar .row > * {
+        width: 100%;
+      }
+    }
+  </style>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-5{% if report.analysis_type == 'internal' %} internal-links-shell{% endif %}">
+  <nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'home:home' %}">Home</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'seo_analyzer:index' %}">SEO</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'seo_analyzer:link_checker' %}">Link Checker</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{ report.analysis_type_label }}</li>
+    </ol>
+  </nav>
+
+  <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4{% if report.analysis_type == 'internal' %} report-toolbar{% endif %}">
+    <div class="{% if report.analysis_type == 'internal' %}report-meta{% endif %}">
+      <h1 class="mb-2">{{ report.analysis_type_label }} Report</h1>
+      <p class="text-muted mb-1"><strong>Website URL:</strong> {{ report.url }}</p>
+      <p class="text-muted mb-0"><strong>Final URL:</strong> {{ report.final_url }}</p>
+    </div>
+    <div class="text-end{% if report.analysis_type == 'internal' %} report-actions-wrap{% endif %}">
+      <div class="small text-uppercase text-muted fw-semibold mb-2">SEO Tools</div>
+      <div class="d-flex gap-2 flex-wrap justify-content-end{% if report.analysis_type == 'internal' %} report-actions{% endif %}">
+        <a href="{% url 'seo_analyzer:checker' %}" class="btn btn-outline-primary">Website Checker</a>
+        <a href="{% url 'seo_analyzer:link_checker' %}" class="btn btn-success">Link Checker</a>
+        <a href="{% url 'seo_analyzer:sitemap' %}" class="btn btn-outline-primary">Sitemap Intelligence</a>
+        <a href="{% url 'seo_analyzer:backlinks' %}" class="btn btn-outline-warning">Backlink Analyzer</a>
+        <a href="{% url 'seo_analyzer:download_report' 'link' report.task_id %}" class="btn btn-primary">Download Link Report</a>
+      </div>
+    </div>
+  </div>
+
+  {% if report.status == 'error' and not report.provider_required %}
+  <div class="alert alert-danger shadow-sm">
+    <h5 class="mb-2">Analysis Error</h5>
+    <p class="mb-1">{{ report.message }}</p>
+    {% if report.error_type %}
+    <p class="mb-0"><strong>Error Type:</strong> {{ report.error_type }}</p>
+    {% endif %}
+  </div>
+  {% elif report.message and report.analysis_type != 'internal' %}
+  <div class="alert alert-info shadow-sm">
+    {{ report.message }}
+  </div>
+  {% endif %}
+
+  {% if report.analysis_type == 'backlinks' and report.provider_required %}
+  <div class="card mb-4 shadow-sm">
+    <div class="card-header bg-white">
+      <h5 class="mb-0">Backlink Intelligence</h5>
+    </div>
+    <div class="card-body">
+      <p class="mb-2"><strong>Status:</strong> {{ report.status_badge.label }}</p>
+      <p class="mb-3"><strong>Message:</strong> Backlink data is not available because no backlink provider is currently connected.</p>
+      <p class="mb-2"><strong>Supported Providers:</strong></p>
+      <ul class="mb-0">
+        {% for provider in report.supported_providers %}
+        <li>{{ provider }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  {% elif report.analysis_type == 'external' %}
+  <div class="mb-4">
+    <span class="me-2 fw-semibold">Status:</span>
+    <span class="badge {{ report.status_badge.class }}">{{ report.status_badge.label }}</span>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-lg col-md-4 col-sm-6">
+      <div class="card h-100 shadow-sm border-primary">
+        <div class="card-body text-center">
+          <div class="display-6 text-primary">{{ report.external_insights.overview_metrics.total_external_links }}</div>
+          <div class="text-muted">Total External Links</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg col-md-4 col-sm-6">
+      <div class="card h-100 shadow-sm border-info">
+        <div class="card-body text-center">
+          <div class="display-6 text-info">{{ report.external_insights.overview_metrics.unique_external_domains }}</div>
+          <div class="text-muted">Unique External Domains</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg col-md-4 col-sm-6">
+      <div class="card h-100 shadow-sm border-success">
+        <div class="card-body text-center">
+          <div class="display-6 text-success">{{ report.external_insights.overview_metrics.working_external_links }}</div>
+          <div class="text-muted">Working External Links</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg col-md-6 col-sm-6">
+      <div class="card h-100 shadow-sm border-danger">
+        <div class="card-body text-center">
+          <div class="display-6 text-danger">{{ report.external_insights.overview_metrics.broken_external_links }}</div>
+          <div class="text-muted">Broken External Links</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg col-md-6 col-sm-6">
+      <div class="card h-100 shadow-sm border-warning">
+        <div class="card-body text-center">
+          <div class="display-6 text-warning">{{ report.external_insights.overview_metrics.redirecting_external_links }}</div>
+          <div class="text-muted">Redirecting External Links</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if report.fallback_message %}
+  <div class="alert alert-warning">
+    {{ report.fallback_message }}
+  </div>
+  {% endif %}
+
+  {% if report.recommendations %}
+  <div class="card mb-4 shadow-sm">
+    <div class="card-header bg-white">
+      <h5 class="mb-0">Recommendations</h5>
+    </div>
+    <div class="card-body">
+      <ul class="mb-0">
+        {% for recommendation in report.recommendations %}
+        <li>{{ recommendation }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="row g-4">
+    <div class="col-lg-7">
+      <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-white">
+          <h5 class="mb-0">Domain Distribution</h5>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Domain</th>
+                  <th>Link Count</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in report.external_insights.domain_distribution %}
+                <tr>
+                  <td>{{ row.domain }}</td>
+                  <td>{{ row.link_count }}</td>
+                  <td>{{ row.status }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="3" class="text-center py-4">No external domain distribution is available for this report.</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-white">
+          <h5 class="mb-0">External Link Inventory</h5>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Link URL</th>
+                  <th>Anchor Text</th>
+                  <th>External Domain</th>
+                  <th>Source Page</th>
+                  <th>HTTP Status Code</th>
+                  <th>Redirects</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for link in links %}
+                <tr>
+                  <td><a href="{{ link.link_url }}" target="_blank" rel="noopener">{{ link.link_url }}</a></td>
+                  <td>{{ link.anchor_text }}</td>
+                  <td>{{ link.external_domain }}</td>
+                  <td>{{ link.source_page }}</td>
+                  <td>{{ link.http_status_code|default:"-" }}</td>
+                  <td>{{ link.redirect_count|default:0 }}</td>
+                  <td>
+                    <span class="badge bg-light text-dark border">{{ link.status_label }}</span>
+                    {% if link.status_detail %}<div class="small text-muted">{{ link.status_detail }}</div>{% endif %}
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="7" class="text-center py-4">No external links found for this analysis.</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-5">
+      <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-white">
+          <h5 class="mb-0">Security Analysis</h5>
+        </div>
+        <div class="card-body">
+          <div class="d-flex justify-content-between mb-2">
+            <span>HTTPS External Links</span>
+            <strong>{{ report.external_insights.security_analysis.https_external_links }}</strong>
+          </div>
+          <div class="d-flex justify-content-between mb-2">
+            <span>HTTP External Links</span>
+            <strong>{{ report.external_insights.security_analysis.http_external_links }}</strong>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span>Potentially Unsafe Links</span>
+            <strong>{{ report.external_insights.security_analysis.potentially_unsafe_links }}</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-white">
+          <h5 class="mb-0">External Link Quality</h5>
+        </div>
+        <div class="card-body">
+          <div class="d-flex justify-content-between mb-2">
+            <span>Authority Available</span>
+            <strong>{{ report.external_insights.quality_section.authority_available }}</strong>
+          </div>
+          <div class="d-flex justify-content-between mb-2">
+            <span>Domain Diversity</span>
+            <strong>{{ report.external_insights.quality_section.domain_diversity }}</strong>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span>Link Distribution</span>
+            <strong>{{ report.external_insights.quality_section.link_distribution }}</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="card shadow-sm">
+        <div class="card-header bg-white">
+          <h5 class="mb-0">External Links With Errors</h5>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Link URL</th>
+                  <th>External Domain</th>
+                  <th>HTTP Status Code</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for link in error_links %}
+                <tr>
+                  <td><a href="{{ link.link_url }}" target="_blank" rel="noopener">{{ link.link_url }}</a></td>
+                  <td>{{ link.external_domain }}</td>
+                  <td>{{ link.http_status_code|default:"-" }}</td>
+                  <td>
+                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle">{{ link.status_label }}</span>
+                    {% if link.status_detail %}<div class="small text-muted">{{ link.status_detail }}</div>{% endif %}
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="4" class="text-center py-4">No error links found in this report.</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% elif report.analysis_type == 'internal' %}
+  <div
+    class="dashboard-hero mb-4 p-4 p-lg-4"
+    id="internal-links-dashboard"
+    data-total="{{ report.summary.total_links|default:0 }}"
+    data-working="{{ report.summary.working_links_count|default:0 }}"
+    data-broken="{{ report.summary.broken_links_count|default:0 }}"
+    data-redirect="{{ report.summary.redirect_links_count|default:0 }}"
+    data-errors="{{ report.summary.error_links_count|default:0 }}"
+    data-health-score="{{ report.health.score|default_if_none:'' }}"
+    data-health-label="{{ report.health.label|default_if_none:'' }}"
+    data-health-grade="{{ report.health.grade|default_if_none:'' }}"
+    data-health-severity="{{ report.health.severity|default_if_none:'' }}"
+    data-health-reason="{{ report.health.reason|default_if_none:'' }}"
+    data-url="{{ report.url|default_if_none:'' }}"
+    data-final-url="{{ report.final_url|default_if_none:'' }}"
+    data-analyzed-at="{{ report.analyzed_at|default_if_none:'' }}"
+  >
+    <div class="row g-4 align-items-center position-relative">
+      <div class="col-xl-4">
+        <div class="eyebrow mb-2">Executive Dashboard</div>
+        <h2 class="mb-3">Internal Links Report</h2>
+        <p class="hero-subtitle mb-4">
+          A dashboard-first view of the analyzed page internal link health using the current crawl report,
+          existing link status data, and current recommendations.
+        </p>
+        <div class="hero-meta-grid">
+          <div class="executive-mini-card">
+            <div class="executive-meta-label">Website</div>
+              <div class="executive-meta-value" id="internal-website-host">{{ report.url|default:"--" }}</div>
+          </div>
+          <div class="executive-mini-card">
+            <div class="executive-meta-label">Final Destination</div>
+              <div class="executive-meta-value" id="internal-final-host">{{ report.final_url|default:report.url|default:"--" }}</div>
+          </div>
+          <div class="executive-mini-card">
+            <div class="executive-meta-label">Scan Date</div>
+              <div class="executive-meta-value" id="internal-scan-date">{{ report.analyzed_at|default:"--" }}</div>
+          </div>
+          <div class="executive-mini-card">
+            <div class="executive-meta-label">Status:</div>
+              <div class="executive-meta-value" id="internal-summary-status">{{ report.health.label|default:report.status_badge.label|default:"--" }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-xl-8">
+        <div class="row g-3">
+          <div class="col-lg-4">
+            <div class="score-ring-card">
+              <div class="eyebrow text-dark mb-2">Internal Link Health</div>
+              <div class="score-ring-wrap">
+                <div class="score-ring" id="internal-health-ring">
+                  <div class="text-center position-relative">
+                    <div class="score-value" id="internal-health-score">{% if report.health.score is not None %}{{ report.health.score }}/100{% else %}--{% endif %}</div>
+                    <div class="score-caption" id="internal-health-kicker">Internal Link Health</div>
+                    <div class="score-grade" id="internal-health-grade">Grade {{ report.health.grade|default:"--" }}</div>
+                  </div>
+                </div>
+              </div>
+              <div class="d-flex align-items-center justify-content-between gap-3 flex-wrap">
+                <div>
+                  <div class="score-caption mb-1">Status</div>
+                  <div class="score-status" id="internal-health-status">{{ report.health.label|default:report.status_badge.label }}</div>
+                </div>
+                <span class="status-pill" id="internal-status-pill">{{ report.health.label|default:report.status_badge.label }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-8">
+            <div class="kpi-grid">
+              <div class="dashboard-card">
+                <div class="d-flex align-items-start justify-content-between gap-3">
+                  <span class="dashboard-icon icon-total"><i class="bi bi-diagram-3"></i></span>
+                  <span class="kpi-trend trend-neutral"><i class="bi bi-activity"></i> Crawl inventory</span>
+                </div>
+                <div class="kpi-value mt-3">{{ report.summary.total_links|default:0 }}</div>
+                <div class="kpi-label mt-2">Total Internal Links</div>
+                <div class="small text-muted mt-2">All discovered internal destinations.</div>
+              </div>
+              <div class="dashboard-card">
+                <div class="d-flex align-items-start justify-content-between gap-3">
+                  <span class="dashboard-icon icon-healthy"><i class="bi bi-check2-circle"></i></span>
+                  <span class="kpi-trend trend-positive"><i class="bi bi-arrow-up-right"></i> Primary success signal</span>
+                </div>
+                <div class="kpi-value mt-3">{{ report.summary.working_links_count|default:0 }}</div>
+                <div class="kpi-label mt-2">Healthy Links</div>
+                <div class="small text-muted mt-2">Directly resolving internal links.</div>
+              </div>
+              <div class="dashboard-card">
+                <div class="d-flex align-items-start justify-content-between gap-3">
+                  <span class="dashboard-icon icon-broken"><i class="bi bi-exclamation-triangle"></i></span>
+                  <span class="kpi-trend {% if report.summary.broken_links_count %}trend-danger{% else %}trend-positive{% endif %}">
+                    <i class="bi {% if report.summary.broken_links_count %}bi-arrow-down-right{% else %}bi-shield-check{% endif %}"></i>
+                    {% if report.summary.broken_links_count %}Immediate cleanup{% else %}No current breakage{% endif %}
+                  </span>
+                </div>
+                <div class="kpi-value mt-3">{{ report.summary.broken_links_count|default:0 }}</div>
+                <div class="kpi-label mt-2">Broken Links</div>
+                <div class="small text-muted mt-2">Dead or invalid destinations.</div>
+              </div>
+              <div class="dashboard-card">
+                <div class="d-flex align-items-start justify-content-between gap-3">
+                  <span class="dashboard-icon icon-redirect"><i class="bi bi-sign-turn-right"></i></span>
+                  <span class="kpi-trend {% if report.summary.redirect_links_count %}trend-warning{% else %}trend-positive{% endif %}">
+                    <i class="bi {% if report.summary.redirect_links_count %}bi-arrow-repeat{% else %}bi-check2{% endif %}"></i>
+                    {% if report.summary.redirect_links_count %}Crawl efficiency risk{% else %}Direct routing{% endif %}
+                  </span>
+                </div>
+                <div class="kpi-value mt-3">{{ report.summary.redirect_links_count|default:0 }}</div>
+                <div class="kpi-label mt-2">Redirect Links</div>
+                <div class="small text-muted mt-2">Links not pointing to final destinations.</div>
+              </div>
+              <div class="dashboard-card">
+                <div class="d-flex align-items-start justify-content-between gap-3">
+                  <span class="dashboard-icon icon-error"><i class="bi bi-bug"></i></span>
+                  <span class="kpi-trend {% if report.summary.error_links_count %}trend-danger{% else %}trend-positive{% endif %}">
+                    <i class="bi {% if report.summary.error_links_count %}bi-x-octagon{% else %}bi-check-circle{% endif %}"></i>
+                    {% if report.summary.error_links_count %}Unresolved issues{% else %}No crawl errors{% endif %}
+                  </span>
+                </div>
+                <div class="kpi-value mt-3">{{ report.summary.error_links_count|default:0 }}</div>
+                <div class="kpi-label mt-2">Error Links</div>
+                <div class="small text-muted mt-2">Timeouts, failures, or unstable responses.</div>
+              </div>
+              <div class="dashboard-card">
+                <div class="d-flex align-items-start justify-content-between gap-3">
+                  <span class="dashboard-icon icon-crawl"><i class="bi bi-speedometer2"></i></span>
+                  <span class="kpi-trend trend-neutral"><i class="bi bi-bar-chart-line"></i> Composite metric</span>
+                </div>
+                <div class="kpi-value mt-3" id="internal-crawl-health-value">{% if report.health.score is not None %}{{ report.health.score }}%{% else %}--{% endif %}</div>
+                <div class="kpi-label mt-2">Crawl Health</div>
+                <div class="small text-muted mt-2">Canonical backend health for the analyzed page.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if report.message %}
+  <div class="insight-strip p-3 p-lg-4 mb-4">
+    <div class="d-flex align-items-start gap-3">
+      <span class="dashboard-icon icon-total"><i class="bi bi-info-circle"></i></span>
+      <div>
+        <div class="fw-bold text-dark mb-1">Report Status</div>
+        <div class="text-muted">{{ report.message }}</div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if report.fallback_message %}
+  <div class="alert alert-warning shadow-sm mb-4">
+    {{ report.fallback_message }}
+  </div>
+  {% endif %}
+
+  <section class="mb-5">
+    <div class="d-flex justify-content-between align-items-end flex-wrap gap-3 mb-3">
+      <div>
+        <div class="section-title">Visual Analytics</div>
+        <p class="section-copy">Monitor link quality, status behavior, page concentration, and redirect complexity before reviewing raw rows.</p>
+      </div>
+    </div>
+    <div class="row g-4">
+      <div class="col-lg-6">
+        <div class="analytics-card">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <h5 class="mb-1">Internal Link Health</h5>
+              <div class="text-muted small">Healthy, broken, redirect, and error distribution</div>
+            </div>
+            <span class="status-pill status-good">Donut Chart</span>
+          </div>
+          <div class="chart-stage">
+            <canvas id="internal-health-chart" class="analytics-canvas"></canvas>
+            <div class="chart-center">
+              <div class="chart-center-score" id="internal-health-chart-score">{% if report.health.score is not None %}{{ report.health.score }}%{% else %}--{% endif %}</div>
+              <div class="chart-center-label" id="internal-health-chart-label">{{ report.health.label|default:report.status_badge.label|default:"--" }}</div>
+              <div class="chart-center-kicker" id="internal-health-chart-kicker">Top Internal Health</div>
+            </div>
+          </div>
+          <div class="insight-panel" id="internal-health-insight"></div>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="analytics-card">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <h5 class="mb-1">HTTP Status Distribution</h5>
+              <div class="text-muted small">Status code overview across discovered internal links</div>
+            </div>
+            <span class="status-pill status-good">Bar Chart</span>
+          </div>
+          <canvas id="internal-status-chart" class="analytics-canvas"></canvas>
+          <div class="insight-panel" id="internal-status-insight"></div>
+        </div>
+      </div>
+      <div class="col-lg-12">
+        <div class="analytics-card">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <h5 class="mb-1">Most Linked Pages</h5>
+              <div class="text-muted small">Top 10 internal destinations by incoming link count</div>
+            </div>
+            <span class="status-pill status-good">Horizontal Bar</span>
+          </div>
+          <canvas id="most-linked-pages-chart" class="analytics-canvas"></canvas>
+          <div class="insight-panel" id="most-linked-pages-insight"></div>
+          <div class="analytics-detail-list" id="most-linked-pages-detail-list"></div>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="analytics-card">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <h5 class="mb-1">Redirect Analysis</h5>
+              <div class="text-muted small">Single redirects, chains, and broken redirect paths</div>
+            </div>
+            <span class="status-pill status-good">Bar Chart</span>
+          </div>
+          <canvas id="redirect-analysis-chart" class="analytics-canvas"></canvas>
+          <div class="insight-panel" id="redirect-analysis-insight"></div>
+          <div class="analytics-detail-list" id="redirect-analysis-detail-list"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="mb-5">
+    <div class="d-flex justify-content-between align-items-end flex-wrap gap-3 mb-3">
+      <div>
+        <div class="section-title">Critical Findings</div>
+        <p class="section-copy">Prioritized issue cards surface the findings that most impact crawl efficiency, discovery, and link equity flow.</p>
+      </div>
+    </div>
+    <div class="row g-4" id="critical-findings-grid">
+      {% for finding in report.findings %}
+      <div class="col-lg-4 col-md-6">
+        <div class="finding-card {{ finding.css_class|default:'finding-info' }}" data-finding-issue="{{ finding.issue|default:'--'|escape }}">
+          <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+            <span class="finding-icon {% if finding.css_class == 'finding-critical' %}icon-broken{% elif finding.css_class == 'finding-warning' %}icon-redirect{% else %}icon-total{% endif %}">
+              <i class="bi {{ finding.icon|default:'bi-info-circle-fill' }}"></i>
+            </span>
+            <span class="priority-badge {% if finding.severity == 'Critical' or finding.severity == 'High' %}priority-high{% elif finding.severity == 'Medium' %}priority-medium{% else %}priority-low{% endif %}">{{ finding.severity }}</span>
+          </div>
+          <h5 class="mb-2">{{ finding.issue|default:"--" }}</h5>
+          <p class="text-muted mb-0">{{ finding.description|default:finding.seo_impact }}</p>
+          <div class="finding-grid">
+            <div class="finding-detail">
+              <span class="finding-detail-label">Severity</span>
+              <span class="finding-detail-value">{{ finding.severity|default:"--" }}</span>
+            </div>
+            <div class="finding-detail">
+              <span class="finding-detail-label">Affected Pages</span>
+              <span class="finding-detail-value">{{ finding.affected_count|default:0 }}</span>
+            </div>
+            <div class="finding-detail">
+              <span class="finding-detail-label">Business Impact</span>
+              <span class="finding-detail-value">{{ finding.business_impact|default:"--" }}</span>
+            </div>
+            <div class="finding-detail">
+              <span class="finding-detail-label">SEO Impact</span>
+              <span class="finding-detail-value">{{ finding.seo_impact|default:"--" }}</span>
+            </div>
+            <div class="finding-detail">
+              <span class="finding-detail-label">Recommended Fix</span>
+              <span class="finding-detail-value">{{ finding.recommended_fix|default:"--" }}</span>
+            </div>
+            <div class="finding-detail">
+              <span class="finding-detail-label">Estimated Time</span>
+              <span class="finding-detail-value">{{ finding.estimated_time|default:"--" }}</span>
+            </div>
+            <div class="finding-detail">
+              <span class="finding-detail-label">Confidence</span>
+              <span class="finding-detail-value">{{ finding.confidence|default:"--" }}</span>
+            </div>
+          </div>
+          <div class="finding-related-list" data-finding-related-list></div>
+        </div>
+      </div>
+      {% empty %}
+      <div class="col-12">
+        <div class="empty-state">No backend findings are currently available for this internal links report.</div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="mb-5">
+    <div class="d-flex justify-content-between align-items-end flex-wrap gap-3 mb-3">
+      <div>
+        <div class="section-title">AI Recommendations</div>
+        <p class="section-copy">Existing recommendations are reframed into operational cards so the team can act quickly without opening raw report rows first.</p>
+      </div>
+    </div>
+    <div class="row g-4" id="ai-recommendations-grid">
+      {% for recommendation in report.recommendations %}
+      <div class="col-lg-6">
+        <div class="recommendation-card" data-recommendation-card data-recommendation-text="{{ recommendation.text|default:'--'|escape }}">
+          <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
+            <h5 class="mb-0">Recommendation {{ forloop.counter }}</h5>
+            <span class="priority-badge {% if recommendation.priority == 'High' %}priority-high{% elif recommendation.priority == 'Medium' %}priority-medium{% else %}priority-low{% endif %}">
+              Priority {{ recommendation.priority|default:"Low" }}
+            </span>
+          </div>
+          <div class="text-muted small text-uppercase fw-bold mb-1">Issue</div>
+          <div class="fs-6 fw-bold text-dark mb-2" data-recommendation-issue>{{ recommendation.text|default:"--" }}</div>
+          <div class="text-muted small" data-recommendation-explanation><strong>Why it matters:</strong> {{ recommendation.business_impact|default:"This action supports cleaner discovery paths, more efficient crawling, and stronger internal authority flow." }}</div>
+          <div class="recommendation-grid">
+            <div class="recommendation-stat">
+              <span class="recommendation-stat-label">Priority</span>
+              <span class="recommendation-stat-value">{{ recommendation.priority|default:"Low" }}</span>
+            </div>
+            <div class="recommendation-stat">
+              <span class="recommendation-stat-label">Difficulty</span>
+              <span class="recommendation-stat-value">{{ recommendation.difficulty|default:"Medium" }}</span>
+            </div>
+            <div class="recommendation-stat">
+              <span class="recommendation-stat-label">Estimated SEO Gain</span>
+              <span class="recommendation-stat-value">{{ recommendation.estimated_gain|default:"--" }}</span>
+            </div>
+            <div class="recommendation-stat">
+              <span class="recommendation-stat-label">Business Impact</span>
+              <span class="recommendation-stat-value">{{ recommendation.business_impact|default:"--" }}</span>
+            </div>
+            <div class="recommendation-stat">
+              <span class="recommendation-stat-label">Time to Fix</span>
+              <span class="recommendation-stat-value">{{ recommendation.estimated_time|default:"--" }}</span>
+            </div>
+            <div class="recommendation-stat">
+              <span class="recommendation-stat-label">Confidence</span>
+              <span class="recommendation-stat-value">{{ recommendation.confidence|default:"--" }}</span>
+            </div>
+          </div>
+          <div class="recommendation-related-list" data-recommendation-related-list></div>
+        </div>
+      </div>
+      {% empty %}
+      <div class="col-12">
+        <div class="empty-state">No recommendations are currently available for this internal links report.</div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="mb-5">
+    <div class="accordion accordion-shell" id="internalReportAccordions">
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="headingCompleteInternalReport">
+          <button
+            class="accordion-button collapsed"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#completeInternalLinkReport"
+            aria-expanded="false"
+            aria-controls="completeInternalLinkReport"
+          >
+            <span class="accordion-header-content">
+              <span>
+                <span class="accordion-title">View Complete Internal Link Report</span>
+                <span class="accordion-subtitle">Search, filter, and export raw internal link rows without leaving the dashboard.</span>
+              </span>
+              <span class="accordion-badge">Operations Console</span>
+            </span>
+          </button>
+        </h2>
+        <div id="completeInternalLinkReport" class="accordion-collapse collapse" aria-labelledby="headingCompleteInternalReport">
+          <div class="accordion-body">
+            <div class="mb-3">
+              <div class="section-title">Complete Internal Link Report</div>
+              <p class="section-copy">Raw internal link tables remain available for detailed QA, validation, and handoff.</p>
+            </div>
+            <div class="table-toolbar">
+              <div class="row g-3 align-items-center">
+                <div class="col-lg-4">
+                  <input type="search" class="form-control toolbar-input" id="internal-report-search" placeholder="Search URL, anchor, source page, or status">
+                </div>
+                <div class="col-lg-3">
+                  <select class="form-select toolbar-select" id="internal-report-scope">
+                    <option value="all">Filter: All Tables</option>
+                    <option value="primary">Filter: Internal Links Table</option>
+                    <option value="errors">Filter: Error Links Table</option>
+                  </select>
+                </div>
+                <div class="col-lg-5">
+                  <div class="d-flex flex-wrap gap-2 justify-content-lg-end">
+                    <button type="button" class="btn btn-outline-secondary toolbar-button">
+                      <i class="bi bi-funnel me-2"></i>Frontend Filter
+                    </button>
+                    <button type="button" class="btn btn-outline-primary toolbar-button" id="internal-export-csv">
+                      <i class="bi bi-filetype-csv me-2"></i>Export CSV
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary toolbar-button" id="internal-export-excel">
+                      <i class="bi bi-file-earmark-spreadsheet me-2"></i>Export Excel <span class="ms-2 badge text-bg-light">Preview</span>
+                    </button>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="toolbar-filter-group" id="internal-status-filters">
+                    <button type="button" class="toolbar-filter active" data-filter="all">All</button>
+                    <button type="button" class="toolbar-filter" data-filter="working">Working</button>
+                    <button type="button" class="toolbar-filter" data-filter="redirect">Redirect</button>
+                    <button type="button" class="toolbar-filter" data-filter="broken">Broken</button>
+                    <button type="button" class="toolbar-filter" data-filter="error">Error</button>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="toolbar-summary" id="internal-report-filter-summary">Showing all available internal link rows.</div>
+                </div>
+              </div>
+            </div>
+            <div class="table-shell card shadow-sm mb-4" id="internal-links-table-shell">
+        <div class="card-header bg-white">
+          <h5 class="mb-0">Internal Links Table</h5>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Link URL</th>
+                  <th>Anchor Text</th>
+                  <th>Source Page</th>
+                  <th>HTTP Status Code</th>
+                  <th>Redirects</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="internal-links-table-body">
+                {% for link in links %}
+                <tr data-link-row="true" data-table-scope="primary" data-status="{{ link.status|default_if_none:''|lower }}" data-status-label="{{ link.status_label|default_if_none:''|lower }}">
+                  <td data-label="Link URL"><a href="{{ link.link_url }}" target="_blank" rel="noopener" class="table-link-text" title="{{ link.link_url }}">{{ link.link_url }}</a></td>
+                  <td data-label="Anchor Text"><span class="table-link-text" title="{{ link.anchor_text|default:'Not Available' }}">{{ link.anchor_text|default:"Not Available" }}</span></td>
+                  <td data-label="Source Page"><span class="table-link-text" title="{{ link.source_page|default:'Not Available' }}">{{ link.source_page|default:"Not Available" }}</span></td>
+                  <td data-label="HTTP Status">{{ link.http_status_code|default:"-" }}</td>
+                  <td data-label="Redirects">{{ link.redirect_count|default:0 }}</td>
+                  <td data-label="Status">
+                    <span class="badge bg-light text-dark border">{{ link.status_label|default:"Not Detected" }}</span>
+                    {% if link.status_detail %}<div class="small text-muted">{{ link.status_detail }}</div>{% endif %}
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="6" class="text-center py-4">No links found for this analysis.</td>
+                </tr>
+                {% endfor %}
+                <tr class="table-filter-empty d-none">
+                  <td colspan="6">No rows match the current search and filter settings.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+            <div class="table-shell card shadow-sm" id="internal-errors-table-shell">
+        <div class="card-header bg-white">
+          <h5 class="mb-0">Internal Links With Errors</h5>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Link URL</th>
+                  <th>Anchor Text</th>
+                  <th>Source Page</th>
+                  <th>HTTP Status Code</th>
+                  <th>Redirects</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="internal-errors-table-body">
+                {% for link in error_links %}
+                <tr data-link-row="true" data-table-scope="errors" data-status="{{ link.status|default_if_none:''|lower }}" data-status-label="{{ link.status_label|default_if_none:''|lower }}">
+                  <td data-label="Link URL"><a href="{{ link.link_url }}" target="_blank" rel="noopener" class="table-link-text" title="{{ link.link_url }}">{{ link.link_url }}</a></td>
+                  <td data-label="Anchor Text"><span class="table-link-text" title="{{ link.anchor_text|default:'Not Available' }}">{{ link.anchor_text|default:"Not Available" }}</span></td>
+                  <td data-label="Source Page"><span class="table-link-text" title="{{ link.source_page|default:'Not Available' }}">{{ link.source_page|default:"Not Available" }}</span></td>
+                  <td data-label="HTTP Status">{{ link.http_status_code|default:"-" }}</td>
+                  <td data-label="Redirects">{{ link.redirect_count|default:0 }}</td>
+                  <td data-label="Status">
+                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle">{{ link.status_label|default:"Not Detected" }}</span>
+                    {% if link.status_detail %}<div class="small text-muted">{{ link.status_detail }}</div>{% endif %}
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="6" class="text-center py-4">No broken or error links found in this report.</td>
+                </tr>
+                {% endfor %}
+                <tr class="table-filter-empty d-none">
+                  <td colspan="6">No rows match the current search and filter settings.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="headingSeoIntelligence">
+          <button
+            class="accordion-button collapsed"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#seoIntelligenceAccordion"
+            aria-expanded="false"
+            aria-controls="seoIntelligenceAccordion"
+          >
+            <span class="accordion-header-content">
+              <span>
+                <span class="accordion-title">SEO Intelligence</span>
+                <span class="accordion-subtitle">Strategic topic signals and supporting context remain available on demand.</span>
+              </span>
+              <span class="accordion-badge">Strategic Layer</span>
+            </span>
+          </button>
+        </h2>
+        <div id="seoIntelligenceAccordion" class="accordion-collapse collapse" aria-labelledby="headingSeoIntelligence">
+          <div class="accordion-body">
+            <div class="seo-intelligence-shell">
+              {% include 'seo_analyzer/partials/topic_intelligence_card.html' with topic_intelligence=topic_intelligence %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="mb-5">
+    <div class="d-flex justify-content-between align-items-end flex-wrap gap-3 mb-3">
+      <div>
+        <div class="section-title">Enterprise Features</div>
+        <p class="section-copy">Unlock advanced internal linking intelligence.</p>
+      </div>
+    </div>
+    <div class="row g-4">
+      <div class="col-lg-3 col-md-6">
+        <div class="enterprise-card d-flex flex-column gap-3">
+          <div class="d-flex justify-content-between align-items-start gap-3">
+            <span class="enterprise-icon"><i class="bi bi-lock"></i></span>
+            <span class="enterprise-badge">Enterprise Preview</span>
+          </div>
+          <h5 class="mb-0">Internal Link Graph</h5>
+          <p class="text-muted mb-0">Visualize your entire website architecture.</p>
+          <div class="locked-note">Available with Enterprise Plan</div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <div class="enterprise-card d-flex flex-column gap-3">
+          <div class="d-flex justify-content-between align-items-start gap-3">
+            <span class="enterprise-icon"><i class="bi bi-lock"></i></span>
+            <span class="enterprise-badge">Enterprise Preview</span>
+          </div>
+          <h5 class="mb-0">Orphan Pages Detection</h5>
+          <p class="text-muted mb-0">Detect pages without incoming internal links.</p>
+          <div class="locked-note">Available with Enterprise Plan</div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <div class="enterprise-card d-flex flex-column gap-3">
+          <div class="d-flex justify-content-between align-items-start gap-3">
+            <span class="enterprise-icon"><i class="bi bi-lock"></i></span>
+            <span class="enterprise-badge">Enterprise Preview</span>
+          </div>
+          <h5 class="mb-0">Crawl Depth Analysis</h5>
+          <p class="text-muted mb-0">Measure click depth from homepage.</p>
+          <div class="locked-note">Available with Enterprise Plan</div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <div class="enterprise-card d-flex flex-column gap-3">
+          <div class="d-flex justify-content-between align-items-start gap-3">
+            <span class="enterprise-icon"><i class="bi bi-lock"></i></span>
+            <span class="enterprise-badge">Enterprise Preview</span>
+          </div>
+          <h5 class="mb-0">Link Equity Distribution</h5>
+          <p class="text-muted mb-0">Understand authority flow.</p>
+          <div class="locked-note">Available with Enterprise Plan</div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <div class="enterprise-card d-flex flex-column gap-3">
+          <div class="d-flex justify-content-between align-items-start gap-3">
+            <span class="enterprise-icon"><i class="bi bi-lock"></i></span>
+            <span class="enterprise-badge">Enterprise Preview</span>
+          </div>
+          <h5 class="mb-0">Anchor Text Optimization</h5>
+          <p class="text-muted mb-0">Analyze anchor diversity and relevance.</p>
+          <div class="locked-note">Available with Enterprise Plan</div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <div class="enterprise-card d-flex flex-column gap-3">
+          <div class="d-flex justify-content-between align-items-start gap-3">
+            <span class="enterprise-icon"><i class="bi bi-lock"></i></span>
+            <span class="enterprise-badge">Enterprise Preview</span>
+          </div>
+          <h5 class="mb-0">AI Link Opportunities</h5>
+          <p class="text-muted mb-0">AI recommends where new internal links should be created.</p>
+          <div class="locked-note">Available with Enterprise Plan</div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <div class="enterprise-card d-flex flex-column gap-3">
+          <div class="d-flex justify-content-between align-items-start gap-3">
+            <span class="enterprise-icon"><i class="bi bi-lock"></i></span>
+            <span class="enterprise-badge">Enterprise Preview</span>
+          </div>
+          <h5 class="mb-0">Internal Linking Strategy</h5>
+          <p class="text-muted mb-0">Generate an optimal internal linking architecture.</p>
+          <div class="locked-note">Available with Enterprise Plan</div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <div class="enterprise-card d-flex flex-column gap-3">
+          <div class="d-flex justify-content-between align-items-start gap-3">
+            <span class="enterprise-icon"><i class="bi bi-lock"></i></span>
+            <span class="enterprise-badge">Enterprise Preview</span>
+          </div>
+          <h5 class="mb-0">Link Flow Visualization</h5>
+          <p class="text-muted mb-0">Interactive relationship graph between pages.</p>
+          <div class="locked-note">Available with Enterprise Plan</div>
+        </div>
+      </div>
+    </div>
+    <div class="mt-4 d-flex justify-content-center">
+      <button type="button" class="btn btn-primary enterprise-cta" id="request-enterprise-demo">
+        <i class="bi bi-stars me-2"></i>Request Enterprise Demo
+      </button>
+    </div>
+  </section>
+
+  {{ links|json_script:"internal-links-json" }}
+  {{ error_links|json_script:"internal-error-links-json" }}
+  {{ report.findings|json_script:"internal-findings-json" }}
+  {{ report.recommendations|json_script:"internal-recommendations-json" }}
+
+  {% else %}
+  <div class="mb-4">
+    <span class="me-2 fw-semibold">Status:</span>
+    <span class="badge {{ report.status_badge.class }}">{{ report.status_badge.label }}</span>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-3 col-sm-6">
+      <div class="card h-100 shadow-sm border-primary">
+        <div class="card-body text-center">
+          <div class="display-6 text-primary">{{ report.summary.total_links|default:"Not Available" }}</div>
+          <div class="text-muted">Total Links</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+      <div class="card h-100 shadow-sm border-success">
+        <div class="card-body text-center">
+          <div class="display-6 text-success">{{ report.summary.working_links_count|default:"Not Available" }}</div>
+          <div class="text-muted">Working Links</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2 col-sm-4">
+      <div class="card h-100 shadow-sm border-danger">
+        <div class="card-body text-center">
+          <div class="display-6 text-danger">{{ report.summary.broken_links_count|default:"Not Available" }}</div>
+          <div class="text-muted">Broken</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2 col-sm-4">
+      <div class="card h-100 shadow-sm border-warning">
+        <div class="card-body text-center">
+          <div class="display-6 text-warning">{{ report.summary.redirect_links_count|default:"Not Available" }}</div>
+          <div class="text-muted">Redirects</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2 col-sm-4">
+      <div class="card h-100 shadow-sm border-secondary">
+        <div class="card-body text-center">
+          <div class="display-6 text-secondary">{{ report.summary.error_links_count|default:"Not Available" }}</div>
+          <div class="text-muted">Errors</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if report.fallback_message %}
+  <div class="alert alert-warning">
+    {{ report.fallback_message }}
+  </div>
+  {% endif %}
+
+  {% if report.recommendations %}
+  <div class="card mb-4 shadow-sm">
+    <div class="card-header bg-white">
+      <h5 class="mb-0">Recommendations</h5>
+    </div>
+    <div class="card-body">
+      <ul class="mb-0">
+        {% for recommendation in report.recommendations %}
+        <li>{{ recommendation }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="card mb-4 shadow-sm">
+    <div class="card-header bg-white">
+      <h5 class="mb-0">{{ report.analysis_type_label }} Table</h5>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Link URL</th>
+              <th>Anchor Text</th>
+              <th>Source Page</th>
+              <th>HTTP Status Code</th>
+              <th>Redirects</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for link in links %}
+            <tr>
+              <td><a href="{{ link.link_url }}" target="_blank" rel="noopener">{{ link.link_url }}</a></td>
+              <td>{{ link.anchor_text }}</td>
+              <td>{{ link.source_page }}</td>
+              <td>{{ link.http_status_code|default:"-" }}</td>
+              <td>{{ link.redirect_count|default:0 }}</td>
+              <td>
+                <span class="badge bg-light text-dark border">{{ link.status_label }}</span>
+                {% if link.status_detail %}<div class="small text-muted">{{ link.status_detail }}</div>{% endif %}
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="6" class="text-center py-4">No links found for this analysis.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-header bg-white">
+      <h5 class="mb-0">{{ report.analysis_type_label }} With Errors</h5>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Link URL</th>
+              <th>Anchor Text</th>
+              <th>Source Page</th>
+              <th>HTTP Status Code</th>
+              <th>Redirects</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for link in error_links %}
+            <tr>
+              <td><a href="{{ link.link_url }}" target="_blank" rel="noopener">{{ link.link_url }}</a></td>
+              <td>{{ link.anchor_text }}</td>
+              <td>{{ link.source_page }}</td>
+              <td>{{ link.http_status_code|default:"-" }}</td>
+              <td>{{ link.redirect_count|default:0 }}</td>
+              <td>
+                <span class="badge bg-danger-subtle text-danger border border-danger-subtle">{{ link.status_label }}</span>
+                {% if link.status_detail %}<div class="small text-muted">{{ link.status_detail }}</div>{% endif %}
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="6" class="text-center py-4">No error links found in this report.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+  {{ block.super }}
+  {% if report.analysis_type == 'internal' %}
+  <script>
+    (function () {
+      const dashboard = document.getElementById('internal-links-dashboard');
+      if (!dashboard) {
+        return;
+      }
+
+      const parseJsonScript = (id, fallback = []) => {
+        const el = document.getElementById(id);
+        if (!el) {
+          return fallback;
+        }
+        try {
+          const parsed = JSON.parse(el.textContent);
+          return parsed === null || parsed === undefined ? fallback : parsed;
+        } catch (error) {
+          return fallback;
+        }
+      };
+
+      const safeText = (value, fallback = '--') => {
+        if (value === undefined || value === null) {
+          return fallback;
+        }
+        const normalized = String(value).trim();
+        if (!normalized || ['undefined', 'null', 'none', 'nan'].includes(normalized.toLowerCase())) {
+          return fallback;
+        }
+        return normalized;
+      };
+
+      const escapeHtml = (value, fallback = '--') => safeText(value, fallback).replace(/[&<>"']/g, (char) => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;',
+      }[char]));
+
+      const toNumber = (value, fallback = 0) => {
+        const numeric = Number(value);
+        return Number.isFinite(numeric) ? numeric : fallback;
+      };
+
+      const formatMetric = (value, suffix = '') => {
+        if (value === undefined || value === null || value === '') {
+          return '--';
+        }
+        const numeric = Number(value);
+        if (!Number.isFinite(numeric)) {
+          return '--';
+        }
+        return `${numeric}${suffix}`;
+      };
+
+      const formatDate = (value) => {
+        const safeValue = safeText(value, '');
+        if (!safeValue) {
+          return '--';
+        }
+        const parsed = new Date(safeValue);
+        if (Number.isNaN(parsed.getTime())) {
+          return safeValue;
+        }
+        return new Intl.DateTimeFormat('en-US', {
+          dateStyle: 'medium',
+          timeStyle: 'short',
+        }).format(parsed);
+      };
+
+      const getDisplayUrl = (value, fallback = '--') => {
+        const safeValue = safeText(value, '');
+        if (!safeValue) {
+          return fallback;
+        }
+        return safeValue;
+      };
+
+      const healthScoreRaw = String(dashboard.dataset.healthScore || '').trim();
+      const rawHealthLabel = String(dashboard.dataset.healthLabel || '').trim();
+      const rawHealthGrade = String(dashboard.dataset.healthGrade || '').trim();
+      const rawHealthSeverity = String(dashboard.dataset.healthSeverity || '').trim();
+      const rawHealthReason = String(dashboard.dataset.healthReason || '').trim();
+      const rawUrl = String(dashboard.dataset.url || '').trim();
+      const rawFinalUrl = String(dashboard.dataset.finalUrl || '').trim();
+      const rawAnalyzedAt = String(dashboard.dataset.analyzedAt || '').trim();
+
+      const healthScore = healthScoreRaw === '' ? null : Number(healthScoreRaw);
+      const healthLabel = safeText(rawHealthLabel, 'Not Measured');
+      const healthGrade = safeText(rawHealthGrade, '--');
+      const healthSeverity = rawHealthSeverity.toLowerCase();
+      const healthReason = safeText(rawHealthReason, 'No canonical health reason is available.');
+      const links = Array.isArray(parseJsonScript('internal-links-json', [])) ? parseJsonScript('internal-links-json', []) : [];
+      const findingsData = Array.isArray(parseJsonScript('internal-findings-json', [])) ? parseJsonScript('internal-findings-json', []) : [];
+      const recommendationsData = Array.isArray(parseJsonScript('internal-recommendations-json', [])) ? parseJsonScript('internal-recommendations-json', []) : [];
+      const totalLinks = toNumber(dashboard.dataset.total, links.length);
+      const workingLinks = toNumber(dashboard.dataset.working, 0);
+      const brokenLinks = toNumber(dashboard.dataset.broken, 0);
+      const redirectLinks = toNumber(dashboard.dataset.redirect, 0);
+      const errorCount = toNumber(dashboard.dataset.errors, 0);
+
+      const scoreNode = document.getElementById('internal-health-score');
+      const crawlHealthNode = document.getElementById('internal-crawl-health-value');
+      const scoreKickerNode = document.getElementById('internal-health-kicker');
+      const scoreGradeNode = document.getElementById('internal-health-grade');
+      const chartCenterScoreNode = document.getElementById('internal-health-chart-score');
+      const chartCenterLabelNode = document.getElementById('internal-health-chart-label');
+      const chartCenterKickerNode = document.getElementById('internal-health-chart-kicker');
+      const ringNode = document.getElementById('internal-health-ring');
+      const pillNode = document.getElementById('internal-status-pill');
+      const websiteHostNode = document.getElementById('internal-website-host');
+      const finalHostNode = document.getElementById('internal-final-host');
+      const scanDateNode = document.getElementById('internal-scan-date');
+      const summaryStatusNode = document.getElementById('internal-summary-status');
+      const scoreKicker = healthLabel === 'Excellent'
+        ? 'Top Internal Health'
+        : healthLabel === 'Good'
+          ? 'Strong Link Structure'
+          : healthLabel === 'Needs Attention'
+            ? 'Needs Link Cleanup'
+            : healthLabel === 'Critical'
+              ? 'High Priority Attention'
+              : 'Health signal pending';
+
+      const setInsightPanel = (id, lines) => {
+        const node = document.getElementById(id);
+        if (!node) {
+          return;
+        }
+        const sanitizedLines = lines
+          .map((line) => safeText(line, '--'))
+          .filter((line, index, all) => line !== '--' || all.length === 1);
+        node.innerHTML = `
+          <div class="insight-title"><i class="bi bi-stars"></i> AI Insight</div>
+          ${sanitizedLines.map((line) => `<p class="insight-copy">${escapeHtml(line)}</p>`).join('')}
+        `;
+      };
+
+      const renderDetailList = (container, items, emptyMessage) => {
+        if (!container) {
+          return;
+        }
+        if (!items.length) {
+          container.innerHTML = `
+            <div class="analytics-detail-item">
+              <span class="detail-item-label">Details</span>
+              <div class="detail-item-value">${escapeHtml(emptyMessage, '--')}</div>
+            </div>
+          `;
+          return;
+        }
+        container.innerHTML = items.map((item) => `
+          <div class="${item.type || 'analytics-detail-item'}">
+            ${item.label ? `<span class="detail-item-label">${escapeHtml(item.label)}</span>` : ''}
+            <div class="detail-item-value">${item.html ? item.html : escapeHtml(item.value)}</div>
+          </div>
+        `).join('');
+      };
+
+      const getRedirectMeta = (link) => {
+        const detail = safeText(link.status_detail, '');
+        const fallbackFinal = safeText(link.final_url, safeText(link.link_url, '--'));
+        const finalMatch = detail.match(/\bto\s+(https?:\/\/\S+)/i);
+        const finalUrl = safeText(finalMatch ? finalMatch[1] : fallbackFinal, '--');
+        const redirectType = safeText(link.http_status_code, '').startsWith('3')
+          ? String(link.http_status_code).trim()
+          : (detail.match(/\b(301|302|307|308)\b/) || [null, '--'])[1];
+        return {
+          originalUrl: safeText(link.link_url, '--'),
+          finalUrl,
+          redirectType: safeText(redirectType, '--'),
+          redirectCount: toNumber(link.redirect_count, 0),
+          sourcePage: safeText(link.source_page, '--'),
+        };
+      };
+
+      const normalizeStatusBucket = (link) => {
+        const label = String(link.status_label || link.status || '').toLowerCase();
+        const detail = String(link.status_detail || '').toLowerCase();
+        const codeValue = String(link.http_status_code || '').trim();
+        const code = toNumber(codeValue, NaN);
+
+        if (label.includes('timeout') || detail.includes('timeout')) {
+          return 'Timeout';
+        }
+        if (Number.isFinite(code)) {
+          if (code >= 200 && code < 300) {
+            return '200';
+          }
+          if ([301, 302, 307, 308, 404, 410].includes(code)) {
+            return String(code);
+          }
+          if (code >= 500 && code < 600) {
+            return '500';
+          }
+          if (code >= 400 && code < 500) {
+            return code === 410 ? '410' : '404';
+          }
+        }
+        if (label.includes('error') || detail.includes('ssl') || detail.includes('dns') || detail.includes('connection')) {
+          return 'Timeout';
+        }
+        return null;
+      };
+
+      const stats = {
+        statusCounts: {
+          '200': 0,
+          '301': 0,
+          '302': 0,
+          '307': 0,
+          '308': 0,
+          '404': 0,
+          '410': 0,
+          '500': 0,
+          'Timeout': 0,
+        },
+        destinationCounts: {},
+        redirectRows: [],
+        brokenRows: [],
+        errorRows: [],
+        emptyAnchorRows: [],
+        redirectSingle: 0,
+        redirectChains: 0,
+        brokenRedirects: 0,
+      };
+
+      links.forEach((link) => {
+        const bucket = normalizeStatusBucket(link);
+        if (bucket && Object.prototype.hasOwnProperty.call(stats.statusCounts, bucket)) {
+          stats.statusCounts[bucket] += 1;
+        }
+
+        const destination = safeText(link.link_url, '');
+        if (destination) {
+          stats.destinationCounts[destination] = (stats.destinationCounts[destination] || 0) + 1;
+        }
+
+        const redirectCountValue = toNumber(link.redirect_count, 0);
+        if (redirectCountValue > 0) {
+          const redirectMeta = getRedirectMeta(link);
+          stats.redirectRows.push(redirectMeta);
+          if (redirectCountValue === 1) {
+            stats.redirectSingle += 1;
+          } else {
+            stats.redirectChains += 1;
+          }
+          const statusCode = toNumber(link.http_status_code, 0);
+          if (statusCode >= 400) {
+            stats.brokenRedirects += 1;
+          }
+        }
+
+        const statusValue = String(link.status || '').toLowerCase();
+        if (statusValue === 'broken' || bucket === '404' || bucket === '410' || bucket === '500') {
+          stats.brokenRows.push({
+            url: safeText(link.link_url, '--'),
+            source: safeText(link.source_page, '--'),
+            detail: safeText(link.status_detail || link.status_label, '--'),
+          });
+        }
+        if (statusValue === 'error' || bucket === 'Timeout') {
+          stats.errorRows.push({
+            url: safeText(link.link_url, '--'),
+            source: safeText(link.source_page, '--'),
+            detail: safeText(link.status_detail || link.status_label, '--'),
+          });
+        }
+        if (!safeText(link.anchor_text, '').replace(/-/g, '').trim()) {
+          stats.emptyAnchorRows.push({
+            url: safeText(link.link_url, '--'),
+            source: safeText(link.source_page, '--'),
+            anchor: safeText(link.anchor_text, '--'),
+          });
+        }
+      });
+
+      const resolvedTotalLinks = totalLinks || links.length || (
+        workingLinks + brokenLinks + redirectLinks + errorCount
+      );
+      const topPages = Object.entries(stats.destinationCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 10)
+        .map(([url, count]) => ({
+          url,
+          count,
+          percentage: resolvedTotalLinks > 0 ? Math.round((count / resolvedTotalLinks) * 100) : 0,
+        }));
+
+      const shortenLabel = (value) => {
+        if (!value) {
+          return 'Unknown';
+        }
+        try {
+          const url = new URL(value);
+          const path = url.pathname === '/' ? 'Homepage' : url.pathname.replace(/\/+$/, '').split('/').pop();
+          return path ? path.slice(0, 32) : url.hostname;
+        } catch (error) {
+          return String(value).slice(0, 32);
+        }
+      };
+
+      const linkedPageCount = Object.keys(stats.destinationCounts).length;
+      const topPageShare = resolvedTotalLinks > 0 && topPages.length ? topPages[0].count / resolvedTotalLinks : 0;
+      const healthyShare = resolvedTotalLinks > 0 ? Math.round((workingLinks / resolvedTotalLinks) * 100) : 0;
+      const redirectShare = resolvedTotalLinks > 0 ? Math.round((redirectLinks / resolvedTotalLinks) * 100) : 0;
+      const errorShare = resolvedTotalLinks > 0 ? Math.round((errorCount / resolvedTotalLinks) * 100) : 0;
+
+      if (scoreNode) {
+        scoreNode.textContent = healthScore === null ? '--' : `${healthScore}/100`;
+      }
+
+      if (crawlHealthNode) {
+        crawlHealthNode.textContent = healthScore === null ? '--' : `${healthScore}%`;
+      }
+
+      if (chartCenterScoreNode) {
+        chartCenterScoreNode.textContent = healthScore === null ? '--' : `${healthScore}%`;
+      }
+
+      if (chartCenterLabelNode) {
+        chartCenterLabelNode.textContent = healthLabel;
+      }
+
+      if (scoreKickerNode) {
+        scoreKickerNode.textContent = scoreKicker;
+      }
+
+      if (scoreGradeNode) {
+        scoreGradeNode.textContent = healthGrade === '--' ? 'Grade --' : `Grade ${healthGrade}`;
+      }
+
+      if (chartCenterKickerNode) {
+        chartCenterKickerNode.textContent = scoreKicker;
+      }
+
+      if (websiteHostNode) {
+        websiteHostNode.textContent = getDisplayUrl(rawUrl);
+      }
+
+      if (finalHostNode) {
+        finalHostNode.textContent = getDisplayUrl(rawFinalUrl || rawUrl);
+      }
+
+      if (scanDateNode) {
+        scanDateNode.textContent = formatDate(rawAnalyzedAt);
+      }
+
+      if (summaryStatusNode) {
+        summaryStatusNode.textContent = healthLabel;
+      }
+
+      if (ringNode) {
+        ringNode.style.setProperty('--score-value', String(healthScore === null ? 0 : healthScore));
+        if (healthScore !== null) {
+          if (healthScore >= 85) {
+            ringNode.style.setProperty('--score-color', '#10b981');
+          } else if (healthScore >= 70) {
+            ringNode.style.setProperty('--score-color', '#06b6d4');
+          } else if (healthScore >= 50) {
+            ringNode.style.setProperty('--score-color', '#f59e0b');
+          } else {
+            ringNode.style.setProperty('--score-color', '#ef4444');
+          }
+        }
+      }
+
+      if (pillNode) {
+        pillNode.textContent = healthLabel;
+        pillNode.classList.remove('status-excellent', 'status-good', 'status-needs-attention', 'status-critical');
+        if (healthSeverity === 'success' && healthLabel === 'Excellent') {
+          pillNode.classList.add('status-excellent');
+        } else if (healthSeverity === 'success') {
+          pillNode.classList.add('status-good');
+        } else if (healthSeverity === 'danger') {
+          pillNode.classList.add('status-critical');
+        } else {
+          pillNode.classList.add('status-needs-attention');
+        }
+      }
+
+      const chartDefaults = {
+        borderWidth: 0,
+        borderRadius: 10,
+        hoverBorderWidth: 0,
+      };
+
+      const valueLabelPlugin = {
+        id: 'valueLabelPlugin',
+        afterDatasetsDraw(chart, args, pluginOptions) {
+          if (!pluginOptions || !pluginOptions.enabled || chart.config.type !== 'bar') {
+            return;
+          }
+          const { ctx, chartArea } = chart;
+          const meta = chart.getDatasetMeta(0);
+          ctx.save();
+          ctx.fillStyle = '#0f172a';
+          ctx.font = '700 12px Inter, sans-serif';
+          ctx.textBaseline = 'middle';
+          meta.data.forEach((element, index) => {
+            const value = chart.data.datasets[0].data[index];
+            const label = safeText(value, '0');
+            const x = Math.min(element.x + 10, chartArea.right - 18);
+            ctx.textAlign = 'left';
+            ctx.fillText(label, x, element.y);
+          });
+          ctx.restore();
+        },
+      };
+
+      const chartRegistry = window.__internalLinksChartRegistry || (window.__internalLinksChartRegistry = {});
+
+      const commonOptions = (extra) => ({
+        animation: {
+          duration: 700,
+        },
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            labels: {
+              color: '#475569',
+              font: {
+                family: 'Inter, sans-serif',
+                size: 12,
+                weight: '600',
+              },
+            },
+          },
+          tooltip: {
+            backgroundColor: 'rgba(15, 23, 42, 0.92)',
+            bodyColor: '#f8fafc',
+            borderColor: 'rgba(6, 182, 212, 0.25)',
+            borderWidth: 1,
+            titleColor: '#fff',
+          },
+        },
+        responsive: true,
+        ...extra,
+      });
+
+      const getChartContainer = (canvas) => canvas.closest('.chart-stage') || canvas.parentElement;
+
+      const clearChartPlaceholder = (canvas) => {
+        const container = getChartContainer(canvas);
+        if (!container) {
+          return;
+        }
+        const placeholder = container.querySelector('[data-chart-empty-state]');
+        if (placeholder) {
+          placeholder.remove();
+        }
+        canvas.style.display = '';
+        const center = container.querySelector('.chart-center');
+        if (center) {
+          center.style.display = '';
+        }
+      };
+
+      const renderChartPlaceholder = (canvas, title, copy) => {
+        const container = getChartContainer(canvas);
+        if (!container) {
+          return;
+        }
+        const existing = container.querySelector('[data-chart-empty-state]');
+        if (existing) {
+          existing.remove();
+        }
+        canvas.style.display = 'none';
+        const center = container.querySelector('.chart-center');
+        if (center) {
+          center.style.display = 'none';
+        }
+        const placeholder = document.createElement('div');
+        placeholder.setAttribute('data-chart-empty-state', 'true');
+        placeholder.className = 'chart-empty-state';
+        placeholder.innerHTML = `
+          <div class="chart-empty-title">${escapeHtml(title, 'No Data')}</div>
+          <p class="chart-empty-copy">${escapeHtml(copy, '--')}</p>
+        `;
+        container.appendChild(placeholder);
+      };
+
+      const destroyChart = (id, canvas) => {
+        const existing = chartRegistry[id]
+          || (typeof Chart !== 'undefined' && typeof Chart.getChart === 'function' ? Chart.getChart(canvas) : null);
+        if (existing && typeof existing.destroy === 'function') {
+          existing.destroy();
+        }
+        delete chartRegistry[id];
+      };
+
+      const buildChart = (id, config, meta = {}) => {
+        const canvas = document.getElementById(id);
+        if (!canvas || typeof Chart === 'undefined') {
+          return false;
+        }
+        destroyChart(id, canvas);
+
+        const values = Array.isArray(meta.dataValues) ? meta.dataValues : [];
+        const hasData = values.some((value) => Number(value) > 0);
+        if (!hasData) {
+          renderChartPlaceholder(
+            canvas,
+            meta.placeholderTitle || 'No Data Available',
+            meta.placeholderCopy || 'There is not enough report data to render this chart yet.'
+          );
+          return false;
+        }
+        clearChartPlaceholder(canvas);
+        try {
+          chartRegistry[id] = new Chart(canvas, config);
+          return true;
+        } catch (error) {
+          renderChartPlaceholder(
+            canvas,
+            meta.placeholderTitle || 'Chart Unavailable',
+            meta.placeholderCopy || 'The current dataset could not be rendered safely.'
+          );
+          return false;
+        }
+      };
+
+      buildChart('internal-health-chart', {
+        type: 'doughnut',
+        data: {
+          labels: ['Healthy', 'Broken', 'Redirect', 'Errors'],
+          datasets: [{
+            ...chartDefaults,
+            data: [workingLinks, brokenLinks, redirectLinks, errorCount],
+            backgroundColor: ['#10b981', '#ef4444', '#f59e0b', '#64748b'],
+          }],
+        },
+        options: commonOptions({
+          cutout: '68%',
+        }),
+      }, {
+        dataValues: [workingLinks, brokenLinks, redirectLinks, errorCount],
+        placeholderTitle: 'No Health Breakdown Yet',
+        placeholderCopy: 'The analyzed page does not currently have enough classified internal links to render the health distribution.',
+      });
+
+      buildChart('internal-status-chart', {
+        type: 'bar',
+        data: {
+          labels: ['200', '301', '302', '307', '308', '404', '410', '500', 'Timeout'],
+          datasets: [{
+            ...chartDefaults,
+            label: 'Internal Links',
+            data: [
+              stats.statusCounts['200'],
+              stats.statusCounts['301'],
+              stats.statusCounts['302'],
+              stats.statusCounts['307'],
+              stats.statusCounts['308'],
+              stats.statusCounts['404'],
+              stats.statusCounts['410'],
+              stats.statusCounts['500'],
+              stats.statusCounts['Timeout'],
+            ],
+            backgroundColor: ['#10b981', '#06b6d4', '#38bdf8', '#7dd3fc', '#2563eb', '#ef4444', '#dc2626', '#7c3aed', '#f59e0b'],
+          }],
+        },
+        options: commonOptions({
+          plugins: {
+            ...commonOptions({}).plugins,
+            legend: {
+              display: false,
+            },
+          },
+          scales: {
+            x: {
+              grid: {
+                display: false,
+              },
+              ticks: {
+                color: '#475569',
+                font: {
+                  family: 'Inter, sans-serif',
+                  weight: '600',
+                },
+              },
+            },
+            y: {
+              beginAtZero: true,
+              grid: {
+                color: 'rgba(148, 163, 184, 0.16)',
+              },
+              ticks: {
+                color: '#475569',
+                precision: 0,
+              },
+            },
+          },
+        }),
+      }, {
+        dataValues: Object.values(stats.statusCounts),
+        placeholderTitle: 'No Status Data Available',
+        placeholderCopy: 'HTTP status distribution will appear here once the analyzed page returns classified internal link results.',
+      });
+
+      buildChart('most-linked-pages-chart', {
+        type: 'bar',
+        plugins: [valueLabelPlugin],
+        data: {
+          labels: topPages.length ? topPages.map((page) => shortenLabel(page.url)) : ['No linked pages'],
+          datasets: [{
+            ...chartDefaults,
+            data: topPages.length ? topPages.map((page) => page.count) : [0],
+            backgroundColor: '#1d4ed8',
+          }],
+        },
+        options: commonOptions({
+          indexAxis: 'y',
+          plugins: {
+            ...commonOptions({}).plugins,
+            legend: {
+              display: false,
+            },
+            valueLabelPlugin: {
+              enabled: true,
+            },
+          },
+          layout: {
+            padding: {
+              right: 34,
+            },
+          },
+          scales: {
+            x: {
+              beginAtZero: true,
+              grid: {
+                color: 'rgba(148, 163, 184, 0.1)',
+              },
+              ticks: {
+                color: '#475569',
+                precision: 0,
+              },
+            },
+            y: {
+              grid: {
+                display: false,
+              },
+              ticks: {
+                color: '#475569',
+                font: {
+                  family: 'Inter, sans-serif',
+                  weight: '600',
+                },
+              },
+            },
+          },
+        }),
+      }, {
+        dataValues: topPages.map((page) => page.count),
+        placeholderTitle: 'No Linked Destinations Yet',
+        placeholderCopy: 'The analyzed page does not currently expose enough repeated internal destinations to rank the top linked pages.',
+      });
+
+      buildChart('redirect-analysis-chart', {
+        type: 'bar',
+        data: {
+          labels: ['Single Redirect', 'Redirect Chain', 'Broken Redirect'],
+          datasets: [{
+            ...chartDefaults,
+            data: [stats.redirectSingle, stats.redirectChains, stats.brokenRedirects],
+            backgroundColor: ['#38bdf8', '#f59e0b', '#ef4444'],
+          }],
+        },
+        options: commonOptions({
+          plugins: {
+            ...commonOptions({}).plugins,
+            legend: {
+              display: false,
+            },
+          },
+          scales: {
+            x: {
+              grid: {
+                display: false,
+              },
+              ticks: {
+                color: '#475569',
+                font: {
+                  family: 'Inter, sans-serif',
+                  weight: '600',
+                },
+              },
+            },
+            y: {
+              beginAtZero: true,
+              grid: {
+                color: 'rgba(148, 163, 184, 0.16)',
+              },
+              ticks: {
+                color: '#475569',
+                precision: 0,
+              },
+            },
+          },
+        }),
+      }, {
+        dataValues: [stats.redirectSingle, stats.redirectChains, stats.brokenRedirects],
+        placeholderTitle: 'No Redirect Patterns Detected',
+        placeholderCopy: 'Redirect analysis will appear here when the analyzed page contains redirected internal URLs.',
+      });
+
+      setInsightPanel('internal-health-insight', [
+        healthReason,
+        healthyShare >= 70
+          ? `Healthy internal links dominate the analyzed page at ${healthyShare}% of audited destinations.`
+          : `Healthy links represent ${healthyShare}% of audited destinations and leave room for structural cleanup.`,
+        redirectShare <= 15
+          ? 'Redirect volume remains controlled with no major drag on internal crawl efficiency.'
+          : `Redirect volume reaches ${redirectShare}% of discovered links and warrants cleanup.`,
+      ]);
+
+      setInsightPanel('internal-status-insight', [
+        stats.statusCounts['404'] + stats.statusCounts['410'] === 0
+          ? 'No significant 404 errors were detected in the current internal crawl.'
+          : `${stats.statusCounts['404'] + stats.statusCounts['410']} internal destinations returned 4xx responses and should be prioritized.`,
+        stats.redirectSingle + stats.redirectChains + stats.brokenRedirects === 0
+          ? 'Most audited destinations resolve successfully on the first request.'
+          : `${stats.redirectSingle + stats.redirectChains + stats.brokenRedirects} internal destinations require at least one redirect before resolving and should be cleaned up.`,
+      ]);
+
+      const topLinkedLabel = topPages[0] ? shortenLabel(topPages[0].url) : 'key destinations';
+      setInsightPanel('most-linked-pages-insight', [
+        topPages.length && topPageShare >= 0.45
+          ? `Internal authority is currently concentrated on ${topLinkedLabel}.`
+          : 'No dominant internal destination was detected in the current report.',
+        topPageShare >= 0.45
+          ? `The leading page absorbs ${Math.round(topPageShare * 100)}% of tracked internal links, suggesting concentrated equity flow.`
+          : 'Link equity is comparatively distributed across multiple internal destinations.',
+      ]);
+
+      setInsightPanel('redirect-analysis-insight', [
+        stats.redirectSingle > 0
+          ? `Most redirects are single hops (${stats.redirectSingle}) rather than long chains.`
+          : 'No single-hop redirects were detected in the current report.',
+        stats.redirectChains === 0 && stats.brokenRedirects === 0
+          ? 'No redirect chains or broken redirect paths were detected.'
+          : `${stats.redirectChains} redirect chains and ${stats.brokenRedirects} broken redirect paths require normalization.`,
+      ]);
+
+      renderDetailList(
+        document.getElementById('most-linked-pages-detail-list'),
+        topPages.map((page) => ({
+          type: 'analytics-detail-item',
+          label: 'Destination URL',
+          html: `
+            <div>${escapeHtml(page.url)}</div>
+            <div class="small text-muted mt-2">${escapeHtml(String(page.count), '0')} incoming internal link(s) · ${escapeHtml(String(page.percentage), '0')}% of total internal links</div>
+          `,
+        })),
+        'No internal destinations are available yet for a top-pages ranking.'
+      );
+
+      renderDetailList(
+        document.getElementById('redirect-analysis-detail-list'),
+        stats.redirectRows.map((row) => ({
+          type: 'analytics-detail-item',
+          label: 'Redirected Internal URL',
+          html: `
+            <div><strong>Original:</strong> ${escapeHtml(row.originalUrl)}</div>
+            <div class="mt-1"><strong>Final:</strong> ${escapeHtml(row.finalUrl)}</div>
+            <div class="mt-1"><strong>Redirect Type:</strong> ${escapeHtml(row.redirectType)}</div>
+            <div class="mt-1"><strong>Redirect Count:</strong> ${escapeHtml(String(row.redirectCount), '0')}</div>
+          `,
+        })),
+        'No redirected internal URLs were detected in this analyzed page report.'
+      );
+
+      const buildFindingCards = () => {
+        const findingsGrid = document.getElementById('critical-findings-grid');
+        if (!findingsGrid) {
+          return;
+        }
+
+        const sanitizedFindings = findingsData.length ? findingsData : [{
+          issue: 'No Issues',
+          severity: 'Low',
+          affected_count: 0,
+          business_impact: 'The analyzed page internal links do not currently show broken, timeout, or redirect issues.',
+          seo_impact: 'The analyzed page currently presents a clean internal linking profile.',
+          recommended_fix: 'Maintain the current link quality and continue monitoring.',
+          estimated_time: 'Ongoing monitoring',
+          confidence: 'High',
+          css_class: 'finding-info',
+          icon: 'bi-shield-check',
+          description: 'No internal link issues were detected in the current analyzed page report.',
+        }];
+
+        const relatedItemsByIssue = {
+          'broken internal links': stats.brokenRows.map((row) => ({
+            type: 'finding-related-item',
+            label: 'Broken URL',
+            html: `
+              <div><strong>Destination:</strong> ${escapeHtml(row.url)}</div>
+              <div class="mt-1"><strong>Source Page:</strong> ${escapeHtml(row.source)}</div>
+              <div class="mt-1"><strong>Status:</strong> ${escapeHtml(row.detail)}</div>
+            `,
+          })),
+          'timeout / error links': stats.errorRows.map((row) => ({
+            type: 'finding-related-item',
+            label: 'Error URL',
+            html: `
+              <div><strong>Destination:</strong> ${escapeHtml(row.url)}</div>
+              <div class="mt-1"><strong>Source Page:</strong> ${escapeHtml(row.source)}</div>
+              <div class="mt-1"><strong>Detail:</strong> ${escapeHtml(row.detail)}</div>
+            `,
+          })),
+          'redirected internal links': stats.redirectRows.map((row) => ({
+            type: 'finding-related-item',
+            label: 'Redirect URL',
+            html: `
+              <div><strong>Original:</strong> ${escapeHtml(row.originalUrl)}</div>
+              <div class="mt-1"><strong>Final:</strong> ${escapeHtml(row.finalUrl)}</div>
+              <div class="mt-1"><strong>Type:</strong> ${escapeHtml(row.redirectType)}</div>
+              <div class="mt-1"><strong>Count:</strong> ${escapeHtml(String(row.redirectCount), '0')}</div>
+            `,
+          })),
+          'too many redirects': stats.redirectRows.filter((row) => row.redirectCount > 1).map((row) => ({
+            type: 'finding-related-item',
+            label: 'Redirect Chain',
+            html: `
+              <div><strong>Original:</strong> ${escapeHtml(row.originalUrl)}</div>
+              <div class="mt-1"><strong>Final:</strong> ${escapeHtml(row.finalUrl)}</div>
+              <div class="mt-1"><strong>Count:</strong> ${escapeHtml(String(row.redirectCount), '0')}</div>
+            `,
+          })),
+          'empty anchor text': stats.emptyAnchorRows.map((row) => ({
+            type: 'finding-related-item',
+            label: 'Empty Anchor',
+            html: `
+              <div><strong>Destination:</strong> ${escapeHtml(row.url)}</div>
+              <div class="mt-1"><strong>Source Page:</strong> ${escapeHtml(row.source)}</div>
+            `,
+          })),
+        };
+
+        findingsGrid.innerHTML = sanitizedFindings.map((finding) => {
+          const issueName = safeText(finding.issue, '--');
+          const normalizedIssue = issueName.toLowerCase();
+          const relatedItems = relatedItemsByIssue[normalizedIssue] || [];
+          const cssClass = safeText(finding.css_class, 'finding-info');
+          const severity = safeText(finding.severity, '--');
+          const priorityClass = severity === 'Critical' || severity === 'High'
+            ? 'priority-high'
+            : severity === 'Medium'
+              ? 'priority-medium'
+              : 'priority-low';
+          const iconClass = cssClass === 'finding-critical'
+            ? 'icon-broken'
+            : cssClass === 'finding-warning'
+              ? 'icon-redirect'
+              : 'icon-total';
+          return `
+            <div class="col-lg-4 col-md-6">
+              <div class="finding-card ${cssClass}" data-finding-issue="${escapeHtml(issueName)}">
+                <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                  <span class="finding-icon ${iconClass}">
+                    <i class="bi ${escapeHtml(finding.icon || 'bi-info-circle-fill')}"></i>
+                  </span>
+                  <span class="priority-badge ${priorityClass}">${escapeHtml(severity)}</span>
+                </div>
+                <h5 class="mb-2">${escapeHtml(issueName)}</h5>
+                <p class="text-muted mb-0">${escapeHtml(finding.description || finding.seo_impact || '--')}</p>
+                <div class="finding-grid">
+                  <div class="finding-detail">
+                    <span class="finding-detail-label">Severity</span>
+                    <span class="finding-detail-value">${escapeHtml(severity)}</span>
+                  </div>
+                  <div class="finding-detail">
+                    <span class="finding-detail-label">Affected Pages</span>
+                    <span class="finding-detail-value">${escapeHtml(String(toNumber(finding.affected_count, 0)), '0')}</span>
+                  </div>
+                  <div class="finding-detail">
+                    <span class="finding-detail-label">Business Impact</span>
+                    <span class="finding-detail-value">${escapeHtml(finding.business_impact, '--')}</span>
+                  </div>
+                  <div class="finding-detail">
+                    <span class="finding-detail-label">SEO Impact</span>
+                    <span class="finding-detail-value">${escapeHtml(finding.seo_impact, '--')}</span>
+                  </div>
+                  <div class="finding-detail">
+                    <span class="finding-detail-label">Recommended Fix</span>
+                    <span class="finding-detail-value">${escapeHtml(finding.recommended_fix, '--')}</span>
+                  </div>
+                  <div class="finding-detail">
+                    <span class="finding-detail-label">Estimated Time</span>
+                    <span class="finding-detail-value">${escapeHtml(finding.estimated_time, '--')}</span>
+                  </div>
+                  <div class="finding-detail">
+                    <span class="finding-detail-label">Confidence</span>
+                    <span class="finding-detail-value">${escapeHtml(finding.confidence, '--')}</span>
+                  </div>
+                </div>
+                <div class="finding-related-list">
+                  ${relatedItems.length ? relatedItems.map((item) => `
+                    <div class="${item.type}">
+                      <span class="detail-item-label">${escapeHtml(item.label)}</span>
+                      <div class="detail-item-value">${item.html}</div>
+                    </div>
+                  `).join('') : `
+                    <div class="finding-related-item">
+                      <span class="detail-item-label">Details</span>
+                      <div class="detail-item-value">No additional URL-level rows are required for this finding.</div>
+                    </div>
+                  `}
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      };
+
+      const buildRecommendationCards = () => {
+        const recommendationGrid = document.getElementById('ai-recommendations-grid');
+        if (!recommendationGrid) {
+          return;
+        }
+
+        const recommendationSeeds = recommendationsData.map((item) => typeof item === 'string' ? { text: item } : item);
+        const findRecommendationText = (keywords, fallback) => {
+          const seed = recommendationSeeds.find((item) =>
+            keywords.some((keyword) => safeText(item.text, '').toLowerCase().includes(keyword))
+          );
+          return safeText(seed && seed.text, fallback);
+        };
+
+        const cards = [];
+        if (stats.brokenRows.length) {
+          cards.push({
+            priority: 'High',
+            issue: findRecommendationText(['broken', 'dead-end'], 'Fix broken internal links'),
+            explanation: 'Broken destinations interrupt navigation for users and reduce crawl continuity on the analyzed page.',
+            estimatedGain: '+18 SEO Score',
+            businessImpact: 'Visitors can lose the intended conversion or discovery path before reaching the target content.',
+            difficulty: 'Easy',
+            estimatedTime: stats.brokenRows.length <= 5 ? '25 minutes' : '60 minutes',
+            related: stats.brokenRows.map((row) => ({
+              label: 'Broken URL',
+              html: `
+                <div><strong>Destination:</strong> ${escapeHtml(row.url)}</div>
+                <div class="mt-1"><strong>Source Page:</strong> ${escapeHtml(row.source)}</div>
+              `,
+            })),
+          });
+        }
+        if (stats.errorRows.length) {
+          cards.push({
+            priority: 'High',
+            issue: findRecommendationText(['error', 'timeout', 'unexpected http'], 'Stabilize timeout and error links'),
+            explanation: 'Timeouts and request failures make the analyzed page internal link audit unreliable for both users and crawlers.',
+            estimatedGain: '+12 SEO Score',
+            businessImpact: 'Unstable destinations create navigation uncertainty and slow down quality assurance.',
+            difficulty: 'Medium',
+            estimatedTime: stats.errorRows.length <= 3 ? '20 minutes' : '45 minutes',
+            related: stats.errorRows.map((row) => ({
+              label: 'Error URL',
+              html: `
+                <div><strong>Destination:</strong> ${escapeHtml(row.url)}</div>
+                <div class="mt-1"><strong>Source Page:</strong> ${escapeHtml(row.source)}</div>
+              `,
+            })),
+          });
+        }
+        if (stats.redirectRows.length) {
+          cards.push({
+            priority: stats.redirectChains > 0 ? 'High' : 'Medium',
+            issue: findRecommendationText(['redirect'], 'Replace redirected internal URLs with their final destination'),
+            explanation: 'Redirected internal links add unnecessary hops before users and crawlers reach the final content.',
+            estimatedGain: '+10 SEO Score',
+            businessImpact: 'Direct routing improves the speed and predictability of the analyzed page navigation path.',
+            difficulty: 'Easy',
+            estimatedTime: stats.redirectRows.length < 5 ? '15 minutes' : '35 minutes',
+            related: stats.redirectRows.map((row) => ({
+              label: 'Redirect URL',
+              html: `
+                <div><strong>Original:</strong> ${escapeHtml(row.originalUrl)}</div>
+                <div class="mt-1"><strong>Final:</strong> ${escapeHtml(row.finalUrl)}</div>
+                <div class="mt-1"><strong>Type:</strong> ${escapeHtml(row.redirectType)}</div>
+                <div class="mt-1"><strong>Count:</strong> ${escapeHtml(String(row.redirectCount), '0')}</div>
+              `,
+            })),
+          });
+        }
+        if (stats.emptyAnchorRows.length) {
+          cards.push({
+            priority: 'Low',
+            issue: 'Replace empty anchor text with descriptive labels',
+            explanation: 'Empty anchors reduce context for users and weaken semantic clarity for internal links.',
+            estimatedGain: '+6 SEO Score',
+            businessImpact: 'Descriptive anchors improve usability and editorial precision on the analyzed page.',
+            difficulty: 'Easy',
+            estimatedTime: '15 minutes',
+            related: stats.emptyAnchorRows.map((row) => ({
+              label: 'Empty Anchor',
+              html: `
+                <div><strong>Destination:</strong> ${escapeHtml(row.url)}</div>
+                <div class="mt-1"><strong>Source Page:</strong> ${escapeHtml(row.source)}</div>
+              `,
+            })),
+          });
+        }
+
+        if (!cards.length) {
+          const fallbackRecommendation = recommendationSeeds[0] || {};
+          cards.push({
+            priority: safeText(fallbackRecommendation.priority, 'Low'),
+            issue: safeText(fallbackRecommendation.text, 'Maintain the current internal link quality'),
+            explanation: 'The current report does not surface broken, redirect, timeout, or empty-anchor issues that require immediate action.',
+            estimatedGain: safeText(fallbackRecommendation.estimated_gain, '+0 SEO Score'),
+            businessImpact: safeText(fallbackRecommendation.business_impact, 'The analyzed page currently presents a stable internal linking profile.'),
+            difficulty: safeText(fallbackRecommendation.difficulty, 'Easy'),
+            estimatedTime: safeText(fallbackRecommendation.estimated_time, 'Ongoing monitoring'),
+            related: [],
+          });
+        }
+
+        recommendationGrid.innerHTML = cards.map((card, index) => {
+          const priorityClass = card.priority === 'High'
+            ? 'priority-high'
+            : card.priority === 'Medium'
+              ? 'priority-medium'
+              : 'priority-low';
+          return `
+            <div class="col-lg-6">
+              <div class="recommendation-card" data-recommendation-card>
+                <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
+                  <h5 class="mb-0">Recommendation ${index + 1}</h5>
+                  <span class="priority-badge ${priorityClass}">Priority ${escapeHtml(card.priority)}</span>
+                </div>
+                <div class="text-muted small text-uppercase fw-bold mb-1">Issue</div>
+                <div class="fs-6 fw-bold text-dark mb-2">${escapeHtml(card.issue)}</div>
+                <div class="text-muted small"><strong>Why it matters:</strong> ${escapeHtml(card.explanation)}</div>
+                <div class="recommendation-grid">
+                  <div class="recommendation-stat">
+                    <span class="recommendation-stat-label">Priority</span>
+                    <span class="recommendation-stat-value">${escapeHtml(card.priority)}</span>
+                  </div>
+                  <div class="recommendation-stat">
+                    <span class="recommendation-stat-label">Difficulty</span>
+                    <span class="recommendation-stat-value">${escapeHtml(card.difficulty)}</span>
+                  </div>
+                  <div class="recommendation-stat">
+                    <span class="recommendation-stat-label">Estimated SEO Gain</span>
+                    <span class="recommendation-stat-value">${escapeHtml(card.estimatedGain)}</span>
+                  </div>
+                  <div class="recommendation-stat">
+                    <span class="recommendation-stat-label">Business Impact</span>
+                    <span class="recommendation-stat-value">${escapeHtml(card.businessImpact)}</span>
+                  </div>
+                  <div class="recommendation-stat">
+                    <span class="recommendation-stat-label">Time to Fix</span>
+                    <span class="recommendation-stat-value">${escapeHtml(card.estimatedTime)}</span>
+                  </div>
+                  <div class="recommendation-stat">
+                    <span class="recommendation-stat-label">Related URLs</span>
+                    <span class="recommendation-stat-value">${escapeHtml(String(card.related.length), '0')}</span>
+                  </div>
+                </div>
+                <div class="recommendation-related-list">
+                  ${card.related.length ? card.related.map((item) => `
+                    <div class="recommendation-related-item">
+                      <span class="detail-item-label">${escapeHtml(item.label)}</span>
+                      <div class="detail-item-value">${item.html}</div>
+                    </div>
+                  `).join('') : `
+                    <div class="recommendation-related-item">
+                      <span class="detail-item-label">Related URLs</span>
+                      <div class="detail-item-value">No specific URL rows are required for this recommendation.</div>
+                    </div>
+                  `}
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      };
+
+      buildFindingCards();
+      buildRecommendationCards();
+
+      const searchInput = document.getElementById('internal-report-search');
+      const scopeSelect = document.getElementById('internal-report-scope');
+      const filterButtons = Array.from(document.querySelectorAll('#internal-status-filters [data-filter]'));
+      const filterSummaryNode = document.getElementById('internal-report-filter-summary');
+      const primaryTableShell = document.getElementById('internal-links-table-shell');
+      const errorTableShell = document.getElementById('internal-errors-table-shell');
+      const csvButton = document.getElementById('internal-export-csv');
+      const excelButton = document.getElementById('internal-export-excel');
+      const demoButton = document.getElementById('request-enterprise-demo');
+      let activeStatusFilter = 'all';
+
+      const matchesStatusFilter = (row, filter) => {
+        if (filter === 'all') {
+          return true;
+        }
+        const status = `${row.dataset.status || ''} ${row.dataset.statusLabel || ''}`.toLowerCase();
+        const codeCell = row.children[3];
+        const codeText = codeCell ? safeText(codeCell.textContent, '') : '';
+        if (filter === 'working') {
+          return status.includes('working') || codeText.startsWith('2');
+        }
+        if (filter === 'redirect') {
+          return status.includes('redirect') || codeText.startsWith('3');
+        }
+        if (filter === 'broken') {
+          return status.includes('broken') || codeText.startsWith('4') || codeText.startsWith('5');
+        }
+        if (filter === 'error') {
+          return status.includes('error') || status.includes('timeout');
+        }
+        return true;
+      };
+
+      const updateTableEmptyState = (tbody) => {
+        if (!tbody) {
+          return 0;
+        }
+        const rows = Array.from(tbody.querySelectorAll('[data-link-row="true"]')).filter((row) => row.dataset.excludeFromView !== 'true');
+        const visibleRows = rows.filter((row) => row.style.display !== 'none');
+        const emptyRow = tbody.querySelector('.table-filter-empty');
+        if (emptyRow) {
+          emptyRow.classList.toggle('d-none', visibleRows.length !== 0);
+        }
+        return visibleRows.length;
+      };
+
+      const applyTableFilters = () => {
+        const searchTerm = safeText(searchInput ? searchInput.value : '', '').toLowerCase();
+        const scope = scopeSelect ? scopeSelect.value : 'all';
+        if (primaryTableShell) {
+          primaryTableShell.classList.toggle('d-none', scope === 'errors');
+        }
+        if (errorTableShell) {
+          errorTableShell.classList.toggle('d-none', scope === 'primary');
+        }
+        const allRows = Array.from(document.querySelectorAll('[data-link-row="true"]'));
+        allRows.forEach((row) => {
+          if (row.dataset.excludeFromView === 'true') {
+            row.style.display = 'none';
+            return;
+          }
+          const rowScope = row.dataset.tableScope || 'primary';
+          const scopeMatch = scope === 'all' || rowScope === scope;
+          const textMatch = !searchTerm || row.textContent.toLowerCase().includes(searchTerm);
+          const statusMatch = matchesStatusFilter(row, activeStatusFilter);
+          row.style.display = scopeMatch && textMatch && statusMatch ? '' : 'none';
+        });
+        const primaryCount = updateTableEmptyState(document.getElementById('internal-links-table-body'));
+        const errorCountVisible = updateTableEmptyState(document.getElementById('internal-errors-table-body'));
+        if (filterSummaryNode) {
+          filterSummaryNode.textContent = `Showing ${primaryCount + errorCountVisible} visible rows across the selected raw report scope.`;
+        }
+      };
+
+      const sanitizeErrorTable = () => {
+        const errorBody = document.getElementById('internal-errors-table-body');
+        if (!errorBody) {
+          return;
+        }
+        const rows = Array.from(errorBody.querySelectorAll('[data-link-row="true"]'));
+        rows.forEach((row) => {
+          const status = `${row.dataset.status || ''} ${row.dataset.statusLabel || ''}`.toLowerCase();
+          const codeCell = row.children[3];
+          const codeText = codeCell ? safeText(codeCell.textContent, '') : '';
+          const isBrokenOrError = status.includes('broken') || status.includes('error') || status.includes('timeout');
+          if (!isBrokenOrError && !codeText.startsWith('4') && !codeText.startsWith('5')) {
+            row.dataset.excludeFromView = 'true';
+            row.style.display = 'none';
+          }
+        });
+      };
+
+      filterButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          activeStatusFilter = button.dataset.filter || 'all';
+          filterButtons.forEach((item) => item.classList.toggle('active', item === button));
+          applyTableFilters();
+        });
+      });
+
+      if (searchInput) {
+        searchInput.addEventListener('input', applyTableFilters);
+      }
+
+      if (scopeSelect) {
+        scopeSelect.addEventListener('change', applyTableFilters);
+      }
+
+      if (csvButton) {
+        csvButton.addEventListener('click', () => {
+          const visibleRows = Array.from(document.querySelectorAll('[data-link-row="true"]')).filter((row) => row.style.display !== 'none');
+          const csvHeader = ['Link URL', 'Anchor Text', 'Source Page', 'HTTP Status Code', 'Redirects', 'Status'];
+          const csvRows = visibleRows.map((row) => Array.from(row.children).slice(0, 6).map((cell) => {
+            const text = safeText(cell.textContent, '').replace(/\s+/g, ' ').trim();
+            return `"${text.replace(/"/g, '""')}"`;
+          }).join(','));
+          const blob = new Blob([[csvHeader.join(','), ...csvRows].join('\n')], { type: 'text/csv;charset=utf-8;' });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = 'internal-links-report.csv';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+          if (filterSummaryNode) {
+            filterSummaryNode.textContent = `CSV export started for ${visibleRows.length} visible rows.`;
+          }
+        });
+      }
+
+      if (excelButton) {
+        excelButton.addEventListener('click', () => {
+          if (filterSummaryNode) {
+            filterSummaryNode.textContent = 'Excel export remains a frontend preview in this release.';
+          }
+          window.alert('Export Excel is available as a UI placeholder in this release.');
+        });
+      }
+
+      if (demoButton) {
+        demoButton.addEventListener('click', () => {
+          window.alert('Enterprise demo requests are available as a UI placeholder in this release.');
+        });
+      }
+
+      sanitizeErrorTable();
+      applyTableFilters();
+    })();
+  </script>
+  {% endif %}
+{% endblock %}

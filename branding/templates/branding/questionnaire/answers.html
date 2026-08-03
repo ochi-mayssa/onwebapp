@@ -1,0 +1,153 @@
+{% extends 'branding/base.html' %}
+{% load branding_extras %}
+
+{% block title %}Answers · {{ questionnaire.title }}{% endblock %}
+
+{% block branding_content %}
+<div class="detail-page">
+    <div class="container py-4 py-lg-5">
+
+        <div class="d-flex align-items-start justify-content-between flex-wrap gap-3 mb-4">
+            <div>
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <a href="{% url 'branding:questionnaire_detail' pk=questionnaire.pk %}" class="btn btn-back btn-sm"><i class="fa-solid fa-arrow-left me-1"></i>Back to Questionnaire</a>
+                    <span class="request-number-display">{{ request_obj.request_number }}</span>
+                </div>
+                <h1 class="fw-800 mb-1"><i class="fa-solid fa-list-check me-2 text-primary"></i>Answers</h1>
+                <p class="text-muted mb-0">{{ questionnaire.title }} · {{ request_obj.company_name }}</p>
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="{% url 'branding:questionnaire_export' pk=questionnaire.pk %}" class="btn btn-brand-primary">
+                    <i class="fa-solid fa-download me-2"></i>Export
+                </a>
+            </div>
+        </div>
+
+        {% if categories_summary %}
+        <div class="mb-4">
+            <h6 class="fw-800 mb-3"><i class="fa-solid fa-shapes me-2 text-primary"></i>Category Summary</h6>
+            <div class="row g-3">
+                {% for category, stats in categories_summary.items %}
+                <div class="col-12 col-md-6 col-xl-4">
+                    <div class="detail-card rounded-4 p-4 h-100">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <h6 class="fw-800 mb-0">{{ category|default:"Uncategorized" }}</h6>
+                            <span class="badge bg-primary-subtle text-primary rounded-pill x-small">{{ stats.answered }}/{{ stats.total }}</span>
+                        </div>
+                        <div class="progress" style="height: 6px;">
+                            <div class="progress-bar bg-primary" style="width: {% widthratio stats.answered stats.total 100 %}%;"></div>
+                        </div>
+                        <div class="x-small text-muted mt-2 fw-700">{% widthratio stats.answered stats.total 100 %}% complete</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="detail-card rounded-4 p-4 mb-4">
+            <h6 class="fw-800 mb-3"><i class="fa-solid fa-key me-2 text-primary"></i>Key Preferences</h6>
+            <div class="row g-3">
+                {% if common_preferences.colors %}
+                <div class="col-md-4">
+                    <div class="small fw-700 mb-2 text-muted">Preferred Colors</div>
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for color in common_preferences.colors %}
+                        <span class="d-inline-flex align-items-center gap-1 px-2 py-1 rounded-pill x-small border">
+                            <span class="rounded-circle d-inline-block" style="width: 14px; height: 14px; background: {{ color }};"></span>
+                            {{ color }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                {% if common_preferences.fonts %}
+                <div class="col-md-4">
+                    <div class="small fw-700 mb-2 text-muted">Preferred Fonts</div>
+                    <div class="d-flex flex-wrap gap-1">
+                        {% for font in common_preferences.fonts %}
+                        <span class="badge bg-light text-dark rounded-pill px-3 py-2">{{ font }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                {% if common_preferences.styles %}
+                <div class="col-md-4">
+                    <div class="small fw-700 mb-2 text-muted">Preferred Styles</div>
+                    <div class="d-flex flex-wrap gap-1">
+                        {% for style in common_preferences.styles %}
+                        <span class="badge bg-light text-dark rounded-pill px-3 py-2">{{ style }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% for qid, data in answers_by_question.items %}
+        <div class="detail-card rounded-4 p-4 mb-3">
+            <div class="d-flex align-items-start justify-content-between flex-wrap gap-2 mb-3">
+                <div class="flex-grow-1">
+                    <p class="fw-800 mb-1">{{ data.question.text }}</p>
+                    <span class="badge rounded-pill x-small status-pill status-{{ data.question.question_type|lower }}">{{ data.question.get_question_type_display|default:data.question.question_type }}</span>
+                    {% if data.question.category %}
+                    <span class="badge bg-light text-dark rounded-pill x-small ms-1">{{ data.question.category }}</span>
+                    {% endif %}
+                </div>
+                <span class="badge bg-primary-subtle text-primary rounded-pill x-small flex-shrink-0">
+                    <i class="fa-solid fa-circle-check me-1"></i>{{ data.answers|length }} answer{{ data.answers|length|pluralize }}
+                </span>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-sm table-hover align-middle mb-0">
+                    <thead>
+                        <tr class="x-small text-muted fw-700">
+                            <th>Client</th>
+                            <th>Value</th>
+                            <th>Date</th>
+                            <th>Version</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for answer in data.answers %}
+                        <tr>
+                            <td class="fw-600">{{ answer.client|default:"—" }}</td>
+                            <td>
+                                {% if answer.value_text %}
+                                <span class="small">{{ answer.value_text|truncatechars:120 }}</span>
+                                {% elif answer.value_choice %}
+                                <span class="badge bg-primary-subtle text-primary rounded-pill x-small">{{ answer.value_choice }}</span>
+                                {% elif answer.value_scale is not None %}
+                                <span class="fw-700 text-primary">{{ answer.value_scale }}</span>
+                                {% elif answer.value_bool is not None %}
+                                {% if answer.value_bool %}<span class="badge bg-success-subtle text-success rounded-pill x-small">Yes</span>{% else %}<span class="badge bg-danger-subtle text-danger rounded-pill x-small">No</span>{% endif %}
+                                {% else %}
+                                <span class="text-muted">—</span>
+                                {% endif %}
+                            </td>
+                            <td class="x-small text-muted">{{ answer.created_at|date:"M j, Y H:i" }}</td>
+                            <td>
+                                <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill x-small">v{{ answer.version|default:"1" }}</span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% empty %}
+        <div class="detail-card rounded-4 p-5 text-center">
+            <div class="empty-state-icon mb-3" style="font-size: 4rem; color: var(--bs-primary); opacity: .3;">
+                <i class="fa-solid fa-inbox"></i>
+            </div>
+            <h4 class="fw-800 mb-2">No Answers Yet</h4>
+            <p class="text-muted mb-0" style="max-width: 480px; margin: 0 auto;">
+                Answers will appear here once the client responds to the questionnaire.
+            </p>
+        </div>
+        {% endfor %}
+
+    </div>
+</div>
+{% endblock %}

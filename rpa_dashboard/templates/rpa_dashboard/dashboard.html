@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+{% load static i18n %}
+
+{% block title %}{% trans "Automation Center" %} | OnWebApp{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active">Automation</li>
+{% endblock %}
+
+{% block page_title %}{% trans "RPA Control Center" %}{% endblock %}
+{% block page_subtitle %}{% trans "Deploy and monitor robotic process automation workflows with industrial reliability." %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="d-flex gap-2">
+    <div class="badge bg-success-subtle text-success d-flex align-items-center px-3 rounded-pill">
+        <span class="me-2">{{ total_workflows }} Total Workflows</span>
+    </div>
+    {% if failing_workflows > 0 %}
+    <div class="badge bg-danger-subtle text-danger d-flex align-items-center px-3 rounded-pill">
+        <span class="me-2">{{ failing_workflows }} Failing</span>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block dashboard_content %}
+<!-- Filters & Search -->
+<div class="card mb-5">
+    <div class="card-body p-4">
+        <form method="get" class="row g-3">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <span class="input-group-text bg-transparent border-end-0 border-slate-200">
+                        <i data-lucide="search" style="width: 16px; color: var(--slate-400);"></i>
+                    </span>
+                    <input type="text" name="search" class="form-control border-start-0 border-slate-200" placeholder="Search by Workflow ID or Title..." value="{{ search_query }}">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <select name="status" class="form-select border-slate-200">
+                    <option value="">All Statuses</option>
+                    <option value="READY" {% if status_filter == 'READY' %}selected{% endif %}>Ready</option>
+                    <option value="FAIL" {% if status_filter == 'FAIL' %}selected{% endif %}>Failing</option>
+                    <option value="SIMULATION" {% if status_filter == 'SIMULATION' %}selected{% endif %}>Simulation</option>
+                    <option value="DISABLED" {% if status_filter == 'DISABLED' %}selected{% endif %}>Disabled</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i data-lucide="filter" style="width: 16px;"></i>
+                    <span>Apply</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Workflow Grid -->
+<div class="row g-4">
+    {% for wf in workflows %}
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 overflow-hidden">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div class="p-2 rounded-3 bg-slate-100 text-slate-600">
+                        <i data-lucide="cpu" style="width: 20px;"></i>
+                    </div>
+                    <span class="badge {% if wf.status == 'READY' %}bg-success-subtle text-success{% elif wf.status == 'FAIL' %}bg-danger-subtle text-danger{% else %}bg-slate-100 text-slate-600{% endif %}" id="status-{{ wf.wf_id }}">
+                        {{ wf.get_status_display }}
+                    </span>
+                </div>
+                
+                <h6 class="fw-bold text-slate-900 mb-1">{{ wf.wf_id }}</h6>
+                <p class="text-muted small mb-4" style="min-height: 40px;">{{ wf.title }}</p>
+                
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted small fw-600">Execution Progress</span>
+                        <span class="text-slate-900 small fw-bold" id="progress-text-{{ wf.wf_id }}">0%</span>
+                    </div>
+                    <div class="progress" style="height: 6px; background-color: var(--slate-100);">
+                        <div class="progress-bar" id="progress-{{ wf.wf_id }}" style="width: 0%; background-color: var(--primary); transition: width 0.3s ease;"></div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between p-3 rounded-3 bg-slate-50 border border-slate-100">
+                    <div class="text-center">
+                        <div class="small text-muted mb-1">Total Runs</div>
+                        <div class="fw-bold text-slate-900">{{ wf.runs.count }}</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="small text-muted mb-1">Pass Rate</div>
+                        <div class="fw-bold text-slate-900">{{ wf.pass_rate }}%</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="small text-muted mb-1">Last Run</div>
+                        <div class="fw-bold text-slate-900">{{ wf.last_run_at|date:"M d"|default:"N/A" }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-white p-4 border-top-0 d-flex gap-2">
+                <a href="{% url 'workflow_detail' wf.wf_id %}" class="btn btn-outline-secondary btn-sm flex-grow-1">
+                    <i data-lucide="eye" style="width: 14px;"></i>
+                    <span>Logs</span>
+                </a>
+                <button class="btn btn-primary btn-sm flex-grow-1 trigger-btn" data-id="{{ wf.wf_id }}">
+                    <i data-lucide="play" style="width: 14px;"></i>
+                    <span>Execute</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12 text-center py-5">
+        <div class="bg-slate-50 d-inline-flex p-5 rounded-circle mb-4">
+            <i data-lucide="robot" class="text-slate-300" style="width: 64px; height: 64px;"></i>
+        </div>
+        <h5 class="text-slate-900 fw-bold">No Workflows Configured</h5>
+        <p class="text-muted mb-4">Start by creating an RPA script or use our templates.</p>
+        <button class="btn btn-primary">
+            <i data-lucide="plus"></i>
+            <span>Create Workflow</span>
+        </button>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Toast UI -->
+<div class="toast-container position-fixed bottom-0 end-0 p-4">
+    <div id="automationToast" class="toast border-0 shadow-lg rounded-4" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-body p-4 d-flex align-items-center gap-3 bg-slate-900 text-white rounded-4">
+            <div id="toastIcon" class="p-2 rounded-circle bg-white bg-opacity-10 text-white">
+                <i data-lucide="info" style="width: 20px;"></i>
+            </div>
+            <div>
+                <h6 id="toastTitle" class="fw-bold mb-1">Process Started</h6>
+                <p id="toastBody" class="small mb-0 opacity-75">Executing background tasks...</p>
+            </div>
+            <button type="button" class="btn-close btn-close-white ms-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+
+<script>
+async function runWorkflow(wfId, btn) {
+    const originalContent = btn.innerHTML;
+    const progressBar = document.getElementById(`progress-${wfId}`);
+    const progressText = document.getElementById(`progress-text-${wfId}`);
+    const statusBadge = document.getElementById(`status-${wfId}`);
+    
+    try {
+        btn.innerHTML = '<div class="spinner-border spinner-border-sm"></div>';
+        btn.disabled = true;
+        progressBar.style.width = '10%';
+        progressText.innerText = '10%';
+        
+        showToast('Process Started', `Initiating workflow ${wfId}...`, 'info');
+
+        // 1. Start Workflow
+        const startRes = await fetch(`/rpa/workflow/${wfId}/start/`, {
+            method: 'POST',
+            headers: {'X-CSRFToken': '{{ csrf_token }}', 'Content-Type': 'application/json'}
+        });
+        const startData = await startRes.json();
+        
+        if (startData.status !== 'success') throw new Error(startData.message);
+        
+        // 2. Run Steps
+        const steps = startData.steps;
+        for (let i = 0; i < steps.length; i++) {
+            const step = steps[i];
+            const stepRes = await fetch(`/rpa/step/${step.id}/run/`, {
+                method: 'POST',
+                headers: {'X-CSRFToken': '{{ csrf_token }}', 'Content-Type': 'application/json'}
+            });
+            const stepData = await stepRes.json();
+            
+            // Calculate and update progress
+            const pct = Math.round(((i + 1) / steps.length) * 100);
+            progressBar.style.width = `${pct}%`;
+            progressText.innerText = `${pct}%`;
+            
+            if (stepData.status !== 'success') throw new Error(stepData.message);
+            if (stepData.step_status === 'FAIL') {
+                showToast('Execution Error', `Step "${step.name}" failed to process.`, 'danger');
+                break;
+            }
+        }
+        
+        showToast('Execution Success', `Workflow ${wfId} completed all steps.`, 'success');
+        setTimeout(() => location.reload(), 2000);
+        
+    } catch (err) {
+        console.error(err);
+        showToast('System Error', err.message, 'danger');
+        btn.innerHTML = originalContent;
+        btn.disabled = false;
+        progressBar.classList.add('bg-danger');
+    }
+}
+
+function showToast(title, message, type) {
+    const toastEl = document.getElementById('automationToast');
+    const toast = new bootstrap.Toast(toastEl);
+    const titleEl = document.getElementById('toastTitle');
+    const bodyEl = document.getElementById('toastBody');
+    const iconEl = document.getElementById('toastIcon');
+    
+    titleEl.innerText = title;
+    bodyEl.innerText = message;
+    
+    if (type === 'success') {
+        iconEl.innerHTML = '<i data-lucide="check-circle"></i>';
+        iconEl.className = 'p-2 rounded-circle bg-success text-white';
+    } else if (type === 'danger') {
+        iconEl.innerHTML = '<i data-lucide="alert-circle"></i>';
+        iconEl.className = 'p-2 rounded-circle bg-danger text-white';
+    } else {
+        iconEl.innerHTML = '<i data-lucide="info"></i>';
+        iconEl.className = 'p-2 rounded-circle bg-primary text-white';
+    }
+    
+    lucide.createIcons();
+    toast.show();
+}
+
+document.querySelectorAll('.trigger-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        runWorkflow(this.dataset.id, this);
+    });
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    lucide.createIcons();
+});
+</script>
+{% endblock %}

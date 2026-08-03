@@ -1,0 +1,121 @@
+{% extends 'services/futuristic_service_base.html' %}
+{% load static %}
+
+{% block service_content %}
+<div class="row align-items-start g-4">
+    <div class="col-lg-8">
+        <div class="card border-0 rounded-4 holographic-card mb-4 animate-on-scroll slide-up">
+            <div class="card-body p-4">
+                <h5 class="card-title mb-4 text-cyan neon-text">Analyze Competitor</h5>
+                <form method="post" id="pricing-form">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label text-theme-primary">Company</label>
+                        {{ form.company }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-theme-primary">Email Address</label>
+                        {{ form.email }}
+                        <div class="form-text text-cyan opacity-75">Optional: We'll email the results to you.</div>
+                    </div>
+                    <button type="submit" class="btn holographic-btn w-100" id="pricing-btn">
+                        <span class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true" id="submit-spinner"></span>
+                        Analyze Pricing
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        {% if result %}
+        <div class="card border-0 rounded-4 holographic-card animate-on-scroll slide-up">
+            <div class="card-body p-4">
+                <h5 class="card-title mb-3 text-cyan neon-text">Pricing Insights for {{ result.company }}</h5>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <div class="p-3 border border-cyan border-opacity-25 rounded-3 h-100 soft-surface">
+                            <div class="d-flex align-items-center mb-2"><i class="fas fa-coins text-warning me-2"></i><strong class="text-theme-primary">Revenue estimate</strong></div>
+                            <div class="fs-5 text-theme-primary">{{ result.revenue }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 border border-purple border-opacity-25 rounded-3 h-100 soft-surface">
+                            <div class="d-flex align-items-center mb-2"><i class="fas fa-chart-line text-success me-2"></i><strong class="text-theme-primary">Growth</strong></div>
+                            <div class="fs-5 text-theme-primary">{{ result.growth_percent }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 border border-pink border-opacity-25 rounded-3 h-100 soft-surface">
+                            <div class="d-flex align-items-center mb-2"><i class="fas fa-bullseye text-info me-2"></i><strong class="text-theme-primary">Trend</strong></div>
+                            <div class="fs-6 text-theme-primary">{{ result.prediction }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                {% if result.chart %}
+                <div class="mt-2">
+                    <h6 class="mb-2 text-cyan">Pricing Trend</h6>
+                    <div style="position: relative; height: 300px;">
+                        <canvas id="pricingChart"></canvas>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if result.summary %}
+                <p class="text-theme-secondary mt-3">{{ result.summary }}</p>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card border-0 rounded-4 holographic-card animate-on-scroll slide-up" style="transition-delay: 0.1s;">
+            <div class="card-body p-4">
+                <h5 class="card-title mb-3 text-cyan neon-text">What you'll get</h5>
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2 text-light"><i class="fas fa-check-circle text-success me-2"></i>Competitor pricing insights</li>
+                    <li class="mb-2 text-light"><i class="fas fa-check-circle text-success me-2"></i>Trend visualization</li>
+                    <li class="mb-2 text-light"><i class="fas fa-check-circle text-success me-2"></i>Optional email report</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function(){
+        // Add cyber-input class
+        document.querySelectorAll('input, select, textarea').forEach(el => {
+                    el.classList.add('form-control', 'cyber-input', 'bg-transparent');
+        });
+
+        // Initialize chart if data exists
+        {% if result and result.chart %}
+        {{ result.chart|json_script:"chart-data-pricing" }}
+        
+        // Chart defaults
+                const styles = getComputedStyle(document.body);
+                Chart.defaults.color = styles.getPropertyValue('--text-secondary').trim() || '#6c757d';
+                Chart.defaults.borderColor = styles.getPropertyValue('--border-color').trim() || 'rgba(0,0,0,0.1)';
+        
+        if(typeof initChartFromJSON === 'function') {
+            initChartFromJSON('pricingChart', 'chart-data-pricing', {type: 'line', color: '#06b6d4'});
+        }
+        {% endif %}
+
+        // Form submission spinner
+        const form = document.getElementById('pricing-form');
+        if(form){
+            form.addEventListener('submit', function(){
+                const btn = document.getElementById('pricing-btn');
+                const spinner = document.getElementById('submit-spinner');
+                if(btn && spinner){
+                    btn.setAttribute('disabled','disabled');
+                    spinner.classList.remove('d-none');
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

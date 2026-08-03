@@ -1,0 +1,148 @@
+{% extends "services/futuristic_service_base.html" %}
+{% load i18n static %}
+{% block title %}{% trans 'HR Operations' %} - OnWebApp{% endblock %}
+
+{% block service_content %}
+<div class="text-center mb-8 reveal">
+    <div class="glass-badge d-inline-flex align-items-center px-4 py-2 rounded-pill mb-4 mx-auto">
+        <span class="x-small fw-800 text-danger uppercase tracking-widest">HR Intelligence — WF-005</span>
+    </div>
+    <h1 class="display-3 fw-800 text-slate-900 mb-4">HR Operations</h1>
+    <p class="fs-5 text-slate-500 mx-auto" style="max-width: 700px; font-weight: 500;">
+        Streamline employee data synchronization, leave processing, and workforce intelligence with an automated command center.
+    </p>
+</div>
+
+<div class="row g-5">
+    <!-- Employee Directory -->
+    <div class="col-lg-8 reveal">
+        <div class="premium-card h-100">
+            <div class="d-flex justify-content-between align-items-center mb-5">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="card-icon mb-0">
+                        <i data-lucide="users"></i>
+                    </div>
+                    <h4 class="fw-800 text-slate-900 mb-0">Workforce Directory</h4>
+                </div>
+                <button class="btn btn-outline-slate rounded-pill px-4 py-2 fw-800">
+                    <i data-lucide="refresh-cw" class="me-2" style="width: 16px;"></i>
+                    Sync Data
+                </button>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead>
+                        <tr class="text-slate-500 small uppercase fw-800 tracking-wider">
+                            <th class="border-0 pb-4">Employee</th>
+                            <th class="border-0 pb-4">Department</th>
+                            <th class="border-0 pb-4">Status</th>
+                            <th class="border-0 pb-4 text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-bottom border-slate-50">
+                            <td class="py-4">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="avatar-sm rounded-circle bg-primary bg-opacity-10 text-primary fw-800 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">JD</div>
+                                    <span class="fw-700 text-slate-900">John Doe</span>
+                                </div>
+                            </td>
+                            <td class="py-4 fw-600 text-slate-600">Engineering</td>
+                            <td class="py-4"><span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3">Active</span></td>
+                            <td class="py-4 text-end">
+                                <button class="btn btn-sm btn-slate-50 border-0"><i data-lucide="more-vertical" style="width: 18px;"></i></button>
+                            </td>
+                        </tr>
+                        <tr class="border-bottom border-slate-50">
+                            <td class="py-4">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="avatar-sm rounded-circle bg-warning bg-opacity-10 text-warning fw-800 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">AS</div>
+                                    <span class="fw-700 text-slate-900">Alice Smith</span>
+                                </div>
+                            </td>
+                            <td class="py-4 fw-600 text-slate-600">Marketing</td>
+                            <td class="py-4"><span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3">Active</span></td>
+                            <td class="py-4 text-end">
+                                <button class="btn btn-sm btn-slate-50 border-0"><i data-lucide="more-vertical" style="width: 18px;"></i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="py-4">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="avatar-sm rounded-circle bg-info bg-opacity-10 text-info fw-800 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">RJ</div>
+                                    <span class="fw-700 text-slate-900">Robert Johnson</span>
+                                </div>
+                            </td>
+                            <td class="py-4 fw-600 text-slate-600">Sales</td>
+                            <td class="py-4"><span class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3">On Leave</span></td>
+                            <td class="py-4 text-end">
+                                <button class="btn btn-sm btn-slate-50 border-0"><i data-lucide="more-vertical" style="width: 18px;"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leave Requests -->
+    <div class="col-lg-4 reveal" style="animation-delay: 0.1s;">
+        <div class="premium-card">
+            <div class="d-flex align-items-center gap-3 mb-5">
+                <div class="card-icon mb-0" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
+                    <i data-lucide="calendar"></i>
+                </div>
+                <h4 class="fw-800 text-slate-900 mb-0">Pending Leaves</h4>
+            </div>
+            
+            <div class="vstack gap-4">
+                <div class="p-4 rounded-4 bg-slate-50 border border-white shadow-sm">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h6 class="fw-800 text-slate-900 mb-1">Robert Johnson</h6>
+                            <span class="x-small text-slate-500 fw-700 uppercase">Vacation Request</span>
+                        </div>
+                        <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3">3 days</span>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-success w-100 rounded-3 py-2 fw-700 small">Approve</button>
+                        <button class="btn btn-outline-danger w-100 rounded-3 py-2 fw-700 small">Reject</button>
+                    </div>
+                </div>
+                
+                <div class="p-4 rounded-4 bg-slate-50 border border-white shadow-sm">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h6 class="fw-800 text-slate-900 mb-1">Emily Davis</h6>
+                            <span class="x-small text-slate-500 fw-700 uppercase">Medical Leave</span>
+                        </div>
+                        <span class="badge bg-info bg-opacity-10 text-info rounded-pill px-3">1 day</span>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-success w-100 rounded-3 py-2 fw-700 small">Approve</button>
+                        <button class="btn btn-outline-danger w-100 rounded-3 py-2 fw-700 small">Reject</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-5">
+                <button class="btn btn-slate-900 w-100 rounded-4 py-3 fw-800 text-white shadow-lg">
+                    View All Requests
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .mb-8 { margin-bottom: 80px; }
+    .glass-badge { background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.1); }
+    .btn-outline-slate { color: var(--slate-600); border-color: var(--slate-200); transition: all 0.3s ease; }
+    .btn-outline-slate:hover { background: var(--slate-900); color: white; border-color: var(--slate-900); transform: translateY(-3px); }
+    .btn-slate-50 { background: var(--slate-50); color: var(--slate-600); transition: all 0.3s ease; }
+    .btn-slate-50:hover { background: var(--slate-200); color: var(--slate-900); }
+</style>
+{% endblock %}

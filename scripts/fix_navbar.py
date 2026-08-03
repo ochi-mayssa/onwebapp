@@ -1,0 +1,109 @@
+#!/usr/bin/env python
+"""Fix the navbar structure"""
+
+with open('templates/base.html', 'r', encoding='utf-8') as f:
+    content = f.read()
+
+# The issue is that our replacement lost the structure. Let me manually fix it.
+# We need to find where the navbar-nav ends properly
+
+old_broken = '''         <!-- Services Navigation Menu -->
+         <div class="collapse navbar-collapse order-lg-1" id="navbarNav">   
+             <!-- Simplified Services Navigation Menu
+
+             <!-- Mobile auth buttons -->'''
+
+new_fixed = '''         <!-- Simplified Services Navigation Menu -->
+         <div class="collapse navbar-collapse order-lg-1" id="navbarNav">
+             <ul class="navbar-nav ms-auto" style="gap: 0.2rem;">
+                
+                <!-- Home Link -->
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'home:home' %}" title="{% trans 'Home' %}">
+                        <i class="fas fa-home"></i> <span class="d-none d-lg-inline ms-1">{% trans 'Home' %}</span>
+                    </a>
+                </li>
+
+                <!-- Primary Services Dropdown -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="servicesMenu" role="button"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-cube"></i> <span class="d-none d-lg-inline ms-1">{% trans 'Services' %}</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="servicesMenu">
+                        <li><a class="dropdown-item" href="{% url 'services:index' %}">
+                            <i class="fas fa-th-large me-2"></i>{% trans 'Platform' %}</a></li>
+                        <li><a class="dropdown-item" href="{% url 'services:erp_integration' %}">
+                            <i class="fas fa-cloud me-2"></i>{% trans 'ERP Integration' %}</a></li>
+                        <li><a class="dropdown-item" href="{% url 'services:crm_integration' %}">
+                            <i class="fas fa-users-viewfinder me-2"></i>{% trans 'CRM' %}</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{% url 'services:industrial_automation' %}">
+                            <i class="fas fa-industry me-2"></i>{% trans 'Automation' %}</a></li>
+                        <li><a class="dropdown-item" href="{% url 'services:social_media_tracking' %}">
+                            <i class="fas fa-hashtag me-2"></i>{% trans 'Social Media' %}</a></li>
+                    </ul>
+                </li>
+
+                <!-- Tools Dropdown -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="toolsMenu" role="button"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-tools"></i> <span class="d-none d-lg-inline ms-1">{% trans 'Tools' %}</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="toolsMenu">
+                        <li><a class="dropdown-item" href="{% url 'seo_analyzer:index' %}">
+                            <i class="fas fa-search me-2"></i>{% trans 'SEO Analyzer' %}</a></li>
+                        <li><a class="dropdown-item" href="{% url 'rpa_dashboard:index' %}">
+                            <i class="fas fa-robot me-2"></i>{% trans 'RPA Dashboard' %}</a></li>
+                        {% if user.is_authenticated %}
+                        <li><a class="dropdown-item" href="{% url 'projects:team_member_projects' user.username %}">
+                            <i class="fas fa-project-diagram me-2"></i>{% trans 'Projects' %}</a></li>
+                        {% endif %}
+                    </ul>
+                </li>
+
+                <!-- User/Auth Items -->
+                {% if user.is_authenticated %}
+                    <!-- User Menu Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userMenu" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-circle"></i> <span class="d-none d-lg-inline ms-1">{{ user.first_name|default:user.username }}</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+                            <li><a class="dropdown-item" href="{% url 'users:profile' %}">
+                                <i class="fas fa-cog me-2"></i>{% trans 'Profile' %}</a></li>
+                            <li><a class="dropdown-item" href="{% url 'crm:client_tracking_portal' %}">
+                                <i class="fas fa-chart-line me-2"></i>{% trans 'Dashboard' %}</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="{% url 'users:logout' %}">
+                                <i class="fas fa-sign-out-alt me-2"></i>{% trans 'Logout' %}</a></li>
+                        </ul>
+                    </li>
+                {% else %}
+                    <!-- Auth Links -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'users:login_view' %}">{% trans 'Login' %}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'users:signup' %}">{% trans 'Sign Up' %}</a>
+                    </li>
+                {% endif %}
+             </ul>
+
+             <!-- Mobile auth buttons -->'''
+
+if old_broken in content:
+    content = content.replace(old_broken, new_fixed)
+    with open('templates/base.html', 'w', encoding='utf-8') as f:
+        f.write(content)
+    print("✅ Navbar structure fixed!")
+else:
+    print("❌ Could not find the broken section")
+    print(f"Looking for:\n{old_broken}\n")
+    # Try to find what's actually there
+    idx = content.find('<!-- Services Navigation Menu -->')
+    if idx > 0:
+        print(f"Found at position {idx}, showing next 500 chars:")
+        print(content[idx:idx+500])

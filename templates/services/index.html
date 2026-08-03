@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans "Solutions — Product Catalog" %} | OnWebApp{% endblock %}
+
+{% block page_title %}{% trans "Solutions" %}{% endblock %}
+{% block page_subtitle %}{% trans "Discover what OnWebApp provides. One unified platform with modular products to automate every corner of your business." %}{% endblock %}
+
+{% block breadcrumb %}
+  <li class="breadcrumb-item active">{% trans "Solutions" %}</li>
+{% endblock %}
+
+{% block main_content %}
+<section class="py-5">
+  <div class="container">
+    <div class="row align-items-center mb-5">
+      <div class="col-lg-7 mb-4 mb-lg-0 reveal">
+        <h6 class="text-primary uppercase x-small fw-800 tracking-widest mb-3">{% trans "Product Catalog" %}</h6>
+        <h1 class="fw-900 mb-3">{% trans "Six products. One platform. Zero silos." %}</h1>
+        <p class="text-muted fs-5 mb-0">
+          {% trans "OnWebApp delivers a complete stack for operations, intelligence, and platform control. Explore each product below, then open the module you need — everything connects automatically." %}
+        </p>
+      </div>
+      <div class="col-lg-5">
+        <div class="card border-0 shadow-sm rounded-28 p-5 bg-primary-gradient text-white reveal">
+          <h5 class="fw-800 mb-3"><i class="fas fa-compass me-2"></i> {% trans "Ready to operate?" %}</h5>
+          <p class="mb-4 opacity-90 small">
+            {% trans "This page explains what products we provide. When you are ready to operate the platform, use the control center below." %}
+          </p>
+          <a href="{% url 'platform_monitoring:hub' %}"
+             class="btn btn-white btn-lg rounded-14 fw-800 px-5 py-3 d-inline-flex align-items-center justify-content-center gap-2">
+            {% trans "Go to Platform Monitoring" %}
+            <i class="fas fa-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-lg-6 col-xxl-4 reveal">
+        <div class="card h-100 border-0 shadow-sm card-hover-border transition-hover rounded-24 overflow-hidden">
+          <div class="card-body p-5">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+              <div class="d-flex align-items-center justify-content-center rounded-18 bg-primary-soft text-primary" style="width:62px;height:62px;">
+                <i class="fas fa-heartbeat fa-lg"></i>
+              </div>
+              <span class="badge rounded-pill bg-primary-soft text-primary fw-700 px-3 py-2">
+                <i class="fas fa-desktop me-1"></i> {% trans "Control Center" %}
+              </span>
+            </div>
+            <h3 class="h4 fw-900 mb-2">{% trans "Platform Monitoring" %}</h3>
+            <p class="text-muted mb-4">
+              {% trans "Operational command center for SEO, Automation, IoT, Security and Integrations. Monitor service health, open modules, and track activity across the platform. The single control tower for your OnWebApp instance." %}
+            </p>
+            <a href="{% url 'platform_monitoring:hub' %}" class="btn btn-outline-primary rounded-12 fw-700 px-4 py-2">
+              {% trans "Open Control Center" %} <i class="fas fa-arrow-right ms-1"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6 col-xxl-4 reveal">
+        <div class="card h-100 border-0 shadow-sm card-hover-border transition-hover rounded-24 overflow-hidden">
+          <div class="card-body p-5">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+              <div class="d-flex align-items-center justify-content-center rounded-18 bg-indigo-soft text-indigo" style="width:62px;height:62px;">
+                <i class="fas fa-industry fa-lg"></i>
+              </div>
+              <span class="badge rounded-pill bg-indigo-soft text-indigo fw-700 px-3 py-2">
+                {% trans "Industrial" %}
+              </span>
+            </div>
+            <h3 class="h4 fw-900 mb-2">{% trans "Industrial Automation" %}</h3>
+            <p class="text-muted mb-4">
+              {% trans "Robust RPA and PLC integration that controls production lines, automated workcells, and factory systems. Connect machines, orchestrate jobs, and measure OEE." %}
+            </p>
+            <a href="{% url 'services:industrial_automation' %}" class="btn btn-outline-primary rounded-12 fw-700 px-4 py-2">
+              {% trans "Learn More" %} <i class="fas fa-arrow-right ms-1"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6 col-xxl-4 reveal">
+        <div class="card h-100 border-0 shadow-sm card-hover-border transition-hover rounded-24 overflow-hidden">
+          <div class="card-body p-5">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+              <div class="d-flex align-items-center justify-content-center rounded-18 bg-purple-soft text-purple" style="width:62px;height:62px;">
+                <i class="fas fa-building fa-lg"></i>
+              </div>
+              <span class="badge rounded-pill bg-purple-soft text-purple fw-700 px-3 py-2">
+                {% trans "Enterprise" %}
+              </span>
+            </div>
+            <h3 class="h4 fw-900 mb-2">{% trans "ERP & CRM" %}</h3>
+            <p class="text-muted mb-4">
+              {% trans "Synchronize your ERPNext data with a modern CRM command center. Inventory, sales, invoices, customers, and follow-ups — unified and always in sync." %}
+            </p>
+            <div class="d-flex flex-wrap gap-2">
+              <a href="{% url 'services:erp_integration' %}" class="btn btn-outline-primary rounded-12 fw-700 px-4 py-2">
+                {% trans "ERP" %}
+              </a>
+              <a href="{% url 'crm:dashboard' %}" class="btn btn-outline-primary rounded-12 fw-700 px-4 py-2">
+                {% trans "CRM" %}
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6 col-xxl-4 reveal">
+        <div class="card h-100 border-0 shadow-sm card-hover-border transition-hover rounded-24 overflow-hidden">
+          <div class="card-body p-5">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+              <div class="d-flex align-items-center justify-content-center rounded-18 bg-sky-soft text-sky" style="width:62px;height:62px;">
+                <i class="fas fa-binoculars fa-lg"></i>
+              </div>
+              <span class="badge rounded-pill bg-sky-soft text-sky fw-700 px-3 py-2">
+                {% trans "Intelligence" %}
+              </span>
+            </div>
+            <h3 class="h4 fw-900 mb-2">{% trans "Competitor Intelligence" %}</h3>
+            <p class="text-muted mb-4">
+              {% trans "Benchmark competitors, track pricing, measure market position and identify strategic opportunities. Continuous market insights without manual research." %}
+            </p>
+            <a href="{% url 'services:competitor_tracking' %}" class="btn btn-outline-primary rounded-12 fw-700 px-4 py-2">
+              {% trans "View Product" %} <i class="fas fa-arrow-right ms-1"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6 col-xxl-4 reveal">
+        <div class="card h-100 border-0 shadow-sm card-hover-border transition-hover rounded-24 overflow-hidden">
+          <div class="card-body p-5">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+              <div class="d-flex align-items-center justify-content-center rounded-18 bg-sky-soft text-sky" style="width:62px;height:62px;">
+                <i class="fas fa-comments fa-lg"></i>
+              </div>
+              <span class="badge rounded-pill bg-sky-soft text-sky fw-700 px-3 py-2">
+                {% trans "Intelligence" %}
+              </span>
+            </div>
+            <h3 class="h4 fw-900 mb-2">{% trans "Social Intelligence" %}</h3>
+            <p class="text-muted mb-4">
+              {% trans "Social listening, audience analysis and engagement analytics across multiple networks. Understand sentiment, trends and influencers that move your market." %}
+            </p>
+            <a href="{% url 'services:social_intelligence' %}" class="btn btn-outline-primary rounded-12 fw-700 px-4 py-2">
+              {% trans "View Product" %} <i class="fas fa-arrow-right ms-1"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6 col-xxl-4 reveal">
+        <div class="card h-100 border-0 shadow-sm card-hover-border transition-hover rounded-24 overflow-hidden">
+          <div class="card-body p-5">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+              <div class="d-flex align-items-center justify-content-center rounded-18 bg-sky-soft text-sky" style="width:62px;height:62px;">
+                <i class="fas fa-fingerprint fa-lg"></i>
+              </div>
+              <span class="badge rounded-pill bg-sky-soft text-sky fw-700 px-3 py-2">
+                {% trans "Presence" %}
+              </span>
+            </div>
+            <h3 class="h4 fw-900 mb-2">{% trans "Digital Presence" %}</h3>
+            <p class="text-muted mb-4">
+              {% trans "Measure and improve your brand's reputation and presence across every digital channel. Reviews, listings, social proof and visibility in a single view." %}
+            </p>
+            <a href="{% url 'social_proof:dashboard' %}" class="btn btn-outline-primary rounded-12 fw-700 px-4 py-2">
+              {% trans "View Product" %} <i class="fas fa-arrow-right ms-1"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="py-5 bg-light-subtle border-top border-light">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h6 class="text-primary uppercase x-small fw-800 tracking-widest mb-3">{% trans "Why OnWebApp" %}</h6>
+      <h2 class="fw-900 mb-3">{% trans "Built to scale, designed to connect." %}</h2>
+      <p class="text-muted fs-6 max-w-2xl mx-auto mb-0">
+        {% trans "Every product shares one identity, one account, one integration fabric, and one control center. Start with one module, grow when you are ready." %}
+      </p>
+    </div>
+  </div>
+</section>
+{% endblock %}

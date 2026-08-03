@@ -1,0 +1,286 @@
+{% extends "base.html" %}
+{% load static i18n %}
+
+{% block title %}{% trans "Industrial Telemetry" %} | OnWebApp{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'users:dashboard' %}">Dashboard</a></li>
+<li class="breadcrumb-item active">Automation</li>
+{% endblock %}
+
+{% block page_title %}{% trans "Industrial Automation" %}{% endblock %}
+{% block page_subtitle %}{% trans "Live telemetry and predictive maintenance for industrial assets." %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="row g-4">
+    <!-- Machine Status Grid -->
+    <div class="col-lg-8">
+        <div class="row g-4 mb-4">
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100 overflow-hidden">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-start mb-4">
+                            <div>
+                                <h6 class="fw-800 mb-1">CNC Milling Machine #1</h6>
+                                <span class="badge bg-success-soft text-success rounded-pill px-3 py-1 x-small fw-800">Operational</span>
+                            </div>
+                            <div class="p-3 rounded-4 bg-primary-soft text-primary">
+                                <i data-lucide="settings" style="width: 24px;"></i>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="small text-secondary fw-800 uppercase tracking-widest" style="font-size: 0.65rem;">Core Health Score</span>
+                                <span class="small fw-800 text-success">98%</span>
+                            </div>
+                            <div class="progress rounded-pill" style="height: 6px; background-color: var(--bg-surface-secondary);">
+                                <div class="progress-bar bg-success rounded-pill shadow-sm" style="width: 98%;"></div>
+                            </div>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-4">
+                                <div class="p-3 bg-surface-secondary rounded-4 text-center border border-color transition-hover">
+                                    <div class="x-small text-secondary fw-800 uppercase mb-1">Temp</div>
+                                    <div class="small fw-800 text-primary">42°C</div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="p-3 bg-surface-secondary rounded-4 text-center border border-color transition-hover">
+                                    <div class="x-small text-secondary fw-800 uppercase mb-1">Vibe</div>
+                                    <div class="small fw-800 text-primary">0.4g</div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="p-3 bg-surface-secondary rounded-4 text-center border border-color transition-hover">
+                                    <div class="x-small text-secondary fw-800 uppercase mb-1">RPM</div>
+                                    <div class="small fw-800 text-primary">12k</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100 overflow-hidden">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-start mb-4">
+                            <div>
+                                <h6 class="fw-800 mb-1">Assembly Robot B2</h6>
+                                <span class="badge bg-warning-soft text-warning rounded-pill px-3 py-1 x-small fw-800">Intervention Required</span>
+                            </div>
+                            <div class="p-3 rounded-4 bg-accent-pink text-white" style="--accent-pink: #ec4899;">
+                                <i data-lucide="bot" style="width: 24px;"></i>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="small text-secondary fw-800 uppercase tracking-widest" style="font-size: 0.65rem;">Core Health Score</span>
+                                <span class="small fw-800 text-warning">72%</span>
+                            </div>
+                            <div class="progress rounded-pill" style="height: 6px; background-color: var(--bg-surface-secondary);">
+                                <div class="progress-bar bg-warning rounded-pill shadow-sm" style="width: 72%;"></div>
+                            </div>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-4">
+                                <div class="p-3 bg-surface-secondary rounded-4 text-center border border-color transition-hover">
+                                    <div class="x-small text-secondary fw-800 uppercase mb-1">Load</div>
+                                    <div class="small fw-800 text-primary">85%</div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="p-3 bg-surface-secondary rounded-4 text-center border border-color transition-hover">
+                                    <div class="x-small text-secondary fw-800 uppercase mb-1">Cycles</div>
+                                    <div class="small fw-800 text-primary">1.2M</div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="p-3 bg-surface-secondary rounded-4 text-center border border-color transition-hover">
+                                    <div class="x-small text-secondary fw-800 uppercase mb-1">Uptime</div>
+                                    <div class="small fw-800 text-primary">94%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm overflow-hidden">
+            <div class="card-header bg-transparent border-0 p-4 d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-800">Real-time Telemetry Analytics</h6>
+                <div class="dropdown">
+                    <button class="btn btn-light btn-sm rounded-pill px-2" data-bs-toggle="dropdown">
+                        <i data-lucide="more-horizontal" style="width: 18px;"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-xl border-0 rounded-4 p-2">
+                        <li><a class="dropdown-item rounded-3" href="#">Export Telemetry</a></li>
+                        <li><a class="dropdown-item rounded-3" href="#">Alert Thresholds</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="card-body p-4">
+                <div style="height: 350px;">
+                    <canvas id="telemetryChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Panel -->
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-transparent border-0 p-4 pb-0">
+                <h6 class="fw-800 mb-0">System Alerts</h6>
+            </div>
+            <div class="card-body p-0">
+                <div class="activity-feed">
+                    <div class="p-4 border-bottom border-light d-flex gap-3 transition-hover">
+                        <div class="p-3 rounded-circle bg-warning-soft text-warning d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; flex-shrink: 0;">
+                            <i data-lucide="alert-triangle" style="width: 18px;"></i>
+                        </div>
+                        <div>
+                            <p class="mb-1 small fw-800 text-primary">Unusual Vibration Detected</p>
+                            <p class="mb-2 x-small text-secondary fw-600">Robot B2 sensors reporting deviation from normal harmonic frequency.</p>
+                            <span class="x-small text-secondary fw-800 opacity-50 uppercase tracking-widest">2 mins ago</span>
+                        </div>
+                    </div>
+                    <div class="p-4 border-0 d-flex gap-3 transition-hover">
+                        <div class="p-3 rounded-circle bg-danger-soft text-danger d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; flex-shrink: 0;">
+                            <i data-lucide="wrench" style="width: 18px;"></i>
+                        </div>
+                        <div>
+                            <p class="mb-1 small fw-800 text-primary">Maintenance Required</p>
+                            <p class="mb-2 x-small text-secondary fw-600">Hydraulic Filter #4 lifecycle exceeded. Immediate replacement recommended.</p>
+                            <span class="x-small text-secondary fw-800 opacity-50 uppercase tracking-widest">1 hour ago</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm overflow-hidden bg-sidebar-bg text-white">
+            <div class="card-header bg-transparent border-0 p-4 pb-0">
+                <h6 class="fw-800 text-white mb-0">Energy Performance</h6>
+            </div>
+            <div class="card-body p-4">
+                <div class="text-center py-5 mb-4 rounded-4 bg-white bg-opacity-5 border border-white border-opacity-10 position-relative overflow-hidden">
+                    <div class="position-absolute top-50 start-50 translate-middle w-100 h-100" style="background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);"></div>
+                    <div class="display-5 fw-800 mb-0 position-relative">12.4 <span class="fs-4 fw-500 opacity-50">kW/h</span></div>
+                    <div class="small opacity-40 uppercase fw-800 tracking-widest position-relative" style="font-size: 0.65rem;">Active Power Load</div>
+                </div>
+                <div class="vstack gap-3">
+                    <div class="d-flex justify-content-between align-items-center p-3 rounded-4 bg-white bg-opacity-5 border border-white border-opacity-10">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="p-2 rounded-3 bg-success-soft text-success"><i data-lucide="leaf" style="width: 16px;"></i></div>
+                            <span class="small fw-800 text-white text-opacity-75">Carbon Impact</span>
+                        </div>
+                        <span class="badge bg-success-soft text-success rounded-pill x-small fw-800">-12%</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center p-3 rounded-4 bg-white bg-opacity-5 border border-white border-opacity-10">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="p-2 rounded-3 bg-primary-soft text-primary"><i data-lucide="clock" style="width: 16px;"></i></div>
+                            <span class="small fw-800 text-white text-opacity-75">Efficiency Index</span>
+                        </div>
+                        <span class="small fw-800">85%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        lucide.createIcons();
+        
+        const ctx = document.getElementById('telemetryChart').getContext('2d');
+        const gradientPrimary = ctx.createLinearGradient(0, 0, 0, 400);
+        gradientPrimary.addColorStop(0, 'rgba(99, 102, 241, 0.1)');
+        gradientPrimary.addColorStop(1, 'rgba(99, 102, 241, 0)');
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['10:00', '10:05', '10:10', '10:15', '10:20', '10:25'],
+                datasets: [
+                    {
+                        label: 'Temperature (°C)',
+                        data: [40, 42, 41, 45, 42, 43],
+                        borderColor: '#6366F1',
+                        borderWidth: 4,
+                        tension: 0.4,
+                        fill: true,
+                        backgroundColor: gradientPrimary,
+                        pointRadius: 0,
+                        pointHoverRadius: 6,
+                        pointHoverBackgroundColor: '#6366F1',
+                        pointHoverBorderColor: '#fff',
+                        pointHoverBorderWidth: 3
+                    },
+                    {
+                        label: 'Vibration (g)',
+                        data: [0.3, 0.4, 0.3, 0.6, 0.4, 0.5],
+                        borderColor: '#F97316',
+                        borderWidth: 4,
+                        tension: 0.4,
+                        fill: false,
+                        pointRadius: 0,
+                        pointHoverRadius: 6,
+                        pointHoverBackgroundColor: '#F97316',
+                        pointHoverBorderColor: '#fff',
+                        pointHoverBorderWidth: 3
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { intersect: false, mode: 'index' },
+                plugins: { 
+                    legend: { 
+                        position: 'top', 
+                        align: 'end',
+                        labels: { 
+                            usePointStyle: true, 
+                            boxWidth: 10,
+                            padding: 25,
+                            font: { size: 12, weight: '700', family: 'Inter' }
+                        } 
+                    },
+                    tooltip: {
+                        backgroundColor: '#0F172A',
+                        padding: 15,
+                        titleFont: { size: 14, weight: '700' },
+                        bodyFont: { size: 13 },
+                        cornerRadius: 12,
+                        displayColors: true
+                    }
+                },
+                scales: {
+                    y: { 
+                        grid: { color: 'rgba(241, 245, 249, 0.5)', drawBorder: false },
+                        ticks: { color: '#94A3B8', font: { size: 12, weight: '600' }, padding: 10 }
+                    },
+                    x: { 
+                        grid: { display: false },
+                        ticks: { color: '#94A3B8', font: { size: 12, weight: '600' }, padding: 10 }
+                    }
+                }
+            }
+        });
+    });
+</script>
+<style>
+    .x-small { font-size: 0.7rem; }
+    .uppercase { text-transform: uppercase; }
+    .rounded-40 { border-radius: 40px !important; }
+    .glass-badge {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+</style>
+{% endblock %}

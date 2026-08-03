@@ -1,0 +1,252 @@
+{% extends "base.html" %}
+{% load static i18n %}
+
+{% block title %}{% trans "Sales Intelligence Hub" %} | OnWebApp{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'users:dashboard' %}">Dashboard</a></li>
+<li class="breadcrumb-item active">CRM</li>
+{% endblock %}
+
+{% block page_title %}{% trans "CRM Command Hub" %}{% endblock %}
+{% block page_subtitle %}{% trans "Manage customer lifecycles and sales velocity with real-time intelligence fallback." %}{% endblock %}
+
+{% block page_actions %}
+<div class="d-flex gap-3">
+    <button class="btn btn-outline-slate shadow-sm" onclick="location.reload()">
+        <i data-lucide="refresh-cw" style="width: 18px;"></i>
+        <span>Sync CRM</span>
+    </button>
+    <button class="btn btn-primary shadow-lg">
+        <i data-lucide="plus" style="width: 18px;"></i>
+        <span>Add Lead</span>
+    </button>
+</div>
+{% endblock %}
+
+{% block dashboard_content %}
+<!-- CRM KPI Row -->
+<div class="row g-4 mb-5">
+    <div class="col-md-6 col-lg-3">
+        <div class="card kpi-card border-0 shadow-sm">
+            <div class="kpi-icon-wrapper" style="background-color: rgba(99, 102, 241, 0.1); color: #6366f1;">
+                <i data-lucide="users"></i>
+            </div>
+            <div class="kpi-value" id="total-leads">--</div>
+            <div class="kpi-label">Active Leads</div>
+            <div class="mt-2">
+                <span class="badge bg-success-soft text-success rounded-pill x-small">
+                    <i data-lucide="trending-up" class="me-1" style="width: 10px;"></i> +4 Today
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+        <div class="card kpi-card border-0 shadow-sm">
+            <div class="kpi-icon-wrapper" style="background-color: rgba(16, 185, 129, 0.1); color: #10b981;">
+                <i data-lucide="percent"></i>
+            </div>
+            <div class="kpi-value">12.5%</div>
+            <div class="kpi-label">Conversion Rate</div>
+            <div class="mt-2">
+                <span class="badge bg-success-soft text-success rounded-pill x-small">
+                    <i data-lucide="trending-up" class="me-1" style="width: 10px;"></i> +2.1%
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+        <div class="card kpi-card border-0 shadow-sm">
+            <div class="kpi-icon-wrapper" style="background-color: rgba(14, 165, 233, 0.1); color: #0ea5e9;">
+                <i data-lucide="dollar-sign"></i>
+            </div>
+            <div class="kpi-value" id="pipeline-val">--</div>
+            <div class="kpi-label">Pipeline Value</div>
+            <div class="mt-2 text-secondary x-small fw-600">70% probability</div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+        <div class="card kpi-card border-0 shadow-sm">
+            <div class="kpi-icon-wrapper" style="background-color: rgba(236, 72, 153, 0.1); color: #ec4899;">
+                <i data-lucide="smile"></i>
+            </div>
+            <div class="kpi-value">88/100</div>
+            <div class="kpi-label">CSAT Score</div>
+            <div class="mt-2 text-secondary x-small fw-600">Above average</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Lead Table -->
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm overflow-hidden">
+            <div class="card-header bg-transparent border-0 p-4 d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="mb-0 fw-800">Sales Intelligence Matrix</h5>
+                    <p class="text-secondary small mb-0">Track and qualify enterprise leads</p>
+                </div>
+                <div class="dropdown">
+                    <button class="btn btn-light btn-sm rounded-pill px-3" data-bs-toggle="dropdown">
+                        <i data-lucide="filter" class="me-2" style="width: 14px;"></i> Filter
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-xl border-0 rounded-4 p-2">
+                        <li><a class="dropdown-item rounded-3" href="#">Hot Leads</a></li>
+                        <li><a class="dropdown-item rounded-3" href="#">Qualified</a></li>
+                        <li><a class="dropdown-item rounded-3" href="#">New</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-surface-secondary">
+                            <tr>
+                                <th class="ps-4 py-3 border-0 small text-uppercase fw-800 text-secondary">Customer</th>
+                                <th class="py-3 border-0 small text-uppercase fw-800 text-secondary">Type</th>
+                                <th class="py-3 border-0 small text-uppercase fw-800 text-secondary">Territory</th>
+                                <th class="pe-4 py-3 border-0 small text-uppercase fw-800 text-secondary text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lead-list">
+                            <tr>
+                                <td colspan="4" class="text-center py-5">
+                                    <div class="spinner-grow text-primary spinner-grow-sm me-2" role="status"></div>
+                                    <span class="text-secondary fw-600">Syncing enterprise data...</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions & Analytics -->
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-transparent border-0 p-4 pb-0">
+                <h5 class="mb-0 fw-800">Quick Actions</h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="vstack gap-3">
+                    <button class="btn btn-light text-start p-3 border-0 d-flex align-items-center gap-3 w-100 rounded-4 transition-hover" onclick="logAction('Assigning leads...')">
+                        <div class="bg-primary-soft text-primary rounded-3 p-2">
+                            <i data-lucide="user-plus" style="width: 18px;"></i>
+                        </div>
+                        <div>
+                            <span class="d-block fw-bold small text-primary">Assign Sales Force</span>
+                            <span class="x-small text-secondary">Distribute to team</span>
+                        </div>
+                    </button>
+                    <button class="btn btn-light text-start p-3 border-0 d-flex align-items-center gap-3 w-100 rounded-4 transition-hover" onclick="logAction('Starting follow-ups...')">
+                        <div class="bg-success-soft text-success rounded-3 p-2">
+                            <i data-lucide="mail" style="width: 18px;"></i>
+                        </div>
+                        <div>
+                            <span class="d-block fw-bold small text-success">Automated Follow-up</span>
+                            <span class="x-small text-secondary">Trigger campaigns</span>
+                        </div>
+                    </button>
+                    <button class="btn btn-light text-start p-3 border-0 d-flex align-items-center gap-3 w-100 rounded-4 transition-hover" onclick="logAction('Escalating leads...')">
+                        <div class="bg-warning-soft text-warning rounded-3 p-2">
+                            <i data-lucide="zap" style="width: 18px;"></i>
+                        </div>
+                        <div>
+                            <span class="d-block fw-bold small text-warning">Escalate Hot Leads</span>
+                            <span class="x-small text-secondary">Priority intervention</span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent border-0 p-4 pb-0">
+                <h5 class="mb-0 fw-800">Funnel Status</h5>
+            </div>
+            <div class="card-body p-4">
+                <canvas id="funnelChart" height="240"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .transition-hover { transition: all 0.2s ease; }
+    .transition-hover:hover { transform: translateX(4px); background-color: var(--bg-surface-secondary); }
+    .x-small { font-size: 0.75rem; }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ADAPTER_URL = 'http://localhost:3000';
+    const ERP_TOKEN = '{{ erp_token|default:"" }}';
+
+    async function fetchCRMData() {
+        if (!ERP_TOKEN) {
+            // Demo data if no token
+            document.getElementById('total-leads').innerText = "12 (Demo)";
+            document.getElementById('pipeline-val').innerText = "$450K (Demo)";
+            renderMockTable();
+            return;
+        }
+
+        try {
+            const crmRes = await fetch(`${ADAPTER_URL}/crm-summary`, {
+                headers: { 'Authorization': `Bearer ${ERP_TOKEN}` }
+            });
+            const crmData = await crmRes.json();
+            
+            document.getElementById('total-leads').innerText = crmData.count;
+            document.getElementById('pipeline-val').innerText = `$${(crmData.total_revenue / 1000).toFixed(0)}K`;
+
+            const res = await fetch(`${ADAPTER_URL}/customers`, {
+                headers: { 'Authorization': `Bearer ${ERP_TOKEN}` }
+            });
+            const leads = await res.json();
+            renderLeadTable(leads);
+
+        } catch (err) {
+            console.error('Fetch Error:', err);
+            renderMockTable();
+        }
+    }
+
+    function renderLeadTable(leads) {
+        const list = document.getElementById('lead-list');
+        list.innerHTML = '';
+        leads.forEach(l => {
+            list.innerHTML += `
+                <tr>
+                    <td class="ps-4">
+                        <div class="fw-bold text-dark small">${l.customer_name}</div>
+                        <div class="text-muted x-small">${l.name}</div>
+                    </td>
+                    <td><span class="badge bg-light text-dark border rounded-pill x-small">${l.customer_type}</span></td>
+                    <td class="text-muted x-small">${l.territory || 'Global'}</td>
+                    <td class="text-end pe-4">
+                        <button class="btn btn-sm btn-link text-primary p-0"><i class="fas fa-external-link-alt"></i></button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    function renderMockTable() {
+        const mock = [
+            { customer_name: 'Acme Corp', name: 'LEAD-001', customer_type: 'Company', territory: 'US' },
+            { customer_name: 'Globex', name: 'LEAD-002', customer_type: 'Company', territory: 'EU' },
+            { customer_name: 'Initech', name: 'LEAD-003', customer_type: 'Individual', territory: 'ASIA' }
+        ];
+        renderLeadTable(mock);
+    }
+
+    function logAction(msg) {
+        console.log(msg);
+        // Toast logic could go here
+    }
+
+    document.addEventListener('DOMContentLoaded', fetchCRMData);
+</script>
+{% endblock %}

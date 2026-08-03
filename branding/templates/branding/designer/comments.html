@@ -1,0 +1,445 @@
+{% extends "branding/base.html" %}
+{% load branding_extras %}
+
+{% block title %}Comments — {{ br.request_number }}{% endblock %}
+
+{% block branding_content %}
+{% csrf_token %}
+
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb" class="mb-3">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'branding:designer_dashboard' %}">My Work</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'branding:request_detail' pk=br.pk %}">{{ br.request_number }}</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Comments</li>
+  </ol>
+</nav>
+
+<!-- Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4 class="mb-0">Comments</h4>
+  {% if unresolved_count %}
+  <span class="badge bg-danger fs-6">{{ unresolved_count }} unresolved</span>
+  {% else %}
+  <span class="badge bg-success fs-6">All resolved</span>
+  {% endif %}
+</div>
+
+<!-- Tag Filter -->
+<div class="mb-4">
+  <div class="d-flex flex-wrap gap-2 align-items-center">
+    <span class="fw-semibold me-1">Filter:</span>
+    <a href="?tag="
+       class="btn btn-sm {% if not tag_filter %}btn-dark{% else %}btn-outline-secondary{% endif %}">
+      All
+    </a>
+    {% for tag_value, tag_label in comment_tags %}
+    <a href="?tag={{ tag_value }}"
+       class="btn btn-sm {% if tag_filter == tag_value %}btn-{% if tag_value == 'general' %}secondary{% elif tag_value == 'design' %}primary{% elif tag_value == 'typography' %}purple{% elif tag_value == 'color' %}pink{% elif tag_value == 'layout' %}info{% elif tag_value == 'branding' %}success{% elif tag_value == 'feedback' %}warning{% elif tag_value == 'urgent' %}danger{% else %}secondary{% endif %}{% else %}btn-outline-{% if tag_value == 'general' %}secondary{% elif tag_value == 'design' %}primary{% elif tag_value == 'typography' %}purple{% elif tag_value == 'color' %}pink{% elif tag_value == 'layout' %}info{% elif tag_value == 'branding' %}success{% elif tag_value == 'feedback' %}warning{% elif tag_value == 'urgent' %}danger{% else %}secondary{% endif %}{% endif %}">
+      {{ tag_label }}
+    </a>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Add Comment Form -->
+<div class="card mb-4 shadow-sm">
+  <div class="card-body">
+    <h6 class="card-title">Add Comment</h6>
+    <form method="post" enctype="multipart/form-data" action="{{ request.path }}">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="add_comment">
+
+      <div class="mb-3">
+        <div class="position-relative">
+          <textarea id="commentContent"
+                    name="content"
+                    class="form-control"
+                    rows="3"
+                    placeholder="Write a comment... Use @ to mention someone"
+                    required></textarea>
+          <div id="mentionDropdown"
+               class="list-group position-absolute w-100 d-none"
+               style="z-index: 1000; max-height: 200px; overflow-y: auto;">
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label for="commentTag" class="form-label">Tag</label>
+          <select id="commentTag" name="tag" class="form-select">
+            {% for tag_value, tag_label in comment_tags %}
+            <option value="{{ tag_value }}">{{ tag_label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-5">
+          <label for="annotationImage" class="form-label">Annotation Image <span class="text-muted">(optional)</span></label>
+          <input type="file"
+                 id="annotationImage"
+                 name="annotation_image"
+                 class="form-control"
+                 accept="image/*">
+        </div>
+        <div class="col-md-3 d-flex align-items-end">
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="fas fa-paper-plane me-1"></i> Post Comment
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Comments List -->
+<div class="comments-list">
+  {% for comment in comments %}
+  <div class="card mb-3 shadow-sm comment-card" id="comment-{{ comment.pk }}" data-comment-pk="{{ comment.pk }}">
+    <div class="card-body">
+      <!-- Comment Header -->
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <div class="d-flex align-items-center">
+          {% if comment.author.profile.avatar %}
+          <img src="{{ comment.author.profile.avatar.url }}"
+               alt="{{ comment.author.get_full_name }}"
+               class="rounded-circle me-2"
+               width="32" height="32">
+          {% else %}
+          <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2"
+               style="width: 32px; height: 32px; font-size: 0.8rem;">
+            {{ comment.author.first_name|first|upper }}{{ comment.author.last_name|first|upper }}
+          </div>
+          {% endif %}
+          <div>
+            <strong>{{ comment.author.get_full_name|default:comment.author.username }}</strong>
+            <small class="text-muted ms-2">{{ comment.created_at|timesince }} ago</small>
+          </div>
+        </div>
+        <div>
+          {% if comment.tag %}
+          <span class="badge
+            {% if comment.tag == 'general' %}bg-secondary
+            {% elif comment.tag == 'design' %}bg-primary
+            {% elif comment.tag == 'typography' %}bg-purple
+            {% elif comment.tag == 'color' %}bg-pink
+            {% elif comment.tag == 'layout' %}bg-info
+            {% elif comment.tag == 'branding' %}bg-success
+            {% elif comment.tag == 'feedback' %}bg-warning
+            {% elif comment.tag == 'urgent' %}bg-danger
+            {% else %}bg-secondary{% endif %}">
+            {{ comment.get_tag_display }}
+          </span>
+          {% endif %}
+          {% if comment.is_resolved %}
+          <span class="badge bg-success ms-1"><i class="fas fa-check"></i> Resolved</span>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Comment Content -->
+      <div class="comment-content mb-3">
+        {{ comment.content|safe }}
+      </div>
+
+      <!-- Annotation Image -->
+      {% if comment.annotation_image %}
+      <div class="annotation-image-wrapper mb-3 position-relative">
+        <img src="{{ comment.annotation_image.url }}"
+             alt="Annotation"
+         class="img-fluid rounded border"
+         style="max-height: 300px;">
+        {% if comment.annotation_x is not None and comment.annotation_y is not None %}
+        <div class="annotation-pin position-absolute"
+             style="left: {{ comment.annotation_x }}px; top: {{ comment.annotation_y }}px;
+                    width: 20px; height: 20px; transform: translate(-50%, -50%);">
+          <i class="fas fa-map-marker-alt text-danger fa-2x drop-shadow"></i>
+        </div>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      <!-- Action Buttons -->
+      <div class="d-flex gap-2">
+        {% if not comment.is_resolved %}
+        <form method="post" action="{{ request.path }}" class="d-inline">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="resolve">
+          <input type="hidden" name="comment_pk" value="{{ comment.pk }}">
+          <button type="submit" class="btn btn-sm btn-outline-success" title="Resolve">
+            <i class="fas fa-check-circle me-1"></i> Resolve
+          </button>
+        </form>
+        {% else %}
+        <form method="post" action="{{ request.path }}" class="d-inline">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="unresolve">
+          <input type="hidden" name="comment_pk" value="{{ comment.pk }}">
+          <button type="submit" class="btn btn-sm btn-outline-warning" title="Unresolve">
+            <i class="fas fa-undo me-1"></i> Unresolve
+          </button>
+        </form>
+        {% endif %}
+
+        <button class="btn btn-sm btn-outline-primary reply-toggle-btn"
+                type="button"
+                data-target="reply-form-{{ comment.pk }}">
+          <i class="fas fa-reply me-1"></i> Reply
+        </button>
+      </div>
+
+      <!-- Inline Reply Form -->
+      <div id="reply-form-{{ comment.pk }}" class="mt-3 d-none">
+        <form method="post" enctype="multipart/form-data" action="{{ request.path }}">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="add_comment">
+          <input type="hidden" name="parent_id" value="{{ comment.pk }}">
+
+          <div class="position-relative">
+            <textarea name="content"
+                      class="form-control form-control-sm reply-textarea"
+                      rows="2"
+                      placeholder="Write a reply... Use @ to mention someone"
+                      required></textarea>
+            <div class="reply-mention-dropdown list-group position-absolute w-100 d-none"
+                 style="z-index: 1000; max-height: 150px; overflow-y: auto;">
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center mt-2">
+            <input type="file"
+                   name="annotation_image"
+                   class="form-control form-control-sm"
+                   accept="image/*"
+                   style="max-width: 250px;">
+            <div>
+              <button type="button"
+                      class="btn btn-sm btn-outline-secondary reply-cancel-btn"
+                      data-target="reply-form-{{ comment.pk }}">
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-sm btn-primary">
+                <i class="fas fa-paper-plane me-1"></i> Reply
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- Replies -->
+      {% if comment.replies %}
+      <div class="replies mt-3 ms-4 border-start ps-3">
+        {% for reply in comment.replies %}
+        <div class="card mb-2 shadow-sm reply-card" id="comment-{{ reply.pk }}">
+          <div class="card-body py-2 px-3">
+            <!-- Reply Header -->
+            <div class="d-flex justify-content-between align-items-start mb-1">
+              <div class="d-flex align-items-center">
+                {% if reply.author.profile.avatar %}
+                <img src="{{ reply.author.profile.avatar.url }}"
+                     alt="{{ reply.author.get_full_name }}"
+                     class="rounded-circle me-2"
+                     width="24" height="24">
+                {% else %}
+                <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2"
+                     style="width: 24px; height: 24px; font-size: 0.6rem;">
+                  {{ reply.author.first_name|first|upper }}{{ reply.author.last_name|first|upper }}
+                </div>
+                {% endif %}
+                <div>
+                  <strong class="small">{{ reply.author.get_full_name|default:reply.author.username }}</strong>
+                  <small class="text-muted ms-2">{{ reply.created_at|timesince }} ago</small>
+                </div>
+              </div>
+              <div>
+                {% if reply.tag %}
+                <span class="badge
+                  {% if reply.tag == 'general' %}bg-secondary
+                  {% elif reply.tag == 'design' %}bg-primary
+                  {% elif reply.tag == 'typography' %}bg-purple
+                  {% elif reply.tag == 'color' %}bg-pink
+                  {% elif reply.tag == 'layout' %}bg-info
+                  {% elif reply.tag == 'branding' %}bg-success
+                  {% elif reply.tag == 'feedback' %}bg-warning
+                  {% elif reply.tag == 'urgent' %}bg-danger
+                  {% else %}bg-secondary{% endif %}">
+                  {{ reply.get_tag_display }}
+                </span>
+                {% endif %}
+              </div>
+            </div>
+
+            <!-- Reply Content -->
+            <div class="comment-content small mb-2">
+              {{ reply.content|safe }}
+            </div>
+
+            <!-- Reply Annotation Image -->
+            {% if reply.annotation_image %}
+            <div class="annotation-image-wrapper mb-2 position-relative">
+              <img src="{{ reply.annotation_image.url }}"
+                   alt="Annotation"
+                   class="img-fluid rounded border"
+                   style="max-height: 200px;">
+              {% if reply.annotation_x is not None and reply.annotation_y is not None %}
+              <div class="annotation-pin position-absolute"
+                   style="left: {{ reply.annotation_x }}px; top: {{ reply.annotation_y }}px;
+                          width: 16px; height: 16px; transform: translate(-50%, -50%);">
+                <i class="fas fa-map-marker-alt text-danger drop-shadow"></i>
+              </div>
+              {% endif %}
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  {% empty %}
+  <div class="text-center text-muted py-5">
+    <i class="fas fa-comments fa-3x mb-3"></i>
+    <p>No comments yet. Be the first to comment!</p>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- Custom Badge Colors -->
+<style>
+  .bg-purple { background-color: #6f42c1 !important; }
+  .bg-pink { background-color: #e83e8c !important; }
+  .drop-shadow { filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.3)); }
+  .comment-content .mention {
+    color: #0d6efd;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .annotation-pin {
+    pointer-events: none;
+  }
+</style>
+
+<!-- @mention JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const mentionSearchUrl = "{% url 'branding:comment_mention_search' pk=br.pk %}";
+
+  function setupMentionSearch(textarea, dropdown) {
+    let debounceTimer = null;
+
+    textarea.addEventListener('input', function () {
+      const cursorPos = textarea.selectionStart;
+      const text = textarea.value.substring(0, cursorPos);
+      const atIndex = text.lastIndexOf('@');
+
+      if (atIndex === -1 || (atIndex > 0 && text[atIndex - 1] !== ' ' && text[atIndex - 1] !== '\n')) {
+        dropdown.classList.add('d-none');
+        return;
+      }
+
+      const query = text.substring(atIndex + 1);
+      if (query.includes(' ') && query.split(' ').length > 2) {
+        dropdown.classList.add('d-none');
+        return;
+      }
+
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(function () {
+        fetch(`${mentionSearchUrl}?q=${encodeURIComponent(query)}`)
+          .then(response => response.json())
+          .then(data => {
+            dropdown.innerHTML = '';
+            if (data.results && data.results.length > 0) {
+              data.results.forEach(function (user) {
+                const item = document.createElement('button');
+                item.type = 'button';
+                item.className = 'list-group-item list-group-item-action d-flex align-items-center py-2';
+                item.innerHTML = `
+                  <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-2"
+                       style="width: 28px; height: 28px; font-size: 0.7rem;">
+                    ${user.initials}
+                  </div>
+                  <div>
+                    <div class="fw-semibold small">${user.full_name || user.username}</div>
+                    <div class="text-muted" style="font-size: 0.75rem;">@${user.username}</div>
+                  </div>
+                `;
+                item.addEventListener('click', function () {
+                  const before = textarea.value.substring(0, atIndex);
+                  const after = textarea.value.substring(cursorPos);
+                  textarea.value = before + '@' + user.username + ' ' + after;
+                  textarea.focus();
+                  dropdown.classList.add('d-none');
+                });
+                dropdown.appendChild(item);
+              });
+              dropdown.classList.remove('d-none');
+            } else {
+              dropdown.classList.add('d-none');
+            }
+          })
+          .catch(function () {
+            dropdown.classList.add('d-none');
+          });
+      }, 300);
+    });
+
+    textarea.addEventListener('blur', function () {
+      setTimeout(function () {
+        dropdown.classList.add('d-none');
+      }, 200);
+    });
+  }
+
+  // Main comment textarea
+  const mainTextarea = document.getElementById('commentContent');
+  const mainDropdown = document.getElementById('mentionDropdown');
+  if (mainTextarea && mainDropdown) {
+    setupMentionSearch(mainTextarea, mainDropdown);
+  }
+
+  // Reply textareas
+  document.querySelectorAll('.reply-textarea').forEach(function (textarea) {
+    const dropdown = textarea.parentElement.querySelector('.reply-mention-dropdown');
+    if (dropdown) {
+      setupMentionSearch(textarea, dropdown);
+    }
+  });
+
+  // Highlight @mentions in rendered content
+  document.querySelectorAll('.comment-content').forEach(function (el) {
+    el.innerHTML = el.innerHTML.replace(
+      /@(\w+)/g,
+      '<span class="mention">@$1</span>'
+    );
+  });
+
+  // Reply toggle buttons
+  document.querySelectorAll('.reply-toggle-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      const targetId = btn.getAttribute('data-target');
+      const form = document.getElementById(targetId);
+      if (form) {
+        form.classList.toggle('d-none');
+        if (!form.classList.contains('d-none')) {
+          form.querySelector('textarea').focus();
+        }
+      }
+    });
+  });
+
+  // Reply cancel buttons
+  document.querySelectorAll('.reply-cancel-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      const targetId = btn.getAttribute('data-target');
+      const form = document.getElementById(targetId);
+      if (form) {
+        form.classList.add('d-none');
+        form.querySelector('textarea').value = '';
+      }
+    });
+  });
+});
+</script>
+{% endblock %}

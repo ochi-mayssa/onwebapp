@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans "Market Intelligence" %} | OnWebApp{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'users:dashboard' %}">Dashboard</a></li>
+<li class="breadcrumb-item active">Market Analysis</li>
+{% endblock %}
+
+{% block page_title %}{% trans "Market Ecosystem" %}{% endblock %}
+{% block page_subtitle %}{% trans "Consolidated intelligence on market sizing, growth trajectories, and competitive landscapes." %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="row g-4">
+    <!-- Main Insights -->
+    <div class="col-lg-8">
+        {% if result %}
+        <div class="row g-4 mb-4">
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm rounded-4 p-4 transition-hover">
+                    <div class="p-2 rounded-3 bg-primary-soft text-primary d-inline-block mb-3">
+                        <i data-lucide="database" style="width: 20px;"></i>
+                    </div>
+                    <div class="uppercase x-small fw-800 text-secondary tracking-widest mb-1">Market Valuation</div>
+                    <div class="h3 fw-800 text-slate-900 mb-0">{{ result.market_size|default:"$12.4B" }}</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm rounded-4 p-4 transition-hover">
+                    <div class="p-2 rounded-3 bg-success-soft text-success d-inline-block mb-3">
+                        <i data-lucide="trending-up" style="width: 20px;"></i>
+                    </div>
+                    <div class="uppercase x-small fw-800 text-secondary tracking-widest mb-1">Growth CAGR</div>
+                    <div class="h3 fw-800 text-slate-900 mb-0">{{ result.growth_rate|default:"15.2%" }}</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm rounded-4 p-4 transition-hover">
+                    <div class="p-2 rounded-3 bg-warning-soft text-warning d-inline-block mb-3">
+                        <i data-lucide="users" style="width: 20px;"></i>
+                    </div>
+                    <div class="uppercase x-small fw-800 text-secondary tracking-widest mb-1">Top Players</div>
+                    <div class="h3 fw-800 text-slate-900 mb-0">8 Major</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
+            <div class="card-header bg-transparent border-0 p-4 pb-0">
+                <h6 class="fw-800 mb-0">Sector Growth Trajectory</h6>
+            </div>
+            <div class="card-body p-4">
+                <div style="height: 350px;">
+                    <canvas id="marketChart"></canvas>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="card border-0 shadow-sm rounded-4 p-4">
+            <h6 class="fw-800 text-slate-900 mb-4">Strategic Market Trends</h6>
+            <div class="vstack gap-3">
+                {% for trend in result.trends %}
+                <div class="p-3 rounded-4 bg-surface-secondary border-0 d-flex justify-content-between align-items-center transition-hover">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="p-2 rounded-circle bg-white shadow-sm">
+                            <i data-lucide="zap" class="text-primary" style="width: 14px;"></i>
+                        </div>
+                        <span class="small fw-800 text-slate-900">{{ trend.title }}</span>
+                    </div>
+                    <span class="badge {% if trend.impact == 'High' %}bg-danger-soft text-danger{% else %}bg-primary-soft text-primary{% endif %} rounded-pill px-3 py-2 fw-800 x-small">
+                        {{ trend.impact }} Impact
+                    </span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Sidebar -->
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+            <h6 class="fw-800 text-slate-900 mb-4">Competitive Landscape</h6>
+            <div class="vstack gap-4">
+                {% for player in result.top_players %}
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="rounded-circle bg-surface-secondary d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                            <span class="fw-800 text-primary small">{{ forloop.counter }}</span>
+                        </div>
+                        <span class="small fw-800 text-secondary">{{ player }}</span>
+                    </div>
+                    <div class="progress rounded-pill" style="width: 60px; height: 4px; background: var(--bg-surface-secondary);">
+                        <div class="progress-bar bg-primary rounded-pill" style="width: {% if forloop.first %}85{% elif forloop.counter == 2 %}65{% else %}45{% endif %}%"></div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <hr class="my-4 opacity-5">
+            <button class="btn btn-light w-100 rounded-pill py-2 fw-800 x-small border">Download Full Matrix</button>
+        </div>
+
+        <div class="card border-0 bg-sidebar-bg text-white p-4 rounded-4 shadow-xl position-relative overflow-hidden">
+            <div class="position-absolute top-0 end-0 p-4 opacity-10">
+                <i data-lucide="sparkles" style="width: 120px; height: 120px;"></i>
+            </div>
+            <h6 class="fw-800 mb-3 text-white position-relative">AI Prediction</h6>
+            <p class="text-white text-opacity-75 small fw-600 mb-4 position-relative">Market sizing in the "Industrial Automation" sector is projected to expand by <span class="text-success fw-800">22%</span> in the next fiscal cycle.</p>
+            <div class="p-3 rounded-4 bg-white bg-opacity-5 border border-white border-opacity-10 position-relative">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="x-small fw-800 opacity-50 uppercase tracking-widest">Confidence Level</span>
+                    <span class="x-small fw-800 text-success">High (88%)</span>
+                </div>
+                <div class="progress bg-white bg-opacity-10 rounded-pill" style="height: 4px;">
+                    <div class="progress-bar bg-success rounded-pill" style="width: 88%;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .transition-hover { transition: all 0.2s ease; }
+    .transition-hover:hover { transform: translateY(-2px); background-color: var(--bg-surface-tertiary); }
+    .x-small { font-size: 0.75rem; }
+    .uppercase { text-transform: uppercase; }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    lucide.createIcons();
+    
+    {% if result %}
+    const ctx = document.getElementById('marketChart');
+    if(ctx) {
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['2021', '2022', '2023', '2024', '2025', '2026 (Est)'],
+                datasets: [{
+                    label: 'Market Valuation (Billion $)',
+                    data: [8.2, 9.1, 10.4, 11.2, 12.4, 14.8],
+                    backgroundColor: 'rgba(99, 102, 241, 0.2)',
+                    borderColor: '#6366f1',
+                    borderWidth: 2,
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    }
+    {% endif %}
+});
+</script>
+{% endblock %}

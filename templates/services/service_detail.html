@@ -1,0 +1,276 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{{ service.seo.title }}{% endblock %}
+
+{% block meta %}
+<meta name="description" content="{{ service.seo.description }}">
+<meta property="og:title" content="{{ service.seo.title }}">
+<meta property="og:description" content="{{ service.seo.description }}">
+<meta property="og:type" content="website">
+{% endblock %}
+
+{% block extra_head %}
+<!-- Lucide Icons -->
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+    :root {
+        --primary: #6366F1;
+        --primary-glow: rgba(99, 102, 241, 0.4);
+        --slate-50: #F8FAFC;
+        --slate-100: #F1F5F9;
+        --slate-200: #E2E8F0;
+        --slate-600: #475569;
+        --slate-900: #0F172A;
+        --radius-xl: 40px;
+    }
+
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: white;
+        color: var(--slate-900);
+        overflow-x: hidden;
+    }
+
+    .service-hero {
+        padding: 180px 0 120px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 20px;
+        background: rgba(99, 102, 241, 0.05);
+        border: 1px solid rgba(99, 102, 241, 0.1);
+        border-radius: 100px;
+        color: var(--primary);
+        font-weight: 800;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 32px;
+    }
+
+    .hero-title {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: clamp(3rem, 8vw, 5rem);
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        line-height: 1;
+        margin-bottom: 32px;
+        background: linear-gradient(135deg, var(--slate-900) 0%, var(--slate-600) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .feature-card {
+        padding: 48px;
+        border-radius: var(--radius-xl);
+        border: 1px solid var(--slate-100);
+        background: white;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        height: 100%;
+        box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.02);
+    }
+
+    .feature-card:hover {
+        border-color: var(--primary-glow);
+        transform: translateY(-12px);
+        box-shadow: 0 40px 80px -15px rgba(99, 102, 241, 0.1);
+    }
+
+    .feature-icon-wrapper {
+        width: 64px;
+        height: 64px;
+        background: var(--slate-50);
+        color: var(--primary);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 32px;
+        transition: all 0.3s ease;
+    }
+
+    .feature-card:hover .feature-icon-wrapper {
+        background: var(--primary);
+        color: white;
+        transform: scale(1.1) rotate(5deg);
+    }
+
+    .step-card {
+        padding: 40px;
+        border-radius: 32px;
+        background: var(--slate-50);
+        border: 1px solid transparent;
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+
+    .step-card:hover {
+        background: white;
+        border-color: var(--slate-100);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.03);
+    }
+
+    .step-number {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 3rem;
+        font-weight: 800;
+        color: var(--primary);
+        opacity: 0.1;
+        margin-bottom: 24px;
+        line-height: 1;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary) 0%, #4F46E5 100%);
+        border: none;
+        box-shadow: 0 10px 20px -5px var(--primary-glow);
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 20px 40px -10px var(--primary-glow);
+    }
+
+    .section-padding { padding: 120px 0; }
+    
+    .bg-blob {
+        position: absolute;
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, transparent 70%);
+        border-radius: 50%;
+        z-index: -1;
+        filter: blur(80px);
+    }
+    .blob-1 { top: -200px; right: -200px; }
+    .blob-2 { bottom: -200px; left: -200px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="service-hero">
+    <div class="container text-center">
+        <div class="hero-badge mx-auto">
+            <i data-lucide="zap"></i>
+            <span>{{ service.badge }}</span>
+        </div>
+        <h1 class="hero-title mx-auto" style="max-width: 900px;">{{ service.title }}</h1>
+        <p class="text-muted fs-5 mx-auto mb-5" style="max-width: 700px;">{{ service.description }}</p>
+        
+        <div class="d-flex justify-content-center gap-3">
+            <a href="{% url 'users:signup' %}" class="btn btn-primary btn-lg px-5 py-3 rounded-3 fw-bold">{{ service.cta.text }}</a>
+            {% if service.cta.secondary_link %}
+            <a href="{% url service.cta.secondary_link %}" class="btn btn-outline-secondary btn-lg px-5 py-3 rounded-3 fw-bold">{{ service.cta.secondary_text }}</a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="section-padding bg-slate-50">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-800 display-5">Enterprise-Grade Features</h2>
+            <p class="text-muted">Everything you need to scale your {{ service.title|lower }} operations.</p>
+        </div>
+        <div class="row g-4">
+            {% for feature in service.features %}
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon-wrapper">
+                        <i class="{{ feature.icon }} fa-2x"></i>
+                    </div>
+                    <h4 class="fw-bold mb-3">{{ feature.title }}</h4>
+                    <p class="text-muted mb-0">{{ feature.description }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Tool Integration / Demo -->
+<section class="section-padding">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <h2 class="display-6 fw-bold mb-4">Why Choose {{ service.title }}?</h2>
+                <p class="lead text-muted mb-4">Designed for high-performance teams, our solution integrates seamlessly into your existing enterprise stack.</p>
+                <div class="vstack gap-3">
+                    {% for benefit in service.benefits %}
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="p-1 rounded-circle bg-success bg-opacity-10 text-success">
+                            <i data-lucide="check" style="width: 16px; height: 16px;"></i>
+                        </div>
+                        <span class="fw-600 text-slate-700">{{ benefit }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div id="tool-integration">
+                    {% block service_demo %}
+                    <div class="p-5 rounded-4 bg-white border shadow-sm">
+                        <div class="text-center">
+                            <div class="p-3 rounded-circle bg-primary bg-opacity-10 text-primary d-inline-block mb-4">
+                                <i data-lucide="play" style="width: 32px; height: 32px;"></i>
+                            </div>
+                            <h4 class="fw-bold">Experience the Tool</h4>
+                            <p class="text-muted mb-4">Get a live walkthrough of the {{ service.title }} interface.</p>
+                            <a href="{% url 'chatbot:chatbot' %}" class="btn btn-primary w-100 py-3 rounded-3 fw-bold">Request Live Demo</a>
+                        </div>
+                    </div>
+                    {% endblock %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Onboarding Section -->
+<section class="section-padding bg-slate-50">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h6 class="text-primary fw-800 uppercase x-small tracking-widest mb-3">Implementation</h6>
+            <h2 class="fw-800 display-5">{{ service.onboarding.title }}</h2>
+        </div>
+        <div class="row g-4">
+            {% for step in service.onboarding.steps %}
+            <div class="col-md-4">
+                <div class="step-card">
+                    <div class="step-number">{{ forloop.counter|stringformat:"02d" }}</div>
+                    <h4 class="fw-bold mb-3">{{ step.title }}</h4>
+                    <p class="text-muted mb-0">{{ step.desc }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Final CTA -->
+<section class="section-padding bg-primary text-white text-center">
+    <div class="container">
+        <h2 class="fw-800 display-4 mb-4">Ready to optimize your operations?</h2>
+        <p class="opacity-75 fs-5 mb-5 mx-auto" style="max-width: 600px;">Join 500+ enterprises using OnWebApp to automate their growth.</p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="{% url 'users:signup' %}" class="btn btn-lg bg-white text-primary fw-800 px-5 py-3 rounded-3">Get Started Now</a>
+            <a href="{% url 'contact:contact' %}" class="btn btn-lg border border-white text-white fw-800 px-5 py-3 rounded-3">Contact Sales</a>
+        </div>
+    </div>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        lucide.createIcons();
+    });
+</script>
+{% endblock %}

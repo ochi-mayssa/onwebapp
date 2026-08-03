@@ -1,0 +1,159 @@
+{% extends "forum/base_forum.html" %}
+{% load static forum_tags %}
+
+{% block forum_title %}My Posts{% endblock %}
+
+{% block forum_content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <h4 class="fw-800 mb-0"><i class="fas fa-user-edit me-2"></i>My Posts</h4>
+    <a href="{% url 'forum:post_create' %}" class="btn btn-primary btn-sm rounded-pill"><i class="fas fa-plus me-1"></i>New Post</a>
+</div>
+
+<!-- Notifications -->
+{% if notifications %}
+<div class="forum-card p-3 mb-3">
+    <h6 class="fw-700 mb-2 small text-uppercase text-secondary"><i class="fas fa-bell me-2"></i>Recent Activity</h6>
+    <div class="list-group list-group-flush">
+        {% for n in notifications %}
+        <div class="list-group-item px-0 py-2 d-flex align-items-start gap-2" style="background:transparent;border-color:var(--border-color);">
+            {% if n.action == 'new_comment' %}
+            <i class="fas fa-comment text-primary mt-1" style="width:16px;"></i>
+            <div class="small">
+                <strong>{{ n.metadata.username }}</strong> commented on
+                <a href="{% url 'forum:post_detail' n.metadata.post_slug %}" class="fw-600">{{ n.metadata.post_title|truncatechars:60 }}</a>
+            {% elif n.action == 'reply_comment' %}
+            <i class="fas fa-reply text-success mt-1" style="width:16px;"></i>
+            <div class="small">
+                <strong>{{ n.metadata.username }}</strong> replied to your comment on
+                <a href="{% url 'forum:post_detail' n.metadata.post_slug %}" class="fw-600">{{ n.metadata.post_title|truncatechars:60 }}</a>
+            {% elif n.action == 'upvote_post' %}
+            <i class="fas fa-arrow-up text-primary mt-1" style="width:16px;"></i>
+            <div class="small">
+                <strong>{{ n.metadata.username }}</strong> upvoted your post
+                <a href="{% url 'forum:post_detail' n.metadata.post_slug %}" class="fw-600">{{ n.metadata.post_title|truncatechars:60 }}</a>
+            {% elif n.action == 'love_post' %}
+            <i class="fas fa-heart text-danger mt-1" style="width:16px;"></i>
+            <div class="small">
+                <strong>{{ n.metadata.username }}</strong> loved your post
+                <a href="{% url 'forum:post_detail' n.metadata.post_slug %}" class="fw-600">{{ n.metadata.post_title|truncatechars:60 }}</a>
+            {% else %}
+            <i class="fas fa-bell text-secondary mt-1" style="width:16px;"></i>
+            <div class="small">
+                <strong>{{ n.metadata.username }}</strong> {{ n.action }} on
+                <a href="{% url 'forum:post_detail' n.metadata.post_slug %}" class="fw-600">{{ n.metadata.post_title|truncatechars:60 }}</a>
+            {% endif %}
+                <span class="text-secondary ms-1">{{ n.timestamp|timesince }} ago</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Tabs -->
+<ul class="nav nav-tabs border-0 mb-3 gap-2" id="myPostsTabs">
+    <li class="nav-item">
+        <a class="nav-link {% if active_tab == 'published' %}active{% endif %} rounded-pill px-3 small fw-600" href="?tab=published" data-bs-toggle="tab">Published ({{ published.paginator.count }})</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if active_tab == 'drafts' %}active{% endif %} rounded-pill px-3 small fw-600" href="?tab=drafts" data-bs-toggle="tab"><i class="fas fa-pen me-1"></i>Drafts ({{ drafts.paginator.count }})</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if active_tab == 'archived' %}active{% endif %} rounded-pill px-3 small fw-600" href="?tab=archived" data-bs-toggle="tab"><i class="fas fa-archive me-1"></i>Archived ({{ archived.paginator.count }})</a>
+    </li>
+</ul>
+
+<div class="tab-content">
+    <!-- Published -->
+    <div class="tab-pane fade {% if active_tab == 'published' %}show active{% endif %}" id="published">
+        {% for post in published %}
+        <div class="forum-card d-flex align-items-start gap-3 p-3 mb-2">
+            <div class="vote-column text-center flex-shrink-0">
+                <div class="fw-700 small {% if post.score > 0 %}text-primary{% elif post.score < 0 %}text-danger{% endif %}">{{ post.score }}</div>
+            </div>
+            <div class="flex-grow-1 min-w-0">
+                <div class="d-flex flex-wrap align-items-center gap-1 mb-1">
+                    {% if post.category %}<span class="badge rounded-pill small px-2" style="background:{{ post.category.color }}20;color:{{ post.category.color }};">{{ post.category.name }}</span>{% endif %}
+                    {% if post.moderation_status == 'pending' %}<span class="badge bg-warning bg-opacity-10 text-warning small px-2">Pending</span>{% endif %}
+                </div>
+                <a href="{% url 'forum:post_detail' post.slug %}" class="forum-post-title">{{ post.title }}</a>
+                <div class="d-flex align-items-center gap-3 mt-1 small text-secondary">
+                    <span><i class="far fa-clock me-1"></i>{{ post.created_at|date:"M j, Y" }}</span>
+                    <span><i class="far fa-comment me-1"></i>{{ post.comment_count }}</span>
+                    <span><i class="far fa-eye me-1"></i>{{ post.views_count }}</span>
+                    <span class="ms-auto">
+                        <a href="{% url 'forum:post_edit' post.slug %}" class="btn btn-sm btn-outline-primary rounded-pill py-0 px-2"><i class="fas fa-edit"></i></a>
+                    </span>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="text-center py-4 text-secondary"><p class="mb-0">No published posts yet. <a href="{% url 'forum:post_create' %}">Write your first post</a>.</p></div>
+        {% endfor %}
+        {% if published.has_other_pages %}
+        <nav class="mt-2"><ul class="pagination pagination-sm justify-content-center">
+            {% if published.has_previous %}<li class="page-item"><a class="page-link" href="?pub_page={{ published.previous_page_number }}&tab=published">Previous</a></li>{% endif %}
+            {% for i in published.paginator.page_range %}
+            <li class="page-item {% if published.number == i %}active{% endif %}"><a class="page-link" href="?pub_page={{ i }}&tab=published">{{ i }}</a></li>
+            {% endfor %}
+            {% if published.has_next %}<li class="page-item"><a class="page-link" href="?pub_page={{ published.next_page_number }}&tab=published">Next</a></li>{% endif %}
+        </ul></nav>
+        {% endif %}
+    </div>
+
+    <!-- Drafts -->
+    <div class="tab-pane fade {% if active_tab == 'drafts' %}show active{% endif %}" id="drafts">
+        {% for post in drafts %}
+        <div class="forum-card d-flex align-items-start gap-3 p-3 mb-2">
+            <div class="flex-grow-1 min-w-0">
+                <a href="{% url 'forum:post_edit' post.slug %}" class="forum-post-title">{{ post.title|default:'(untitled)' }}</a>
+                <div class="d-flex align-items-center gap-2 mt-1 small text-secondary">
+                    <span class="badge bg-warning bg-opacity-10 text-warning small">Draft</span>
+                    <span>{{ post.created_at|date:"M j, Y" }}</span>
+                    <span class="ms-auto">
+                        <a href="{% url 'forum:post_edit' post.slug %}" class="btn btn-sm btn-outline-primary rounded-pill py-0 px-2"><i class="fas fa-edit"></i></a>
+                    </span>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="text-center py-4 text-secondary"><p class="mb-0">No drafts.</p></div>
+        {% endfor %}
+        {% if drafts.has_other_pages %}
+        <nav class="mt-2"><ul class="pagination pagination-sm justify-content-center">
+            {% if drafts.has_previous %}<li class="page-item"><a class="page-link" href="?draft_page={{ drafts.previous_page_number }}&tab=drafts">Previous</a></li>{% endif %}
+            {% for i in drafts.paginator.page_range %}
+            <li class="page-item {% if drafts.number == i %}active{% endif %}"><a class="page-link" href="?draft_page={{ i }}&tab=drafts">{{ i }}</a></li>
+            {% endfor %}
+            {% if drafts.has_next %}<li class="page-item"><a class="page-link" href="?draft_page={{ drafts.next_page_number }}&tab=drafts">Next</a></li>{% endif %}
+        </ul></nav>
+        {% endif %}
+    </div>
+
+    <!-- Archived -->
+    <div class="tab-pane fade {% if active_tab == 'archived' %}show active{% endif %}" id="archived">
+        {% for post in archived %}
+        <div class="forum-card d-flex align-items-start gap-3 p-3 mb-2">
+            <div class="flex-grow-1 min-w-0">
+                <a href="{% url 'forum:post_detail' post.slug %}" class="forum-post-title text-secondary">{{ post.title }}</a>
+                <div class="d-flex align-items-center gap-2 mt-1 small text-secondary">
+                    <span class="badge bg-secondary bg-opacity-10 text-secondary small">Archived</span>
+                    <span>{{ post.created_at|date:"M j, Y" }}</span>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="text-center py-4 text-secondary"><p class="mb-0">No archived posts.</p></div>
+        {% endfor %}
+        {% if archived.has_other_pages %}
+        <nav class="mt-2"><ul class="pagination pagination-sm justify-content-center">
+            {% if archived.has_previous %}<li class="page-item"><a class="page-link" href="?arch_page={{ archived.previous_page_number }}&tab=archived">Previous</a></li>{% endif %}
+            {% for i in archived.paginator.page_range %}
+            <li class="page-item {% if archived.number == i %}active{% endif %}"><a class="page-link" href="?arch_page={{ i }}&tab=archived">{{ i }}</a></li>
+            {% endfor %}
+            {% if archived.has_next %}<li class="page-item"><a class="page-link" href="?arch_page={{ archived.next_page_number }}&tab=archived">Next</a></li>{% endif %}
+        </ul></nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

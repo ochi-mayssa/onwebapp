@@ -1,0 +1,131 @@
+{% extends "community/wizard/base_wizard.html" %}
+{% load static i18n %}
+
+{% block wizard_content %}
+<div class="wizard-card">
+    <div class="wizard-section-label mb-1">Step 10 of 13</div>
+    <h2 class="mb-2">Project Summary</h2>
+    <p class="lead mb-4">Review everything before generating your proposal.</p>
+
+    <div class="row g-4">
+        <!-- Business Info -->
+        <div class="col-md-6">
+            <div class="card rounded-3 border-0 h-100" style="background:var(--bg-surface-secondary,#f8fafc);">
+                <div class="card-body p-4">
+                    <h6 class="fw-700 text-primary mb-3"><i class="fas fa-building me-2"></i>Business</h6>
+                    <table class="table table-sm table-borderless mb-0">
+                        <tr><td class="text-secondary small fw-600" style="width:40%;">Name</td><td class="small">{{ session.business_name|default:"—" }}</td></tr>
+                        <tr><td class="text-secondary small fw-600">Industry</td><td class="small">{{ session.industry|default:"—" }}</td></tr>
+                        <tr><td class="text-secondary small fw-600">Description</td><td class="small">{{ session.business_description|default:"—" }}</td></tr>
+                        <tr><td class="text-secondary small fw-600">Audience</td><td class="small">{{ session.target_audience|default:"—" }}</td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Project Info -->
+        <div class="col-md-6">
+            <div class="card rounded-3 border-0 h-100" style="background:var(--bg-surface-secondary,#f8fafc);">
+                <div class="card-body p-4">
+                    <h6 class="fw-700 text-primary mb-3"><i class="fas fa-folder-open me-2"></i>Project</h6>
+                    <table class="table table-sm table-borderless mb-0">
+                        <tr><td class="text-secondary small fw-600" style="width:40%;">Name</td><td class="small">{{ session.project_name|default:"—" }}</td></tr>
+                        <tr><td class="text-secondary small fw-600">Goals</td><td class="small">{{ session.project_goals|default:"—" }}</td></tr>
+                        <tr><td class="text-secondary small fw-600">Budget</td><td class="small">{{ session.get_budget_range_display|default:"—" }}</td></tr>
+                        <tr><td class="text-secondary small fw-600">Launch</td><td class="small">{{ session.target_launch_date|default:"—" }}</td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Services & Features -->
+        <div class="col-md-6">
+            <div class="card rounded-3 border-0 h-100" style="background:var(--bg-surface-secondary,#f8fafc);">
+                <div class="card-body p-4">
+                    <h6 class="fw-700 text-primary mb-3"><i class="fas fa-cubes me-2"></i>Services & Features</h6>
+                    <div class="mb-2">
+                        <span class="text-secondary small fw-600">Services:</span>
+                        {% for s in session.get_selected_services_list %}
+                        <span class="badge bg-primary bg-opacity-10 text-primary small fw-600 me-1 mb-1">{{ s }}</span>
+                        {% empty %}
+                        <span class="text-muted small">None selected</span>
+                        {% endfor %}
+                    </div>
+                    <div>
+                        <span class="text-secondary small fw-600">Features:</span>
+                        {% for f in session.get_features_list %}
+                        <span class="badge bg-success bg-opacity-10 text-success small fw-600 me-1 mb-1">{{ f }}</span>
+                        {% empty %}
+                        <span class="text-muted small">None selected</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Design & Package -->
+        <div class="col-md-6">
+            <div class="card rounded-3 border-0 h-100" style="background:var(--bg-surface-secondary,#f8fafc);">
+                <div class="card-body p-4">
+                    <h6 class="fw-700 text-primary mb-3"><i class="fas fa-palette me-2"></i>Design & Package</h6>
+                    <table class="table table-sm table-borderless mb-0">
+                        <tr><td class="text-secondary small fw-600" style="width:40%;">Style</td><td class="small">{{ session.get_design_style_display|default:"—" }}</td></tr>
+                        <tr><td class="text-secondary small fw-600">Typography</td><td class="small">{{ session.get_typography_style_display|default:"—" }}</td></tr>
+                        <tr><td class="text-secondary small fw-600">Package</td><td class="small">{{ session.get_package_display|default:"—" }}</td></tr>
+                        <tr><td class="text-secondary small fw-600">Add-ons</td>
+                            <td>{% for a in session.get_addons_list %}<span class="badge bg-warning bg-opacity-10 text-warning small fw-600 me-1 mb-1">{{ a }}</span>{% empty %}<span class="small text-muted">None</span>{% endfor %}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estimation Preview -->
+    {% if estimation %}
+    <div class="mt-4">
+        <div class="card rounded-3 border-0" style="background:var(--bg-surface-secondary,#f8fafc);">
+            <div class="card-body p-4">
+                <h6 class="fw-700 text-primary mb-3"><i class="fas fa-calculator me-2"></i>Estimated Cost & Timeline</h6>
+                <div class="row text-center">
+                    <div class="col-md-3">
+                        <div class="fw-800 fs-5 text-body">${{ estimation.budget_min|default:"—" }}</div>
+                        <div class="text-secondary small">Low Estimate</div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="fw-800 fs-5 text-primary">${{ estimation.budget_max|default:"—" }}</div>
+                        <div class="text-secondary small">High Estimate</div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="fw-800 fs-5 text-body">{{ estimation.timeline_weeks|default:"—" }} wks</div>
+                        <div class="text-secondary small">Timeline</div>
+                    </div>
+                    <div class="col-md-3">
+                        <span class="badge rounded-pill px-3 py-2 fw-700
+                            {% if estimation.complexity == 'Simple' %}bg-success
+                            {% elif estimation.complexity == 'Moderate' %}bg-warning text-dark
+                            {% elif estimation.complexity == 'Complex' %}bg-danger
+                            {% else %}bg-secondary{% endif %}">
+                            {{ estimation.complexity|default:"—" }}
+                        </span>
+                        <div class="text-secondary small mt-1">Complexity</div>
+                    </div>
+                </div>
+                <div class="mt-3 text-center">
+                    <small class="text-secondary">Recommended: <strong>{{ estimation.recommended_package|default:"—" }}</strong></small>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="mt-5 text-center">
+        <button type="post" class="btn-wizard-next px-5 py-3" onclick="document.getElementById('advanceStep10').submit();">
+            Generate Proposal <i class="fas fa-file-alt ms-2"></i>
+        </button>
+        <form method="post" id="advanceStep10" class="d-none">
+            {% csrf_token %}
+        </form>
+    </div>
+</div>
+{% endblock %}

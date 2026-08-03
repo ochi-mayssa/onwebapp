@@ -1,0 +1,451 @@
+{% extends 'base.html' %}
+{% block title %}URL Intelligence Report - OnWebApp{% endblock %}
+{% block content %}
+<div class="container mt-4 mb-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'seo_analyzer:index' %}">SEO</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'seo_analyzer:url_intelligence' %}">URL Intelligence</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Report</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+        <div>
+            <h1 class="mb-2">URL Intelligence Report</h1>
+            <div class="small text-uppercase text-muted fw-semibold mb-2">SEO Tools</div>
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="{% url 'seo_analyzer:checker' %}" class="btn btn-outline-primary btn-sm">Website Checker</a>
+                <a href="{% url 'seo_analyzer:url_intelligence' %}" class="btn btn-primary btn-sm">URL Intelligence</a>
+                <a href="{% url 'seo_analyzer:link_checker' %}" class="btn btn-outline-success btn-sm">Link Checker</a>
+                <a href="{% url 'seo_analyzer:sitemap' %}" class="btn btn-outline-primary btn-sm">Sitemap Intelligence</a>
+                <a href="{% url 'seo_analyzer:backlinks' %}" class="btn btn-outline-warning btn-sm">Backlinks</a>
+            </div>
+        </div>
+        <div class="text-end">
+            <div class="small text-muted">Analyzed URL</div>
+            <div class="fw-semibold">{{ task.url }}</div>
+            <div class="small text-muted mt-1">{{ result.created_at|date:"F j, Y, g:i a" }}</div>
+            <a href="{% url 'seo_analyzer:download_report' 'url' task.id %}" class="btn btn-primary btn-sm mt-3">Download PDF Report</a>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-lg-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body p-4 text-center">
+                    <div class="text-muted small text-uppercase fw-semibold mb-2">URL Health Score</div>
+                    <div class="display-5 fw-bold mb-2">{{ result.health_score|floatformat:0 }}/100</div>
+                    <div class="mt-3">
+                        <span class="badge {% if score_labels.overall == 'Excellent' %}bg-success-subtle text-success{% elif score_labels.overall == 'Good' %}bg-primary-subtle text-primary{% elif score_labels.overall == 'Needs Improvement' %}bg-warning-subtle text-warning{% else %}bg-danger-subtle text-danger{% endif %}">
+                            {{ score_labels.overall }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-8">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="card shadow-sm h-100"><div class="card-body">
+                        <div class="small text-muted">HTTP Status</div>
+                        <div class="h4 mb-0">{{ result.http_status_code|default:"Unavailable" }}</div>
+                        <div class="small text-muted mt-2">{{ access_status_label }}</div>
+                    </div></div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card shadow-sm h-100"><div class="card-body">
+                        <div class="small text-muted">HTTPS</div>
+                        <div class="h4 mb-0">{% if result.https_status %}Enabled{% else %}Not Secure{% endif %}</div>
+                    </div></div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card shadow-sm h-100"><div class="card-body">
+                        <div class="small text-muted">URL Length</div>
+                        <div class="h4 mb-0">{{ result.url_length }}</div>
+                    </div></div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card shadow-sm h-100"><div class="card-body">
+                        <div class="small text-muted">URL Depth</div>
+                        <div class="h4 mb-0">{{ result.url_depth }}</div>
+                    </div></div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card shadow-sm h-100"><div class="card-body">
+                        <div class="small text-muted">Indexability</div>
+                        <div class="h6 mb-0">{{ indexability_status_label }}</div>
+                    </div></div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card shadow-sm h-100"><div class="card-body">
+                        <div class="small text-muted">Canonical Status</div>
+                        <div class="h6 mb-0">{{ canonical_status_label }}</div>
+                    </div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white">
+            <h2 class="h5 mb-0">URL Resolution</h2>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-lg-6">
+                    <div class="small text-muted mb-1">Original URL</div>
+                    <code class="d-block text-break">{{ result.original_url }}</code>
+                </div>
+                <div class="col-lg-6">
+                    <div class="small text-muted mb-1">Final URL</div>
+                    <code class="d-block text-break">{{ result.final_url }}</code>
+                </div>
+            </div>
+            <div class="row g-3 mt-2">
+                <div class="col-md-3"><strong>Redirect Detected:</strong> {% if result.redirect_detected %}Yes{% else %}No{% endif %}</div>
+                <div class="col-md-3"><strong>Redirect Count:</strong> {{ result.redirect_count }}</div>
+                <div class="col-md-3"><strong>Response Time:</strong> {{ result.response_time|default:"-" }}s</div>
+                <div class="col-md-3"><strong>Target Keyword:</strong> {{ task.target_keyword|default:"Not Provided" }}</div>
+            </div>
+            <div class="mt-3">
+                <div><strong>Access Status:</strong> {{ access_status_label }}</div>
+                <div class="small text-muted">{{ access_status_explanation }}</div>
+            </div>
+            {% if result.redirect_chain %}
+            <div class="mt-3">
+                <div class="small text-muted mb-2">Redirect Chain</div>
+                <div class="d-flex flex-column gap-2">
+                    {% for step in result.redirect_chain %}
+                    <code class="text-break">{{ step }}</code>
+                    {% if not forloop.last %}<div class="text-muted small">↓</div>{% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-5">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h2 class="h5 mb-0">URL Structure Visualization</h2>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-column gap-2">
+                        <div><strong>Protocol:</strong> {{ structure.protocol|default:"Unknown" }}</div>
+                        <div class="text-muted small">↓</div>
+                        <div><strong>Domain:</strong> {{ structure.domain|default:"Unknown" }}</div>
+                        <div class="text-muted small">↓</div>
+                        <div><strong>Path:</strong> {{ structure.path|default:"/" }}</div>
+                        <div class="text-muted small">↓</div>
+                        <div><strong>Slug:</strong> {{ structure.slug|default:"None" }}</div>
+                        <div class="text-muted small">↓</div>
+                        <div>
+                            <strong>Parameters:</strong>
+                            {% if parameters.all %}
+                                {{ result.query_params_count }}
+                            {% else %}
+                                None
+                            {% endif %}
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row g-3 small">
+                        <div class="col-6"><strong>Subdomain:</strong> {{ structure.subdomain }}</div>
+                        <div class="col-6"><strong>Trailing Slash:</strong> {% if result.trailing_slash %}Yes{% else %}No{% endif %}</div>
+                        <div class="col-6"><strong>Uppercase:</strong> {% if result.has_uppercase %}Yes{% else %}No{% endif %}</div>
+                        <div class="col-6"><strong>Underscores:</strong> {% if result.has_underscores %}Yes{% else %}No{% endif %}</div>
+                        <div class="col-6"><strong>Hyphens:</strong> {{ result.hyphen_count }}</div>
+                        <div class="col-6"><strong>Fragment:</strong> {% if result.has_fragment %}Yes{% else %}No{% endif %}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-7">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h2 class="h5 mb-0">URL Health Breakdown</h2>
+                </div>
+                <div class="card-body">
+                    <canvas id="urlHealthBreakdownChart" height="190"></canvas>
+                    <div class="row g-3 mt-2">
+                        <div class="col-md-4"><strong>Structure:</strong> {{ result.structure_score|floatformat:0 }}/100 - {{ score_labels.structure }}</div>
+                        <div class="col-md-4"><strong>Technical:</strong> {{ result.technical_score|floatformat:0 }}/100 - {{ score_labels.technical }}</div>
+                        <div class="col-md-4"><strong>Canonical:</strong> {{ result.canonical_score|floatformat:0 }}/100 - {{ score_labels.canonical }}</div>
+                        <div class="col-md-4"><strong>Indexability:</strong> {{ result.indexability_score|floatformat:0 }}/100 - {{ score_labels.indexability }}</div>
+                        <div class="col-md-4"><strong>SEO Friendly:</strong> {{ result.seo_friendliness_score|floatformat:0 }}/100 - {{ score_labels.seo_friendliness }}</div>
+                        <div class="col-md-4"><strong>Keyword:</strong> {% if keyword_evaluated %}{{ result.keyword_relevance_score|floatformat:0 }}/100 - {{ score_labels.keyword }}{% else %}N/A - {{ score_labels.keyword }}{% endif %}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h2 class="h5 mb-0">Parameter Classification</h2>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-4"><strong>Tracking:</strong> {{ result.tracking_params_count }}</div>
+                        <div class="col-sm-4"><strong>Functional:</strong> {{ result.functional_params_count }}</div>
+                        <div class="col-sm-4"><strong>Review Needed:</strong> {{ result.unnecessary_params_count }}</div>
+                    </div>
+                    {% if parameters.all %}
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Value</th>
+                                    <th>Classification</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in parameters.tracking %}
+                                <tr>
+                                    <td>{{ item.key }}</td>
+                                    <td class="text-break">{{ item.value|default:"-" }}</td>
+                                    <td><span class="badge bg-info-subtle text-info">Tracking</span></td>
+                                </tr>
+                                {% endfor %}
+                                {% for item in parameters.functional %}
+                                <tr>
+                                    <td>{{ item.key }}</td>
+                                    <td class="text-break">{{ item.value|default:"-" }}</td>
+                                    <td><span class="badge bg-success-subtle text-success">Functional</span></td>
+                                </tr>
+                                {% endfor %}
+                                {% for item in parameters.unnecessary %}
+                                <tr>
+                                    <td>{{ item.key }}</td>
+                                    <td class="text-break">{{ item.value|default:"-" }}</td>
+                                    <td><span class="badge bg-warning-subtle text-warning">Review Needed</span></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted mb-0">No query parameters were detected.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h2 class="h5 mb-0">URL Quality Checks</h2>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Check</th>
+                                    <th>Status</th>
+                                    <th>Finding</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for check in quality_checks %}
+                                <tr>
+                                    <td>{{ check.label }}</td>
+                                    <td>
+                                        <span class="badge
+                                            {% if check.status == 'PASS' %}bg-success
+                                            {% elif check.status == 'FAIL' %}bg-danger
+                                            {% elif check.status == 'WARNING' %}bg-warning text-dark
+                                            {% else %}bg-info text-dark{% endif %}">
+                                            {{ check.status }}
+                                        </span>
+                                    </td>
+                                    <td>{{ check.finding }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white">
+            <h2 class="h5 mb-0">Critical Findings</h2>
+        </div>
+        <div class="card-body">
+            {% if issues %}
+            <div class="row g-3">
+                {% for issue in issues %}
+                <div class="col-lg-6">
+                    <div class="border rounded-3 p-3 h-100">
+                        <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
+                            <h3 class="h6 mb-0">{{ issue.name }}</h3>
+                            <span class="badge
+                                {% if issue.severity == 'critical' %}bg-danger
+                                {% elif issue.severity == 'high' %}bg-warning text-dark
+                                {% elif issue.severity == 'medium' %}bg-info text-dark
+                                {% elif issue.severity == 'low' %}bg-secondary
+                                {% else %}bg-light text-dark border{% endif %}">
+                                {{ issue.get_severity_display }}
+                            </span>
+                        </div>
+                        <p class="mb-2"><strong>Evidence:</strong> {{ issue.evidence|default:"No supporting evidence captured." }}</p>
+                        <p class="mb-2"><strong>SEO Impact:</strong> {{ issue.seo_impact }}</p>
+                        <p class="mb-0"><strong>Recommended Fix:</strong> {{ issue.recommended_fix }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-muted mb-0">No structural or technical URL problems were detected for this URL.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h2 class="h5 mb-0">Suggested Optimized URL</h2>
+                </div>
+                <div class="card-body">
+                    <div class="small text-muted mb-1">Current URL</div>
+                    <code class="d-block text-break mb-3">{{ optimized_url.current_url }}</code>
+                    {% if optimized_url.suggested_url %}
+                    <div class="small text-muted mb-1">Suggested Optimized URL</div>
+                    <code class="d-block text-break mb-3">{{ optimized_url.suggested_url }}</code>
+                    <div class="alert {% if optimized_url.requires_validation or optimized_url.status == "developer_validation_required" %}alert-warning{% else %}alert-success{% endif %} mb-0">
+                        <strong>Status:</strong> {% if optimized_url.status == "clean_url" %}Clean URL Recommendation{% elif optimized_url.status == "developer_validation_required" %}Developer Validation Required{% elif optimized_url.requires_validation %}Requires Developer Validation{% else %}Safe Optimization Suggestion{% endif %}<br>
+                        {{ optimized_url.message }}
+                        {% if optimized_url.validation_notes %}
+                        <ul class="mb-0 mt-2">
+                            {% for note in optimized_url.validation_notes %}
+                            <li>{{ note }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                        {% if optimized_url.migration_warning %}
+                        <div class="mt-2"><strong>Migration Warning:</strong> {{ optimized_url.migration_warning }}</div>
+                        {% endif %}
+                    </div>
+                    {% else %}
+                    <div class="alert {% if optimized_url.status == "developer_validation_required" %}alert-warning{% else %}alert-success{% endif %} mb-0">
+                        {% if optimized_url.status == "developer_validation_required" %}
+                        <strong>Status:</strong> Developer Validation Required<br>
+                        {% endif %}
+                        {{ optimized_url.message }}
+                        {% if optimized_url.validation_notes %}
+                        <ul class="mb-0 mt-2">
+                            {% for note in optimized_url.validation_notes %}
+                            <li>{{ note }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h2 class="h5 mb-0">AI Recommendations</h2>
+                </div>
+                <div class="card-body">
+                    {% if recommendations %}
+                    <div class="vstack gap-3">
+                        {% for recommendation in recommendations %}
+                        <div class="border rounded-3 p-3">
+                            <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
+                                <strong>{{ recommendation.problem }}</strong>
+                                <span class="badge bg-dark">{{ recommendation.priority }}</span>
+                            </div>
+                            <p class="mb-2"><strong>Why It Matters:</strong> {{ recommendation.why_it_matters }}</p>
+                            <p class="mb-2"><strong>Recommended Action:</strong> {{ recommendation.recommended_action }}</p>
+                            <p class="mb-0"><strong>Expected SEO Improvement:</strong> {{ recommendation.expected_seo_improvement }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted mb-0">No recommendations are needed beyond maintaining the current URL structure.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-white">
+            <h2 class="h5 mb-0">Advanced URL Intelligence <span class="text-muted">Enterprise Roadmap</span></h2>
+        </div>
+        <div class="card-body">
+            <p class="text-muted">Available in a future Enterprise Upgrade.</p>
+            <div class="row g-3">
+                <div class="col-md-6 col-xl-4"><div class="border rounded-3 p-3 h-100"><strong>Site-Wide URL Inventory</strong><p class="text-muted mb-0">Analyze all URLs across an entire website.</p></div></div>
+                <div class="col-md-6 col-xl-4"><div class="border rounded-3 p-3 h-100"><strong>Duplicate URL Detection</strong><p class="text-muted mb-0">Identify duplicate URL variations and duplicate content paths.</p></div></div>
+                <div class="col-md-6 col-xl-4"><div class="border rounded-3 p-3 h-100"><strong>Bulk Canonical Audit</strong><p class="text-muted mb-0">Analyze canonical consistency across thousands of URLs.</p></div></div>
+                <div class="col-md-6 col-xl-4"><div class="border rounded-3 p-3 h-100"><strong>URL Architecture Analysis</strong><p class="text-muted mb-0">Evaluate site-wide URL hierarchy and structure.</p></div></div>
+                <div class="col-md-6 col-xl-4"><div class="border rounded-3 p-3 h-100"><strong>Faceted Navigation Intelligence</strong><p class="text-muted mb-0">Detect SEO risks created by filters and parameter combinations.</p></div></div>
+                <div class="col-md-6 col-xl-4"><div class="border rounded-3 p-3 h-100"><strong>Pagination URL Intelligence</strong><p class="text-muted mb-0">Analyze pagination structures and crawl behavior.</p></div></div>
+                <div class="col-md-6 col-xl-4"><div class="border rounded-3 p-3 h-100"><strong>URL Migration Mapping</strong><p class="text-muted mb-0">Map old URLs to new destinations during website migrations.</p></div></div>
+                <div class="col-md-6 col-xl-4"><div class="border rounded-3 p-3 h-100"><strong>Redirect Mapping</strong><p class="text-muted mb-0">Analyze large-scale redirect architecture.</p></div></div>
+                <div class="col-md-6 col-xl-4"><div class="border rounded-3 p-3 h-100"><strong>URL Pattern Detection</strong><p class="text-muted mb-0">Identify problematic URL patterns across the website.</p></div></div>
+                <div class="col-md-6 col-xl-4"><div class="border rounded-3 p-3 h-100"><strong>AI URL Optimization Opportunities</strong><p class="text-muted mb-0">Discover site-wide opportunities for improving URL structures.</p></div></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const canvas = document.getElementById("urlHealthBreakdownChart");
+    if (!canvas) return;
+    new Chart(canvas, {
+        type: "bar",
+        data: {
+            labels: ["Structure", "Technical", "Canonical", "Indexability", "SEO Friendly", "Keyword"],
+            datasets: [{
+                data: [
+                    {{ result.structure_score|default:0 }},
+                    {{ result.technical_score|default:0 }},
+                    {{ result.canonical_score|default:0 }},
+                    {{ result.indexability_score|default:0 }},
+                    {{ result.seo_friendliness_score|default:0 }},
+                    {% if result.keyword_relevance_score %}{{ result.keyword_relevance_score }}{% else %}0{% endif %}
+                ],
+                backgroundColor: [
+                    "rgba(13, 110, 253, 0.75)",
+                    "rgba(25, 135, 84, 0.75)",
+                    "rgba(102, 16, 242, 0.75)",
+                    "rgba(255, 193, 7, 0.75)",
+                    "rgba(13, 202, 240, 0.75)",
+                    "rgba(108, 117, 125, 0.75)"
+                ],
+                borderRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,345 @@
+{% extends "base.html" %}
+{% load static i18n %}
+
+{% block title %}{% trans "ERP Enterprise Control" %} | OnWebApp{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'users:dashboard' %}">Dashboard</a></li>
+<li class="breadcrumb-item active">ERP</li>
+{% endblock %}
+
+{% block page_title %}{% trans "ERPNext Operations" %}{% endblock %}
+{% block page_subtitle %}{% trans "Real-time enterprise resource planning and inventory synchronization." %}{% endblock %}
+
+{% block page_actions %}
+<div class="d-flex gap-2">
+    <button class="btn btn-outline-secondary" onclick="fetchData()">
+        <i data-lucide="refresh-cw"></i>
+        <span>Sync Data</span>
+    </button>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#invoiceModal">
+        <i data-lucide="file-plus"></i>
+        <span>Create Invoice</span>
+    </button>
+</div>
+{% endblock %}
+
+{% block dashboard_content %}
+<!-- ERP KPI Row -->
+<div class="row g-4 mb-5">
+    <div class="col-md-3">
+        <div class="card kpi-card border-0 shadow-sm">
+            <div class="kpi-icon-wrapper" style="background-color: rgba(14, 165, 233, 0.1); color: #0ea5e9;">
+                <i data-lucide="users"></i>
+            </div>
+            <div class="kpi-value" id="cust-count">--</div>
+            <div class="kpi-label">ERP Customers</div>
+            <div class="position-absolute bottom-0 end-0 p-3 opacity-10">
+                <i data-lucide="users" style="width: 48px; height: 48px;"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card kpi-card border-0 shadow-sm">
+            <div class="kpi-icon-wrapper" style="background-color: rgba(99, 102, 241, 0.1); color: #6366f1;">
+                <i data-lucide="package"></i>
+            </div>
+            <div class="kpi-value" id="stock-count">--</div>
+            <div class="kpi-label">Stock Items</div>
+            <div class="position-absolute bottom-0 end-0 p-3 opacity-10">
+                <i data-lucide="package" style="width: 48px; height: 48px;"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card kpi-card border-0 shadow-sm">
+            <div class="kpi-icon-wrapper" style="background-color: rgba(16, 185, 129, 0.1); color: #10b981;">
+                <i data-lucide="banknote"></i>
+            </div>
+            <div class="kpi-value" id="unpaid-invoices">$0.00</div>
+            <div class="kpi-label">Total Sales (30d)</div>
+            <div class="position-absolute bottom-0 end-0 p-3 opacity-10">
+                <i data-lucide="banknote" style="width: 48px; height: 48px;"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card kpi-card border-0 shadow-sm">
+            <div class="kpi-icon-wrapper" style="background-color: rgba(22, 163, 74, 0.1); color: #16a34a;">
+                <i data-lucide="check-circle"></i>
+            </div>
+            <div class="kpi-value" style="font-size: 1.25rem; margin-top: 12px;">Connected</div>
+            <div class="kpi-label">ERPNext Instance</div>
+            <div class="position-absolute top-0 end-0 p-3">
+                <span class="badge bg-success-soft text-success rounded-pill x-small">Active</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Customer List -->
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm overflow-hidden">
+            <div class="card-header bg-transparent border-0 p-4 d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="mb-0 fw-800">ERP Customer Ledger</h5>
+                    <p class="text-secondary small mb-0">Synchronized data from ERPNext</p>
+                </div>
+                <button class="btn btn-light btn-sm rounded-pill px-3">
+                    <i data-lucide="download" class="me-2" style="width: 14px;"></i> Export
+                </button>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-surface-secondary">
+                            <tr>
+                                <th class="ps-4 py-3 border-0 small text-uppercase fw-800 text-secondary">Customer Name</th>
+                                <th class="py-3 border-0 small text-uppercase fw-800 text-secondary">Type</th>
+                                <th class="py-3 border-0 small text-uppercase fw-800 text-secondary">Territory</th>
+                                <th class="pe-4 py-3 border-0 small text-uppercase fw-800 text-secondary text-end">Manage</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customer-list">
+                            <tr>
+                                <td colspan="4" class="text-center py-5">
+                                    <div class="d-flex flex-column align-items-center">
+                                        <div class="spinner-border text-primary spinner-border-sm mb-3" role="status"></div>
+                                        <p class="text-secondary small">Synchronizing with ERPNext database...</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions & Tools -->
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-transparent border-0 p-4 pb-0">
+                <h5 class="mb-0 fw-800">Quick Operations</h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="vstack gap-3">
+                    <button class="btn btn-light text-start p-3 border-0 d-flex align-items-center gap-3 w-100 rounded-4 transition-hover" onclick="showStock()">
+                        <div class="bg-primary-soft text-primary rounded-3 p-2">
+                            <i data-lucide="boxes" style="width: 18px;"></i>
+                        </div>
+                        <div>
+                            <span class="d-block fw-bold small text-primary">Inventory Status</span>
+                            <span class="x-small text-secondary">Real-time stock levels</span>
+                        </div>
+                    </button>
+                    
+                    <button class="btn btn-light text-start p-3 border-0 d-flex align-items-center gap-3 w-100 rounded-4 transition-hover" onclick="showFinance()">
+                        <div class="bg-success-soft text-success rounded-3 p-2">
+                            <i data-lucide="bar-chart-big" style="width: 18px;"></i>
+                        </div>
+                        <div>
+                            <span class="d-block fw-bold small text-success">Financial Reports</span>
+                            <span class="x-small text-secondary">Balance & Cashflow</span>
+                        </div>
+                    </button>
+                </div>
+
+                <div class="mt-4 p-4 rounded-4 bg-surface-secondary border border-color">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <i data-lucide="link" class="text-primary" style="width: 16px;"></i>
+                        <h6 class="mb-0 fw-800 small">Customer Portal</h6>
+                    </div>
+                    <p class="text-secondary x-small mb-3">Share this portal with your clients to track their orders live.</p>
+                    <div class="input-group input-group-sm">
+                        <input type="text" class="form-control border-color bg-white" id="portal-url" value="https://{{ erp_site.site_name }}.onwebapp.com/orders" readonly>
+                        <button class="btn btn-primary px-3" onclick="copyPortalUrl()">
+                            <i data-lucide="copy" style="width: 14px;"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .transition-hover { transition: all 0.2s ease; }
+    .transition-hover:hover { transform: translateX(4px); background-color: var(--bg-surface-secondary); }
+    .x-small { font-size: 0.75rem; }
+</style>
+
+<!-- Drill-down Section -->
+<div id="drilldown-container" class="mt-5" style="display: none;">
+    <div class="card border-primary border-opacity-25">
+        <div class="card-header bg-white p-4 border-bottom d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold" id="drilldown-title">Module View</h5>
+            <button class="btn-close" onclick="closeDrilldown()"></button>
+        </div>
+        <div class="card-body p-4" id="drilldown-content">
+            <!-- Content Injected via JS -->
+        </div>
+    </div>
+</div>
+
+<!-- Invoice Modal -->
+<div class="modal fade" id="invoiceModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="modal-header bg-slate-900 text-white p-4">
+                <h5 class="modal-title fw-bold">Create ERP Invoice</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4 bg-white">
+                <form id="invoice-form">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-slate-600">Select Customer</label>
+                        <select class="form-select border-slate-200 p-3 rounded-3" id="inv-customer" required>
+                            <!-- JS Injected -->
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-slate-600">Item Code</label>
+                        <input type="text" class="form-control border-slate-200 p-3 rounded-3" id="inv-item" placeholder="e.g. FG-102-A" required>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <label class="form-label fw-bold small text-slate-600">Quantity</label>
+                            <input type="number" class="form-control border-slate-200 p-3 rounded-3" id="inv-qty" value="1" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label fw-bold small text-slate-600">Unit Price ($)</label>
+                            <input type="number" class="form-control border-slate-200 p-3 rounded-3" id="inv-rate" value="100" required>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer bg-slate-50 p-4 border-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary px-4" onclick="createInvoice()">Generate Invoice</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const ADAPTER_URL = '{{ erp_gateway_url|default:"http://localhost:3000" }}';
+    const ERP_TOKEN = '{{ erp_token|default:"" }}';
+
+    async function fetchData() {
+        if (!ERP_TOKEN) {
+            document.getElementById('cust-count').innerText = "5 (Demo)";
+            document.getElementById('stock-count').innerText = "8 (Demo)";
+            renderMockCustomers();
+            lucide.createIcons();
+            return;
+        }
+
+        try {
+            const analyticsRes = await fetch(`${ADAPTER_URL}/analytics`, {
+                headers: { 'Authorization': `Bearer ${ERP_TOKEN}` }
+            });
+            const analytics = await analyticsRes.json();
+            
+            if (analytics.total_sales) {
+                document.getElementById('unpaid-invoices').innerText = `$${analytics.total_sales.toLocaleString()}`;
+            }
+
+            const custRes = await fetch(`${ADAPTER_URL}/customers`, {
+                headers: { 'Authorization': `Bearer ${ERP_TOKEN}` }
+            });
+            const customers = await custRes.json();
+            
+            renderCustomerTable(customers);
+
+            const stockRes = await fetch(`${ADAPTER_URL}/stock`, {
+                headers: { 'Authorization': `Bearer ${ERP_TOKEN}` }
+            });
+            const stock = await stockRes.json();
+            document.getElementById('stock-count').innerText = stock.length;
+            window.cachedStock = stock;
+            
+            lucide.createIcons();
+
+        } catch (err) {
+            console.error('Fetch Error:', err);
+            renderMockCustomers();
+            lucide.createIcons();
+        }
+    }
+
+    function renderCustomerTable(customers) {
+        document.getElementById('cust-count').innerText = customers.length;
+        const list = document.getElementById('customer-list');
+        const select = document.getElementById('inv-customer');
+        
+        list.innerHTML = '';
+        select.innerHTML = '<option value="">Choose customer...</option>';
+        
+        customers.forEach(c => {
+            list.innerHTML += `
+                <tr>
+                    <td>
+                        <div class="fw-bold text-slate-900">${c.customer_name}</div>
+                        <div class="text-muted small" style="font-size: 11px;">${c.name}</div>
+                    </td>
+                    <td><span class="badge bg-slate-100 text-slate-600">${c.customer_type}</span></td>
+                    <td class="text-slate-500 small">${c.territory || 'Global'}</td>
+                    <td class="text-end">
+                        <button class="btn btn-outline-secondary btn-sm p-1 px-2"><i data-lucide="external-link" style="width: 14px;"></i></button>
+                    </td>
+                </tr>
+            `;
+            select.innerHTML += `<option value="${c.name}">${c.customer_name}</option>`;
+        });
+        lucide.createIcons();
+    }
+
+    function renderMockCustomers() {
+        const mock = [
+            { customer_name: 'Global Industries', name: 'CUST-001', customer_type: 'Company', territory: 'NA' },
+            { customer_name: 'Tech Solutions', name: 'CUST-002', customer_type: 'Company', territory: 'EU' }
+        ];
+        renderCustomerTable(mock);
+    }
+
+    function showStock() {
+        const container = document.getElementById('drilldown-container');
+        const title = document.getElementById('drilldown-title');
+        const content = document.getElementById('drilldown-content');
+        title.innerText = 'Inventory Management';
+        container.style.display = 'block';
+        content.innerHTML = '<div class="p-5 text-center"><div class="spinner-border text-primary"></div></div>';
+        
+        // Mock inventory view
+        setTimeout(() => {
+            content.innerHTML = `
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead><tr><th>Item</th><th>Stock</th><th>Price</th></tr></thead>
+                        <tbody>
+                            <tr><td>Steel Sheet</td><td>450</td><td>$15.50</td></tr>
+                            <tr><td>Aluminum Rod</td><td>120</td><td>$22.00</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }, 800);
+    }
+
+    function closeDrilldown() {
+        document.getElementById('drilldown-container').style.display = 'none';
+    }
+
+    function copyPortalUrl() {
+        const url = document.getElementById('portal-url');
+        url.select();
+        document.execCommand('copy');
+        // Simple toast would be better here
+    }
+
+    document.addEventListener('DOMContentLoaded', fetchData);
+</script>
+{% endblock %}

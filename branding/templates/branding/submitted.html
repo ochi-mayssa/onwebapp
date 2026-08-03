@@ -1,0 +1,73 @@
+{% extends 'branding/base.html' %}
+
+{% block title %}Request {{ branding_request.request_number }} Submitted{% endblock %}
+
+{% block branding_content %}
+<div class="submitted-page">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-7 col-xl-6">
+                <div class="submitted-hero text-center mb-5">
+                    <div class="submitted-icon">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+                    <h1 class="display-6 fw-800 mt-4 mb-2">Request Submitted!</h1>
+                    <p class="text-muted lead">Thank you! Our brand studio will review your request and reach out shortly.</p>
+                </div>
+
+                <div class="submitted-card">
+                    <div class="submitted-row">
+                        <span class="submitted-label"><i class="fa-solid fa-hashtag me-2"></i>Request Number</span>
+                        <span class="submitted-value request-number">{{ branding_request.request_number }}</span>
+                    </div>
+                    <div class="submitted-row">
+                        <span class="submitted-label"><i class="fa-solid fa-building me-2"></i>Company</span>
+                        <span class="submitted-value">{{ branding_request.company_name }}</span>
+                    </div>
+                    <div class="submitted-row">
+                        <span class="submitted-label"><i class="fa-solid fa-industry me-2"></i>Industry</span>
+                        <span class="submitted-value">{{ branding_request.get_industry_display }}</span>
+                    </div>
+                    <div class="submitted-row">
+                        <span class="submitted-label"><i class="fa-solid fa-circle-check me-2"></i>Status</span>
+                        <span class="submitted-value"><span class="status-pill status-pending">Pending Review</span></span>
+                    </div>
+
+                    <div class="submitted-collection d-flex align-items-center gap-3 mt-4">
+                        {% if branding_request.collection.preview_image %}
+                        <img src="{{ branding_request.collection.preview_image.url }}" alt="" class="submitted-thumb">
+                        {% else %}
+                        <div class="submitted-thumb submitted-thumb-fallback"><i class="fa-solid fa-palette"></i></div>
+                        {% endif %}
+                        <div>
+                            <div class="x-small fw-800 text-primary text-uppercase tracking-widest">Selected Collection</div>
+                            <h5 class="fw-800 mb-0">{{ branding_request.collection.name }}</h5>
+                            <span class="text-muted small">{{ branding_request.collection.industry }}</span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-column flex-sm-row gap-2 mt-4 pt-4 border-top">
+                        <a href="{% url 'branding:landing' %}" class="btn btn-brand-primary flex-fill">
+                            <i class="fa-solid fa-palette me-2"></i>Explore Brand Library
+                        </a>
+                        {% if user.is_staff %}
+                        <a href="{% url 'branding:request_detail' branding_request.pk %}" class="btn btn-back flex-fill">
+                            <i class="fa-solid fa-gauge-high me-2"></i>Open in Dashboard
+                        </a>
+                        {% else %}
+                        <a href="{% url 'home:home' %}" class="btn btn-back flex-fill">
+                            <i class="fa-solid fa-house me-2"></i>Back to Home
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="text-center mt-4 small text-muted">
+                    <i class="fa-solid fa-envelope me-1"></i> A confirmation email is on its way. For questions, contact our
+                    <a href="{% url 'contact:contact' %}" class="text-decoration-none">brand studio team</a>.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

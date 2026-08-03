@@ -1,0 +1,19 @@
+{% extends 'platform/base_platform.html' %}
+
+{% block title %}Links{% endblock %}
+
+{% block content %}
+<h1>Links</h1>
+<p><a href="{% url 'platform:links_add' %}">Add new link</a></p>
+<ul>
+    {% for link in links %}
+    <li>
+        <a href="{% url 'platform:links_detail' link.pk %}">{{ link.title }}</a>
+        — {{ link.link_type }} — <a href="{{ link.url }}" target="_blank">visit</a>
+    </li>
+    {% empty %}
+    <li>No links yet.</li>
+    {% endfor %}
+</ul>
+<p><a href="{% url 'home:index' %}">Back to site home</a></p>
+{% endblock %}

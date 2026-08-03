@@ -1,0 +1,18 @@
+{% extends 'services/index.html' %}
+
+{% block content %}
+<h2>Platform Links</h2>
+<ul>
+	{% for link in links %}
+	<li>
+		<strong>{{ link.title }}</strong> — {{ link.link_type }} —
+		<a href="{{ link.url }}" {% if link.link_type == 'external' %}target="_blank" rel="noopener"{% endif %}>Visit</a>
+		{% if link.description %}<div>{{ link.description }}</div>{% endif %}
+	</li>
+	{% empty %}
+	<li>No links yet.</li>
+	{% endfor %}
+</ul>
+<p><a href="{% url 'platform:links' %}">Manage platform links (backend)</a></p>
+<p><a href="{% url 'home:index' %}">Return to site home</a></p>
+{% endblock %}

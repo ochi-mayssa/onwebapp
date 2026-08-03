@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% block title %}Social Media Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Social Media Analytics Dashboard</h1>
+        <a href="{% url 'services:run_social_crawl' %}" class="btn btn-primary">
+            <i class="fas fa-sync-alt"></i> New Crawl
+        </a>
+    </div>
+
+    {% if message %}
+    <div class="alert alert-info">
+        {{ message }}
+    </div>
+    {% endif %}
+
+    <!-- KPI Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <h5 class="card-title text-muted">Total Posts</h5>
+                    <h2 class="display-4">{{ stats.total_posts }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <h5 class="card-title text-muted">Tracked Users</h5>
+                    <h2 class="display-4">{{ stats.total_users }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center h-100 border-success">
+                <div class="card-body">
+                    <h5 class="card-title text-success">Viral Posts</h5>
+                    <h2 class="display-4">{{ stats.viral_posts }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <h5 class="card-title text-muted">Top Hashtag</h5>
+                    {% if stats.top_hashtags %}
+                    <h3>#{{ stats.top_hashtags.0.name }}</h3>
+                    <small>{{ stats.top_hashtags.0.avg_engagement|floatformat:1 }} Avg Eng.</small>
+                    {% else %}
+                    <h3>-</h3>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Platform Breakdown -->
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">Platform Performance</div>
+                <div class="card-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Platform</th>
+                                <th>Posts</th>
+                                <th>Avg Engagement</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in stats.platforms %}
+                            <tr>
+                                <td class="text-capitalize">{{ p.platform }}</td>
+                                <td>{{ p.total_posts_tracked }}</td>
+                                <td>{{ p.avg_engagement_rate|floatformat:1 }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="3">No metrics yet.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">Top Hashtags</div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        {% for tag in stats.top_hashtags %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            #{{ tag.name }}
+                            <span class="badge bg-primary rounded-pill">{{ tag.avg_engagement|floatformat:0 }} Eng.</span>
+                        </li>
+                        {% empty %}
+                        <li class="list-group-item">No hashtags tracked.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

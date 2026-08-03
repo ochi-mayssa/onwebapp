@@ -1,0 +1,127 @@
+{% extends "services/service_detail.html" %}
+{% load i18n static %}
+
+{% block service_hero %}{% endblock %}
+
+{% block service_demo %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card border-0 rounded-4 holographic-card mb-4 animate-on-scroll slide-up">
+            <div class="card-body p-4">
+                <h5 class="card-title mb-4 text-cyan neon-text"><i class="fas fa-share-alt me-2"></i>Analyze Handle or Company</h5>
+                <form method="post" id="engagement-form">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label text-light">Company / Handle</label>
+                        {{ form.company }}
+                        <small class="form-text text-cyan opacity-75 d-block mt-1">Enter a company name or social handle.</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-light">Email Address</label>
+                        {{ form.email }}
+                        <small class="form-text text-cyan opacity-75 d-block mt-1">Optional: We'll email the results to you.</small>
+                    </div>
+                    <button type="submit" class="btn holographic-btn w-100 shadow-lg" id="engagement-btn">
+                        <span class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true" id="submit-spinner"></span>
+                        <i class="fas fa-search me-2"></i>Analyze
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        {% if result %}
+        <div class="card border-0 rounded-4 holographic-card mb-4 animate-on-scroll slide-up" style="animation-delay: 0.1s;">
+            <div class="card-body p-4">
+                <h5 class="card-title mb-4 text-cyan neon-text">Engagement Report: {{ result.company }}</h5>
+                
+                <div class="row g-4 mb-4">
+                    <div class="col-md-6">
+                        <div class="p-3 border border-cyan border-opacity-25 rounded-3 bg-black bg-opacity-25">
+                            <h6 class="text-cyan mb-2">Avg. Engagement Rate</h6>
+                            <div class="display-6 text-white">{{ result.engagement_rate }}%</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 border border-purple border-opacity-25 rounded-3 bg-black bg-opacity-25">
+                            <h6 class="text-purple mb-2">Total Interactions</h6>
+                            <div class="display-6 text-white">{{ result.total_interactions }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-container position-relative" style="height:300px;">
+                    <canvas id="engagementChart"></canvas>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add cyber-input classes
+        document.querySelectorAll('#engagement-form input').forEach(el => {
+            el.classList.add('form-control', 'cyber-input', 'bg-transparent', 'text-light');
+        });
+
+        // Form handling
+        const form = document.getElementById('engagement-form');
+        if(form) {
+            form.addEventListener('submit', function() {
+                const btn = document.getElementById('engagement-btn');
+                const spinner = document.getElementById('submit-spinner');
+                btn.disabled = true;
+                spinner.classList.remove('d-none');
+            });
+        }
+
+        {% if result %}
+        // Chart
+        const ctx = document.getElementById('engagementChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Likes', 'Comments', 'Shares', 'Saves'],
+                datasets: [{
+                    label: 'Interactions',
+                    data: {{ result.breakdown|safe }},
+                    backgroundColor: [
+                        'rgba(6, 182, 212, 0.6)',
+                        'rgba(139, 92, 246, 0.6)',
+                        'rgba(236, 72, 153, 0.6)',
+                        'rgba(16, 185, 129, 0.6)'
+                    ],
+                    borderColor: [
+                        '#06b6d4',
+                        '#8b5cf6',
+                        '#ec4899',
+                        '#10b981'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                        ticks: { color: '#94a3b8' }
+                    },
+                    x: {
+                        grid: { display: false,
+                        ticks: { color: '#94a3b8' }
+                    }
+                },
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+        {% endif %}
+    });
+</script>
+{% endblock %}

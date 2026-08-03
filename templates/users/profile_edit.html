@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans "Edit Profile" %} | OnWebApp{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'users:dashboard' %}">Dashboard</a></li>
+<li class="breadcrumb-item"><a href="{% url 'users:profile_dashboard' %}">Profile</a></li>
+<li class="breadcrumb-item active">Edit</li>
+{% endblock %}
+
+{% block page_title %}{% trans "Edit Identity" %}{% endblock %}
+{% block page_subtitle %}{% trans "Update your personal and organizational information." %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card border">
+            <div class="card-header bg-transparent border-bottom px-4 py-3">
+                <h6 class="fw-semibold mb-0">Personal & business information</h6>
+            </div>
+            <div class="card-body px-4 py-4">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-medium text-secondary mb-1">Display name</label>
+                            <input type="text" class="form-control form-control-sm" name="display_name" value="{{ profile.display_name|default:'' }}" placeholder="e.g. Alex Rivera">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-medium text-secondary mb-1">Avatar URL</label>
+                            <input type="text" class="form-control form-control-sm" name="avatar" value="{{ profile.avatar|default:'' }}" placeholder="https://example.com/avatar.jpg">
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label small fw-medium text-secondary mb-1">Professional bio</label>
+                        <textarea class="form-control form-control-sm" name="bio" rows="3" placeholder="Your role, expertise, or business goals...">{{ profile.bio|default:'' }}</textarea>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-medium text-secondary mb-1">Organization name</label>
+                            <input type="text" class="form-control form-control-sm" name="company_name" value="{{ profile.company_name|default:'' }}" placeholder="Acme Corp">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-medium text-secondary mb-1">Industry sector</label>
+                            <input type="text" class="form-control form-control-sm" name="industry" list="industryOptions" value="{{ profile.industry|default:'' }}" placeholder="Select or type...">
+                            <datalist id="industryOptions">
+                                <option value="Technology / Software">
+                                <option value="Manufacturing">
+                                <option value="Retail & E-commerce">
+                                <option value="Finance & Banking">
+                                <option value="Healthcare">
+                                <option value="Education">
+                                <option value="Logistics & Transportation">
+                                <option value="Other">
+                            </datalist>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-medium text-secondary mb-1">Company size</label>
+                            <select class="form-select form-select-sm" name="company_size">
+                                <option value="" {% if not profile.company_size %}selected{% endif %}>Select range...</option>
+                                <option value="1-10" {% if profile.company_size == '1-10' %}selected{% endif %}>1-10 employees</option>
+                                <option value="11-50" {% if profile.company_size == '11-50' %}selected{% endif %}>11-50 employees</option>
+                                <option value="51-200" {% if profile.company_size == '51-200' %}selected{% endif %}>51-200 employees</option>
+                                <option value="201-500" {% if profile.company_size == '201-500' %}selected{% endif %}>201-500 employees</option>
+                                <option value="500+" {% if profile.company_size == '500+' %}selected{% endif %}>500+ employees</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-medium text-secondary mb-1">Primary country</label>
+                            <input type="text" class="form-control form-control-sm" name="country" list="countryOptions" value="{{ profile.country|default:'' }}" placeholder="Search country...">
+                            <datalist id="countryOptions">
+                                <option value="United States">
+                                <option value="United Kingdom">
+                                <option value="Canada">
+                                <option value="Germany">
+                                <option value="France">
+                                <option value="Tunisia">
+                                <option value="Other">
+                            </datalist>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-primary btn-sm px-4" type="submit">Save changes</button>
+                        <a href="{% url 'users:profile_dashboard' %}" class="btn btn-outline-secondary btn-sm px-4">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Override any existing playful styles - keep it minimal */
+    .card {
+        border-radius: 0.375rem;
+        box-shadow: none;
+    }
+    .form-control, .form-select {
+        border-color: #d1d5db;
+        font-size: 0.875rem;
+        padding: 0.4rem 0.7rem;
+        border-radius: 0.25rem;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 2px rgba(59,130,246,0.1);
+    }
+    .btn-sm {
+        font-size: 0.75rem;
+        padding: 0.4rem 1rem;
+    }
+    hr {
+        margin: 1rem 0;
+        border-color: #e5e7eb;
+    }
+    .form-label {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    });
+</script>
+{% endblock %}

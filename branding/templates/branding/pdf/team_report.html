@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Team Performance Report</title>
+<style>
+    @page { size: A4 landscape; margin: 1.5cm; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10pt; color: #1e293b; line-height: 1.5; }
+    .header { text-align: center; margin-bottom: 1.5rem; padding-bottom: 0.8rem; border-bottom: 3px solid #6366f1; }
+    .header h1 { font-size: 22pt; color: #4f46e5; margin-bottom: 0.2rem; }
+    .header .subtitle { font-size: 10pt; color: #64748b; }
+    .section { margin-bottom: 1.5rem; page-break-inside: avoid; }
+    .section h2 { font-size: 13pt; color: #4f46e5; margin-bottom: 0.6rem; padding-bottom: 0.3rem; border-bottom: 2px solid #e2e8f0; }
+    table { width: 100%; border-collapse: collapse; font-size: 9pt; }
+    th { background: #f1f5f9; color: #475569; font-weight: 700; text-transform: uppercase; font-size: 7.5pt; letter-spacing: 0.04em; padding: 0.5rem 0.6rem; border-bottom: 2px solid #e2e8f0; text-align: left; }
+    td { padding: 0.5rem 0.6rem; border-bottom: 1px solid #f1f5f9; }
+    tr:nth-child(even) td { background: #fafbfc; }
+    .text-center { text-align: center; }
+    .text-right { text-align: right; }
+    .badge { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 999px; font-size: 8pt; font-weight: 700; }
+    .badge-danger { background: #fef2f2; color: #dc2626; }
+    .badge-success { background: #f0fdf4; color: #16a34a; }
+    .badge-warning { background: #fefce8; color: #ca8a04; }
+    .badge-secondary { background: #f1f5f9; color: #64748b; }
+    .chart-row { display: flex; gap: 1rem; margin-bottom: 1rem; }
+    .chart-row img { max-width: 100%; height: auto; border: 1px solid #e2e8f0; border-radius: 8px; }
+    .chart-half { flex: 1; }
+    .summary-grid { display: flex; gap: 1rem; margin-bottom: 1rem; }
+    .summary-card { flex: 1; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.8rem; text-align: center; }
+    .summary-card .value { font-size: 20pt; font-weight: 800; color: #4f46e5; }
+    .summary-card .label { font-size: 8pt; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.04em; }
+    .footer { margin-top: 2rem; padding-top: 0.6rem; border-top: 1px solid #e2e8f0; font-size: 8pt; color: #94a3b8; text-align: center; }
+</style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Team Performance Report</h1>
+    <div class="subtitle">Generated {{ generated_at|date:"F j, Y \a\t g:i A" }} &mdash; Branding Studio</div>
+</div>
+
+<div class="summary-grid">
+    <div class="summary-card">
+        <div class="value">{{ team_data|length }}</div>
+        <div class="label">Team Size</div>
+    </div>
+    <div class="summary-card">
+        <div class="value">
+            {% for d in team_data %}{% if forloop.first %}{{ d.active }}{% endif %}{% endfor %}
+        </div>
+        <div class="label">Most Active</div>
+    </div>
+    <div class="summary-card">
+        <div class="value">
+            {% with total=0 %}{% for d in team_data %}{% widthratio d.completed 1 1 as x %}{% endfor %}{% endwith %}
+            —
+        </div>
+        <div class="label">Total Completed</div>
+    </div>
+    <div class="summary-card">
+        <div class="value">
+            {% for d in team_data %}{% if forloop.first and d.satisfaction %}{{ d.satisfaction }}{% endif %}{% endfor %}
+        </div>
+        <div class="label">Avg Satisfaction</div>
+    </div>
+</div>
+
+<div class="section">
+    <h2>Workload Comparison</h2>
+    {% if chart_workload %}
+    <img src="data:image/png;base64,{{ chart_workload }}" alt="Workload Chart">
+    {% endif %}
+</div>
+
+<div class="chart-row">
+    {% if chart_on_time %}
+    <div class="chart-half section">
+        <h2>On-Time Delivery</h2>
+        <img src="data:image/png;base64,{{ chart_on_time }}" alt="On-Time Chart">
+    </div>
+    {% endif %}
+    {% if chart_satisfaction %}
+    <div class="chart-half section">
+        <h2>Client Satisfaction</h2>
+        <img src="data:image/png;base64,{{ chart_satisfaction }}" alt="Satisfaction Chart">
+    </div>
+    {% endif %}
+</div>
+
+<div class="section">
+    <h2>Designer Metrics</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Designer</th>
+                <th>Email</th>
+                <th class="text-center">Active</th>
+                <th class="text-center">Completed</th>
+                <th class="text-center">Avg Days</th>
+                <th class="text-center">On-Time %</th>
+                <th class="text-center">Rating</th>
+                <th class="text-center">Feedback</th>
+                <th class="text-center">Workload</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for d in team_data %}
+            <tr>
+                <td><strong>{{ d.name }}</strong></td>
+                <td>{{ d.email }}</td>
+                <td class="text-center">{{ d.active }}</td>
+                <td class="text-center">{{ d.completed }}</td>
+                <td class="text-center">{% if d.avg_days %}{{ d.avg_days }}d{% else %}&mdash;{% endif %}</td>
+                <td class="text-center">
+                    {% if d.on_time_pct is not None %}
+                    <span class="badge {% if d.on_time_pct >= 90 %}badge-success{% elif d.on_time_pct >= 70 %}badge-warning{% else %}badge-danger{% endif %}">
+                        {{ d.on_time_pct }}%
+                    </span>
+                    {% else %}&mdash;{% endif %}
+                </td>
+                <td class="text-center">{% if d.satisfaction %}{{ d.satisfaction }}/5{% else %}&mdash;{% endif %}</td>
+                <td class="text-center">{{ d.feedback_count }}</td>
+                <td class="text-center">
+                    {% if d.is_overloaded %}
+                    <span class="badge badge-danger">{{ d.active }}/{{ threshold }}</span>
+                    {% else %}
+                    <span class="badge badge-secondary">{{ d.active }}/{{ threshold }}</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="footer">
+    OnWebApp Branding Studio &mdash; Team Performance Report &mdash; {{ generated_at|date:"Y-m-d H:i" }}
+</div>
+
+</body>
+</html>

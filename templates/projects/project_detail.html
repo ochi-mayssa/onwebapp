@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{{ project.title }} | OnWebApp{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'users:dashboard' %}">Dashboard</a></li>
+<li class="breadcrumb-item active">Project Details</li>
+{% endblock %}
+
+{% block page_title %}{{ project.title }}{% endblock %}
+{% block page_subtitle %}{% trans "Track milestones, deliverables, and execution progress." %}{% endblock %}
+
+{% block page_actions %}
+<div class="d-flex gap-2">
+    <a href="{% url 'projects:add_client_asset' project.id %}" class="btn btn-outline-secondary">
+        <i data-lucide="upload-cloud"></i>
+        <span>Upload Asset</span>
+    </a>
+</div>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="row g-5">
+    <!-- Main Content -->
+    <div class="col-lg-8">
+        <!-- Progress Summary -->
+        <div class="card mb-5">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="text-muted small fw-600 uppercase">Overall Progress</span>
+                    <span class="fw-bold text-primary">{{ project.progress_percentage }}%</span>
+                </div>
+                <div class="progress mb-4" style="height: 10px; background-color: var(--slate-100); border-radius: 20px;">
+                    <div class="progress-bar" style="width: {{ project.progress_percentage }}%; background-color: var(--primary); border-radius: 20px;"></div>
+                </div>
+                <div class="row g-4">
+                    <div class="col-6 col-md-3">
+                        <div class="text-muted x-small uppercase fw-600 mb-1">Status</div>
+                        <span class="badge bg-primary-subtle text-primary">{{ project.get_current_status_display }}</span>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="text-muted x-small uppercase fw-600 mb-1">Current Phase</div>
+                        <div class="fw-bold text-slate-900 small">{{ project.get_current_phase_display }}</div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="text-muted x-small uppercase fw-600 mb-1">Est. Delivery</div>
+                        <div class="fw-bold text-slate-900 small">{{ project.expected_delivery_date|date:"M d, Y"|default:"TBD" }}</div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="text-muted x-small uppercase fw-600 mb-1">Project ID</div>
+                        <div class="fw-bold text-slate-900 small">#{{ project.id }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Agile Plan Section -->
+        <div class="card mb-5">
+            <div class="card-header bg-white p-4 border-bottom d-flex justify-content-between align-items-center">
+                <h6 class="fw-bold text-slate-900 mb-0">Agile Strategy & Roadmap</h6>
+                <span class="badge {% if project.agile_status == 'APPROVED' %}bg-success-subtle text-success{% elif project.agile_status == 'CHANGES_REQUESTED' %}bg-danger-subtle text-danger{% else %}bg-warning-subtle text-warning{% endif %}">
+                    {{ project.get_agile_status_display }}
+                </span>
+            </div>
+            <div class="card-body p-4">
+                {% if project.agile_plan_file %}
+                    <div class="d-flex align-items-center justify-content-between p-4 rounded-4 bg-slate-50 border border-slate-100 mb-4">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="p-2 rounded-3 bg-white text-danger shadow-sm">
+                                <i data-lucide="file-text"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold text-slate-900 mb-0">Blueprint v1.0</h6>
+                                <a href="{{ project.agile_plan_file.url }}" target="_blank" class="text-primary small text-decoration-none fw-bold">Download PDF</a>
+                            </div>
+                        </div>
+                        {% if project.agile_status == 'AWAITING_APPROVAL' %}
+                        <div class="d-flex gap-2">
+                            <form action="{% url 'projects:review_agile_plan' project.id %}" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="approve">
+                                <button type="submit" class="btn btn-success btn-sm px-3">Approve</button>
+                            </form>
+                            <button class="btn btn-outline-danger btn-sm px-3" data-bs-toggle="modal" data-bs-target="#rejectPlanModal">Revise</button>
+                        </div>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-5 border border-dashed rounded-4">
+                        <i data-lucide="loader" class="text-slate-300 mb-3" style="width: 40px; height: 40px;"></i>
+                        <p class="text-muted small">Our team is finalizing your project roadmap.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Phases List -->
+        <div class="vstack gap-4">
+            <h6 class="text-slate-900 fw-bold small uppercase px-1" style="letter-spacing: 0.05em;">Project Execution Phases</h6>
+            {% for phase in phases %}
+            <div class="card overflow-hidden">
+                <div class="card-header bg-white p-4 border-bottom-0 d-flex justify-content-between align-items-center cursor-pointer" data-bs-toggle="collapse" data-bs-target="#phase-{{ phase.id }}">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="p-2 rounded-3 {% if phase.status == 'COMPLETED' %}bg-success-subtle text-success{% elif phase.status == 'IN_PROGRESS' %}bg-primary-subtle text-primary{% else %}bg-slate-50 text-slate-400{% endif %}">
+                            <i data-lucide="{% if phase.status == 'COMPLETED' %}check-circle{% elif phase.status == 'IN_PROGRESS' %}play-circle{% else %}circle{% endif %}" style="width: 18px;"></i>
+                        </div>
+                        <h6 class="fw-bold text-slate-900 mb-0">{{ phase.get_phase_type_display }}</h6>
+                    </div>
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="badge {% if phase.status == 'COMPLETED' %}bg-success-subtle text-success{% elif phase.status == 'IN_PROGRESS' %}bg-primary-subtle text-primary{% else %}bg-slate-100 text-slate-500{% endif %}">
+                            {{ phase.get_status_display }}
+                        </span>
+                        <i data-lucide="chevron-down" class="text-slate-300" style="width: 16px;"></i>
+                    </div>
+                </div>
+                <div class="collapse {% if phase.status == 'IN_PROGRESS' %}show{% endif %}" id="phase-{{ phase.id }}">
+                    <div class="card-body p-4 pt-0 border-top mt-4">
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <h6 class="x-small fw-bold text-muted uppercase mb-3">Deliverables</h6>
+                                <div class="vstack gap-2">
+                                    {% for d in phase.deliverables.all %}
+                                        {% if d.client_visible %}
+                                        <div class="d-flex align-items-center justify-content-between p-3 rounded-3 bg-slate-50 border border-slate-100">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <i data-lucide="file" style="width: 14px; color: var(--slate-400);"></i>
+                                                <span class="small fw-600 text-slate-700">{{ d.name }}</span>
+                                            </div>
+                                            <div class="d-flex gap-2">
+                                                {% if d.link %}<a href="{{ d.link }}" target="_blank" class="text-primary"><i data-lucide="external-link" style="width: 14px;"></i></a>{% endif %}
+                                                {% if d.file %}<a href="{{ d.file.url }}" target="_blank" class="text-primary"><i data-lucide="download" style="width: 14px;"></i></a>{% endif %}
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    {% empty %}
+                                        <p class="text-muted x-small italic mb-0">No deliverables published yet.</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="x-small fw-bold text-muted uppercase mb-3">Phase Communication</h6>
+                                <div class="chat-container mb-3 bg-slate-50 rounded-4 p-3" style="max-height: 200px; overflow-y: auto;">
+                                    {% for msg in phase.feedback.all %}
+                                    <div class="mb-3 {% if not msg.is_admin_response %}text-end{% endif %}">
+                                        <div class="d-inline-block p-2 px-3 rounded-4 small {% if not msg.is_admin_response %}bg-primary text-white{% else %}bg-white border text-slate-700{% endif %}">
+                                            {{ msg.content }}
+                                        </div>
+                                        <div class="x-small text-muted mt-1">{{ msg.created_at|timesince }} ago</div>
+                                    </div>
+                                    {% empty %}
+                                    <p class="text-center text-muted x-small py-4">No messages in this phase.</p>
+                                    {% endfor %}
+                                </div>
+                                <form action="{% url 'projects:add_client_phase_feedback' project.id phase.id %}" method="post">
+                                    {% csrf_token %}
+                                    <div class="input-group">
+                                        <input type="text" name="content" class="form-control border-slate-200 small" placeholder="Quick message...">
+                                        <button class="btn btn-primary btn-sm px-3" type="submit"><i data-lucide="send" style="width: 14px;"></i></button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <div class="card mb-5">
+            <div class="card-header bg-white p-4 border-bottom">
+                <h6 class="fw-bold text-slate-900 mb-0">Project Metadata</h6>
+            </div>
+            <div class="card-body p-4">
+                <div class="vstack gap-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted small">Start Date</span>
+                        <span class="fw-bold text-slate-900 small">{{ project.created_at|date:"M d, Y" }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted small">Agile Team</span>
+                        <span class="fw-bold text-slate-900 small">{{ project.assigned_team|default:"OnWebApp Core" }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted small">Primary Tech</span>
+                        <span class="badge bg-slate-100 text-slate-600">Django / AI</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card bg-slate-900 text-white border-0 shadow-lg p-4 rounded-4">
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <div class="p-2 rounded-3 bg-white bg-opacity-10 text-primary">
+                    <i data-lucide="help-circle"></i>
+                </div>
+                <h6 class="fw-bold mb-0">Need Support?</h6>
+            </div>
+            <p class="opacity-75 small mb-4">Our project managers are available for real-time strategy adjustments.</p>
+            <a href="{% url 'projects:add_client_general_feedback' project.id %}" class="btn btn-primary w-100 py-3 fw-bold">Contact Manager</a>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="rejectPlanModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="modal-header bg-danger text-white p-4">
+                <h5 class="modal-title fw-bold">Request Roadmap Revisions</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{% url 'projects:review_agile_plan' project.id %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="reject">
+                <div class="modal-body p-4">
+                    <label class="form-label fw-bold small text-slate-600">Rejection Reason</label>
+                    <textarea name="reason" class="form-control border-slate-200 p-3 rounded-3" rows="4" required placeholder="Please describe what needs to be changed..."></textarea>
+                </div>
+                <div class="modal-footer bg-slate-50 p-4 border-0">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger px-4">Submit Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        lucide.createIcons();
+    });
+</script>
+<style>
+    .cursor-pointer { cursor: pointer; }
+    .uppercase { text-transform: uppercase; }
+    .x-small { font-size: 0.75rem; }
+    .chat-container::-webkit-scrollbar { width: 4px; }
+    .chat-container::-webkit-scrollbar-thumb { background: var(--slate-200); border-radius: 10px; }
+</style>
+{% endblock %}

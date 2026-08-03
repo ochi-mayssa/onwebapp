@@ -1,0 +1,42 @@
+{% extends "forum/base_forum.html" %}
+{% load static forum_tags %}
+
+{% block forum_title %}Leaderboard{% endblock %}
+
+{% block forum_content %}
+<div class="forum-card p-4 mb-4">
+    <h4 class="fw-800 mb-1"><i class="fas fa-trophy text-warning me-2"></i>Top Contributors</h4>
+    <p class="text-secondary small mb-0">Community members ranked by contributions.</p>
+</div>
+
+<div class="d-flex gap-2 mb-4 small">
+    <a href="?period=week" class="btn btn-sm rounded-pill {% if period == 'week' %}btn-primary{% else %}btn-outline-secondary{% endif %}">This Week</a>
+    <a href="?period=month" class="btn btn-sm rounded-pill {% if period == 'month' %}btn-primary{% else %}btn-outline-secondary{% endif %}">This Month</a>
+    <a href="?period=all" class="btn btn-sm rounded-pill {% if period == 'all' %}btn-primary{% else %}btn-outline-secondary{% endif %}">All Time</a>
+</div>
+
+{% for u in top_users %}
+<div class="forum-card d-flex align-items-center gap-3 p-3 mb-2">
+    <div class="flex-shrink-0 text-center" style="width:40px;">
+        <span class="fw-800 fs-5 {% if forloop.counter == 1 %}text-warning{% elif forloop.counter == 2 %}text-secondary{% elif forloop.counter == 3 %}text-danger{% else %}text-secondary{% endif %}">
+            #{{ forloop.counter }}
+        </span>
+    </div>
+    <img src="{{ u|user_avatar }}" class="rounded-circle flex-shrink-0" width="40" height="40" alt="">
+    <div class="flex-grow-1 min-w-0">
+        <a href="{% url 'forum:user_profile' u.username %}" class="fw-700 text-body text-decoration-none">{{ u.username }}</a>
+        <div class="small text-secondary">{{ u.post_count }} posts &bull; {{ u.total_upvotes|default:0 }} upvotes</div>
+    </div>
+    {% user_reputation u as rep %}
+    <div class="text-end flex-shrink-0">
+        <div class="fw-700 text-primary">{{ rep }}</div>
+        <div class="small text-secondary">rep</div>
+    </div>
+</div>
+{% empty %}
+<div class="text-center py-5 text-secondary">
+    <i class="fas fa-trophy fs-1 mb-2"></i>
+    <p class="mb-0">No contributors yet.</p>
+</div>
+{% endfor %}
+{% endblock %}

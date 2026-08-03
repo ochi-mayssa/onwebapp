@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "Links" %} · {% trans "SEO" %} · {% trans "Platform Monitoring" %} · OnWebApp{% endblock %}
+
+{% block content %}
+<style>
+  .bg-indigo-soft { background-color: rgba(99, 102, 241, 0.10); color: #4338ca; }
+  .bg-purple-soft { background-color: rgba(147, 51, 234, 0.10); color: #7e22ce; }
+  .bg-teal-soft { background-color: rgba(13, 148, 136, 0.10); color: #0f766e; }
+  .bg-rose-soft { background-color: rgba(244, 63, 94, 0.10); color: #be123c; }
+  .bg-amber-soft { background-color: rgba(217, 119, 6, 0.10); color: #b45309; }
+  .bg-sky-soft { background-color: rgba(14, 165, 233, 0.10); color: #0369a1; }
+  .bg-success-soft { background-color: rgba(16, 185, 129, 0.10); color: #047857; }
+  .bg-warning-soft { background-color: rgba(245, 158, 11, 0.10); color: #b45309; }
+  .bg-danger-soft { background-color: rgba(239, 68, 68, 0.10); color: #b91c1c; }
+  .bg-secondary-soft { background-color: rgba(100, 116, 139, 0.10); color: #475569; }
+  .bg-primary-soft { background-color: rgba(79, 70, 229, 0.10); color: #4338ca; }
+  .text-indigo { color: #4338ca; }
+  .text-purple { color: #7e22ce; }
+  .text-teal { color: #0f766e; }
+  .text-rose { color: #be123c; }
+  .text-amber { color: #b45309; }
+  .text-sky { color: #0369a1; }
+  .bg-primary-gradient { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); }
+  .transition-hover { transition: all .2s ease; }
+  .card-hover-border:hover { transform: translateY(-2px); box-shadow: 0 12px 28px -12px rgba(15, 23, 42, 0.15) !important; }
+  .text-900 { color: #0f172a; } .text-700 { color: #334155; } .text-600 { color: #475569; } .text-500 { color: #64748b; } .bg-300 { background: #cbd5e1; }
+  .pm-breadcrumb a { color: #475569; text-decoration: none; } .pm-breadcrumb a:hover { color: #4338ca; }
+</style>
+
+<div class="d-flex">
+  {% include "platform_monitoring/_sidebar.html" %}
+
+  <main class="flex-grow-1 min-vh-100 bg-light">
+    <div class="px-4 py-4 px-lg-6 py-lg-5">
+      <nav class="pm-breadcrumb small text-muted mb-3" aria-label="breadcrumb">
+        <a href="{{ pm_hub }}">{% trans "Platform Monitoring" %}</a>
+        <span class="mx-1">/</span>
+        <a href="{{ pm_seo }}">{% trans "SEO" %}</a>
+        <span class="mx-1">/</span>
+        <span class="fw-700 text-900">{% trans "Links" %}</span>
+      </nav>
+
+      <div class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-4">
+        <div class="d-flex align-items-start gap-3">
+          <div class="d-flex align-items-center justify-content-center rounded-16 bg-primary-soft text-primary" style="width:56px;height:56px;">
+            <i data-lucide="git-branch" style="width:26px;height:26px;"></i>
+          </div>
+          <div>
+            <div class="x-small fw-800 text-primary uppercase tracking-widest mb-1">
+              {% trans "SEO" %} › {% trans "Links" %}
+            </div>
+            <h1 class="h2 fw-900 text-900 mb-1">{% trans "Links" %}</h1>
+            <p class="text-600 mb-0">{{ page_tagline }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card border-0 rounded-18 shadow-sm mb-4 bg-white overflow-hidden">
+        <div class="card-body p-4">
+          <div class="row g-4 align-items-center">
+            <div class="col-md-8">
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="badge rounded-pill bg-success-soft text-success x-small">
+                  <span class="d-inline-block rounded-circle bg-success me-1" style="width:6px;height:6px;"></span>
+                  {% trans "Reuses existing implementation" %}
+                </span>
+              </div>
+              <h3 class="h6 fw-800 text-900 mb-1">
+                <i data-lucide="shield-check" style="width:16px;height:16px;"></i>
+                {% trans "Internal Links continues showing:" %}
+              </h3>
+              <ul class="list-unstyled small text-600 mb-0 d-flex flex-wrap gap-x-4 gap-y-1">
+                <li><i data-lucide="check" style="width:12px;height:12px;"></i> {% trans "Working Links" %}</li>
+                <li><i data-lucide="check" style="width:12px;height:12px;"></i> {% trans "Broken Links" %}</li>
+                <li><i data-lucide="check" style="width:12px;height:12px;"></i> {% trans "Errors" %}</li>
+                <li><i data-lucide="check" style="width:12px;height:12px;"></i> {% trans "Recommendations" %}</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-3">
+        {% with sc='primary' %}
+          {% for mod in seo_links_modules %}
+            <div class="col-xl-4 col-lg-6">
+              <div class="card h-100 border-0 shadow-sm card-hover-border transition-hover rounded-18 overflow-hidden">
+                <div class="card-body p-5">
+                  <div class="d-flex align-items-start justify-content-between mb-4">
+                    <div class="d-flex align-items-center justify-content-center rounded-16 bg-{{ sc }}-soft text-{{ sc }}" style="width:54px;height:54px;">
+                      <i data-lucide="{{ mod.icon }}" style="width:24px;height:24px;"></i>
+                    </div>
+                    <span class="badge rounded-pill {{ mod.badge.class }} d-inline-flex align-items-center gap-1 px-3 py-2 small">
+                      <span class="d-inline-block rounded-circle {{ mod.badge.dot }}" style="width:8px;height:8px;"></span>
+                      {{ mod.badge.label }}
+                    </span>
+                  </div>
+                  <h3 class="h5 fw-900 text-900 mb-2">{{ mod.name }}</h3>
+                  <p class="text-muted mb-5">{{ mod.description }}</p>
+                  <a href="{{ mod.route }}" class="btn btn-outline-{{ sc }} rounded-12 fw-700 px-4 py-2 d-inline-flex align-items-center gap-2">
+                    {% trans "Open" %} <i data-lucide="arrow-up-right" style="width:14px;height:14px;"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        {% endwith %}
+      </div>
+    </div>
+  </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    if (window.lucide) { window.lucide.createIcons(); }
+  });
+</script>
+{% endblock %}

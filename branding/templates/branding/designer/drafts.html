@@ -1,0 +1,126 @@
+{% extends "branding/base.html" %}
+{% load branding_extras %}
+
+{% block title %}Design Drafts — {{ br.request_number|default:"BR-"|add:br.pk|stringformat:"s" }}{% endblock %}
+
+{% block branding_content %}
+<div class="container py-4">
+
+    {# ── Header ── #}
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+        <div>
+            <nav aria-label="breadcrumb" class="mb-2">
+                <ol class="breadcrumb mb-0 small">
+                    <li class="breadcrumb-item"><a href="{% url 'branding:designer_dashboard' %}" class="text-decoration-none"><i class="fa-solid fa-palette me-1"></i>My Work</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'branding:request_detail' br.pk %}" class="text-decoration-none">{{ br.request_number }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Drafts</li>
+                </ol>
+            </nav>
+            <h1 class="h4 fw-bold mb-1"><i class="fa-solid fa-layer-group me-2"></i>Design Drafts</h1>
+            <p class="text-muted mb-0 small">{{ br.company_name }} &middot; {{ br.request_number }}</p>
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+            <a href="{% url 'branding:request_detail' br.pk %}" class="btn btn-sm btn-outline-secondary">
+                <i class="fa-solid fa-arrow-left me-1"></i>Back to Request
+            </a>
+            <button type="button" class="btn btn-sm btn-brand-primary" data-bs-toggle="collapse" data-bs-target="#createDraftForm">
+                <i class="fa-solid fa-plus me-1"></i>New Draft
+            </button>
+        </div>
+    </div>
+
+    {# ── Create Draft Form ── #}
+    <div class="collapse mb-4" id="createDraftForm">
+        <form method="post" action="{{ request.path }}" enctype="multipart/form-data" class="detail-card rounded-4 p-4">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="create_draft">
+            <h6 class="fw-bold mb-3"><i class="fa-solid fa-cloud-arrow-up me-2 text-primary"></i>Create New Draft</h6>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="draft_title" class="form-label x-small fw-700">Title <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control form-control-sm" id="draft_title" name="title" required placeholder="e.g. Logo Concepts v1">
+                </div>
+                <div class="col-md-6">
+                    <label for="draft_files" class="form-label x-small fw-700">Files <span class="text-danger">*</span></label>
+                    <input type="file" class="form-control form-control-sm" id="draft_files" name="files" accept="*" multiple required>
+                    <div class="form-text">Select one or more files to upload</div>
+                </div>
+                <div class="col-12">
+                    <label for="draft_description" class="form-label x-small fw-700">Description</label>
+                    <textarea class="form-control form-control-sm" id="draft_description" name="description" rows="3" placeholder="Brief description of this draft..."></textarea>
+                </div>
+                <div class="col-12 text-end">
+                    <button type="submit" class="btn btn-brand-primary btn-sm px-4">
+                        <i class="fa-solid fa-upload me-1"></i>Create Draft
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    {# ── Drafts List ── #}
+    {% if drafts %}
+    <div class="row g-3">
+        {% for d in drafts %}
+        <div class="col-md-6 col-xl-4">
+            <a href="{% url 'branding:designer_draft_detail' pk=br.pk draft_id=d.id %}" class="text-decoration-none">
+                <div class="detail-card rounded-4 p-4 h-100 draft-card">
+                    <div class="d-flex align-items-start justify-content-between mb-2">
+                        <h6 class="fw-bold mb-0 text-truncate me-2">
+                            <i class="fa-solid fa-file-image me-1 text-muted"></i>
+                            {{ d.title }}
+                        </h6>
+                        {% if d.submitted %}
+                            <span class="badge bg-success-subtle text-success rounded-pill x-small flex-shrink-0"><i class="fa-solid fa-check me-1"></i>Submitted</span>
+                        {% else %}
+                            <span class="badge bg-warning-subtle text-warning rounded-pill x-small flex-shrink-0"><i class="fa-solid fa-clock me-1"></i>Pending</span>
+                        {% endif %}
+                    </div>
+                    {% if d.description %}
+                    <p class="text-muted small mb-2 text-truncate-2">{{ d.description|truncatechars:120 }}</p>
+                    {% endif %}
+                    <div class="d-flex align-items-center gap-3 mt-auto pt-2 border-top">
+                        <span class="x-small text-muted">
+                            <i class="fa-solid fa-code-branch me-1"></i>{{ d.versions.count }} version{{ d.versions.count|pluralize }}
+                        </span>
+                        <span class="x-small text-muted">
+                            <i class="fa-regular fa-clock me-1"></i>{{ d.created_at|date:"M j, Y" }}
+                        </span>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="detail-card rounded-4 p-5 text-center">
+        <div class="mx-auto mb-3" style="width:64px;height:64px;border-radius:50%;background:var(--bs-tertiary-bg,#f1f5f9);display:flex;align-items:center;justify-content:center;">
+            <i class="fa-regular fa-folder-open fa-2x text-muted"></i>
+        </div>
+        <h5 class="fw-bold">No drafts yet</h5>
+        <p class="text-muted mb-3">Create your first design draft to get started.</p>
+        <button type="button" class="btn btn-brand-primary btn-sm" data-bs-toggle="collapse" data-bs-target="#createDraftForm">
+            <i class="fa-solid fa-plus me-1"></i>Create Draft
+        </button>
+    </div>
+    {% endif %}
+
+</div>
+
+<style>
+    .text-truncate-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .draft-card {
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+        border: 1px solid var(--bs-border-color, #e2e8f0);
+    }
+    .draft-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+</style>
+{% endblock %}

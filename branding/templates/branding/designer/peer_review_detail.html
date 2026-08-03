@@ -1,0 +1,174 @@
+{% extends "branding/base.html" %}
+{% load branding_extras %}
+
+{% block title %}Peer Review — {{ br.request_number|default:"BR-"|add:br.pk|stringformat:"s" }}{% endblock %}
+
+{% block branding_content %}
+<div class="container py-4">
+
+    {# ── Breadcrumb & Header ── #}
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb small mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'branding:designer_dashboard' %}" class="text-decoration-none">My Work</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'branding:request_detail' br.pk %}" class="text-decoration-none">{{ br.request_number }}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'branding:peer_reviews' br.pk %}" class="text-decoration-none">Peer Reviews</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Review</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+        <h1 class="h4 fw-bold mb-0"><i class="fa-solid fa-code-review me-2 text-primary"></i>Peer Review</h1>
+        <a href="{% url 'branding:peer_reviews' br.pk %}" class="btn btn-sm btn-outline-secondary">
+            <i class="fa-solid fa-arrow-left me-1"></i>Back to Reviews
+        </a>
+    </div>
+
+    {# ── Review Info Card ── #}
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white d-flex flex-wrap justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold">Review Details</h5>
+            <div class="mt-2 mt-md-0">
+                {% if review.status == 'PENDING' %}
+                    <span class="badge bg-warning text-dark rounded-pill">Pending</span>
+                {% elif review.status == 'IN_PROGRESS' %}
+                    <span class="badge bg-info rounded-pill">In Progress</span>
+                {% elif review.status == 'COMPLETED' %}
+                    <span class="badge bg-success rounded-pill">Completed</span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row text-muted small mb-3">
+                <div class="col-sm-6 col-md-3 mb-2">
+                    <i class="fa-solid fa-user me-1"></i>
+                    <strong>Reviewer:</strong> {{ review.reviewer.get_full_name|default:review.reviewer.username }}
+                </div>
+                <div class="col-sm-6 col-md-3 mb-2">
+                    <i class="fa-solid fa-user-plus me-1"></i>
+                    <strong>Requested by:</strong> {{ review.requested_by.get_full_name|default:review.requested_by.username }}
+                </div>
+                <div class="col-sm-6 col-md-3 mb-2">
+                    <i class="fa-regular fa-calendar me-1"></i>
+                    <strong>Due:</strong>
+                    {% if review.due_date %}
+                        {{ review.due_date|date:"M d, Y" }}
+                    {% else %}
+                        —
+                    {% endif %}
+                </div>
+                <div class="col-sm-6 col-md-3 mb-2">
+                    <i class="fa-solid fa-file-lines me-1"></i>
+                    <strong>Template:</strong> {{ review.critique_template.name|default:"—" }}
+                </div>
+            </div>
+
+            {% if review.message %}
+                <div class="card bg-light border-0 mb-0">
+                    <div class="card-body py-3">
+                        <h6 class="card-title text-muted mb-2"><i class="fa-solid fa-envelope me-1"></i>Message</h6>
+                        <p class="card-text mb-0">{{ review.message|linebreaksbr }}</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {# ── Action Buttons ── #}
+    {% if review.status == 'PENDING' and review.reviewer == user %}
+        <form method="post" action="{{ request.path }}" class="mb-4">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="start">
+            <button type="submit" class="btn btn-info text-white">
+                <i class="fa-solid fa-play me-1"></i>Start Review
+            </button>
+        </form>
+    {% elif review.status == 'IN_PROGRESS' and review.reviewer == user %}
+        <form method="post" action="{{ request.path }}" class="mb-4">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="complete">
+            <button type="submit" class="btn btn-success">
+                <i class="fa-solid fa-check me-1"></i>Complete Review
+            </button>
+        </form>
+    {% endif %}
+
+    {# ── Feedback List ── #}
+    <div class="mb-5">
+        <h5 class="fw-bold mb-3"><i class="fa-solid fa-comments me-1 text-info"></i>Feedback</h5>
+        {% if feedbacks %}
+            {% for fb in feedbacks %}
+            <div class="card shadow-sm mb-3">
+                <div class="card-body">
+                    <div class="d-flex align-items-start justify-content-between gap-3 mb-2">
+                        <div>
+                            <span class="fw-bold text-dark">{{ fb.author.get_full_name|default:fb.author.username }}</span>
+                            <span class="text-muted x-small d-block">{{ fb.created_at|date:"M d, Y H:i" }}</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            {% if fb.category %}
+                                <span class="badge bg-light text-dark rounded-pill x-small">{{ fb.category }}</span>
+                            {% endif %}
+                            <div class="text-warning x-small" title="Rating: {{ fb.rating }}/5">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= fb.rating %}
+                                        <i class="fa-solid fa-star"></i>
+                                    {% else %}
+                                        <i class="fa-regular fa-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <p class="mb-0 mt-2">{{ fb.content|linebreaksbr }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="designer-section p-4 text-center">
+                <div class="empty-state-icon mx-auto mb-3" style="width:56px;height:56px;border-radius:50%;background:var(--bs-tertiary-bg,#f1f5f9);display:flex;align-items:center;justify-content:center;">
+                    <i class="fa-regular fa-comments fa-2x text-muted"></i>
+                </div>
+                <h6 class="fw-bold mb-1">No feedback yet</h6>
+                <p class="text-muted small mb-0">Feedback will appear here once the review begins.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    {# ── Add Feedback Form ── #}
+    {% if review.reviewer == user %}
+    <div class="designer-section mb-4">
+        <h6 class="fw-bold mb-3"><i class="fa-solid fa-plus-circle me-1 text-success"></i>Add Feedback</h6>
+        <form method="post" action="{{ request.path }}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add_feedback">
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="fb-category" class="form-label x-small fw-700">Category</label>
+                    <input type="text" id="fb-category" name="category" class="form-control form-control-sm" placeholder="e.g. Typography, Color, Layout" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="fb-rating" class="form-label x-small fw-700">Rating</label>
+                    <select id="fb-rating" name="rating" class="form-select form-select-sm" required>
+                        <option value="1">1 — Poor</option>
+                        <option value="2">2 — Fair</option>
+                        <option value="3" selected>3 — Good</option>
+                        <option value="4">4 — Very Good</option>
+                        <option value="5">5 — Excellent</option>
+                    </select>
+                </div>
+                <div class="col-12">
+                    <label for="fb-content" class="form-label x-small fw-700">Content</label>
+                    <textarea id="fb-content" name="content" class="form-control form-control-sm" rows="4" placeholder="Write your feedback..." required></textarea>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-sm mt-3">
+                <i class="fa-solid fa-paper-plane me-1"></i>Submit Feedback
+            </button>
+        </form>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

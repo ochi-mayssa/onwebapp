@@ -1,0 +1,55 @@
+{% if issues %}
+<div class="table-responsive">
+    <table class="table table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th scope="col">Issue</th>
+                <th scope="col">Severity</th>
+                <th scope="col">Category</th>
+                <th scope="col">Page</th>
+                <th scope="col">Status</th>
+                <th scope="col" class="text-end">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for issue in issues %}
+            <tr>
+                <td>
+                    <strong>{{ issue.name }}</strong>
+                    <p class="text-muted small mb-0">{{ issue.description|truncatewords:20 }}</p>
+                </td>
+                <td>
+                    <span class="badge {% if issue.severity == 'critical' %}bg-danger{% elif issue.severity == 'high' %}bg-warning text-dark{% elif issue.severity == 'medium' %}bg-info text-dark{% else %}bg-secondary{% endif %}">
+                        {{ issue.severity|capfirst }}
+                    </span>
+                </td>
+                <td>{{ issue.category|capfirst }}</td>
+                <td>
+                    {% if issue.page_audit %}
+                        <a href="{{ issue.page_audit.final_url }}" target="_blank" rel="noopener noreferrer">{{ issue.page_audit.final_url|truncatechars:40 }}</a>
+                    {% else %}
+                        <em>Audit-wide</em>
+                    {% endif %}
+                </td>
+                <td>
+                    <span class="badge {% if issue.status == 'open' %}bg-secondary{% else %}bg-success{% endif %}">
+                        {{ issue.status|capfirst }}
+                    </span>
+                </td>
+                <td class="text-end">
+                    {% if issue.page_audit and issue.page_audit.final_url %}
+                        <a href="{{ issue.page_audit.final_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-primary">Open</a>
+                    {% else %}
+                        <span class="text-muted small">N/A</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="alert alert-success" role="alert">
+    No issues found! Great job!
+</div>
+{% endif %}

@@ -1,0 +1,474 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ questionnaire.title }} · {{ request_obj.company_name }}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: #f8fafc; color: #1e293b; line-height: 1.6; min-height: 100vh; }
+        .cv-header { background: linear-gradient(135deg, #1e293b, #334155); color: #fff; padding: 1.5rem 1rem; text-align: center; }
+        .cv-header h1 { font-size: 1.25rem; font-weight: 800; margin: 0; }
+        .cv-header p { font-size: .8rem; opacity: .7; margin: .25rem 0 0; }
+        .cv-progress-wrap { background: #fff; padding: 1rem; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 100; }
+        .cv-progress-bar { height: 6px; background: #e2e8f0; border-radius: 99px; overflow: hidden; }
+        .cv-progress-fill { height: 100%; background: linear-gradient(90deg, #3b82f6, #6366f1); border-radius: 99px; transition: width .4s ease; }
+        .cv-progress-text { font-size: .7rem; color: #64748b; margin-top: .5rem; text-align: right; font-weight: 600; }
+        .cv-section { padding: 1.5rem 1rem; max-width: 720px; margin: 0 auto; }
+        .cv-section-title { font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #94a3b8; margin-bottom: 1rem; padding-bottom: .5rem; border-bottom: 2px solid #e2e8f0; }
+        .cv-question { background: #fff; border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; border: 1px solid #e2e8f0; transition: box-shadow .2s; }
+        .cv-question:hover { box-shadow: 0 2px 12px rgba(0,0,0,.06); }
+        .cv-question-label { font-size: .95rem; font-weight: 700; margin-bottom: .75rem; color: #1e293b; }
+        .cv-question-label .cv-required { color: #ef4444; margin-left: 2px; }
+        .cv-question-type { display: inline-block; font-size: .6rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; padding: 2px 8px; border-radius: 99px; background: #e0e7ff; color: #4f46e5; margin-bottom: .5rem; }
+        .cv-question-help { font-size: .75rem; color: #94a3b8; margin-bottom: .75rem; }
+        .cv-input { width: 100%; padding: .6rem .75rem; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: .875rem; font-family: inherit; transition: border-color .2s, box-shadow .2s; background: #fff; }
+        .cv-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,.15); }
+        .cv-textarea { resize: vertical; min-height: 80px; }
+        .cv-radio-group, .cv-checkbox-group { display: flex; flex-direction: column; gap: .5rem; }
+        .cv-radio-item, .cv-checkbox-item { display: flex; align-items: center; gap: .5rem; padding: .6rem .75rem; border: 1.5px solid #e2e8f0; border-radius: 8px; cursor: pointer; transition: all .15s; font-size: .875rem; }
+        .cv-radio-item:hover, .cv-checkbox-item:hover { border-color: #3b82f6; background: #eff6ff; }
+        .cv-radio-item input, .cv-checkbox-item input { accent-color: #3b82f6; }
+        .cv-radio-item.selected, .cv-checkbox-item.selected { border-color: #3b82f6; background: #eff6ff; }
+        .cv-scale-wrap { padding: .5rem 0; }
+        .cv-scale-labels { display: flex; justify-content: space-between; font-size: .65rem; color: #94a3b8; margin-bottom: .25rem; }
+        .cv-scale-input { width: 100%; accent-color: #3b82f6; }
+        .cv-scale-value { text-align: center; font-size: 1.5rem; font-weight: 800; color: #3b82f6; margin-top: .25rem; }
+        .cv-toggle-group { display: flex; gap: .5rem; }
+        .cv-toggle-btn { flex: 1; padding: .75rem; border: 2px solid #e2e8f0; border-radius: 8px; background: #fff; font-weight: 700; font-size: .875rem; cursor: pointer; transition: all .15s; text-align: center; }
+        .cv-toggle-btn:hover { border-color: #3b82f6; }
+        .cv-toggle-btn.active-yes { border-color: #22c55e; background: #f0fdf4; color: #16a34a; }
+        .cv-toggle-btn.active-no { border-color: #ef4444; background: #fef2f2; color: #dc2626; }
+        .cv-color-input { display: flex; align-items: center; gap: .75rem; }
+        .cv-color-swatch { width: 48px; height: 48px; border-radius: 8px; border: 2px solid #e2e8f0; cursor: pointer; }
+        .cv-color-input input[type="color"] { width: 48px; height: 48px; padding: 0; border: none; cursor: pointer; border-radius: 8px; }
+        .cv-file-upload { border: 2px dashed #cbd5e1; border-radius: 8px; padding: 1.5rem; text-align: center; cursor: pointer; transition: all .15s; }
+        .cv-file-upload:hover { border-color: #3b82f6; background: #eff6ff; }
+        .cv-file-upload i { font-size: 1.5rem; color: #94a3b8; margin-bottom: .5rem; display: block; }
+        .cv-file-upload span { font-size: .8rem; color: #64748b; }
+        .cv-preview-img { max-width: 200px; max-height: 150px; border-radius: 8px; margin-top: .75rem; display: none; }
+        .cv-rank-list { list-style: none; padding: 0; }
+        .cv-rank-item { display: flex; align-items: center; gap: .5rem; padding: .6rem .75rem; background: #fff; border: 1.5px solid #e2e8f0; border-radius: 8px; margin-bottom: .5rem; cursor: grab; transition: all .15s; font-size: .875rem; }
+        .cv-rank-item:active { cursor: grabbing; box-shadow: 0 4px 12px rgba(0,0,0,.1); }
+        .cv-rank-item .cv-rank-num { font-weight: 800; color: #3b82f6; min-width: 20px; }
+        .cv-rank-item .cv-rank-handle { color: #94a3b8; margin-left: auto; }
+        .cv-star-rating { display: flex; gap: .25rem; font-size: 1.5rem; }
+        .cv-star { color: #e2e8f0; cursor: pointer; transition: color .15s; }
+        .cv-star.filled { color: #f59e0b; }
+        .cv-star:hover { color: #f59e0b; }
+        .cv-actions { display: flex; gap: .5rem; margin-top: .75rem; }
+        .cv-btn-save { padding: .4rem 1rem; border: none; border-radius: 6px; font-size: .75rem; font-weight: 700; cursor: pointer; background: #3b82f6; color: #fff; transition: background .15s; }
+        .cv-btn-save:hover { background: #2563eb; }
+        .cv-btn-save.saved { background: #22c55e; }
+        .cv-btn-skip { padding: .4rem 1rem; border: 1px solid #e2e8f0; border-radius: 6px; font-size: .75rem; font-weight: 600; cursor: pointer; background: #fff; color: #64748b; transition: all .15s; }
+        .cv-btn-skip:hover { border-color: #cbd5e1; background: #f8fafc; }
+        .cv-decision-card { background: #fff; border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; border: 2px solid #f59e0b; }
+        .cv-decision-card h6 { font-weight: 800; margin-bottom: .5rem; color: #b45309; }
+        .cv-submit-wrap { padding: 2rem 1rem; text-align: center; }
+        .cv-submit-btn { padding: .875rem 2.5rem; border: none; border-radius: 10px; font-size: 1rem; font-weight: 800; cursor: pointer; background: linear-gradient(135deg, #3b82f6, #6366f1); color: #fff; transition: transform .15s, box-shadow .15s; }
+        .cv-submit-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(59,130,246,.3); }
+        .cv-submit-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
+        .cv-toast { position: fixed; bottom: 1.5rem; right: 1.5rem; background: #1e293b; color: #fff; padding: .75rem 1.25rem; border-radius: 8px; font-size: .8rem; font-weight: 600; transform: translateY(120%); transition: transform .3s ease; z-index: 1000; }
+        .cv-toast.show { transform: translateY(0); }
+        @media (max-width: 576px) { .cv-section { padding: 1rem .75rem; } .cv-question { padding: 1rem; } }
+    </style>
+</head>
+<body>
+
+<header class="cv-header">
+    <h1>{{ questionnaire.title }}</h1>
+    <p>{{ request_obj.company_name }}</p>
+</header>
+
+<div class="cv-progress-wrap">
+    <div class="cv-progress-bar"><div class="cv-progress-fill" id="progressFill" style="width: 0%;"></div></div>
+    <div class="cv-progress-text" id="progressText">0% complete</div>
+</div>
+
+{% csrf_token %}
+
+{% regroup questions by category as category_groups %}
+
+{% for group in category_groups %}
+<div class="cv-section">
+    <div class="cv-section-title">{{ group.grouper|default:"General" }}</div>
+
+    {% for question in group.list %}
+    <div class="cv-question" data-qid="{{ question.pk }}" data-type="{{ question.question_type }}">
+        <div class="cv-question-type">{{ question.get_question_type_display|default:question.question_type }}</div>
+        <div class="cv-question-label">
+            {{ question.text }}{% if question.is_required %}<span class="cv-required">*</span>{% endif %}
+        </div>
+        {% if question.description %}
+        <div class="cv-question-help">{{ question.description }}</div>
+        {% endif %}
+
+        {% if question.question_type == 'MULTIPLE_CHOICE' or question.question_type == 'SINGLE_CHOICE' %}
+        <div class="{% if question.question_type == 'MULTIPLE_CHOICE' %}cv-checkbox-group{% else %}cv-radio-group{% endif %}">
+            {% for option in question.options_list %}
+            <label class="{% if question.question_type == 'MULTIPLE_CHOICE' %}cv-checkbox-item{% else %}cv-radio-item{% endif %}">
+                <input type="{% if question.question_type == 'MULTIPLE_CHOICE' %}checkbox{% else %}radio{% endif %}"
+                       name="q_{{ question.pk }}" value="{{ option }}"
+                       {% if existing_answers %}{% endif %}>
+                {{ option }}
+            </label>
+            {% endfor %}
+        </div>
+
+        {% elif question.question_type == 'PREFERENCE_SCALE' %}
+        <div class="cv-scale-wrap">
+            <div class="cv-scale-labels">
+                <span>{{ question.scale_labels.0|default:"1" }}</span>
+                <span>{{ question.scale_labels.1|default:"10" }}</span>
+            </div>
+            <input type="range" class="cv-scale-input" name="q_{{ question.pk }}"
+                   min="{{ question.scale_min|default:1 }}" max="{{ question.scale_max|default:10 }}" value="5"
+                   oninput="this.nextElementSibling.textContent=this.value">
+            <div class="cv-scale-value">5</div>
+        </div>
+
+        {% elif question.question_type == 'YES_NO' %}
+        <div class="cv-toggle-group">
+            <button type="button" class="cv-toggle-btn" data-qid="{{ question.pk }}" data-value="yes" onclick="toggleYesNo(this)">
+                <i class="fa-solid fa-check me-1"></i> Yes
+            </button>
+            <button type="button" class="cv-toggle-btn" data-qid="{{ question.pk }}" data-value="no" onclick="toggleYesNo(this)">
+                <i class="fa-solid fa-xmark me-1"></i> No
+            </button>
+        </div>
+        <input type="hidden" name="q_{{ question.pk }}" id="yn_{{ question.pk }}">
+
+        {% elif question.question_type == 'SHORT_TEXT' %}
+        <input type="text" class="cv-input" name="q_{{ question.pk }}"
+               placeholder="{{ question.placeholder|default:'Type your answer...' }}" maxlength="255">
+
+        {% elif question.question_type == 'LONG_TEXT' %}
+        <textarea class="cv-input cv-textarea" name="q_{{ question.pk }}"
+                  placeholder="{{ question.placeholder|default:'Type your answer...' }}"></textarea>
+
+        {% elif question.question_type == 'COLOR_PICKER' %}
+        <div class="cv-color-input">
+            <input type="color" name="q_{{ question.pk }}" value="#3b82f6" class="cv-color-swatch">
+            <span class="small fw-600" id="colorLabel_{{ question.pk }}">#3b82f6</span>
+        </div>
+
+        {% elif question.question_type == 'FONT_SELECTION' %}
+        <select class="cv-input" name="q_{{ question.pk }}">
+            <option value="">Select a font...</option>
+            {% for font in question.options_list %}
+            <option value="{{ font }}">{{ font }}</option>
+            {% endfor %}
+        </select>
+
+        {% elif question.question_type == 'IMAGE_UPLOAD' %}
+        <div class="cv-file-upload" onclick="this.querySelector('input').click()">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+            <span>Click to upload or drag and drop</span>
+            <input type="file" name="q_{{ question.pk }}" class="d-none" accept="image/*" onchange="previewImage(this)">
+            <img class="cv-preview-img" id="preview_{{ question.pk }}">
+        </div>
+
+        {% elif question.question_type == 'RANK_ORDER' %}
+        <ul class="cv-rank-list" id="rankList_{{ question.pk }}">
+            {% for option in question.options_list %}
+            <li class="cv-rank-item" draggable="true" data-value="{{ option }}">
+                <span class="cv-rank-num">{{ forloop.counter }}</span>
+                <span>{{ option }}</span>
+                <span class="cv-rank-handle"><i class="fa-solid fa-grip-vertical"></i></span>
+            </li>
+            {% endfor %}
+        </ul>
+        <input type="hidden" name="q_{{ question.pk }}" id="rankInput_{{ question.pk }}">
+
+        {% elif question.question_type == 'RATING' %}
+        <div class="cv-star-rating" data-qid="{{ question.pk }}">
+            {% for i in "12345" %}
+            <i class="cv-star fa-star" data-rating="{{ forloop.counter }}" onclick="setRating(this)"></i>
+            {% endfor %}
+        </div>
+        <input type="hidden" name="q_{{ question.pk }}" id="rating_{{ question.pk }}">
+
+        {% endif %}
+
+        <div class="cv-actions">
+            <button type="button" class="cv-btn-save" onclick="saveAnswer(this, {{ question.pk }})">
+                <i class="fa-solid fa-check me-1"></i>Save
+            </button>
+            <button type="button" class="cv-btn-skip" onclick="skipQuestion({{ question.pk }})">Skip</button>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endfor %}
+
+{% if decision_points %}
+<div class="cv-section">
+    <div class="cv-section-title">Decision Points</div>
+    {% for dp in decision_points %}
+    <div class="cv-decision-card" data-dpid="{{ dp.pk }}">
+        <h6><i class="fa-solid fa-code-branch me-1"></i>{{ dp.title }}</h6>
+        {% if dp.description %}
+        <p class="small text-muted mb-2">{{ dp.description }}</p>
+        {% endif %}
+        <div class="cv-radio-group">
+            {% for option in dp.options_list %}
+            <label class="cv-radio-item">
+                <input type="radio" name="dp_{{ dp.pk }}" value="{{ option }}">
+                {{ option }}
+            </label>
+            {% endfor %}
+        </div>
+        <div class="cv-actions">
+            <button type="button" class="cv-btn-save" onclick="saveDecision(this, {{ dp.pk }})">
+                <i class="fa-solid fa-check me-1"></i>Save Decision
+            </button>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="cv-submit-wrap">
+    <button type="button" class="cv-submit-btn" id="submitAll" onclick="submitAll()">
+        <i class="fa-solid fa-paper-plane me-2"></i>Submit Questionnaire
+    </button>
+</div>
+
+<div class="cv-toast" id="toast"></div>
+
+<script>
+(function() {
+    'use strict';
+
+    var token = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    function showToast(msg) {
+        var t = document.getElementById('toast');
+        t.textContent = msg;
+        t.classList.add('show');
+        setTimeout(function() { t.classList.remove('show'); }, 2500);
+    }
+
+    window.toggleYesNo = function(btn) {
+        var qid = btn.dataset.qid;
+        var val = btn.dataset.value;
+        var siblings = btn.parentElement.querySelectorAll('.cv-toggle-btn');
+        siblings.forEach(function(b) { b.classList.remove('active-yes', 'active-no'); });
+        btn.classList.add(val === 'yes' ? 'active-yes' : 'active-no');
+        document.getElementById('yn_' + qid).value = val;
+    };
+
+    window.setRating = function(star) {
+        var rating = parseInt(star.dataset.rating);
+        var parent = star.parentElement;
+        var qid = parent.dataset.qid;
+        parent.querySelectorAll('.cv-star').forEach(function(s) {
+            s.classList.toggle('filled', parseInt(s.dataset.rating) <= rating);
+        });
+        document.getElementById('rating_' + qid).value = rating;
+    };
+
+    window.previewImage = function(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            var preview = document.getElementById('preview_' + input.name.replace('q_', ''));
+            reader.onload = function(e) { preview.src = e.target.result; preview.style.display = 'block'; };
+            reader.readAsDataURL(input.files[0]);
+        }
+    };
+
+    document.querySelectorAll('.cv-color-input input[type="color"]').forEach(function(input) {
+        input.addEventListener('input', function() {
+            var label = document.getElementById('colorLabel_' + this.name.replace('q_', ''));
+            if (label) label.textContent = this.value;
+        });
+    });
+
+    document.querySelectorAll('.cv-rank-list').forEach(function(list) {
+        var dragSrc = null;
+        list.querySelectorAll('.cv-rank-item').forEach(function(item) {
+            item.addEventListener('dragstart', function(e) {
+                dragSrc = item;
+                item.style.opacity = '.5';
+            });
+            item.addEventListener('dragend', function() {
+                item.style.opacity = '1';
+                updateRankNumbers(list);
+            });
+            item.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                var rect = item.getBoundingClientRect();
+                var mid = rect.top + rect.height / 2;
+                if (e.clientY < mid) {
+                    item.style.borderTop = '2px solid #3b82f6';
+                    item.style.borderBottom = '';
+                } else {
+                    item.style.borderBottom = '2px solid #3b82f6';
+                    item.style.borderTop = '';
+                }
+            });
+            item.addEventListener('dragleave', function() {
+                item.style.borderTop = '';
+                item.style.borderBottom = '';
+            });
+            item.addEventListener('drop', function(e) {
+                e.preventDefault();
+                item.style.borderTop = '';
+                item.style.borderBottom = '';
+                if (dragSrc === item) return;
+                var rect = item.getBoundingClientRect();
+                var mid = rect.top + rect.height / 2;
+                if (e.clientY < mid) {
+                    list.insertBefore(dragSrc, item);
+                } else {
+                    list.insertBefore(dragSrc, item.nextSibling);
+                }
+                updateRankNumbers(list);
+            });
+        });
+    });
+
+    function updateRankNumbers(list) {
+        list.querySelectorAll('.cv-rank-item').forEach(function(item, i) {
+            item.querySelector('.cv-rank-num').textContent = i + 1;
+        });
+    }
+
+    function getQuestionValue(qid, type) {
+        if (type === 'MULTIPLE_CHOICE') {
+            var checks = document.querySelectorAll('input[name="q_' + qid + '"]:checked');
+            return Array.from(checks).map(function(c) { return c.value; }).join(', ');
+        } else if (type === 'SINGLE_CHOICE' || type === 'FONT_SELECTION') {
+            var sel = document.querySelector('input[name="q_' + qid + '"]:checked') || document.querySelector('select[name="q_' + qid + '"]');
+            return sel ? sel.value : '';
+        } else if (type === 'YES_NO') {
+            return document.getElementById('yn_' + qid).value;
+        } else if (type === 'RATING') {
+            return document.getElementById('rating_' + qid).value;
+        } else if (type === 'RANK_ORDER') {
+            var items = document.querySelectorAll('#rankList_' + qid + ' .cv-rank-item');
+            return Array.from(items).map(function(it) { return it.dataset.value; }).join(' > ');
+        } else if (type === 'PREFERENCE_SCALE') {
+            var range = document.querySelector('input[name="q_' + qid + '"]');
+            return range ? range.value : '';
+        } else {
+            var input = document.querySelector('[name="q_' + qid + '"]');
+            return input ? input.value : '';
+        }
+    }
+
+    window.saveAnswer = function(btn, qid) {
+        var card = btn.closest('.cv-question');
+        var type = card.dataset.type;
+        var value = getQuestionValue(qid, type);
+        if (!value) { showToast('Please provide an answer before saving.'); return; }
+
+        var formData = new FormData();
+        formData.append('csrfmiddlewaretoken', token);
+        formData.append('value', value);
+
+        var fileInput = card.querySelector('input[type="file"]');
+        if (fileInput && fileInput.files[0]) {
+            formData.append('file', fileInput.files[0]);
+        }
+
+        fetch(window.location.href + '?action=save&qid=' + qid, {
+            method: 'POST',
+            body: formData,
+            credentials: 'same-origin'
+        }).then(function(r) { return r.json(); }).then(function(data) {
+            if (data.success) {
+                btn.classList.add('saved');
+                btn.innerHTML = '<i class="fa-solid fa-check-double me-1"></i>Saved';
+                showToast('Answer saved!');
+                updateProgress();
+            } else {
+                showToast('Error saving answer. Please try again.');
+            }
+        }).catch(function() { showToast('Network error. Please try again.'); });
+    };
+
+    window.skipQuestion = function(qid) {
+        var card = document.querySelector('[data-qid="' + qid + '"]');
+        card.style.opacity = '.5';
+        card.style.transform = 'translateX(8px)';
+        setTimeout(function() {
+            card.style.opacity = '1';
+            card.style.transform = '';
+            var next = card.nextElementSibling;
+            if (next && next.classList.contains('cv-question')) {
+                next.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }, 400);
+    };
+
+    window.saveDecision = function(btn, dpId) {
+        var card = btn.closest('.cv-decision-card');
+        var checked = card.querySelector('input[name="dp_' + dpId + '"]:checked');
+        if (!checked) { showToast('Please select an option.'); return; }
+
+        var formData = new FormData();
+        formData.append('csrfmiddlewaretoken', token);
+        formData.append('decision', checked.value);
+
+        fetch(window.location.href + '?action=decision&dp_id=' + dpId, {
+            method: 'POST',
+            body: formData,
+            credentials: 'same-origin'
+        }).then(function(r) { return r.json(); }).then(function(data) {
+            if (data.success) {
+                btn.classList.add('saved');
+                btn.innerHTML = '<i class="fa-solid fa-check-double me-1"></i>Saved';
+                showToast('Decision saved!');
+            } else {
+                showToast('Error saving decision.');
+            }
+        }).catch(function() { showToast('Network error.'); });
+    };
+
+    window.submitAll = function() {
+        if (!confirm('Submit all your answers? You can still edit them later.')) return;
+
+        fetch(window.location.href + '?action=submit', {
+            method: 'POST',
+            headers: { 'X-CSRFToken': token },
+            credentials: 'same-origin'
+        }).then(function(r) { return r.json(); }).then(function(data) {
+            if (data.success) {
+                document.getElementById('submitAll').disabled = true;
+                document.getElementById('submitAll').innerHTML = '<i class="fa-solid fa-check-double me-2"></i>Submitted!';
+                showToast('Questionnaire submitted successfully!');
+            } else {
+                showToast('Error submitting. Please try again.');
+            }
+        }).catch(function() { showToast('Network error.'); });
+    };
+
+    function updateProgress() {
+        var total = document.querySelectorAll('.cv-question').length;
+        var saved = document.querySelectorAll('.cv-btn-save.saved').length;
+        var pct = total > 0 ? Math.round((saved / total) * 100) : 0;
+        document.getElementById('progressFill').style.width = pct + '%';
+        document.getElementById('progressText').textContent = pct + '% complete';
+    }
+
+    document.querySelectorAll('input[type="range"]').forEach(function(range) {
+        range.addEventListener('input', function() {
+            this.nextElementSibling.textContent = this.value;
+        });
+    });
+
+    document.querySelectorAll('.cv-radio-item input, .cv-checkbox-item input').forEach(function(input) {
+        input.addEventListener('change', function() {
+            var group = this.closest('.cv-radio-group, .cv-checkbox-group');
+            group.querySelectorAll('label').forEach(function(l) { l.classList.remove('selected'); });
+            group.querySelectorAll('input:checked').forEach(function(i) { i.closest('label').classList.add('selected'); });
+        });
+    });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans "Competitor Intelligence" %} | OnWebApp{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'users:dashboard' %}">Dashboard</a></li>
+<li class="breadcrumb-item active">Competitor Tracking</li>
+{% endblock %}
+
+{% block page_title %}{% trans "Strategic Intelligence" %}{% endblock %}
+{% block page_subtitle %}{% trans "Real-time competitor analysis, market share tracking, and organizational KPI mapping." %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="row g-4">
+    <!-- Input Card -->
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
+          <div class="card-body p-4">
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <div class="p-2 rounded-3 bg-danger-soft text-danger">
+                    <i data-lucide="binoculars" style="width: 20px;"></i>
+                </div>
+                <h6 class="fw-800 mb-0">Analysis Specification</h6>
+            </div>
+            <form method="post" id="competitorTrackingForm">
+              {% csrf_token %}
+              <div class="mb-4">
+                <label class="form-label small fw-800 text-secondary uppercase tracking-wider">Target URL</label>
+                {{ form.url }}
+              </div>
+              <div class="mb-4">
+                <label class="form-label small fw-800 text-secondary uppercase tracking-wider">Alert Email</label>
+                {{ form.email }}
+              </div>
+              <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-800 shadow-lg" id="run-analysis-btn">
+                <span class="spinner-border spinner-border-sm me-2 d-none" id="ctSpinner" role="status" aria-hidden="true"></span>
+                <i data-lucide="search" class="me-2" style="width: 18px;"></i>Initialize Deep Audit
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4 p-4 bg-surface-secondary">
+            <h6 class="fw-800 text-slate-900 mb-3 small uppercase tracking-widest">Market Alert</h6>
+            <div class="p-3 rounded-3 bg-white border border-color mb-3">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <i data-lucide="alert-circle" class="text-warning" style="width: 14px;"></i>
+                    <span class="small fw-800">Competitor Expansion</span>
+                </div>
+                <p class="text-secondary x-small fw-600 mb-0">Competitor A has increased ad spend in "Enterprise RPA" category by 15%.</p>
+            </div>
+            <a href="#" class="btn btn-link text-primary x-small fw-800 text-decoration-none p-0">View Strategic Feed →</a>
+        </div>
+    </div>
+
+    <!-- Results Area -->
+    <div class="col-lg-8">
+        {% if result %}
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+          <div class="card-body p-4">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="p-2 rounded-3 bg-success-soft text-success">
+                        <i data-lucide="bar-chart-3" style="width: 20px;"></i>
+                    </div>
+                    <h6 class="fw-800 mb-0">Analysis Results: <span class="text-primary">{{ result.url }}</span></h6>
+                </div>
+                <span class="badge bg-surface-secondary text-secondary rounded-pill px-3 py-2 fw-800 x-small">Status: Verified</span>
+            </div>
+
+            <div class="row g-4 mb-5">
+              <div class="col-md-6">
+                <div class="p-4 rounded-4 bg-surface-secondary border-0 h-100 transition-hover">
+                  <small class="text-secondary d-block mb-1 uppercase x-small fw-800 tracking-widest">Visibility Index</small>
+                  <h4 class="fw-800 text-slate-900 mb-0">{{ result.seo_score }}/100</h4>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-4 rounded-4 bg-surface-secondary border-0 h-100 transition-hover">
+                  <small class="text-secondary d-block mb-1 uppercase x-small fw-800 tracking-widest">Performance Score</small>
+                  <h4 class="fw-800 text-success mb-0">{{ result.performance_score }}%</h4>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-4 rounded-4 bg-surface-secondary border-0 h-100 transition-hover">
+                  <small class="text-secondary d-block mb-1 uppercase x-small fw-800 tracking-widest">Market Share</small>
+                  <h4 class="fw-800 text-slate-900 mb-0">{{ result.market_share|default:"12.4%" }}</h4>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-4 rounded-4 bg-surface-secondary border-0 h-100 transition-hover">
+                  <small class="text-secondary d-block mb-1 uppercase x-small fw-800 tracking-widest">Market Rank</small>
+                  <h4 class="fw-800 text-primary mb-0">#{{ result.rank|default:"5" }}</h4>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-5">
+              <h6 class="fw-800 text-slate-900 mb-3 d-flex align-items-center gap-2">
+                <i data-lucide="layers" class="text-primary" style="width: 18px;"></i>
+                Strategic Organization Metrics
+              </h6>
+              <div class="d-flex flex-wrap gap-2">
+                <div class="px-3 py-2 rounded-pill bg-surface-secondary text-secondary x-small fw-800 d-flex align-items-center gap-2">
+                  <i data-lucide="users" style="width: 12px;"></i> Employees: 500+
+                </div>
+                <div class="px-3 py-2 rounded-pill bg-surface-secondary text-secondary x-small fw-800 d-flex align-items-center gap-2">
+                  <i data-lucide="calendar" style="width: 12px;"></i> Founded: 2018
+                </div>
+                <div class="px-3 py-2 rounded-pill bg-surface-secondary text-secondary x-small fw-800 d-flex align-items-center gap-2">
+                  <i data-lucide="map-pin" style="width: 12px;"></i> HQ: Global
+                </div>
+              </div>
+            </div>
+
+            <h6 class="fw-800 text-slate-900 mb-4">Traffic Velocity Visualization</h6>
+            <div style="height: 300px;">
+              <canvas id="competitorChart"></canvas>
+            </div>
+
+            <div class="p-4 rounded-4 bg-primary-soft border-0 d-flex gap-3 mt-5 transition-hover">
+              <i data-lucide="info" class="text-primary" style="width: 24px;"></i>
+              <div>
+                <strong class="text-slate-900 small fw-800">Intelligence Summary:</strong>
+                <p class="text-secondary small mt-2 mb-0 fw-600">The target competitor shows high volatility in organic search rankings. Recommended strategy: Focus on high-intent long-tail keywords where competitor visibility is currently <span class="text-danger">sub-optimal</span>.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .transition-hover { transition: all 0.2s ease; }
+    .transition-hover:hover { transform: translateY(-2px); background-color: var(--bg-surface-tertiary); }
+    .x-small { font-size: 0.75rem; }
+    .uppercase { text-transform: uppercase; }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  lucide.createIcons();
+  const ctForm = document.getElementById('competitorTrackingForm');
+  if (ctForm) {
+    ctForm.addEventListener('submit', function() {
+      const btn = document.getElementById('run-analysis-btn');
+      const spinner = document.getElementById('ctSpinner');
+      btn.setAttribute('disabled', 'disabled');
+      if (spinner) spinner.classList.remove('d-none');
+    });
+  }
+
+  {% if result %}
+  const ctx = document.getElementById('competitorChart');
+  if (ctx) {
+      new Chart(ctx, {
+          type: 'line',
+          data: {
+              labels: ['Q1', 'Q2', 'Q3', 'Q4', 'Q1-26', 'Q2-26'],
+              datasets: [{
+                  label: 'Traffic Velocity',
+                  data: [42, 58, 45, 65, 72, 85],
+                  borderColor: '#6366f1',
+                  backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                  fill: true,
+                  tension: 0.4,
+                  borderWidth: 3
+              }]
+          },
+          options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { display: false } },
+              scales: {
+                  y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+                  x: { grid: { display: false } }
+              }
+          }
+      });
+  }
+  {% endif %}
+});
+</script>
+{% endblock %}

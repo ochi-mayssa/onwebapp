@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load i18n static %}
+
+{% block title %}{% trans "About Us" %} | OnWebApp{% endblock %}
+
+{% block content %}
+<div class="container py-5 mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="text-center mb-5">
+                <h1 class="display-4 fw-bold mb-3">{% trans "Our Mission" %}</h1>
+                <p class="lead text-muted">{% trans "Bridging the gap between industrial automation and digital intelligence." %}</p>
+            </div>
+
+            <div class="card border-0 shadow-sm p-4 mb-5 holographic-panel">
+                <h2 class="h3 mb-4">{% trans "Who We Are" %}</h2>
+                <p>{% trans "OnWebApp is a cutting-edge SaaS platform designed to empower factories and modern enterprises with real-time analytics, automated workflows, and seamless ERP/CRM integration. We believe that the future of industry lies in the intelligent application of data." %}</p>
+                
+                <h2 class="h3 mb-4 mt-5">{% trans "What We Do" %}</h2>
+                <ul class="list-unstyled">
+                    <li class="mb-3 d-flex align-items-start">
+                        <i class="fas fa-check-circle text-primary mt-1 me-3"></i>
+                        <div>
+                            <strong>{% trans "Industrial IoT Monitoring" %}</strong>: {% trans "Real-time tracking of machine health and performance." %}
+                        </div>
+                    </li>
+                    <li class="mb-3 d-flex align-items-start">
+                        <i class="fas fa-check-circle text-primary mt-1 me-3"></i>
+                        <div>
+                            <strong>{% trans "Enterprise Integration" %}</strong>: {% trans "White-labeled ERP and CRM solutions that scale with your business." %}
+                        </div>
+                    </li>
+                    <li class="mb-3 d-flex align-items-start">
+                        <i class="fas fa-check-circle text-primary mt-1 me-3"></i>
+                        <div>
+                            <strong>{% trans "AI-Powered Analytics" %}</strong>: {% trans "Predictive maintenance and demand forecasting to optimize operations." %}
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="text-center">
+                <h2 class="h3 mb-4">{% trans "Our Team" %}</h2>
+                <p class="text-muted">{% trans "We are a global team of engineers, data scientists, and industry experts dedicated to building the operating system for the next industrial revolution." %}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .holographic-panel {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+    }
+    [data-bs-theme="dark"] .holographic-panel {
+        background: rgba(0, 0, 0, 0.2);
+    }
+</style>
+{% endblock %}

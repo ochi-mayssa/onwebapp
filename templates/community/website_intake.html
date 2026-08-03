@@ -1,0 +1,133 @@
+{% extends 'community/base_community.html' %}
+{% load static %}
+
+{% block title %}Website Design Intake - Websity Community{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white p-4">
+                    <h2 class="mb-0 text-white">Step 1: Website Project Intake</h2>
+                    <p class="mb-0 opacity-75">Help us understand your vision to recommend the perfect package.</p>
+                </div>
+                <div class="card-body p-4 p-md-5">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <!-- 1. Basic Information -->
+                        <h4 class="mb-3 text-primary">1. Basic Information</h4>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label">Full Name</label>
+                                {{ form.full_name }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Company / Project Name</label>
+                                {{ form.company_name }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Email Address</label>
+                                {{ form.email }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Phone Number</label>
+                                {{ form.phone_number }}
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Country</label>
+                                {{ form.country }}
+                            </div>
+                        </div>
+
+                        <!-- 2. Project Type -->
+                        <h4 class="mb-3 text-primary">2. Project Type</h4>
+                        <div class="mb-4">
+                            <label class="form-label">What type of website do you need?</label>
+                            {{ form.project_type }}
+                        </div>
+
+                        <!-- 3. Website Goals -->
+                        <h4 class="mb-3 text-primary">3. Website Goals</h4>
+                        <div class="mb-4">
+                            <label class="form-label">What do you want to achieve?</label>
+                            <div class="row">
+                                {% for checkbox in form.website_goals %}
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        {{ checkbox.tag }}
+                                        <label class="form-check-label" for="{{ checkbox.id_for_label }}">
+                                            {{ checkbox.choice_label }}
+                                        </label>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- 4. Required Pages -->
+                        <h4 class="mb-3 text-primary">4. Required Pages</h4>
+                        <div class="mb-4">
+                            <div class="row">
+                                {% for checkbox in form.required_pages %}
+                                <div class="col-md-4 col-6">
+                                    <div class="form-check">
+                                        {{ checkbox.tag }}
+                                        <label class="form-check-label" for="{{ checkbox.id_for_label }}">
+                                            {{ checkbox.choice_label }}
+                                        </label>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- 5. Design Preferences -->
+                        <h4 class="mb-3 text-primary">5. Design Preferences</h4>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label">Style Preference</label>
+                                {{ form.style_preference }}
+                                <div class="form-text">e.g. Modern, Minimal, Corporate, Creative</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Color Preference</label>
+                                {{ form.color_preference }}
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Reference Websites (Optional)</label>
+                                {{ form.reference_websites }}
+                            </div>
+                        </div>
+
+                        <!-- 6. Future Vision -->
+                        <h4 class="mb-3 text-primary">6. Future Vision</h4>
+                        <p class="text-muted small">Where do you see your project in the next 6–12 months?</p>
+                        <div class="mb-4">
+                            <div class="row">
+                                {% for checkbox in form.future_vision %}
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        {{ checkbox.tag }}
+                                        <label class="form-check-label" for="{{ checkbox.id_for_label }}">
+                                            {{ checkbox.choice_label }}
+                                        </label>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-5">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                Continue to Package Selection <i class="fas fa-arrow-right ms-2"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

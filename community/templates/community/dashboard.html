@@ -1,0 +1,208 @@
+{% extends 'base.html' %}
+
+{% block title %}Community Dashboard{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="display-5 fw-bold">Community Dashboard</h1>
+            <p class="lead text-muted">Manage your projects and subscription.</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            {% if subscription %}
+            <span class="badge bg-success p-2">
+                <i class="bi bi-star-fill me-1"></i> {{ subscription.plan_name }} Plan
+            </span>
+            {% else %}
+            <span class="badge bg-secondary p-2">Free Account</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Alerts Section -->
+    <div id="alerts-container">
+        {% if pending_approvals %}
+        <div class="alert alert-warning border-warning shadow-sm" role="alert">
+            <div class="d-flex">
+                <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
+                <div>
+                    <h5 class="alert-heading fw-bold">Action Required</h5>
+                    <p class="mb-0">You have {{ pending_approvals.count }} phase(s) waiting for approval.</p>
+                    <ul class="mt-2 mb-0">
+                        {% for phase in pending_approvals %}
+                        <li>
+                            <a href="{% url 'projects:project_detail' phase.project.id %}" class="alert-link">
+                                {{ phase.project.title }} - {{ phase.get_phase_type_display }}
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if delayed_phases %}
+        <div class="alert alert-danger border-danger shadow-sm" role="alert">
+            <div class="d-flex">
+                <i class="bi bi-clock-history fs-4 me-3"></i>
+                <div>
+                    <h5 class="alert-heading fw-bold">Project Delays</h5>
+                    <p class="mb-0">Some phases are currently delayed.</p>
+                    <ul class="mt-2 mb-0">
+                        {% for phase in delayed_phases %}
+                        <li>
+                            <a href="{% url 'projects:project_detail' phase.project.id %}" class="alert-link">
+                                {{ phase.project.title }} - {{ phase.get_phase_type_display }}
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="row g-4">
+        <!-- Projects Card -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header border-bottom-0 pt-4 pb-2 d-flex justify-content-between align-items-center">
+                    <h4 class="card-title fw-bold mb-0"><i class="bi bi-folder2-open me-2 text-primary"></i>My Projects</h4>
+                    <a href="{% url 'community:website_building' %}" class="btn btn-primary btn-sm">
+                        <i class="bi bi-plus-lg me-1"></i>New Project
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if projects %}
+                    <div class="list-group list-group-flush">
+                        {% for project in projects %}
+                        <a href="{% url 'projects:project_detail' project.id %}" class="list-group-item list-group-item-action px-0 py-3 border-bottom">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h5 class="mb-1 fw-bold">{{ project.title }}</h5>
+                                    <p class="mb-1 text-muted small">{{ project.description|truncatechars:100 }}</p>
+                                    <small class="text-muted">Updated: {{ project.updated_at|date:"M d, Y" }}</small>
+                                </div>
+                                <div class="text-end">
+                                    <span class="badge {% if project.current_status == 'COMPLETED' %}bg-success{% elif project.current_status == 'IN_PROGRESS' %}bg-primary{% elif project.current_status == 'DELAYED' %}bg-danger{% else %}bg-secondary{% endif %}">
+                                        {{ project.get_current_status_display }}
+                                    </span>
+                                    <div class="mt-2">
+                                        <div class="progress" style="height: 6px; width: 100px;">
+                                            <div class="progress-bar" role="progressbar" style="width: {{ project.progress_percentage }}%"></div>
+                                        </div>
+                                        <small class="text-muted" style="font-size: 0.7rem;">{{ project.progress_percentage }}%</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-rocket-takeoff fs-1 text-muted opacity-50"></i>
+                        <h5 class="mt-3">Start Your First Project</h5>
+                        <p class="text-muted">Use our website building tool to get started.</p>
+                        <a href="{% url 'community:website_building' %}" class="btn btn-outline-primary">Create Project</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity Feed -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header border-bottom-0 pt-4 pb-2">
+                    <h4 class="card-title fw-bold mb-0"><i class="bi bi-activity me-2 text-primary"></i>Recent Activity</h4>
+                </div>
+                <div class="card-body">
+                    {% if activities %}
+                    <ul class="list-unstyled">
+                        {% for activity in activities|slice:":10" %}
+                        <li class="mb-3 pb-3 border-bottom last-no-border">
+                            <div class="d-flex">
+                                <div class="me-3">
+                                    <div class="avatar-sm bg-light text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                        <i class="bi bi-bell"></i>
+                                    </div>
+                                </div>
+                                <div>
+                                    <p class="mb-1 small">{{ activity.action }}</p>
+                                    <small class="text-muted">{{ activity.timestamp|timesince }} ago</small>
+                                </div>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="text-muted text-center py-4">No recent activity.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- WebSocket Client -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsUrl = protocol + '//' + window.location.host + '/ws/dashboard/';
+        
+        console.log('Connecting to WebSocket:', wsUrl);
+        const socket = new WebSocket(wsUrl);
+
+        socket.onopen = function(e) {
+            console.log('WebSocket connection established');
+        };
+
+        socket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            console.log('Received:', data);
+            
+            // Create toast notification
+            showToast(data.message.text, data.message.level);
+        };
+
+        socket.onclose = function(e) {
+            console.error('WebSocket closed unexpectedly');
+        };
+
+        function showToast(message, type = 'info') {
+            // Create toast container if it doesn't exist
+            let container = document.getElementById('toast-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'toast-container';
+                container.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+                document.body.appendChild(container);
+            }
+
+            // Create toast element
+            const toastId = 'toast-' + Date.now();
+            const bgClass = type === 'danger' ? 'bg-danger text-white' : (type === 'success' ? 'bg-success text-white' : 'bg-light');
+            
+            const toastHtml = `
+                <div id="${toastId}" class="toast align-items-center ${bgClass} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            ${message}
+                        </div>
+                        <button type="button" class="btn-close ${type !== 'light' ? 'btn-close-white' : ''} me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+            `;
+            
+            container.insertAdjacentHTML('beforeend', toastHtml);
+            
+            const toastElement = document.getElementById(toastId);
+            const toast = new bootstrap.Toast(toastElement);
+            toast.show();
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends "branding/base.html" %}
+{% load branding_extras %}
+
+{% block title %}Collection Templates{% endblock %}
+
+{% block branding_content %}
+<div class="container py-4">
+
+    {# ── Header ── #}
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+        <div>
+            <nav aria-label="breadcrumb" class="mb-2">
+                <ol class="breadcrumb mb-0 small">
+                    <li class="breadcrumb-item"><a href="{% url 'branding:designer_dashboard' %}" class="text-decoration-none"><i class="fa-solid fa-palette me-1"></i>My Work</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Collection Templates</li>
+                </ol>
+            </nav>
+            <h1 class="h4 fw-bold mb-1"><i class="fa-solid fa-layer-group me-2"></i>Collection Templates</h1>
+            <p class="text-muted mb-0 small">Add design templates to brand collections for clients and team members.</p>
+        </div>
+    </div>
+
+    {# ── Category Filters ── #}
+    <div class="d-flex gap-2 flex-wrap mb-4">
+        <a href="{% url 'branding:collection_template_list' %}" class="btn btn-sm {% if not category_filter %}btn-brand-primary{% else %}btn-outline-secondary{% endif %}">All</a>
+        {% for value, label in categories %}
+        <a href="{% url 'branding:collection_template_list' %}?category={{ value }}" class="btn btn-sm {% if category_filter == value %}btn-brand-primary{% else %}btn-outline-secondary{% endif %}">{{ label }}</a>
+        {% endfor %}
+    </div>
+
+    {# ── Collections Grid ── #}
+    <div class="row g-3">
+        {% for col in collections %}
+        <div class="col-md-6 col-lg-4">
+            <a href="{% url 'branding:collection_template_detail' collection_pk=col.pk %}" class="text-decoration-none">
+                <div class="detail-card rounded-4 p-4 h-100" style="border-left: 4px solid {{ col.accent_color|default:'#6366f1' }};">
+                    <div class="d-flex align-items-start justify-content-between mb-3">
+                        <div>
+                            <h6 class="fw-bold mb-1">{{ col.name }}</h6>
+                            <span class="badge bg-light text-dark small">{{ col.get_category_display }}</span>
+                            {% if col.industry %}<span class="badge bg-light text-muted small ms-1">{{ col.industry }}</span>{% endif %}
+                        </div>
+                        <span class="badge bg-primary rounded-pill">{{ col.template_count }}</span>
+                    </div>
+                    {% if col.description %}
+                    <p class="text-muted small mb-3">{{ col.description|truncatechars:100 }}</p>
+                    {% endif %}
+                    <div class="d-flex align-items-center gap-2 text-muted x-small">
+                        <i class="fa-solid fa-file-zipper"></i>
+                        {{ col.template_count }} template{{ col.template_count|pluralize }}
+                        <span class="ms-auto"><i class="fa-solid fa-arrow-right"></i></span>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5 text-muted">
+            <i class="fa-solid fa-folder-open fa-3x mb-3 d-block"></i>
+            <p>No collections found.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

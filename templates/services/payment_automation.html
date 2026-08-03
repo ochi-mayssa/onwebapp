@@ -1,0 +1,131 @@
+{% extends "services/futuristic_service_base.html" %}
+{% load i18n static %}
+{% block title %}{% trans 'Payment Automation' %} - OnWebApp{% endblock %}
+
+{% block service_content %}
+<div class="text-center mb-8 reveal">
+    <div class="glass-badge d-inline-flex align-items-center px-4 py-2 rounded-pill mb-4 mx-auto">
+        <span class="x-small fw-800 text-success uppercase tracking-widest">Financial Gateway — WF-002</span>
+    </div>
+    <h1 class="display-3 fw-800 text-slate-900 mb-4">Payment Automation</h1>
+    <p class="fs-5 text-slate-500 mx-auto" style="max-width: 700px; font-weight: 500;">
+        Seamless end-to-end subscription management, automated renewals, and intelligent invoicing powered by global payment engines.
+    </p>
+</div>
+
+<div class="row g-5">
+    <!-- Subscription Setup -->
+    <div class="col-lg-5 reveal">
+        <div class="premium-card h-100">
+            <div class="d-flex align-items-center gap-3 mb-5">
+                <div class="card-icon mb-0">
+                    <i data-lucide="credit-card"></i>
+                </div>
+                <h4 class="fw-800 text-slate-900 mb-0">Initialize Subscription</h4>
+            </div>
+            
+            <form onsubmit="event.preventDefault(); alert('Simulation: Subscription created!');">
+                <div class="vstack gap-4">
+                    <div>
+                        <label class="form-label fw-700 text-slate-600 small uppercase">Customer Email</label>
+                        <input type="email" class="cyber-input" placeholder="customer@example.com">
+                    </div>
+                    <div>
+                        <label class="form-label fw-700 text-slate-600 small uppercase">Select Plan</label>
+                        <select class="cyber-input">
+                            <option>Starter ($29/mo)</option>
+                            <option>Professional ($99/mo)</option>
+                            <option>Enterprise ($299/mo)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label fw-700 text-slate-600 small uppercase">Billing Frequency</label>
+                        <select class="cyber-input">
+                            <option>Monthly</option>
+                            <option>Yearly (Save 20%)</option>
+                        </select>
+                    </div>
+                    <button class="holographic-btn w-100 justify-content-center py-3 mt-4">
+                        <i data-lucide="plus-circle" style="width: 18px;"></i>
+                        <span>Create Subscription</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Recent Transactions -->
+    <div class="col-lg-7 reveal" style="animation-delay: 0.1s;">
+        <div class="premium-card h-100">
+            <div class="d-flex justify-content-between align-items-center mb-5">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="card-icon mb-0" style="background: rgba(14, 165, 233, 0.1); color: #0ea5e9;">
+                        <i data-lucide="history"></i>
+                    </div>
+                    <h4 class="fw-800 text-slate-900 mb-0">Transaction Matrix</h4>
+                </div>
+                <button class="btn btn-sm btn-outline-slate border-0">
+                    <i data-lucide="download" style="width: 18px;"></i>
+                </button>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead>
+                        <tr class="text-slate-500 small uppercase fw-800 tracking-wider">
+                            <th class="border-0 pb-4">Entity</th>
+                            <th class="border-0 pb-4">Volume</th>
+                            <th class="border-0 pb-4">Status</th>
+                            <th class="border-0 pb-4 text-end">Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-bottom border-slate-50">
+                            <td class="py-4">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="avatar-sm rounded-circle bg-slate-900 text-white fw-800 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-size: 10px;">AC</div>
+                                    <span class="fw-700 text-slate-900">Acme Corp</span>
+                                </div>
+                            </td>
+                            <td class="py-4 fw-800 text-slate-900">$99.00</td>
+                            <td class="py-4"><span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3">Settled</span></td>
+                            <td class="py-4 text-end text-slate-500 fw-600 small">Today</td>
+                        </tr>
+                        <tr class="border-bottom border-slate-50">
+                            <td class="py-4">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="avatar-sm rounded-circle bg-slate-900 text-white fw-800 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-size: 10px;">GL</div>
+                                    <span class="fw-700 text-slate-900">Global Ltd</span>
+                                </div>
+                            </td>
+                            <td class="py-4 fw-800 text-slate-900">$299.00</td>
+                            <td class="py-4"><span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3">Settled</span></td>
+                            <td class="py-4 text-end text-slate-500 fw-600 small">Yesterday</td>
+                        </tr>
+                        <tr>
+                            <td class="py-4">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="avatar-sm rounded-circle bg-slate-900 text-white fw-800 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-size: 10px;">SI</div>
+                                    <span class="fw-700 text-slate-900">Startup Inc</span>
+                                </div>
+                            </td>
+                            <td class="py-4 fw-800 text-slate-900">$29.00</td>
+                            <td class="py-4"><span class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3">In Progress</span></td>
+                            <td class="py-4 text-end text-slate-500 fw-600 small">2 days ago</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .mb-8 { margin-bottom: 80px; }
+    .glass-badge { background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.1); }
+    .btn-outline-slate { color: var(--slate-600); border-color: var(--slate-200); transition: all 0.3s ease; }
+    .btn-outline-slate:hover { background: var(--slate-900); color: white; border-color: var(--slate-900); transform: translateY(-3px); }
+</style>
+{% endblock %}

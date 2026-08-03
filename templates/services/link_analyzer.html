@@ -1,0 +1,130 @@
+{% extends "services/futuristic_service_base.html" %}
+{% load static %}
+{% block title %}Link Analyzer - Services{% endblock %}
+{% block meta %}
+<meta name="description" content="Analyze your site's internal and external links for broken links, redirects and performance.">
+<link rel="canonical" href="{{ request.build_absolute_uri }}">
+{% endblock %}
+
+{% block service_content %}
+<div class="text-center mb-5 animate-on-scroll">
+    <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 rounded-pill px-3 py-2 mb-3 neon-text">
+        WF-008
+    </span>
+    <h1 class="display-4 fw-bold text-gradient-cyan">Link Analyzer</h1>
+    <p class="lead text-light opacity-75 mx-auto" style="max-width: 700px;">
+        Analyze and optimize your website's internal and external links.
+    </p>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card border-0 rounded-4 holographic-card mb-4 animate-on-scroll slide-up">
+            <div class="card-body p-4">
+                <h5 class="card-title mb-4 text-cyan neon-text">Analyze URL</h5>
+                <form method="post" id="link-analyzer-form">
+                    {% csrf_token %}
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger bg-danger bg-opacity-10 border-danger border-opacity-25 text-danger">{{ form.non_field_errors }}</div>
+                    {% endif %}
+                    <div class="mb-3">
+                        <label class="form-label text-light">{{ form.url.label }}</label>
+                        {{ form.url }}
+                        {% if form.url.errors %}
+                            <div class="text-danger small">{{ form.url.errors|striptags }}</div>
+                        {% endif %}
+                        <div class="form-text text-light opacity-50">Enter a full URL, e.g., https://example.com</div>
+                    </div>
+                    <button type="submit" class="btn holographic-btn w-100 fw-bold" id="link-btn">
+                        <span class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true" id="submit-spinner"></span>
+                        Analyze Links
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        {% if result %}
+        <div class="card border-0 rounded-4 holographic-card mb-4 animate-on-scroll slide-up" style="transition-delay: 0.1s;">
+            <div class="card-body p-4">
+                <h5 class="card-title mb-4 text-cyan neon-text">Analysis Results</h5>
+                
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <div class="p-3 border border-secondary border-opacity-25 rounded-3 h-100 bg-black bg-opacity-25">
+                            <div class="d-flex align-items-center mb-2"><i class="fas fa-link text-primary me-2"></i><strong class="text-light">Total Links</strong></div>
+                            <div class="fs-4 text-primary neon-text">{{ result.total_links }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 border border-secondary border-opacity-25 rounded-3 h-100 bg-black bg-opacity-25">
+                            <div class="d-flex align-items-center mb-2"><i class="fas fa-external-link-alt text-info me-2"></i><strong class="text-light">External</strong></div>
+                            <div class="fs-4 text-info neon-text">{{ result.external_links }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 border border-secondary border-opacity-25 rounded-3 h-100 bg-black bg-opacity-25">
+                            <div class="d-flex align-items-center mb-2"><i class="fas fa-unlink text-danger me-2"></i><strong class="text-light">Broken</strong></div>
+                            <div class="fs-4 text-danger neon-text">{{ result.broken_links }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                {% if result.chart %}
+                <div class="mt-4 p-3 border border-secondary border-opacity-25 rounded-3 bg-black bg-opacity-25">
+                    <h6 class="text-light mb-3">Link Performance</h6>
+                    <div style="position: relative; height: 220px;">
+                        <canvas id="linkPerfChart"></canvas>
+                    </div>
+                </div>
+                {{ result.chart|json_script:"chart-data-link" }}
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card border-0 rounded-4 holographic-card animate-on-scroll slide-up" style="transition-delay: 0.2s;">
+            <div class="card-body p-4">
+                <h5 class="card-title mb-3 text-cyan neon-text">What you'll get</h5>
+                <ul class="list-unstyled mb-0 text-light opacity-75">
+                    <li class="mb-3"><i class="fas fa-check-circle text-success me-2"></i>Internal vs external link breakdown</li>
+                    <li class="mb-3"><i class="fas fa-check-circle text-success me-2"></i>Broken link detection</li>
+                    <li class="mb-3"><i class="fas fa-check-circle text-success me-2"></i>Performance timeline chart</li>
+                    <li class="mb-3"><i class="fas fa-check-circle text-success me-2"></i>Optional email report</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Form submission spinner
+    const linkForm = document.getElementById('link-analyzer-form');
+    if (linkForm) {
+        linkForm.addEventListener('submit', function(e) {
+            const btn = document.getElementById('link-btn');
+            const spinner = document.getElementById('submit-spinner');
+            if(btn) btn.setAttribute('disabled', 'disabled');
+            if(spinner) spinner.classList.remove('d-none');
+        });
+    }
+
+    // Chart initialization
+    const linkScript = document.getElementById('chart-data-link');
+    if (linkScript && typeof initChartFromJSON === 'function') {
+        const getThemeColor = (varName) => getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+        const primaryColor = getThemeColor('--primary-color') || '#06b6d4';
+        try {
+            initChartFromJSON('linkPerfChart', 'chart-data-link', {
+                type: 'line',
+                color: primaryColor
+            });
+        } catch (err) {
+            console.warn('Chart init error', err);
+        }
+    }
+</script>
+{% endblock %}

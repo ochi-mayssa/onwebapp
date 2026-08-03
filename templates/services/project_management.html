@@ -1,0 +1,116 @@
+{% extends "services/futuristic_service_base.html" %}
+{% load i18n static %}
+{% block title %}{% trans 'Project Management' %} - OnWebApp{% endblock %}
+
+{% block service_content %}
+<div class="container position-relative z-2">
+    <div class="text-center mb-5 animate-on-scroll">
+        <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 rounded-pill px-3 py-2 mb-3">
+            WF-001
+        </span>
+        <h1 class="display-4 fw-bold neon-text">{% trans 'Project Management Automation' %}</h1>
+        <p class="lead text-secondary mx-auto" style="max-width: 700px;">
+            {% trans 'Automate community/client project requests, assignments, and notifications.' %}
+        </p>
+    </div>
+
+    <div class="row g-4">
+        <!-- Project Intake Form -->
+        <div class="col-lg-5 animate-on-scroll slide-up">
+            <div class="holographic-card h-100 p-4">
+                <h4 class="card-title fw-bold mb-4"><i class="fas fa-plus-circle me-2 text-primary"></i>{% trans 'New Project Request' %}</h4>
+                <form onsubmit="event.preventDefault(); alert('Simulation: Project created and assigned to PM!');">
+                    <div class="mb-3">
+                        <label class="form-label text-secondary">{% trans 'Project Name' %}</label>
+                        <input type="text" class="cyber-input w-100" placeholder="e.g. Website Redesign">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-secondary">{% trans 'Client/Community' %}</label>
+                        <input type="text" class="cyber-input w-100" placeholder="e.g. Local Non-Profit">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-secondary">{% trans 'Priority' %}</label>
+                        <select class="cyber-input w-100">
+                            <option>{% trans 'High' %}</option>
+                            <option>{% trans 'Medium' %}</option>
+                            <option>{% trans 'Low' %}</option>
+                        </select>
+                    </div>
+                    <button class="holographic-btn w-100 fw-bold">{% trans 'Submit Request' %}</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Active Projects Dashboard -->
+        <div class="col-lg-7 animate-on-scroll slide-up" style="transition-delay: 0.1s;">
+            <div class="holographic-card h-100 p-4">
+                <h4 class="card-title fw-bold mb-4"><i class="fas fa-tasks me-2 text-info"></i>{% trans 'Active Projects' %}</h4>
+                <div class="table-responsive">
+                    <table class="table table-hover bg-transparent mb-0" style="color: var(--text-primary);">
+                        <thead>
+                            <tr>
+                                <th class="bg-transparent text-secondary">{% trans 'Project' %}</th>
+                                <th class="bg-transparent text-secondary">{% trans 'Status' %}</th>
+                                <th class="bg-transparent text-secondary">{% trans 'Progress' %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="bg-transparent">
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle bg-primary bg-opacity-25 p-2 me-2"><i class="fas fa-code text-primary"></i></div>
+                                        <div>
+                                            <div class="fw-bold">Alpha Portal</div>
+                                            <small class="text-secondary">Due in 2 days</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="bg-transparent"><span class="badge bg-warning bg-opacity-10 text-warning">{% trans 'In Progress' %}</span></td>
+                                <td class="bg-transparent align-middle">
+                                    <div class="progress" style="height: 6px; width: 100px; background: rgba(255,255,255,0.1);">
+                                        <div class="progress-bar bg-warning" style="width: 60%"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="bg-transparent">
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle bg-success bg-opacity-25 p-2 me-2"><i class="fas fa-mobile-alt text-success"></i></div>
+                                        <div>
+                                            <div class="fw-bold">Mobile App V2</div>
+                                            <small class="text-secondary">Client Review</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="bg-transparent"><span class="badge bg-info bg-opacity-10 text-info">{% trans 'Review' %}</span></td>
+                                <td class="bg-transparent align-middle">
+                                    <div class="progress" style="height: 6px; width: 100px; background: rgba(255,255,255,0.1);">
+                                        <div class="progress-bar bg-info" style="width: 90%"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="bg-transparent">
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle bg-danger bg-opacity-25 p-2 me-2"><i class="fas fa-bullhorn text-danger"></i></div>
+                                        <div>
+                                            <div class="fw-bold">Q3 Marketing</div>
+                                            <small class="text-secondary">Just started</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="bg-transparent"><span class="badge bg-secondary bg-opacity-10 text-secondary">{% trans 'Planning' %}</span></td>
+                                <td class="bg-transparent align-middle">
+                                    <div class="progress" style="height: 6px; width: 100px; background: rgba(255,255,255,0.1);">
+                                        <div class="progress-bar bg-secondary" style="width: 15%"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

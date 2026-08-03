@@ -1,0 +1,95 @@
+{% extends "emails/base.html" %}
+
+{% block subject %}{{ designer_name }} assigned to {{ request_number }}{% endblock %}
+
+{% block preview_text %}{{ designer_name }} has been assigned to your branding project {{ request_number }}.{% endblock %}
+
+{% block content %}
+<!-- Icon -->
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+    <tr>
+        <td align="center" style="padding-bottom:20px;">
+            <div style="width:64px; height:64px; background-color:#ede9fe; border-radius:50%; text-align:center; line-height:64px; font-size:28px;">
+                &#x1F464;
+            </div>
+        </td>
+    </tr>
+</table>
+
+<!-- Heading -->
+<h2 style="margin:0 0 8px; font-size:22px; font-weight:800; color:#1e293b; text-align:center;">
+    Designer Assigned
+</h2>
+<p style="margin:0 0 24px; font-size:15px; color:#64748b; text-align:center; line-height:1.5;">
+    A designer has been assigned to your branding project.
+</p>
+
+<!-- Designer Card -->
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color:#f0fdf4; border-radius:10px; border:1px solid #bbf7d0;">
+    <tr>
+        <td style="padding:20px 24px;">
+            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                <tr>
+                    <td width="48" valign="top" style="padding-right:16px;">
+                        <div style="width:48px; height:48px; background-color:#4f46e5; border-radius:50%; text-align:center; line-height:48px; color:#ffffff; font-size:18px; font-weight:700;">
+                            {{ designer_name|first|upper }}
+                        </div>
+                    </td>
+                    <td valign="top">
+                        <span style="font-size:12px; color:#65a30d; text-transform:uppercase; letter-spacing:0.5px; font-weight:600;">Your Designer</span><br>
+                        <span style="font-size:18px; color:#1e293b; font-weight:800;">{{ designer_name }}</span>
+                        {% if designer_email %}
+                        <br><span style="font-size:13px; color:#64748b;">{{ designer_email }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+<!-- Project Info -->
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-top:20px; background-color:#f8fafc; border-radius:10px; border:1px solid #e2e8f0;">
+    <tr>
+        <td style="padding:20px 24px;">
+            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                <tr>
+                    <td width="50%" style="padding:6px 0;">
+                        <span style="font-size:12px; color:#94a3b8; text-transform:uppercase; letter-spacing:0.5px; font-weight:600;">Request</span><br>
+                        <span style="font-size:15px; color:#1e293b; font-weight:700;">{{ request_number }}</span>
+                    </td>
+                    <td width="50%" style="padding:6px 0;">
+                        <span style="font-size:12px; color:#94a3b8; text-transform:uppercase; letter-spacing:0.5px; font-weight:600;">Company</span><br>
+                        <span style="font-size:15px; color:#1e293b; font-weight:700;">{{ company_name }}</span>
+                    </td>
+                </tr>
+                {% if estimated_delivery %}
+                <tr>
+                    <td colspan="2" style="padding:6px 0;">
+                        <span style="font-size:12px; color:#94a3b8; text-transform:uppercase; letter-spacing:0.5px; font-weight:600;">Estimated Delivery</span><br>
+                        <span style="font-size:15px; color:#1e293b; font-weight:700;">{{ estimated_delivery }}</span>
+                    </td>
+                </tr>
+                {% endif %}
+            </table>
+        </td>
+    </tr>
+</table>
+
+<!-- CTA Button -->
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-top:24px;">
+    <tr>
+        <td align="center">
+            <table role="presentation" cellspacing="0" cellpadding="0" border="0">
+                <tr>
+                    <td style="background-color:#4f46e5; border-radius:8px;">
+                        <a href="{{ action_url }}" style="display:inline-block; padding:14px 32px; font-size:15px; font-weight:700; color:#ffffff; text-decoration:none; border-radius:8px;">
+                            View Project &rarr;
+                        </a>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+{% endblock %}
