@@ -299,19 +299,35 @@ def link_analyzer(request):
     result = None
     if request.method == 'POST' and form.is_valid():
         url = form.cleaned_data['url']
-        result = processors.process_seo_analysis(url)
+        analysis = processors.process_seo_analysis(url)
+        summary = analysis.get('executive_summary') or {}
+        broken_links = analysis.get('broken_links') or []
+        result = {
+            'url': url,
+            'total_links': summary.get('links_discovered', 0),
+            'internal_links': summary.get('internal_links_discovered', 0),
+            'external_links': summary.get('external_links_discovered', 0),
+            'links_checked': summary.get('links_checked', 0),
+            'broken_links': broken_links,
+            'broken_links_count': summary.get('broken_links', len(broken_links)),
+            'error': analysis.get('error'),
+            'error_message': analysis.get('error_message'),
+            'blocked': analysis.get('blocked'),
+            'analysis_source': analysis.get('analysis_source'),
+            'chart': analysis.get('chart'),
+        }
         crawler_api = os.environ.get('LINK_CRAWLER_API')
         if crawler_api and hasattr(processors, 'requests'):
             try:
                 resp = processors.requests.get(crawler_api, params={'url': url}, timeout=10)
                 if resp.ok:
-                    data = resp.json()
-                    result['broken_links'] = data.get('broken_links', [])
+                    api_broken = resp.json().get('broken_links', []) or []
+                    if api_broken:
+                        result['broken_links'] = api_broken
+                        result['broken_links_count'] = len(api_broken)
                     result['source'] = 'api'
             except Exception:
-                result.setdefault('broken_links', [])
-        else:
-            result.setdefault('broken_links', [])
+                pass
     return render(request, 'services/link_analyzer.html', {
         'form': form, 
         'result': result,
