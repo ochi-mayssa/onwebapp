@@ -426,6 +426,12 @@ SECURE_HSTS_SECONDS = 0
 SECURE_HSTS_INCLUDE_SUBDOMAINS = False
 SECURE_HSTS_PRELOAD = False
 
+# Behind a TLS-terminating reverse proxy (Coolify/Traefik, Render, etc.),
+# Django must trust the proxy's forwarded protocol so request.build_absolute_uri()
+# and request.scheme produce https URLs. Only honored when the header is present,
+# so it is harmless in local development where the header is never sent.
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 # Sentry Configuration (Optional: for error tracking in production)
 SENTRY_DSN = os.environ.get('SENTRY_DSN', '')
 if SENTRY_DSN:

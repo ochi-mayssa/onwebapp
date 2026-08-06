@@ -403,8 +403,8 @@ document.addEventListener("DOMContentLoaded", function () {
       throw new Error(payload.message || "We could not start the link analysis. Please try again.");
     }
 
-    activeProgressUrl = payload.progress_url;
-    activeResultUrl = payload.result_url;
+    activeProgressUrl = new URL(payload.progress_url, window.location.href).href;
+    activeResultUrl = new URL(payload.result_url, window.location.href).href;
     pollStartedAt = Date.now();
     pollTimer = window.setInterval(pollProgress, 1000);
     await pollProgress();

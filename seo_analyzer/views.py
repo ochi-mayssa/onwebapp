@@ -944,11 +944,11 @@ def _handle_link_checker_request(request, initial_type="internal", forced_analys
                     {
                         "task_id": task_id,
                         "status": "accepted",
-                        "progress_url": request.build_absolute_uri(
-                            reverse("seo_analyzer:link_progress", kwargs={"task_id": task_id})
+                        "progress_url": reverse(
+                            "seo_analyzer:link_progress", kwargs={"task_id": task_id}
                         ),
-                        "result_url": request.build_absolute_uri(
-                            reverse("seo_analyzer:link_results", kwargs={"task_id": task_id})
+                        "result_url": reverse(
+                            "seo_analyzer:link_results", kwargs={"task_id": task_id}
                         ),
                     },
                     status=202,

@@ -309,9 +309,9 @@ def install_progress_hooks() -> None:
 
 
 def _run_link_analysis(task_id: str, url: str, analysis_type: str) -> None:
-    close_old_connections()
     _PROGRESS_CONTEXT.task_id = task_id
     try:
+        close_old_connections()
         set_progress_stage("Preparing Analysis")
         report_data = link_checker.analyze_links(url, analysis_type)
         report_data["task_id"] = task_id
@@ -341,7 +341,10 @@ def _run_link_analysis(task_id: str, url: str, analysis_type: str) -> None:
                 progress["completed_at"] = time()
     finally:
         _PROGRESS_CONTEXT.task_id = None
-        close_old_connections()
+        try:
+            close_old_connections()
+        except Exception:  # pragma: no cover - never mask the original outcome
+            pass
 
 
 def _progress_for_checking(progress: dict[str, Any]) -> int:
