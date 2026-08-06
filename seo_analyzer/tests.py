@@ -23,6 +23,7 @@ from seo_analyzer.services.analyzer import analyze
 from seo_analyzer.services.crawler import crawl
 from seo_analyzer.services.link_checker import (
     BACKLINK_FALLBACK_MESSAGE,
+    _get_session_pool,
     analyze_links,
     build_internal_link_findings,
     build_internal_link_health,
@@ -80,6 +81,14 @@ class FakeResponse:
         self.content = content
         self.text = text if text is not None else content.decode("utf-8", errors="ignore")
         self.history = history or []
+        self._content = content
+
+    def iter_content(self, chunk_size=65536):
+        for i in range(0, len(self.content), chunk_size):
+            yield self.content[i : i + chunk_size]
+
+    def close(self):
+        pass
 
 
 class FakeSession:
@@ -97,7 +106,7 @@ class FakeSession:
             content=html,
         )
 
-    def get(self, url, timeout=0, allow_redirects=True, stream=False):
+    def get(self, url, timeout=0, allow_redirects=True, stream=False, headers=None):
         if url == "https://example.com":
             return self.page_response
         if url == "https://external.example/page":
@@ -112,22 +121,20 @@ class FakeSession:
             return FakeResponse(url, status_code=200, headers={})
         return FakeResponse(url, status_code=404, headers={})
 
-    def head(self, url, timeout=0, allow_redirects=False):
+    def head(self, url, timeout=0, allow_redirects=False, headers=None):
         if url == "https://example.com/about":
             return FakeResponse(url, status_code=200, headers={})
         if url == "https://external.example/page":
-            history = [FakeResponse("https://external.example/page", status_code=301, headers={})]
             return FakeResponse(
-                "https://external.example/final",
-                status_code=200,
-                headers={},
-                history=history,
+                url,
+                status_code=301,
+                headers={"Location": "https://external.example/final"},
             )
         return FakeResponse(url, status_code=404, headers={})
 
 
 class EmptyLinkSession:
-    def get(self, url, timeout=0, allow_redirects=True, stream=False):
+    def get(self, url, timeout=0, allow_redirects=True, stream=False, headers=None):
         html = b"<html><body><p>No links here.</p></body></html>"
         return FakeResponse(
             "https://example.com",
@@ -136,15 +143,15 @@ class EmptyLinkSession:
             content=html,
         )
 
-    def head(self, url, timeout=0, allow_redirects=True):
+    def head(self, url, timeout=0, allow_redirects=True, headers=None):
         return FakeResponse(url, status_code=200, headers={})
 
 
 class TimeoutSession:
-    def get(self, url, timeout=0, allow_redirects=True, stream=False):
+    def get(self, url, timeout=0, allow_redirects=True, stream=False, headers=None):
         raise requests.exceptions.ConnectTimeout("timeout")
 
-    def head(self, url, timeout=0, allow_redirects=True):
+    def head(self, url, timeout=0, allow_redirects=True, headers=None):
         raise requests.exceptions.ConnectTimeout("timeout")
 
 
@@ -176,7 +183,7 @@ class TrackingSession:
         self.tracker = tracker
         self.responses = responses or {}
 
-    def get(self, url, timeout=0, allow_redirects=True, stream=False):
+    def get(self, url, timeout=0, allow_redirects=True, stream=False, headers=None):
         if url == "https://example.com":
             return FakeResponse(
                 "https://example.com",
@@ -192,7 +199,7 @@ class TrackingSession:
             return response
         return FakeResponse(url, status_code=404, headers={})
 
-    def head(self, url, timeout=0, allow_redirects=True):
+    def head(self, url, timeout=0, allow_redirects=True, headers=None):
         self._count(url, "head")
         response = self.responses.get(url)
         if isinstance(response, Exception):
@@ -589,12 +596,12 @@ class LinkCheckerServiceTests(TestCase):
         mock_session.headers = {}
 
         with patch("seo_analyzer.services.link_checker.requests.Session", return_value=mock_session):
-            session = _build_session()
+            session = _get_session_pool()
 
         self.assertIs(session, mock_session)
         self.assertEqual(session.headers, {})
 
-    @patch("seo_analyzer.services.link_checker._build_session", return_value=FakeSession())
+    @patch("seo_analyzer.services.link_checker._get_session_pool", return_value=FakeSession())
     def test_internal_link_checker_extracts_same_domain_links(self, _mock_session):
         report = analyze_links("https://example.com", "internal")
 
@@ -610,7 +617,7 @@ class LinkCheckerServiceTests(TestCase):
         self.assertIn("ai_visibility_potential", report["topic_intelligence"])
         self.assertIn("search_intent", report["topic_intelligence"])
 
-    @patch("seo_analyzer.services.link_checker._build_session", return_value=FakeSession())
+    @patch("seo_analyzer.services.link_checker._get_session_pool", return_value=FakeSession())
     def test_external_link_checker_extracts_off_domain_links(self, _mock_session):
         report = analyze_links("https://example.com", "external")
 
@@ -650,7 +657,7 @@ class LinkCheckerServiceTests(TestCase):
         self.assertIn("topic_intelligence", report)
         self.assertEqual(report["topic_intelligence"]["primary_h1"], "Backlink Intelligence")
 
-    @patch("seo_analyzer.services.link_checker._build_session", return_value=TimeoutSession())
+    @patch("seo_analyzer.services.link_checker._get_session_pool", return_value=TimeoutSession())
     def test_link_checker_returns_structured_error_payload(self, _mock_session):
         report = analyze_links("https://example.com", "internal")
 
@@ -662,7 +669,7 @@ class LinkCheckerServiceTests(TestCase):
         )
         self.assertEqual(report["summary"]["total_issues"], 1)
 
-    @patch("seo_analyzer.services.link_checker._build_session", return_value=EmptyLinkSession())
+    @patch("seo_analyzer.services.link_checker._get_session_pool", return_value=EmptyLinkSession())
     def test_link_checker_reports_no_links_found_state(self, _mock_session):
         report = analyze_links("https://example.com", "internal")
 
@@ -676,7 +683,7 @@ class LinkCheckerServiceTests(TestCase):
         html = b"<html><body>" + (b'<a href="/about">About</a>' * 20) + b"</body></html>"
 
         with patch(
-            "seo_analyzer.services.link_checker._build_session",
+            "seo_analyzer.services.link_checker._get_session_pool",
             side_effect=lambda: TrackingSession(
                 html,
                 tracker,
@@ -708,22 +715,15 @@ class LinkCheckerServiceTests(TestCase):
         )
 
         with patch(
-            "seo_analyzer.services.link_checker._build_session",
+            "seo_analyzer.services.link_checker._get_session_pool",
             side_effect=lambda: TrackingSession(
                 html,
                 tracker,
                 responses={
                     "https://external.example/page": FakeResponse(
-                        "https://external.example/final",
-                        status_code=200,
-                        headers={},
-                        history=[
-                            FakeResponse(
-                                "https://external.example/page",
-                                status_code=301,
-                                headers={},
-                            )
-                        ],
+                        "https://external.example/page",
+                        status_code=301,
+                        headers={"Location": "https://external.example/final"},
                     )
                 },
             ),
@@ -742,7 +742,7 @@ class LinkCheckerServiceTests(TestCase):
         self.assertEqual(tracker["https://external.example/page"]["head"], 1)
         self.assertEqual(tracker["https://external.example/page"]["get"], 0)
 
-    @patch("seo_analyzer.services.link_checker._build_session", return_value=FakeSession())
+    @patch("seo_analyzer.services.link_checker._get_session_pool", return_value=FakeSession())
     def test_internal_report_structure_remains_internal_specific(self, _mock_session):
         report = analyze_links("https://example.com", "internal")
 
@@ -751,7 +751,7 @@ class LinkCheckerServiceTests(TestCase):
         self.assertEqual(report["recommendations"][0]["text"], "Internal linking structure is healthy.")
         self.assertIn("performance_log", report)
 
-    @patch("seo_analyzer.services.link_checker._build_session", return_value=FakeSession())
+    @patch("seo_analyzer.services.link_checker._get_session_pool", return_value=FakeSession())
     def test_external_report_structure_remains_external_specific(self, _mock_session):
         report = analyze_links("https://example.com", "external")
 
@@ -767,7 +767,7 @@ class LinkCheckerServiceTests(TestCase):
         html = b'<html><body><a href="/missing">Missing</a></body></html>'
 
         with patch(
-            "seo_analyzer.services.link_checker._build_session",
+            "seo_analyzer.services.link_checker._get_session_pool",
             side_effect=lambda: TrackingSession(
                 html,
                 tracker,
@@ -802,7 +802,7 @@ class LinkCheckerServiceTests(TestCase):
         timeout_error = requests.exceptions.ConnectTimeout("timeout")
 
         with patch(
-            "seo_analyzer.services.link_checker._build_session",
+            "seo_analyzer.services.link_checker._get_session_pool",
             side_effect=lambda: TrackingSession(
                 html,
                 tracker,
@@ -813,16 +813,9 @@ class LinkCheckerServiceTests(TestCase):
                         headers={},
                     ),
                     "https://example.com/redirect": FakeResponse(
-                        "https://example.com/final",
-                        status_code=200,
-                        headers={},
-                        history=[
-                            FakeResponse(
-                                "https://example.com/redirect",
-                                status_code=301,
-                                headers={},
-                            )
-                        ],
+                        "https://example.com/redirect",
+                        status_code=301,
+                        headers={"Location": "https://example.com/final"},
                     ),
                     "https://example.com/missing": FakeResponse(
                         "https://example.com/missing",
@@ -875,22 +868,15 @@ class LinkCheckerServiceTests(TestCase):
         )
 
         with patch(
-            "seo_analyzer.services.link_checker._build_session",
+            "seo_analyzer.services.link_checker._get_session_pool",
             side_effect=lambda: TrackingSession(
                 html,
                 tracker,
                 responses={
                     "https://example.com/services/industrial-automation": FakeResponse(
-                        "https://example.com/accounts/login/",
-                        status_code=200,
-                        headers={},
-                        history=[
-                            FakeResponse(
-                                "https://example.com/services/industrial-automation",
-                                status_code=302,
-                                headers={},
-                            )
-                        ],
+                        "https://example.com/services/industrial-automation",
+                        status_code=302,
+                        headers={"Location": "https://example.com/accounts/login/"},
                     ),
                     "https://example.com/missing": FakeResponse(
                         "https://example.com/missing",
@@ -917,7 +903,7 @@ class LinkCheckerServiceTests(TestCase):
         timeout_error = requests.exceptions.ConnectTimeout("timeout")
 
         with patch(
-            "seo_analyzer.services.link_checker._build_session",
+            "seo_analyzer.services.link_checker._get_session_pool",
             side_effect=lambda: TrackingSession(
                 html,
                 tracker,
@@ -931,7 +917,7 @@ class LinkCheckerServiceTests(TestCase):
         self.assertEqual(report["links"][0]["status"], "error")
         self.assertIn("Connection Timeout", report["links"][0]["status_detail"])
 
-    @patch("seo_analyzer.services.link_checker._build_session", return_value=FakeSession())
+    @patch("seo_analyzer.services.link_checker._get_session_pool", return_value=FakeSession())
     def test_internal_health_is_reused_by_pdf_payload_and_monitoring(self, _mock_session):
         report = analyze_links("https://example.com", "internal")
 

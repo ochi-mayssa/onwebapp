@@ -205,11 +205,11 @@ def install_progress_hooks() -> None:
     if _HOOKS_INSTALLED:
         return
 
-    original_analyze_page_links = link_checker._analyze_page_links
-    original_collect_candidate_links = link_checker._collect_candidate_links
-    original_run_fast_link_checks = link_checker._run_fast_link_checks
+    original_analyze_page_links = link_checker._analyze_page_links_optimized
+    original_collect_candidate_links = link_checker._collect_candidate_links_fast
+    original_run_fast_link_checks = link_checker._run_fast_link_checks_optimized
     original_build_summary = link_checker._build_summary
-    original_build_page_link_recommendations = link_checker._build_page_link_recommendations
+    original_build_page_link_recommendations = link_checker._build_page_link_recommendations_optimized
     original_build_backlink_recommendations = link_checker._build_backlink_recommendations
     original_analyze_domain = BacklinkAnalyzer.analyze_domain
     original_verify_backlink_status = BacklinkAnalyzer.verify_backlink_status
@@ -228,7 +228,7 @@ def install_progress_hooks() -> None:
         )
         return candidate_links, collection_stats
 
-    def wrapped_run_fast_link_checks(urls: list[str], *, analysis_type: str):
+    def wrapped_run_fast_link_checks(urls: list[str]):
         normalized_urls: list[str] = []
         seen_urls: set[str] = set()
         for url in urls:
@@ -247,11 +247,11 @@ def install_progress_hooks() -> None:
         if not normalized_urls:
             return cache
 
-        session = link_checker._build_session()
+        session = link_checker._get_session_pool()
         max_workers = min(link_checker.LINK_CHECK_MAX_WORKERS, len(normalized_urls))
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
             future_map = {
-                executor.submit(link_checker._check_url_status, session, checked_url): checked_url
+                executor.submit(link_checker._check_single_url_fast, session, checked_url): checked_url
                 for checked_url in normalized_urls
             }
             for future in as_completed(future_map):
@@ -297,11 +297,11 @@ def install_progress_hooks() -> None:
         record_status_result(status_key)
         return result
 
-    link_checker._analyze_page_links = wrapped_analyze_page_links
-    link_checker._collect_candidate_links = wrapped_collect_candidate_links
-    link_checker._run_fast_link_checks = wrapped_run_fast_link_checks
+    link_checker._analyze_page_links_optimized = wrapped_analyze_page_links
+    link_checker._collect_candidate_links_fast = wrapped_collect_candidate_links
+    link_checker._run_fast_link_checks_optimized = wrapped_run_fast_link_checks
     link_checker._build_summary = wrapped_build_summary
-    link_checker._build_page_link_recommendations = wrapped_build_page_link_recommendations
+    link_checker._build_page_link_recommendations_optimized = wrapped_build_page_link_recommendations
     link_checker._build_backlink_recommendations = wrapped_build_backlink_recommendations
     BacklinkAnalyzer.analyze_domain = wrapped_analyze_domain
     BacklinkAnalyzer.verify_backlink_status = wrapped_verify_backlink_status

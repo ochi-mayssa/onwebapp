@@ -1,16 +1,16 @@
 from __future__ import annotations
 
-from concurrent.futures import ThreadPoolExecutor, as_completed, TimeoutError
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
 import logging
-from threading import Thread
 from time import perf_counter
 from typing import Any
 from urllib.parse import urljoin, urlparse
 
 import requests
 from requests.adapters import HTTPAdapter
+from urllib3.util.timeout import Timeout
 from bs4 import BeautifulSoup
 
 from .backlink_engine import BacklinkAnalyzer
@@ -31,10 +31,9 @@ logger = logging.getLogger(__name__)
 
 # Performance-optimized constants
 MAX_LINKS_PER_REPORT = 15
-LINK_CHECK_MAX_WORKERS = 30
-LINK_CHECK_TIMEOUT = (0.3, 0.8)
-LINK_CHECK_MAX_REDIRECTS = 2
-HTML_DOWNLOAD_TIMEOUT = (1.5, 3.0)
+LINK_CHECK_MAX_WORKERS = 15
+LINK_CHECK_TOTAL_SECONDS = 3.0
+HTML_DOWNLOAD_TOTAL_SECONDS = 8.0
 BATCH_SIZE = 50
 CONNECTION_POOL_SIZE = 50
 MAX_HTML_SIZE = 1024 * 1024  # 1MB
@@ -297,18 +296,49 @@ def _analyze_page_links_optimized(url: str, analysis_type: str) -> dict[str, Any
 
 
 def _download_html_fast(session: requests.Session, url: str) -> requests.Response:
-    """Fast HTML download with streaming and limited content."""
-    return session.get(
-        url, 
-        timeout=HTML_DOWNLOAD_TIMEOUT, 
+    """Fast HTML download with a hard total deadline and capped content size.
+
+    A tuple ``(connect, read)`` timeout in requests is a *per-byte* read
+    timeout: a slow-but-steady server never hits it and the request can hang
+    indefinitely. A ``urllib3`` total ``Timeout`` bounds the whole request, so
+    every download is guaranteed to finish within ``HTML_DOWNLOAD_TOTAL_SECONDS``.
+    """
+    timeout = Timeout(
+        connect=2.0,
+        read=2.0,
+        total=HTML_DOWNLOAD_TOTAL_SECONDS,
+    )
+    deadline = perf_counter() + HTML_DOWNLOAD_TOTAL_SECONDS
+
+    response = session.get(
+        url,
+        timeout=timeout,
         allow_redirects=True,
         stream=True,
         headers={
             'Accept-Encoding': 'gzip, deflate',
             'Cache-Control': 'no-cache',
-            'User-Agent': 'Mozilla/5.0 (compatible; LinkChecker/1.0)'
-        }
+            'User-Agent': 'Mozilla/5.0 (compatible; LinkChecker/1.0)',
+        },
     )
+
+    chunks: list[bytes] = []
+    size = 0
+    try:
+        for chunk in response.iter_content(chunk_size=65536):
+            if size + len(chunk) > MAX_HTML_SIZE:
+                chunks.append(chunk[: MAX_HTML_SIZE - size])
+                break
+            chunks.append(chunk)
+            size += len(chunk)
+            if perf_counter() >= deadline:
+                break
+    finally:
+        response.close()
+
+    response._content = b"".join(chunks)
+    response._content_consumed = True
+    return response
 
 
 def _collect_candidate_links_fast(
@@ -405,48 +435,46 @@ def _run_fast_link_checks_optimized(urls: list[str]) -> dict[str, tuple[int | No
 
 
 def _check_urls_batch_optimized(urls: list[str]) -> dict[str, tuple[int | None, str, str | dict[str, Any]]]:
-    """Check a batch of URLs with optimized connection pooling."""
+    """Check a batch of URLs with optimized connection pooling.
+
+    Each request uses a urllib3 total timeout, so every worker thread is
+    guaranteed to finish. Relying on ``future.result(timeout=...)`` here would
+    be unsafe: the timed-out worker thread keeps running and ``ThreadPoolExecutor``
+    waits for it on context exit, which can hang the whole batch.
+    """
     if not urls:
         return {}
-    
+
     session = _get_session_pool()
     cache: dict[str, tuple[int | None, str, str | dict[str, Any]]] = {}
-    
+
     max_workers = min(LINK_CHECK_MAX_WORKERS, len(urls))
-    
+
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         future_to_url = {
-            executor.submit(_check_single_url_fast, session, url): url 
+            executor.submit(_check_single_url_fast, session, url): url
             for url in urls
         }
-        
-        # Process with overall timeout
-        try:
-            for future in as_completed(future_to_url, timeout=2.0):
-                url = future_to_url[future]
-                try:
-                    cache[url] = future.result(timeout=0.5)
-                except (TimeoutError, Exception):
-                    cache[url] = (None, "error", "Timeout or error during check")
-        except TimeoutError:
-            # Cancel remaining futures
-            for future in future_to_url:
-                future.cancel()
-            # Mark remaining as timeout
-            for url in urls:
-                if url not in cache:
-                    cache[url] = (None, "error", "Batch timeout")
-    
+
+        for future in as_completed(future_to_url):
+            url = future_to_url[future]
+            try:
+                cache[url] = future.result()
+            except Exception:
+                cache[url] = (None, "error", "Error during check")
+
     return cache
 
 
 def _check_single_url_fast(session: requests.Session, url: str) -> tuple[int | None, str, str | dict[str, Any]]:
-    """Ultra-fast single URL check with minimal overhead."""
+    """Ultra-fast single URL check with total-timeout protection."""
+    timeout = Timeout(connect=1.0, read=2.0, total=LINK_CHECK_TOTAL_SECONDS)
+
     # Try HEAD first
     try:
         response = session.head(
             url,
-            timeout=(0.2, 0.5),
+            timeout=timeout,
             allow_redirects=False,
             headers={'Accept-Encoding': 'gzip, deflate'}
         )
@@ -491,7 +519,7 @@ def _check_single_url_fast(session: requests.Session, url: str) -> tuple[int | N
         try:
             response = session.get(
                 url,
-                timeout=(0.3, 0.6),
+                timeout=timeout,
                 allow_redirects=False,
                 stream=True,
                 headers={'Accept-Encoding': 'gzip, deflate'}
@@ -836,7 +864,8 @@ def _verify_backlink_fast(backlink: dict[str, Any]) -> dict[str, Any]:
     
     try:
         session = _get_session_pool()
-        response = session.head(url, timeout=(0.3, 0.5), allow_redirects=False)
+        timeout = Timeout(connect=1.0, read=2.0, total=LINK_CHECK_TOTAL_SECONDS)
+        response = session.head(url, timeout=timeout, allow_redirects=False)
         backlink["http_status"] = response.status_code
         if 200 <= response.status_code < 300:
             backlink["verification_status"] = "active"
