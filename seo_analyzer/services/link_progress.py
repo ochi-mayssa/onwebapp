@@ -2,12 +2,11 @@ from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from copy import deepcopy
-from threading import Thread, local
+from threading import Lock, Thread, local
 from time import monotonic, time
 from typing import Any
 from uuid import uuid4
 
-from django.core.cache import cache
 from django.db import close_old_connections
 from django.urls import reverse
 
@@ -54,13 +53,10 @@ BACKLINK_STAGE_PIPELINE = [
     "Completed",
 ]
 
-_CACHE_PREFIX = 'link_progress:'
+_STORE: dict[str, dict[str, Any]] = {}
+_STORE_LOCK = Lock()
 _PROGRESS_CONTEXT = local()
 _HOOKS_INSTALLED = False
-
-
-def _cache_key(task_id: str) -> str:
-    return f'{_CACHE_PREFIX}{task_id}'
 
 
 def start_link_analysis(url: str, analysis_type: str) -> str:
@@ -72,7 +68,8 @@ def start_link_analysis(url: str, analysis_type: str) -> str:
         BACKLINK_STAGE_PIPELINE if analysis_type == "backlinks" else DEFAULT_STAGE_PIPELINE
     )
 
-    progress_data = {
+    with _STORE_LOCK:
+        _STORE[task_id] = {
             "task_id": task_id,
             "url": normalized_url,
             "analysis_type": analysis_type,
@@ -98,7 +95,6 @@ def start_link_analysis(url: str, analysis_type: str) -> str:
             "failure_reason": "",
             "report_data": None,
         }
-    cache.set(_cache_key(task_id), progress_data, PROGRESS_TTL_SECONDS)
 
     Thread(
         target=_run_link_analysis,
@@ -109,7 +105,9 @@ def start_link_analysis(url: str, analysis_type: str) -> str:
 
 
 def get_link_progress(task_id: str) -> dict[str, Any] | None:
-    progress = cache.get(_cache_key(str(task_id)))
+    _cleanup_expired_jobs()
+    with _STORE_LOCK:
+        progress = deepcopy(_STORE.get(str(task_id)))
     if not progress:
         return None
 
@@ -136,11 +134,13 @@ def get_link_progress(task_id: str) -> dict[str, Any] | None:
 
 
 def get_completed_link_report(task_id: str) -> dict[str, Any] | None:
-    progress = cache.get(_cache_key(str(task_id)))
-    if not progress or progress.get("status") != "completed":
-        return None
-    report = progress.get("report_data")
-    return deepcopy(report) if report else None
+    _cleanup_expired_jobs()
+    with _STORE_LOCK:
+        progress = _STORE.get(str(task_id))
+        if not progress or progress.get("status") != "completed":
+            return None
+        report = progress.get("report_data")
+        return deepcopy(report) if report else None
 
 
 def set_progress_stage(stage: str, **extra_fields: Any) -> None:
@@ -148,20 +148,20 @@ def set_progress_stage(stage: str, **extra_fields: Any) -> None:
     if not task_id:
         return
 
-    progress = cache.get(_cache_key(task_id))
-    if not progress or progress.get("status") != "running":
-        return
-    progress["stage"] = stage
-    progress["updated_at"] = time()
-    progress.update(extra_fields)
-    if stage == "Checking Link Status":
-        progress["percentage_completed"] = _progress_for_checking(progress)
-    else:
-        progress["percentage_completed"] = STAGE_PROGRESS.get(
-            stage,
-            progress.get("percentage_completed", 0),
-        )
-    cache.set(_cache_key(task_id), progress, PROGRESS_TTL_SECONDS)
+    with _STORE_LOCK:
+        progress = _STORE.get(task_id)
+        if not progress or progress.get("status") != "running":
+            return
+        progress["stage"] = stage
+        progress["updated_at"] = time()
+        progress.update(extra_fields)
+        if stage == "Checking Link Status":
+            progress["percentage_completed"] = _progress_for_checking(progress)
+        else:
+            progress["percentage_completed"] = STAGE_PROGRESS.get(
+                stage,
+                progress.get("percentage_completed", 0),
+            )
 
 
 def set_candidate_link_counts(total_links_found: int, total_unique_urls: int, duplicate_urls_skipped: int) -> None:
@@ -178,26 +178,27 @@ def record_status_result(status_key: str) -> None:
     if not task_id:
         return
 
-    progress = cache.get(_cache_key(task_id))
-    if not progress or progress.get("status") != "running":
-        return
-    progress["stage"] = "Checking Link Status"
-    progress["links_checked"] += 1
-    if status_key == "working":
-        progress["working_links_found"] += 1
-    elif status_key == "broken":
-        progress["broken_links_found"] += 1
-    elif status_key == "redirect":
-        progress["redirects_found"] += 1
-    else:
-        progress["errors_found"] += 1
-    progress["percentage_completed"] = _progress_for_checking(progress)
-    progress["updated_at"] = time()
-    cache.set(_cache_key(task_id), progress, PROGRESS_TTL_SECONDS)
+    with _STORE_LOCK:
+        progress = _STORE.get(task_id)
+        if not progress or progress.get("status") != "running":
+            return
+        progress["stage"] = "Checking Link Status"
+        progress["links_checked"] += 1
+        if status_key == "working":
+            progress["working_links_found"] += 1
+        elif status_key == "broken":
+            progress["broken_links_found"] += 1
+        elif status_key == "redirect":
+            progress["redirects_found"] += 1
+        else:
+            progress["errors_found"] += 1
+        progress["percentage_completed"] = _progress_for_checking(progress)
+        progress["updated_at"] = time()
 
 
 def reset_progress_store() -> None:
-    cache.clear()
+    with _STORE_LOCK:
+        _STORE.clear()
 
 
 def install_progress_hooks() -> None:
@@ -205,11 +206,11 @@ def install_progress_hooks() -> None:
     if _HOOKS_INSTALLED:
         return
 
-    original_analyze_page_links = link_checker._analyze_page_links_optimized
-    original_collect_candidate_links = link_checker._collect_candidate_links_fast
-    original_run_fast_link_checks = link_checker._run_fast_link_checks_optimized
+    original_analyze_page_links = link_checker._analyze_page_links
+    original_collect_candidate_links = link_checker._collect_candidate_links
+    original_run_fast_link_checks = link_checker._run_fast_link_checks
     original_build_summary = link_checker._build_summary
-    original_build_page_link_recommendations = link_checker._build_page_link_recommendations_optimized
+    original_build_page_link_recommendations = link_checker._build_page_link_recommendations
     original_build_backlink_recommendations = link_checker._build_backlink_recommendations
     original_analyze_domain = BacklinkAnalyzer.analyze_domain
     original_verify_backlink_status = BacklinkAnalyzer.verify_backlink_status
@@ -228,7 +229,7 @@ def install_progress_hooks() -> None:
         )
         return candidate_links, collection_stats
 
-    def wrapped_run_fast_link_checks(urls: list[str]):
+    def wrapped_run_fast_link_checks(urls: list[str], *, analysis_type: str):
         normalized_urls: list[str] = []
         seen_urls: set[str] = set()
         for url in urls:
@@ -247,11 +248,10 @@ def install_progress_hooks() -> None:
         if not normalized_urls:
             return cache
 
-        session = link_checker._get_session_pool()
         max_workers = min(link_checker.LINK_CHECK_MAX_WORKERS, len(normalized_urls))
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
             future_map = {
-                executor.submit(link_checker._check_single_url_fast, session, checked_url): checked_url
+                executor.submit(link_checker._check_url_status_with_session, checked_url): checked_url
                 for checked_url in normalized_urls
             }
             for future in as_completed(future_map):
@@ -297,11 +297,11 @@ def install_progress_hooks() -> None:
         record_status_result(status_key)
         return result
 
-    link_checker._analyze_page_links_optimized = wrapped_analyze_page_links
-    link_checker._collect_candidate_links_fast = wrapped_collect_candidate_links
-    link_checker._run_fast_link_checks_optimized = wrapped_run_fast_link_checks
+    link_checker._analyze_page_links = wrapped_analyze_page_links
+    link_checker._collect_candidate_links = wrapped_collect_candidate_links
+    link_checker._run_fast_link_checks = wrapped_run_fast_link_checks
     link_checker._build_summary = wrapped_build_summary
-    link_checker._build_page_link_recommendations_optimized = wrapped_build_page_link_recommendations
+    link_checker._build_page_link_recommendations = wrapped_build_page_link_recommendations
     link_checker._build_backlink_recommendations = wrapped_build_backlink_recommendations
     BacklinkAnalyzer.analyze_domain = wrapped_analyze_domain
     BacklinkAnalyzer.verify_backlink_status = wrapped_verify_backlink_status
@@ -321,24 +321,24 @@ def _run_link_analysis(task_id: str, url: str, analysis_type: str) -> None:
         except Exception:
             # Monitoring must never block the primary report flow.
             pass
-        progress = cache.get(_cache_key(task_id))
-        if progress:
-            progress["status"] = "completed"
-            progress["stage"] = "Completed"
-            progress["percentage_completed"] = 100
-            progress["updated_at"] = time()
-            progress["completed_at"] = time()
-            progress["report_data"] = report_data
-            cache.set(_cache_key(task_id), progress, PROGRESS_TTL_SECONDS)
+        with _STORE_LOCK:
+            progress = _STORE.get(task_id)
+            if progress:
+                progress["status"] = "completed"
+                progress["stage"] = "Completed"
+                progress["percentage_completed"] = 100
+                progress["updated_at"] = time()
+                progress["completed_at"] = time()
+                progress["report_data"] = report_data
     except Exception as exc:  # pragma: no cover - defensive guard
-        progress = cache.get(_cache_key(task_id))
-        if progress:
-            progress["status"] = "failed"
-            progress["stage"] = "Analysis Failed"
-            progress["failure_reason"] = str(exc) or "Unexpected analysis error."
-            progress["updated_at"] = time()
-            progress["completed_at"] = time()
-            cache.set(_cache_key(task_id), progress, PROGRESS_TTL_SECONDS)
+        with _STORE_LOCK:
+            progress = _STORE.get(task_id)
+            if progress:
+                progress["status"] = "failed"
+                progress["stage"] = "Analysis Failed"
+                progress["failure_reason"] = str(exc) or "Unexpected analysis error."
+                progress["updated_at"] = time()
+                progress["completed_at"] = time()
     finally:
         _PROGRESS_CONTEXT.task_id = None
         close_old_connections()
@@ -372,3 +372,15 @@ def _estimate_remaining_seconds(progress: dict[str, Any], elapsed_seconds: float
         estimated_total = elapsed_seconds / (percentage / 100)
         return max(estimated_total - elapsed_seconds, 0.0)
     return None
+
+
+def _cleanup_expired_jobs() -> None:
+    threshold = time() - PROGRESS_TTL_SECONDS
+    with _STORE_LOCK:
+        expired = [
+            task_id
+            for task_id, progress in _STORE.items()
+            if (progress.get("updated_at") or progress.get("started_at") or 0) < threshold
+        ]
+        for task_id in expired:
+            _STORE.pop(task_id, None)
