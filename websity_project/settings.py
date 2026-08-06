@@ -260,6 +260,9 @@ STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+    },
     'staticfiles': {
         'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
     },
@@ -343,8 +346,8 @@ CLAMAV_TIMEOUT = int(os.environ.get('CLAMAV_TIMEOUT', '10'))
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'unique-snowflake',
-        'TIMEOUT': 300,
+        'LOCATION': 'seo-progress-store',
+        'TIMEOUT': 1800,
         'OPTIONS': {
             'MAX_ENTRIES': 1000,
         }

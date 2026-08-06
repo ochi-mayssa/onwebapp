@@ -2156,7 +2156,7 @@ def dashboard(request):
 
     designers = cache_get_or_set(
         designers_key(),
-        lambda: list(User.objects.filter(is_staff=True).order_by('username')),
+        lambda: list(User.objects.filter(groups__name='Designers', is_active=True).order_by('username')),
         TIMEOUT_DESIGNERS,
     )
     collections = cache_get_or_set(
@@ -2205,7 +2205,7 @@ def request_detail(request, pk):
     form = BrandingRequestForm(instance=req)
     designers = cache_get_or_set(
         designers_key(),
-        lambda: list(User.objects.filter(is_staff=True).order_by('username')),
+        lambda: list(User.objects.filter(groups__name='Designers', is_active=True).order_by('username')),
         TIMEOUT_DESIGNERS,
     )
 
@@ -3457,7 +3457,7 @@ def supervisor_dashboard(request):
 
     designers = cache_get_or_set(
         designers_key(),
-        lambda: list(User.objects.filter(is_staff=True).order_by('username')),
+        lambda: list(User.objects.filter(groups__name='Designers', is_active=True).order_by('username')),
         TIMEOUT_DESIGNERS,
     )
 

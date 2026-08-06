@@ -339,7 +339,7 @@ document.addEventListener("DOMContentLoaded", function () {
       });
 
       if (!response.ok) {
-        throw new Error("We could not retrieve the live analysis progress.");
+        return;
       }
 
       const progress = await response.json();
@@ -364,10 +364,7 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
       }
     } catch (error) {
-      stopPolling();
-      showClientError(error.message || "We lost the live analysis connection. Please try again.");
-      failureReason.textContent = error.message || "We lost the live analysis connection.";
-      failureState.classList.remove("d-none");
+      // Transient errors: keep polling (network hiccup, single worker busy)
     }
   }
 

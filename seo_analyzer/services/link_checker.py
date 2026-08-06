@@ -4,11 +4,13 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
 import logging
+from threading import Thread
 from time import perf_counter
 from typing import Any
 from urllib.parse import urljoin, urlparse
 
 import requests
+from requests.adapters import HTTPAdapter
 from bs4 import BeautifulSoup
 
 from .backlink_engine import BacklinkAnalyzer
@@ -25,10 +27,11 @@ BACKLINK_FALLBACK_MESSAGE = (
     "Backlink data requires Moz, Ahrefs, Semrush, or Google Search Console integration."
 )
 logger = logging.getLogger(__name__)
-MAX_LINKS_PER_REPORT = 100
-LINK_CHECK_MAX_WORKERS = 20
-LINK_CHECK_TIMEOUT = 3
-LINK_CHECK_MAX_REDIRECTS = 3
+MAX_LINKS_PER_REPORT = 15
+LINK_CHECK_MAX_WORKERS = 15
+LINK_CHECK_TIMEOUT = (0.5, 1.0)
+LINK_CHECK_MAX_REDIRECTS = 2
+HTML_DOWNLOAD_TIMEOUT = (2, 5)
 
 ANALYSIS_LABELS = {
     "internal": "Internal Links",
@@ -53,6 +56,13 @@ def analyze_links(url: str, analysis_type: str) -> dict[str, Any]:
 
 def _build_session() -> requests.Session:
     session = requests.Session()
+    adapter = HTTPAdapter(
+        max_retries=0,
+        pool_connections=10,
+        pool_maxsize=20,
+    )
+    session.mount("http://", adapter)
+    session.mount("https://", adapter)
     return session
 
 
@@ -164,13 +174,37 @@ def _provider_required_payload(payload: dict[str, Any], detail: str) -> dict[str
     return payload
 
 
+def _download_html(session: requests.Session, url: str, total_timeout: float = 8.0) -> requests.Response:
+    result: list[requests.Response | Exception] = []
+
+    def _do_download():
+        try:
+            result.append(session.get(url, timeout=(2, 5), allow_redirects=True))
+        except Exception as exc:
+            result.append(exc)
+
+    worker = Thread(target=_do_download, daemon=True)
+    worker.start()
+    worker.join(timeout=total_timeout)
+
+    if worker.is_alive():
+        raise requests.Timeout(
+            f"Page download exceeded {total_timeout}s total timeout."
+        )
+    if not result:
+        raise requests.ConnectionError("Page download produced no result.")
+    if isinstance(result[0], Exception):
+        raise result[0]
+    return result[0]
+
+
 def _analyze_page_links(url: str, analysis_type: str) -> dict[str, Any]:
     payload = _base_payload(url, analysis_type)
     session = _build_session()
     started_at = perf_counter()
 
     try:
-        response = session.get(url, timeout=15, allow_redirects=True)
+        response = _download_html(session, url, total_timeout=8.0)
     except requests.RequestException as exc:
         error_type, message = classify_request_error(exc)
         return _error_payload(payload, error_type, message)
@@ -377,10 +411,11 @@ def _run_fast_link_checks(urls: list[str], *, analysis_type: str) -> dict[str, t
     if not unique_urls:
         return cache
 
+    session = _build_session()
     max_workers = min(LINK_CHECK_MAX_WORKERS, len(unique_urls))
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         future_map = {
-            executor.submit(_check_url_status_with_session, checked_url): checked_url
+            executor.submit(_check_url_status, session, checked_url): checked_url
             for checked_url in unique_urls
         }
         for future in as_completed(future_map):
@@ -394,40 +429,54 @@ def _run_fast_link_checks(urls: list[str], *, analysis_type: str) -> dict[str, t
     return cache
 
 
-def _check_url_status_with_session(url: str) -> tuple[int | None, str, str | dict[str, Any]]:
-    session = _build_session()
-    session.max_redirects = LINK_CHECK_MAX_REDIRECTS
-    return _check_url_status(session, url)
-
-
 def _check_url_status(session: requests.Session, url: str) -> tuple[int | None, str, str | dict[str, Any]]:
+    result: list[tuple[int | None, str, str | dict[str, Any]] | Exception] = []
+
+    def _do_check():
+        try:
+            result.append(_check_url_status_inner(session, url))
+        except Exception as exc:
+            result.append(exc)
+
+    worker = Thread(target=_do_check, daemon=True)
+    worker.start()
+    worker.join(timeout=3.0)
+
+    if worker.is_alive():
+        return None, "error", "Timeout: link check exceeded 3s"
+    if not result:
+        return None, "error", "Link check produced no result"
+    if isinstance(result[0], Exception):
+        error_type, message = classify_request_error(result[0])
+        return None, "error", f"{error_type}: {message}"
+    return result[0]
+
+
+def _check_url_status_inner(session: requests.Session, url: str) -> tuple[int | None, str, str | dict[str, Any]]:
     try:
-        response = session.head(url, timeout=LINK_CHECK_TIMEOUT, allow_redirects=True)
-        if _should_fallback_to_get(response):
-            response = session.get(
-                url,
-                timeout=LINK_CHECK_TIMEOUT,
-                allow_redirects=True,
-                stream=True,
-            )
-        status_code = response.status_code
-        redirect_chain = build_redirect_chain(url, response)
-        redirect_count = max(len(redirect_chain) - 1, 0)
-        final_url = normalize_url(response.url)
-    except requests.RequestException as exc:
+        head_response = session.head(
+            url,
+            timeout=(0.3, 1.0),
+            allow_redirects=False,
+        )
+        status_code = head_response.status_code
+        final_url = normalize_url(head_response.headers.get("Location", "") or url) if 300 <= status_code < 400 else url
+        redirect_count = 1 if 300 <= status_code < 400 else 0
+        redirect_chain = [url, final_url] if redirect_count else [url]
+    except requests.RequestException:
         try:
             response = session.get(
                 url,
-                timeout=LINK_CHECK_TIMEOUT,
-                allow_redirects=True,
+                timeout=(0.3, 1.0),
+                allow_redirects=False,
                 stream=True,
             )
             status_code = response.status_code
-            redirect_chain = build_redirect_chain(url, response)
-            redirect_count = max(len(redirect_chain) - 1, 0)
-            final_url = normalize_url(response.url)
-        except requests.RequestException as fallback_exc:
-            error_type, message = classify_request_error(fallback_exc)
+            final_url = normalize_url(response.headers.get("Location", "") or url) if 300 <= status_code < 400 else url
+            redirect_count = 1 if 300 <= status_code < 400 else 0
+            redirect_chain = [url, final_url] if redirect_count else [url]
+        except requests.RequestException as exc:
+            error_type, message = classify_request_error(exc)
             return None, "error", f"{error_type}: {message}"
 
     detail = {
@@ -436,26 +485,19 @@ def _check_url_status(session: requests.Session, url: str) -> tuple[int | None, 
         "redirect_chain": redirect_chain,
         "final_url": final_url,
     }
-    if 200 <= status_code < 300 and redirect_count > 0:
+    if 300 <= status_code < 400:
         if _is_authentication_redirect_url(final_url):
-            detail["message"] = f"Authentication Required: redirected {redirect_count} time(s) to {final_url}"
+            detail["message"] = f"Authentication Required: redirected to {final_url}"
         else:
-            detail["message"] = f"Redirected {redirect_count} time(s) to {final_url}"
+            detail["message"] = f"Redirected to {final_url}"
         return status_code, "redirect", detail
     if 200 <= status_code < 300:
         return status_code, "working", detail
     if 400 <= status_code < 600:
-        if redirect_count > 0:
-            detail["message"] = f"Broken after {redirect_count} redirect(s) ({status_code})"
-        else:
-            detail["message"] = f"Broken ({status_code})"
+        detail["message"] = f"Broken ({status_code})"
         return status_code, "broken", detail
     detail["message"] = f"Unknown status ({status_code})"
     return status_code, "error", detail
-
-
-def _should_fallback_to_get(response: requests.Response) -> bool:
-    return response.status_code in {403, 405, 429, 500, 501, 502, 503}
 
 
 def _is_authentication_redirect_url(url: str) -> bool:

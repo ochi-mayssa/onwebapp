@@ -324,7 +324,9 @@ def login_view(request):
                 return redirect('branding:designer_dashboard')
             if user.groups.filter(name='Supervisors').exists():
                 return redirect('branding:supervisor_dashboard')
-            if user.is_staff or user.is_superuser:
+            if user.is_superuser:
+                return redirect('/admin/')
+            if user.is_staff:
                 return redirect('branding:unified_dashboard')
 
             # Client: check if they have branding requests

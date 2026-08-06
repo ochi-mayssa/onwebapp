@@ -20,7 +20,7 @@ def _get_seo_statuses():
     try:
         from seo_analyzer.models import SEOMonitoringSnapshot, SEOTask
 
-        snapshots = SEOMonitoringSnapshot.objects.order_by('-recorded_at')[:5]
+        snapshots = SEOMonitoringSnapshot.objects.order_by('-created_at')[:5]
         tasks = list(SEOTask.objects.all()[:10])
 
         if snapshots.exists():
@@ -79,17 +79,14 @@ def _get_seo_statuses():
         pass
 
     try:
-        from seo_analyzer.models import LinkCheckTask
-        qs = list(LinkCheckTask.objects.all()[:10])
-        if qs:
-            broken = 0
-            total = 0
-            for t in qs:
-                total += 1
-                try:
-                    broken += int(getattr(t, 'broken_links_count', 0) or 0)
-                except (TypeError, ValueError):
-                    pass
+        from seo_analyzer.models import SEOMonitoringSnapshot
+        link_snapshots = SEOMonitoringSnapshot.objects.filter(
+            analysis_type__in=['internal', 'external']
+        ).order_by('-created_at')[:5]
+        if link_snapshots.exists():
+            latest = link_snapshots.first()
+            broken = getattr(latest, 'broken_links', 0) or 0
+            total = (getattr(latest, 'internal_links', 0) or 0) + (getattr(latest, 'external_links', 0) or 0)
             if broken > 0:
                 statuses['internal_links'] = 'Error'
                 statuses['external_links'] = 'Warning'
