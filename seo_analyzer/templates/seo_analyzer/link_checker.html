@@ -197,6 +197,8 @@ document.addEventListener("DOMContentLoaded", function () {
   let pollTimer = null;
   let activeProgressUrl = null;
   let activeResultUrl = null;
+  let pollStartedAt = null;
+  const POLL_WATCHDOG_MS = 150000;
 
   function showClientError(message) {
     errorBox.textContent = message;
@@ -324,10 +326,19 @@ document.addEventListener("DOMContentLoaded", function () {
     stopPolling();
     activeProgressUrl = null;
     activeResultUrl = null;
+    pollStartedAt = null;
   }
 
   async function pollProgress() {
     if (!activeProgressUrl) return;
+
+    if (pollStartedAt && (Date.now() - pollStartedAt) > POLL_WATCHDOG_MS) {
+      stopPolling();
+      failureReason.textContent = "The analysis took too long to complete. Please try again.";
+      failureState.classList.remove("d-none");
+      showClientError("The link analysis timed out while waiting for progress updates.");
+      return;
+    }
 
     try {
       const response = await fetch(activeProgressUrl, {
@@ -394,6 +405,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     activeProgressUrl = payload.progress_url;
     activeResultUrl = payload.result_url;
+    pollStartedAt = Date.now();
     pollTimer = window.setInterval(pollProgress, 1000);
     await pollProgress();
   }

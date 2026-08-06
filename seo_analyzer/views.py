@@ -8,6 +8,7 @@ from django.utils.html import format_html
 from django.utils import timezone
 from django.views import View
 from django.utils.decorators import method_decorator
+from django.views.decorators.cache import never_cache
 
 from services.decorators import require_seo_intelligence
 
@@ -807,6 +808,7 @@ def url_intelligence_results_view(request, task_id):
 
 
 @require_seo_intelligence
+@never_cache
 def link_progress_view(request, task_id):
     progress = get_link_progress(str(task_id))
     if not progress:
