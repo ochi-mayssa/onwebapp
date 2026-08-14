@@ -4,6 +4,7 @@ from datetime import datetime
 
 from django.conf import settings
 from django.db import models
+from django.db.models import Sum
 from django.urls import reverse
 from django.utils import timezone
 
@@ -3969,3 +3970,118 @@ class ClientPreferenceProfile(models.Model):
 
         self.save()
         return self
+
+
+# ---------------------------------------------------------------------------
+# Designer Brand Collection Management
+# ---------------------------------------------------------------------------
+
+ASSET_TYPE_CHOICES = [
+    ('logo', 'Logo'),
+    ('color_palette', 'Color Palette'),
+    ('typography', 'Typography'),
+    ('reference', 'Design Reference'),
+    ('template', 'Template'),
+    ('file', 'Creative File'),
+    ('image', 'Image'),
+    ('document', 'Document'),
+]
+
+
+class DesignerCollection(models.Model):
+    """A designer-owned brand collection for organizing brand assets."""
+
+    designer = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='designer_collections',
+    )
+    name = models.CharField(max_length=150)
+    slug = models.SlugField(max_length=170, blank=True)
+    description = models.TextField(blank=True, default='')
+    industry = models.CharField(max_length=80, blank=True, default='')
+    client_name = models.CharField(max_length=120, blank=True, default='')
+    style_tags = models.JSONField(default=list, blank=True)
+    color_palette = models.JSONField(default=list, blank=True)
+    fonts = models.JSONField(default=list, blank=True)
+    accent_color = models.CharField(max_length=9, default='#6366f1')
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        unique_together = [('designer', 'slug')]
+
+    def __str__(self):
+        return f"{self.name} ({self.designer})"
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            from django.utils.text import slugify
+            base = slugify(self.name)[:160]
+            slug = base
+            n = 1
+            while DesignerCollection.objects.filter(
+                designer=self.designer, slug=slug
+            ).exclude(pk=self.pk).exists():
+                slug = f"{base}-{n}"
+                n += 1
+            self.slug = slug
+        super().save(*args, **kwargs)
+
+    @property
+    def asset_count(self):
+        return self.assets.count()
+
+    @property
+    def asset_counts_by_type(self):
+        return dict(
+            self.assets.values_list('asset_type')
+            .annotate(cnt=Count('id'))
+            .values_list('asset_type', 'cnt')
+        )
+
+
+class DesignerAsset(models.Model):
+    """An asset (file, image, color palette, etc.) within a designer collection."""
+
+    collection = models.ForeignKey(
+        DesignerCollection,
+        on_delete=models.CASCADE,
+        related_name='assets',
+    )
+    name = models.CharField(max_length=200)
+    asset_type = models.CharField(max_length=20, choices=ASSET_TYPE_CHOICES, default='file')
+    file = models.FileField(upload_to='designer/collections/%Y/%m/', blank=True, null=True)
+    thumbnail = models.ImageField(upload_to='designer/collections/thumbs/%Y/%m/', blank=True, null=True)
+    description = models.TextField(blank=True, default='')
+    tags = models.JSONField(default=list, blank=True)
+    color_hex = models.CharField(max_length=9, blank=True, default='')
+    font_name = models.CharField(max_length=100, blank=True, default='')
+    sort_order = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['sort_order', '-created_at']
+
+    def __str__(self):
+        return f"{self.name} ({self.get_asset_type_display()})"
+
+    @property
+    def file_size_display(self):
+        if not self.file:
+            return ''
+        size = self.file.size
+        if size < 1024:
+            return f"{size} B"
+        elif size < 1024 * 1024:
+            return f"{size / 1024:.1f} KB"
+        return f"{size / (1024 * 1024):.1f} MB"
+
+    @property
+    def is_image(self):
+        return self.asset_type in ('logo', 'image', 'reference') and self.file
+

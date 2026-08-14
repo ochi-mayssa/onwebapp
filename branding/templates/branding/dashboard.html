@@ -10,8 +10,8 @@
         <!-- Page header -->
         <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
             <div>
-                <h1 class="fw-800 mb-1">Branding Team Dashboard</h1>
-                <p class="text-muted mb-0">Manage branding requests, designers, priorities and deliverables.</p>
+                <h1 class="fw-800 mb-1" style="font-size:1.6rem;">Branding Team Dashboard</h1>
+                <p class="text-muted mb-0 small">Manage branding requests, designers, priorities and deliverables.</p>
             </div>
             <div class="d-flex gap-2 flex-wrap">
                 <a href="{% url 'branding:analytics_overview' %}" class="btn btn-back"><i class="fa-solid fa-chart-line me-2"></i>Analytics</a>
@@ -45,7 +45,7 @@
                 <div class="stat-card stat-card-metric">
                     <div class="stat-card-icon stat-metric-2"><i class="fa-solid fa-stopwatch"></i></div>
                     <div class="stat-card-value">{{ avg_seconds|duration_display }}</div>
-                    <div class="stat-card-label">Average Completion Time</div>
+                    <div class="stat-card-label">Avg Completion</div>
                 </div>
             </div>
             <div class="col-6 col-md-4 col-lg-4">
@@ -151,11 +151,11 @@
                     <tbody>
                         {% for r in requests %}
                         <tr>
-                            <td>
+                            <td data-label="Request">
                                 <span class="fw-800 text-primary small">{{ r.request_number }}</span>
                                 <div class="x-small text-muted">{{ r.user.username }}</div>
                             </td>
-                            <td>
+                            <td data-label="Company">
                                 <div class="d-flex align-items-center gap-2">
                                     <span class="table-avatar">{{ r.company_name|slice:":1"|upper }}</span>
                                     <div>
@@ -166,8 +166,8 @@
                                     </div>
                                 </div>
                             </td>
-                            <td>{{ r.get_industry_display }}</td>
-                            <td>
+                            <td data-label="Industry">{{ r.get_industry_display }}</td>
+                            <td data-label="Collection">
                                 {% if r.collection %}
                                 <div class="d-flex align-items-center gap-2">
                                     {% if r.collection.preview_image %}
@@ -177,16 +177,16 @@
                                 </div>
                                 {% else %}<span class="text-muted small">—</span>{% endif %}
                             </td>
-                            <td>
+                            <td data-label="Designer">
                                 {% if r.designer %}
                                 <span class="d-inline-flex align-items-center gap-1"><i class="fa-solid fa-user-pen text-muted"></i>{{ r.designer.username }}</span>
                                 {% else %}<span class="text-muted small">Unassigned</span>{% endif %}
                             </td>
-                            <td><span class="priority-badge priority-{{ r.priority|lower }}">{{ r.get_priority_display }}</span></td>
-                            <td><span class="status-pill status-{{ r.status|lower }}">{{ r.get_status_display }}</span></td>
-                            <td class="text-muted small text-nowrap">{{ r.created_at|date:"M j, Y" }}</td>
-                            <td class="text-muted small text-nowrap">{{ r.updated_at|date:"M j" }}</td>
-                            <td class="text-end">
+                            <td data-label="Priority"><span class="priority-badge priority-{{ r.priority|lower }}">{{ r.get_priority_display }}</span></td>
+                            <td data-label="Status"><span class="status-pill status-{{ r.status|lower }}">{{ r.get_status_display }}</span></td>
+                            <td data-label="Created" class="text-muted small text-nowrap">{{ r.created_at|date:"M j, Y" }}</td>
+                            <td data-label="Updated" class="text-muted small text-nowrap">{{ r.updated_at|date:"M j" }}</td>
+                            <td data-label="Actions" class="text-end">
                                 <div class="d-inline-flex gap-1">
                                     <a href="{% url 'branding:request_detail' r.pk %}" class="btn btn-sm btn-icon" title="View" data-bs-toggle="tooltip"><i class="fa-solid fa-eye"></i></a>
                                     {% if r.status != 'ARCHIVED' %}

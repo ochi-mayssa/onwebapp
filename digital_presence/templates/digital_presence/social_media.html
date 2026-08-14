@@ -1,0 +1,335 @@
+{% extends 'branding/base.html' %}
+{% load branding_extras dp_tags %}
+
+{% block branding_content %}
+<style>body .branding-page{padding:0!important;margin:0!important;}body .branding-header,body .branding-footer,body footer{display:none!important;}</style>
+<script>document.body.classList.add('dd-active');</script>
+<div class="dd-layout">
+    {% include 'digital_presence/_sidebar.html' with active_page='social_media' %}
+    <main class="dd-main">
+        <header class="dd-topbar">
+            <div class="dd-topbar-left">
+                <button class="dd-sidebar-toggle" id="ddSidebarToggle"><i class="fa-solid fa-bars"></i></button>
+                <div><div class="dd-topbar-title">Social Media</div><div class="dd-topbar-subtitle">Monitor OnWebApp social media presence and engagement.</div></div>
+            </div>
+            <div class="dd-topbar-right">
+                <button class="dd-topbar-btn dd-theme-toggle" id="ddThemeToggle" title="Toggle theme"><i class="fa-solid fa-sun" id="ddThemeIcon"></i></button>
+                <div class="dd-topbar-avatar">{{ user.username|slice:":1"|upper }}</div>
+            </div>
+        </header>
+        <div class="dd-content">
+
+            {# ── Connection Status Banner ── #}
+            {% if connected_count == 0 %}
+            <div class="dd-alert-banner dd-alert-banner-warning">
+                <div class="dd-alert-banner-icon" style="background:rgba(251,191,36,0.15);color:#fbbf24;">
+                    <i class="fa-solid fa-plug"></i>
+                </div>
+                <div class="dd-alert-banner-body">
+                    <div class="dd-alert-banner-title">No Platforms Connected</div>
+                    <div class="dd-alert-banner-message">Connect your social media accounts to start tracking engagement and performance.</div>
+                </div>
+                <div class="dd-alert-banner-action">
+                    <a href="#platforms-section" class="dd-fix-btn dd-fix-btn-warning"><i class="fa-solid fa-arrow-down"></i> Setup</a>
+                </div>
+            </div>
+            {% elif connected_count < 3 %}
+            <div class="dd-alert-banner dd-alert-banner-success">
+                <div class="dd-alert-banner-icon" style="background:rgba(34,197,94,0.15);color:#22c55e;">
+                    <i class="fa-solid fa-plug"></i>
+                </div>
+                <div class="dd-alert-banner-body">
+                    <div class="dd-alert-banner-title">{{ connected_count }}/{{ platform_count }} Platforms Connected</div>
+                    <div class="dd-alert-banner-message">Connect more platforms to get a complete view of your social media presence.</div>
+                </div>
+                <div class="dd-alert-banner-action">
+                    <a href="#platforms-section" class="dd-fix-btn dd-fix-btn-success"><i class="fa-solid fa-plus"></i> Add More</a>
+                </div>
+            </div>
+            {% endif %}
+
+            {# ── Summary Metrics ── #}
+            <div class="dd-metrics dd-metrics-4">
+                <div class="dd-metric" style="border-top:3px solid #818cf8;">
+                    <div class="dd-metric-value">{{ connected_count }}</div>
+                    <div class="dd-metric-label">Connected</div>
+                </div>
+                <div class="dd-metric" style="border-top:3px solid #22c55e;">
+                    <div class="dd-metric-value">{{ total_posts|intcomma }}</div>
+                    <div class="dd-metric-label">Total Posts</div>
+                </div>
+                <div class="dd-metric" style="border-top:3px solid #22d3ee;">
+                    <div class="dd-metric-value">{{ total_engagement|intcomma }}</div>
+                    <div class="dd-metric-label">Total Engagement</div>
+                </div>
+                <div class="dd-metric" style="border-top:3px solid {% if alerts %}#fbbf24{% else %}#22c55e{% endif %};">
+                    <div class="dd-metric-value">{{ alerts|length }}</div>
+                    <div class="dd-metric-label">Alerts</div>
+                </div>
+            </div>
+
+            {# ── Platforms ── #}
+            <div id="platforms-section" class="dd-panel" style="margin-top:16px;">
+                <div class="dd-panel-header">
+                    <span class="dd-panel-title"><i class="fa-solid fa-share-nodes" style="color:#818cf8;"></i>Platforms</span>
+                    <span style="font-size:0.6rem;color:#52525b;">{{ connected_count }}/{{ platform_count }} connected</span>
+                </div>
+                <div class="dd-platform-grid">
+                    {% for p in platforms %}
+                    <div class="dd-platform-card" style="border-color:{% if p.status == 'connected' %}{{ p.color }}33{% else %}{% endif %};">
+                        <div class="dd-platform-header">
+                            <div class="dd-platform-icon" style="background:{{ p.color }}15;"><i class="{{ p.icon }}" style="color:{{ p.color }};"></i></div>
+                            <div style="flex:1;">
+                                <div class="dd-platform-name">{{ p.name }}</div>
+                                <span class="dd-platform-status dd-platform-status-{{ p.status }}">{{ p.status|title }}</span>
+                            </div>
+                        </div>
+                        {% if p.status == 'connected' and p.metrics %}
+                        <div class="dd-platform-metrics">
+                            <div class="dd-platform-metric">
+                                <div class="dd-platform-metric-value">{{ p.metrics.posts|intcomma }}</div>
+                                <div class="dd-platform-metric-label">Posts</div>
+                            </div>
+                            <div class="dd-platform-metric">
+                                <div class="dd-platform-metric-value">{{ p.metrics.total_engagement|intcomma }}</div>
+                                <div class="dd-platform-metric-label">Engagement</div>
+                            </div>
+                            {% if p.metrics.growth_pct is not None %}
+                            <div class="dd-platform-metric">
+                                <div class="dd-platform-metric-value {% if p.metrics.growth_pct > 0 %}dd-color-good{% elif p.metrics.growth_pct < 0 %}dd-color-bad{% endif %}">{{ p.metrics.growth_pct }}%</div>
+                                <div class="dd-platform-metric-label">Growth</div>
+                            </div>
+                            {% endif %}
+                            {% if p.metrics.engagement_rate is not None %}
+                            <div class="dd-platform-metric">
+                                <div class="dd-platform-metric-value">{{ p.metrics.engagement_rate }}</div>
+                                <div class="dd-platform-metric-label">Avg Eng/Post</div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-top:8px;">
+                            <div style="text-align:center;">
+                                <div style="font-size:0.75rem;font-weight:700;color:#fafafa;">{{ p.metrics.likes|intcomma }}</div>
+                                <div style="font-size:0.5rem;color:#52525b;">{% if p.key == 'linkedin' %}Reactions{% else %}Likes{% endif %}</div>
+                            </div>
+                            <div style="text-align:center;">
+                                <div style="font-size:0.75rem;font-weight:700;color:#fafafa;">{{ p.metrics.comments|intcomma }}</div>
+                                <div style="font-size:0.5rem;color:#52525b;">Comments</div>
+                            </div>
+                            <div style="text-align:center;">
+                                <div style="font-size:0.75rem;font-weight:700;color:#fafafa;">{{ p.metrics.shares|intcomma }}</div>
+                                <div style="font-size:0.5rem;color:#52525b;">Shares</div>
+                            </div>
+                        </div>
+                        {% if p.last_sync %}
+                        <div style="margin-top:8px;font-size:0.55rem;color:#52525b;text-align:center;">Last sync {{ p.last_sync|timesince }} ago</div>
+                        {% endif %}
+                        {% else %}
+                        <div class="dd-empty-cta" style="padding:20px 16px;">
+                            <div class="dd-empty-cta-icon" style="background:{{ p.color }}15;color:{{ p.color }};width:40px;height:40px;border-radius:10px;font-size:1rem;">
+                                <i class="{{ p.icon }}"></i>
+                            </div>
+                            {% if not p.env_configured and not p.provider_exists %}
+                            <div class="dd-empty-cta-title" style="font-size:0.7rem;">Not Configured</div>
+                            <div class="dd-empty-cta-desc" style="font-size:0.58rem;">Set environment variables to enable {{ p.name }} integration.</div>
+                            <div class="dd-fix-btn dd-fix-btn-primary"><i class="fa-solid fa-cog"></i> Configure</div>
+                            {% elif p.status == 'not_connected' %}
+                            <div class="dd-empty-cta-title" style="font-size:0.7rem;">Not Connected</div>
+                            <div class="dd-empty-cta-desc" style="font-size:0.58rem;">Connect this platform to start tracking.</div>
+                            <div class="dd-fix-btn dd-fix-btn-primary"><i class="fa-solid fa-plug"></i> Connect</div>
+                            {% else %}
+                            <div class="dd-empty-cta-title" style="font-size:0.7rem;">Data Unavailable</div>
+                            <div class="dd-empty-cta-desc" style="font-size:0.58rem;">Check connection settings.</div>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            {# ── Alerts ── #}
+            {% if alerts %}
+            <div class="dd-panel" style="margin-top:16px;">
+                <div class="dd-panel-header">
+                    <span class="dd-panel-title"><i class="fa-solid fa-bell" style="color:#fbbf24;"></i>Alerts</span>
+                    <span class="dd-alert-count">{{ alerts|length }} active</span>
+                </div>
+                {% for a in alerts %}
+                <div class="dd-alert-item dd-alert-{{ a.severity }}" style="margin-bottom:6px;">
+                    <div class="dd-alert-item-body">
+                        <div class="dd-alert-item-title">{{ a.title }}</div>
+                        <div class="dd-alert-item-message">{{ a.message }}</div>
+                    </div>
+                    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+                        <span class="dd-severity-badge dd-severity-{{ a.severity }}">{{ a.severity }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {# ── Performance Chart ── #}
+            <div class="dd-panel" style="margin-top:16px;">
+                <div class="dd-panel-header">
+                    <span class="dd-panel-title"><i class="fa-solid fa-chart-line" style="color:#22c55e;"></i>Performance</span>
+                    <div style="display:flex;gap:4px;align-items:center;">
+                        <select id="chartMetric" class="dd-select">
+                            <option value="engagement">Engagement</option>
+                            <option value="likes">Likes</option>
+                            <option value="comments">Comments</option>
+                            <option value="shares">Shares</option>
+                            <option value="views">Views</option>
+                        </select>
+                        <select id="chartPlatform" class="dd-select">
+                            <option value="all">All Platforms</option>
+                            <option value="facebook">Facebook</option>
+                            <option value="instagram">Instagram</option>
+                            <option value="linkedin">LinkedIn</option>
+                        </select>
+                        <select id="chartPeriod" class="dd-select">
+                            <option value="7d">7 Days</option>
+                            <option value="30d" selected>30 Days</option>
+                            <option value="90d">90 Days</option>
+                            <option value="12m">12 Months</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="dd-chart-container">
+                    <canvas id="socialChart"></canvas>
+                </div>
+            </div>
+
+            {# ── Recent Posts ── #}
+            {% if posts %}
+            <div class="dd-panel" style="margin-top:16px;">
+                <div class="dd-panel-header">
+                    <span class="dd-panel-title"><i class="fa-solid fa-clock" style="color:#22d3ee;"></i>Recent Posts</span>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table class="dd-table">
+                        <thead>
+                            <tr>
+                                <th>Platform</th>
+                                <th>Post</th>
+                                <th style="text-align:center;">Likes</th>
+                                <th style="text-align:center;">Comments</th>
+                                <th style="text-align:center;">Shares</th>
+                                <th style="text-align:center;">Engagement</th>
+                                <th style="text-align:center;">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for post in posts %}
+                            <tr>
+                                <td>
+                                    <span style="display:inline-flex;align-items:center;gap:4px;">
+                                        {% if post.platform == 'facebook' %}<i class="fa-brands fa-facebook-f" style="color:#1877F2;"></i>
+                                        {% elif post.platform == 'instagram' %}<i class="fa-brands fa-instagram" style="color:#E4405F;"></i>
+                                        {% elif post.platform == 'linkedin' %}<i class="fa-brands fa-linkedin-in" style="color:#0A66C2;"></i>
+                                        {% else %}<i class="fa-solid fa-globe" style="color:#52525b;"></i>{% endif %}
+                                        {{ post.platform|capfirst }}
+                                    </span>
+                                </td>
+                                <td style="max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ post.caption|default:"No caption" }}</td>
+                                <td style="text-align:center;">{{ post.likes|intcomma }}</td>
+                                <td style="text-align:center;">{{ post.comments|intcomma }}</td>
+                                <td style="text-align:center;">{{ post.shares|intcomma }}</td>
+                                <td style="text-align:center;font-weight:700;" class="{% if post.classification == 'viral' %}dd-color-good{% elif post.classification == 'low' %}dd-color-bad{% endif %}">{{ post.engagement_score|intcomma }}</td>
+                                <td style="text-align:center;">{{ post.posted_at|date:"M j" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+
+            {# ── Top Performing Content ── #}
+            {% if top_posts %}
+            <div class="dd-panel" style="margin-top:16px;">
+                <div class="dd-panel-header">
+                    <span class="dd-panel-title"><i class="fa-solid fa-trophy" style="color:#fbbf24;"></i>Top Performing Content</span>
+                </div>
+                {% for post in top_posts %}
+                <div class="dd-project-card">
+                    <div class="dd-project-thumb placeholder" style="background:{% if post.platform == 'facebook' %}rgba(24,119,242,0.1);color:#1877F2{% elif post.platform == 'instagram' %}rgba(228,64,95,0.1);color:#E4405F{% elif post.platform == 'linkedin' %}rgba(10,102,194,0.1);color:#0A66C2{% else %}rgba(82,82,91,0.1);color:#52525b{% endif %};">
+                        {% if post.platform == 'facebook' %}<i class="fa-brands fa-facebook-f"></i>
+                        {% elif post.platform == 'instagram' %}<i class="fa-brands fa-instagram"></i>
+                        {% elif post.platform == 'linkedin' %}<i class="fa-brands fa-linkedin-in"></i>
+                        {% else %}<i class="fa-solid fa-globe"></i>{% endif %}
+                    </div>
+                    <div class="dd-project-info">
+                        <div class="dd-project-title">{{ post.caption|default:"No caption"|truncatechars:80 }}</div>
+                        <div class="dd-project-meta">
+                            <i class="fa-solid fa-heart" style="color:#ef4444;"></i> {{ post.likes|intcomma }} likes
+                            <span style="margin:0 4px;">·</span>
+                            <i class="fa-solid fa-comment" style="color:#22d3ee;"></i> {{ post.comments|intcomma }} comments
+                            <span style="margin:0 4px;">·</span>
+                            <i class="fa-solid fa-share" style="color:#818cf8;"></i> {{ post.shares|intcomma }} shares
+                        </div>
+                    </div>
+                    <div class="dd-project-badges">
+                        <span class="dd-status dd-status-{% if post.classification == 'viral' %}completed{% elif post.classification == 'low' %}revision{% else %}designing{% endif %}">{{ post.classification }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {# ── Empty State ── #}
+            {% if not posts and not alerts %}
+            <div class="dd-panel" style="margin-top:16px;">
+                <div class="dd-empty-cta">
+                    <div class="dd-empty-cta-icon" style="background:rgba(34,211,238,0.1);color:#22d3ee;"><i class="fa-solid fa-share-nodes"></i></div>
+                    <div class="dd-empty-cta-title">No Social Media Data Yet</div>
+                    <div class="dd-empty-cta-desc">Connect your social media platforms and run a crawl to start collecting data.</div>
+                    <a href="#platforms-section" class="dd-empty-cta-btn dd-empty-cta-btn-primary"><i class="fa-solid fa-plug"></i> Setup Platforms</a>
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+(function(){
+    var s=document.getElementById('ddSidebar'),o=document.getElementById('ddSidebarOverlay'),t=document.getElementById('ddSidebarToggle');
+    if(t)t.addEventListener('click',function(){s.classList.toggle('open');o.classList.toggle('show')});
+    if(o)o.addEventListener('click',function(){s.classList.remove('open');o.classList.remove('show')});
+    var b=document.getElementById('ddThemeToggle'),icon=document.getElementById('ddThemeIcon'),root=document.documentElement;
+    function getTheme(){var v=localStorage.getItem('dd-theme');if(v)return v;return window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'}
+    function setTheme(t){root.setAttribute('data-dd-theme',t);localStorage.setItem('dd-theme',t);if(icon)icon.className=t==='dark'?'fa-solid fa-sun':'fa-solid fa-moon'}
+    setTheme(getTheme());
+    if(b)b.addEventListener('click',function(){var c=root.getAttribute('data-dd-theme')||'dark';setTheme(c==='dark'?'light':'dark')});
+
+    var chartCanvas=document.getElementById('socialChart');
+    var chart=null;
+    var chartUrl='{% url "digital_presence:social_chart_data" %}';
+
+    function loadChart(){
+        var metric=document.getElementById('chartMetric').value;
+        var platform=document.getElementById('chartPlatform').value;
+        var period=document.getElementById('chartPeriod').value;
+        fetch(chartUrl+'?metric='+metric+'&platform='+platform+'&period='+period)
+            .then(function(r){return r.json()})
+            .then(function(data){
+                if(chart)chart.destroy();
+                var ctx=chartCanvas.getContext('2d');
+                var datasets=data.datasets.map(function(ds){
+                    return {label:ds.label,data:ds.data,borderColor:ds.borderColor,backgroundColor:ds.backgroundColor,borderWidth:2,fill:true,tension:0.3,pointRadius:2,pointHoverRadius:4};
+                });
+                chart=new Chart(ctx,{type:'line',data:{labels:data.labels,datasets:datasets},options:{responsive:true,maintainAspectRatio:false,interaction:{intersect:false,mode:'index'},plugins:{legend:{labels:{color:'#a1a1aa',font:{size:10}}}},scales:{x:{grid:{color:'#1a1a1e'},ticks:{color:'#52525b',font:{size:9}}},y:{grid:{color:'#1a1a1e'},ticks:{color:'#52525b',font:{size:9}},beginAtZero:true}}}});
+            })
+            .catch(function(){});
+    }
+
+    document.getElementById('chartMetric').addEventListener('change',loadChart);
+    document.getElementById('chartPlatform').addEventListener('change',loadChart);
+    document.getElementById('chartPeriod').addEventListener('change',loadChart);
+    loadChart();
+})();
+</script>
+{% endblock %}

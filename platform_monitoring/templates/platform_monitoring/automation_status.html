@@ -1,0 +1,255 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<style>
+    .status-page {
+        padding: 35px 15px 60px;
+        background: #fbfcff;
+        min-height: 100vh;
+    }
+
+    .status-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+
+    .status-title {
+        font-size: 36px;
+        font-weight: 700;
+        color: #17233a;
+        margin: 0;
+    }
+
+    .status-subtitle {
+        color: #52627a;
+        font-size: 17px;
+        margin-top: 6px;
+    }
+
+    .system-badge {
+        padding: 10px 20px;
+        border-radius: 10px;
+        font-weight: 600;
+        background: #dff5ea;
+        color: #183a32;
+    }
+
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 18px;
+        margin-bottom: 28px;
+    }
+
+    .summary-card {
+        background: white;
+        border: 1px solid #edf0f5;
+        border-radius: 18px;
+        padding: 25px;
+        box-shadow: 0 2px 7px rgba(20, 30, 55, .05);
+    }
+
+    .summary-label {
+        color: #52627a;
+        font-size: 15px;
+        margin-bottom: 10px;
+    }
+
+    .summary-value {
+        color: #17233a;
+        font-size: 30px;
+        font-weight: 700;
+    }
+
+    .runs-card {
+        background: white;
+        border: 1px solid #edf0f5;
+        border-radius: 18px;
+        padding: 28px;
+        box-shadow: 0 2px 7px rgba(20, 30, 55, .05);
+    }
+
+    .runs-card h2 {
+        color: #17233a;
+        font-size: 23px;
+        margin-bottom: 5px;
+    }
+
+    .runs-description {
+        color: #64748b;
+        margin-bottom: 25px;
+    }
+
+    .status-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .status-table th {
+        text-align: left;
+        padding: 14px 10px;
+        color: #17233a;
+        border-bottom: 1px solid #e5eaf1;
+    }
+
+    .status-table td {
+        padding: 16px 10px;
+        border-bottom: 1px solid #edf0f5;
+        color: #35445c;
+    }
+
+    .run-status {
+        display: inline-block;
+        padding: 5px 12px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .SUCCESS {
+        background: #dff5ea;
+        color: #174b3b;
+    }
+
+    .FAILURE {
+        background: #fde8e8;
+        color: #9b1c1c;
+    }
+
+    .RUNNING {
+        background: #e3efff;
+        color: #1d4ed8;
+    }
+
+    .PENDING {
+        background: #fff4d6;
+        color: #8a5b00;
+    }
+
+    @media (max-width: 900px) {
+        .summary-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+</style>
+
+<div class="status-page">
+
+    <div class="status-header">
+        <div>
+            <h1 class="status-title">Current Status</h1>
+            <div class="status-subtitle">
+                Live automation execution status overview.
+            </div>
+        </div>
+
+        <div class="system-badge">
+            ● {{ system_status }}
+        </div>
+    </div>
+
+    <div class="summary-grid">
+
+        <div class="summary-card">
+            <div class="summary-label">Total Workflows</div>
+            <div class="summary-value">{{ total_workflows }}</div>
+        </div>
+
+        <div class="summary-card">
+            <div class="summary-label">Running</div>
+            <div class="summary-value">{{ running }}</div>
+        </div>
+
+        <div class="summary-card">
+            <div class="summary-label">Pending</div>
+            <div class="summary-value">{{ pending }}</div>
+        </div>
+
+        <div class="summary-card">
+            <div class="summary-label">Latest Execution</div>
+
+            {% if latest_run %}
+                <div class="summary-value" style="font-size:21px;">
+                    {{ latest_run.status }}
+                </div>
+                <div style="margin-top:6px;color:#64748b;">
+                    {{ latest_run.workflow.wf_id }}
+                </div>
+            {% else %}
+                <div class="summary-value">—</div>
+            {% endif %}
+        </div>
+
+    </div>
+
+    <div class="runs-card">
+
+        <h2>Recent Activity</h2>
+
+        <div class="runs-description">
+            Latest automation executions recorded by the RPA engine.
+        </div>
+
+        <table class="status-table">
+
+            <thead>
+                <tr>
+                    <th>Run</th>
+                    <th>Workflow</th>
+                    <th>Status</th>
+                    <th>Progress</th>
+                    <th>Duration</th>
+                    <th>Started</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for run in recent_runs %}
+
+                <tr>
+                    <td>#{{ run.id }}</td>
+
+                    <td>
+                        <strong>{{ run.workflow.wf_id }}</strong><br>
+                        <span style="color:#64748b;">
+                            {{ run.workflow.title }}
+                        </span>
+                    </td>
+
+                    <td>
+                        <span class="run-status {{ run.status }}">
+                            ● {{ run.get_status_display }}
+                        </span>
+                    </td>
+
+                    <td>{{ run.progress }}%</td>
+
+                    <td>{{ run.duration_ms }} ms</td>
+
+                    <td>{{ run.started_at|date:"M d, Y H:i:s" }}</td>
+                </tr>
+
+                {% empty %}
+
+                <tr>
+                    <td colspan="6" style="text-align:center;padding:30px;">
+                        No workflow activity recorded.
+                    </td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

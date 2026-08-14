@@ -1,0 +1,30 @@
+<aside class="dd-sidebar" id="ddSidebar">
+    <a class="dd-sidebar-logo" href="{% url 'branding:designer_dashboard' %}">
+        <span class="dd-sidebar-logo-icon"><i class="fa-solid fa-palette"></i></span>
+        <span><span class="dd-sidebar-logo-text">Branding Studio</span><span class="dd-sidebar-logo-sub">Designer</span></span>
+    </a>
+    <nav class="dd-sidebar-nav">
+        <div class="dd-sidebar-section">
+            <div class="dd-sidebar-section-title">Digital Presence</div>
+            <a href="{% url 'digital_presence:overview' %}" class="dd-nav-item{% if active_page == 'overview' %} active{% endif %}"><i class="fa-solid fa-globe"></i>Overview</a>
+            <a href="{% url 'digital_presence:social_media' %}" class="dd-nav-item{% if active_page == 'social_media' %} active{% endif %}"><i class="fa-solid fa-share-nodes"></i>Social Media</a>
+            <a href="{% url 'digital_presence:seo' %}" class="dd-nav-item{% if active_page == 'seo' %} active{% endif %}"><i class="fa-solid fa-magnifying-glass-chart"></i>SEO</a>
+            <a href="{% url 'digital_presence:keywords' %}" class="dd-nav-item{% if active_page == 'keywords' %} active{% endif %}"><i class="fa-solid fa-key"></i>Keywords</a>
+            <a href="{% url 'digital_presence:content' %}" class="dd-nav-item{% if active_page == 'content' %} active{% endif %}"><i class="fa-solid fa-file-lines"></i>Content</a>
+            <a href="{% url 'digital_presence:reports' %}" class="dd-nav-item{% if active_page == 'reports' %} active{% endif %}"><i class="fa-solid fa-chart-bar"></i>Reports</a>
+        </div>
+        <div class="dd-sidebar-section">
+            <div class="dd-sidebar-section-title">Workspace</div>
+            <a href="{% url 'branding:designer_dashboard' %}" class="dd-nav-item"><i class="fa-solid fa-gauge-high"></i>Dashboard</a>
+            <a href="{% url 'branding:my_requests' %}" class="dd-nav-item"><i class="fa-solid fa-folder-open"></i>My Projects</a>
+        </div>
+    </nav>
+    <div class="dd-sidebar-user">
+        <div class="dd-sidebar-avatar">{{ user.username|slice:":1"|upper }}</div>
+        <div class="dd-sidebar-user-info">
+            <div class="dd-sidebar-user-name">{{ user.get_full_name|default:user.username }}</div>
+            <div class="dd-sidebar-user-role">Designer</div>
+        </div>
+    </div>
+</aside>
+<div class="dd-sidebar-overlay" id="ddSidebarOverlay"></div>

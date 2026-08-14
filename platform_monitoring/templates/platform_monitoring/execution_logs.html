@@ -1,0 +1,286 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}Execution Logs{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <i data-lucide="file-text" style="width:28px;height:28px;"></i>
+                <h1 class="h3 mb-0">Execution Logs</h1>
+            </div>
+
+            <p class="text-muted mb-0">
+                Workflow execution history, status, duration & audit trail.
+            </p>
+        </div>
+
+        <span class="badge bg-light text-dark border px-3 py-2">
+            {{ total_runs }} Total Runs
+        </span>
+    </div>
+
+
+    <!-- SUMMARY -->
+    <div class="row g-3 mb-4">
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small mb-1">Total Runs</div>
+                    <div class="fs-3 fw-bold">{{ total_runs }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small mb-1">Successful</div>
+                    <div class="fs-3 fw-bold text-success">
+                        {{ success_runs }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small mb-1">Failed</div>
+                    <div class="fs-3 fw-bold text-danger">
+                        {{ failed_runs }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small mb-1">Running / Pending</div>
+                    <div class="fs-3 fw-bold text-warning">
+                        {{ running_runs }}
+                    </div>
+
+                    <div class="small text-muted mt-1">
+                        Success Rate: {{ success_rate }}%
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- EXECUTION TABLE -->
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-header bg-transparent border-0 pt-4 px-4">
+
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="h5 mb-1">Workflow Runs</h2>
+                    <p class="text-muted small mb-0">
+                        Latest workflow executions recorded by the RPA engine.
+                    </p>
+                </div>
+
+                <i data-lucide="activity"
+                   style="width:24px;height:24px;"></i>
+            </div>
+
+        </div>
+
+        <div class="card-body px-4">
+
+            {% if runs %}
+
+            <div class="table-responsive">
+
+                <table class="table align-middle">
+
+                    <thead>
+                        <tr>
+                            <th>Run</th>
+                            <th>Workflow</th>
+                            <th>Status</th>
+                            <th>Progress</th>
+                            <th>Duration</th>
+                            <th>Started</th>
+                            <th>Triggered By</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                    {% for run in runs %}
+
+                        <tr>
+
+                            <!-- RUN ID -->
+                            <td>
+                                <strong>#{{ run.id }}</strong>
+                            </td>
+
+
+                            <!-- WORKFLOW -->
+                            <td>
+                                <div>
+                                    <strong>
+                                        {{ run.workflow.wf_id }}
+                                    </strong>
+
+                                    <div class="small text-muted">
+                                        {{ run.workflow.title }}
+                                    </div>
+                                </div>
+                            </td>
+
+
+                            <!-- STATUS -->
+                            <td>
+
+                                {% if run.status == "SUCCESS" %}
+
+                                    <span class="badge bg-success-subtle text-success">
+                                        ● Success
+                                    </span>
+
+                                {% elif run.status == "FAILURE" %}
+
+                                    <span class="badge bg-danger-subtle text-danger">
+                                        ● Failure
+                                    </span>
+
+                                {% elif run.status == "RUNNING" %}
+
+                                    <span class="badge bg-primary-subtle text-primary">
+                                        ● Running
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="badge bg-warning-subtle text-warning">
+                                        ● Pending
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- PROGRESS -->
+                            <td style="min-width:150px;">
+
+                                <div class="d-flex align-items-center gap-2">
+
+                                    <div class="progress flex-grow-1"
+                                         style="height:6px;">
+
+                                        <div
+                                            class="progress-bar"
+                                            role="progressbar"
+                                            style="width: {{ run.progress }}%;"
+                                            aria-valuenow="{{ run.progress }}"
+                                            aria-valuemin="0"
+                                            aria-valuemax="100">
+                                        </div>
+
+                                    </div>
+
+                                    <small>
+                                        {{ run.progress }}%
+                                    </small>
+
+                                </div>
+
+                            </td>
+
+
+                            <!-- DURATION -->
+                            <td>
+                                {{ run.duration_ms }} ms
+                            </td>
+
+
+                            <!-- STARTED -->
+                            <td>
+                                <div>
+                                    {{ run.started_at|date:"M d, Y" }}
+                                </div>
+
+                                <small class="text-muted">
+                                    {{ run.started_at|date:"H:i:s" }}
+                                </small>
+                            </td>
+
+
+                            <!-- USER -->
+                            <td>
+
+                                {% if run.triggered_by %}
+
+                                    {{ run.triggered_by }}
+
+                                {% else %}
+
+                                    <span class="text-muted">
+                                        System
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            {% else %}
+
+                <div class="text-center py-5">
+
+                    <i data-lucide="file-x"
+                       style="width:42px;height:42px;"
+                       class="text-muted mb-3"></i>
+
+                    <h3 class="h5">
+                        No Execution Logs
+                    </h3>
+
+                    <p class="text-muted mb-0">
+                        Workflow executions will appear here after they run.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    if (typeof lucide !== "undefined") {
+        lucide.createIcons();
+    }
+});
+</script>
+
+{% endblock %}

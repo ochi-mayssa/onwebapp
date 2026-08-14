@@ -86,6 +86,7 @@ urlpatterns = [
 
     # Designer Dashboard
     path('designer/dashboard/', views.designer_dashboard, name='designer_dashboard'),
+    path('team-designer/dashboard/', views.team_designer_dashboard, name='team_designer_dashboard'),
 
     # Designer Workflow — Draft Uploads
     path('designer/requests/<int:pk>/drafts/', views.designer_drafts, name='designer_drafts'),
@@ -114,6 +115,15 @@ urlpatterns = [
     path('designer/collection-templates/<int:pk>/edit/', views.collection_template_edit, name='collection_template_edit'),
     path('designer/collection-templates/<int:pk>/delete/', views.collection_template_delete, name='collection_template_delete'),
     path('designer/collection-templates/<int:pk>/download/', views.collection_template_download, name='collection_template_download'),
+
+    # Designer Brand Collections
+    path('designer/collections/', views.designer_collection_list, name='designer_collection_list'),
+    path('designer/collections/create/', views.designer_collection_create, name='designer_collection_create'),
+    path('designer/collections/<slug:slug>/', views.designer_collection_detail, name='designer_collection_detail'),
+    path('designer/collections/<slug:slug>/edit/', views.designer_collection_edit, name='designer_collection_edit'),
+    path('designer/collections/<slug:slug>/delete/', views.designer_collection_delete, name='designer_collection_delete'),
+    path('designer/collections/<slug:slug>/upload/', views.designer_asset_upload, name='designer_asset_upload'),
+    path('designer/assets/<int:pk>/delete/', views.designer_asset_delete, name='designer_asset_delete'),
 
     # Collaboration — Peer Review
     path('designer/requests/<int:pk>/peer-reviews/', views.peer_reviews, name='peer_reviews'),

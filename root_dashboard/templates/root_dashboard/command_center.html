@@ -1,0 +1,834 @@
+{% extends "base.html" %}
+{% load i18n static root_dashboard_tags web_tags %}
+
+{% block title %}{% trans "Root Command Center" %} | OnWebApp{% endblock %}
+
+{% block meta %}
+<meta name="description" content="OnWebApp Root Command Center - Executive platform overview">
+<link rel="canonical" href="{{ request.build_absolute_uri }}">
+{% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-expand-lg navbar-glass sticky-top py-3">
+    <div class="container">
+        <a class="navbar-brand py-0 d-flex align-items-center gap-2" href="{% url 'root_dashboard:command_center' %}">
+            <img src="{% static 'img/logo.png' %}" alt="OnWebApp" height="40" class="d-inline-block align-text-top">
+            <span class="fw-800 text-slate-900">OnWebApp</span>
+            <span class="badge bg-danger ms-2 px-2 py-1" style="font-size: 0.65rem; letter-spacing: 0.05em;">
+                <i class="fas fa-crown me-1"></i>ROOT
+            </span>
+        </a>
+
+        <div class="d-flex align-items-center order-lg-2 gap-2">
+            <!-- System Status -->
+            <div class="d-none d-md-flex align-items-center rounded-pill bg-surface-secondary border px-3 py-1">
+                <div class="spinner-grow spinner-grow-sm text-success me-2" role="status" style="width: 8px; height: 8px;"></div>
+                <span class="small fw-700 text-secondary">{% trans "System Live" %}</span>
+            </div>
+
+            <!-- Notifications -->
+            <div class="dropdown">
+                <button class="btn btn-sm btn-light rounded-pill px-3 border-0 position-relative" type="button" id="rootNotifications" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-bell"></i>
+                    {% if alerts %}<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">{{ alerts|length }}</span>{% endif %}
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow-xl border-0 rounded-24 p-3" aria-labelledby="rootNotifications" style="min-width: 320px;">
+                    <li class="px-3 py-2 mb-2 border-bottom"><span class="fw-800 text-slate-900">{% trans "Alerts" %}</span></li>
+                    {% for alert in alerts %}
+                    <li class="px-3 py-2">
+                        <div class="d-flex align-items-start gap-2">
+                            <i class="{{ alert.category|category_icon }} mt-1"></i>
+                            <div>
+                                <span class="fw-600 small d-block">{{ alert.title }}</span>
+                                <span class="text-secondary" style="font-size: 0.75rem;">{{ alert.detail }}</span>
+                            </div>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- Theme Toggle -->
+            <button id="themeToggle" class="btn btn-sm btn-light rounded-pill px-3 border-0" title="{% trans 'Toggle theme' %}">
+                <i id="themeIcon" class="fas fa-moon"></i>
+            </button>
+
+            <!-- Root Profile Menu -->
+            <div class="dropdown">
+                <button class="user-dropdown-toggle d-flex align-items-center gap-2" type="button" id="rootProfileMenu" data-bs-toggle="dropdown" aria-expanded="false">
+                    <div class="user-avatar-sm" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                        {{ user.username|slice:":1"|upper }}
+                    </div>
+                    <i class="fas fa-chevron-down small opacity-50"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow-xl border-0 rounded-24 p-3" aria-labelledby="rootProfileMenu" style="min-width: 260px;">
+                    <li class="px-3 py-2 mb-2 border-bottom">
+                        <span class="d-block fw-800 text-slate-900">{{ user.username }}</span>
+                        <span class="d-block x-small text-slate-500">{{ user.email }}</span>
+                        <span class="badge bg-danger mt-1" style="font-size: 0.6rem;">ROOT ACCESS</span>
+                    </li>
+                    <li><a class="dropdown-item" href="{% url 'root_dashboard:command_center' %}"><span class="service-icon"><i class="fas fa-crown"></i></span>{% trans "Command Center" %}</a></li>
+                    <li><a class="dropdown-item" href="{% url 'root_dashboard:operations_center' %}"><span class="service-icon"><i class="fas fa-heartbeat"></i></span>{% trans "Operations Center" %}</a></li>
+                    <li><a class="dropdown-item" href="/admin/"><span class="service-icon"><i class="fas fa-cog"></i></span>{% trans "Django Admin" %}</a></li>
+                    <li><hr class="dropdown-divider opacity-50"></li>
+                    <li class="px-3 py-2 border-top mt-2 pt-3">
+                        <a class="btn btn-danger btn-sm w-100 rounded-pill fw-800 py-2" href="{% url 'users:logout' %}"><i class="fas fa-sign-out-alt me-2"></i>{% trans "Log Out" %}</a>
+                    </li>
+                </ul>
+            </div>
+
+            <button class="navbar-toggler ms-2 border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#rootNav">
+                <div class="hamburger"><span></span><span></span></div>
+            </button>
+        </div>
+
+        <div class="collapse navbar-collapse order-lg-1" id="rootNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link active" href="{% url 'root_dashboard:command_center' %}"><i class="fas fa-crown me-1"></i> {% trans "Command Center" %}</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'root_dashboard:operations_center' %}"><i class="fas fa-heartbeat me-1"></i> {% trans "Operations" %}</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% monitoring_url %}"><i class="fas fa-desktop me-1"></i> {% trans "Monitoring" %}</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'crm:dashboard' %}"><i class="fas fa-users me-1"></i> {% trans "CRM" %}</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4" style="max-width: 1600px;">
+
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- HERO HEADER -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <div class="card border-0 mb-4 overflow-hidden" style="border-radius: var(--radius-xl); background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);">
+        <div class="card-body p-4 p-lg-5">
+            <div class="row align-items-center">
+                <div class="col-lg-7">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <div style="background:rgba(255,255,255,0.15);width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;">
+                            <i class="fas fa-crown text-white" style="font-size:1.2rem;"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-white fw-800 mb-0" style="font-size: 1.6rem; letter-spacing: -0.02em;">
+                                {% trans "Command Center" %}
+                            </h1>
+                            <p class="text-white-50 mb-0 small">{% trans "OnWebApp Platform Overview" %}</p>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-wrap gap-3 mt-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <div style="background:rgba(16,185,129,0.2);width:10px;height:10px;border-radius:50%;"></div>
+                            <span class="text-white-50 small">{% trans "All systems operational" %}</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-users text-white-50 small"></i>
+                            <span class="text-white-50 small">{{ user_metrics.total|intcomma }} {% trans "users" %}</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-project-diagram text-white-50 small"></i>
+                            <span class="text-white-50 small">{{ project_metrics.active|intcomma }} {% trans "active projects" %}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-5 mt-3 mt-lg-0">
+                    <div class="d-flex gap-2 flex-wrap justify-content-lg-end align-items-center">
+                        <!-- Global Search -->
+                        <div class="position-relative flex-grow-1" style="max-width: 280px;" id="globalSearchWrapper">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text border-0 rounded-start-pill ps-3" style="background:rgba(255,255,255,0.15);"><i class="fas fa-search text-white-50 small"></i></span>
+                                <input type="text" id="globalSearchInput" class="form-control border-0 rounded-end-pill text-white"
+                                       placeholder="{% trans 'Search...' %}"
+                                       autocomplete="off" style="background:rgba(255,255,255,0.15); font-size:0.85rem;">
+                            </div>
+                            <div id="globalSearchResults" class="position-absolute top-100 start-0 w-100 mt-1 shadow-xl border-0 rounded-24 p-3 d-none"
+                                 style="background: var(--bg-surface-primary); z-index: 1050; max-height: 400px; overflow-y: auto;">
+                                <div id="globalSearchLoading" class="text-center py-3 d-none">
+                                    <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                                    <span class="ms-2 small text-secondary">{% trans "Searching..." %}</span>
+                                </div>
+                                <div id="globalSearchEmpty" class="text-center py-3 d-none">
+                                    <span class="small text-secondary">{% trans "No results found" %}</span>
+                                </div>
+                                <div id="globalSearchContent"></div>
+                            </div>
+                        </div>
+                        <!-- Time Filters -->
+                        <div class="d-flex gap-1">
+                            <a href="?period=7d" class="btn btn-sm rounded-pill px-3 {% if time_filter == '7d' %}btn-light{% else %}text-white{% endif %}" style="{% if time_filter != '7d' %}background:rgba(255,255,255,0.1);{% endif %}font-size:0.78rem;">7D</a>
+                            <a href="?period=30d" class="btn btn-sm rounded-pill px-3 {% if time_filter == '30d' %}btn-light{% else %}text-white{% endif %}" style="{% if time_filter != '30d' %}background:rgba(255,255,255,0.1);{% endif %}font-size:0.78rem;">30D</a>
+                            <a href="?period=90d" class="btn btn-sm rounded-pill px-3 {% if time_filter == '90d' %}btn-light{% else %}text-white{% endif %}" style="{% if time_filter != '90d' %}background:rgba(255,255,255,0.1);{% endif %}font-size:0.78rem;">90D</a>
+                            <a href="?period=365d" class="btn btn-sm rounded-pill px-3 {% if time_filter == '365d' %}btn-light{% else %}text-white{% endif %}" style="{% if time_filter != '365d' %}background:rgba(255,255,255,0.1);{% endif %}font-size:0.78rem;">12M</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- KPI CARDS -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <section class="mb-4">
+        <div class="row g-3">
+            <!-- Users -->
+            <div class="col-xl-3 col-lg-6">
+                <div class="card border-0 shadow-sm h-100 kpi-card" style="border-radius: var(--radius-xl); border-top: 3px solid #6366f1;">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-start justify-content-between mb-3">
+                            <div>
+                                <p class="text-secondary small fw-600 mb-1 text-uppercase" style="font-size:0.7rem; letter-spacing:0.05em;">{% trans "Total Users" %}</p>
+                                <h2 class="fw-800 mb-0" style="font-size: 2rem; color: #1e1b4b;">{{ user_metrics.total|intcomma }}</h2>
+                            </div>
+                            <div style="background:rgba(99,102,241,0.1);color:#6366f1;width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;">
+                                <i class="fas fa-users" style="font-size:1.1rem;"></i>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-column gap-2">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-secondary" style="font-size:0.78rem;">{% trans "Active" %}</span>
+                                <span class="fw-700" style="font-size:0.85rem;">{{ user_metrics.active|intcomma }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-secondary" style="font-size:0.78rem;">{% trans "New (7d)" %}</span>
+                                <span class="fw-700 text-success" style="font-size:0.85rem;">+{{ user_metrics.new_7d|intcomma }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-secondary" style="font-size:0.78rem;">{% trans "New (30d)" %}</span>
+                                <span class="fw-700 text-success" style="font-size:0.85rem;">+{{ user_metrics.new_30d|intcomma }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-secondary" style="font-size:0.78rem;">{% trans "Suspended" %}</span>
+                                <span class="fw-700 {% if user_metrics.suspended > 0 %}text-danger{% endif %}" style="font-size:0.85rem;">{{ user_metrics.suspended|intcomma }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customers -->
+            <div class="col-xl-3 col-lg-6">
+                <div class="card border-0 shadow-sm h-100 kpi-card" style="border-radius: var(--radius-xl); border-top: 3px solid #0ea5e9;">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-start justify-content-between mb-3">
+                            <div>
+                                <p class="text-secondary small fw-600 mb-1 text-uppercase" style="font-size:0.7rem; letter-spacing:0.05em;">{% trans "Customers" %}</p>
+                                {% if customer_metrics.unavailable %}
+                                    <h2 class="fw-800 mb-0 text-tertiary" style="font-size: 2rem;">&mdash;</h2>
+                                {% else %}
+                                    <h2 class="fw-800 mb-0" style="font-size: 2rem; color: #1e1b4b;">{{ customer_metrics.total|intcomma }}</h2>
+                                {% endif %}
+                            </div>
+                            <div style="background:rgba(14,165,233,0.1);color:#0ea5e9;width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;">
+                                <i class="fas fa-user-tie" style="font-size:1.1rem;"></i>
+                            </div>
+                        </div>
+                        {% if not customer_metrics.unavailable %}
+                        <div class="d-flex flex-column gap-2">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-secondary" style="font-size:0.78rem;">{% trans "Active" %}</span>
+                                <span class="fw-700" style="font-size:0.85rem;">{{ customer_metrics.active|intcomma }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-secondary" style="font-size:0.78rem;">{% trans "At-Risk" %}</span>
+                                <span class="fw-700 {% if customer_metrics.at_risk > 0 %}text-danger{% endif %}" style="font-size:0.85rem;">{{ customer_metrics.at_risk|intcomma }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-secondary" style="font-size:0.78rem;">{% trans "New (30d)" %}</span>
+                                <span class="fw-700 text-success" style="font-size:0.85rem;">+{{ customer_metrics.new_30d|intcomma }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-secondary" style="font-size:0.78rem;">{% trans "Avg Health" %}</span>
+                                <span class="fw-700" style="font-size:0.85rem;">{{ customer_metrics.avg_health_score }}/100</span>
+                            </div>
+                        </div>
+                        {% else %}
+                        <p class="text-secondary small mb-0">{% trans "Monitoring unavailable" %}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Projects -->
+            <div class="col-xl-3 col-lg-6">
+                <div class="card border-0 shadow-sm h-100 kpi-card" style="border-radius: var(--radius-xl); border-top: 3px solid #8b5cf6;">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-start justify-content-between mb-3">
+                            <div>
+                                <p class="text-secondary small fw-600 mb-1 text-uppercase" style="font-size:0.7rem; letter-spacing:0.05em;">{% trans "Projects" %}</p>
+                                {% if project_metrics.unavailable %}
+                                    <h2 class="fw-800 mb-0 text-tertiary" style="font-size: 2rem;">&mdash;</h2>
+                                {% else %}
+                                    <h2 class="fw-800 mb-0" style="font-size: 2rem; color: #1e1b4b;">{{ project_metrics.total|intcomma }}</h2>
+                                {% endif %}
+                            </div>
+                            <div style="background:rgba(139,92,246,0.1);color:#8b5cf6;width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;">
+                                <i class="fas fa-project-diagram" style="font-size:1.1rem;"></i>
+                            </div>
+                        </div>
+                        {% if not project_metrics.unavailable %}
+                        <div class="d-flex flex-column gap-2">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-secondary" style="font-size:0.78rem;">{% trans "Active" %}</span>
+                                <span class="fw-700 text-primary" style="font-size:0.85rem;">{{ project_metrics.active|intcomma }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-secondary" style="font-size:0.78rem;">{% trans "Completed" %}</span>
+                                <span class="fw-700 text-success" style="font-size:0.85rem;">{{ project_metrics.completed|intcomma }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-secondary" style="font-size:0.78rem;">{% trans "Delayed" %}</span>
+                                <span class="fw-700 {% if project_metrics.delayed > 0 %}text-danger{% endif %}" style="font-size:0.85rem;">{{ project_metrics.delayed|intcomma }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-secondary" style="font-size:0.78rem;">{% trans "Avg Progress" %}</span>
+                                <span class="fw-700" style="font-size:0.85rem;">{{ project_metrics.avg_progress }}%</span>
+                            </div>
+                        </div>
+                        {% else %}
+                        <p class="text-secondary small mb-0">{% trans "Monitoring unavailable" %}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Revenue + Subscriptions (combined) -->
+            <div class="col-xl-3 col-lg-6">
+                <div class="card border-0 shadow-sm h-100 kpi-card" style="border-radius: var(--radius-xl); border-top: 3px solid #10b981;">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-start justify-content-between mb-3">
+                            <div>
+                                <p class="text-secondary small fw-600 mb-1 text-uppercase" style="font-size:0.7rem; letter-spacing:0.05em;">{% trans "Revenue" %}</p>
+                                {% if revenue_metrics.data_available %}
+                                    <h2 class="fw-800 mb-0" style="font-size: 2rem; color: #1e1b4b;">{{ revenue_metrics.total_revenue_display }}</h2>
+                                {% else %}
+                                    <h2 class="fw-800 mb-0" style="font-size: 2rem; color: #1e1b4b;">$0.00</h2>
+                                {% endif %}
+                            </div>
+                            <div style="background:rgba(16,185,129,0.1);color:#10b981;width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;">
+                                <i class="fas fa-dollar-sign" style="font-size:1.1rem;"></i>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-column gap-2">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-secondary" style="font-size:0.78rem;">{% trans "MRR" %}</span>
+                                <span class="fw-700 text-success" style="font-size:0.85rem;">{{ revenue_metrics.subscription_mrr_display }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-secondary" style="font-size:0.78rem;">{% trans "Payments" %}</span>
+                                <span class="fw-700" style="font-size:0.85rem;">{{ revenue_metrics.payment_count|intcomma }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-secondary" style="font-size:0.78rem;">{% trans "Failed" %}</span>
+                                <span class="fw-700 {% if revenue_metrics.payment_failed > 0 %}text-danger{% endif %}" style="font-size:0.85rem;">{{ revenue_metrics.payment_failed|intcomma }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-secondary" style="font-size:0.78rem;">{% trans "Outstanding" %}</span>
+                                <span class="fw-700 text-warning" style="font-size:0.85rem;">${{ revenue_metrics.invoice_outstanding }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- PLATFORM HEALTH + ALERTS (above fold) -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <section class="mb-4">
+        <div class="row g-3">
+            <!-- Platform Health -->
+            <div class="col-lg-5">
+                <div class="card border-0 shadow-sm h-100" style="border-radius: var(--radius-xl);">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <h6 class="fw-800 mb-0" style="font-size: 0.95rem;">
+                                <i class="fas fa-heartbeat me-2" style="color:#10b981;"></i>{% trans "Platform Health" %}
+                            </h6>
+                            <span class="badge rounded-pill px-3" style="font-size:0.65rem; background:rgba(16,185,129,0.1); color:#10b981;">{% trans "Operational" %}</span>
+                        </div>
+                        <div class="d-flex flex-column gap-2">
+                            {% for key, check in platform_health.items %}
+                            <div class="d-flex align-items-center justify-content-between p-2 rounded-3" style="background: var(--bg-surface-secondary);">
+                                <div class="d-flex align-items-center gap-2">
+                                    {{ check.status|status_dot }}
+                                    <span class="fw-600 small">{{ check.label }}</span>
+                                </div>
+                                {% if check.status == 'ok' %}
+                                <span class="badge rounded-pill px-2" style="font-size: 0.6rem; background:rgba(16,185,129,0.1); color:#10b981;">{% trans "OK" %}</span>
+                                {% else %}
+                                <span class="badge rounded-pill px-2" style="font-size: 0.6rem; background:rgba(239,68,68,0.1); color:#ef4444;">{% trans "Error" %}</span>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alerts -->
+            <div class="col-lg-7">
+                <div class="card border-0 shadow-sm h-100" style="border-radius: var(--radius-xl);">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <h6 class="fw-800 mb-0" style="font-size: 0.95rem;">
+                                <i class="fas fa-exclamation-triangle me-2" style="color:#f59e0b;"></i>{% trans "Requires Attention" %}
+                            </h6>
+                            {% if alerts %}
+                            <span class="badge rounded-pill px-3" style="font-size:0.65rem; background:rgba(245,158,11,0.1); color:#f59e0b;">{{ alerts|length }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="d-flex flex-column gap-2" style="max-height: 220px; overflow-y: auto;">
+                            {% for alert in alerts %}
+                            <div class="d-flex align-items-start gap-3 p-2 rounded-3" style="background: var(--bg-surface-secondary);">
+                                <div style="width:4px;min-height:36px;border-radius:2px;background:{% if alert.severity == 'error' %}#ef4444{% elif alert.severity == 'warning' %}#f59e0b{% elif alert.severity == 'success' %}#10b981{% else %}#3b82f6{% endif %};flex-shrink:0;"></div>
+                                <div class="flex-grow-1">
+                                    <span class="fw-600 small d-block">{{ alert.title }}</span>
+                                    <span class="text-secondary" style="font-size: 0.72rem;">{{ alert.detail }}</span>
+                                </div>
+                                <i class="{{ alert.category|category_icon }} small text-tertiary mt-1"></i>
+                            </div>
+                            {% empty %}
+                            <div class="text-center py-4">
+                                <div style="background:rgba(16,185,129,0.1);color:#10b981;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <span class="fw-600 small d-block">{% trans "All Clear" %}</span>
+                                <span class="text-secondary" style="font-size:0.72rem;">{% trans "No issues detected." %}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- CHARTS -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <section class="mb-4">
+        <div class="row g-3">
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm" style="border-radius: var(--radius-xl);">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <h6 class="fw-800 mb-0" style="font-size:0.95rem;"><i class="fas fa-chart-line me-2" style="color:#6366f1;"></i>{% trans "User Growth" %}</h6>
+                        </div>
+                        {% if charts.user_growth.values %}
+                        <canvas id="chartUserGrowth" height="180"></canvas>
+                        {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-chart-line fa-2x mb-2 d-block" style="color:#cbd5e1;"></i>
+                            <span class="small text-secondary">{% trans "No data available for this period" %}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm" style="border-radius: var(--radius-xl);">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <h6 class="fw-800 mb-0" style="font-size:0.95rem;"><i class="fas fa-project-diagram me-2" style="color:#8b5cf6;"></i>{% trans "Project Activity" %}</h6>
+                        </div>
+                        {% if charts.project_activity.values %}
+                        <canvas id="chartProjectActivity" height="180"></canvas>
+                        {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-project-diagram fa-2x mb-2 d-block" style="color:#cbd5e1;"></i>
+                            <span class="small text-secondary">{% trans "No data available for this period" %}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="mb-4">
+        <div class="row g-3">
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm" style="border-radius: var(--radius-xl);">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <h6 class="fw-800 mb-0" style="font-size:0.95rem;"><i class="fas fa-dollar-sign me-2" style="color:#10b981;"></i>{% trans "Revenue" %}</h6>
+                        </div>
+                        {% if charts.revenue.values %}
+                        <canvas id="chartRevenue" height="180"></canvas>
+                        {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-dollar-sign fa-2x mb-2 d-block" style="color:#cbd5e1;"></i>
+                            <span class="small text-secondary">{% trans "No data available for this period" %}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm" style="border-radius: var(--radius-xl);">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <h6 class="fw-800 mb-0" style="font-size:0.95rem;"><i class="fas fa-credit-card me-2" style="color:#f59e0b;"></i>{% trans "Subscriptions" %}</h6>
+                        </div>
+                        {% if charts.subscriptions.values %}
+                        <canvas id="chartSubscriptions" height="180"></canvas>
+                        {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-credit-card fa-2x mb-2 d-block" style="color:#cbd5e1;"></i>
+                            <span class="small text-secondary">{% trans "No data available for this period" %}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- SERVICES + ACTIVITY -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <section class="mb-4">
+        <div class="row g-3">
+            <div class="col-lg-5">
+                <div class="card border-0 shadow-sm h-100" style="border-radius: var(--radius-xl);">
+                    <div class="card-body p-4">
+                        <h6 class="fw-800 mb-3" style="font-size:0.95rem;"><i class="fas fa-th-large me-2" style="color:#6366f1;"></i>{% trans "Services" %}</h6>
+                        <div class="d-flex flex-column gap-2">
+                            {% for svc in service_overview %}
+                            <div class="d-flex align-items-center justify-content-between p-2 rounded-3" style="background: var(--bg-surface-secondary);">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div style="width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:{{ svc.color }}15;">
+                                        <i class="{{ svc.icon }}" style="color: {{ svc.color }}; font-size:0.85rem;"></i>
+                                    </div>
+                                    <div>
+                                        <span class="fw-600 small d-block">{{ svc.name }}</span>
+                                        {% if svc.stats.active is not None %}
+                                        <span class="text-secondary" style="font-size:0.68rem;">{{ svc.stats.active }} active</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="fw-700" style="font-size:0.85rem;">{{ svc.stats.total|intcomma|default:"—" }}</span>
+                                    {{ svc.status|status_dot }}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-7">
+                <div class="card border-0 shadow-sm h-100" style="border-radius: var(--radius-xl);">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <h6 class="fw-800 mb-0" style="font-size:0.95rem;"><i class="fas fa-history me-2" style="color:#8b5cf6;"></i>{% trans "Recent Activity" %}</h6>
+                            <span class="badge rounded-pill px-3" style="font-size:0.65rem; background:var(--bg-surface-secondary); color:var(--text-secondary);">{{ recent_activity|length }}</span>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th class="border-0 small text-uppercase fw-700 text-secondary" style="font-size:0.7rem; letter-spacing:0.05em;">{% trans "User" %}</th>
+                                        <th class="border-0 small text-uppercase fw-700 text-secondary" style="font-size:0.7rem; letter-spacing:0.05em;">{% trans "Action" %}</th>
+                                        <th class="border-0 small text-uppercase fw-700 text-secondary" style="font-size:0.7rem; letter-spacing:0.05em;">{% trans "Time" %}</th>
+                                        <th class="border-0 small text-uppercase fw-700 text-secondary text-end" style="font-size:0.7rem; letter-spacing:0.05em;">{% trans "IP" %}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in recent_activity %}
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div class="user-avatar-sm" style="width:30px;height:30px;font-size:0.7rem; background: linear-gradient(135deg, #6366f1, #8b5cf6);">{{ item.user|slice:":1"|upper }}</div>
+                                                <span class="fw-600 small text-truncate" style="max-width: 150px;">{{ item.user }}</span>
+                                            </div>
+                                        </td>
+                                        <td><span class="badge rounded-pill px-2 py-1" style="font-size: 0.68rem; background:var(--bg-surface-secondary);">{{ item.action }}</span></td>
+                                        <td><span class="text-secondary small">{{ item.timestamp|timesince }} {% trans "ago" %}</span></td>
+                                        <td class="text-end"><code class="small text-tertiary">{{ item.ip_address|default:"—" }}</code></td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr><td colspan="4" class="text-center py-4 text-secondary small">{% trans "No recent activity" %}</td></tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- QUICK ACTIONS -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <section class="mb-4">
+        <div class="card border-0 shadow-sm" style="border-radius: var(--radius-xl);">
+            <div class="card-body p-4">
+                <h6 class="fw-800 mb-3" style="font-size:0.95rem;"><i class="fas fa-bolt me-2" style="color:#f59e0b;"></i>{% trans "Quick Actions" %}</h6>
+                <div class="row g-2">
+                    <div class="col-lg-2 col-md-4 col-6">
+                        <a href="{% url 'users:dashboard' %}" class="d-flex align-items-center gap-2 p-2 rounded-3 text-decoration-none quick-action-row" style="transition: background 0.2s;">
+                            <div style="background:rgba(99,102,241,0.1);color:#6366f1;width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                <i class="fas fa-tachometer-alt small"></i>
+                            </div>
+                            <div>
+                                <span class="fw-600 small text-dark d-block" style="font-size:0.8rem;">{% trans "Dashboard" %}</span>
+                                <span class="text-secondary" style="font-size:0.65rem;">{% trans "Users" %}</span>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-lg-2 col-md-4 col-6">
+                        <a href="{% url 'crm:customer_list' %}" class="d-flex align-items-center gap-2 p-2 rounded-3 text-decoration-none quick-action-row" style="transition: background 0.2s;">
+                            <div style="background:rgba(14,165,233,0.1);color:#0ea5e9;width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                <i class="fas fa-user-tie small"></i>
+                            </div>
+                            <div>
+                                <span class="fw-600 small text-dark d-block" style="font-size:0.8rem;">{% trans "Customers" %}</span>
+                                <span class="text-secondary" style="font-size:0.65rem;">{% trans "CRM" %}</span>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-lg-2 col-md-4 col-6">
+                        <a href="{% url 'payments:plans' %}" class="d-flex align-items-center gap-2 p-2 rounded-3 text-decoration-none quick-action-row" style="transition: background 0.2s;">
+                            <div style="background:rgba(16,185,129,0.1);color:#10b981;width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                <i class="fas fa-credit-card small"></i>
+                            </div>
+                            <div>
+                                <span class="fw-600 small text-dark d-block" style="font-size:0.8rem;">{% trans "Payments" %}</span>
+                                <span class="text-secondary" style="font-size:0.65rem;">{% trans "Plans" %}</span>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-lg-2 col-md-4 col-6">
+                        <a href="{% url 'projects:admin_dashboard' %}" class="d-flex align-items-center gap-2 p-2 rounded-3 text-decoration-none quick-action-row" style="transition: background 0.2s;">
+                            <div style="background:rgba(139,92,246,0.1);color:#8b5cf6;width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                <i class="fas fa-project-diagram small"></i>
+                            </div>
+                            <div>
+                                <span class="fw-600 small text-dark d-block" style="font-size:0.8rem;">{% trans "Projects" %}</span>
+                                <span class="text-secondary" style="font-size:0.65rem;">{% trans "Admin" %}</span>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-lg-2 col-md-4 col-6">
+                        <a href="{% url 'branding:dashboard' %}" class="d-flex align-items-center gap-2 p-2 rounded-3 text-decoration-none quick-action-row" style="transition: background 0.2s;">
+                            <div style="background:rgba(249,115,22,0.1);color:#f97316;width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                <i class="fas fa-palette small"></i>
+                            </div>
+                            <div>
+                                <span class="fw-600 small text-dark d-block" style="font-size:0.8rem;">{% trans "Branding" %}</span>
+                                <span class="text-secondary" style="font-size:0.65rem;">{% trans "Requests" %}</span>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-lg-2 col-md-4 col-6">
+                        <a href="{% monitoring_url %}" class="d-flex align-items-center gap-2 p-2 rounded-3 text-decoration-none quick-action-row" style="transition: background 0.2s;">
+                            <div style="background:rgba(20,184,166,0.1);color:#14b8a6;width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                <i class="fas fa-desktop small"></i>
+                            </div>
+                            <div>
+                                <span class="fw-600 small text-dark d-block" style="font-size:0.8rem;">{% trans "Monitoring" %}</span>
+                                <span class="text-secondary" style="font-size:0.65rem;">{% trans "Platform" %}</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const chartsData = {
+        userGrowth: {{ charts.user_growth|safe }},
+        projectActivity: {{ charts.project_activity|safe }},
+        revenue: {{ charts.revenue|safe }},
+        subscriptions: {{ charts.subscriptions|safe }},
+    };
+
+    function getGridColor() {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        return isDark ? 'rgba(148, 163, 184, 0.12)' : 'rgba(203, 213, 225, 0.25)';
+    }
+
+    function getTextColor() {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        return isDark ? '#94a3b8' : '#94a3b8';
+    }
+
+    const commonOptions = {
+        responsive: true,
+        maintainAspectRatio: true,
+        interaction: { intersect: false, mode: 'index' },
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                padding: { top: 10, bottom: 10, left: 14, right: 14 },
+                borderRadius: 10,
+                titleFont: { size: 12, weight: '600', family: 'Inter' },
+                bodyFont: { size: 11, family: 'Inter' },
+                displayColors: false,
+            },
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: { font: { size: 10, family: 'Inter' }, color: getTextColor(), stepSize: 1, padding: 8 },
+                grid: { color: getGridColor(), drawBorder: false },
+                border: { display: false },
+            },
+            x: {
+                ticks: { font: { size: 10, family: 'Inter' }, color: getTextColor(), maxTicksLimit: 8, padding: 4 },
+                grid: { display: false, drawBorder: false },
+                border: { display: false },
+            },
+        },
+    };
+
+    function createLineChart(canvasId, data, color) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas || !data.values || data.values.length === 0) return;
+        const ctx = canvas.getContext('2d');
+        const gradient = ctx.createLinearGradient(0, 0, 0, 180);
+        gradient.addColorStop(0, color + '25');
+        gradient.addColorStop(1, color + '05');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.labels,
+                datasets: [{
+                    label: data.title,
+                    data: data.values,
+                    borderColor: color,
+                    backgroundColor: gradient,
+                    borderWidth: 2.5,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 0,
+                    pointHoverRadius: 6,
+                    pointHoverBackgroundColor: color,
+                    pointHoverBorderColor: '#fff',
+                    pointHoverBorderWidth: 3,
+                }],
+            },
+            options: { ...commonOptions },
+        });
+    }
+
+    createLineChart('chartUserGrowth', chartsData.userGrowth, '#6366f1');
+    createLineChart('chartProjectActivity', chartsData.projectActivity, '#8b5cf6');
+    createLineChart('chartRevenue', chartsData.revenue, '#10b981');
+    createLineChart('chartSubscriptions', chartsData.subscriptions, '#f59e0b');
+
+    // ── Global Search ──
+    const searchInput = document.getElementById('globalSearchInput');
+    const searchResults = document.getElementById('globalSearchResults');
+    const searchContent = document.getElementById('globalSearchContent');
+    const searchLoading = document.getElementById('globalSearchLoading');
+    const searchEmpty = document.getElementById('globalSearchEmpty');
+    let searchTimeout = null;
+
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            const q = this.value.trim();
+            if (q.length < 2) {
+                searchResults.classList.add('d-none');
+                return;
+            }
+            searchLoading.classList.remove('d-none');
+            searchEmpty.classList.add('d-none');
+            searchContent.innerHTML = '';
+            searchResults.classList.remove('d-none');
+
+            searchTimeout = setTimeout(function() {
+                fetch('{% url "root_dashboard:search_api" %}?q=' + encodeURIComponent(q))
+                    .then(r => r.json())
+                    .then(data => {
+                        searchLoading.classList.add('d-none');
+                        if (data.total === 0) {
+                            searchEmpty.classList.remove('d-none');
+                            return;
+                        }
+                        let html = '<div class="small fw-700 text-secondary mb-2">' + data.total + ' result(s)</div>';
+                        for (const [type, items] of Object.entries(data.results)) {
+                            html += '<div class="mb-2">';
+                            html += '<div class="small fw-700 text-primary text-capitalize mb-1">' + type + '</div>';
+                            for (const item of items) {
+                                html += '<a href="' + item.url + '" class="d-flex align-items-center gap-2 p-2 rounded-2 text-decoration-none mb-1" style="background:var(--bg-surface-secondary);">';
+                                html += '<i class="' + item.icon + ' small" style="color:' + item.color + ';"></i>';
+                                html += '<div class="flex-grow-1"><span class="fw-600 small d-block">' + item.title + '</span>';
+                                if (item.subtitle) html += '<span class="text-secondary" style="font-size:0.7rem;">' + item.subtitle + '</span>';
+                                html += '</div></a>';
+                            }
+                            html += '</div>';
+                        }
+                        searchContent.innerHTML = html;
+                    })
+                    .catch(() => {
+                        searchLoading.classList.add('d-none');
+                        searchEmpty.classList.remove('d-none');
+                    });
+            }, 300);
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                searchResults.classList.add('d-none');
+            }
+        });
+    }
+});
+</script>
+
+<style>
+/* KPI Cards */
+.kpi-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.08) !important;
+}
+
+/* Quick Actions Row */
+.quick-action-row:hover {
+    background: var(--bg-surface-secondary) !important;
+}
+.quick-action-row:hover div:first-child {
+    transform: scale(1.05);
+    transition: transform 0.2s ease;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 5px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+    background: #475569;
+}
+
+/* Table rows */
+.table tbody tr {
+    transition: background 0.15s ease;
+}
+.table tbody tr:hover {
+    background: var(--bg-surface-secondary) !important;
+}
+</style>
+{% endblock %}

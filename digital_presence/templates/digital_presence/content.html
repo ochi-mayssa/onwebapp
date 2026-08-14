@@ -1,0 +1,174 @@
+{% extends 'branding/base.html' %}
+{% load branding_extras dp_tags %}
+
+{% block branding_content %}
+<style>body .branding-page{padding:0!important;margin:0!important;}body .branding-header,body .branding-footer,body footer{display:none!important;}</style>
+<script>document.body.classList.add('dd-active');</script>
+<div class="dd-layout">
+    {% include 'digital_presence/_sidebar.html' with active_page='content' %}
+    <main class="dd-main">
+        <header class="dd-topbar">
+            <div class="dd-topbar-left">
+                <button class="dd-sidebar-toggle" id="ddSidebarToggle"><i class="fa-solid fa-bars"></i></button>
+                <div><div class="dd-topbar-title">Content Performance</div><div class="dd-topbar-subtitle">Analyze content performance and identify opportunities.</div></div>
+            </div>
+            <div class="dd-topbar-right">
+                <button class="dd-topbar-btn dd-theme-toggle" id="ddThemeToggle" title="Toggle theme"><i class="fa-solid fa-sun" id="ddThemeIcon"></i></button>
+                <div class="dd-topbar-avatar">{{ user.username|slice:":1"|upper }}</div>
+            </div>
+        </header>
+        <div class="dd-content">
+            {% if content.available %}
+
+            {# ── Alert Banner ── #}
+            {% if content.missing_h1 > 0 or content.missing_meta > 0 or content.missing_alt > 0 %}
+            <div class="dd-alert-banner dd-alert-banner-warning">
+                <div class="dd-alert-banner-icon" style="background:rgba(251,191,36,0.15);color:#fbbf24;">
+                    <i class="fa-solid fa-exclamation-circle"></i>
+                </div>
+                <div class="dd-alert-banner-body">
+                    <div class="dd-alert-banner-title">Content Needs Attention</div>
+                    <div class="dd-alert-banner-message">
+                        {% if content.missing_h1 > 0 %}{{ content.missing_h1 }} pages missing H1{% endif %}{% if content.missing_h1 > 0 and content.missing_meta > 0 %}, {% endif %}{% if content.missing_meta > 0 %}{{ content.missing_meta }} missing meta{% endif %}{% if content.missing_meta > 0 and content.missing_alt > 0 %}, {% endif %}{% if content.missing_alt > 0 %}{{ content.missing_alt }} missing alt text{% endif %}.
+                    </div>
+                </div>
+                <div class="dd-alert-banner-action">
+                    <a href="#issues-section" class="dd-fix-btn dd-fix-btn-warning"><i class="fa-solid fa-arrow-down"></i> Fix Now</a>
+                </div>
+            </div>
+            {% endif %}
+
+            {# ── Content Metrics ── #}
+            <div class="dd-metrics dd-metrics-5">
+                <div class="dd-metric" style="border-top:3px solid #818cf8;">
+                    <div class="dd-metric-value">{{ content.pages_audited|intcomma }}</div>
+                    <div class="dd-metric-label">Pages Audited</div>
+                </div>
+                <div class="dd-metric" style="border-top:3px solid {% if content.latest_content_score and content.latest_content_score >= 70 %}#22c55e{% elif content.latest_content_score and content.latest_content_score >= 40 %}#fbbf24{% else %}#ef4444{% endif %};">
+                    <div class="dd-metric-value">{% if content.latest_content_score is not None %}{{ content.latest_content_score }}%{% else %}&mdash;{% endif %}</div>
+                    <div class="dd-metric-label">Content Score</div>
+                    <div class="dd-progress {% if content.latest_content_score and content.latest_content_score >= 70 %}dd-progress-good{% elif content.latest_content_score and content.latest_content_score >= 40 %}dd-progress-warn{% else %}dd-progress-bad{% endif %}" style="margin-top:6px;">
+                        <div class="dd-progress-bar" style="width:{% if content.latest_content_score %}{% widthratio content.latest_content_score 1 100 %}{% else %}0{% endif %}%;"></div>
+                    </div>
+                </div>
+                <div class="dd-metric" style="border-top:3px solid #22c55e;">
+                    <div class="dd-metric-value">{{ content.total_words|intcomma }}</div>
+                    <div class="dd-metric-label">Total Words</div>
+                </div>
+                <div class="dd-metric" style="border-top:3px solid {% if content.missing_alt > 0 %}#fbbf24{% else %}#22c55e{% endif %};">
+                    <div class="dd-metric-value">{{ content.missing_alt|intcomma }}</div>
+                    <div class="dd-metric-label">Missing Alt Text</div>
+                </div>
+                <div class="dd-metric" style="border-top:3px solid {% if content.total_issues > 0 %}#ef4444{% else %}#22c55e{% endif %};">
+                    <div class="dd-metric-value">{{ content.total_issues|intcomma }}</div>
+                    <div class="dd-metric-label">Total Issues</div>
+                </div>
+            </div>
+
+            {# ── Content Health Progress ── #}
+            <div class="dd-panel" style="margin-top:16px;">
+                <div class="dd-panel-header">
+                    <span class="dd-panel-title"><i class="fa-solid fa-chart-bar" style="color:#818cf8;"></i>Content Health</span>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:12px;">
+                    <div>
+                        <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+                            <span style="font-size:0.65rem;color:#a1a1aa;">Pages with H1 Tag</span>
+                            <span style="font-size:0.65rem;font-weight:700;color:{% if content.missing_h1 > 0 %}#fbbf24{% else %}#22c55e{% endif %};">{{ content.pages_audited|add:'-'|add:content.missing_h1 }}/{{ content.pages_audited }}</span>
+                        </div>
+                        <div class="dd-progress {% if content.missing_h1 > 0 %}dd-progress-warn{% else %}dd-progress-good{% endif %}">
+                            <div class="dd-progress-bar" style="width:{% if content.pages_audited %}{% widthratio content.pages_audited|add:'-'|add:content.missing_h1 content.pages_audited 100 %}{% else %}0{% endif %}%;"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+                            <span style="font-size:0.65rem;color:#a1a1aa;">Pages with Meta Description</span>
+                            <span style="font-size:0.65rem;font-weight:700;color:{% if content.missing_meta > 0 %}#fbbf24{% else %}#22c55e{% endif %};">{{ content.pages_audited|add:'-'|add:content.missing_meta }}/{{ content.pages_audited }}</span>
+                        </div>
+                        <div class="dd-progress {% if content.missing_meta > 0 %}dd-progress-warn{% else %}dd-progress-good{% endif %}">
+                            <div class="dd-progress-bar" style="width:{% if content.pages_audited %}{% widthratio content.pages_audited|add:'-'|add:content.missing_meta content.pages_audited 100 %}{% else %}0{% endif %}%;"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+                            <span style="font-size:0.65rem;color:#a1a1aa;">Images with Alt Text</span>
+                            <span style="font-size:0.65rem;font-weight:700;color:{% if content.missing_alt > 0 %}#fbbf24{% else %}#22c55e{% endif %};">Needs {{ content.missing_alt|intcomma }} fixes</span>
+                        </div>
+                        <div class="dd-progress {% if content.missing_alt > 0 %}dd-progress-warn{% else %}dd-progress-good{% endif %}">
+                            <div class="dd-progress-bar" style="width:{% if content.missing_alt > 0 %}50{% else %}100{% endif %}%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# ── Content Needs Attention ── #}
+            {% if content.missing_h1 > 0 or content.missing_meta > 0 or content.missing_alt > 0 %}
+            <div id="issues-section" class="dd-panel" style="margin-top:16px;">
+                <div class="dd-panel-header">
+                    <span class="dd-panel-title"><i class="fa-solid fa-triangle-exclamation" style="color:#fbbf24;"></i>Needs Attention</span>
+                </div>
+                <div class="dd-action-grid">
+                    {% if content.missing_h1 > 0 %}
+                    <div class="dd-action-item">
+                        <div class="dd-action-item-icon" style="background:rgba(239,68,68,0.1);color:#ef4444;"><i class="fa-solid fa-heading"></i></div>
+                        <div class="dd-action-item-title">Missing H1 Tags</div>
+                        <div class="dd-action-item-desc">{{ content.missing_h1|intcomma }} page{{ content.missing_h1|pluralize }} missing H1 heading. H1 tags are critical for SEO and accessibility.</div>
+                        <div class="dd-fix-btn dd-fix-btn-critical"><i class="fa-solid fa-wrench"></i> Fix {{ content.missing_h1|intcomma }}</div>
+                    </div>
+                    {% endif %}
+                    {% if content.missing_meta > 0 %}
+                    <div class="dd-action-item">
+                        <div class="dd-action-item-icon" style="background:rgba(251,191,36,0.1);color:#fbbf24;"><i class="fa-solid fa-align-left"></i></div>
+                        <div class="dd-action-item-title">Missing Meta Descriptions</div>
+                        <div class="dd-action-item-desc">{{ content.missing_meta|intcomma }} page{{ content.missing_meta|pluralize }} missing meta description. Meta descriptions improve click-through rates.</div>
+                        <div class="dd-fix-btn dd-fix-btn-warning"><i class="fa-solid fa-wrench"></i> Fix {{ content.missing_meta|intcomma }}</div>
+                    </div>
+                    {% endif %}
+                    {% if content.missing_alt > 0 %}
+                    <div class="dd-action-item">
+                        <div class="dd-action-item-icon" style="background:rgba(251,191,36,0.1);color:#fbbf24;"><i class="fa-solid fa-image"></i></div>
+                        <div class="dd-action-item-title">Missing Alt Text</div>
+                        <div class="dd-action-item-desc">{{ content.missing_alt|intcomma }} page{{ content.missing_alt|pluralize }} with images missing alt text. Alt text improves accessibility and image SEO.</div>
+                        <div class="dd-fix-btn dd-fix-btn-warning"><i class="fa-solid fa-wrench"></i> Fix {{ content.missing_alt|intcomma }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            {# ── Content Opportunities ── #}
+            {% if opportunities.available and opportunities.opportunities %}
+            <div class="dd-panel" style="margin-top:16px;">
+                <div class="dd-panel-header">
+                    <span class="dd-panel-title"><i class="fa-solid fa-lightbulb" style="color:#fbbf24;"></i>Content Opportunities</span>
+                    <span style="font-size:0.65rem;color:#52525b;">{{ opportunities.opportunities|length }} found</span>
+                </div>
+                {% for opp in opportunities.opportunities %}
+                <div class="dd-opp-item dd-opp-item-{{ opp.priority }}">
+                    <div class="dd-opp-item-header">
+                        <span class="dd-opp-item-title">{{ opp.reason }}</span>
+                        <span class="dd-opp-item-badge" style="background:{% if opp.priority == 'critical' %}rgba(239,68,68,0.15);color:#ef4444{% elif opp.priority == 'high' %}rgba(251,191,36,0.15);color:#fbbf24{% elif opp.priority == 'medium' %}rgba(129,140,248,0.15);color:#818cf8{% else %}rgba(34,197,94,0.15);color:#22c55e{% endif %};">{{ opp.priority }}</span>
+                    </div>
+                    <div class="dd-opp-item-data">{{ opp.data }}</div>
+                    <div class="dd-opp-item-action"><i class="fa-solid fa-arrow-right"></i> {{ opp.suggested_action }}</div>
+                    {% if opp.page %}<div class="dd-opp-item-page">{{ opp.page }}</div>{% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% else %}
+            <div class="dd-panel">
+                <div class="dd-empty-cta">
+                    <div class="dd-empty-cta-icon" style="background:rgba(34,197,94,0.1);color:#22c55e;"><i class="fa-solid fa-file-lines"></i></div>
+                    <div class="dd-empty-cta-title">No Content Data</div>
+                    <div class="dd-empty-cta-desc">Run an SEO audit to start analyzing content performance.</div>
+                    <a href="{% url 'seo_analyzer:index' %}" class="dd-empty-cta-btn dd-empty-cta-btn-primary"><i class="fa-solid fa-play"></i> Start Audit</a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+</div>
+{% include 'digital_presence/_scripts.html' %}
+{% endblock %}

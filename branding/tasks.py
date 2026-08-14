@@ -170,9 +170,8 @@ def task_process_data_export(self, export_request_id):
         try:
             from .models import BrandingNotification
             BrandingNotification.objects.create(
-                user=req.user,
+                recipient=req.user,
                 notification_type='SYSTEM',
-                title='Data Export Ready',
                 message='Your data export is ready for download. It will be available for 30 days.',
             )
         except Exception:

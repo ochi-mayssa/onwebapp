@@ -14,7 +14,9 @@
                 <p class="text-muted mb-0">Track and manage your branding projects.</p>
             </div>
             <div class="d-flex gap-2">
+                {% if user_role != 'designer' %}
                 <a href="{% url 'branding:wizard' %}" class="btn btn-brand-primary"><i class="fa-solid fa-plus me-2"></i>New Request</a>
+                {% endif %}
             </div>
         </div>
 

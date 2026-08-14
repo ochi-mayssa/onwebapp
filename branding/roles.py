@@ -12,11 +12,13 @@ User = get_user_model()
 
 # Group names
 GROUP_DESIGNERS = 'Designers'
+GROUP_TEAM_DESIGNERS = 'TeamDesigners'
 GROUP_SUPERVISORS = 'Supervisors'
 GROUP_STAFF = 'Staff'
 
 ROLE_CLIENT = 'client'
 ROLE_DESIGNER = 'designer'
+ROLE_TEAM_DESIGNER = 'team_designer'
 ROLE_SUPERVISOR = 'supervisor'
 ROLE_STAFF = 'staff'
 ROLE_ADMIN = 'admin'
@@ -32,6 +34,8 @@ def get_user_role(user):
         return ROLE_SUPERVISOR
     if user.groups.filter(name=GROUP_DESIGNERS).exists():
         return ROLE_DESIGNER
+    if user.groups.filter(name=GROUP_TEAM_DESIGNERS).exists():
+        return ROLE_TEAM_DESIGNER
     if user.is_staff:
         return ROLE_STAFF
     return ROLE_CLIENT
@@ -60,6 +64,15 @@ def is_designer(user):
     return user.groups.filter(name=GROUP_DESIGNERS).exists()
 
 
+def is_team_designer(user):
+    """Check if user is in the TeamDesigners group."""
+    if not user.is_authenticated:
+        return False
+    if user.is_superuser:
+        return True
+    return user.groups.filter(name=GROUP_TEAM_DESIGNERS).exists()
+
+
 def is_staff_user(user):
     """Check if user is staff (any staff role)."""
     return user.is_authenticated and user.is_staff
@@ -77,6 +90,8 @@ def get_role_dashboard_url(user):
         return reverse('branding:unified_dashboard')
     if role == ROLE_DESIGNER:
         return reverse('branding:designer_dashboard')
+    if role == ROLE_TEAM_DESIGNER:
+        return reverse('branding:team_designer_dashboard')
     return reverse('branding:my_requests')
 
 
@@ -134,12 +149,12 @@ def get_role_nav_items(user):
         ])
 
     elif role == ROLE_DESIGNER:
-        # Designer nav
+        # Designer nav — creative production workspace
         nav.extend([
             {
                 'url': reverse('branding:designer_dashboard'),
-                'label': 'My Work',
-                'icon': 'fa-solid fa-palette',
+                'label': 'Dashboard',
+                'icon': 'fa-solid fa-gauge-high',
             },
             {
                 'url': reverse('branding:workflow_dashboard'),
@@ -152,11 +167,6 @@ def get_role_nav_items(user):
                 'icon': 'fa-solid fa-table-columns',
             },
             {
-                'url': reverse('branding:designer_time_tracking'),
-                'label': 'Timer',
-                'icon': 'fa-solid fa-stopwatch',
-            },
-            {
                 'url': reverse('branding:designer_resources'),
                 'label': 'Resources',
                 'icon': 'fa-solid fa-book',
@@ -166,10 +176,35 @@ def get_role_nav_items(user):
                 'label': 'Tools',
                 'icon': 'fa-solid fa-screwdriver-wrench',
             },
+        ])
+
+    elif role == ROLE_TEAM_DESIGNER:
+        # Team Designer nav — creative production only
+        nav.extend([
             {
-                'url': reverse('branding:knowledge_base'),
-                'label': 'KB',
-                'icon': 'fa-solid fa-lightbulb',
+                'url': reverse('branding:team_designer_dashboard'),
+                'label': 'Dashboard',
+                'icon': 'fa-solid fa-gauge-high',
+            },
+            {
+                'url': reverse('branding:workflow_dashboard'),
+                'label': 'Workflow',
+                'icon': 'fa-solid fa-diagram-project',
+            },
+            {
+                'url': reverse('branding:kanban'),
+                'label': 'Board',
+                'icon': 'fa-solid fa-table-columns',
+            },
+            {
+                'url': reverse('branding:designer_resources'),
+                'label': 'Resources',
+                'icon': 'fa-solid fa-book',
+            },
+            {
+                'url': reverse('branding:designer_templates'),
+                'label': 'Templates',
+                'icon': 'fa-solid fa-file-lines',
             },
         ])
 
@@ -238,12 +273,10 @@ def get_role_dropdown_items(user):
             {'url': reverse('branding:supervisor_team'), 'label': 'Team', 'icon': 'fa-solid fa-users'},
             {'url': reverse('branding:designer_dashboard'), 'label': 'My Work', 'icon': 'fa-solid fa-palette'},
             {'section': 'Designer'},
-            {'url': reverse('branding:designer_time_tracking'), 'label': 'Time Tracking', 'icon': 'fa-solid fa-stopwatch'},
             {'url': reverse('branding:designer_resources'), 'label': 'Resources', 'icon': 'fa-solid fa-book'},
             {'url': reverse('branding:designer_templates'), 'label': 'Templates', 'icon': 'fa-solid fa-file-lines'},
             {'url': reverse('branding:collection_template_list'), 'label': 'Collection Templates', 'icon': 'fa-solid fa-layer-group'},
             {'section': 'Collaboration'},
-            {'url': reverse('branding:knowledge_base'), 'label': 'Knowledge Base', 'icon': 'fa-solid fa-lightbulb'},
             {'url': reverse('branding:showcase'), 'label': 'Showcase', 'icon': 'fa-solid fa-trophy'},
             {'section': 'Integrations'},
             {'url': reverse('branding:figma_integration'), 'label': 'Figma', 'icon': 'fa-brands fa-figma', 'style': 'color:#a259ff'},
@@ -253,36 +286,45 @@ def get_role_dropdown_items(user):
             {'url': reverse('branding:design_tools_organizer'), 'label': 'Asset Organizer', 'icon': 'fa-solid fa-folder-open', 'style': 'color:#06b6d4'},
             {'url': reverse('branding:design_tools_brand_check'), 'label': 'Brand Check', 'icon': 'fa-solid fa-clipboard-check', 'style': 'color:#22c55e'},
             {'url': reverse('branding:slack_integration'), 'label': 'Slack', 'icon': 'fa-brands fa-slack', 'style': 'color:#e01e5a'},
-            {'url': reverse('branding:calendar_integration'), 'label': 'Calendar', 'icon': 'fa-solid fa-calendar-days', 'style': 'color:#3b82f6'},
         ])
 
     elif role == ROLE_DESIGNER:
         items.extend([
-            {'url': reverse('branding:my_requests'), 'label': 'My Requests', 'icon': 'fa-solid fa-folder-open'},
-            {'url': reverse('branding:client_profile'), 'label': 'Branding Profile', 'icon': 'fa-solid fa-sliders'},
+            {'url': reverse('branding:designer_dashboard'), 'label': 'Dashboard', 'icon': 'fa-solid fa-gauge-high'},
             {'url': reverse('branding:notifications'), 'label': 'Notifications', 'icon': 'fa-regular fa-bell'},
             {'url': reverse('users:profile_dashboard'), 'label': 'Profile', 'icon': 'fa-solid fa-user'},
-            {'section': 'Designer'},
-            {'url': reverse('branding:unified_dashboard'), 'label': 'Dashboard', 'icon': 'fa-solid fa-gauge-high'},
+            {'section': 'Workspace'},
             {'url': reverse('branding:kanban'), 'label': 'Board', 'icon': 'fa-solid fa-table-columns'},
-            {'url': reverse('branding:designer_dashboard'), 'label': 'My Work', 'icon': 'fa-solid fa-palette'},
             {'url': reverse('branding:workflow_dashboard'), 'label': 'Workflow', 'icon': 'fa-solid fa-diagram-project'},
-            {'url': reverse('branding:designer_time_tracking'), 'label': 'Time Tracking', 'icon': 'fa-solid fa-stopwatch'},
+            {'url': reverse('branding:feedback_list'), 'label': 'Feedback', 'icon': 'fa-solid fa-star'},
+            {'section': 'Design'},
             {'url': reverse('branding:designer_resources'), 'label': 'Resources', 'icon': 'fa-solid fa-book'},
             {'url': reverse('branding:designer_templates'), 'label': 'Templates', 'icon': 'fa-solid fa-file-lines'},
+            {'url': reverse('branding:collection_template_list'), 'label': 'Collections', 'icon': 'fa-solid fa-layer-group'},
             {'section': 'Tools'},
             {'url': reverse('branding:design_tools_color'), 'label': 'Color Picker', 'icon': 'fa-solid fa-droplet', 'style': 'color:#818cf8'},
             {'url': reverse('branding:design_tools_fonts'), 'label': 'Font Finder', 'icon': 'fa-solid fa-font', 'style': 'color:#f59e0b'},
             {'url': reverse('branding:design_tools_organizer'), 'label': 'Asset Organizer', 'icon': 'fa-solid fa-folder-open', 'style': 'color:#06b6d4'},
             {'url': reverse('branding:design_tools_brand_check'), 'label': 'Brand Check', 'icon': 'fa-solid fa-clipboard-check', 'style': 'color:#22c55e'},
-            {'section': 'Collaboration'},
-            {'url': reverse('branding:knowledge_base'), 'label': 'Knowledge Base', 'icon': 'fa-solid fa-lightbulb'},
-            {'url': reverse('branding:showcase'), 'label': 'Showcase', 'icon': 'fa-solid fa-trophy'},
             {'section': 'Integrations'},
             {'url': reverse('branding:figma_integration'), 'label': 'Figma', 'icon': 'fa-brands fa-figma', 'style': 'color:#a259ff'},
             {'url': reverse('branding:adobe_integration'), 'label': 'Adobe CC', 'icon': 'fa-solid fa-palette', 'style': 'color:#ff0000'},
             {'url': reverse('branding:slack_integration'), 'label': 'Slack', 'icon': 'fa-brands fa-slack', 'style': 'color:#e01e5a'},
-            {'url': reverse('branding:calendar_integration'), 'label': 'Calendar', 'icon': 'fa-solid fa-calendar-days', 'style': 'color:#3b82f6'},
+        ])
+
+    elif role == ROLE_TEAM_DESIGNER:
+        items.extend([
+            {'url': reverse('branding:team_designer_dashboard'), 'label': 'Dashboard', 'icon': 'fa-solid fa-gauge-high'},
+            {'url': reverse('branding:notifications'), 'label': 'Notifications', 'icon': 'fa-regular fa-bell'},
+            {'url': reverse('users:profile_dashboard'), 'label': 'Profile', 'icon': 'fa-solid fa-user'},
+            {'section': 'Workspace'},
+            {'url': reverse('branding:kanban'), 'label': 'Board', 'icon': 'fa-solid fa-table-columns'},
+            {'url': reverse('branding:workflow_dashboard'), 'label': 'Workflow', 'icon': 'fa-solid fa-diagram-project'},
+            {'url': reverse('branding:feedback_list'), 'label': 'Feedback', 'icon': 'fa-solid fa-star'},
+            {'section': 'Design'},
+            {'url': reverse('branding:designer_resources'), 'label': 'Resources', 'icon': 'fa-solid fa-book'},
+            {'url': reverse('branding:designer_templates'), 'label': 'Templates', 'icon': 'fa-solid fa-file-lines'},
+            {'url': reverse('branding:collection_template_list'), 'label': 'Collections', 'icon': 'fa-solid fa-layer-group'},
         ])
 
     elif role == ROLE_STAFF:
@@ -340,5 +382,16 @@ def staff_required(view_func):
     def _wrapped(request, *args, **kwargs):
         if not request.user.is_staff:
             raise PermissionDenied('Staff only.')
+        return view_func(request, *args, **kwargs)
+    return _wrapped
+
+
+def team_designer_required(view_func):
+    """Decorator: user must be a team designer, designer, or superuser."""
+    @login_required
+    @wraps(view_func)
+    def _wrapped(request, *args, **kwargs):
+        if not (is_team_designer(request.user) or is_designer(request.user)):
+            raise PermissionDenied('Team Designers only.')
         return view_func(request, *args, **kwargs)
     return _wrapped

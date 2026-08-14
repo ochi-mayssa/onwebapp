@@ -1,0 +1,250 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}Task Scheduler{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <!-- PAGE HEADER -->
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <i data-lucide="clock" style="width:28px;height:28px;"></i>
+                <h1 class="h3 mb-0">Task Scheduler</h1>
+            </div>
+
+            <p class="text-muted mb-0">
+                Scheduled jobs & Celery Beat orchestration.
+            </p>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-success-subtle text-success px-3 py-2">
+                <span class="me-1">●</span>
+                Scheduler Healthy
+            </span>
+        </div>
+    </div>
+
+
+    <!-- SUMMARY CARDS -->
+    <div class="row g-3 mb-4">
+
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <div>
+                            <div class="text-muted small mb-1">
+                                Scheduled Tasks
+                            </div>
+
+                            <div class="fs-3 fw-bold">
+                                {{ scheduled_tasks_count }}
+                            </div>
+                        </div>
+
+                        <div>
+                            <i data-lucide="calendar-clock"
+                               style="width:32px;height:32px;"></i>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <div>
+                            <div class="text-muted small mb-1">
+                                Scheduler Engine
+                            </div>
+
+                            <div class="fs-5 fw-semibold">
+                                Celery Beat
+                            </div>
+                        </div>
+
+                        <div>
+                            <i data-lucide="workflow"
+                               style="width:32px;height:32px;"></i>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <div>
+                            <div class="text-muted small mb-1">
+                                Current Status
+                            </div>
+
+                            <div class="fs-5 fw-semibold text-success">
+                                Healthy
+                            </div>
+                        </div>
+
+                        <div>
+                            <i data-lucide="circle-check"
+                               style="width:32px;height:32px;"></i>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- TASK LIST -->
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-header bg-transparent border-0 pt-4 px-4">
+
+            <div class="d-flex justify-content-between align-items-center">
+
+                <div>
+                    <h2 class="h5 mb-1">
+                        Scheduled Jobs
+                    </h2>
+
+                    <p class="text-muted small mb-0">
+                        Tasks currently configured in Celery Beat.
+                    </p>
+                </div>
+
+                <span class="badge bg-light text-dark border">
+                    {{ scheduled_tasks_count }} tasks
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="card-body px-4">
+
+            {% if scheduled_tasks %}
+
+            <div class="table-responsive">
+
+                <table class="table align-middle">
+
+                    <thead>
+                        <tr>
+                            <th>Task Name</th>
+                            <th>Task</th>
+                            <th>Schedule</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for task in scheduled_tasks %}
+
+                        <tr>
+
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+
+                                    <div>
+                                        <i data-lucide="clock"
+                                           style="width:18px;height:18px;"></i>
+                                    </div>
+
+                                    <strong>
+                                        {{ task.name }}
+                                    </strong>
+
+                                </div>
+                            </td>
+
+
+                            <td>
+                                <code>
+                                    {{ task.task }}
+                                </code>
+                            </td>
+
+
+                            <td>
+                                <span class="badge bg-light text-dark border">
+                                    {{ task.schedule }}
+                                </span>
+                            </td>
+
+
+                            <td>
+                                <span class="badge bg-success-subtle text-success">
+                                    <span class="me-1">●</span>
+                                    {{ task.status }}
+                                </span>
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            {% else %}
+
+            <div class="text-center py-5">
+
+                <i data-lucide="calendar-x"
+                   style="width:42px;height:42px;"
+                   class="text-muted mb-3"></i>
+
+                <h3 class="h5">
+                    No Scheduled Tasks
+                </h3>
+
+                <p class="text-muted mb-0">
+                    No tasks are currently configured in CELERY_BEAT_SCHEDULE.
+                </p>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    if (typeof lucide !== "undefined") {
+        lucide.createIcons();
+    }
+});
+</script>
+
+{% endblock %}

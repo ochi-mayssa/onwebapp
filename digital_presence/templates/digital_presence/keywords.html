@@ -1,0 +1,215 @@
+{% extends 'branding/base.html' %}
+{% load branding_extras dp_tags %}
+
+{% block branding_content %}
+<style>body .branding-page{padding:0!important;margin:0!important;}body .branding-header,body .branding-footer,body footer{display:none!important;}
+.kw-filter{background:#f3f4f6;border:1px solid #d1d5db;color:#6b7280;font-size:0.6rem;padding:4px 8px;border-radius:6px;cursor:pointer;}
+.kw-filter.active{background:#6366f1;color:#fff;border-color:#6366f1;}
+</style>
+<script>document.body.classList.add('dd-active');</script>
+<div class="dd-layout">
+    {% include 'digital_presence/_sidebar.html' with active_page='keywords' %}
+    <main class="dd-main">
+        <header class="dd-topbar">
+            <div class="dd-topbar-left">
+                <button class="dd-sidebar-toggle" id="ddSidebarToggle"><i class="fa-solid fa-bars"></i></button>
+                <div><div class="dd-topbar-title">Keywords</div><div class="dd-topbar-subtitle">Track keyword rankings, visibility, and opportunities.</div></div>
+            </div>
+            <div class="dd-topbar-right">
+                <button class="dd-topbar-btn dd-theme-toggle" id="ddThemeToggle" title="Toggle theme"><i class="fa-solid fa-sun" id="ddThemeIcon"></i></button>
+                <div class="dd-topbar-avatar">{{ user.username|slice:":1"|upper }}</div>
+            </div>
+        </header>
+        <div class="dd-content">
+            {% if keywords.available %}
+
+            {# ── Summary Metrics ── #}
+            <div class="dd-metrics dd-metrics-4">
+                <div class="dd-metric" style="border-top:3px solid #818cf8;">
+                    <div class="dd-metric-value">{{ keywords.total_keywords|intcomma }}</div>
+                    <div class="dd-metric-label">Keywords Tracked</div>
+                    <div class="dd-progress dd-progress-info" style="margin-top:6px;">
+                        <div class="dd-progress-bar" style="width:100%;"></div>
+                    </div>
+                </div>
+                <div class="dd-metric" style="border-top:3px solid #22c55e;">
+                    <div class="dd-metric-value">{{ keywords.matched_count|intcomma }}</div>
+                    <div class="dd-metric-label">Matched</div>
+                    <div class="dd-progress dd-progress-good" style="margin-top:6px;">
+                        <div class="dd-progress-bar" style="width:{% if keywords.total_keywords %}{% widthratio keywords.matched_count keywords.total_keywords 100 %}{% else %}0{% endif %}%;"></div>
+                    </div>
+                </div>
+                <div class="dd-metric" style="border-top:3px solid #fbbf24;">
+                    <div class="dd-metric-value">{{ keywords.partial_count|intcomma }}</div>
+                    <div class="dd-metric-label">Partial Match</div>
+                    <div class="dd-progress dd-progress-warn" style="margin-top:6px;">
+                        <div class="dd-progress-bar" style="width:{% if keywords.total_keywords %}{% widthratio keywords.partial_count keywords.total_keywords 100 %}{% else %}0{% endif %}%;"></div>
+                    </div>
+                </div>
+                <div class="dd-metric" style="border-top:3px solid #22d3ee;">
+                    <div class="dd-metric-value">{% if keywords.avg_relevance is not None %}{{ keywords.avg_relevance }}%{% else %}—{% endif %}</div>
+                    <div class="dd-metric-label">Avg Relevance</div>
+                    <div class="dd-progress {% if keywords.avg_relevance and keywords.avg_relevance >= 70 %}dd-progress-good{% elif keywords.avg_relevance and keywords.avg_relevance >= 40 %}dd-progress-warn{% else %}dd-progress-bad{% endif %}" style="margin-top:6px;">
+                        <div class="dd-progress-bar" style="width:{% if keywords.avg_relevance %}{% widthratio keywords.avg_relevance 1 100 %}{% else %}0{% endif %}%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            {# ── Keyword Table ── #}
+            {% if keywords.keywords %}
+            <div class="dd-panel" style="margin-top:16px;">
+                <div class="dd-panel-header">
+                    <span class="dd-panel-title"><i class="fa-solid fa-key" style="color:#818cf8;"></i>Keyword Monitoring</span>
+                    <div style="display:flex;gap:4px;">
+                        <button class="kw-filter active" data-filter="all" onclick="filterKeywords('all',this)">All</button>
+                        <button class="kw-filter" data-filter="matched" onclick="filterKeywords('matched',this)">Matched</button>
+                        <button class="kw-filter" data-filter="partial" onclick="filterKeywords('partial',this)">Partial</button>
+                        <button class="kw-filter" data-filter="no_match" onclick="filterKeywords('no_match',this)">No Match</button>
+                    </div>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table class="dd-table" id="kwTable">
+                        <thead>
+                            <tr>
+                                <th>Keyword</th>
+                                <th>URL</th>
+                                <th style="text-align:center;">Relevance</th>
+                                <th style="text-align:center;">Health</th>
+                                <th style="text-align:center;">Match</th>
+                                <th style="text-align:center;">Issues</th>
+                                <th style="text-align:center;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for kw in keywords.keywords %}
+                            <tr class="kw-row" data-match="{{ kw.match_status }}">
+                                <td style="font-weight:600;color:#fafafa;">{{ kw.keyword }}</td>
+                                <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#818cf8;">{{ kw.url }}</td>
+                                <td style="text-align:center;">
+                                    {% if kw.relevance_score is not None %}
+                                    <span style="color:{% if kw.relevance_score >= 70 %}#22c55e{% elif kw.relevance_score >= 40 %}#fbbf24{% else %}#ef4444{% endif %};font-weight:700;">{{ kw.relevance_score|floatformat:0 }}%</span>
+                                    {% else %}<span style="color:#52525b;">—</span>{% endif %}
+                                </td>
+                                <td style="text-align:center;">
+                                    {% if kw.health_score is not None %}
+                                    <span style="color:{% if kw.health_score >= 70 %}#22c55e{% elif kw.health_score >= 40 %}#fbbf24{% else %}#ef4444{% endif %};font-weight:700;">{{ kw.health_score|floatformat:0 }}%</span>
+                                    {% else %}<span style="color:#52525b;">—</span>{% endif %}
+                                </td>
+                                <td style="text-align:center;">
+                                    {% if kw.match_status == 'yes' %}<span style="color:#22c55e;font-weight:600;">Matched</span>
+                                    {% elif kw.match_status == 'partial' %}<span style="color:#fbbf24;font-weight:600;">Partial</span>
+                                    {% elif kw.match_status == 'no' %}<span style="color:#ef4444;font-weight:600;">No Match</span>
+                                    {% else %}<span style="color:#52525b;">—</span>{% endif %}
+                                </td>
+                                <td style="text-align:center;color:{% if kw.issues > 0 %}#ef4444{% else %}#22c55e{% endif %};font-weight:700;">{{ kw.issues }}</td>
+                                <td style="text-align:center;"><span class="dd-status dd-status-{{ kw.status }}">{{ kw.status }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% else %}
+            <div class="dd-panel" style="margin-top:16px;">
+                <div class="dd-empty-cta">
+                    <div class="dd-empty-cta-icon" style="background:rgba(251,191,36,0.1);color:#fbbf24;"><i class="fa-solid fa-key"></i></div>
+                    <div class="dd-empty-cta-title">No Keywords Tracked Yet</div>
+                    <div class="dd-empty-cta-desc">Run URL Intelligence analysis with target keywords to start tracking their performance and visibility.</div>
+                    <a href="{% url 'seo_analyzer:index' %}" class="dd-empty-cta-btn dd-empty-cta-btn-primary"><i class="fa-solid fa-play"></i> Start Analysis</a>
+                </div>
+            </div>
+            {% endif %}
+
+            {# ── Keyword Trend Chart ── #}
+            <div class="dd-panel" style="margin-top:16px;">
+                <div class="dd-panel-header">
+                    <span class="dd-panel-title"><i class="fa-solid fa-chart-line" style="color:#22c55e;"></i>Keyword Trends</span>
+                    <select id="kwPeriod" class="dd-select">
+                        <option value="7d">7 Days</option>
+                        <option value="30d" selected>30 Days</option>
+                        <option value="90d">90 Days</option>
+                    </select>
+                </div>
+                <div class="dd-chart-container">
+                    <canvas id="kwTrendChart"></canvas>
+                </div>
+            </div>
+
+            {# ── Keyword Opportunities ── #}
+            {% if opportunities.available and opportunities.opportunities %}
+            <div class="dd-panel" style="margin-top:16px;">
+                <div class="dd-panel-header">
+                    <span class="dd-panel-title"><i class="fa-solid fa-lightbulb" style="color:#fbbf24;"></i>Keyword Opportunities</span>
+                    <span style="font-size:0.65rem;color:#52525b;">{{ opportunities.opportunities|length }} found</span>
+                </div>
+                {% for opp in opportunities.opportunities %}
+                <div class="dd-opp-item dd-opp-item-{% if opp.type == 'no_match' %}critical{% elif opp.type == 'keyword_mismatch' or opp.type == 'low_friendliness' %}high{% else %}medium{% endif %}">
+                    <div class="dd-opp-item-header">
+                        <span class="dd-opp-item-title">{{ opp.title }}</span>
+                        <span class="dd-opp-item-badge" style="background:{% if opp.type == 'no_match' %}rgba(239,68,68,0.15);color:#ef4444{% elif opp.type == 'keyword_mismatch' %}rgba(251,191,36,0.15);color:#fbbf24{% else %}rgba(129,140,248,0.15);color:#818cf8{% endif %};">{{ opp.type }}</span>
+                    </div>
+                    <div class="dd-opp-item-data">{{ opp.description }}</div>
+                    <div class="dd-opp-item-action"><i class="fa-solid fa-arrow-right"></i> Why this matters: {{ opp.why_it_matters }}</div>
+                    <div class="dd-opp-item-action"><i class="fa-solid fa-wrench"></i> Suggested action: {{ opp.suggested_action }}</div>
+                    {% if opp.url %}<div class="dd-opp-item-page">{{ opp.url }}</div>{% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% else %}
+            <div class="dd-panel">
+                <div class="dd-empty-cta">
+                    <div class="dd-empty-cta-icon" style="background:rgba(251,191,36,0.1);color:#fbbf24;"><i class="fa-solid fa-key"></i></div>
+                    <div class="dd-empty-cta-title">No Keyword Data</div>
+                    <div class="dd-empty-cta-desc">Run URL Intelligence analysis to start tracking keywords.</div>
+                    <a href="{% url 'seo_analyzer:index' %}" class="dd-empty-cta-btn dd-empty-cta-btn-primary"><i class="fa-solid fa-play"></i> Start Analysis</a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+(function(){
+    window.filterKeywords=function(filter,btn){
+        document.querySelectorAll('.kw-filter').forEach(function(b){b.classList.remove('active')});
+        btn.classList.add('active');
+        document.querySelectorAll('.kw-row').forEach(function(row){
+            if(filter==='all'){row.style.display=''}
+            else{row.style.display=row.getAttribute('data-match')===filter?'':'none'}
+        });
+    };
+
+    var kwChart=null;
+    var kwUrl='{% url "digital_presence:keyword_chart_data" %}';
+    function loadKwChart(){
+        var period=document.getElementById('kwPeriod').value;
+        fetch(kwUrl+'?period='+period)
+            .then(function(r){return r.json()})
+            .then(function(data){
+                if(kwChart)kwChart.destroy();
+                var ctx=document.getElementById('kwTrendChart').getContext('2d');
+                var datasets=data.datasets.map(function(ds){
+                    return {label:ds.label,data:ds.data,borderColor:ds.borderColor,backgroundColor:ds.backgroundColor,borderWidth:2,fill:true,tension:0.3,pointRadius:2,pointHoverRadius:4};
+                });
+                kwChart=new Chart(ctx,{
+                    type:'line',
+                    data:{labels:data.labels,datasets:datasets},
+                    options:{
+                        responsive:true,maintainAspectRatio:false,
+                        interaction:{intersect:false,mode:'index'},
+                        plugins:{legend:{labels:{color:'#a1a1aa',font:{size:10}}}},
+                        scales:{x:{grid:{color:'#1a1a1e'},ticks:{color:'#52525b',font:{size:9}}},y:{grid:{color:'#1a1a1e'},ticks:{color:'#52525b',font:{size:9}},beginAtZero:true,max:100}}
+                    }
+                });
+            }).catch(function(){});
+    }
+    document.getElementById('kwPeriod').addEventListener('change',loadKwChart);
+    loadKwChart();
+})();
+</script>
+{% include 'digital_presence/_scripts.html' %}
+{% endblock %}

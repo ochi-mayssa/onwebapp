@@ -320,12 +320,14 @@ def login_view(request):
             ActivityLog.objects.create(user=user, action='login', ip_address=_get_client_ip(request), metadata={'method': 'email'})
             
             # Branding role redirects (priority: specific roles first)
+            if user.groups.filter(name='TeamDesigners').exists():
+                return redirect('branding:team_designer_dashboard')
             if user.groups.filter(name='Designers').exists():
                 return redirect('branding:designer_dashboard')
             if user.groups.filter(name='Supervisors').exists():
                 return redirect('branding:supervisor_dashboard')
             if user.is_superuser:
-                return redirect('/admin/')
+                return redirect('root_dashboard:command_center')
             if user.is_staff:
                 return redirect('branding:unified_dashboard')
 

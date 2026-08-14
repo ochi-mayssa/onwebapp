@@ -100,6 +100,14 @@ def _get_seo_statuses():
 
 
 def _get_automation_statuses():
+    """
+    Return the real status of the Automation modules displayed
+    in Platform Monitoring.
+
+    Workflow Automation is based on the latest workflow run only.
+    Old failures do not make the current workflow unhealthy.
+    """
+
     statuses = {
         'email_automation': 'Not Configured',
         'workflow_automation': 'Not Configured',
@@ -107,54 +115,131 @@ def _get_automation_statuses():
         'execution_logs': 'Not Configured',
         'current_status': 'Not Configured',
     }
+
+    # =====================================================
+    # 1. WORKFLOW AUTOMATION
+    # =====================================================
+
     try:
         from rpa_dashboard.models import WorkflowRun
-        runs = list(WorkflowRun.objects.all()[:20])
-        if runs:
-            failed = sum(1 for r in runs if getattr(r, 'status', '') in ('failed', 'error'))
-            running = sum(1 for r in runs if getattr(r, 'status', '') in ('running', 'pending'))
-            success = sum(1 for r in runs if getattr(r, 'status', '') in ('success', 'completed'))
-            if failed > 0:
-                statuses['workflow_automation'] = 'Error'
-                statuses['execution_logs'] = 'Error'
-                statuses['current_status'] = 'Error'
-            elif running > 0:
-                statuses['workflow_automation'] = 'Warning'
-                statuses['execution_logs'] = 'Warning'
-                statuses['current_status'] = 'Warning'
-            elif success > 0:
+
+        latest_run = (
+            WorkflowRun.objects
+            .order_by('-started_at')
+            .first()
+        )
+
+        if latest_run:
+            run_status = str(
+                getattr(latest_run, 'status', '') or ''
+            ).strip().upper()
+
+            # ---------------------------------------------
+            # Latest execution succeeded
+            # ---------------------------------------------
+            if run_status in (
+                'SUCCESS',
+                'COMPLETED',
+                'DONE',
+                'PASS',
+            ):
                 statuses['workflow_automation'] = 'Healthy'
-                statuses['execution_logs'] = 'Healthy'
-                statuses['current_status'] = 'Healthy'
-    except Exception:
-        pass
-    return statuses
 
+            # ---------------------------------------------
+            # Latest execution is still running
+            # ---------------------------------------------
+            elif run_status in (
+                'RUNNING',
+                'PENDING',
+                'STARTED',
+                'QUEUED',
+            ):
+                statuses['workflow_automation'] = 'Warning'
 
-def _get_integration_statuses():
-    statuses = {
-        'erp': 'Not Configured',
-        'crm': 'Not Configured',
-        'stripe': 'Not Configured',
-        'google': 'Not Configured',
-        'meta': 'Not Configured',
-        'api_status': 'Healthy',
-    }
+            # ---------------------------------------------
+            # Latest execution failed
+            # ---------------------------------------------
+            elif run_status in (
+                'FAILURE',
+                'FAILED',
+                'FAIL',
+                'ERROR',
+            ):
+                statuses['workflow_automation'] = 'Error'
+
+            else:
+                statuses['workflow_automation'] = 'Warning'
+
+            # If WorkflowRun records exist, execution logging exists
+            statuses['execution_logs'] = 'Healthy'
+
+    except Exception as exc:
+        print(
+            "Platform Monitoring - Workflow status error:",
+            exc
+        )
+
+    # =====================================================
+    # 2. TASK SCHEDULER / CELERY BEAT
+    # =====================================================
+
     try:
-        from crm.models import Customer
-        if Customer.objects.exists():
-            statuses['crm'] = 'Healthy'
-    except Exception:
-        pass
-    try:
-        from payments.models import Invoice
-        if Invoice.objects.all()[:5].exists():
-            statuses['stripe'] = 'Healthy'
-    except Exception:
-        pass
+        from django.conf import settings
+
+        beat_schedule = getattr(
+            settings,
+            'CELERY_BEAT_SCHEDULE',
+            {}
+        )
+
+        if beat_schedule and len(beat_schedule) > 0:
+            statuses['task_scheduler'] = 'Healthy'
+        else:
+            statuses['task_scheduler'] = 'Not Configured'
+
+    except Exception as exc:
+        print(
+            "Platform Monitoring - Scheduler status error:",
+            exc
+        )
+
+    # =====================================================
+    # 3. EMAIL AUTOMATION
+    # =====================================================
+
+    # Keep this Not Configured until a real email automation
+    # system / scheduled email workflow is detected.
+    statuses['email_automation'] = 'Not Configured'
+
+    # =====================================================
+    # 4. CURRENT AUTOMATION STATUS
+    # =====================================================
+
+    automation_components = [
+        statuses['workflow_automation'],
+        statuses['task_scheduler'],
+        statuses['execution_logs'],
+    ]
+
+    if 'Error' in automation_components:
+        statuses['current_status'] = 'Error'
+
+    elif 'Warning' in automation_components:
+        statuses['current_status'] = 'Warning'
+
+    elif all(
+        status == 'Healthy'
+        for status in automation_components
+    ):
+        statuses['current_status'] = 'Healthy'
+
+    elif 'Healthy' in automation_components:
+        statuses['current_status'] = 'Warning'
+
+    else:
+        statuses['current_status'] = 'Not Configured'
+
     return statuses
-
-
 def _status_badge(status):
     if status == 'Healthy':
         return {
@@ -259,14 +344,21 @@ def _build_automation_modules():
          'route': rpa, 'status': s['workflow_automation'],
          'description': _('RPA-powered workflow execution engine.')},
         {'id': 'task_scheduler', 'name': _('Task Scheduler'), 'icon': 'clock',
-         'route': rpa, 'status': s['task_scheduler'],
+         'route': _route('platform_monitoring:task_scheduler'),
+         'status': s['task_scheduler'],
          'description': _('Cron & scheduled job orchestration.')},
-        {'id': 'execution_logs', 'name': _('Execution Logs'), 'icon': 'file-text',
-         'route': rpa, 'status': s['execution_logs'],
-         'description': _('Granular execution logs & audit trail.')},
-        {'id': 'current_status', 'name': _('Current Status'), 'icon': 'activity',
-         'route': rpa, 'status': s['current_status'],
-         'description': _('Live automation execution status overview.')},
+       {'id': 'execution_logs', 'name': _('Execution Logs'), 'icon': 'file-text',
+       'route': _route('platform_monitoring:execution_logs'),
+       'status': s['execution_logs'],
+        'description': _('Granular execution logs & audit trail.')},
+        {
+       'id': 'current_status',
+      'name': _('Current Status'),
+      'icon': 'activity',
+      'route': _route('platform_monitoring:automation_status'),
+      'status': 'Healthy',
+      'description': _('Live automation execution status overview.'),
+      },
     ]
 
 
@@ -310,7 +402,120 @@ def _build_security_modules():
          'route': '', 'status': 'Not Configured',
          'description': _('Executive security posture reports.')},
     ]
+def _get_integration_statuses():
+    """
+    Return integration statuses for Platform Monitoring.
 
+    This function checks whether the related Django routes
+    are available. External integrations that cannot be
+    verified locally remain Not Configured.
+    """
+
+    statuses = {
+        'erp': 'Not Configured',
+        'crm': 'Not Configured',
+        'stripe': 'Not Configured',
+        'google': 'Not Configured',
+        'meta': 'Not Configured',
+        'api_status': 'Not Configured',
+    }
+
+    # ERP
+    try:
+        if _route('services:erp_integration'):
+            statuses['erp'] = 'Healthy'
+    except Exception:
+        pass
+
+    # CRM
+    try:
+        if _route('crm:dashboard'):
+            statuses['crm'] = 'Healthy'
+    except Exception:
+        pass
+
+    # Stripe
+    try:
+        if _route('payments:plans'):
+            statuses['stripe'] = 'Healthy'
+    except Exception:
+        pass
+
+    # Google
+    # No route/configuration is shown in the current
+    # integration module, so keep it Not Configured.
+    statuses['google'] = 'Not Configured'
+
+    # Meta
+    try:
+        if _route('services:social_media_tracking'):
+            statuses['meta'] = 'Healthy'
+    except Exception:
+        pass
+
+    # Platform API
+    try:
+        if _route('api_status'):
+            statuses['api_status'] = 'Healthy'
+    except Exception:
+        pass
+
+    return statuses
+
+
+def _build_integration_modules():
+    s = _get_integration_statuses()
+
+    return [
+        {
+            'id': 'erp',
+            'name': _('ERP'),
+            'icon': 'building-2',
+            'route': _route('services:erp_integration'),
+            'status': s['erp'],
+            'description': _('ERP system integration status.')
+        },
+        {
+            'id': 'crm',
+            'name': _('CRM'),
+            'icon': 'users-round',
+            'route': _route('crm:dashboard'),
+            'status': s['crm'],
+            'description': _('CRM platform integration & sync.')
+        },
+        {
+            'id': 'stripe',
+            'name': _('Stripe'),
+            'icon': 'credit-card',
+            'route': _route('payments:plans'),
+            'status': s['stripe'],
+            'description': _('Stripe payments & billing.')
+        },
+        {
+            'id': 'google',
+            'name': _('Google'),
+            'icon': 'globe',
+            'route': '',
+            'status': s['google'],
+            'description': _('Google Workspace & Search integrations.')
+        },
+        {
+            'id': 'meta',
+            'name': _('Meta'),
+            'icon': 'share-2',
+            'route': _route('services:social_media_tracking'),
+            'status': s['meta'],
+            'description': _('Meta (Facebook/Instagram) APIs.')
+        },
+        {
+            'id': 'api_status',
+            'name': _('API Status'),
+            'icon': 'plug-zap',
+            'route': _route('api_status'),
+            'status': s['api_status'],
+            'description': _('Platform API health & uptime.')
+        },
+    ]
 
 def _build_integration_modules():
     s = _get_integration_statuses()
@@ -590,6 +795,54 @@ def automation_view(request):
         'modules': ctx['automation_modules'],
     })
 
+@login_required
+def task_scheduler_view(request):
+    from django.conf import settings
+
+    beat_schedule = getattr(settings, 'CELERY_BEAT_SCHEDULE', {})
+
+    scheduled_tasks = []
+
+    for task_name, config in beat_schedule.items():
+        schedule = config.get('schedule')
+        task_path = config.get('task', '')
+
+        # Convert schedule to a readable value
+        if isinstance(schedule, (int, float)):
+            if schedule < 60:
+                schedule_display = f'Every {int(schedule)} seconds'
+            elif schedule < 3600:
+                schedule_display = f'Every {int(schedule // 60)} minutes'
+            elif schedule < 86400:
+                schedule_display = f'Every {int(schedule // 3600)} hours'
+            else:
+                schedule_display = f'Every {int(schedule // 86400)} days'
+        else:
+            schedule_display = str(schedule)
+
+        scheduled_tasks.append({
+            'name': task_name,
+            'task': task_path,
+            'schedule': schedule_display,
+            'status': 'Healthy',
+        })
+
+    ctx = _base_context(
+        active_section='automation',
+        active_sub='task_scheduler',
+        page_title=_('Task Scheduler'),
+        page_tagline=_('Scheduled jobs & Celery Beat orchestration.')
+    )
+
+    return render(
+        request,
+        'platform_monitoring/task_scheduler.html',
+        {
+            **ctx,
+            'scheduled_tasks': scheduled_tasks,
+            'scheduled_tasks_count': len(scheduled_tasks),
+        }
+    )  
 
 @login_required
 def iot_view(request):
@@ -659,3 +912,98 @@ def standalone_view(request, section_id):
         'section_accent': meta['accent'],
         'modules': meta['modules'],
     })
+@login_required
+def execution_logs_view(request):
+    from rpa_dashboard.models import WorkflowRun
+
+    runs = (
+        WorkflowRun.objects
+        .select_related('workflow', 'triggered_by')
+        .prefetch_related('steps')
+        .order_by('-started_at')
+    )
+
+    total_runs = runs.count()
+    success_runs = runs.filter(status='SUCCESS').count()
+    failed_runs = runs.filter(status='FAILURE').count()
+    running_runs = runs.filter(status__in=['RUNNING', 'PENDING']).count()
+
+    success_rate = round(
+        (success_runs / total_runs * 100) if total_runs else 0,
+        1
+    )
+
+    ctx = _base_context(
+        active_section='automation',
+        page_title=_('Execution Logs'),
+        page_tagline=_('Workflow execution history, status, duration & audit trail.')
+    )
+
+    ctx.update({
+        'runs': runs[:100],
+        'total_runs': total_runs,
+        'success_runs': success_runs,
+        'failed_runs': failed_runs,
+        'running_runs': running_runs,
+        'success_rate': success_rate,
+    })
+
+    return render(
+        request,
+        'platform_monitoring/execution_logs.html',
+        ctx
+    )
+@login_required
+def automation_status_view(request):
+    try:
+        from rpa_dashboard.models import WorkflowRun, RPAWorkflow
+
+        total_workflows = RPAWorkflow.objects.count()
+
+        running = WorkflowRun.objects.filter(status='RUNNING').count()
+        pending = WorkflowRun.objects.filter(status='PENDING').count()
+
+        latest_run = (
+            WorkflowRun.objects
+            .select_related('workflow')
+            .order_by('-started_at')
+            .first()
+        )
+
+        recent_runs = (
+            WorkflowRun.objects
+            .select_related('workflow', 'triggered_by')
+            .order_by('-started_at')[:5]
+        )
+
+        if running > 0:
+            system_status = 'Running'
+        elif pending > 0:
+            system_status = 'Pending'
+        elif latest_run and latest_run.status == 'FAILURE':
+            system_status = 'Attention'
+        else:
+            system_status = 'Healthy'
+
+    except Exception:
+        total_workflows = 0
+        running = 0
+        pending = 0
+        latest_run = None
+        recent_runs = []
+        system_status = 'Unavailable'
+
+    context = {
+        'total_workflows': total_workflows,
+        'running': running,
+        'pending': pending,
+        'latest_run': latest_run,
+        'recent_runs': recent_runs,
+        'system_status': system_status,
+    }
+
+    return render(
+        request,
+        'platform_monitoring/automation_status.html',
+        context
+    )

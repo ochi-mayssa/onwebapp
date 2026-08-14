@@ -1,0 +1,269 @@
+{% extends 'branding/base.html' %}
+{% load branding_extras dp_tags %}
+
+{% block branding_content %}
+<style>body .branding-page{padding:0!important;margin:0!important;}body .branding-header,body .branding-footer,body footer{display:none!important;}</style>
+<script>document.body.classList.add('dd-active');</script>
+<div class="dd-layout">
+    {% include 'digital_presence/_sidebar.html' with active_page='reports' %}
+    <main class="dd-main">
+        <header class="dd-topbar">
+            <div class="dd-topbar-left">
+                <button class="dd-sidebar-toggle" id="ddSidebarToggle"><i class="fa-solid fa-bars"></i></button>
+                <div><div class="dd-topbar-title">Reports</div><div class="dd-topbar-subtitle">Digital Presence performance reports.</div></div>
+            </div>
+            <div class="dd-topbar-right">
+                <button class="dd-topbar-btn dd-theme-toggle" id="ddThemeToggle" title="Toggle theme"><i class="fa-solid fa-sun" id="ddThemeIcon"></i></button>
+                <div class="dd-topbar-avatar">{{ user.username|slice:":1"|upper }}</div>
+            </div>
+        </header>
+        <div class="dd-content">
+
+            {# ── Social Media Report ── #}
+            <div class="dd-panel">
+                <div class="dd-panel-header">
+                    <span class="dd-panel-title"><i class="fa-solid fa-share-nodes" style="color:#22d3ee;"></i>Social Media Report</span>
+                    <a href="{% url 'digital_presence:social_media' %}" class="dd-section-heading-action">View Details →</a>
+                </div>
+                {% if social.available %}
+                <div class="dd-metrics dd-metrics-4">
+                    <div class="dd-metric" style="border-top:3px solid #818cf8;">
+                        <div class="dd-metric-value">{{ social.providers_connected }}</div>
+                        <div class="dd-metric-label">Connected</div>
+                        <div class="dd-progress dd-progress-info" style="margin-top:6px;">
+                            <div class="dd-progress-bar" style="width:{% widthratio social.providers_connected 3 100 %}%;"></div>
+                        </div>
+                    </div>
+                    <div class="dd-metric" style="border-top:3px solid #22d3ee;">
+                        <div class="dd-metric-value">{{ social.total_events|intcomma }}</div>
+                        <div class="dd-metric-label">Total Events</div>
+                    </div>
+                    <div class="dd-metric" style="border-top:3px solid #22c55e;">
+                        <div class="dd-metric-value">{{ social.positive_events|intcomma }}</div>
+                        <div class="dd-metric-label">Positive</div>
+                    </div>
+                    <div class="dd-metric" style="border-top:3px solid {% if social.avg_sentiment and social.avg_sentiment > 0 %}#22c55e{% elif social.avg_sentiment and social.avg_sentiment < 0 %}#ef4444{% else %}#52525b{% endif %};">
+                        <div class="dd-metric-value">{% if social.avg_sentiment is not None %}{{ social.avg_sentiment }}{% else %}&mdash;{% endif %}</div>
+                        <div class="dd-metric-label">Avg Sentiment</div>
+                    </div>
+                </div>
+
+                {% if social.recent_events %}
+                <div style="margin-top:16px;">
+                    <div style="font-size:0.7rem;font-weight:600;color:#fafafa;margin-bottom:8px;">Recent Activity</div>
+                    {% for e in social.recent_events %}
+                    <div style="display:flex;align-items:start;gap:8px;padding:6px 0;{% if not forloop.last %}border-bottom:1px solid #1a1a1e;{% endif %}">
+                        <div style="width:6px;height:6px;border-radius:50%;margin-top:5px;flex-shrink:0;background:{% if e.sentiment > 0.3 %}#22c55e{% elif e.sentiment < -0.3 %}#ef4444{% else %}#52525b{% endif %};"></div>
+                        <div style="flex:1;min-width:0;">
+                            <div style="font-size:0.65rem;font-weight:600;color:#fafafa;">{{ e.author }}</div>
+                            <div style="font-size:0.6rem;color:#52525b;">{{ e.text|truncatechars:80 }}</div>
+                            <div style="font-size:0.55rem;color:#52525b;">{{ e.provider }} &middot; {{ e.created_at|timesince }} ago</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% else %}
+                <div class="dd-empty-cta" style="padding:20px;">
+                    <div class="dd-empty-cta-icon" style="background:rgba(34,211,238,0.1);color:#22d3ee;width:36px;height:36px;border-radius:8px;font-size:0.9rem;"><i class="fa-solid fa-share-nodes"></i></div>
+                    <div class="dd-empty-cta-title" style="font-size:0.7rem;">No Social Data</div>
+                    <div class="dd-empty-cta-desc" style="font-size:0.58rem;">Connect platforms to see social media data.</div>
+                </div>
+                {% endif %}
+            </div>
+
+            {# ── SEO Report ── #}
+            <div class="dd-panel" style="margin-top:16px;">
+                <div class="dd-panel-header">
+                    <span class="dd-panel-title"><i class="fa-solid fa-magnifying-glass-chart" style="color:#818cf8;"></i>SEO Report</span>
+                    <a href="{% url 'digital_presence:seo' %}" class="dd-section-heading-action">View Details →</a>
+                </div>
+                {% if seo.available %}
+                <div class="dd-metrics dd-metrics-4">
+                    <div class="dd-metric" style="border-top:3px solid {% if seo.latest_health_score and seo.latest_health_score >= 70 %}#22c55e{% elif seo.latest_health_score and seo.latest_health_score >= 40 %}#fbbf24{% else %}#ef4444{% endif %};">
+                        <div class="dd-metric-value">{% if seo.latest_health_score is not None %}{{ seo.latest_health_score }}%{% else %}&mdash;{% endif %}</div>
+                        <div class="dd-metric-label">Health Score</div>
+                        <div class="dd-progress {% if seo.latest_health_score and seo.latest_health_score >= 70 %}dd-progress-good{% elif seo.latest_health_score and seo.latest_health_score >= 40 %}dd-progress-warn{% else %}dd-progress-bad{% endif %}" style="margin-top:6px;">
+                            <div class="dd-progress-bar" style="width:{% if seo.latest_health_score %}{% widthratio seo.latest_health_score 1 100 %}{% else %}0{% endif %}%;"></div>
+                        </div>
+                    </div>
+                    <div class="dd-metric" style="border-top:3px solid #818cf8;">
+                        <div class="dd-metric-value">{{ seo.completed_tasks|intcomma }}</div>
+                        <div class="dd-metric-label">Completed Audits</div>
+                    </div>
+                    <div class="dd-metric" style="border-top:3px solid #22d3ee;">
+                        <div class="dd-metric-value">{{ seo.total_tasks|intcomma }}</div>
+                        <div class="dd-metric-label">Total Audits</div>
+                    </div>
+                    <div class="dd-metric" style="border-top:3px solid {% if seo.issues_count > 0 %}#ef4444{% else %}#22c55e{% endif %};">
+                        <div class="dd-metric-value">{{ seo.issues_count|intcomma }}</div>
+                        <div class="dd-metric-label">SEO Issues</div>
+                    </div>
+                </div>
+
+                {% if seo.latest_health_score is not None %}
+                <div style="margin-top:16px;">
+                    <div style="font-size:0.7rem;font-weight:600;color:#fafafa;margin-bottom:8px;">Score Breakdown</div>
+                    <div class="dd-score-grid">
+                        <div class="dd-score-card">
+                            <div class="dd-score-value" style="color:{% if seo.latest_technical_score and seo.latest_technical_score >= 70 %}#22c55e{% elif seo.latest_technical_score and seo.latest_technical_score >= 40 %}#fbbf24{% else %}#ef4444{% endif %};">{% if seo.latest_technical_score is not None %}{{ seo.latest_technical_score }}%{% else %}&mdash;{% endif %}</div>
+                            <div class="dd-score-label">Technical</div>
+                            <div class="dd-progress {% if seo.latest_technical_score and seo.latest_technical_score >= 70 %}dd-progress-good{% elif seo.latest_technical_score and seo.latest_technical_score >= 40 %}dd-progress-warn{% else %}dd-progress-bad{% endif %}" style="margin-top:4px;">
+                                <div class="dd-progress-bar" style="width:{% if seo.latest_technical_score %}{% widthratio seo.latest_technical_score 1 100 %}{% else %}0{% endif %}%;"></div>
+                            </div>
+                        </div>
+                        <div class="dd-score-card">
+                            <div class="dd-score-value" style="color:{% if seo.latest_content_score and seo.latest_content_score >= 70 %}#22c55e{% elif seo.latest_content_score and seo.latest_content_score >= 40 %}#fbbf24{% else %}#ef4444{% endif %};">{% if seo.latest_content_score is not None %}{{ seo.latest_content_score }}%{% else %}&mdash;{% endif %}</div>
+                            <div class="dd-score-label">Content</div>
+                            <div class="dd-progress {% if seo.latest_content_score and seo.latest_content_score >= 70 %}dd-progress-good{% elif seo.latest_content_score and seo.latest_content_score >= 40 %}dd-progress-warn{% else %}dd-progress-bad{% endif %}" style="margin-top:4px;">
+                                <div class="dd-progress-bar" style="width:{% if seo.latest_content_score %}{% widthratio seo.latest_content_score 1 100 %}{% else %}0{% endif %}%;"></div>
+                            </div>
+                        </div>
+                        <div class="dd-score-card">
+                            <div class="dd-score-value" style="color:{% if seo.latest_visibility_score and seo.latest_visibility_score >= 70 %}#22c55e{% elif seo.latest_visibility_score and seo.latest_visibility_score >= 40 %}#fbbf24{% else %}#ef4444{% endif %};">{% if seo.latest_visibility_score is not None %}{{ seo.latest_visibility_score }}%{% else %}&mdash;{% endif %}</div>
+                            <div class="dd-score-label">Visibility</div>
+                            <div class="dd-progress {% if seo.latest_visibility_score and seo.latest_visibility_score >= 70 %}dd-progress-good{% elif seo.latest_visibility_score and seo.latest_visibility_score >= 40 %}dd-progress-warn{% else %}dd-progress-bad{% endif %}" style="margin-top:4px;">
+                                <div class="dd-progress-bar" style="width:{% if seo.latest_visibility_score %}{% widthratio seo.latest_visibility_score 1 100 %}{% else %}0{% endif %}%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if seo.recent_tasks %}
+                <div style="margin-top:16px;">
+                    <div style="font-size:0.7rem;font-weight:600;color:#fafafa;margin-bottom:8px;">Recent Audits</div>
+                    {% for t in seo.recent_tasks %}
+                    <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;{% if not forloop.last %}border-bottom:1px solid #1a1a1e;{% endif %}">
+                        <div style="flex:1;font-size:0.65rem;color:#fafafa;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ t.url }}</div>
+                        <span class="dd-status dd-status-{{ t.status }}" style="margin-left:8px;">{{ t.status }}</span>
+                        <div style="font-size:0.6rem;color:#52525b;margin-left:8px;">{{ t.created_at|date:"M j" }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% else %}
+                <div class="dd-empty-cta" style="padding:20px;">
+                    <div class="dd-empty-cta-icon" style="background:rgba(129,140,248,0.1);color:#818cf8;width:36px;height:36px;border-radius:8px;font-size:0.9rem;"><i class="fa-solid fa-magnifying-glass-chart"></i></div>
+                    <div class="dd-empty-cta-title" style="font-size:0.7rem;">No SEO Data</div>
+                    <div class="dd-empty-cta-desc" style="font-size:0.58rem;">Run an SEO audit to see data.</div>
+                </div>
+                {% endif %}
+            </div>
+
+            {# ── Keyword Report ── #}
+            <div class="dd-panel" style="margin-top:16px;">
+                <div class="dd-panel-header">
+                    <span class="dd-panel-title"><i class="fa-solid fa-key" style="color:#fbbf24;"></i>Keyword Report</span>
+                    <a href="{% url 'digital_presence:keywords' %}" class="dd-section-heading-action">View Details →</a>
+                </div>
+                {% if keywords.available %}
+                <div class="dd-metrics dd-metrics-4">
+                    <div class="dd-metric" style="border-top:3px solid #fbbf24;">
+                        <div class="dd-metric-value">{{ keywords.total_analyses|intcomma }}</div>
+                        <div class="dd-metric-label">Total Analyses</div>
+                    </div>
+                    <div class="dd-metric" style="border-top:3px solid #22c55e;">
+                        <div class="dd-metric-value">{{ keywords.keywords_found|intcomma }}</div>
+                        <div class="dd-metric-label">Keywords Found</div>
+                    </div>
+                    <div class="dd-metric" style="border-top:3px solid #22d3ee;">
+                        <div class="dd-metric-value">{% if keywords.avg_keyword_score is not None %}{{ keywords.avg_keyword_score }}%{% else %}&mdash;{% endif %}</div>
+                        <div class="dd-metric-label">Avg Relevance</div>
+                        <div class="dd-progress {% if keywords.avg_keyword_score and keywords.avg_keyword_score >= 70 %}dd-progress-good{% elif keywords.avg_keyword_score and keywords.avg_keyword_score >= 40 %}dd-progress-warn{% else %}dd-progress-bad{% endif %}" style="margin-top:6px;">
+                            <div class="dd-progress-bar" style="width:{% if keywords.avg_keyword_score %}{% widthratio keywords.avg_keyword_score 1 100 %}{% else %}0{% endif %}%;"></div>
+                        </div>
+                    </div>
+                    <div class="dd-metric" style="border-top:3px solid #818cf8;">
+                        <div class="dd-metric-value">{{ keyword_mon.total_keywords|intcomma }}</div>
+                        <div class="dd-metric-label">Keywords Tracked</div>
+                    </div>
+                </div>
+
+                {% if keyword_mon.keywords %}
+                <div style="margin-top:16px;">
+                    <div style="font-size:0.7rem;font-weight:600;color:#fafafa;margin-bottom:8px;">Keyword Performance</div>
+                    {% for kw in keyword_mon.keywords|slice:":10" %}
+                    <div style="display:flex;align-items:center;gap:8px;padding:6px 0;{% if not forloop.last %}border-bottom:1px solid #1a1a1e;{% endif %}">
+                        <div style="flex:1;font-size:0.7rem;font-weight:600;color:#fafafa;">{{ kw.keyword }}</div>
+                        {% if kw.relevance_score is not None %}
+                        <span style="font-size:0.6rem;padding:2px 6px;border-radius:4px;background:{% if kw.relevance_score >= 70 %}rgba(34,197,94,0.1);color:#22c55e{% elif kw.relevance_score >= 40 %}rgba(251,191,36,0.1);color:#fbbf24{% else %}rgba(239,68,68,0.1);color:#ef4444{% endif %};">{{ kw.relevance_score|floatformat:0 }}%</span>
+                        {% else %}
+                        <span style="font-size:0.6rem;color:#52525b;">&mdash;</span>
+                        {% endif %}
+                        <span style="font-size:0.55rem;color:{% if kw.match_status == 'yes' %}#22c55e{% elif kw.match_status == 'partial' %}#fbbf24{% elif kw.match_status == 'no' %}#ef4444{% else %}#52525b{% endif %};">{{ kw.match_status }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% else %}
+                <div class="dd-empty-cta" style="padding:20px;">
+                    <div class="dd-empty-cta-icon" style="background:rgba(251,191,36,0.1);color:#fbbf24;width:36px;height:36px;border-radius:8px;font-size:0.9rem;"><i class="fa-solid fa-key"></i></div>
+                    <div class="dd-empty-cta-title" style="font-size:0.7rem;">No Keyword Data</div>
+                    <div class="dd-empty-cta-desc" style="font-size:0.58rem;">Run URL Intelligence analysis to see data.</div>
+                </div>
+                {% endif %}
+            </div>
+
+            {# ── Content Report ── #}
+            <div class="dd-panel" style="margin-top:16px;">
+                <div class="dd-panel-header">
+                    <span class="dd-panel-title"><i class="fa-solid fa-file-lines" style="color:#22c55e;"></i>Content Report</span>
+                    <a href="{% url 'digital_presence:content' %}" class="dd-section-heading-action">View Details →</a>
+                </div>
+                {% if content.available %}
+                <div class="dd-metrics dd-metrics-4">
+                    <div class="dd-metric" style="border-top:3px solid #818cf8;">
+                        <div class="dd-metric-value">{{ content.pages_audited|intcomma }}</div>
+                        <div class="dd-metric-label">Pages Audited</div>
+                    </div>
+                    <div class="dd-metric" style="border-top:3px solid {% if content.latest_content_score and content.latest_content_score >= 70 %}#22c55e{% elif content.latest_content_score and content.latest_content_score >= 40 %}#fbbf24{% else %}#ef4444{% endif %};">
+                        <div class="dd-metric-value">{% if content.latest_content_score is not None %}{{ content.latest_content_score }}%{% else %}&mdash;{% endif %}</div>
+                        <div class="dd-metric-label">Content Score</div>
+                        <div class="dd-progress {% if content.latest_content_score and content.latest_content_score >= 70 %}dd-progress-good{% elif content.latest_content_score and content.latest_content_score >= 40 %}dd-progress-warn{% else %}dd-progress-bad{% endif %}" style="margin-top:6px;">
+                            <div class="dd-progress-bar" style="width:{% if content.latest_content_score %}{% widthratio content.latest_content_score 1 100 %}{% else %}0{% endif %}%;"></div>
+                        </div>
+                    </div>
+                    <div class="dd-metric" style="border-top:3px solid #22c55e;">
+                        <div class="dd-metric-value">{{ content.total_words|intcomma }}</div>
+                        <div class="dd-metric-label">Total Words</div>
+                    </div>
+                    <div class="dd-metric" style="border-top:3px solid {% if content.total_issues > 0 %}#ef4444{% else %}#22c55e{% endif %};">
+                        <div class="dd-metric-value">{{ content.total_issues|intcomma }}</div>
+                        <div class="dd-metric-label">Total Issues</div>
+                    </div>
+                </div>
+
+                {% if content.missing_h1 > 0 or content.missing_meta > 0 or content.missing_alt > 0 %}
+                <div style="margin-top:16px;">
+                    <div style="font-size:0.7rem;font-weight:600;color:#fafafa;margin-bottom:8px;">Issues Breakdown</div>
+                    <div class="dd-score-grid">
+                        <div class="dd-score-card">
+                            <div class="dd-score-value" style="color:{% if content.missing_h1 > 0 %}#ef4444{% else %}#22c55e{% endif %};">{{ content.missing_h1|intcomma }}</div>
+                            <div class="dd-score-label">Missing H1</div>
+                        </div>
+                        <div class="dd-score-card">
+                            <div class="dd-score-value" style="color:{% if content.missing_meta > 0 %}#fbbf24{% else %}#22c55e{% endif %};">{{ content.missing_meta|intcomma }}</div>
+                            <div class="dd-score-label">Missing Meta</div>
+                        </div>
+                        <div class="dd-score-card">
+                            <div class="dd-score-value" style="color:{% if content.missing_alt > 0 %}#fbbf24{% else %}#22c55e{% endif %};">{{ content.missing_alt|intcomma }}</div>
+                            <div class="dd-score-label">Missing Alt</div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% else %}
+                <div class="dd-empty-cta" style="padding:20px;">
+                    <div class="dd-empty-cta-icon" style="background:rgba(34,197,94,0.1);color:#22c55e;width:36px;height:36px;border-radius:8px;font-size:0.9rem;"><i class="fa-solid fa-file-lines"></i></div>
+                    <div class="dd-empty-cta-title" style="font-size:0.7rem;">No Content Data</div>
+                    <div class="dd-empty-cta-desc" style="font-size:0.58rem;">Run an SEO audit to see data.</div>
+                </div>
+                {% endif %}
+            </div>
+
+        </div>
+    </main>
+</div>
+{% include 'digital_presence/_scripts.html' %}
+{% endblock %}

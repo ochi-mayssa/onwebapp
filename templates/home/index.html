@@ -11,14 +11,12 @@
 <!-- Animate.css for entrance animations -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 <style>
-    /* Premium Hero */
     .hero-section {
         padding: 180px 0 120px;
         position: relative;
         background: radial-gradient(circle at 70% 30%, rgba(99, 102, 241, 0.05) 0%, transparent 50%),
                     radial-gradient(circle at 10% 70%, rgba(6, 182, 212, 0.05) 0%, transparent 50%);
     }
-
     .hero-title {
         font-size: clamp(3rem, 8vw, 4.5rem);
         font-weight: 800;
@@ -26,7 +24,6 @@
         line-height: 1.1;
         margin-bottom: 24px;
     }
-
     .hero-subtitle {
         font-size: 1.25rem;
         color: var(--text-secondary);
@@ -34,12 +31,6 @@
         max-width: 600px;
         font-weight: 450;
     }
-
-    .hero-preview-container {
-        position: relative;
-        perspective: 1000px;
-    }
-
     .hero-preview {
         border-radius: 24px;
         box-shadow: var(--card-shadow-xl);
@@ -48,27 +39,15 @@
         transform: rotateY(-10deg) rotateX(5deg);
         transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
     }
-
     .hero-preview:hover {
         transform: rotateY(0) rotateX(0);
     }
-
-    /* Dashboard Preview Section */
-    .dashboard-preview-section {
-        background: var(--bg-surface-secondary);
-        border-radius: 48px;
-        margin: 0 24px;
-        padding: 80px 0;
-    }
-
-    /* Comparison Table */
     .comp-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
     .comp-row { background: var(--bg-surface-secondary); border-radius: 12px; transition: all 0.3s ease; }
     .comp-row:hover { background: var(--bg-surface-tertiary); transform: translateX(8px); }
     .comp-cell { padding: 20px; border-top: 1px solid transparent; border-bottom: 1px solid transparent; }
     .comp-cell:first-child { border-left: 1px solid transparent; border-top-left-radius: 12px; border-bottom-left-radius: 12px; }
     .comp-cell:last-child { border-right: 1px solid transparent; border-top-right-radius: 12px; border-bottom-right-radius: 12px; }
-
     .x-small { font-size: 0.8rem; }
     .uppercase { text-transform: uppercase; }
     .tracking-widest { letter-spacing: 0.15em; }
@@ -90,7 +69,7 @@
             </div>
             <div class="col-lg-5 d-none d-lg-block reveal-up delay-200">
                 <div class="hero-preview p-2">
-                    <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80" alt="OnWebApp Dashboard Preview" class="img-fluid rounded-4">
+                    <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80" alt="OnWebApp Dashboard Preview" class="img-fluid rounded-4">
                 </div>
             </div>
         </div>
@@ -196,7 +175,7 @@
                         <h4 class="fw-bold">CRM System</h4>
                         <p class="text-secondary small mb-4">Track leads, monitor customer health, and automate engagement with AI-driven insights.</p>
                         <div class="rounded-3 overflow-hidden border">
-                            <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&q=80" class="img-fluid opacity-75" alt="CRM UI Preview">
+                            <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&q=80" class="img-fluid opacity-75" alt="CRM System Preview" loading="lazy">
                         </div>
                     </div>
                 </div>
@@ -210,7 +189,7 @@
                         <h4 class="fw-bold">ERP Integration</h4>
                         <p class="text-secondary small mb-4">Manage stock, orders, and enterprise invoicing with full ERPNext cloud synchronization.</p>
                         <div class="rounded-3 overflow-hidden border">
-                            <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=400&q=80" class="img-fluid opacity-75" alt="ERP UI Preview">
+                            <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=400&q=80" class="img-fluid opacity-75" alt="ERP Integration Preview" loading="lazy">
                         </div>
                     </div>
                 </div>
@@ -224,15 +203,11 @@
                         <h4 class="fw-bold">Live Analytics</h4>
                         <p class="text-secondary small mb-4">Real-time business intelligence with interactive charts and market distribution mapping.</p>
                         <div class="rounded-3 overflow-hidden border">
-                            <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&q=80" class="img-fluid opacity-75" alt="Analytics UI Preview">
+                            <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&q=80" class="img-fluid opacity-75" alt="Analytics Dashboard Preview" loading="lazy">
                         </div>
                     </div>
                 </div>
             </div>
-            <!-- More features... -->
-        </div>
-    </div>
-</section>
             <div class="col-md-6 col-lg-4 reveal-up delay-100">
                 <div class="card h-100 border-0 shadow-sm hover-lift">
                     <div class="card-body p-4">
@@ -242,7 +217,7 @@
                         <h4 class="fw-bold">Automation Engine</h4>
                         <p class="text-secondary small mb-4">Deploy custom RPA workflows that handle repetitive tasks with industrial-grade reliability.</p>
                         <div class="rounded-3 overflow-hidden border">
-                            <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&q=80" class="img-fluid opacity-75" alt="RPA UI Preview">
+                            <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&q=80" class="img-fluid opacity-75" alt="Automation Engine Preview" loading="lazy">
                         </div>
                     </div>
                 </div>
@@ -256,7 +231,7 @@
                         <h4 class="fw-bold">Platform Monitoring</h4>
                         <p class="text-secondary small mb-4">Global uptime checks, Core Web Vitals, and security audits for your entire digital ecosystem.</p>
                         <div class="rounded-3 overflow-hidden border">
-                            <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&q=80" class="img-fluid opacity-75" alt="Monitoring UI Preview">
+                            <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=400&q=80" class="img-fluid opacity-75" alt="Platform Monitoring Preview" loading="lazy">
                         </div>
                     </div>
                 </div>
@@ -270,7 +245,7 @@
                         <h4 class="fw-bold">Social Tracking</h4>
                         <p class="text-secondary small mb-4">Monitor brand sentiment and social engagement across all platforms in real-time.</p>
                         <div class="rounded-3 overflow-hidden border">
-                            <img src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=400&q=80" class="img-fluid opacity-75" alt="Social UI Preview">
+                            <img src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=400&q=80" class="img-fluid opacity-75" alt="Social Tracking Preview" loading="lazy">
                         </div>
                     </div>
                 </div>
@@ -288,9 +263,7 @@
             <p class="text-secondary">From lead capture to revenue analytics in one automated loop.</p>
         </div>
         <div class="position-relative">
-            <!-- Connection Line -->
             <div class="d-none d-lg-block position-absolute top-50 start-0 end-0 translate-middle-y" style="height: 2px; background: linear-gradient(90deg, transparent, var(--border-color), transparent); z-index: 0;"></div>
-            
             <div class="row g-4 justify-content-center position-relative" style="z-index: 1;">
                 <div class="col-md-4 col-lg-2 reveal-up delay-100">
                     <div class="text-center">
@@ -344,9 +317,7 @@
 
 <!-- 5. Live Demo / Preview Section -->
 <section class="section-padding bg-slate-900 text-white position-relative overflow-hidden" style="border-radius: 0 0 64px 64px;">
-    <!-- Abstract Glow -->
     <div class="position-absolute top-50 start-50 translate-middle w-100 h-100" style="background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%); z-index: 0;"></div>
-    
     <div class="container position-relative" style="z-index: 1;">
         <div class="row align-items-center g-5">
             <div class="col-lg-5 reveal-up">
@@ -373,7 +344,7 @@
             <div class="col-lg-7 reveal-up delay-200">
                 <div class="hero-preview-container">
                     <div class="p-2 bg-white bg-opacity-10 rounded-4 border border-white border-opacity-10">
-                        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1000&q=80" alt="OnWebApp UI Preview" class="img-fluid rounded-3 shadow-2xl">
+                        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1000&q=80" alt="OnWebApp Command Center" class="img-fluid rounded-3 shadow-2xl">
                     </div>
                 </div>
             </div>
@@ -544,9 +515,7 @@
 
 <!-- 9. Final CTA Section -->
 <section class="section-padding bg-primary position-relative overflow-hidden">
-    <!-- Abstract Pattern -->
     <div class="position-absolute top-0 start-0 w-100 h-100 opacity-10" style="background-image: radial-gradient(#fff 1px, transparent 1px); background-size: 32px 32px;"></div>
-    
     <div class="container position-relative text-center text-white" style="z-index: 1;">
         <div class="reveal-up">
             <h2 class="fw-800 display-4 mb-4">Start managing your business smarter today.</h2>
@@ -560,10 +529,8 @@
 </section>
 
 <script>
-    // Initialize Lucide Icons
     lucide.createIcons();
 
-    // Scroll Reveal Animation
     function reveal() {
         var reveals = document.querySelectorAll(".reveal-up");
         for (var i = 0; i < reveals.length; i++) {
@@ -583,6 +550,7 @@
 <style>
     .x-small { font-size: 0.8rem; }
     .uppercase { text-transform: uppercase; }
+    .tracking-widest { letter-spacing: 0.15em; }
 </style>
 
 {% endblock %}

@@ -51,6 +51,8 @@ urlpatterns = [
     path('forum/', include('forum.urls', namespace='forum')),
     path('social-proof/', include('social_proof.urls')),
     path('branding/', include('branding.urls', namespace='branding')),
+    path('root/', include('root_dashboard.urls', namespace='root_dashboard')),
+    path('digital/', include('digital_presence.urls', namespace='digital_presence')),
 
     # Branding REST API
     path('api/branding/', include('branding.api.urls', namespace='branding-api')),

@@ -49,7 +49,7 @@ from .utils import (
     team_overview_key,
 )
 from .decorators import rate_limit
-from .roles import get_role_dashboard_url, designer_required, supervisor_required, staff_required
+from .roles import get_role_dashboard_url, designer_required, supervisor_required, staff_required, team_designer_required, is_designer
 from .models import (
     ASSET_TYPES,
     AdobeAsset,
@@ -369,12 +369,18 @@ def _detect_asset_type(name, content_type):
 
 @login_required
 def wizard(request):
+    if is_designer(request.user):
+        messages.warning(request, 'Designers cannot create branding requests.')
+        return redirect('branding:designer_dashboard')
     draft = _get_or_create_draft(request.user)
     return redirect('branding:wizard_step', step=draft.current_step)
 
 
 @login_required
 def wizard_step(request, step):
+    if is_designer(request.user):
+        messages.warning(request, 'Designers cannot create branding requests.')
+        return redirect('branding:designer_dashboard')
     try:
         step = int(step)
     except (TypeError, ValueError):
@@ -428,6 +434,8 @@ def wizard_step(request, step):
 @login_required
 @require_POST
 def wizard_autosave(request):
+    if is_designer(request.user):
+        return JsonResponse({'error': 'Designers cannot create branding requests.'}, status=403)
     try:
         data = json.loads(request.body or '{}')
     except json.JSONDecodeError:
@@ -444,6 +452,8 @@ def wizard_autosave(request):
 @require_POST
 @rate_limit('file_upload')
 def upload_file(request):
+    if is_designer(request.user):
+        return JsonResponse({'error': 'Designers cannot create branding requests.'}, status=403)
     draft = _get_or_create_draft(request.user)
     file = request.FILES.get('file')
     if not file:
@@ -3769,43 +3779,16 @@ def designer_dashboard(request):
         )
     )
 
-    # ── Weekly Overview (deadlines this week + next week) ──
-    week_start = today - timedelta(days=today.weekday())
-    week_end = week_start + timedelta(days=6)
-    next_week_end = week_end + timedelta(days=7)
-
-    weekly_deadlines = active_qs.filter(
-        estimated_delivery_date__gte=week_start,
-        estimated_delivery_date__lte=next_week_end,
-    ).select_related('user').order_by('estimated_delivery_date')
-
-    # Group by day for calendar
-    calendar_days = []
-    for i in range(14):
-        day = week_start + timedelta(days=i)
-        day_projects = [r for r in weekly_deadlines if r.estimated_delivery_date == day]
-        calendar_days.append({
-            'date': day,
-            'is_today': day == today,
-            'is_weekend': day.weekday() >= 5,
-            'projects': day_projects,
-            'count': len(day_projects),
-        })
-
-    # Workload distribution (days of week for next 2 weeks)
-    workload_by_day = {}
-    for i in range(14):
-        day = week_start + timedelta(days=i)
-        day_name = day.strftime('%a')
-        count = sum(1 for r in weekly_deadlines if r.estimated_delivery_date == day)
-        if day_name not in workload_by_day:
-            workload_by_day[day_name] = 0
-        workload_by_day[day_name] += count
-
     # ── Notifications (recent for me) ──
     recent_notifications = BrandingNotification.objects.filter(
         recipient=me, is_read=False
     ).select_related('request')[:10]
+
+    # ── Brand Collections ──
+    from .models import DesignerCollection, DesignerAsset
+    my_collections = DesignerCollection.objects.filter(designer=me, is_active=True)
+    collection_count = my_collections.count()
+    asset_count = DesignerAsset.objects.filter(collection__designer=me).count()
 
     # ── Status update handling ──
     if request.method == 'POST':
@@ -3884,11 +3867,186 @@ def designer_dashboard(request):
         'upcoming_projects': upcoming_projects,
         # Priority
         'priority_projects': priority_projects,
-        # Calendar
-        'calendar_days': calendar_days,
-        'workload_by_day': workload_by_day,
-        'week_start': week_start,
-        'week_end': week_end,
+        # Collections
+        'collection_count': collection_count,
+        'asset_count': asset_count,
+        'my_collections': my_collections[:6],
+        # Notifications
+        'recent_notifications': recent_notifications,
+        # Context
+        'today': today,
+        'STATUS_CHOICES': STATUS_CHOICES,
+        'PRIORITY_CHOICES': PRIORITY_CHOICES,
+    })
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# TEAM DESIGNER DASHBOARD
+# ═══════════════════════════════════════════════════════════════════════════
+
+@team_designer_required
+def team_designer_dashboard(request):
+    """Team Designer dashboard — restricted version of designer dashboard."""
+    me = request.user
+    now = timezone.now()
+    today = now.date()
+    month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+
+    my_projects = BrandingRequest.objects.filter(designer=me).exclude(status='DRAFT')
+
+    # ── Metrics ──
+    active_qs = my_projects.filter(status__in=DESIGNER_ACTIVE_STATUSES)
+    active_count = active_qs.count()
+
+    overdue_qs = active_qs.filter(estimated_delivery_date__lt=today)
+    overdue_count = overdue_qs.count()
+
+    today_deadline_qs = active_qs.filter(estimated_delivery_date=today)
+    today_deadline_count = today_deadline_qs.count()
+
+    waiting_feedback_qs = my_projects.filter(status='WAITING_CLIENT')
+    waiting_feedback_count = waiting_feedback_qs.count()
+
+    completed_qs = my_projects.filter(status='COMPLETED', completed_at__isnull=False)
+    completed_total = completed_qs.count()
+    completed_month = completed_qs.filter(completed_at__gte=month_start).count()
+
+    avg_comp = completed_qs.aggregate(
+        avg=Avg(F('completed_at') - F('created_at'))
+    )['avg']
+    avg_days = round(avg_comp.total_seconds() / 86400, 1) if avg_comp else None
+
+    assigned_month = my_projects.filter(created_at__gte=month_start).count()
+    completion_rate = round(completed_month / assigned_month * 100) if assigned_month else None
+
+    next_deadline = active_qs.filter(
+        estimated_delivery_date__gte=today
+    ).order_by('estimated_delivery_date').values_list('estimated_delivery_date', flat=True).first()
+
+    days_to_next = (next_deadline - today).days if next_deadline else None
+
+    # ── Project Lists ──
+    active_projects = active_qs.select_related('user', 'collection').order_by(
+        '-priority', 'estimated_delivery_date', 'created_at'
+    )
+
+    waiting_projects = waiting_feedback_qs.select_related('user', 'collection').order_by(
+        'estimated_delivery_date', 'created_at'
+    )
+
+    completed_projects = completed_qs.select_related('user', 'collection').order_by(
+        '-completed_at'
+    )[:20]
+
+    upcoming_qs = my_projects.filter(
+        status__in=DESIGNER_UPCOMING_STATUSES
+    ).select_related('user', 'collection').order_by('-priority', 'created_at')
+    upcoming_projects = upcoming_qs[:20]
+
+    # ── Today's Priority (sorted by urgency) ──
+    priority_projects = active_qs.select_related('user', 'collection')
+    priority_order = {'URGENT': 0, 'HIGH': 1, 'MEDIUM': 2, 'LOW': 3}
+    priority_projects = sorted(
+        priority_projects,
+        key=lambda r: (
+            0 if r.estimated_delivery_date and r.estimated_delivery_date < today else 1,
+            priority_order.get(r.priority, 9),
+            r.estimated_delivery_date or timezone.now().date() + timedelta(days=365),
+        )
+    )
+
+    # ── Notifications (recent for me) ──
+    recent_notifications = BrandingNotification.objects.filter(
+        recipient=me, is_read=False
+    ).select_related('request')[:10]
+
+    # ── Brand Collections ──
+    from .models import DesignerCollection, DesignerAsset
+    my_collections = DesignerCollection.objects.filter(designer=me, is_active=True)
+    collection_count = my_collections.count()
+    asset_count = DesignerAsset.objects.filter(collection__designer=me).count()
+
+    # ── Status update handling ──
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        req_pk = request.POST.get('request_pk')
+
+        if action and req_pk:
+            req = get_object_or_404(BrandingRequest, pk=req_pk, designer=me)
+            new_status = request.POST.get('new_status', '')
+
+            if action == 'update_status' and new_status:
+                valid_designer_statuses = ['DESIGNING', 'WAITING_CLIENT', 'COMPLETED']
+                if new_status in valid_designer_statuses:
+                    req.status = new_status
+                    if new_status == 'COMPLETED':
+                        req.completed_at = now
+                    req.save(update_fields=['status', 'completed_at', 'updated_at'])
+                    req.log('STATUS_CHANGE',
+                            f'Status changed to {req.get_status_display()} by designer',
+                            actor=me)
+                    if new_status == 'WAITING_CLIENT':
+                        _notify(
+                            req.user, req, 'STATUS_CHANGED',
+                            f'Your project {req.request_number} is ready for your review.',
+                            actor=me,
+                        )
+                    elif new_status == 'COMPLETED':
+                        _notify(
+                            req.user, req, 'COMPLETED',
+                            f'Your project {req.request_number} has been completed!',
+                            actor=me,
+                        )
+                    messages.success(request, f'{req.request_number} updated to {req.get_status_display()}')
+                    invalidate_after_status_change(me.pk)
+
+            elif action == 'start_working':
+                if req.status == 'ASSIGNED':
+                    req.status = 'DESIGNING'
+                    req.save(update_fields=['status', 'updated_at'])
+                    req.log('STATUS_CHANGE', 'Started designing', actor=me)
+                    messages.success(request, f'Started working on {req.request_number}')
+                    invalidate_after_status_change(me.pk)
+
+            elif action == 'mark_complete':
+                if req.status in ('DESIGNING', 'REVISION'):
+                    req.status = 'COMPLETED'
+                    req.completed_at = now
+                    req.save(update_fields=['status', 'completed_at', 'updated_at'])
+                    req.log('STATUS_CHANGE', 'Marked as completed by designer', actor=me)
+                    _notify(
+                        req.user, req, 'COMPLETED',
+                        f'Your project {req.request_number} has been completed!',
+                        actor=me,
+                    )
+                    messages.success(request, f'{req.request_number} marked as completed')
+                    invalidate_after_status_change(me.pk)
+
+            return redirect('branding:team_designer_dashboard')
+
+    return render(request, 'branding/team_designer_dashboard.html', {
+        # Metrics
+        'active_count': active_count,
+        'overdue_count': overdue_count,
+        'today_deadline_count': today_deadline_count,
+        'waiting_feedback_count': waiting_feedback_count,
+        'completed_total': completed_total,
+        'completed_month': completed_month,
+        'avg_days': avg_days,
+        'completion_rate': completion_rate,
+        'next_deadline': next_deadline,
+        'days_to_next': days_to_next,
+        # Project lists
+        'active_projects': active_projects,
+        'waiting_projects': waiting_projects,
+        'completed_projects': completed_projects,
+        'upcoming_projects': upcoming_projects,
+        # Priority
+        'priority_projects': priority_projects,
+        # Collections
+        'collection_count': collection_count,
+        'asset_count': asset_count,
+        'my_collections': my_collections[:6],
         # Notifications
         'recent_notifications': recent_notifications,
         # Context
@@ -4296,6 +4454,194 @@ def collection_template_download(request, pk):
     tpl = get_object_or_404(CollectionTemplate, pk=pk)
     tpl.increment_downloads()
     return redirect(tpl.file.url)
+
+
+# ---------------------------------------------------------------------------
+# Designer Brand Collection Management
+# ---------------------------------------------------------------------------
+
+from .models import DesignerCollection, DesignerAsset, ASSET_TYPE_CHOICES
+
+
+@designer_required
+def designer_collection_list(request):
+    """List all collections owned by the current designer."""
+    collections = DesignerCollection.objects.filter(
+        designer=request.user, is_active=True
+    ).order_by('-created_at')
+
+    q = request.GET.get('q', '').strip()
+    if q:
+        collections = collections.filter(
+            Q(name__icontains=q) | Q(industry__icontains=q) | Q(client_name__icontains=q)
+        )
+
+    total_assets = DesignerAsset.objects.filter(
+        collection__designer=request.user
+    ).count()
+
+    return render(request, 'branding/designer/collection_list.html', {
+        'collections': collections,
+        'total_collections': collections.count(),
+        'total_assets': total_assets,
+        'search_query': q,
+    })
+
+
+@designer_required
+def designer_collection_create(request):
+    """Create a new brand collection."""
+    if request.method == 'POST':
+        name = request.POST.get('name', '').strip()
+        description = request.POST.get('description', '').strip()
+        industry = request.POST.get('industry', '').strip()
+        client_name = request.POST.get('client_name', '').strip()
+        accent_color = request.POST.get('accent_color', '#6366f1').strip()
+        style_tags = [t.strip() for t in request.POST.get('style_tags', '').split(',') if t.strip()]
+        color_palette = [c.strip() for c in request.POST.get('color_palette', '').split('\n') if c.strip()]
+        fonts = [f.strip() for f in request.POST.get('fonts', '').split('\n') if f.strip()]
+
+        if not name:
+            messages.error(request, 'Collection name is required.')
+        else:
+            collection = DesignerCollection.objects.create(
+                designer=request.user,
+                name=name,
+                description=description,
+                industry=industry,
+                client_name=client_name,
+                accent_color=accent_color,
+                style_tags=style_tags,
+                color_palette=color_palette,
+                fonts=fonts,
+            )
+            messages.success(request, f'Collection "{collection.name}" created.')
+            return redirect('branding:designer_collection_detail', slug=collection.slug)
+
+    return render(request, 'branding/designer/collection_form.html', {
+        'form_mode': 'create',
+    })
+
+
+@designer_required
+def designer_collection_detail(request, slug):
+    """View a collection and its assets."""
+    collection = get_object_or_404(
+        DesignerCollection, designer=request.user, slug=slug
+    )
+    assets = collection.assets.filter(is_active=True).order_by('sort_order', '-created_at')
+
+    asset_type = request.GET.get('type', '')
+    if asset_type:
+        assets = assets.filter(asset_type=asset_type)
+
+    asset_counts = collection.asset_counts_by_type
+
+    return render(request, 'branding/designer/collection_detail.html', {
+        'collection': collection,
+        'assets': assets,
+        'asset_type': asset_type,
+        'asset_counts': asset_counts,
+        'asset_types': ASSET_TYPE_CHOICES,
+    })
+
+
+@designer_required
+def designer_collection_edit(request, slug):
+    """Edit collection metadata."""
+    collection = get_object_or_404(
+        DesignerCollection, designer=request.user, slug=slug
+    )
+    if request.method == 'POST':
+        collection.name = request.POST.get('name', collection.name).strip()
+        collection.description = request.POST.get('description', collection.description).strip()
+        collection.industry = request.POST.get('industry', collection.industry).strip()
+        collection.client_name = request.POST.get('client_name', collection.client_name).strip()
+        collection.accent_color = request.POST.get('accent_color', collection.accent_color).strip()
+        collection.style_tags = [t.strip() for t in request.POST.get('style_tags', '').split(',') if t.strip()]
+        collection.color_palette = [c.strip() for c in request.POST.get('color_palette', '').split('\n') if c.strip()]
+        collection.fonts = [f.strip() for f in request.POST.get('fonts', '').split('\n') if f.strip()]
+
+        if not collection.name:
+            messages.error(request, 'Collection name is required.')
+        else:
+            collection.save()
+            messages.success(request, f'Collection "{collection.name}" updated.')
+            return redirect('branding:designer_collection_detail', slug=collection.slug)
+
+    return render(request, 'branding/designer/collection_form.html', {
+        'form_mode': 'edit',
+        'collection': collection,
+    })
+
+
+@designer_required
+def designer_collection_delete(request, slug):
+    """Delete a collection."""
+    collection = get_object_or_404(
+        DesignerCollection, designer=request.user, slug=slug
+    )
+    if request.method == 'POST':
+        name = collection.name
+        collection.delete()
+        messages.success(request, f'Collection "{name}" deleted.')
+        return redirect('branding:designer_collection_list')
+
+    return render(request, 'branding/designer/collection_confirm_delete.html', {
+        'collection': collection,
+    })
+
+
+@designer_required
+def designer_asset_upload(request, slug):
+    """Upload an asset to a collection."""
+    collection = get_object_or_404(
+        DesignerCollection, designer=request.user, slug=slug
+    )
+    if request.method == 'POST':
+        name = request.POST.get('name', '').strip()
+        asset_type = request.POST.get('asset_type', 'file')
+        description = request.POST.get('description', '').strip()
+        tags = [t.strip() for t in request.POST.get('tags', '').split(',') if t.strip()]
+        color_hex = request.POST.get('color_hex', '').strip()
+        font_name = request.POST.get('font_name', '').strip()
+        file = request.FILES.get('file')
+
+        if not name:
+            messages.error(request, 'Asset name is required.')
+        elif not file and asset_type not in ('color_palette',):
+            messages.error(request, 'Please select a file to upload.')
+        else:
+            DesignerAsset.objects.create(
+                collection=collection,
+                name=name,
+                asset_type=asset_type,
+                file=file,
+                description=description,
+                tags=tags,
+                color_hex=color_hex,
+                font_name=font_name,
+            )
+            messages.success(request, f'Asset "{name}" uploaded.')
+
+        return redirect('branding:designer_collection_detail', slug=collection.slug)
+
+    return redirect('branding:designer_collection_detail', slug=collection.slug)
+
+
+@designer_required
+def designer_asset_delete(request, pk):
+    """Delete an asset."""
+    asset = get_object_or_404(
+        DesignerAsset, pk=pk, collection__designer=request.user
+    )
+    collection_slug = asset.collection.slug
+    if request.method == 'POST':
+        name = asset.name
+        asset.delete()
+        messages.success(request, f'Asset "{name}" deleted.')
+
+    return redirect('branding:designer_collection_detail', slug=collection_slug)
 
 
 @designer_required

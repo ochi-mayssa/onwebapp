@@ -1,0 +1,336 @@
+{% extends 'branding/base.html' %}
+{% load branding_extras dp_tags %}
+
+{% block branding_content %}
+<style>body .branding-page{padding:0!important;margin:0!important;}body .branding-header,body .branding-footer,body footer{display:none!important;}</style>
+<script>document.body.classList.add('dd-active');</script>
+<div class="dd-layout">
+    {% include 'digital_presence/_sidebar.html' with active_page='seo' %}
+    <main class="dd-main">
+        <header class="dd-topbar">
+            <div class="dd-topbar-left">
+                <button class="dd-sidebar-toggle" id="ddSidebarToggle"><i class="fa-solid fa-bars"></i></button>
+                <div><div class="dd-topbar-title">SEO Command Center</div><div class="dd-topbar-subtitle">Monitor search engine optimization health and performance.{% if seo.latest_domain %} · {{ seo.latest_domain }}{% endif %}</div></div>
+            </div>
+            <div class="dd-topbar-right">
+                <button class="dd-topbar-btn dd-theme-toggle" id="ddThemeToggle" title="Toggle theme"><i class="fa-solid fa-sun" id="ddThemeIcon"></i></button>
+                <div class="dd-topbar-avatar">{{ user.username|slice:":1"|upper }}</div>
+            </div>
+        </header>
+        <div class="dd-content">
+            {% if seo.available %}
+
+            {# ── Alert Banner ── #}
+            {% if seo.total_issues > 0 %}
+            <div class="dd-alert-banner {% if seo.critical_issues > 0 %}dd-alert-banner-critical{% else %}dd-alert-banner-warning{% endif %}">
+                <div class="dd-alert-banner-icon" style="background:{% if seo.critical_issues > 0 %}rgba(239,68,68,0.15);color:#ef4444{% else %}rgba(251,191,36,0.15);color:#fbbf24{% endif %};">
+                    <i class="fa-solid fa-{% if seo.critical_issues > 0 %}triangle-exclamation{% else %}exclamation-circle{% endif %}"></i>
+                </div>
+                <div class="dd-alert-banner-body">
+                    <div class="dd-alert-banner-title">{{ seo.total_issues }} SEO Issue{{ seo.total_issues|pluralize }} Found</div>
+                    <div class="dd-alert-banner-message">
+                        {% if seo.critical_issues > 0 %}{{ seo.critical_issues }} critical{% endif %}{% if seo.critical_issues > 0 and seo.high_issues > 0 %}, {% endif %}{% if seo.high_issues > 0 %}{{ seo.high_issues }} high priority{% endif %} issues requiring attention.
+                    </div>
+                </div>
+                <div class="dd-alert-banner-action">
+                    <a href="#issues-section" class="dd-fix-btn {% if seo.critical_issues > 0 %}dd-fix-btn-critical{% else %}dd-fix-btn-warning{% endif %}"><i class="fa-solid fa-arrow-down"></i> Fix Now</a>
+                </div>
+            </div>
+            {% endif %}
+
+            {# ── Score Metrics ── #}
+            <div class="dd-metrics dd-metrics-5">
+                <div class="dd-metric" style="border-top:3px solid {% if seo.health_score and seo.health_score >= 70 %}#22c55e{% elif seo.health_score and seo.health_score >= 40 %}#fbbf24{% else %}#ef4444{% endif %};">
+                    <div class="dd-metric-value">{% if seo.health_score is not None %}{{ seo.health_score|floatformat:0 }}%{% else %}—{% endif %}</div>
+                    <div class="dd-metric-label">Health Score</div>
+                    <div class="dd-progress {% if seo.health_score and seo.health_score >= 70 %}dd-progress-good{% elif seo.health_score and seo.health_score >= 40 %}dd-progress-warn{% else %}dd-progress-bad{% endif %}" style="margin-top:6px;">
+                        <div class="dd-progress-bar" style="width:{% if seo.health_score %}{% widthratio seo.health_score 1 100 %}{% else %}0{% endif %}%;"></div>
+                    </div>
+                </div>
+                <div class="dd-metric" style="border-top:3px solid {% if seo.technical_score and seo.technical_score >= 70 %}#22c55e{% elif seo.technical_score and seo.technical_score >= 40 %}#fbbf24{% else %}#ef4444{% endif %};">
+                    <div class="dd-metric-value">{% if seo.technical_score is not None %}{{ seo.technical_score|floatformat:0 }}%{% else %}—{% endif %}</div>
+                    <div class="dd-metric-label">Technical</div>
+                    <div class="dd-progress {% if seo.technical_score and seo.technical_score >= 70 %}dd-progress-good{% elif seo.technical_score and seo.technical_score >= 40 %}dd-progress-warn{% else %}dd-progress-bad{% endif %}" style="margin-top:6px;">
+                        <div class="dd-progress-bar" style="width:{% if seo.technical_score %}{% widthratio seo.technical_score 1 100 %}{% else %}0{% endif %}%;"></div>
+                    </div>
+                </div>
+                <div class="dd-metric" style="border-top:3px solid {% if seo.on_page_score and seo.on_page_score >= 70 %}#22c55e{% elif seo.on_page_score and seo.on_page_score >= 40 %}#fbbf24{% else %}#ef4444{% endif %};">
+                    <div class="dd-metric-value">{% if seo.on_page_score is not None %}{{ seo.on_page_score|floatformat:0 }}%{% else %}—{% endif %}</div>
+                    <div class="dd-metric-label">On-Page</div>
+                    <div class="dd-progress {% if seo.on_page_score and seo.on_page_score >= 70 %}dd-progress-good{% elif seo.on_page_score and seo.on_page_score >= 40 %}dd-progress-warn{% else %}dd-progress-bad{% endif %}" style="margin-top:6px;">
+                        <div class="dd-progress-bar" style="width:{% if seo.on_page_score %}{% widthratio seo.on_page_score 1 100 %}{% else %}0{% endif %}%;"></div>
+                    </div>
+                </div>
+                <div class="dd-metric" style="border-top:3px solid {% if seo.performance_score and seo.performance_score >= 70 %}#22c55e{% elif seo.performance_score and seo.performance_score >= 40 %}#fbbf24{% else %}#ef4444{% endif %};">
+                    <div class="dd-metric-value">{% if seo.performance_score is not None %}{{ seo.performance_score|floatformat:0 }}%{% else %}—{% endif %}</div>
+                    <div class="dd-metric-label">Performance</div>
+                    <div class="dd-progress {% if seo.performance_score and seo.performance_score >= 70 %}dd-progress-good{% elif seo.performance_score and seo.performance_score >= 40 %}dd-progress-warn{% else %}dd-progress-bad{% endif %}" style="margin-top:6px;">
+                        <div class="dd-progress-bar" style="width:{% if seo.performance_score %}{% widthratio seo.performance_score 1 100 %}{% else %}0{% endif %}%;"></div>
+                    </div>
+                </div>
+                <div class="dd-metric" style="border-top:3px solid {% if seo.discovery_score and seo.discovery_score >= 70 %}#22c55e{% elif seo.discovery_score and seo.discovery_score >= 40 %}#fbbf24{% else %}#ef4444{% endif %};">
+                    <div class="dd-metric-value">{% if seo.discovery_score is not None %}{{ seo.discovery_score|floatformat:0 }}%{% else %}—{% endif %}</div>
+                    <div class="dd-metric-label">Discovery</div>
+                    <div class="dd-progress {% if seo.discovery_score and seo.discovery_score >= 70 %}dd-progress-good{% elif seo.discovery_score and seo.discovery_score >= 40 %}dd-progress-warn{% else %}dd-progress-bad{% endif %}" style="margin-top:6px;">
+                        <div class="dd-progress-bar" style="width:{% if seo.discovery_score %}{% widthratio seo.discovery_score 1 100 %}{% else %}0{% endif %}%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            {# ── Page Stats ── #}
+            <div class="dd-metrics dd-metrics-6" style="margin-top:8px;">
+                <div class="dd-metric" style="border-top:3px solid #818cf8;">
+                    <div class="dd-metric-value">{{ seo.pages_crawled|intcomma }}</div>
+                    <div class="dd-metric-label">Pages Crawled</div>
+                </div>
+                <div class="dd-metric" style="border-top:3px solid {% if seo.broken_links > 0 %}#ef4444{% else %}#22c55e{% endif %};">
+                    <div class="dd-metric-value">{{ seo.broken_links|intcomma }}</div>
+                    <div class="dd-metric-label">Broken Links</div>
+                </div>
+                <div class="dd-metric" style="border-top:3px solid {% if seo.missing_titles > 0 %}#fbbf24{% else %}#22c55e{% endif %};">
+                    <div class="dd-metric-value">{{ seo.missing_titles|intcomma }}</div>
+                    <div class="dd-metric-label">Missing Titles</div>
+                </div>
+                <div class="dd-metric" style="border-top:3px solid {% if seo.missing_descriptions > 0 %}#fbbf24{% else %}#22c55e{% endif %};">
+                    <div class="dd-metric-value">{{ seo.missing_descriptions|intcomma }}</div>
+                    <div class="dd-metric-label">Missing Meta</div>
+                </div>
+                <div class="dd-metric" style="border-top:3px solid {% if seo.missing_alt_text > 0 %}#fbbf24{% else %}#22c55e{% endif %};">
+                    <div class="dd-metric-value">{{ seo.missing_alt_text|intcomma }}</div>
+                    <div class="dd-metric-label">Missing Alt</div>
+                </div>
+                <div class="dd-metric" style="border-top:3px solid #22d3ee;">
+                    <div class="dd-metric-value">{{ seo.total_issues|intcomma }}</div>
+                    <div class="dd-metric-label">Total Issues</div>
+                </div>
+            </div>
+
+            {# ── Health Breakdown + Score Trend ── #}
+            <div class="dd-grid-2" style="margin-top:16px;">
+                <div class="dd-panel">
+                    <div class="dd-panel-header">
+                        <span class="dd-panel-title"><i class="fa-solid fa-chart-radar" style="color:#818cf8;"></i>Health Breakdown</span>
+                    </div>
+                    {% if health_breakdown.available and health_breakdown.categories %}
+                    <div class="dd-chart-container">
+                        <canvas id="healthRadar"></canvas>
+                    </div>
+                    {% else %}
+                    <div style="padding:40px;text-align:center;">
+                        <div style="font-size:0.75rem;color:#52525b;">Health breakdown unavailable.</div>
+                        <div style="font-size:0.65rem;color:#52525b;margin-top:4px;">Run an SEO audit to see detailed scores.</div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="dd-panel">
+                    <div class="dd-panel-header">
+                        <span class="dd-panel-title"><i class="fa-solid fa-chart-line" style="color:#22c55e;"></i>Score Trend</span>
+                        <select id="seoMetric" class="dd-select">
+                            <option value="health_score">Health Score</option>
+                            <option value="technical_score">Technical</option>
+                            <option value="performance_score">Performance</option>
+                            <option value="content_score">Content</option>
+                            <option value="visibility_score">Visibility</option>
+                        </select>
+                        <select id="seoPeriod" class="dd-select">
+                            <option value="7d">7 Days</option>
+                            <option value="30d" selected>30 Days</option>
+                            <option value="90d">90 Days</option>
+                            <option value="12m">12 Months</option>
+                        </select>
+                    </div>
+                    <div class="dd-chart-container">
+                        <canvas id="seoTrendChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            {# ── SEO Issues ── #}
+            <div id="issues-section" class="dd-issue-grid" style="margin-top:16px;">
+                <div class="dd-panel">
+                    <div class="dd-panel-header">
+                        <span class="dd-panel-title"><i class="fa-solid fa-circle-xmark" style="color:#ef4444;"></i>Critical</span>
+                        <div style="display:flex;align-items:center;gap:6px;">
+                            <span style="font-size:0.65rem;color:#ef4444;">{{ issues.critical|length }}</span>
+                            {% if issues.critical %}
+                            <a href="#issues-section" class="dd-fix-btn dd-fix-btn-critical"><i class="fa-solid fa-wrench"></i> Fix All</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% for issue in issues.critical %}
+                    <div class="dd-issue-item dd-issue-item-critical">
+                        <div style="display:flex;align-items:start;justify-content:space-between;gap:8px;">
+                            <div style="flex:1;min-width:0;">
+                                <div class="dd-issue-item-name">{{ issue.name }}</div>
+                                <div class="dd-issue-item-desc">{{ issue.description|truncatechars:120 }}</div>
+                                {% if issue.url %}<div class="dd-issue-item-url">{{ issue.url }}</div>{% endif %}
+                                {% if issue.recommendation %}<div style="font-size:0.55rem;color:#22c55e;margin-top:2px;"><i class="fa-solid fa-lightbulb"></i> {{ issue.recommendation|truncatechars:100 }}</div>{% endif %}
+                            </div>
+                            <a href="#issues-section" class="dd-fix-btn dd-fix-btn-critical"><i class="fa-solid fa-wrench"></i></a>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div style="padding:24px;text-align:center;"><div style="font-size:0.7rem;color:#22c55e;"><i class="fa-solid fa-check-circle"></i> No critical issues</div></div>
+                    {% endfor %}
+                </div>
+
+                <div class="dd-panel">
+                    <div class="dd-panel-header">
+                        <span class="dd-panel-title"><i class="fa-solid fa-triangle-exclamation" style="color:#fbbf24;"></i>Warnings</span>
+                        <div style="display:flex;align-items:center;gap:6px;">
+                            <span style="font-size:0.65rem;color:#fbbf24;">{{ issues.warning|length }}</span>
+                            {% if issues.warning %}
+                            <a href="#issues-section" class="dd-fix-btn dd-fix-btn-warning"><i class="fa-solid fa-wrench"></i> Fix All</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% for issue in issues.warning %}
+                    <div class="dd-issue-item dd-issue-item-high">
+                        <div style="display:flex;align-items:start;justify-content:space-between;gap:8px;">
+                            <div style="flex:1;min-width:0;">
+                                <div class="dd-issue-item-name">{{ issue.name }}</div>
+                                <div class="dd-issue-item-desc">{{ issue.description|truncatechars:120 }}</div>
+                                {% if issue.url %}<div class="dd-issue-item-url">{{ issue.url }}</div>{% endif %}
+                            </div>
+                            <a href="#issues-section" class="dd-fix-btn dd-fix-btn-warning"><i class="fa-solid fa-wrench"></i></a>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div style="padding:24px;text-align:center;"><div style="font-size:0.7rem;color:#22c55e;"><i class="fa-solid fa-check-circle"></i> No warnings</div></div>
+                    {% endfor %}
+                </div>
+
+                <div class="dd-panel">
+                    <div class="dd-panel-header">
+                        <span class="dd-panel-title"><i class="fa-solid fa-lightbulb" style="color:#818cf8;"></i>Opportunities</span>
+                        <span style="font-size:0.65rem;color:#818cf8;">{{ issues.opportunities|length }}</span>
+                    </div>
+                    {% for issue in issues.opportunities %}
+                    <div class="dd-issue-item dd-issue-item-medium">
+                        <div style="display:flex;align-items:start;justify-content:space-between;gap:8px;">
+                            <div style="flex:1;min-width:0;">
+                                <div class="dd-issue-item-name">{{ issue.name }}</div>
+                                <div class="dd-issue-item-desc">{{ issue.description|truncatechars:120 }}</div>
+                                {% if issue.recommendation %}<div style="font-size:0.55rem;color:#22c55e;margin-top:2px;"><i class="fa-solid fa-arrow-right"></i> {{ issue.recommendation|truncatechars:100 }}</div>{% endif %}
+                            </div>
+                            <a href="#issues-section" class="dd-fix-btn dd-fix-btn-primary"><i class="fa-solid fa-arrow-up-right"></i></a>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div style="padding:24px;text-align:center;"><div style="font-size:0.7rem;color:#52525b;">No opportunities identified.</div></div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            {# ── Audit History ── #}
+            <div class="dd-panel" style="margin-top:16px;">
+                <div class="dd-panel-header">
+                    <span class="dd-panel-title"><i class="fa-solid fa-clock-rotate-left" style="color:#22d3ee;"></i>Audit History</span>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table class="dd-table">
+                        <thead>
+                            <tr>
+                                <th>URL</th>
+                                <th style="text-align:center;">Health</th>
+                                <th style="text-align:center;">Pages</th>
+                                <th style="text-align:center;">Issues</th>
+                                <th style="text-align:center;">Status</th>
+                                <th style="text-align:right;">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for t in seo.recent_tasks %}
+                            <tr>
+                                <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#fafafa;">{{ t.url }}</td>
+                                <td style="text-align:center;font-weight:700;color:{% if t.health_score and t.health_score >= 70 %}#22c55e{% elif t.health_score and t.health_score >= 40 %}#fbbf24{% elif t.health_score %}#ef4444{% else %}#52525b{% endif %};">{% if t.health_score is not None %}{{ t.health_score|floatformat:0 }}%{% else %}—{% endif %}</td>
+                                <td style="text-align:center;color:#fafafa;">{{ t.pages_crawled|intcomma }}</td>
+                                <td style="text-align:center;color:{% if t.issues > 0 %}#ef4444{% else %}#22c55e{% endif %};">{{ t.issues|intcomma }}</td>
+                                <td style="text-align:center;"><span class="dd-status dd-status-{{ t.status }}">{{ t.status }}</span></td>
+                                <td style="text-align:right;color:#52525b;">{{ t.created_at|date:"M j, Y" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="6" style="padding:24px;text-align:center;color:#52525b;">No audit history yet.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {% else %}
+            <div class="dd-panel">
+                <div class="dd-empty-cta">
+                    <div class="dd-empty-cta-icon" style="background:rgba(129,140,248,0.1);color:#818cf8;"><i class="fa-solid fa-magnifying-glass-chart"></i></div>
+                    <div class="dd-empty-cta-title">No SEO Data</div>
+                    <div class="dd-empty-cta-desc">Run an SEO audit to start monitoring search engine optimization.</div>
+                    <a href="{% url 'seo_analyzer:index' %}" class="dd-empty-cta-btn dd-empty-cta-btn-primary"><i class="fa-solid fa-play"></i> Start Audit</a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+(function(){
+    {% if health_breakdown.available and health_breakdown.categories %}
+    var radarData = {{ health_breakdown.categories|safe }};
+    if(radarData && radarData.length){
+        var rCtx=document.getElementById('healthRadar').getContext('2d');
+        new Chart(rCtx,{
+            type:'radar',
+            data:{
+                labels:radarData.map(function(d){return d.name}),
+                datasets:[{
+                    label:'Score',
+                    data:radarData.map(function(d){return d.score||0}),
+                    borderColor:'#818cf8',
+                    backgroundColor:'#818cf833',
+                    borderWidth:2,
+                    pointBackgroundColor:radarData.map(function(d){return d.status==='good'?'#22c55e':d.status==='needs_work'?'#fbbf24':'#ef4444'}),
+                }]
+            },
+            options:{
+                responsive:true,
+                maintainAspectRatio:false,
+                plugins:{legend:{display:false}},
+                scales:{r:{min:0,max:100,grid:{color:'#1a1a1e'},ticks:{display:false},pointLabels:{color:'#a1a1aa',font:{size:10}}}}
+            }
+        });
+    }
+    {% endif %}
+
+    var seoChart=null;
+    var seoUrl='{% url "digital_presence:seo_chart_data" %}';
+    function loadSeoChart(){
+        var metric=document.getElementById('seoMetric').value;
+        var period=document.getElementById('seoPeriod').value;
+        fetch(seoUrl+'?metric='+metric+'&period='+period)
+            .then(function(r){return r.json()})
+            .then(function(data){
+                if(seoChart)seoChart.destroy();
+                var ctx=document.getElementById('seoTrendChart').getContext('2d');
+                var datasets=data.datasets.map(function(ds){
+                    return {label:ds.label,data:ds.data,borderColor:ds.borderColor,backgroundColor:ds.backgroundColor,borderWidth:2,fill:true,tension:0.3,pointRadius:2,pointHoverRadius:4};
+                });
+                seoChart=new Chart(ctx,{
+                    type:'line',
+                    data:{labels:data.labels,datasets:datasets},
+                    options:{
+                        responsive:true,maintainAspectRatio:false,
+                        interaction:{intersect:false,mode:'index'},
+                        plugins:{legend:{labels:{color:'#a1a1aa',font:{size:10}}}},
+                        scales:{x:{grid:{color:'#1a1a1e'},ticks:{color:'#52525b',font:{size:9}}},y:{grid:{color:'#1a1a1e'},ticks:{color:'#52525b',font:{size:9}},beginAtZero:true,max:100}}
+                    }
+                });
+            }).catch(function(){});
+    }
+    document.getElementById('seoMetric').addEventListener('change',loadSeoChart);
+    document.getElementById('seoPeriod').addEventListener('change',loadSeoChart);
+    loadSeoChart();
+})();
+</script>
+{% include 'digital_presence/_scripts.html' %}
+{% endblock %}

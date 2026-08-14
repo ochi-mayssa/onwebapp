@@ -47,15 +47,18 @@ class UserSummarySerializer(serializers.ModelSerializer):
 # ── Brand Collection ──────────────────────────────────────────────────────
 
 class BrandCollectionListSerializer(serializers.ModelSerializer):
-    preview_items_count = serializers.IntegerField(source='preview_items_count', read_only=True, default=0)
+    preview_items_count = serializers.SerializerMethodField()
 
     class Meta:
         model = BrandCollection
         fields = [
             'id', 'name', 'slug', 'category', 'industry', 'description',
             'style_tags', 'preview_image', 'accent_color', 'is_active',
-            'sort_order', 'created_at',
+            'sort_order', 'created_at', 'preview_items_count',
         ]
+
+    def get_preview_items_count(self, obj):
+        return len(obj.preview_items)
 
 
 class BrandCollectionDetailSerializer(serializers.ModelSerializer):

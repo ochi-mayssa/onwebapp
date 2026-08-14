@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-{% load i18n static %}
+{% load i18n static web_tags %}
 {% get_current_language as LANGUAGE_CODE %}
 <html lang="{{ LANGUAGE_CODE }}">
 <head>
@@ -440,7 +440,11 @@
                         {% if user.is_staff and user.is_superuser %}
                             <li><hr class="dropdown-divider opacity-50"></li>
                             <li class="dropdown-header x-small fw-800 text-primary uppercase tracking-widest p-3 pb-2">Admin Control</li>
-                            <li><a class="dropdown-item" href="{% url 'platform_monitoring:hub' %}">
+                            <li><a class="dropdown-item" href="{% url 'root_dashboard:command_center' %}">
+                                <span class="service-icon" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;"><i class="fas fa-crown"></i></span>
+                                Root Command Center
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% monitoring_url %}">
                                 <span class="service-icon"><i class="fas fa-heartbeat"></i></span>
                                 Platform Monitoring
                             </a></li>
@@ -535,7 +539,7 @@
         <!-- Services Navigation Menu -->
         <div class="collapse navbar-collapse order-lg-1" id="navbarNav">
             <ul class="navbar-nav ms-auto">
-                {% if not user.is_authenticated or not user.is_staff or user.is_superuser %}
+                
                     {% if '/projects/admin/' not in request.path %}
                         {% if request.resolver_match.url_name == 'login_view' or request.resolver_match.url_name == 'signup' or '/login/' in request.path or '/signup/' in request.path %}
                             <!-- Minimal nav for Auth pages: Home + Solutions + Pricing + Community -->
@@ -621,7 +625,7 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'branding:landing' %}">{% trans 'Branding' %}</a>
                         </li>
-                        {% endif %}
+                        
                     {% endif %}
                 {% endif %}
             </ul>

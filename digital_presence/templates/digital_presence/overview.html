@@ -1,0 +1,361 @@
+{% extends 'branding/base.html' %}
+{% load branding_extras dp_tags %}
+
+{% block branding_content %}
+<style>body .branding-page{padding:0!important;margin:0!important;}body .branding-header,body .branding-footer,body footer{display:none!important;}</style>
+<script>document.body.classList.add('dd-active');</script>
+<div class="dd-layout">
+    {% include 'digital_presence/_sidebar.html' with active_page='overview' %}
+    <main class="dd-main">
+        <header class="dd-topbar">
+            <div class="dd-topbar-left">
+                <button class="dd-sidebar-toggle" id="ddSidebarToggle"><i class="fa-solid fa-bars"></i></button>
+                <div>
+                    <div class="dd-topbar-title">Digital Presence</div>
+                    <div class="dd-topbar-subtitle">Monitor social media, SEO, keywords and content performance.</div>
+                </div>
+            </div>
+            <div class="dd-topbar-right">
+                <button class="dd-topbar-btn dd-theme-toggle" id="ddThemeToggle" title="Toggle theme"><i class="fa-solid fa-sun" id="ddThemeIcon"></i></button>
+                <div class="dd-topbar-avatar">{{ user.username|slice:":1"|upper }}</div>
+            </div>
+        </header>
+        <div class="dd-content">
+
+            {# ── Sync Status Bar ── #}
+            <div class="dd-sync-bar">
+                <div class="dd-sync-bar-left">
+                    {% if sync_status.social.status == 'connected' or sync_status.seo.status == 'available' %}
+                    <div class="dd-sync-bar-dot"></div>
+                    {% elif sync_status.social.status == 'stale' or sync_status.seo.status == 'stale' %}
+                    <div class="dd-sync-bar-dot stale"></div>
+                    {% else %}
+                    <div class="dd-sync-bar-dot offline"></div>
+                    {% endif %}
+                    <div>
+                        <div class="dd-sync-bar-text">System Status</div>
+                        <div class="dd-sync-bar-time">
+                            {% if sync_status.social.last_sync %}
+                                Last sync {{ sync_status.social.last_sync|timesince }} ago
+                            {% elif sync_status.seo.last_sync %}
+                                Last sync {{ sync_status.seo.last_sync|timesince }} ago
+                            {% else %}
+                                No sync data yet
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="dd-sync-bar-actions">
+                    <a href="{% url 'digital_presence:seo' %}" class="dd-sync-btn"><i class="fa-solid fa-rotate"></i> Refresh</a>
+                    <a href="{% url 'digital_presence:reports' %}" class="dd-sync-btn"><i class="fa-solid fa-chart-simple"></i> Reports</a>
+                </div>
+            </div>
+
+            {# ── Priority Alerts ── #}
+            {% if alerts %}
+            <div class="dd-alert-banner dd-alert-banner-critical">
+                <div class="dd-alert-banner-icon" style="background:rgba(239,68,68,0.15);color:#ef4444;">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <div class="dd-alert-banner-body">
+                    <div class="dd-alert-banner-title">{{ alerts|length }} Alert{{ alerts|length|pluralize }} Require{{ alerts|length|pluralize:"s" }} Attention</div>
+                    <div class="dd-alert-banner-message">
+                        {% critical_count alerts as cc %}{% warning_count alerts as wc %}
+                        {% if cc %}{{ cc }} critical{% endif %}{% if cc and wc %}, {% endif %}{% if wc %}{{ wc }} warning{{ wc|pluralize }}{% endif %}
+                        issue{{ cc|add:wc|pluralize }} found across your digital presence.
+                    </div>
+                </div>
+                <div class="dd-alert-banner-action">
+                    <a href="#alerts-section" class="dd-fix-btn dd-fix-btn-critical"><i class="fa-solid fa-arrow-down"></i> View</a>
+                </div>
+            </div>
+            {% endif %}
+
+            {# ── Health Score + Summary ── #}
+            <div class="dd-grid-2" style="margin-bottom:16px;">
+                {# Overall Health Score #}
+                <div class="dd-panel">
+                    <div class="dd-panel-header">
+                        <span class="dd-panel-title"><i class="fa-solid fa-heart-pulse" style="color:#ef4444;"></i>Overall Health</span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:20px;">
+                        <div class="dd-health-ring">
+                            {% if seo.latest_health_score is not None %}
+                            <svg viewBox="0 0 80 80">
+                                <circle class="dd-health-ring-bg" cx="40" cy="40" r="34"/>
+                                <circle class="dd-health-ring-bar" cx="40" cy="40" r="34"
+                                    stroke="{% if seo.latest_health_score >= 70 %}#22c55e{% elif seo.latest_health_score >= 40 %}#fbbf24{% else %}#ef4444{% endif %}"
+                                    stroke-dasharray="213.6"
+                                    stroke-dashoffset="{{ 213.6|floatformat:0 }}"/>
+                            </svg>
+                            <div class="dd-health-ring-value">{{ seo.latest_health_score|floatformat:0 }}%</div>
+                            {% else %}
+                            <svg viewBox="0 0 80 80">
+                                <circle class="dd-health-ring-bg" cx="40" cy="40" r="34"/>
+                                <circle class="dd-health-ring-bar" cx="40" cy="40" r="34" stroke="#52525b" stroke-dasharray="213.6" stroke-dashoffset="213.6"/>
+                            </svg>
+                            <div class="dd-health-ring-value">&mdash;</div>
+                            {% endif %}
+                        </div>
+                        <div style="flex:1;">
+                            <div class="dd-metrics dd-metrics-2" style="gap:8px;">
+                                <div class="dd-metric" style="padding:8px;border-top:3px solid {% if seo.latest_technical_score and seo.latest_technical_score >= 70 %}#22c55e{% elif seo.latest_technical_score and seo.latest_technical_score >= 40 %}#fbbf24{% else %}#ef4444{% endif %};">
+                                    <div class="dd-metric-value" style="font-size:0.95rem;">{% if seo.latest_technical_score is not None %}{{ seo.latest_technical_score }}%{% else %}&mdash;{% endif %}</div>
+                                    <div class="dd-metric-label">Technical</div>
+                                </div>
+                                <div class="dd-metric" style="padding:8px;border-top:3px solid {% if seo.latest_content_score and seo.latest_content_score >= 70 %}#22c55e{% elif seo.latest_content_score and seo.latest_content_score >= 40 %}#fbbf24{% else %}#ef4444{% endif %};">
+                                    <div class="dd-metric-value" style="font-size:0.95rem;">{% if seo.latest_content_score is not None %}{{ seo.latest_content_score }}%{% else %}&mdash;{% endif %}</div>
+                                    <div class="dd-metric-label">Content</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {# Quick Stats #}
+                <div class="dd-panel">
+                    <div class="dd-panel-header">
+                        <span class="dd-panel-title"><i class="fa-solid fa-chart-pie" style="color:#818cf8;"></i>Quick Stats</span>
+                    </div>
+                    <div class="dd-metrics dd-metrics-3" style="gap:8px;">
+                        <div class="dd-metric" style="padding:8px;border-top:3px solid #22d3ee;">
+                            <div class="dd-metric-value" style="font-size:0.95rem;">{{ social.total_events|intcomma }}</div>
+                            <div class="dd-metric-label">Social Events</div>
+                        </div>
+                        <div class="dd-metric" style="padding:8px;border-top:3px solid #fbbf24;">
+                            <div class="dd-metric-value" style="font-size:0.95rem;">{{ keywords.keywords_found|intcomma }}</div>
+                            <div class="dd-metric-label">Keywords</div>
+                        </div>
+                        <div class="dd-metric" style="padding:8px;border-top:3px solid #22c55e;">
+                            <div class="dd-metric-value" style="font-size:0.95rem;">{{ content.total_words|intcomma }}</div>
+                            <div class="dd-metric-label">Words</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# ── Section Cards ── #}
+            <div class="dd-section-grid">
+                <a href="{% url 'digital_presence:social_media' %}" class="dd-panel dd-section-card">
+                    <div class="dd-section-header">
+                        <div class="dd-section-icon" style="background:rgba(34,211,238,0.1);color:#22d3ee;"><i class="fa-solid fa-share-nodes"></i></div>
+                        <div class="dd-section-name">Social Media</div>
+                    </div>
+                    {% if overview.social.available %}
+                    <div class="dd-platform-dots">
+                        <span class="dd-dot-row"><span class="dd-dot" style="background:{% if overview.social.facebook_status == 'connected' %}#22c55e{% elif overview.social.facebook_status == 'sync_failed' %}#ef4444{% else %}#52525b{% endif %};"></span>FB</span>
+                        <span class="dd-dot-row"><span class="dd-dot" style="background:{% if overview.social.instagram_status == 'connected' %}#22c55e{% elif overview.social.instagram_status == 'sync_failed' %}#ef4444{% else %}#52525b{% endif %};"></span>IG</span>
+                        <span class="dd-dot-row"><span class="dd-dot" style="background:{% if overview.social.linkedin_status == 'connected' %}#22c55e{% elif overview.social.linkedin_status == 'sync_failed' %}#ef4444{% else %}#52525b{% endif %};"></span>LI</span>
+                    </div>
+                    <div class="dd-section-value">{{ overview.social.total_engagement|intcomma }}</div>
+                    <div class="dd-section-label">Total Engagement</div>
+                    <div class="dd-progress dd-progress-info" style="margin-top:8px;">
+                        <div class="dd-progress-bar" style="width:{% widthratio overview.social.connected_platforms 3 100 %}%;"></div>
+                    </div>
+                    <div style="font-size:0.5rem;color:#52525b;margin-top:3px;">{{ overview.social.connected_platforms }}/3 platforms connected</div>
+                    {% if overview.social.best_post %}
+                    <div class="dd-section-highlight">
+                        <div class="dd-section-highlight-label">Best Post</div>
+                        <div class="dd-section-highlight-text">{{ overview.social.best_post.caption|truncatechars:60 }} ({{ overview.social.best_post.engagement }} eng)</div>
+                    </div>
+                    {% endif %}
+                    {% else %}
+                    <div class="dd-empty-cta">
+                        <div class="dd-empty-cta-icon" style="background:rgba(34,211,238,0.1);color:#22d3ee;"><i class="fa-solid fa-share-nodes"></i></div>
+                        <div class="dd-empty-cta-title">No Social Data</div>
+                        <div class="dd-empty-cta-desc">Connect your social media platforms to start tracking engagement.</div>
+                    </div>
+                    {% endif %}
+                </a>
+
+                <a href="{% url 'digital_presence:seo' %}" class="dd-panel dd-section-card">
+                    <div class="dd-section-header">
+                        <div class="dd-section-icon" style="background:rgba(129,140,248,0.1);color:#818cf8;"><i class="fa-solid fa-magnifying-glass-chart"></i></div>
+                        <div class="dd-section-name">SEO</div>
+                    </div>
+                    {% if overview.seo.available %}
+                    <div class="dd-section-stats">
+                        <div class="dd-section-stat">
+                            <div class="dd-section-stat-value {% if overview.seo.health_score and overview.seo.health_score >= 70 %}dd-color-good{% elif overview.seo.health_score and overview.seo.health_score >= 40 %}dd-color-warn{% else %}dd-color-bad{% endif %}">{% if overview.seo.health_score is not None %}{{ overview.seo.health_score|floatformat:0 }}%{% else %}&mdash;{% endif %}</div>
+                            <div class="dd-section-stat-label">Health</div>
+                        </div>
+                        <div class="dd-section-stat">
+                            <div class="dd-section-stat-value">{{ overview.seo.pages_crawled|intcomma }}</div>
+                            <div class="dd-section-stat-label">Pages</div>
+                        </div>
+                    </div>
+                    <div class="dd-progress {% if overview.seo.health_score and overview.seo.health_score >= 70 %}dd-progress-good{% elif overview.seo.health_score and overview.seo.health_score >= 40 %}dd-progress-warn{% else %}dd-progress-bad{% endif %}" style="margin-top:8px;">
+                        <div class="dd-progress-bar" style="width:{% if overview.seo.health_score %}{% widthratio overview.seo.health_score 1 100 %}{% else %}0{% endif %}%;"></div>
+                    </div>
+                    {% if overview.seo.critical_issues > 0 %}<div class="dd-section-issue dd-color-bad"><i class="fa-solid fa-circle-xmark"></i> {{ overview.seo.critical_issues }} critical issues</div>{% endif %}
+                    {% if overview.seo.total_issues > 0 %}<div class="dd-section-issue dd-color-muted">{{ overview.seo.total_issues }} total issues</div>{% endif %}
+                    {% else %}
+                    <div class="dd-empty-cta">
+                        <div class="dd-empty-cta-icon" style="background:rgba(129,140,248,0.1);color:#818cf8;"><i class="fa-solid fa-magnifying-glass-chart"></i></div>
+                        <div class="dd-empty-cta-title">Run SEO Audit</div>
+                        <div class="dd-empty-cta-desc">Start an SEO audit to analyze your website's search engine optimization.</div>
+                    </div>
+                    {% endif %}
+                </a>
+
+                <a href="{% url 'digital_presence:keywords' %}" class="dd-panel dd-section-card">
+                    <div class="dd-section-header">
+                        <div class="dd-section-icon" style="background:rgba(251,191,36,0.1);color:#fbbf24;"><i class="fa-solid fa-key"></i></div>
+                        <div class="dd-section-name">Keywords</div>
+                    </div>
+                    {% if overview.keywords.available %}
+                    <div class="dd-section-stats">
+                        <div class="dd-section-stat">
+                            <div class="dd-section-stat-value">{{ overview.keywords.total|intcomma }}</div>
+                            <div class="dd-section-stat-label">Tracked</div>
+                        </div>
+                        <div class="dd-section-stat">
+                            <div class="dd-section-stat-value dd-color-good">{{ overview.keywords.matched|intcomma }}</div>
+                            <div class="dd-section-stat-label">Matched</div>
+                        </div>
+                    </div>
+                    <div class="dd-progress dd-progress-info" style="margin-top:8px;">
+                        <div class="dd-progress-bar" style="width:{% if overview.keywords.total %}{% widthratio overview.keywords.matched overview.keywords.total 100 %}{% else %}0{% endif %}%;"></div>
+                    </div>
+                    <div style="font-size:0.5rem;color:#52525b;margin-top:3px;">{% widthratio overview.keywords.matched overview.keywords.total 100 %}% match rate</div>
+                    {% if overview.keywords.improving > 0 %}<div class="dd-section-issue dd-color-good"><i class="fa-solid fa-arrow-up"></i> {{ overview.keywords.improving }} improving</div>{% endif %}
+                    {% if overview.keywords.declining > 0 %}<div class="dd-section-issue dd-color-bad"><i class="fa-solid fa-arrow-down"></i> {{ overview.keywords.declining }} declining</div>{% endif %}
+                    {% else %}
+                    <div class="dd-empty-cta">
+                        <div class="dd-empty-cta-icon" style="background:rgba(251,191,36,0.1);color:#fbbf24;"><i class="fa-solid fa-key"></i></div>
+                        <div class="dd-empty-cta-title">Track Keywords</div>
+                        <div class="dd-empty-cta-desc">Run URL Intelligence analysis with target keywords to start tracking.</div>
+                    </div>
+                    {% endif %}
+                </a>
+
+                <a href="{% url 'digital_presence:content' %}" class="dd-panel dd-section-card">
+                    <div class="dd-section-header">
+                        <div class="dd-section-icon" style="background:rgba(34,197,94,0.1);color:#22c55e;"><i class="fa-solid fa-file-lines"></i></div>
+                        <div class="dd-section-name">Content</div>
+                    </div>
+                    {% if overview.content.available %}
+                    <div class="dd-section-stats">
+                        <div class="dd-section-stat">
+                            <div class="dd-section-stat-value">{{ overview.content.total_pages|intcomma }}</div>
+                            <div class="dd-section-stat-label">Pages</div>
+                        </div>
+                        <div class="dd-section-stat">
+                            <div class="dd-section-stat-value {% if overview.content.needs_attention > 0 %}dd-color-warn{% else %}dd-color-good{% endif %}">{{ overview.content.needs_attention|intcomma }}</div>
+                            <div class="dd-section-stat-label">Need Attention</div>
+                        </div>
+                    </div>
+                    <div class="dd-progress {% if overview.content.needs_attention > 0 %}dd-progress-warn{% else %}dd-progress-good{% endif %}" style="margin-top:8px;">
+                        <div class="dd-progress-bar" style="width:{% if overview.content.total_pages %}{% widthratio overview.content.total_pages|add:'-'|add:overview.content.needs_attention overview.content.total_pages 100 %}{% else %}100{% endif %}%;"></div>
+                    </div>
+                    <div style="font-size:0.5rem;color:#52525b;margin-top:3px;">{{ overview.content.total_pages|add:'-'|add:overview.content.needs_attention }}/{{ overview.content.total_pages }} pages healthy</div>
+                    {% if overview.content.missing_alt > 0 %}<div class="dd-section-issue dd-color-warn">{{ overview.content.missing_alt }} missing alt</div>{% endif %}
+                    {% else %}
+                    <div class="dd-empty-cta">
+                        <div class="dd-empty-cta-icon" style="background:rgba(34,197,94,0.1);color:#22c55e;"><i class="fa-solid fa-file-lines"></i></div>
+                        <div class="dd-empty-cta-title">Analyze Content</div>
+                        <div class="dd-empty-cta-desc">Run an SEO audit to analyze content performance and identify opportunities.</div>
+                    </div>
+                    {% endif %}
+                </a>
+            </div>
+
+            {# ── Priority Alerts Detail ── #}
+            {% if alerts %}
+            <div id="alerts-section" class="dd-panel" style="margin-top:16px;">
+                <div class="dd-panel-header">
+                    <span class="dd-panel-title"><i class="fa-solid fa-triangle-exclamation" style="color:#ef4444;"></i>Requires Attention</span>
+                    <span class="dd-alert-count">{{ alerts|length }} alert{{ alerts|length|pluralize }}</span>
+                </div>
+                <div class="dd-alert-grid">
+                    {% for a in alerts %}
+                    <div class="dd-alert-item dd-alert-{{ a.severity }}">
+                        <div class="dd-alert-item-body">
+                            <div class="dd-alert-item-title">{{ a.title }}</div>
+                            <div class="dd-alert-item-message">{{ a.message }}</div>
+                        </div>
+                        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+                            <span class="dd-severity-badge dd-severity-{{ a.severity }}">{{ a.severity }}</span>
+                            {% if a.category == 'connection' %}
+                            <a href="{% url 'digital_presence:social_media' %}" class="dd-fix-btn dd-fix-btn-{{ a.severity }}"><i class="fa-solid fa-wrench"></i> Fix</a>
+                            {% elif a.category == 'seo' %}
+                            <a href="{% url 'digital_presence:seo' %}" class="dd-fix-btn dd-fix-btn-{{ a.severity }}"><i class="fa-solid fa-wrench"></i> Fix</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {# ── Quick Actions ── #}
+            <div class="dd-panel" style="margin-top:16px;">
+                <div class="dd-section-heading">
+                    <div class="dd-section-heading-title"><i class="fa-solid fa-bolt" style="color:#fbbf24;"></i> Quick Actions</div>
+                </div>
+                <div class="dd-action-grid">
+                    <a href="{% url 'digital_presence:seo' %}" class="dd-action-item">
+                        <div class="dd-action-item-icon" style="background:rgba(239,68,68,0.1);color:#ef4444;"><i class="fa-solid fa-bug"></i></div>
+                        <div class="dd-action-item-title">Fix SEO Issues</div>
+                        <div class="dd-action-item-desc">Review and fix critical SEO issues impacting your search rankings.</div>
+                    </a>
+                    <a href="{% url 'digital_presence:social_media' %}" class="dd-action-item">
+                        <div class="dd-action-item-icon" style="background:rgba(34,211,238,0.1);color:#22d3ee;"><i class="fa-solid fa-plug"></i></div>
+                        <div class="dd-action-item-title">Connect Social</div>
+                        <div class="dd-action-item-desc">Set up Facebook, Instagram, or LinkedIn integrations.</div>
+                    </a>
+                    <a href="{% url 'digital_presence:keywords' %}" class="dd-action-item">
+                        <div class="dd-action-item-icon" style="background:rgba(251,191,36,0.1);color:#fbbf24;"><i class="fa-solid fa-key"></i></div>
+                        <div class="dd-action-item-title">Track Keywords</div>
+                        <div class="dd-action-item-desc">Run URL Intelligence analysis with target keywords.</div>
+                    </a>
+                    <a href="{% url 'digital_presence:content' %}" class="dd-action-item">
+                        <div class="dd-action-item-icon" style="background:rgba(34,197,94,0.1);color:#22c55e;"><i class="fa-solid fa-image"></i></div>
+                        <div class="dd-action-item-title">Fix Alt Text</div>
+                        <div class="dd-action-item-desc">Add missing alt text to images for better accessibility and SEO.</div>
+                    </a>
+                </div>
+            </div>
+
+            {# ── Last Synchronization ── #}
+            <div class="dd-panel" style="margin-top:16px;">
+                <div class="dd-panel-header">
+                    <span class="dd-panel-title"><i class="fa-solid fa-rotate" style="color:#52525b;"></i>Last Synchronization</span>
+                </div>
+                <div class="dd-sync-grid">
+                    <div class="dd-sync-col">
+                        <div class="dd-sync-heading">Social Media</div>
+                        {% for p in sync_status.social.platforms %}
+                        <div class="dd-sync-row">
+                            <span class="dd-dot" style="background:{% if p.status == 'connected' %}#22c55e{% elif p.status == 'sync_failed' %}#ef4444{% else %}#52525b{% endif %};"></span>
+                            <span class="dd-sync-name">{{ p.name }}</span>
+                            <span class="dd-sync-time">{% if p.last_sync %}{{ p.last_sync|timesince }} ago{% else %}Never{% endif %}</span>
+                        </div>
+                        {% empty %}
+                        <div class="dd-sync-empty">No platforms configured.</div>
+                        {% endfor %}
+                    </div>
+                    <div class="dd-sync-col">
+                        <div class="dd-sync-heading">SEO</div>
+                        <div class="dd-sync-row">
+                            <span class="dd-dot" style="background:{% if sync_status.seo.status == 'available' %}#22c55e{% else %}#52525b{% endif %};"></span>
+                            <span class="dd-sync-name">SEO Analyzer</span>
+                            <span class="dd-sync-time">{% if sync_status.seo.last_sync %}{{ sync_status.seo.last_sync|timesince }} ago{% else %}No audits yet{% endif %}</span>
+                        </div>
+                    </div>
+                    <div class="dd-sync-col">
+                        <div class="dd-sync-heading">Keywords</div>
+                        <div class="dd-sync-row">
+                            <span class="dd-dot" style="background:{% if sync_status.keywords.status == 'available' %}#22c55e{% else %}#52525b{% endif %};"></span>
+                            <span class="dd-sync-name">URL Intelligence</span>
+                            <span class="dd-sync-time">{% if sync_status.keywords.last_sync %}{{ sync_status.keywords.last_sync|timesince }} ago{% else %}No analyses yet{% endif %}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+</div>
+{% include 'digital_presence/_scripts.html' %}
+{% endblock %}

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load i18n static %}
+{% load i18n static web_tags %}
 
 {% block title %}{% trans "Solutions — Product Catalog" %} | OnWebApp{% endblock %}
 
@@ -27,7 +27,7 @@
           <p class="mb-4 opacity-90 small">
             {% trans "This page explains what products we provide. When you are ready to operate the platform, use the control center below." %}
           </p>
-          <a href="{% url 'platform_monitoring:hub' %}"
+          <a href="{% monitoring_url %}"
              class="btn btn-white btn-lg rounded-14 fw-800 px-5 py-3 d-inline-flex align-items-center justify-content-center gap-2">
             {% trans "Go to Platform Monitoring" %}
             <i class="fas fa-arrow-right"></i>
@@ -52,7 +52,7 @@
             <p class="text-muted mb-4">
               {% trans "Operational command center for SEO, Automation, IoT, Security and Integrations. Monitor service health, open modules, and track activity across the platform. The single control tower for your OnWebApp instance." %}
             </p>
-            <a href="{% url 'platform_monitoring:hub' %}" class="btn btn-outline-primary rounded-12 fw-700 px-4 py-2">
+            <a href="{% monitoring_url %}" class="btn btn-outline-primary rounded-12 fw-700 px-4 py-2">
               {% trans "Open Control Center" %} <i class="fas fa-arrow-right ms-1"></i>
             </a>
           </div>

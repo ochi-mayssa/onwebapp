@@ -1,0 +1,27 @@
+<script>
+document.addEventListener('DOMContentLoaded',function(){
+    var s=document.getElementById('ddSidebar'),
+        o=document.getElementById('ddSidebarOverlay'),
+        t=document.getElementById('ddSidebarToggle');
+    if(t)t.addEventListener('click',function(){s.classList.toggle('open');o.classList.toggle('show')});
+    if(o)o.addEventListener('click',function(){s.classList.remove('open');o.classList.remove('show')});
+    var b=document.getElementById('ddThemeToggle'),
+        i=document.getElementById('ddThemeIcon'),
+        r=document.documentElement;
+    function gt(){
+        var st=localStorage.getItem('dd-theme');
+        if(st)return st;
+        return window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'
+    }
+    function stt(t){
+        r.setAttribute('data-dd-theme',t);
+        localStorage.setItem('dd-theme',t);
+        if(i)i.className=t==='dark'?'fa-solid fa-sun':'fa-solid fa-moon'
+    }
+    stt(gt());
+    if(b)b.addEventListener('click',function(){
+        var c=r.getAttribute('data-dd-theme')||'dark';
+        stt(c==='dark'?'light':'dark')
+    })
+});
+</script>
