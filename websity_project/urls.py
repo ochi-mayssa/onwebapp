@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.contrib.sitemaps.views import sitemap
-from django.views.generic.base import RedirectView
+from django.views.generic.base import RedirectView, TemplateView
 from .sitemaps import StaticViewSitemap, ProjectSitemap
 from django.conf import settings
 from django.conf.urls.static import static
@@ -66,6 +66,7 @@ urlpatterns = [
     path('api/branding/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
 
     path('accounts/', include('django.contrib.auth.urls')),
+    path('robots.txt', TemplateView.as_view(template_name='robots.txt', content_type='text/plain'), name='robots_txt'),
     path('', include('home.urls', namespace='home')),
     path('sitemap.xml', sitemap, {'sitemaps': {'static': StaticViewSitemap(), 'projects': ProjectSitemap() if ProjectSitemap else None}}, name='sitemap'),
 ]

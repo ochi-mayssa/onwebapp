@@ -10,17 +10,21 @@ class StaticViewSitemap(Sitemap):
     priority = 0.6
 
     def items(self):
-        # Add top-level named views here that should appear in the sitemap
         return [
             'home:home',
             'services:index',
+            'integration:integration_homepage',
+            'integration:system_integration',
+            'integration:data_integration',
+            'integration:b2b_integration',
+            'branding:landing',
+            'community:home',
+            'blog:index',
+            'blog:article_list',
             'seo_analyzer:index',
-            'services:link_analyzer',
-            'services:keyword_research',
-            'services:keyword_checker',
-            'services:engagement_analytics',
-            'services:social_tracking',
             'platform:index',
+            'platform_monitoring:hub',
+            'contact:contact',
         ]
 
     def location(self, item):
