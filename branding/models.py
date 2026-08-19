@@ -4,7 +4,7 @@ from datetime import datetime
 
 from django.conf import settings
 from django.db import models
-from django.db.models import Sum
+from django.db.models import Count, Sum
 from django.urls import reverse
 from django.utils import timezone
 
@@ -38,6 +38,7 @@ COLLECTION_CATEGORIES = [
     ('education', 'Education'),
     ('finance', 'Finance'),
     ('real_estate', 'Real Estate'),
+    ('technology', 'Technology'),
     ('saas', 'SaaS'),
 ]
 
@@ -1320,6 +1321,16 @@ class DesignResource(models.Model):
         blank=True,
         related_name='resources',
     )
+    designer_collection = models.ForeignKey(
+        'DesignerCollection',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='resources',
+        help_text='Designer-owned collection this resource belongs to.',
+    )
+    color_hex = models.CharField(max_length=9, blank=True, default='')
+    font_name = models.CharField(max_length=100, blank=True, default='')
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -4005,6 +4016,20 @@ class DesignerCollection(models.Model):
     color_palette = models.JSONField(default=list, blank=True)
     fonts = models.JSONField(default=list, blank=True)
     accent_color = models.CharField(max_length=9, default='#6366f1')
+
+    # Collection preview kit (designer uploads → published to clients)
+    preview_image = models.ImageField(upload_to='designer/collections/previews/%Y/%m/', blank=True, null=True)
+    hero_image = models.ImageField(upload_to='designer/collections/previews/%Y/%m/', blank=True, null=True)
+    logo_image = models.ImageField(upload_to='designer/collections/previews/%Y/%m/', blank=True, null=True)
+    typography_image = models.ImageField(upload_to='designer/collections/previews/%Y/%m/', blank=True, null=True)
+    business_card_image = models.ImageField(upload_to='designer/collections/previews/%Y/%m/', blank=True, null=True)
+    presentation_image = models.ImageField(upload_to='designer/collections/previews/%Y/%m/', blank=True, null=True)
+    letterhead_image = models.ImageField(upload_to='designer/collections/previews/%Y/%m/', blank=True, null=True)
+    email_signature_image = models.ImageField(upload_to='designer/collections/previews/%Y/%m/', blank=True, null=True)
+    social_media_image = models.ImageField(upload_to='designer/collections/previews/%Y/%m/', blank=True, null=True)
+    brand_guidelines_image = models.ImageField(upload_to='designer/collections/previews/%Y/%m/', blank=True, null=True)
+    is_published = models.BooleanField(default=False, help_text='Published to client library')
+
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -4041,6 +4066,22 @@ class DesignerCollection(models.Model):
             .annotate(cnt=Count('id'))
             .values_list('asset_type', 'cnt')
         )
+
+    @property
+    def preview_items(self):
+        """Ordered kit of (key, label, icon, image) for the preview grid."""
+        items = [
+            ('hero', 'Hero Image', 'fa-image', self.hero_image),
+            ('logo', 'Logo', 'fa-shapes', self.logo_image),
+            ('typography', 'Typography', 'fa-font', self.typography_image),
+            ('business_card', 'Business Card', 'fa-id-card', self.business_card_image),
+            ('presentation', 'Presentation', 'fa-file-powerpoint', self.presentation_image),
+            ('letterhead', 'Letterhead', 'fa-envelope-open-text', self.letterhead_image),
+            ('email_signature', 'Email Signature', 'fa-envelope', self.email_signature_image),
+            ('social_media', 'Social Media', 'fa-hashtag', self.social_media_image),
+            ('brand_guidelines', 'Brand Guidelines', 'fa-book-open', self.brand_guidelines_image),
+        ]
+        return [(key, label, icon, image) for key, label, icon, image in items if image]
 
 
 class DesignerAsset(models.Model):

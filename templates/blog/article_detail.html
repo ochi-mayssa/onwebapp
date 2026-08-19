@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{{ article.title }} | OnWebApp{% endblock %}
+
+{% block extra_css %}
+<style>
+    .article-hero {
+        position: relative; height: 50vh; min-height: 400px;
+        overflow: hidden; display: flex; align-items: flex-end;
+    }
+    .article-hero-bg {
+        position: absolute; inset: 0;
+        background: url('{{ article.image }}') center/cover no-repeat;
+    }
+    .article-hero-bg::after {
+        content: ''; position: absolute; inset: 0;
+        background: linear-gradient(to top, rgba(15,23,42,.9) 0%, rgba(15,23,42,.3) 60%, transparent 100%);
+    }
+    .article-hero-content {
+        position: relative; z-index: 2; padding: 3rem 0;
+    }
+    .article-hero-tag {
+        display: inline-block; padding: .3rem .9rem;
+        border-radius: 20px; font-size: .75rem; font-weight: 700;
+        background: rgba(30,64,175,.2); color: #60a5fa;
+        border: 1px solid rgba(30,64,175,.3);
+        margin-bottom: 1rem;
+    }
+    .article-hero h1 {
+        font-size: clamp(1.8rem, 4vw, 2.8rem);
+        font-weight: 800; color: #fff;
+        line-height: 1.2; margin-bottom: 1rem;
+        max-width: 700px;
+    }
+    .article-hero-meta {
+        display: flex; align-items: center; gap: 1.5rem;
+        font-size: .85rem; color: rgba(255,255,255,.6);
+    }
+    .article-hero-meta i { font-size: .8rem; }
+
+    .article-body {
+        padding: 4rem 0 5rem;
+        background: var(--bg-body);
+    }
+    .article-content {
+        max-width: 720px; margin: 0 auto;
+    }
+    .article-content h2 {
+        font-weight: 800; font-size: 1.4rem;
+        margin: 2.5rem 0 1rem;
+        color: var(--text-primary);
+    }
+    .article-content p {
+        color: var(--text-muted); font-size: 1rem;
+        line-height: 1.8; margin-bottom: 1.25rem;
+    }
+    .article-content ul, .article-content ol {
+        color: var(--text-muted); font-size: 1rem;
+        line-height: 1.8; margin-bottom: 1.25rem;
+        padding-left: 1.5rem;
+    }
+    .article-content li { margin-bottom: .5rem; }
+    .article-content strong { color: var(--text-primary); }
+
+    .article-nav {
+        max-width: 720px; margin: 0 auto;
+        padding-top: 2.5rem;
+        border-top: 1px solid var(--border-color);
+        display: flex; justify-content: space-between; gap: 2rem;
+    }
+    .article-nav-link {
+        text-decoration: none; color: var(--text-muted);
+        transition: color .2s; flex: 1;
+    }
+    .article-nav-link:hover { color: #1e40af; }
+    .article-nav-label {
+        font-size: .75rem; font-weight: 700;
+        text-transform: uppercase; letter-spacing: .06em;
+        margin-bottom: .3rem;
+    }
+    .article-nav-title {
+        font-weight: 700; font-size: .9rem;
+        line-height: 1.4;
+    }
+    .article-nav-next { text-align: right; }
+
+    .article-cta {
+        max-width: 720px; margin: 3rem auto 0;
+        background: var(--bg-surface);
+        border: 1px solid var(--border-color);
+        border-radius: 16px; padding: 2rem;
+        text-align: center;
+    }
+    .article-cta h5 { font-weight: 800; margin-bottom: .5rem; }
+    .article-cta p { color: var(--text-muted); font-size: .9rem; margin-bottom: 1.25rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="article-hero">
+    <div class="article-hero-bg"></div>
+    <div class="container article-hero-content">
+        <span class="article-hero-tag">{{ article.tag }}</span>
+        <h1>{{ article.title }}</h1>
+        <div class="article-hero-meta">
+            <span><i class="far fa-calendar me-1"></i> {{ article.date }}</span>
+            <span><i class="far fa-clock me-1"></i> {{ article.read_time }}</span>
+            <span><i class="far fa-newspaper me-1"></i> OnWebApp Insights</span>
+        </div>
+    </div>
+</section>
+
+<section class="article-body">
+    <div class="container">
+        <div class="article-content">
+            {{ article.content|safe }}
+
+            <div class="article-cta">
+                <h5>{% trans "Ready to implement this?" %}</h5>
+                <p>{% trans "Our architects will design a custom solution for your business." %}</p>
+                <a href="{% url article.service_url %}" class="btn btn-primary rounded-pill px-4 fw-700">
+                    {% trans "Explore this service" %} <i class="fas fa-arrow-right ms-2"></i>
+                </a>
+            </div>
+
+            <div class="article-nav">
+                {% if prev_article %}
+                <a href="{% url 'blog:article_detail' slug=prev_article.slug %}" class="article-nav-link">
+                    <div class="article-nav-label"><i class="fas fa-arrow-left me-1"></i> {% trans "Previous" %}</div>
+                    <div class="article-nav-title">{{ prev_article.title }}</div>
+                </a>
+                {% else %}<div></div>{% endif %}
+                {% if next_article %}
+                <a href="{% url 'blog:article_detail' slug=next_article.slug %}" class="article-nav-link article-nav-next">
+                    <div class="article-nav-label">{% trans "Next" %} <i class="fas fa-arrow-right ms-1"></i></div>
+                    <div class="article-nav-title">{{ next_article.title }}</div>
+                </a>
+                {% else %}<div></div>{% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block global_cta %}{% endblock %}

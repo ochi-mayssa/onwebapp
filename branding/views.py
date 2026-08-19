@@ -4164,42 +4164,216 @@ def designer_feedback_detail(request, pk, fr_id):
 
 @login_required
 @designer_required
+def design_library(request):
+    """Unified Design Library — collections, resources, and templates in one place."""
+    me = request.user
+    tab = request.GET.get('tab', 'collections')
+    q = request.GET.get('q', '').strip()
+
+    # My Collections
+    my_collections = DesignerCollection.objects.filter(designer=me, is_active=True).order_by('-created_at')
+    if q:
+        my_collections = my_collections.filter(
+            Q(name__icontains=q) | Q(industry__icontains=q) | Q(client_name__icontains=q)
+        )
+    collection_count = my_collections.count()
+    total_assets = DesignerAsset.objects.filter(collection__designer=me).count()
+
+    # Resources
+    resources = DesignResource.objects.filter(is_active=True).select_related('owner', 'designer_collection')
+    if q:
+        resources = resources.filter(
+            Q(title__icontains=q) | Q(description__icontains=q)
+        )
+    my_resources = resources.filter(owner=me)
+    team_resources = resources.filter(shared_level='team')
+    resource_count = resources.count()
+
+    # Templates
+    my_templates = DesignTemplate.objects.filter(owner=me).order_by('-created_at')
+    shared_templates = DesignTemplate.objects.filter(is_team_shared=True).exclude(owner=me)
+    if q:
+        my_templates = my_templates.filter(name__icontains=q)
+        shared_templates = shared_templates.filter(name__icontains=q)
+    template_count = my_templates.count() + shared_templates.count()
+
+    # Add Design action
+    if request.method == 'POST':
+        action = request.POST.get('action')
+
+        if action == 'quick_upload':
+            title = request.POST.get('title', '').strip()
+            file = request.FILES.get('file')
+            url = request.POST.get('url', '').strip()
+            category = request.POST.get('category', 'other')
+            description = request.POST.get('description', '').strip()
+            shared_level = request.POST.get('shared_level', 'personal')
+            tags_raw = request.POST.get('tags', '').strip()
+            tags = [t.strip() for t in tags_raw.split(',') if t.strip()] if tags_raw else []
+            designer_collection_id = request.POST.get('designer_collection_id')
+            color_hex = request.POST.get('color_hex', '').strip()
+            font_name = request.POST.get('font_name', '').strip()
+
+            dc = None
+            if designer_collection_id:
+                dc = DesignerCollection.objects.filter(pk=designer_collection_id, designer=me).first()
+
+            if title:
+                if file:
+                    if file.size > settings.MAX_DESIGN_FILE_SIZE:
+                        messages.error(request, f'File too large. Maximum size is {settings.MAX_DESIGN_FILE_SIZE // (1024*1024)} MB.')
+                        return redirect(f'{reverse("branding:design_library")}?tab={tab}')
+                    if file.content_type not in settings.ALLOWED_DESIGN_MIME_TYPES:
+                        ext = os.path.splitext(file.name)[1].lower()
+                        if ext not in settings.ALLOWED_DESIGN_EXTENSIONS:
+                            messages.error(request, f'File type "{file.content_type}" is not allowed.')
+                            return redirect(f'{reverse("branding:design_library")}?tab={tab}')
+                DesignResource.objects.create(
+                    title=title, description=description, category=category,
+                    shared_level=shared_level, url=url, tags=tags,
+                    file=file, designer_collection=dc,
+                    color_hex=color_hex, font_name=font_name,
+                    owner=me,
+                )
+                messages.success(request, f'"{title}" added to your library.')
+            else:
+                messages.error(request, 'Title is required.')
+
+            redirect_url = f'{reverse("branding:design_library")}?tab={tab}'
+            return redirect(redirect_url)
+
+        elif action == 'create_collection':
+            name = request.POST.get('name', '').strip()
+            if name:
+                style_tags_raw = request.POST.get('style_tags', '').strip()
+                color_palette_raw = request.POST.get('color_palette', '').strip()
+                fonts_raw = request.POST.get('fonts', '').strip()
+                image_fields = [
+                    'preview_image', 'hero_image', 'logo_image', 'typography_image',
+                    'business_card_image', 'presentation_image', 'letterhead_image',
+                    'email_signature_image', 'social_media_image', 'brand_guidelines_image',
+                ]
+                image_data = {}
+                for field in image_fields:
+                    img = request.FILES.get(field)
+                    if img:
+                        image_data[field] = img
+                collection = DesignerCollection.objects.create(
+                    designer=me, name=name,
+                    description=request.POST.get('description', '').strip(),
+                    industry=request.POST.get('industry', '').strip(),
+                    client_name=request.POST.get('client_name', '').strip(),
+                    accent_color=request.POST.get('accent_color', '#6366f1').strip(),
+                    style_tags=[t.strip() for t in style_tags_raw.split(',') if t.strip()] if style_tags_raw else [],
+                    color_palette=[c.strip() for c in color_palette_raw.split('\n') if c.strip()] if color_palette_raw else [],
+                    fonts=[f.strip() for f in fonts_raw.split('\n') if f.strip()] if fonts_raw else [],
+                    **image_data,
+                )
+                messages.success(request, f'Collection "{collection.name}" created.')
+                return redirect(f'{reverse("branding:design_library")}?tab=collections')
+            else:
+                messages.error(request, 'Collection name is required.')
+                return redirect(f'{reverse("branding:design_library")}?tab=collections')
+
+        elif action == 'delete_resource':
+            res_id = request.POST.get('resource_id')
+            res = DesignResource.objects.filter(pk=res_id, owner=me).first()
+            if res:
+                name = res.title
+                res.delete()
+                messages.success(request, f'Resource "{name}" deleted.')
+            return redirect(f'{reverse("branding:design_library")}?tab={tab}')
+
+    return render(request, 'branding/designer/library.html', {
+        'tab': tab,
+        'my_collections': my_collections,
+        'collection_count': collection_count,
+        'total_assets': total_assets,
+        'my_resources': my_resources,
+        'team_resources': team_resources,
+        'resource_count': resource_count,
+        'my_templates': my_templates,
+        'shared_templates': shared_templates,
+        'template_count': template_count,
+        'q': q,
+        'designer_collections': DesignerCollection.objects.filter(designer=me, is_active=True),
+        'categories': RESOURCE_CATEGORIES,
+    })
+
+
+@login_required
+@designer_required
 def designer_resources(request):
     """Design resources library."""
     resources = DesignResource.objects.filter(is_active=True).select_related('owner', 'collection')
-    shared = resources.filter(shared_level='team')
-    mine = resources.filter(owner=request.user)
+
+    q = request.GET.get('q', '').strip()
+    if q:
+        resources = resources.filter(
+            Q(title__icontains=q) | Q(description__icontains=q) | Q(tags__icontains=q)
+        )
+
+    visibility = request.GET.get('vis', '')
+    if visibility == 'personal':
+        resources = resources.filter(owner=request.user)
+    elif visibility == 'team':
+        resources = resources.filter(shared_level='team')
+    elif visibility == 'collection':
+        resources = resources.filter(shared_level='collection')
+
     category_filter = request.GET.get('category', '')
     if category_filter:
-        shared = shared.filter(category=category_filter)
-        mine = mine.filter(category=category_filter)
-    if request.method == 'POST' and request.POST.get('action') == 'add_resource':
-        title = request.POST.get('title', '').strip()
-        description = request.POST.get('description', '').strip()
-        category = request.POST.get('category', 'other')
-        shared_level = request.POST.get('shared_level', 'personal')
-        url = request.POST.get('url', '').strip()
-        tags_raw = request.POST.get('tags', '').strip()
-        tags = [t.strip() for t in tags_raw.split(',') if t.strip()] if tags_raw else []
-        file = request.FILES.get('file')
-        collection_id = request.POST.get('collection_id')
-        collection = None
-        if collection_id:
-            collection = BrandCollection.objects.filter(pk=collection_id).first()
-        if title:
-            DesignResource.objects.create(
-                title=title, description=description, category=category,
-                shared_level=shared_level, url=url, tags=tags,
-                file=file, collection=collection, owner=request.user,
-            )
-            messages.success(request, f'Resource "{title}" added.')
+        resources = resources.filter(category=category_filter)
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        if action == 'add_resource':
+            title = request.POST.get('title', '').strip()
+            description = request.POST.get('description', '').strip()
+            category = request.POST.get('category', 'other')
+            shared_level = request.POST.get('shared_level', 'personal')
+            url = request.POST.get('url', '').strip()
+            tags_raw = request.POST.get('tags', '').strip()
+            tags = [t.strip() for t in tags_raw.split(',') if t.strip()] if tags_raw else []
+            file = request.FILES.get('file')
+            collection_id = request.POST.get('collection_id')
+            collection = None
+            if collection_id:
+                collection = BrandCollection.objects.filter(pk=collection_id).first()
+            if title:
+                DesignResource.objects.create(
+                    title=title, description=description, category=category,
+                    shared_level=shared_level, url=url, tags=tags,
+                    file=file, collection=collection, owner=request.user,
+                )
+                messages.success(request, f'Resource "{title}" added.')
+                return redirect('branding:designer_resources')
+            else:
+                messages.error(request, 'Title is required.')
+        elif action == 'delete_resource':
+            res_id = request.POST.get('resource_id')
+            res = DesignResource.objects.filter(pk=res_id, owner=request.user).first()
+            if res:
+                name = res.title
+                res.delete()
+                messages.success(request, f'Resource "{name}" deleted.')
             return redirect('branding:designer_resources')
-    collections = BrandCollection.objects.all()
+
+    mine_count = resources.filter(owner=request.user).count()
+    team_count = resources.filter(shared_level='team').count()
+    total_downloads = resources.aggregate(t=Sum('download_count'))['t'] or 0
+
     return render(request, 'branding/designer/resources.html', {
-        'shared': shared, 'mine': mine,
+        'resources': resources,
+        'mine_count': mine_count,
+        'team_count': team_count,
+        'total_count': resources.count(),
+        'total_downloads': total_downloads,
         'categories': RESOURCE_CATEGORIES,
         'category_filter': category_filter,
-        'collections': collections,
+        'visibility': visibility,
+        'search_query': q,
+        'collections': BrandCollection.objects.all(),
     })
 
 
@@ -4536,6 +4710,65 @@ def designer_collection_detail(request, slug):
         assets = assets.filter(asset_type=asset_type)
 
     asset_counts = collection.asset_counts_by_type
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        if action == 'publish':
+            # Create or update a BrandCollection from this designer collection
+            from django.utils.text import slugify
+            bc_slug = slugify(collection.name)[:140]
+            if not bc_slug:
+                bc_slug = 'collection-' + str(collection.pk)
+            # Map designer industry to a valid BrandCollection category
+            _INDUSTRY_CAT_MAP = {
+                'manufacturing': 'manufacturing', 'healthcare': 'healthcare',
+                'restaurant': 'restaurant', 'food': 'restaurant', 'food & beverage': 'restaurant',
+                'construction': 'construction', 'education': 'education',
+                'finance': 'finance', 'real estate': 'real_estate', 'real_estate': 'real_estate',
+                'saas': 'saas', 'technology': 'technology', 'tech': 'technology',
+            }
+            industry_lower = (collection.industry or '').strip().lower()
+            category = _INDUSTRY_CAT_MAP.get(industry_lower, 'saas')
+            bc, created = BrandCollection.objects.update_or_create(
+                slug=bc_slug,
+                defaults={
+                    'category': category,
+                    'name': collection.name,
+                    'industry': collection.industry,
+                    'description': collection.description,
+                    'style_tags': collection.style_tags,
+                    'accent_color': collection.accent_color,
+                    'color_palette': collection.color_palette,
+                    'fonts': collection.fonts,
+                    'preview_image': collection.preview_image,
+                    'hero_image': collection.hero_image,
+                    'logo_image': collection.logo_image,
+                    'typography_image': collection.typography_image,
+                    'business_card_image': collection.business_card_image,
+                    'presentation_image': collection.presentation_image,
+                    'letterhead_image': collection.letterhead_image,
+                    'email_signature_image': collection.email_signature_image,
+                    'social_media_image': collection.social_media_image,
+                    'brand_guidelines_image': collection.brand_guidelines_image,
+                    'is_active': True,
+                }
+            )
+            collection.is_published = True
+            collection.save(update_fields=['is_published'])
+            invalidate_collections()
+            msg = 'Published to client library.' if created else 'Updated in client library.'
+            messages.success(request, msg)
+            return redirect('branding:designer_collection_detail', slug=collection.slug)
+
+        elif action == 'unpublish':
+            from django.utils.text import slugify
+            bc_slug = slugify(collection.name)[:140]
+            BrandCollection.objects.filter(slug=bc_slug).delete()
+            collection.is_published = False
+            collection.save(update_fields=['is_published'])
+            invalidate_collections()
+            messages.success(request, 'Removed from client library.')
+            return redirect('branding:designer_collection_detail', slug=collection.slug)
 
     return render(request, 'branding/designer/collection_detail.html', {
         'collection': collection,

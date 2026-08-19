@@ -1,0 +1,325 @@
+{% extends 'branding/base.html' %}
+{% load i18n %}
+
+{% block title %}{% if action == 'add' %}{% trans "New Blog Post" %}{% else %}{% trans "Edit Blog Post" %}{% endif %} | OnWebApp{% endblock %}
+
+{% block branding_content %}
+<style>body{background:#09090b!important;}body .branding-page{background:#09090b;padding:0!important;margin:0!important;}body .branding-header,body .branding-footer,body footer{display:none!important;}</style>
+<script>document.body.classList.add('dd-active');</script>
+
+<link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+
+<div class="dd-layout">
+    {% include 'blog/_management_sidebar.html' with active='posts' %}
+
+    <main class="dd-main">
+        <header class="dd-topbar">
+            <div class="dd-topbar-left">
+                <button class="dd-sidebar-toggle" id="ddSidebarToggle"><i class="fa-solid fa-bars"></i></button>
+                <div>
+                    <div class="dd-topbar-title">{% if action == 'add' %}{% trans "New Blog Post" %}{% else %}{% trans "Edit Blog Post" %}{% endif %}</div>
+                    <div class="dd-topbar-subtitle">{% if action == 'add' %}{% trans "Create a new short-form blog post." %}{% else %}{% trans "Update" %} {{ post.title }}{% endif %}</div>
+                </div>
+            </div>
+            <div class="dd-topbar-right">
+                <a href="{% url 'blog:manage_blog_posts' %}" class="dd-btn dd-btn-ghost"><i class="fa-solid fa-arrow-left me-1"></i> {% trans "Back" %}</a>
+            </div>
+        </header>
+
+        <div class="dd-content">
+            {% if messages %}
+            <div class="dd-alert-bar">
+                {% for message in messages %}
+                <div class="dd-alert {% if message.tags == 'success' %}dd-alert-info{% elif message.tags == 'error' %}dd-alert-critical{% else %}dd-alert-warning{% endif %}">
+                    <i class="fa-solid {% if message.tags == 'success' %}fa-circle-check{% elif message.tags == 'error' %}fa-circle-xmark{% else %}fa-info-circle{% endif %}"></i>
+                    <span>{{ message }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <form method="post" class="dd-form" id="postForm" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="dd-panel" style="margin-bottom:1.5rem;">
+                    <div class="dd-panel-header">
+                        <span class="dd-panel-title"><i class="fa-solid fa-info-circle"></i> {% trans "Basic Info" %}</span>
+                    </div>
+                    <div class="dd-panel-body">
+
+                        <div class="dd-field">
+                            <label class="dd-form-label">{% trans "Title" %} *</label>
+                            <input type="text" name="title" value="{% if post %}{{ post.title }}{% endif %}" class="dd-form-input" required placeholder="{% trans 'Post title...' %}">
+                        </div>
+
+                        <div class="dd-field-row">
+                            <div class="dd-field">
+                                <label class="dd-form-label">{% trans "Tag" %}</label>
+                                <select name="tag" class="dd-form-select">
+                                    {% for value, label in tag_choices %}
+                                    <option value="{{ value }}" {% if post and post.tag == value %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="dd-field">
+                                <label class="dd-form-label">{% trans "Read Time" %}</label>
+                                <input type="text" name="read_time" value="{% if post %}{{ post.read_time }}{% else %}3 min{% endif %}" class="dd-form-input" placeholder="3 min">
+                            </div>
+                        </div>
+
+                        <div class="dd-field">
+                            <label class="dd-form-label">{% trans "Featured Image" %}</label>
+                            <div class="dd-upload-zone" id="uploadZone">
+                                {% if post and post.image %}
+                                <div class="dd-upload-preview" id="uploadPreview">
+                                    <img src="{{ post.image.url }}" alt="Preview" id="previewImg">
+                                    <button type="button" class="dd-upload-remove" id="removeImage"><i class="fa-solid fa-xmark"></i></button>
+                                </div>
+                                {% else %}
+                                <div class="dd-upload-placeholder" id="uploadPlaceholder">
+                                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                                    <span>{% trans "Click to upload or drag and drop" %}</span>
+                                    <span class="dd-form-hint">{% trans "PNG, JPG, GIF up to 5MB" %}</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <input type="file" name="image" id="imageInput" accept="image/*" class="d-none">
+                            {% if post and post.image %}
+                            <input type="hidden" name="existing_image" value="{{ post.image.url }}">
+                            {% endif %}
+                        </div>
+
+                        <div class="dd-field">
+                            <label class="dd-form-label">{% trans "Description" %} *</label>
+                            <textarea name="description" class="dd-form-textarea" rows="3" required placeholder="{% trans 'Short description for card view...' %}">{% if post %}{{ post.description }}{% endif %}</textarea>
+                            <span class="dd-form-hint" id="descHint">{% trans "Brief summary shown on post cards. Max 300 characters." %}</span>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="dd-panel" style="margin-bottom:1.5rem;">
+                    <div class="dd-panel-header">
+                        <span class="dd-panel-title"><i class="fa-solid fa-pen-fancy"></i> {% trans "Content" %} *</span>
+                    </div>
+                    <div class="dd-panel-body">
+                        <div class="dd-editor-wrapper">
+                            <div id="quillEditor">{% if post %}{{ post.content|safe }}{% endif %}</div>
+                        </div>
+                        <textarea name="content" id="contentField" class="d-none" required></textarea>
+                        <span class="dd-form-hint">{% trans "Write your blog post content using the editor above. You can format text, add headings, lists, links, and images." %}</span>
+                    </div>
+                </div>
+
+                <div class="dd-panel" style="margin-bottom:1.5rem;">
+                    <div class="dd-panel-header">
+                        <span class="dd-panel-title"><i class="fa-solid fa-gear"></i> {% trans "Settings" %}</span>
+                    </div>
+                    <div class="dd-panel-body">
+                        <div class="dd-field">
+                            <label class="dd-toggle">
+                                <input type="checkbox" name="is_published" {% if not post or post.is_published %}checked{% endif %}>
+                                <span class="dd-toggle-slider"></span>
+                                <span class="dd-toggle-label">{% trans "Published" %}</span>
+                            </label>
+                            <span class="dd-form-hint" style="margin-top:.35rem;">{% trans "Toggle to publish or unpublish this post." %}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dd-form-actions">
+                    <button type="submit" class="dd-btn dd-btn-primary dd-btn-lg">
+                        <i class="fa-solid fa-check me-1"></i> {% if action == 'add' %}{% trans "Create Post" %}{% else %}{% trans "Save Changes" %}{% endif %}
+                    </button>
+                    <a href="{% url 'blog:manage_blog_posts' %}" class="dd-btn dd-btn-ghost dd-btn-lg">{% trans "Cancel" %}</a>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
+
+<script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var sidebar = document.getElementById('ddSidebar');
+    var overlay = document.getElementById('ddSidebarOverlay');
+    var toggle = document.getElementById('ddSidebarToggle');
+    if (toggle) toggle.addEventListener('click', function() { sidebar.classList.toggle('open'); overlay.classList.toggle('show'); });
+    if (overlay) overlay.addEventListener('click', function() { sidebar.classList.remove('open'); overlay.classList.remove('show'); });
+
+    var quill = new Quill('#quillEditor', {
+        theme: 'snow',
+        placeholder: 'Write your blog post content here...',
+        modules: {
+            toolbar: [
+                [{'header': [1, 2, 3, 4, false]}],
+                ['bold', 'italic', 'underline', 'strike'],
+                [{'color': []}, {'background': []}],
+                ['blockquote', 'code-block'],
+                [{'list': 'ordered'}, {'list': 'bullet'}, {'list': 'check'}],
+                [{'indent': '-1'}, {'indent': '+1'}],
+                ['link', 'image'],
+                ['clean']
+            ]
+        }
+    });
+
+    var form = document.getElementById('postForm');
+    var contentField = document.getElementById('contentField');
+    form.addEventListener('submit', function() {
+        contentField.value = quill.root.innerHTML;
+    });
+
+    // Image upload preview
+    var uploadZone = document.getElementById('uploadZone');
+    var imageInput = document.getElementById('imageInput');
+    var uploadPlaceholder = document.getElementById('uploadPlaceholder');
+    var uploadPreview = document.getElementById('uploadPreview');
+    var removeImage = document.getElementById('removeImage');
+
+    if (uploadZone) {
+        uploadZone.addEventListener('click', function() {
+            if (!uploadPreview) imageInput.click();
+        });
+        uploadZone.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            uploadZone.classList.add('dd-upload-dragover');
+        });
+        uploadZone.addEventListener('dragleave', function() {
+            uploadZone.classList.remove('dd-upload-dragover');
+        });
+        uploadZone.addEventListener('drop', function(e) {
+            e.preventDefault();
+            uploadZone.classList.remove('dd-upload-dragover');
+            if (e.dataTransfer.files.length) {
+                imageInput.files = e.dataTransfer.files;
+                handleFileSelect(e.dataTransfer.files[0]);
+            }
+        });
+    }
+
+    if (imageInput) {
+        imageInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                handleFileSelect(this.files[0]);
+            }
+        });
+    }
+
+    function handleFileSelect(file) {
+        if (!file || !file.type.startsWith('image/')) return;
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            var preview = document.getElementById('uploadPreview');
+            if (!preview) {
+                preview = document.createElement('div');
+                preview.className = 'dd-upload-preview';
+                preview.id = 'uploadPreview';
+                uploadZone.innerHTML = '';
+                uploadZone.appendChild(preview);
+            }
+            preview.innerHTML = '<img src="' + e.target.result + '" alt="Preview" id="previewImg"><button type="button" class="dd-upload-remove" id="removeImage"><i class="fa-solid fa-xmark"></i></button>';
+            document.getElementById('removeImage').addEventListener('click', function(ev) {
+                ev.stopPropagation();
+                imageInput.value = '';
+                uploadZone.innerHTML = '<div class="dd-upload-placeholder" id="uploadPlaceholder"><i class="fa-solid fa-cloud-arrow-up"></i><span>Click to upload or drag and drop</span><span class="dd-form-hint">PNG, JPG, GIF up to 5MB</span></div>';
+            });
+        };
+        reader.readAsDataURL(file);
+    }
+
+    if (removeImage) {
+        removeImage.addEventListener('click', function(ev) {
+            ev.stopPropagation();
+            imageInput.value = '';
+            uploadZone.innerHTML = '<div class="dd-upload-placeholder" id="uploadPlaceholder"><i class="fa-solid fa-cloud-arrow-up"></i><span>Click to upload or drag and drop</span><span class="dd-form-hint">PNG, JPG, GIF up to 5MB</span></div>';
+        });
+    }
+
+    var desc = document.querySelector('textarea[name="description"]');
+    var hint = document.getElementById('descHint');
+    if (desc && hint) {
+        function updateCount() {
+            var remaining = 300 - desc.value.length;
+            hint.textContent = remaining >= 0
+                ? remaining + ' characters remaining'
+                : 'Over limit by ' + Math.abs(remaining) + ' characters';
+            hint.style.color = remaining < 0 ? '#ef4444' : '';
+        }
+        desc.addEventListener('input', updateCount);
+        updateCount();
+    }
+});
+</script>
+
+<style>
+.dd-panel-body{padding:1rem 1.25rem 1.25rem}
+.dd-field{margin-bottom:1rem}
+.dd-field:last-child{margin-bottom:0}
+.dd-field-row{display:flex;gap:1rem}
+.dd-field-row .dd-field{flex:1;min-width:0}
+.dd-form-actions{display:flex;gap:.75rem;align-items:center;padding-top:.5rem}
+.dd-btn-lg{padding:.7rem 1.5rem;font-size:.9rem}
+.dd-editor-wrapper{
+    border:1.5px solid #e5e7eb;border-radius:10px;overflow:hidden;
+    background:#fff;transition:border-color .2s;
+}
+.dd-editor-wrapper:focus-within{
+    border-color:#818cf8;box-shadow:0 0 0 3px rgba(129,140,248,.12);
+}
+#quillEditor{min-height:300px;font-size:.9rem;line-height:1.7}
+#quillEditor .ql-editor{padding:1.25rem 1.5rem}
+#quillEditor .ql-editor.ql-blank::before{color:#9ca3af;font-style:normal}
+.ql-toolbar.ql-snow{
+    border:none!important;border-bottom:1px solid #e5e7eb!important;
+    background:#fafafa;padding:.5rem .75rem!important;
+}
+.ql-container.ql-snow{border:none!important}
+.ql-snow .ql-stroke{stroke:#6b7280}
+.ql-snow .ql-fill{fill:#6b7280}
+.ql-snow .ql-picker{color:#374151}
+.ql-snow .ql-active .ql-stroke{stroke:#6366f1}
+.ql-snow .ql-active{color:#6366f1}
+.ql-toolbar .ql-formats{margin-right:.75rem}
+.ql-editor h1{font-size:1.75rem;font-weight:700;margin:1.5rem 0 .75rem}
+.ql-editor h2{font-size:1.35rem;font-weight:700;margin:1.25rem 0 .6rem}
+.ql-editor h3{font-size:1.1rem;font-weight:600;margin:1rem 0 .5rem}
+.ql-editor p{margin-bottom:.75rem;color:#374151}
+.ql-editor ul,.ql-editor ol{padding-left:1.5rem;margin-bottom:.75rem}
+.ql-editor li{margin-bottom:.25rem}
+.ql-editor blockquote{
+    border-left:3px solid #818cf8;padding-left:1rem;margin:1rem 0;
+    color:#6b7280;font-style:italic;
+}
+.ql-editor pre{
+    background:#f3f4f6;border-radius:8px;padding:1rem;font-family:monospace;
+    font-size:.82rem;overflow-x:auto;
+}
+.dd-upload-zone{
+    border:2px dashed #d1d5db;border-radius:12px;cursor:pointer;
+    transition:all .2s;background:#fafafa;overflow:hidden;
+}
+.dd-upload-zone:hover{border-color:#818cf8;background:#f5f3ff}
+.dd-upload-zone.dd-upload-dragover{border-color:#6366f1;background:#ede9fe}
+.dd-upload-placeholder{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:2rem 1rem;text-align:center;color:#6b7280;
+}
+.dd-upload-placeholder i{font-size:2rem;color:#9ca3af;margin-bottom:.5rem}
+.dd-upload-placeholder span{font-size:.85rem;font-weight:500}
+.dd-upload-preview{position:relative;padding:.5rem}
+.dd-upload-preview img{
+    width:100%;max-height:200px;object-fit:cover;border-radius:8px;display:block;
+}
+.dd-upload-remove{
+    position:absolute;top:.75rem;right:.75rem;width:28px;height:28px;
+    border-radius:50%;background:rgba(0,0,0,.6);color:#fff;border:none;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;
+    font-size:.75rem;transition:background .2s;
+}
+.dd-upload-remove:hover{background:rgba(239,68,68,.9)}
+.d-none{display:none!important}
+</style>
+{% endblock %}
+
+{% block global_cta %}{% endblock %}

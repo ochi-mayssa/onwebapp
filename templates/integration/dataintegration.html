@@ -1,0 +1,893 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans "Data Integration" %} | OnWebApp{% endblock %}
+
+{% block meta_description %}{% trans "Aggregate data from multiple systems into a secure enterprise data warehouse (EDW). Real-time synchronization, data virtualization, and automated ETL pipelines." %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ── Hero ── */
+    .di-hero {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #1e3a5f 100%);
+        padding: 13rem 0 8rem;
+        position: relative; overflow: hidden;
+    }
+    .di-hero::before {
+        content: ''; position: absolute; inset: 0;
+        background: url('{% static "img/data.jpg" %}') center/cover no-repeat;
+        opacity: .12;
+    }
+    .di-hero .container { position: relative; z-index: 2; }
+    .di-hero-particles { position: absolute; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
+    .di-hero-particle {
+        position: absolute; border-radius: 50%;
+        background: rgba(30,64,175,.25);
+        animation: diFloat linear infinite;
+    }
+    @keyframes diFloat {
+        0% { transform: translateY(100vh) scale(0); opacity: 0; }
+        10% { opacity: 1; } 90% { opacity: 1; }
+        100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+    }
+
+    /* ── Buttons ── */
+    .cta-btn-primary {
+        display: inline-flex; align-items: center; gap: .5rem;
+        padding: .85rem 2rem; border-radius: 50px;
+        background: linear-gradient(135deg, #1e40af, #1e3a8a);
+        color: #fff; font-weight: 700; font-size: .95rem;
+        text-decoration: none; transition: all .3s;
+        box-shadow: 0 4px 20px rgba(30,64,175,.35);
+    }
+    .cta-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(30,64,175,.5); color: #fff; }
+    .cta-btn-secondary {
+        display: inline-flex; align-items: center; gap: .5rem;
+        padding: .85rem 2rem; border-radius: 50px;
+        background: transparent; border: 1.5px solid rgba(255,255,255,.2);
+        color: #fff; font-weight: 700; font-size: .95rem;
+        text-decoration: none; transition: all .3s;
+    }
+    .cta-btn-secondary:hover { border-color: rgba(255,255,255,.5); background: rgba(255,255,255,.05); color: #fff; }
+
+    /* ── Metric cards ── */
+    .di-metric-card {
+        background: var(--bg-surface); border: 1px solid var(--border-color);
+        border-radius: 16px; padding: 1.5rem; text-align: center;
+        transition: transform .3s;
+    }
+    .di-metric-card:hover { transform: translateY(-3px); }
+    .di-metric-value { font-size: 2rem; font-weight: 800; color: #1e40af; }
+
+    /* ── ETL Pipeline ── */
+    .di-pipeline {
+        background: linear-gradient(135deg, #0f172a, #1e293b);
+        border-radius: 16px; padding: 2.5rem 2rem;
+        overflow: hidden; position: relative;
+    }
+    .di-pipeline::after {
+        content: ''; position: absolute; inset: 0;
+        background:
+            linear-gradient(rgba(30,64,175,.06) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(30,64,175,.06) 1px, transparent 1px);
+        background-size: 24px 24px; pointer-events: none;
+    }
+    .di-pipeline-row {
+        display: flex; align-items: center; justify-content: center;
+        gap: .75rem; flex-wrap: wrap; position: relative; z-index: 1;
+    }
+    .di-pipeline-node {
+        padding: .6rem 1rem; border-radius: 10px;
+        font-size: .72rem; font-weight: 700; text-align: center;
+        border: 1.5px solid rgba(30,64,175,.4);
+        background: rgba(30,64,175,.1); color: #60a5fa;
+        min-width: 90px; transition: all .3s;
+    }
+    .di-pipeline-node:hover { border-color: #3b82f6; transform: translateY(-2px); box-shadow: 0 4px 16px rgba(59,130,246,.2); }
+    .di-pipeline-node i { display: block; font-size: .85rem; margin-bottom: .2rem; color: #1e40af; }
+    .di-pipeline-node small { display: block; font-size: .55rem; opacity: .5; }
+    .di-pipeline-center {
+        padding: .75rem 1.5rem; border-radius: 12px;
+        background: linear-gradient(135deg, #1e40af, #1e3a8a);
+        color: #fff; font-size: .8rem; font-weight: 800;
+        box-shadow: 0 4px 20px rgba(30,64,175,.4);
+        text-align: center; position: relative;
+    }
+    .di-pipeline-center:hover { box-shadow: 0 4px 28px rgba(30,64,175,.6); }
+    .di-pipeline-center i { font-size: 1rem; }
+    .di-pipeline-arrow {
+        color: rgba(96,165,250,.4); font-size: .9rem;
+        animation: diArrowPulse 1.5s ease-in-out infinite;
+    }
+    @keyframes diArrowPulse { 0%, 100% { opacity: .4; } 50% { opacity: 1; } }
+    .di-pipeline-packet {
+        position: absolute; width: 6px; height: 6px; border-radius: 50%;
+        background: #3b82f6; z-index: 3;
+        box-shadow: 0 0 8px #3b82f6, 0 0 16px rgba(59,130,246,.3);
+        animation: diPacketMove 2.5s ease-in-out infinite;
+    }
+    @keyframes diPacketMove {
+        0% { top: 15%; opacity: 0; } 15% { opacity: 1; }
+        85% { opacity: 1; } 100% { top: 85%; opacity: 0; }
+    }
+    .di-pipeline-live {
+        display: inline-flex; align-items: center; gap: .4rem;
+        position: relative; z-index: 1; margin-top: 1.5rem;
+    }
+    .di-pipeline-live-dot {
+        width: 8px; height: 8px; border-radius: 50%;
+        background: #22c55e;
+        animation: diLivePulse 1.5s ease-in-out infinite;
+    }
+    @keyframes diLivePulse {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(34,197,94,.4); }
+        50% { box-shadow: 0 0 0 6px rgba(34,197,94,0); }
+    }
+    .di-pipeline-live span { font-size: .7rem; color: rgba(255,255,255,.4); letter-spacing: .08em; text-transform: uppercase; }
+
+    /* ── Comparison Table ── */
+    .di-compare-wrap {
+        background: var(--bg-surface); border: 1px solid var(--border-color);
+        border-radius: 16px; overflow: hidden;
+    }
+    .di-compare-table { width: 100%; border-collapse: collapse; }
+    .di-compare-table thead th {
+        padding: 1.25rem 1.5rem; font-weight: 800; font-size: .85rem; text-align: left;
+        background: linear-gradient(135deg, #0f172a, #1e293b);
+        color: #fff; border-bottom: 2px solid rgba(30,64,175,.3);
+    }
+    .di-compare-table thead th:first-child { width: 20%; color: rgba(255,255,255,.5); font-size: .75rem; text-transform: uppercase; letter-spacing: .08em; }
+    .di-compare-table thead th:not(:first-child) { text-align: center; }
+    .di-compare-table thead th .th-icon {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 32px; height: 32px; border-radius: 8px;
+        background: rgba(30,64,175,.2); color: #60a5fa;
+        font-size: .8rem; margin-bottom: .3rem;
+    }
+    .di-compare-table tbody tr {
+        transition: all .2s; border-left: 3px solid transparent; cursor: pointer;
+    }
+    .di-compare-table tbody tr:nth-child(even) { background: rgba(30,64,175,.02); }
+    .di-compare-table tbody tr:hover { background: rgba(30,64,175,.05); border-left-color: #1e40af; }
+    .di-compare-table tbody tr:not(:last-child) td { border-bottom: 1px solid var(--border-color); }
+    .di-compare-table tbody td {
+        padding: 1rem 1.5rem; font-size: .82rem; color: var(--text-muted);
+        line-height: 1.6; vertical-align: top;
+    }
+    .di-compare-table tbody td:first-child {
+        font-weight: 700; color: var(--text-primary); font-size: .78rem;
+        display: flex; align-items: flex-start; gap: .5rem;
+    }
+    .di-compare-table tbody td:first-child .row-icon {
+        width: 26px; height: 26px; min-width: 26px; border-radius: 6px;
+        background: rgba(30,64,175,.08); color: #1e40af;
+        display: flex; align-items: center; justify-content: center;
+        font-size: .65rem; margin-top: .1rem;
+    }
+    .di-compare-table tbody td:not(:first-child) { text-align: center; }
+    .di-compare-table .check { color: #22c55e; }
+    .di-compare-table .warn { color: #f59e0b; }
+    .di-compare-table .cross { color: #ef4444; }
+    .di-compare-best {
+        display: inline-block; padding: .15rem .45rem; border-radius: 4px;
+        font-size: .55rem; font-weight: 800; text-transform: uppercase;
+        background: rgba(34,197,94,.1); color: #22c55e;
+        margin-left: .3rem; letter-spacing: .04em;
+    }
+
+    /* ── Technique Tabs ── */
+    .di-tech-tabs { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+    .di-tech-tab {
+        padding: .55rem 1.4rem; border-radius: 999px;
+        border: 1px solid var(--border-color); background: transparent;
+        font-size: .85rem; font-weight: 600; color: var(--text-muted);
+        cursor: pointer; transition: all .25s;
+        display: flex; align-items: center; gap: .4rem;
+    }
+    .di-tech-tab:hover { border-color: #1e40af; color: #1e40af; }
+    .di-tech-tab.active { background: #1e40af; color: #fff; border-color: transparent; }
+    .di-tech-tab i { font-size: .75rem; }
+    .di-tech-panel { display: none; animation: diFadeIn .4s ease; }
+    .di-tech-panel.active { display: block; }
+    @keyframes diFadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .di-tech-best {
+        display: inline-block; padding: .2rem .6rem; border-radius: 5px;
+        font-size: .65rem; font-weight: 700; margin-top: .5rem;
+        background: rgba(30,64,175,.06); color: #1e40af;
+    }
+
+    /* ── Sector Pills ── */
+    .di-sector-pills { display: flex; flex-wrap: wrap; gap: .75rem; }
+    .di-sector-pill {
+        padding: .6rem 1.4rem; border-radius: 999px;
+        background: var(--bg-surface); border: 1px solid var(--border-color);
+        font-size: .85rem; font-weight: 600; color: var(--text-primary);
+        transition: all .25s; cursor: default; white-space: nowrap;
+    }
+    .di-sector-pill:hover { border-color: #1e40af; color: #1e40af; transform: translateY(-2px); }
+
+    /* ── Sector Cards ── */
+    .di-sector-card {
+        background: var(--bg-surface); border: 1px solid var(--border-color);
+        border-radius: 16px; padding: 1.75rem; transition: all .3s;
+        height: 100%; position: relative; overflow: hidden;
+    }
+    .di-sector-card::before {
+        content: ''; position: absolute; top: 0; left: 0;
+        width: 100%; height: 3px;
+        background: linear-gradient(90deg, #1e40af, transparent 80%);
+        opacity: 0; transition: opacity .3s;
+    }
+    .di-sector-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,.06); }
+    .di-sector-card:hover::before { opacity: 1; }
+    .di-sector-icon {
+        width: 48px; height: 48px; border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.1rem; margin-bottom: 1rem; transition: all .3s;
+    }
+    .di-sector-card:hover .di-sector-icon { transform: scale(1.1); }
+    .di-sector-link {
+        display: inline-flex; align-items: center; gap: .3rem;
+        font-size: .78rem; font-weight: 700; color: #1e40af;
+        text-decoration: none; margin-top: .75rem;
+    }
+    .di-sector-link i { transition: transform .2s; font-size: .7rem; }
+    .di-sector-card:hover .di-sector-link i { transform: translateX(3px); }
+
+    /* ── Related Cards ── */
+    .di-related-card {
+        background: var(--bg-surface); border: 1px solid var(--border-color);
+        border-radius: 16px; padding: 1.75rem; text-align: center;
+        text-decoration: none; transition: all .3s; height: 100%; display: block;
+        position: relative; overflow: hidden;
+    }
+    .di-related-card::before {
+        content: ''; position: absolute; left: 0; top: 0;
+        width: 3px; height: 0; background: #1e40af;
+        transition: height .3s;
+    }
+    .di-related-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,.06); border-color: #1e40af; color: inherit; }
+    .di-related-card:hover::before { height: 100%; }
+    .di-related-card:hover h6 { color: #1e40af; }
+    .di-related-icon {
+        width: 56px; height: 56px; border-radius: 14px;
+        display: inline-flex; align-items: center; justify-content: center;
+        font-size: 1.3rem; margin-bottom: .75rem;
+    }
+    .di-related-arrow {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 28px; height: 28px; border-radius: 50%;
+        background: rgba(30,64,175,.06); color: #1e40af;
+        font-size: .65rem; margin-top: .5rem;
+        transition: all .3s;
+    }
+    .di-related-card:hover .di-related-arrow { background: #1e40af; color: #fff; transform: translateX(3px); }
+
+    /* ── Newsletter ── */
+    .di-newsletter {
+        background: var(--bg-surface); border: 1px solid var(--border-color);
+        border-radius: 16px; padding: 2.5rem;
+        display: flex; align-items: center; gap: 2rem;
+    }
+    .di-newsletter-form {
+        display: flex; gap: .5rem; flex: 1;
+    }
+    .di-newsletter-form input {
+        flex: 1; padding: .75rem 1.25rem; border-radius: 50px;
+        border: 1.5px solid var(--border-color); background: var(--bg-body);
+        color: var(--text-primary); font-size: .9rem;
+        outline: none; transition: border-color .2s;
+    }
+    .di-newsletter-form input:focus { border-color: #1e40af; }
+    .di-newsletter-form button {
+        padding: .75rem 1.5rem; border-radius: 50px;
+        background: #1e40af; color: #fff; border: none;
+        font-weight: 700; font-size: .9rem; cursor: pointer;
+        transition: all .3s; white-space: nowrap;
+    }
+    .di-newsletter-form button:hover { background: #1e3a8a; }
+
+    /* ── CTA ── */
+    .di-cta {
+        background: #fff;
+        padding: 4.5rem 2rem; text-align: center;
+        position: relative; overflow: hidden;
+    }
+    .di-cta::before {
+        content: ''; position: absolute; inset: 0;
+        background:
+            radial-gradient(circle at 30% 40%, rgba(30,64,175,.04), transparent 50%),
+            radial-gradient(circle at 70% 60%, rgba(59,130,246,.03), transparent 50%);
+        pointer-events: none;
+    }
+    .di-cta::after {
+        content: ''; position: absolute; inset: 0;
+        background:
+            linear-gradient(rgba(30,64,175,.02) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(30,64,175,.02) 1px, transparent 1px);
+        background-size: 32px 32px; pointer-events: none;
+    }
+    .di-cta-trust {
+        display: flex; justify-content: center; gap: 1.5rem;
+        margin-top: 1.5rem; flex-wrap: wrap;
+    }
+    .di-cta-trust span {
+        display: flex; align-items: center; gap: .35rem;
+        font-size: .78rem; color: var(--text-muted);
+    }
+    .di-cta-trust span i { color: #22c55e; font-size: .7rem; }
+
+    /* ── Progress Bar ── */
+    .di-progress-bar {
+        position: fixed; top: 0; left: 0; z-index: 9999;
+        width: 0%; height: 3px;
+        background: linear-gradient(90deg, #1e40af, #3b82f6);
+        transition: width .3s ease;
+        box-shadow: 0 0 8px rgba(30,64,175,.5);
+    }
+
+    /* ── Back to Top ── */
+    .di-back-to-top {
+        position: fixed; bottom: 2rem; right: 2rem;
+        width: 44px; height: 44px; border-radius: 50%;
+        background: linear-gradient(135deg, #1e40af, #1e3a8a);
+        color: #fff; border: none; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1rem; z-index: 9990;
+        opacity: 0; transform: translateY(20px);
+        transition: all .3s; box-shadow: 0 4px 16px rgba(30,64,175,.3);
+    }
+    .di-back-to-top.show { opacity: 1; transform: translateY(0); }
+    .di-back-to-top:hover { transform: translateY(-3px); box-shadow: 0 6px 24px rgba(30,64,175,.4); }
+
+    /* ── Section Heading Reveal ── */
+    .section-heading { opacity: 0; transform: translateY(20px); transition: all .6s cubic-bezier(.22,1,.36,1); }
+    .section-heading.visible { opacity: 1; transform: translateY(0); }
+
+    /* ── Mobile ── */
+    @media (max-width: 991.98px) {
+        .di-hero { padding: 8rem 0 4rem; }
+        .di-compare-wrap { overflow-x: auto; }
+        .di-compare-table { min-width: 600px; }
+        .di-pipeline-row { gap: .5rem; }
+        .di-pipeline-node { min-width: 70px; font-size: .65rem; padding: .5rem .7rem; }
+        .di-newsletter { flex-direction: column; text-align: center; }
+        .di-newsletter-form { width: 100%; }
+    }
+    @media (max-width: 575.98px) {
+        section { padding-top: 3rem !important; padding-bottom: 3rem !important; }
+        .di-hero { padding: 7rem 0 3rem; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- HERO -->
+<section class="di-hero">
+    <div class="di-hero-particles" id="diParticles"></div>
+    <div class="container">
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'home:home' %}" class="text-decoration-none" style="color:#1e40af;">{% trans "Home" %}</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'services:index' %}" class="text-decoration-none" style="color:#1e40af;">{% trans "Services" %}</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'integration:integration_homepage' %}" class="text-decoration-none" style="color:#1e40af;">{% trans "Integration" %}</a></li>
+                <li class="breadcrumb-item active text-secondary" aria-current="page">{% trans "Data Integration" %}</li>
+            </ol>
+        </nav>
+        <div class="col-lg-8">
+            <span class="badge rounded-pill px-3 py-2 mb-3" style="background:rgba(30,64,175,.12);border:1px solid rgba(30,64,175,.25);color:#1e40af;font-size:.8rem;font-weight:700;letter-spacing:.04em;">
+                <i class="fas fa-database me-1"></i> {% trans "Data Integration" %}
+            </span>
+            <h1 class="display-5 fw-800 mb-3" style="background:linear-gradient(135deg,#06b6d4,#3b82f6,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">
+                {% trans "A Unified and Secure View of All Data." %}
+            </h1>
+            <p class="lead mb-4" style="color:#94a3b8;max-width:560px;">
+                {% trans "Aggregate data from multiple systems into a secure enterprise data warehouse (EDW). Real-time synchronization, data virtualization, and automated ETL pipelines." %}
+            </p>
+            <div class="d-flex flex-wrap gap-3 mb-4">
+                <a href="{% url 'contact:contact' %}" class="cta-btn-primary">
+                    {% trans "Request a Quote" %} <i class="fas fa-arrow-right"></i>
+                </a>
+                <a href="#etl-pipeline" class="cta-btn-secondary">
+                    <i class="fas fa-project-diagram"></i> {% trans "View Pipeline" %}
+                </a>
+            </div>
+            <div style="display:flex;gap:1.5rem;flex-wrap:wrap;">
+                <span style="display:flex;align-items:center;gap:.35rem;font-size:.8rem;color:rgba(255,255,255,.5);"><i class="fas fa-check-circle" style="color:#22c55e;font-size:.7rem;"></i> {% trans "50+ Data Sources" %}</span>
+                <span style="display:flex;align-items:center;gap:.35rem;font-size:.8rem;color:rgba(255,255,255,.5);"><i class="fas fa-check-circle" style="color:#22c55e;font-size:.7rem;"></i> {% trans "99.99% Accuracy" %}</span>
+                <span style="display:flex;align-items:center;gap:.35rem;font-size:.8rem;color:rgba(255,255,255,.5);"><i class="fas fa-check-circle" style="color:#22c55e;font-size:.7rem;"></i> {% trans "Real-Time Sync" %}</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- KEY METRICS -->
+<section class="py-5" style="background:var(--bg-body);">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-3 col-6 animate-on-scroll slide-up">
+                <div class="di-metric-card">
+                    <div class="di-metric-value">50+</div>
+                    <div class="text-muted small fw-600">{% trans "Data Sources Supported" %}</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 animate-on-scroll slide-up" style="transition-delay:.08s;">
+                <div class="di-metric-card">
+                    <div class="di-metric-value">&lt;1s</div>
+                    <div class="text-muted small fw-600">{% trans "Real-Time Sync Latency" %}</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 animate-on-scroll slide-up" style="transition-delay:.16s;">
+                <div class="di-metric-card">
+                    <div class="di-metric-value">99.99%</div>
+                    <div class="text-muted small fw-600">{% trans "Data Accuracy" %}</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 animate-on-scroll slide-up" style="transition-delay:.24s;">
+                <div class="di-metric-card">
+                    <div class="di-metric-value">80%</div>
+                    <div class="text-muted small fw-600">{% trans "Faster Reporting" %}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ETL PIPELINE -->
+<section id="etl-pipeline" class="py-5" style="background:var(--bg-surface);">
+    <div class="container py-5">
+        <div class="section-heading text-center mx-auto animate-on-scroll">
+            <span class="section-label">{% trans "Pipeline" %}</span>
+            <h2>{% trans "ETL Data Integration Pipeline" %}</h2>
+            <p class="mx-auto" style="max-width:600px;">{% trans "How data flows from disparate sources through extraction, transformation, and loading into your enterprise data warehouse." %}</p>
+        </div>
+
+        <div class="di-pipeline mt-4 animate-on-scroll slide-up">
+            <div class="di-pipeline-packet" style="left:20%;animation-delay:0s;"></div>
+            <div class="di-pipeline-packet" style="left:50%;animation-delay:.8s;"></div>
+            <div class="di-pipeline-packet" style="left:80%;animation-delay:1.6s;"></div>
+
+            <div class="di-pipeline-row" style="margin-bottom:1rem;">
+                <div class="di-pipeline-node"><i class="fas fa-server"></i> ERP<small>SAP / Oracle</small></div>
+                <div class="di-pipeline-node"><i class="fas fa-address-book"></i> CRM<small>Salesforce</small></div>
+                <div class="di-pipeline-node"><i class="fas fa-microchip"></i> IoT<small>Sensors</small></div>
+                <div class="di-pipeline-node"><i class="fas fa-share-alt"></i> Social<small>APIs</small></div>
+                <div class="di-pipeline-node"><i class="fas fa-file-alt"></i> Files<small>CSV / JSON</small></div>
+            </div>
+            <div class="di-pipeline-row" style="margin-bottom:1rem;">
+                <div class="di-pipeline-arrow"><i class="fas fa-arrow-down"></i></div>
+                <div class="di-pipeline-arrow"><i class="fas fa-arrow-down"></i></div>
+                <div class="di-pipeline-arrow"><i class="fas fa-arrow-down"></i></div>
+                <div class="di-pipeline-arrow"><i class="fas fa-arrow-down"></i></div>
+                <div class="di-pipeline-arrow"><i class="fas fa-arrow-down"></i></div>
+            </div>
+            <div class="di-pipeline-row" style="margin-bottom:1rem;">
+                <div class="di-pipeline-center" style="min-width:100%;">
+                    <i class="fas fa-download"></i> {% trans "EXTRACT" %} — {% trans "Pull raw data from all sources via connectors, APIs, and change data capture (CDC)" %}
+                </div>
+            </div>
+            <div class="di-pipeline-row" style="margin-bottom:1rem;">
+                <div class="di-pipeline-arrow"><i class="fas fa-arrow-down"></i></div>
+            </div>
+            <div class="di-pipeline-row" style="margin-bottom:1rem;">
+                <div class="di-pipeline-center" style="min-width:100%;background:linear-gradient(135deg,#1e3a8a,#1e40af);">
+                    <i class="fas fa-cogs"></i> {% trans "TRANSFORM" %} — {% trans "Cleanse, deduplicate, validate, enrich, and convert to unified format (JSON/XML)" %}
+                </div>
+            </div>
+            <div class="di-pipeline-row" style="margin-bottom:1rem;">
+                <div class="di-pipeline-arrow"><i class="fas fa-arrow-down"></i></div>
+            </div>
+            <div class="di-pipeline-row" style="margin-bottom:1rem;">
+                <div class="di-pipeline-center" style="min-width:100%;background:linear-gradient(135deg,#1e293b,#0f172a);">
+                    <i class="fas fa-upload"></i> {% trans "LOAD" %} — {% trans "Push transformed data into EDW, data lakes, or analytics platforms" %}
+                </div>
+            </div>
+            <div class="di-pipeline-row" style="margin-bottom:1rem;">
+                <div class="di-pipeline-arrow"><i class="fas fa-arrow-down"></i></div>
+            </div>
+            <div class="di-pipeline-row">
+                <div class="di-pipeline-node"><i class="fas fa-warehouse"></i> EDW<small>Data Warehouse</small></div>
+                <div class="di-pipeline-node"><i class="fas fa-database"></i> Data Lake<small>Raw Storage</small></div>
+                <div class="di-pipeline-node"><i class="fas fa-chart-bar"></i> BI Tools<small>Analytics</small></div>
+                <div class="di-pipeline-node"><i class="fas fa-tachometer-alt"></i> Dashboard<small>Real-Time</small></div>
+            </div>
+            <div class="di-pipeline-live">
+                <div class="di-pipeline-live-dot"></div>
+                <span>{% trans "Live Data Flow" %}</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- OVERVIEW -->
+<section class="py-5" style="background:var(--bg-body);">
+    <div class="container py-5">
+        <div class="section-heading text-center mx-auto animate-on-scroll">
+            <span class="section-label">{% trans "Overview" %}</span>
+            <h2>{% trans "What Is Data Integration?" %}</h2>
+        </div>
+        <div class="row align-items-center g-5 mt-2">
+            <div class="col-lg-7 animate-on-scroll slide-up">
+                <p class="lead" style="color:var(--text-primary);line-height:1.8;">
+                    {% trans "Collecting massive amounts of data from multiple sources is a major challenge in today's world. Data formats vary from system to system, ultimately ending up in separate data repositories." %}
+                </p>
+                <p style="color:var(--text-muted);line-height:1.8;">
+                    {% trans "This is where data integration comes in. Data integration refers to collecting data from disparate systems into a unified, secure, central data repository. This repository extracts data from its original sources, such as Enterprise Resource Planning (ERP) systems, Internet of Things (IoT) devices, social media channels, and more, to provide a unified and structured version of the data in a single repository." %}
+                </p>
+                <p style="color:var(--text-muted);line-height:1.8;">
+                    {% trans "This enables end users to query, analyze, and report on this data through Business Intelligence (BI) interfaces and Intelligent Process Automation (IPA)." %}
+                </p>
+            </div>
+            <div class="col-lg-5 animate-on-scroll slide-up" style="transition-delay:.1s;">
+                <div style="background:linear-gradient(135deg,#0f172a,#1e293b);border-radius:16px;padding:2.5rem;text-align:center;">
+                    <i class="fas fa-database" style="font-size:3rem;color:#1e40af;opacity:.6;margin-bottom:1rem;display:block;"></i>
+                    <h5 class="text-white fw-700 mb-2">{% trans "Enterprise Data Warehouse" %}</h5>
+                    <p style="color:#94a3b8;font-size:.85rem;margin:0;">{% trans "Centralized, secure, unified data for all your business operations." %}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- COMPARISON TABLE -->
+<section class="py-5" style="background:var(--bg-surface);">
+    <div class="container py-5">
+        <div class="section-heading text-center mx-auto animate-on-scroll">
+            <span class="section-label">{% trans "Comparison" %}</span>
+            <h2>{% trans "Consolidation vs Virtualization vs Replication" %}</h2>
+            <p class="mx-auto" style="max-width:650px;">{% trans "Choose the right data integration technique based on your organization's needs, data volume, and real-time requirements." %}</p>
+        </div>
+
+        <div class="di-compare-wrap mt-4 animate-on-scroll slide-up">
+            <table class="di-compare-table">
+                <thead>
+                    <tr>
+                        <th>{% trans "Feature" %}</th>
+                        <th><div class="th-icon"><i class="fas fa-layer-group"></i></div><div>{% trans "Consolidation" %}</div></th>
+                        <th><div class="th-icon"><i class="fas fa-eye"></i></div><div>{% trans "Virtualization" %}</div></th>
+                        <th><div class="th-icon"><i class="fas fa-copy"></i></div><div>{% trans "Replication" %}</div></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="row-icon"><i class="fas fa-cogs"></i></span> {% trans "Method" %}</td>
+                        <td>{% trans "ETL (Extract, Transform, Load)" %}</td>
+                        <td>{% trans "Data Federation (logical views)" %}</td>
+                        <td>{% trans "Copy & Paste (sync)" %}</td>
+                    </tr>
+                    <tr>
+                        <td><span class="row-icon"><i class="fas fa-hard-hat"></i></span> {% trans "Data Movement" %}</td>
+                        <td><i class="fas fa-check-circle check"></i> {% trans "Moves data" %}</td>
+                        <td><i class="fas fa-times-circle cross"></i> {% trans "Stays in source" %} <span class="di-compare-best">{% trans "Best" %}</span></td>
+                        <td><i class="fas fa-check-circle check"></i> {% trans "Copies data" %}</td>
+                    </tr>
+                    <tr>
+                        <td><span class="row-icon"><i class="fas fa-clock"></i></span> {% trans "Real-Time" %}</td>
+                        <td><i class="fas fa-times-circle cross"></i> {% trans "Batch" %}</td>
+                        <td><i class="fas fa-check-circle check"></i> {% trans "On-demand" %} <span class="di-compare-best">{% trans "Best" %}</span></td>
+                        <td><i class="fas fa-check-circle check"></i> {% trans "Near real-time" %}</td>
+                    </tr>
+                    <tr>
+                        <td><span class="row-icon"><i class="fas fa-chart-line"></i></span> {% trans "Best For" %}</td>
+                        <td>{% trans "Reporting, BI dashboards" %} <span class="di-compare-best">{% trans "Best" %}</span></td>
+                        <td>{% trans "Agile queries, minimal latency" %}</td>
+                        <td>{% trans "Departmental access, DR" %}</td>
+                    </tr>
+                    <tr>
+                        <td><span class="row-icon"><i class="fas fa-exclamation-triangle"></i></span> {% trans "Complexity" %}</td>
+                        <td><i class="fas fa-exclamation-triangle warn"></i> {% trans "High" %}</td>
+                        <td><i class="fas fa-check-circle check"></i> {% trans "Low" %} <span class="di-compare-best">{% trans "Best" %}</span></td>
+                        <td><i class="fas fa-exclamation-triangle warn"></i> {% trans "Medium" %}</td>
+                    </tr>
+                    <tr>
+                        <td><span class="row-icon"><i class="fas fa-database"></i></span> {% trans "Storage Impact" %}</td>
+                        <td><i class="fas fa-exclamation-triangle warn"></i> {% trans "High" %}</td>
+                        <td><i class="fas fa-check-circle check"></i> {% trans "None" %} <span class="di-compare-best">{% trans "Best" %}</span></td>
+                        <td><i class="fas fa-exclamation-triangle warn"></i> {% trans "Medium" %}</td>
+                    </tr>
+                    <tr>
+                        <td><span class="row-icon"><i class="fas fa-tachometer-alt"></i></span> {% trans "Query Performance" %}</td>
+                        <td><i class="fas fa-check-circle check"></i> {% trans "Fast" %} <span class="di-compare-best">{% trans "Best" %}</span></td>
+                        <td><i class="fas fa-exclamation-triangle warn"></i> {% trans "Varies" %}</td>
+                        <td><i class="fas fa-check-circle check"></i> {% trans "Fast" %}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- TECHNIQUES -->
+<section class="py-5" style="background:var(--bg-body);">
+    <div class="container py-5">
+        <div class="section-heading text-center mx-auto animate-on-scroll">
+            <span class="section-label">{% trans "Techniques" %}</span>
+            <h2>{% trans "Data Integration Techniques" %}</h2>
+            <p class="mx-auto" style="max-width:700px;">{% trans "Today, all organizations need real-time data to make urgent business decisions and deliver added value to customers faster." %}</p>
+        </div>
+
+        <div class="di-tech-tabs justify-content-center animate-on-scroll slide-up">
+            <button class="di-tech-tab active" data-tab="consolidation"><i class="fas fa-layer-group"></i> {% trans "Data Consolidation" %}</button>
+            <button class="di-tech-tab" data-tab="virtualization"><i class="fas fa-eye"></i> {% trans "Data Virtualization" %}</button>
+            <button class="di-tech-tab" data-tab="replication"><i class="fas fa-copy"></i> {% trans "Data Replication" %}</button>
+        </div>
+
+        <div class="di-tech-panel active" id="tab-consolidation">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-7 animate-on-scroll slide-up">
+                    <h3 class="fw-800 mb-3">{% trans "Data Consolidation" %}</h3>
+                    <p style="color:var(--text-muted);line-height:1.8;">
+                        {% trans "Data consolidation is a classic data integration process that utilizes ETL (Extract, Transform, Load) technology to combine data from disparate sources, remove duplicates, correct errors, and consolidate it into a single data store." %}
+                    </p>
+                    <p style="color:var(--text-muted);line-height:1.8;">
+                        {% trans "The core idea is to provide end users with all their important data in one place, enabling the highest possible accuracy in reporting and analysis." %}
+                    </p>
+                    <span class="di-tech-best"><i class="fas fa-check-circle"></i> {% trans "Best for: Reporting, historical analysis, BI dashboards" %}</span>
+                </div>
+                <div class="col-lg-5 animate-on-scroll slide-up" style="transition-delay:.1s;">
+                    <div style="background:linear-gradient(135deg,#0f172a,#1e293b);border-radius:16px;padding:2rem;text-align:center;">
+                        <i class="fas fa-layer-group" style="font-size:2.5rem;color:#1e40af;opacity:.6;margin-bottom:1rem;display:block;"></i>
+                        <h5 class="text-white fw-700 mb-2">{% trans "ETL Pipeline" %}</h5>
+                        <p style="color:#94a3b8;font-size:.82rem;">{% trans "Extract → Transform → Load into central warehouse" %}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="di-tech-panel" id="tab-virtualization">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-7 animate-on-scroll slide-up">
+                    <h3 class="fw-800 mb-3">{% trans "Data Virtualization" %}</h3>
+                    <p style="color:var(--text-muted);line-height:1.8;">
+                        {% trans "Data virtualization collects and integrates enterprise data from multiple sources into a single, real-time, virtual view — without moving the data." %}
+                    </p>
+                    <p style="color:var(--text-muted);line-height:1.8;">
+                        {% trans "It creates integrated virtual (logical) views of all the data needed to access and query it on demand through data federation." %}
+                    </p>
+                    <span class="di-tech-best"><i class="fas fa-check-circle"></i> {% trans "Best for: Agile queries, multiple source views, minimal latency" %}</span>
+                </div>
+                <div class="col-lg-5 animate-on-scroll slide-up" style="transition-delay:.1s;">
+                    <div style="background:linear-gradient(135deg,#0f172a,#1e293b);border-radius:16px;padding:2rem;text-align:center;">
+                        <i class="fas fa-eye" style="font-size:2.5rem;color:#1e40af;opacity:.6;margin-bottom:1rem;display:block;"></i>
+                        <h5 class="text-white fw-700 mb-2">{% trans "Logical Views" %}</h5>
+                        <p style="color:#94a3b8;font-size:.82rem;">{% trans "Query data where it lives — no movement required" %}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="di-tech-panel" id="tab-replication">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-7 animate-on-scroll slide-up">
+                    <h3 class="fw-800 mb-3">{% trans "Data Replication" %}</h3>
+                    <p style="color:var(--text-muted);line-height:1.8;">
+                        {% trans "Data replication involves copying data from one system to another. The data remains in its original sources; a copy is created at the destination sites." %}
+                    </p>
+                    <p class="fw-700 mt-3 mb-2" style="color:var(--text-primary);">{% trans "You can copy data in three ways:" %}</p>
+                    <ul style="color:var(--text-muted);line-height:2;">
+                        <li><strong>{% trans "Full Table Copy" %}</strong> — {% trans "Copy all data from source to destination." %}</li>
+                        <li><strong>{% trans "Key-based Incremental" %}</strong> — {% trans "Copy only changed data since last update." %}</li>
+                        <li><strong>{% trans "Record-based Incremental" %}</strong> — {% trans "Copy based on source system record changes." %}</li>
+                    </ul>
+                    <span class="di-tech-best"><i class="fas fa-check-circle"></i> {% trans "Best for: Departmental access, DR, system migration" %}</span>
+                </div>
+                <div class="col-lg-5 animate-on-scroll slide-up" style="transition-delay:.1s;">
+                    <div style="background:linear-gradient(135deg,#0f172a,#1e293b);border-radius:16px;padding:2rem;text-align:center;">
+                        <i class="fas fa-copy" style="font-size:2.5rem;color:#1e40af;opacity:.6;margin-bottom:1rem;display:block;"></i>
+                        <h5 class="text-white fw-700 mb-2">{% trans "Sync Copies" %}</h5>
+                        <p style="color:#94a3b8;font-size:.82rem;">{% trans "Full, key-based, or record-based replication" %}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SECTORS -->
+<section class="py-5" style="background:var(--bg-surface);">
+    <div class="container py-5">
+        <div class="section-heading text-center mx-auto animate-on-scroll">
+            <span class="section-label">{% trans "Sectors" %}</span>
+            <h2>{% trans "Data Integration Across Industries" %}</h2>
+        </div>
+
+        <div class="di-sector-pills justify-content-center mb-5 animate-on-scroll slide-up">
+            <span class="di-sector-pill"><i class="fas fa-store me-2" style="color:#1e40af;"></i>{% trans "Retail" %}</span>
+            <span class="di-sector-pill"><i class="fas fa-truck me-2" style="color:#1e40af;"></i>{% trans "Logistics" %}</span>
+            <span class="di-sector-pill"><i class="fas fa-cogs me-2" style="color:#1e40af;"></i>{% trans "Smart Manufacturing" %}</span>
+            <span class="di-sector-pill"><i class="fas fa-share-alt me-2" style="color:#1e40af;"></i>{% trans "Social Media" %}</span>
+            <span class="di-sector-pill"><i class="fas fa-microchip me-2" style="color:#1e40af;"></i>{% trans "IoT" %}</span>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4 animate-on-scroll slide-up">
+                <div class="di-sector-card">
+                    <div class="di-sector-icon" style="background:rgba(30,64,175,.08);color:#1e40af;"><i class="fas fa-database"></i></div>
+                    <h5 class="fw-700 mb-2">{% trans "Systems Data Integration" %}</h5>
+                    <p class="text-muted small mb-2">{% trans "Aggregate data from multiple system sources into a central enterprise data repository." %}</p>
+                    <p class="text-muted small mb-0">{% trans "Enhance synchronization technology to exchange ERP data with CRM, inventory, sales, and HR software in real time." %}</p>
+                    <a href="{% url 'contact:contact' %}" class="di-sector-link">{% trans "View use case" %} <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4 animate-on-scroll slide-up" style="transition-delay:.08s;">
+                <div class="di-sector-card">
+                    <div class="di-sector-icon" style="background:rgba(30,64,175,.08);color:#1e40af;"><i class="fas fa-share-alt"></i></div>
+                    <h5 class="fw-700 mb-2">{% trans "Social Media Data Integration" %}</h5>
+                    <p class="text-muted small mb-2">{% trans "Collect and integrate all marketing data." %}</p>
+                    <p class="text-muted small mb-0">{% trans "Collect marketing data from your social media platforms and integrate it to uncover hidden patterns of customer behavior." %}</p>
+                    <a href="{% url 'contact:contact' %}" class="di-sector-link">{% trans "View use case" %} <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4 animate-on-scroll slide-up" style="transition-delay:.16s;">
+                <div class="di-sector-card">
+                    <div class="di-sector-icon" style="background:rgba(30,64,175,.08);color:#1e40af;"><i class="fas fa-microchip"></i></div>
+                    <h5 class="fw-700 mb-2">{% trans "IoT Automated Data Integration" %}</h5>
+                    <p class="text-muted small mb-2">{% trans "Automated Data Integration: Concepts & Strategies" %}</p>
+                    <p class="text-muted small mb-0">{% trans "Overcoming data barriers and quickly accessing all your organization's information." %}</p>
+                    <a href="{% url 'contact:contact' %}" class="di-sector-link">{% trans "View use case" %} <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- RELATED SOLUTIONS -->
+<section class="py-5" style="background:var(--bg-surface);">
+    <div class="container py-5">
+        <div class="section-heading text-center mx-auto animate-on-scroll">
+            <span class="section-label">{% trans "Explore More" %}</span>
+            <h2>{% trans "Related Solutions" %}</h2>
+        </div>
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-4 col-lg-3 animate-on-scroll slide-up">
+                <a href="{% url 'services:detail' page='iot-integration' %}" class="di-related-card">
+                    <div class="di-related-icon" style="background:rgba(30,64,175,.08);color:#1e40af;"><i class="fas fa-microchip"></i></div>
+                    <h6 class="fw-700" style="color:var(--text-primary);">{% trans "IoT Integration" %}</h6>
+                    <p class="text-muted small mb-2">{% trans "Connect edge devices, sensors, and kiosks to your cloud platform." %}</p>
+                    <div class="di-related-arrow"><i class="fas fa-arrow-right"></i></div>
+                </a>
+            </div>
+            <div class="col-md-4 col-lg-3 animate-on-scroll slide-up" style="transition-delay:.08s;">
+                <a href="{% url 'integration:system_integration' %}" class="di-related-card">
+                    <div class="di-related-icon" style="background:rgba(30,64,175,.08);color:#1e40af;"><i class="fas fa-project-diagram"></i></div>
+                    <h6 class="fw-700" style="color:var(--text-primary);">{% trans "System Integration" %}</h6>
+                    <p class="text-muted small mb-2">{% trans "API hub for workflow automation across your entire tech stack." %}</p>
+                    <div class="di-related-arrow"><i class="fas fa-arrow-right"></i></div>
+                </a>
+            </div>
+            <div class="col-md-4 col-lg-3 animate-on-scroll slide-up" style="transition-delay:.16s;">
+                <a href="{% url 'services:industrial_automation' %}" class="di-related-card">
+                    <div class="di-related-icon" style="background:rgba(30,64,175,.08);color:#1e40af;"><i class="fas fa-robot"></i></div>
+                    <h6 class="fw-700" style="color:var(--text-primary);">{% trans "Industrial Automation" %}</h6>
+                    <p class="text-muted small mb-2">{% trans "Automate production lines, quality control, and supply chain." %}</p>
+                    <div class="di-related-arrow"><i class="fas fa-arrow-right"></i></div>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- NEWSLETTER -->
+<section class="py-5" style="background:var(--bg-body);">
+    <div class="container">
+        <div class="di-newsletter animate-on-scroll slide-up">
+            <div style="flex:1;">
+                <h5 class="fw-800 mb-1">{% trans "Stay Updated" %}</h5>
+                <p class="text-muted small mb-0">{% trans "Get the latest data integration insights and platform updates." %}</p>
+            </div>
+            <form class="di-newsletter-form" onsubmit="return false;">
+                <input type="email" placeholder="{% trans 'Enter your email' %}" aria-label="{% trans 'Email' %}">
+                <button type="submit">{% trans "Subscribe" %}</button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="py-5" style="background:var(--bg-surface);">
+    <div class="container py-4">
+        <div class="di-cta animate-on-scroll slide-up">
+            <div class="position-relative" style="z-index:2;">
+                <div style="display:inline-flex;align-items:center;gap:.5rem;background:rgba(30,64,175,.08);border:1px solid rgba(30,64,175,.15);padding:.4rem 1rem;border-radius:20px;margin-bottom:1.25rem;">
+                    <i class="fas fa-database" style="color:#1e40af;font-size:.75rem;"></i>
+                    <span style="color:#1e40af;font-size:.75rem;font-weight:700;">{% trans "DATA INTEGRATION" %}</span>
+                </div>
+                <h2 class="display-5 fw-800 mb-3" style="color:var(--text-primary);">{% trans "Ready to Unify Your Data?" %}</h2>
+                <p class="mb-4" style="color:var(--text-muted);max-width:520px;margin:0 auto;font-size:1rem;line-height:1.7;">
+                    {% trans "Get a free data integration assessment. Our architects will map your data landscape and design a custom solution." %}
+                </p>
+                <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
+                    <a href="{% url 'contact:contact' %}" class="cta-btn-primary">
+                        {% trans "Request a Quote" %} <i class="fas fa-arrow-right"></i>
+                    </a>
+                    <a href="{% url 'integration:integration_homepage' %}" class="cta-btn-secondary">
+                        <i class="fas fa-arrow-left"></i> {% trans "Back to Integration" %}
+                    </a>
+                </div>
+                <div class="di-cta-trust">
+                    <span><i class="fas fa-lock"></i> {% trans "100% Free" %}</span>
+                    <span><i class="fas fa-clock"></i> {% trans "30-Min Consult" %}</span>
+                    <span><i class="fas fa-user-tie"></i> {% trans "Expert Architects" %}</span>
+                    <span><i class="fas fa-ban"></i> {% trans "No Obligation" %}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="di-progress-bar" id="diProgressBar"></div>
+<button class="di-back-to-top" id="diBackToTop" aria-label="Back to top"><i class="fas fa-arrow-up"></i></button>
+{% endblock %}
+
+{% block footer %}{% endblock %}
+{% block global_cta %}{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Hero particles
+    var pc = document.getElementById('diParticles');
+    if (pc) {
+        for (var i = 0; i < 20; i++) {
+            var p = document.createElement('div');
+            p.className = 'di-hero-particle';
+            var size = Math.random() * 4 + 2;
+            p.style.width = size + 'px';
+            p.style.height = size + 'px';
+            p.style.left = Math.random() * 100 + '%';
+            p.style.animationDuration = (Math.random() * 10 + 8) + 's';
+            p.style.animationDelay = (Math.random() * 8) + 's';
+            pc.appendChild(p);
+        }
+    }
+
+    // Section heading reveal
+    var headings = document.querySelectorAll('.section-heading');
+    var headingObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                headingObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.3 });
+    headings.forEach(function(h) { headingObserver.observe(h); });
+
+    // Technique tabs
+    var tabs = document.querySelectorAll('.di-tech-tab');
+    var panels = document.querySelectorAll('.di-tech-panel');
+    tabs.forEach(function(tab) {
+        tab.addEventListener('click', function() {
+            var target = this.dataset.tab;
+            tabs.forEach(function(t) { t.classList.remove('active'); });
+            this.classList.add('active');
+            panels.forEach(function(p) {
+                p.classList.remove('active');
+                if (p.id === 'tab-' + target) p.classList.add('active');
+            });
+        });
+    });
+
+    // Progress bar
+    var progressBar = document.getElementById('diProgressBar');
+    if (progressBar) {
+        window.addEventListener('scroll', function() {
+            var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            var docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            progressBar.style.width = (scrollTop / docHeight * 100) + '%';
+        });
+    }
+
+    // Back to top
+    var backToTop = document.getElementById('diBackToTop');
+    if (backToTop) {
+        window.addEventListener('scroll', function() {
+            backToTop.classList.toggle('show', window.pageYOffset > 400);
+        });
+        backToTop.addEventListener('click', function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
+});
+</script>
+{% endblock %}

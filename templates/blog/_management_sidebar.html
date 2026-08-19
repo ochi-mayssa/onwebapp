@@ -1,0 +1,45 @@
+{% load i18n %}
+<aside class="dd-sidebar" id="ddSidebar">
+    <a class="dd-sidebar-logo" href="{% url 'branding:designer_dashboard' %}">
+        <span class="dd-sidebar-logo-icon"><i class="fa-solid fa-palette"></i></span>
+        <span>
+            <span class="dd-sidebar-logo-text">Branding Studio</span>
+            <span class="dd-sidebar-logo-sub">Content</span>
+        </span>
+    </a>
+
+    <nav class="dd-sidebar-nav">
+        <div class="dd-sidebar-section">
+            <div class="dd-sidebar-section-title">{% trans "CONTENT" %}</div>
+            <a href="{% url 'blog:manage_articles' %}" class="dd-nav-item {% if active == 'articles' %}active{% endif %}">
+                <i class="fa-solid fa-newspaper"></i>{% trans "Articles" %}
+            </a>
+            <a href="{% url 'blog:manage_blog_posts' %}" class="dd-nav-item {% if active == 'posts' %}active{% endif %}">
+                <i class="fa-solid fa-pen-nib"></i>{% trans "Blog Posts" %}
+            </a>
+        </div>
+
+        <div class="dd-sidebar-section">
+            <div class="dd-sidebar-section-title">{% trans "NAVIGATION" %}</div>
+            <a href="{% url 'branding:designer_dashboard' %}" class="dd-nav-item">
+                <i class="fa-solid fa-gauge-high"></i>{% trans "Dashboard" %}
+            </a>
+            <a href="{% url 'branding:my_requests' %}" class="dd-nav-item">
+                <i class="fa-solid fa-folder-open"></i>{% trans "My Projects" %}
+            </a>
+            <a href="{% url 'blog:index' %}" class="dd-nav-item" target="_blank">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i>{% trans "View Blog" %}
+            </a>
+        </div>
+    </nav>
+
+    <div class="dd-sidebar-user">
+        <div class="dd-sidebar-avatar">{{ user.username|slice:":1"|upper }}</div>
+        <div class="dd-sidebar-user-info">
+            <div class="dd-sidebar-user-name">{{ user.get_full_name|default:user.username }}</div>
+            <div class="dd-sidebar-user-role">{% trans "Content Manager" %}</div>
+        </div>
+    </div>
+</aside>
+
+<div class="dd-sidebar-overlay" id="ddSidebarOverlay"></div>

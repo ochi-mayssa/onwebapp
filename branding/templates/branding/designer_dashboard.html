@@ -16,12 +16,37 @@
         </a>
 
         <nav class="dd-sidebar-nav">
-            {# ── Workspace ── #}
+            {# ── Dashboard ── #}
             <div class="dd-sidebar-section">
-                <div class="dd-sidebar-section-title">Workspace</div>
+                <div class="dd-sidebar-section-title">Dashboard</div>
                 <a href="{% url 'branding:designer_dashboard' %}" class="dd-nav-item active">
                     <i class="fa-solid fa-gauge-high"></i>Overview
                 </a>
+                <a href="{% url 'branding:showcase' %}" class="dd-nav-item">
+                    <i class="fa-solid fa-trophy"></i>Showcase
+                </a>
+            </div>
+
+            {# ── Design Library ── #}
+            <div class="dd-sidebar-section">
+                <div class="dd-sidebar-section-title">Design Library</div>
+                <a href="{% url 'branding:design_library' %}" class="dd-nav-item">
+                    <i class="fa-solid fa-book-open"></i>Library
+                </a>
+                <a href="{% url 'branding:design_library' %}?tab=collections" class="dd-nav-item">
+                    <i class="fa-solid fa-layer-group"></i>My Collections
+                </a>
+                <a href="{% url 'branding:design_library' %}?tab=resources" class="dd-nav-item">
+                    <i class="fa-solid fa-cube"></i>Resources
+                </a>
+                <a href="{% url 'branding:design_library' %}?tab=templates" class="dd-nav-item">
+                    <i class="fa-solid fa-file-lines"></i>Templates
+                </a>
+            </div>
+
+            {# ── Workspace ── #}
+            <div class="dd-sidebar-section">
+                <div class="dd-sidebar-section-title">Workspace</div>
                 <a href="{% url 'branding:my_requests' %}" class="dd-nav-item">
                     <i class="fa-solid fa-folder-open"></i>My Projects
                     <span class="dd-nav-badge">{{ active_projects|length }}</span>
@@ -31,26 +56,6 @@
                 </a>
                 <a href="{% url 'branding:workflow_dashboard' %}" class="dd-nav-item">
                     <i class="fa-solid fa-pen-ruler"></i>Workflow
-                </a>
-            </div>
-
-            {# ── Creative ── #}
-            <div class="dd-sidebar-section">
-                <div class="dd-sidebar-section-title">Creative</div>
-                <a href="{% url 'branding:collection_template_list' %}" class="dd-nav-item">
-                    <i class="fa-solid fa-layer-group"></i>Collections
-                    {% if collection_count > 0 %}
-                    <span class="dd-nav-badge">{{ collection_count }}</span>
-                    {% endif %}
-                </a>
-                <a href="{% url 'branding:designer_templates' %}" class="dd-nav-item">
-                    <i class="fa-solid fa-file-lines"></i>Templates
-                </a>
-                <a href="{% url 'branding:designer_resources' %}" class="dd-nav-item">
-                    <i class="fa-solid fa-book"></i>Resources
-                </a>
-                <a href="{% url 'branding:showcase' %}" class="dd-nav-item">
-                    <i class="fa-solid fa-trophy"></i>Showcase
                 </a>
             </div>
 
@@ -99,6 +104,17 @@
                 </a>
                 <a href="{% url 'digital_presence:reports' %}" class="dd-nav-item">
                     <i class="fa-solid fa-chart-bar"></i>Reports
+                </a>
+            </div>
+
+            {# ── Content Management ── #}
+            <div class="dd-sidebar-section">
+                <div class="dd-sidebar-section-title">Content</div>
+                <a href="{% url 'blog:manage_articles' %}" class="dd-nav-item">
+                    <i class="fa-solid fa-newspaper"></i>Articles
+                </a>
+                <a href="{% url 'blog:manage_blog_posts' %}" class="dd-nav-item">
+                    <i class="fa-solid fa-pen-nib"></i>Blog Posts
                 </a>
             </div>
         </nav>
@@ -417,7 +433,7 @@
                                 <div class="dd-action-icon" style="background:rgba(251,191,36,0.1);color:#fbbf24;"><i class="fa-solid fa-layer-group"></i></div>
                                 <span class="dd-action-label">Collections</span>
                             </a>
-                            <a href="{% url 'branding:designer_resources' %}" class="dd-action-card">
+                            <a href="{% url 'branding:design_library' %}?tab=resources" class="dd-action-card">
                                 <div class="dd-action-icon" style="background:rgba(52,211,153,0.1);color:#34d399;"><i class="fa-solid fa-book"></i></div>
                                 <span class="dd-action-label">Resources</span>
                             </a>

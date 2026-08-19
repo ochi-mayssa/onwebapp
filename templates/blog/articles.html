@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans "Articles" %} | OnWebApp{% endblock %}
+
+{% block extra_css %}
+<style>
+    .articles-hero {
+        padding: 8rem 0 4rem;
+        background: var(--bg-body);
+        text-align: center;
+    }
+    .articles-hero h1 {
+        font-size: clamp(2rem, 5vw, 3rem);
+        font-weight: 800;
+        margin-bottom: 1rem;
+    }
+    .articles-hero p {
+        color: var(--text-muted);
+        font-size: 1.1rem;
+        max-width: 560px;
+        margin: 0 auto;
+        line-height: 1.7;
+    }
+    .articles-grid {
+        padding: 4rem 0 5rem;
+        background: var(--bg-body);
+    }
+    .articles-filter {
+        display: flex; justify-content: center; gap: .75rem;
+        margin-bottom: 3rem; flex-wrap: wrap;
+    }
+    .articles-filter-btn {
+        padding: .5rem 1.25rem; border-radius: 50px;
+        border: 1.5px solid var(--border-color);
+        background: transparent; color: var(--text-muted);
+        font-weight: 600; font-size: .85rem;
+        cursor: pointer; transition: all .3s;
+    }
+    .articles-filter-btn:hover,
+    .articles-filter-btn.active {
+        border-color: #1e40af; color: #1e40af;
+        background: rgba(30,64,175,.05);
+    }
+    .article-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-color);
+        border-radius: 16px; overflow: hidden;
+        transition: all .3s; text-decoration: none; color: inherit;
+        display: flex; flex-direction: column; height: 100%;
+    }
+    .article-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 32px rgba(0,0,0,.06);
+        border-color: #1e40af; color: inherit;
+    }
+    .article-card-img {
+        height: 200px;
+        background-size: cover; background-position: center;
+        position: relative; overflow: hidden;
+    }
+    .article-card-img::after {
+        content: ''; position: absolute; inset: 0;
+        background: linear-gradient(to top, rgba(15,23,42,.4) 0%, transparent 50%);
+    }
+    .article-card:hover .article-card-img {
+        transform: scale(1.02);
+        transition: transform .5s ease;
+    }
+    .article-card-body {
+        padding: 1.5rem; flex: 1; display: flex; flex-direction: column;
+    }
+    .article-tag {
+        display: inline-block; padding: .2rem .7rem;
+        border-radius: 20px; font-size: .7rem; font-weight: 700;
+        background: rgba(30,64,175,.08); color: #1e40af;
+        margin-bottom: .75rem; width: fit-content;
+    }
+    .article-card-body h5 {
+        font-weight: 700; font-size: 1.05rem;
+        margin-bottom: .5rem; line-height: 1.4;
+    }
+    .article-card-body p {
+        color: var(--text-muted); font-size: .85rem;
+        line-height: 1.6; margin-bottom: 1rem; flex: 1;
+    }
+    .article-meta {
+        display: flex; align-items: center; gap: 1rem;
+        font-size: .75rem; color: var(--text-muted);
+    }
+    .article-meta i { font-size: .7rem; }
+    .article-read-more {
+        font-size: .8rem; font-weight: 700; color: #1e40af;
+        display: inline-flex; align-items: center; gap: .3rem;
+        margin-top: .75rem;
+    }
+    .article-read-more i { transition: transform .2s; }
+    .article-card:hover .article-read-more i { transform: translateX(3px); }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="articles-hero">
+    <div class="container">
+        <h1>{% trans "Articles" %}</h1>
+        <p>{% trans "In-depth research, analysis, and thought leadership on integration, automation, and digital transformation." %}</p>
+    </div>
+</section>
+
+<section class="articles-grid">
+    <div class="container">
+        <div class="articles-filter">
+            <button class="articles-filter-btn active" data-filter="all">{% trans "All" %}</button>
+            <button class="articles-filter-btn" data-filter="Integration">{% trans "Integration" %}</button>
+            <button class="articles-filter-btn" data-filter="Automation">{% trans "Automation" %}</button>
+            <button class="articles-filter-btn" data-filter="Data">{% trans "Data" %}</button>
+            <button class="articles-filter-btn" data-filter="ERP & CRM">{% trans "ERP & CRM" %}</button>
+            <button class="articles-filter-btn" data-filter="IoT">{% trans "IoT" %}</button>
+        </div>
+
+        <div class="row g-4" id="articlesGrid">
+            {% for article in articles %}
+            <div class="col-md-6 col-lg-4 article-item" data-category="{{ article.tag }}">
+                <a href="{% url 'blog:article_detail' slug=article.slug %}" class="article-card">
+                    <div class="article-card-img" style="background-image:url('{{ article.image }}');"></div>
+                    <div class="article-card-body">
+                        <span class="article-tag">{{ article.tag }}</span>
+                        <h5>{{ article.title }}</h5>
+                        <p>{{ article.description }}</p>
+                        <div class="article-meta">
+                            <span><i class="far fa-calendar me-1"></i> {{ article.date }}</span>
+                            <span><i class="far fa-clock me-1"></i> {{ article.read_time }}</span>
+                        </div>
+                        <span class="article-read-more">{% trans "Read article" %} <i class="fas fa-arrow-right"></i></span>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var btns = document.querySelectorAll('.articles-filter-btn');
+    var items = document.querySelectorAll('.article-item');
+
+    btns.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            btns.forEach(function(b) { b.classList.remove('active'); });
+            btn.classList.add('active');
+            var filter = btn.dataset.filter;
+            items.forEach(function(item) {
+                if (filter === 'all' || item.dataset.category === filter) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    });
+});
+</script>
+{% endblock %}
+
+{% block global_cta %}{% endblock %}

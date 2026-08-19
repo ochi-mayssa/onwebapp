@@ -5,13 +5,44 @@
      data-tags='{{ collection.style_tags|escapejs }}'
      data-examples='{{ collection.examples|escapejs }}'
      data-image="{% if collection.preview_image %}{{ collection.preview_image.url }}{% endif %}"
-     data-color="{{ collection.accent_color }}">
+     data-color="{{ collection.accent_color }}"
+     data-hero="{% if collection.hero_image %}{{ collection.hero_image.url }}{% endif %}"
+     data-logo="{% if collection.logo_image %}{{ collection.logo_image.url }}{% endif %}"
+     data-typography="{% if collection.typography_image %}{{ collection.typography_image.url }}{% endif %}"
+     data-business-card="{% if collection.business_card_image %}{{ collection.business_card_image.url }}{% endif %}"
+     data-presentation="{% if collection.presentation_image %}{{ collection.presentation_image.url }}{% endif %}"
+     data-letterhead="{% if collection.letterhead_image %}{{ collection.letterhead_image.url }}{% endif %}"
+     data-email-signature="{% if collection.email_signature_image %}{{ collection.email_signature_image.url }}{% endif %}"
+     data-social-media="{% if collection.social_media_image %}{{ collection.social_media_image.url }}{% endif %}"
+     data-brand-guidelines="{% if collection.brand_guidelines_image %}{{ collection.brand_guidelines_image.url }}{% endif %}"
+     data-palette='{{ collection.color_palette|escapejs }}'
+     data-fonts='{{ collection.fonts|escapejs }}'>
     <div class="collection-cover">
         {% if collection.preview_image %}
         <img src="{{ collection.preview_image.url }}" alt="{{ collection.name }}" loading="lazy">
         {% else %}
-        <div class="collection-cover-fallback" style="background: linear-gradient(135deg, {{ collection.accent_color }}33, {{ collection.accent_color }}88);">
-            <span>{{ collection.name|slice:":2"|upper }}</span>
+        <div class="collection-cover-fallback" style="background:{{ collection.accent_color }};">
+            <div style="position:absolute;top:0;left:0;right:0;bottom:0;overflow:hidden;">
+                <div style="position:absolute;top:12%;left:50%;transform:translateX(-50%);width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.2);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;">
+                    <span style="font-size:1.1rem;font-weight:800;color:#fff;">{{ collection.name|slice:":1"|upper }}</span>
+                </div>
+                <div style="position:absolute;top:48%;left:50%;transform:translate(-50%,-50%);text-align:center;width:85%;">
+                    <div style="font-size:0.55rem;font-weight:700;color:rgba(255,255,255,0.7);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:2px;">{{ collection.industry|default:"Brand" }}</div>
+                    <div style="font-size:0.95rem;font-weight:800;color:#fff;line-height:1.2;">{{ collection.name }}</div>
+                </div>
+                <div style="position:absolute;bottom:10%;left:50%;transform:translateX(-50%);display:flex;gap:5px;">
+                    {% for color in collection.color_palette|slice:":5" %}
+                    <div style="width:14px;height:14px;border-radius:50%;background:{{ color }};border:2px solid rgba(255,255,255,0.4);"></div>
+                    {% endfor %}
+                    {% if not collection.color_palette %}
+                    <div style="width:14px;height:14px;border-radius:50%;background:rgba(255,255,255,0.3);border:2px solid rgba(255,255,255,0.4);"></div>
+                    <div style="width:14px;height:14px;border-radius:50%;background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.4);"></div>
+                    <div style="width:14px;height:14px;border-radius:50%;background:rgba(0,0,0,0.2);border:2px solid rgba(255,255,255,0.4);"></div>
+                    {% endif %}
+                </div>
+                <div style="position:absolute;top:8%;right:-10%;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,0.06);"></div>
+                <div style="position:absolute;bottom:3%;left:-8%;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,0.04);"></div>
+            </div>
         </div>
         {% endif %}
         <div class="collection-cover-overlay">
@@ -19,13 +50,21 @@
                 <i class="fa-solid fa-expand me-1"></i>Preview
             </button>
         </div>
+        <button type="button" class="lc-gallery-btn lc-gallery-next" title="View all images"><i class="fa-solid fa-chevron-right"></i></button>
         {% if selected and selected.id == collection.id %}
         <span class="collection-selected-badge"><i class="fa-solid fa-check"></i></span>
         {% endif %}
     </div>
 
     <div class="collection-body">
-        <div class="d-flex align-items-start justify-content-between gap-2">
+        <div class="cc-header">
+            {% if collection.logo_image %}
+            <img src="{{ collection.logo_image.url }}" alt="{{ collection.name }} logo" class="cc-logo">
+            {% else %}
+            <div class="cc-logo cc-logo-fallback" style="background:{{ collection.accent_color }};">
+                <span>{{ collection.name|slice:":1"|upper }}</span>
+            </div>
+            {% endif %}
             <div>
                 <h4 class="collection-name fw-800 mb-0">{{ collection.name }}</h4>
                 <span class="collection-industry">{{ collection.industry }}</span>
@@ -35,17 +74,25 @@
 
         <p class="collection-desc mb-3">{{ collection.description|truncatechars:110 }}</p>
 
-        <div class="collection-tags mb-3">
-            {% for tag in collection.style_tags %}<span class="style-tag">{{ tag }}</span>{% endfor %}
-        </div>
-
-        {% if collection.examples %}
-        <div class="collection-examples">
-            {% for ex in collection.examples|slice:":3" %}
-            <span><i class="fa-solid fa-circle-check"></i> {{ ex }}</span>
+        {% if collection.color_palette %}
+        <div class="cc-palette mb-2">
+            {% for color in collection.color_palette|slice:":6" %}
+            <div class="cc-swatch" style="background:{{ color }};" title="{{ color }}"></div>
             {% endfor %}
         </div>
         {% endif %}
+
+        {% if collection.fonts %}
+        <div class="cc-fonts mb-2">
+            {% for font in collection.fonts|slice:":2" %}
+            <span class="cc-font">{{ font }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="collection-tags mb-3">
+            {% for tag in collection.style_tags|slice:":3" %}<span class="style-tag">{{ tag }}</span>{% endfor %}
+        </div>
 
         <label class="collection-choose">
             <input type="radio" name="collection" value="{{ collection.id }}" {% if selected and selected.id == collection.id %}checked{% endif %}>

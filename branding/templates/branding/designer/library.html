@@ -1,0 +1,1015 @@
+{% extends "branding/base.html" %}
+{% load static %}
+
+{% block title %}Design Library | Designer{% endblock %}
+
+{% block branding_content %}
+<style>body{background:#f5f5f7!important;}body .branding-page{background:#f5f5f7;padding:0!important;margin:0!important;}body .branding-header,body .branding-footer,body footer{display:none!important;}.dd-main .dd-collection-card{background:#fff!important;border-color:#e5e7eb!important;color:#111827!important;}.dd-main .dd-collection-card:hover{border-color:#6366f1!important;box-shadow:0 8px 24px rgba(99,102,241,.08)!important;}.dd-main .dd-collection-name{color:#111827!important;}.dd-main .dd-collection-meta{color:#6b7280!important;}.dd-main .dd-collection-desc{color:#6b7280!important;}.dd-main .dd-collection-count{color:#6b7280!important;}.dd-main .dd-collection-date{color:#9ca3af!important;}.dd-main .dd-tag{background:#f3f4f6!important;color:#374151!important;border-color:#e5e7eb!important;}.dd-main .dd-card{background:#fff!important;border-color:#e5e7eb!important;}.dd-main .dd-empty{color:#6b7280!important;}.dd-main .dd-empty i{color:#d1d5db!important;}</style>
+<script>document.body.classList.add('dd-active');</script>
+<div class="dd-layout">
+    {# ── Sidebar ── #}
+    <aside class="dd-sidebar" id="ddSidebar">
+        <a class="dd-sidebar-logo" href="{% url 'branding:designer_dashboard' %}">
+            <span class="dd-sidebar-logo-icon"><i class="fa-solid fa-palette"></i></span>
+            <span>
+                <span class="dd-sidebar-logo-text">Branding Studio</span>
+                <span class="dd-sidebar-logo-sub">Designer</span>
+            </span>
+        </a>
+
+        <nav class="dd-sidebar-nav">
+            {# ── Dashboard ── #}
+            <div class="dd-sidebar-section">
+                <div class="dd-sidebar-section-title">Dashboard</div>
+                <a href="{% url 'branding:designer_dashboard' %}" class="dd-nav-item">
+                    <i class="fa-solid fa-gauge-high"></i>Overview
+                </a>
+                <a href="{% url 'branding:showcase' %}" class="dd-nav-item">
+                    <i class="fa-solid fa-trophy"></i>Showcase
+                </a>
+            </div>
+
+            {# ── Design Library ── #}
+            <div class="dd-sidebar-section">
+                <div class="dd-sidebar-section-title">Design Library</div>
+                <a href="{% url 'branding:design_library' %}" class="dd-nav-item active">
+                    <i class="fa-solid fa-book-open"></i>Library
+                </a>
+                <a href="{% url 'branding:design_library' %}?tab=collections" class="dd-nav-item">
+                    <i class="fa-solid fa-layer-group"></i>My Collections
+                </a>
+                <a href="{% url 'branding:design_library' %}?tab=resources" class="dd-nav-item">
+                    <i class="fa-solid fa-cube"></i>Resources
+                </a>
+                <a href="{% url 'branding:design_library' %}?tab=templates" class="dd-nav-item">
+                    <i class="fa-solid fa-file-lines"></i>Templates
+                </a>
+            </div>
+
+            {# ── Workspace ── #}
+            <div class="dd-sidebar-section">
+                <div class="dd-sidebar-section-title">Workspace</div>
+                <a href="{% url 'branding:my_requests' %}" class="dd-nav-item">
+                    <i class="fa-solid fa-folder-open"></i>My Projects
+                </a>
+                <a href="{% url 'branding:kanban' %}" class="dd-nav-item">
+                    <i class="fa-solid fa-table-columns"></i>Board
+                </a>
+                <a href="{% url 'branding:workflow_dashboard' %}" class="dd-nav-item">
+                    <i class="fa-solid fa-pen-ruler"></i>Workflow
+                </a>
+            </div>
+
+            {# ── Collaboration ── #}
+            <div class="dd-sidebar-section">
+                <div class="dd-sidebar-section-title">Collaboration</div>
+                <a href="{% url 'branding:feedback_list' %}" class="dd-nav-item">
+                    <i class="fa-solid fa-message"></i>Feedback
+                </a>
+            </div>
+        </nav>
+
+        <div class="dd-sidebar-user">
+            <div class="dd-sidebar-avatar">{{ user.username|slice:":1"|upper }}</div>
+            <div class="dd-sidebar-user-info">
+                <div class="dd-sidebar-user-name">{{ user.get_full_name|default:user.username }}</div>
+                <div class="dd-sidebar-user-role">Designer</div>
+            </div>
+        </div>
+    </aside>
+
+    <div class="dd-sidebar-overlay" id="ddSidebarOverlay"></div>
+
+    {# ── Main Content ── #}
+    <main class="dd-main">
+        <header class="dd-topbar">
+            <div class="dd-topbar-left">
+                <button class="dd-sidebar-toggle" id="ddSidebarToggle"><i class="fa-solid fa-bars"></i></button>
+                <div>
+                    <div class="dd-topbar-title">Design Library</div>
+                    <div class="dd-topbar-subtitle">{{ total_collections }} collection{{ total_collections|pluralize }} &middot; {{ total_resources }} resource{{ total_resources|pluralize }} &middot; {{ total_templates }} template{{ total_templates|pluralize }}</div>
+                </div>
+            </div>
+            <div class="dd-topbar-right">
+                <button class="dd-btn dd-btn-primary" onclick="openModal('addDesignModal')"><i class="fa-solid fa-plus"></i>Add Design</button>
+            </div>
+        </header>
+
+        <div class="dd-content">
+            {% if messages %}
+            {% for msg in messages %}
+            <div class="dd-alert dd-alert-{{ msg.tags }}">{{ msg }}</div>
+            {% endfor %}
+            {% endif %}
+
+            {# ── Search Bar ── #}
+            <form method="get" class="dd-search-bar" style="margin-bottom:1.5rem;">
+                <input type="text" name="q" value="{{ search_query }}" placeholder="Search collections, resources, or templates..." class="dd-input">
+                <button type="submit" class="dd-btn dd-btn-ghost"><i class="fa-solid fa-search"></i></button>
+            </form>
+
+            {# ── Tab Filters ── #}
+            <div class="dd-filter-row" style="margin-bottom:1.5rem;">
+                <a href="?tab=collections{% if search_query %}&q={{ search_query }}{% endif %}" class="dd-filter {% if tab == 'collections' %}active{% endif %}">
+                    <i class="fa-solid fa-layer-group" style="margin-right:4px;"></i>Collections
+                    <span class="dd-filter-count">{{ my_collections|length }}</span>
+                </a>
+                <a href="?tab=resources{% if search_query %}&q={{ search_query }}{% endif %}" class="dd-filter {% if tab == 'resources' %}active{% endif %}">
+                    <i class="fa-solid fa-cube" style="margin-right:4px;"></i>Resources
+                    <span class="dd-filter-count">{{ total_resources }}</span>
+                </a>
+                <a href="?tab=templates{% if search_query %}&q={{ search_query }}{% endif %}" class="dd-filter {% if tab == 'templates' %}active{% endif %}">
+                    <i class="fa-solid fa-file-lines" style="margin-right:4px;"></i>Templates
+                    <span class="dd-filter-count">{{ total_templates }}</span>
+                </a>
+            </div>
+
+            {# ── Collections Tab ── #}
+            {% if tab == 'collections' %}
+            <div class="dd-tab-content active">
+                {% if my_collections %}
+                <div class="dd-grid-3">
+                    {# ── New Collection Card ── #}
+                    <div class="dd-card dd-collection-card" style="border:2px dashed var(--dd-border);cursor:pointer;display:flex;align-items:center;justify-content:center;min-height:180px;" onclick="openPanel('createCollectionPanel')">
+                        <div style="text-align:center;">
+                            <div style="width:48px;height:48px;border-radius:12px;background:var(--dd-bg-elevated);display:inline-flex;align-items:center;justify-content:center;margin-bottom:0.75rem;">
+                                <i class="fa-solid fa-plus" style="color:var(--dd-text-secondary);font-size:1.25rem;"></i>
+                            </div>
+                            <div style="font-weight:600;color:var(--dd-text);">New Collection</div>
+                            <div style="font-size:0.75rem;color:var(--dd-text-muted);margin-top:0.25rem;">Create a brand collection</div>
+                        </div>
+                    </div>
+
+                    {% for c in my_collections %}
+                    <a href="{% url 'branding:designer_collection_detail' slug=c.slug %}" class="dd-card dd-collection-card">
+                        <div class="dd-collection-header" style="border-left:3px solid {{ c.accent_color }}">
+                            <div class="dd-collection-icon" style="background:{{ c.accent_color }}20;color:{{ c.accent_color }}">
+                                <i class="fa-solid fa-layer-group"></i>
+                            </div>
+                            <div>
+                                <div class="dd-collection-name">{{ c.name }}</div>
+                                {% if c.industry %}<div class="dd-collection-meta">{{ c.industry }}</div>{% endif %}
+                            </div>
+                        </div>
+                        {% if c.description %}
+                        <p class="dd-collection-desc">{{ c.description|truncatechars:80 }}</p>
+                        {% endif %}
+                        <div class="dd-collection-footer">
+                            <span class="dd-collection-count"><i class="fa-solid fa-cube"></i> {{ c.asset_count }} asset{{ c.asset_count|pluralize }}</span>
+                            <span class="dd-collection-date">{{ c.created_at|date:"M j" }}</span>
+                        </div>
+                        {% if c.style_tags %}
+                        <div class="dd-collection-tags">
+                            {% for tag in c.style_tags|slice:":3" %}
+                            <span class="dd-tag">{{ tag }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="dd-empty">
+                    <i class="fa-solid fa-layer-group"></i>
+                    <p>No collections yet</p>
+                    <button class="dd-btn dd-btn-primary" style="margin-top:1rem;" onclick="openPanel('createCollectionPanel')"><i class="fa-solid fa-plus"></i>Create Your First Collection</button>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            {# ── Resources Tab ── #}
+            {% if tab == 'resources' %}
+            <div class="dd-tab-content active">
+
+                {# ── My Resources ── #}
+                <div style="margin-bottom:2rem;">
+                    <h5 style="font-weight:700;margin-bottom:0.75rem;"><i class="fa-solid fa-user" style="margin-right:0.5rem;color:var(--dd-text-muted);"></i>My Resources</h5>
+                    {% if my_resources %}
+                    <div class="dd-grid-3">
+                        {% for res in my_resources %}
+                        <div class="dd-card dd-resource-card">
+                            <div class="dd-resource-icon">
+                                {% if res.file %}
+                                    {% with ext=res.file.name|slice:"-3:" %}
+                                    {% if ext == ".psd" or ext == ".ai" or ext == ".ind" %}
+                                    <i class="fa-solid fa-palette" style="color:#31a8ff;"></i>
+                                    {% elif ext == ".pdf" %}
+                                    <i class="fa-solid fa-file-pdf" style="color:#ef4444;"></i>
+                                    {% elif ext == ".zip" or ext == ".rar" %}
+                                    <i class="fa-solid fa-file-zipper" style="color:#f59e0b;"></i>
+                                    {% elif ext == ".svg" or ext == ".png" or ext == ".jpg" or ext == "peg" %}
+                                    <i class="fa-solid fa-file-image" style="color:#8b5cf6;"></i>
+                                    {% elif ext == ".otf" or ext == ".ttf" or ext == ".woff" %}
+                                    <i class="fa-solid fa-font" style="color:#06b6d4;"></i>
+                                    {% else %}
+                                    <i class="fa-solid fa-file" style="color:#6b7280;"></i>
+                                    {% endif %}
+                                    {% endwith %}
+                                {% elif res.url %}
+                                <i class="fa-solid fa-arrow-up-right-from-square" style="color:#818cf8;"></i>
+                                {% else %}
+                                <i class="fa-solid fa-cube" style="color:#6b7280;"></i>
+                                {% endif %}
+                            </div>
+                            <div class="dd-resource-body">
+                                <div class="dd-resource-header">
+                                    <div class="dd-resource-title">{{ res.title }}</div>
+                                    <span class="dd-tag dd-tag-sm {% if res.shared_level == 'team' %}dd-tag-data{% elif res.shared_level == 'collection' %}dd-tag-integration{% else %}dd-tag-automation{% endif %}">{{ res.get_shared_level_display }}</span>
+                                </div>
+                                {% if res.description %}
+                                <p class="dd-resource-desc">{{ res.description|truncatechars:90 }}</p>
+                                {% endif %}
+                                <div class="dd-resource-meta">
+                                    <span><i class="fa-solid fa-tag"></i>{{ res.get_category_display }}</span>
+                                    {% if res.file %}
+                                    <span><i class="fa-solid fa-download"></i>{{ res.download_count }}</span>
+                                    {% endif %}
+                                    <span><i class="fa-solid fa-clock"></i>{{ res.created_at|date:"M j" }}</span>
+                                </div>
+                                {% if res.tags %}
+                                <div class="dd-resource-tags">
+                                    {% for tag in res.tags|slice:":3" %}
+                                    <span class="dd-tag">{{ tag }}</span>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="dd-resource-actions">
+                                {% if res.file %}
+                                <a href="{{ res.file.url }}" class="dd-btn dd-btn-primary dd-btn-sm" download onclick="event.stopPropagation()"><i class="fa-solid fa-download"></i></a>
+                                {% endif %}
+                                {% if res.url %}
+                                <a href="{{ res.url }}" class="dd-btn dd-btn-ghost dd-btn-sm" target="_blank" rel="noopener" onclick="event.stopPropagation()"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                                {% endif %}
+                                {% if res.owner == user %}
+                                <form method="post" action="{% url 'branding:design_library' %}" class="d-inline" onsubmit="return confirm('Delete this resource?')">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="delete_resource">
+                                    <input type="hidden" name="resource_id" value="{{ res.pk }}">
+                                    <button type="submit" class="dd-btn dd-btn-ghost dd-btn-sm dd-btn-danger" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="dd-empty" style="padding:2rem 1rem;">
+                        <i class="fa-solid fa-cube"></i>
+                        <p>No personal resources yet</p>
+                        <button class="dd-btn dd-btn-primary" style="margin-top:1rem;" onclick="openModal('addDesignModal')"><i class="fa-solid fa-plus"></i>Add Resource</button>
+                    </div>
+                    {% endif %}
+                </div>
+
+                {# ── Team Shared ── #}
+                <div>
+                    <h5 style="font-weight:700;margin-bottom:0.75rem;"><i class="fa-solid fa-users" style="margin-right:0.5rem;color:var(--dd-text-muted);"></i>Team Shared</h5>
+                    {% if team_resources %}
+                    <div class="dd-grid-3">
+                        {% for res in team_resources %}
+                        <div class="dd-card dd-resource-card">
+                            <div class="dd-resource-icon">
+                                {% if res.file %}
+                                    {% with ext=res.file.name|slice:"-3:" %}
+                                    {% if ext == ".psd" or ext == ".ai" or ext == ".ind" %}
+                                    <i class="fa-solid fa-palette" style="color:#31a8ff;"></i>
+                                    {% elif ext == ".pdf" %}
+                                    <i class="fa-solid fa-file-pdf" style="color:#ef4444;"></i>
+                                    {% elif ext == ".zip" or ext == ".rar" %}
+                                    <i class="fa-solid fa-file-zipper" style="color:#f59e0b;"></i>
+                                    {% elif ext == ".svg" or ext == ".png" or ext == ".jpg" or ext == "peg" %}
+                                    <i class="fa-solid fa-file-image" style="color:#8b5cf6;"></i>
+                                    {% elif ext == ".otf" or ext == ".ttf" or ext == ".woff" %}
+                                    <i class="fa-solid fa-font" style="color:#06b6d4;"></i>
+                                    {% else %}
+                                    <i class="fa-solid fa-file" style="color:#6b7280;"></i>
+                                    {% endif %}
+                                    {% endwith %}
+                                {% elif res.url %}
+                                <i class="fa-solid fa-arrow-up-right-from-square" style="color:#818cf8;"></i>
+                                {% else %}
+                                <i class="fa-solid fa-cube" style="color:#6b7280;"></i>
+                                {% endif %}
+                            </div>
+                            <div class="dd-resource-body">
+                                <div class="dd-resource-header">
+                                    <div class="dd-resource-title">{{ res.title }}</div>
+                                    <span class="dd-tag dd-tag-sm dd-tag-data">{{ res.get_shared_level_display }}</span>
+                                </div>
+                                {% if res.description %}
+                                <p class="dd-resource-desc">{{ res.description|truncatechars:90 }}</p>
+                                {% endif %}
+                                <div class="dd-resource-meta">
+                                    <span><i class="fa-solid fa-tag"></i>{{ res.get_category_display }}</span>
+                                    {% if res.file %}
+                                    <span><i class="fa-solid fa-download"></i>{{ res.download_count }}</span>
+                                    {% endif %}
+                                    <span><i class="fa-solid fa-clock"></i>{{ res.created_at|date:"M j" }}</span>
+                                </div>
+                                {% if res.tags %}
+                                <div class="dd-resource-tags">
+                                    {% for tag in res.tags|slice:":3" %}
+                                    <span class="dd-tag">{{ tag }}</span>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="dd-resource-actions">
+                                {% if res.file %}
+                                <a href="{{ res.file.url }}" class="dd-btn dd-btn-primary dd-btn-sm" download onclick="event.stopPropagation()"><i class="fa-solid fa-download"></i></a>
+                                {% endif %}
+                                {% if res.url %}
+                                <a href="{{ res.url }}" class="dd-btn dd-btn-ghost dd-btn-sm" target="_blank" rel="noopener" onclick="event.stopPropagation()"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="dd-empty" style="padding:2rem 1rem;">
+                        <i class="fa-solid fa-users"></i>
+                        <p>No team resources shared yet</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            {# ── Templates Tab ── #}
+            {% if tab == 'templates' %}
+            <div class="dd-tab-content active">
+
+                {# ── My Templates ── #}
+                <div style="margin-bottom:2rem;">
+                    <h5 style="font-weight:700;margin-bottom:0.75rem;"><i class="fa-solid fa-user" style="margin-right:0.5rem;color:var(--dd-text-muted);"></i>My Templates</h5>
+                    {% if my_templates %}
+                    <div class="dd-grid-3">
+                        {% for tpl in my_templates %}
+                        <div class="dd-card" style="padding:1.25rem;">
+                            <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:0.5rem;">
+                                <div style="font-weight:700;font-size:0.9rem;color:var(--dd-text);">{{ tpl.name }}</div>
+                                <span class="dd-tag dd-tag-sm dd-tag-automation">{{ tpl.get_category_display }}</span>
+                            </div>
+                            <div style="font-size:0.75rem;color:var(--dd-text-muted);margin-bottom:0.5rem;">{{ tpl.subject }}</div>
+                            <div style="display:flex;align-items:center;gap:1rem;margin-top:auto;padding-top:0.75rem;border-top:1px solid var(--dd-border);">
+                                <span style="font-size:0.7rem;color:var(--dd-text-muted);"><i class="fa-solid fa-arrow-up" style="margin-right:0.25rem;"></i>{{ tpl.use_count }} use{{ tpl.use_count|pluralize }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="dd-empty" style="padding:2rem 1rem;">
+                        <i class="fa-solid fa-file-lines"></i>
+                        <p>No templates yet</p>
+                        <button class="dd-btn dd-btn-primary" style="margin-top:1rem;" onclick="openModal('addDesignModal')"><i class="fa-solid fa-plus"></i>Create Template</button>
+                    </div>
+                    {% endif %}
+                </div>
+
+                {# ── Team Templates ── #}
+                <div>
+                    <h5 style="font-weight:700;margin-bottom:0.75rem;"><i class="fa-solid fa-users" style="margin-right:0.5rem;color:var(--dd-text-muted);"></i>Team Templates</h5>
+                    {% if shared_templates %}
+                    <div class="dd-grid-3">
+                        {% for tpl in shared_templates %}
+                        <div class="dd-card" style="padding:1.25rem;">
+                            <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:0.5rem;">
+                                <div style="font-weight:700;font-size:0.9rem;color:var(--dd-text);">{{ tpl.name }}</div>
+                                <span class="dd-tag dd-tag-sm dd-tag-data">{{ tpl.get_category_display }}</span>
+                            </div>
+                            <div style="font-size:0.75rem;color:var(--dd-text-muted);margin-bottom:0.25rem;">{{ tpl.subject }}</div>
+                            <div style="font-size:0.7rem;color:var(--dd-text-muted);"><i class="fa-solid fa-user" style="margin-right:0.25rem;"></i>{{ tpl.owner.get_full_name|default:tpl.owner.username }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="dd-empty" style="padding:2rem 1rem;">
+                        <i class="fa-solid fa-users"></i>
+                        <p>No team templates shared yet</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+</div>
+
+{# ── Add Design Modal ── #}
+<div class="dd-modal-overlay" id="addDesignModal" style="display:none;" onclick="if(event.target===this)closeModal('addDesignModal')">
+    <div class="dd-modal">
+        <form method="post" action="{% url 'branding:design_library' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="quick_upload">
+
+            <div class="dd-modal-header">
+                <div class="dd-modal-title">Add Design</div>
+                <button type="button" class="dd-modal-close" onclick="closeModal('addDesignModal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="dd-modal-body">
+                {# ── Title ── #}
+                <div class="dd-panel-field">
+                    <label class="dd-label">Title <span class="dd-required">*</span></label>
+                    <input type="text" name="title" class="dd-input" required placeholder="e.g. Acme Brand Guidelines">
+                </div>
+
+                {# ── File Upload Zone ── #}
+                <div class="dd-panel-field">
+                    <label class="dd-label">File</label>
+                    <div class="dd-drop-zone" id="addDesignDropZone">
+                        <div class="dd-drop-placeholder" id="addDesignDropPlaceholder">
+                            <div class="dd-drop-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+                            <div class="dd-drop-text">Drop a file here or <span class="dd-drop-browse">browse</span></div>
+                            <div class="dd-drop-hint">PSD, AI, PDF, ZIP, images, fonts, or any file</div>
+                        </div>
+                        <div class="dd-drop-preview" id="addDesignDropPreview" style="display:none;">
+                            <div class="dd-drop-preview-icon" id="addDesignPreviewIcon"><i class="fa-solid fa-file"></i></div>
+                            <div class="dd-drop-preview-info">
+                                <div class="dd-drop-preview-name" id="addDesignPreviewName"></div>
+                                <div class="dd-drop-preview-size" id="addDesignPreviewSize"></div>
+                            </div>
+                            <button type="button" class="dd-drop-preview-remove" id="addDesignRemoveFile"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                    </div>
+                    <input type="file" name="file" id="addDesignFileInput" class="d-none">
+                </div>
+
+                {# ── URL Input ── #}
+                <div class="dd-panel-field">
+                    <label class="dd-label">Or paste a URL</label>
+                    <input type="url" name="url" class="dd-input" placeholder="https://dribbble.com/shots/...">
+                </div>
+
+                {# ── Category ── #}
+                <div class="dd-panel-field">
+                    <label class="dd-label">Category</label>
+                    <select name="category" class="dd-input">
+                        <option value="">Select category...</option>
+                        {% for value, label in categories %}
+                        <option value="{{ value }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                {# ── Visibility ── #}
+                <div class="dd-panel-field">
+                    <label class="dd-label">Visibility</label>
+                    <select name="visibility" class="dd-input">
+                        <option value="personal">Personal</option>
+                        <option value="team">Team</option>
+                        <option value="collection">Collection</option>
+                    </select>
+                </div>
+
+                {# ── Collection ── #}
+                <div class="dd-panel-field">
+                    <label class="dd-label">Collection</label>
+                    <select name="collection_id" class="dd-input">
+                        <option value="">No collection</option>
+                        {% for col in designer_collections %}
+                        <option value="{{ col.pk }}">{{ col.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                {# ── Description ── #}
+                <div class="dd-panel-field">
+                    <label class="dd-label">Description</label>
+                    <textarea name="description" class="dd-input" rows="3" placeholder="Describe this design asset..."></textarea>
+                </div>
+
+                {# ── Tags ── #}
+                <div class="dd-panel-field">
+                    <label class="dd-label">Tags</label>
+                    <div class="dd-tag-input-wrap" id="addDesignTagInputWrap">
+                        <div class="dd-tag-chips" id="addDesignTagChips"></div>
+                        <input type="text" class="dd-input dd-tag-field" id="addDesignTagInput" placeholder="Type and press Enter...">
+                    </div>
+                    <input type="hidden" name="tags" id="addDesignTagsHidden" value="">
+                </div>
+
+                {# ── Color Hex ── #}
+                <div class="dd-panel-field">
+                    <label class="dd-label">Color Hex</label>
+                    <div style="display:flex;align-items:center;gap:0.75rem;">
+                        <input type="color" name="color_hex" value="#6366f1" style="width:40px;height:40px;border:none;border-radius:8px;cursor:pointer;background:transparent;">
+                        <input type="text" name="color_hex_text" class="dd-input" placeholder="#6366f1" style="flex:1;">
+                    </div>
+                </div>
+
+                {# ── Font Name ── #}
+                <div class="dd-panel-field">
+                    <label class="dd-label">Font Name</label>
+                    <input type="text" name="font_name" class="dd-input" placeholder="e.g. Inter, Montserrat, Fira Code">
+                </div>
+            </div>
+
+            <div class="dd-modal-footer">
+                <button type="button" class="dd-btn dd-btn-ghost" onclick="closeModal('addDesignModal')">Cancel</button>
+                <button type="submit" class="dd-btn dd-btn-primary"><i class="fa-solid fa-plus"></i>Add Design</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{# ── Create Collection Modal ── #}
+{# ── Create Collection Panel ── #}
+<div class="dd-slide-panel" id="createCollectionPanel">
+    <div class="dd-panel-topbar">
+        <div class="dd-panel-topbar-title">Create Collection</div>
+        <button type="button" class="dd-modal-close" onclick="closePanel('createCollectionPanel')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <form method="post" action="{% url 'branding:design_library' %}" id="createCollectionForm" style="display:flex;flex-direction:column;height:100%;overflow:hidden;" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="create_collection">
+        <input type="hidden" name="style_tags" id="ccTagsHidden">
+        <input type="hidden" name="color_palette" id="ccPaletteHidden">
+        <input type="hidden" name="fonts" id="ccFontsHidden">
+
+        <div class="dd-panel-scroll">
+            {# ── Industry Presets ── #}
+            <div>
+                <label class="dd-label" style="margin-bottom:0.5rem;">Quick Start</label>
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;" id="ccPresets">
+                    <button type="button" class="cc-preset" data-industry="Technology" data-color="#3b82f6" data-tags="modern,minimalist,tech">
+                        <i class="fa-solid fa-microchip"></i><span>Technology</span>
+                    </button>
+                    <button type="button" class="cc-preset" data-industry="Healthcare" data-color="#10b981" data-tags="clean,trustworthy,professional">
+                        <i class="fa-solid fa-heart-pulse"></i><span>Healthcare</span>
+                    </button>
+                    <button type="button" class="cc-preset" data-industry="Food & Beverage" data-color="#f59e0b" data-tags="warm,appetizing,organic">
+                        <i class="fa-solid fa-utensils"></i><span>Food</span>
+                    </button>
+                    <button type="button" class="cc-preset" data-industry="Finance" data-color="#1e40af" data-tags="professional,trustworthy,corporate">
+                        <i class="fa-solid fa-chart-line"></i><span>Finance</span>
+                    </button>
+                    <button type="button" class="cc-preset" data-industry="Fashion" data-color="#ec4899" data-tags="elegant,luxury,trendy">
+                        <i class="fa-solid fa-shirt"></i><span>Fashion</span>
+                    </button>
+                    <button type="button" class="cc-preset" data-industry="Education" data-color="#8b5cf6" data-tags="friendly,accessible,playful">
+                        <i class="fa-solid fa-graduation-cap"></i><span>Education</span>
+                    </button>
+                </div>
+            </div>
+
+            {# ── Name ── #}
+            <div class="dd-panel-field">
+                <label class="dd-label">Collection Name <span class="dd-required">*</span></label>
+                <input type="text" name="name" id="ccName" class="dd-input" required placeholder="e.g. Acme Corp Brand Identity">
+            </div>
+
+            {# ── Industry + Client row ── #}
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+                <div class="dd-panel-field">
+                    <label class="dd-label">Industry</label>
+                    <input type="text" name="industry" id="ccIndustry" class="dd-input" placeholder="e.g. Technology">
+                </div>
+                <div class="dd-panel-field">
+                    <label class="dd-label">Client</label>
+                    <input type="text" name="client_name" id="ccClient" class="dd-input" placeholder="e.g. Acme Corp">
+                </div>
+            </div>
+
+            {# ── Description ── #}
+            <div class="dd-panel-field">
+                <label class="dd-label">Description</label>
+                <textarea name="description" id="ccDesc" class="dd-input" rows="2" placeholder="Describe this brand collection..."></textarea>
+            </div>
+
+            {# ── Accent Color ── #}
+            <div class="dd-panel-field">
+                <label class="dd-label">Accent Color</label>
+                <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;" id="ccColorSwatches">
+                    <button type="button" class="cc-swatch" data-color="#6366f1" style="background:#6366f1;" title="Indigo"></button>
+                    <button type="button" class="cc-swatch" data-color="#3b82f6" style="background:#3b82f6;" title="Blue"></button>
+                    <button type="button" class="cc-swatch" data-color="#10b981" style="background:#10b981;" title="Green"></button>
+                    <button type="button" class="cc-swatch" data-color="#f59e0b" style="background:#f59e0b;" title="Amber"></button>
+                    <button type="button" class="cc-swatch" data-color="#ef4444" style="background:#ef4444;" title="Red"></button>
+                    <button type="button" class="cc-swatch" data-color="#ec4899" style="background:#ec4899;" title="Pink"></button>
+                    <button type="button" class="cc-swatch" data-color="#8b5cf6" style="background:#8b5cf6;" title="Violet"></button>
+                    <button type="button" class="cc-swatch" data-color="#14b8a6" style="background:#14b8a6;" title="Teal"></button>
+                    <button type="button" class="cc-swatch" data-color="#64748b" style="background:#64748b;" title="Slate"></button>
+                    <button type="button" class="cc-swatch" data-color="#f97316" style="background:#f97316;" title="Orange"></button>
+                    <input type="color" name="accent_color" id="ccAccentColor" value="#6366f1" style="width:32px;height:32px;border:none;padding:0;cursor:pointer;border-radius:6px;" title="Custom color">
+                </div>
+            </div>
+
+            {# ── Style Tags ── #}
+            <div class="dd-panel-field">
+                <label class="dd-label">Style Tags</label>
+                <div class="dd-tag-input-wrap">
+                    <div class="dd-tag-chips" id="ccTagChips"></div>
+                    <input type="text" class="dd-input" id="ccTagInput" placeholder="Type and press Enter...">
+                </div>
+            </div>
+
+            {# ── Color Palette ── #}
+            <div class="dd-panel-field">
+                <label class="dd-label">Color Palette <span class="dd-hint">(brand colors)</span></label>
+                <div id="ccPaletteInputs" style="display:flex;flex-direction:column;gap:0.5rem;"></div>
+                <button type="button" class="dd-btn dd-btn-ghost dd-btn-sm" style="margin-top:0.5rem;" onclick="addCcPaletteColor()"><i class="fa-solid fa-plus"></i>Add Color</button>
+            </div>
+
+            {# ── Typography ── #}
+            <div class="dd-panel-field">
+                <label class="dd-label">Typography <span class="dd-hint">(font names)</span></label>
+                <div id="ccFontInputs" style="display:flex;flex-direction:column;gap:0.5rem;"></div>
+                <button type="button" class="dd-btn dd-btn-ghost dd-btn-sm" style="margin-top:0.5rem;" onclick="addCcFont()"><i class="fa-solid fa-plus"></i>Add Font</button>
+            </div>
+
+            {# ── Preview Images ── #}
+            <div class="dd-panel-field">
+                <label class="dd-label">Preview Images <span class="dd-hint">(visual kit for clients)</span></label>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;" id="ccImageGrid">
+                    <label class="cc-image-upload" data-key="preview_image">
+                        <input type="file" name="preview_image" accept="image/*" class="d-none" onchange="ccPreviewImg(this)">
+                        <div class="cc-image-slot"><i class="fa-solid fa-image"></i><span>Cover</span></div>
+                    </label>
+                    <label class="cc-image-upload" data-key="logo_image">
+                        <input type="file" name="logo_image" accept="image/*" class="d-none" onchange="ccPreviewImg(this)">
+                        <div class="cc-image-slot"><i class="fa-solid fa-shapes"></i><span>Logo</span></div>
+                    </label>
+                    <label class="cc-image-upload" data-key="hero_image">
+                        <input type="file" name="hero_image" accept="image/*" class="d-none" onchange="ccPreviewImg(this)">
+                        <div class="cc-image-slot"><i class="fa-solid fa-image"></i><span>Hero</span></div>
+                    </label>
+                    <label class="cc-image-upload" data-key="business_card_image">
+                        <input type="file" name="business_card_image" accept="image/*" class="d-none" onchange="ccPreviewImg(this)">
+                        <div class="cc-image-slot"><i class="fa-solid fa-id-card"></i><span>Business Card</span></div>
+                    </label>
+                    <label class="cc-image-upload" data-key="typography_image">
+                        <input type="file" name="typography_image" accept="image/*" class="d-none" onchange="ccPreviewImg(this)">
+                        <div class="cc-image-slot"><i class="fa-solid fa-font"></i><span>Typography</span></div>
+                    </label>
+                    <label class="cc-image-upload" data-key="presentation_image">
+                        <input type="file" name="presentation_image" accept="image/*" class="d-none" onchange="ccPreviewImg(this)">
+                        <div class="cc-image-slot"><i class="fa-solid fa-file-powerpoint"></i><span>Presentation</span></div>
+                    </label>
+                    <label class="cc-image-upload" data-key="letterhead_image">
+                        <input type="file" name="letterhead_image" accept="image/*" class="d-none" onchange="ccPreviewImg(this)">
+                        <div class="cc-image-slot"><i class="fa-solid fa-envelope-open-text"></i><span>Letterhead</span></div>
+                    </label>
+                    <label class="cc-image-upload" data-key="social_media_image">
+                        <input type="file" name="social_media_image" accept="image/*" class="d-none" onchange="ccPreviewImg(this)">
+                        <div class="cc-image-slot"><i class="fa-solid fa-hashtag"></i><span>Social Media</span></div>
+                    </label>
+                    <label class="cc-image-upload" data-key="email_signature_image">
+                        <input type="file" name="email_signature_image" accept="image/*" class="d-none" onchange="ccPreviewImg(this)">
+                        <div class="cc-image-slot"><i class="fa-solid fa-envelope"></i><span>Email Sig</span></div>
+                    </label>
+                    <label class="cc-image-upload" data-key="brand_guidelines_image">
+                        <input type="file" name="brand_guidelines_image" accept="image/*" class="d-none" onchange="ccPreviewImg(this)">
+                        <div class="cc-image-slot"><i class="fa-solid fa-book-open"></i><span>Guidelines</span></div>
+                    </label>
+                </div>
+            </div>
+
+            {# ── Live Preview ── #}
+            <div class="dd-panel-field">
+                <label class="dd-label">Preview</label>
+                <div class="dd-card dd-collection-card" id="ccPreview" style="pointer-events:none;border-left:3px solid #6366f1;">
+                    <div class="dd-collection-header">
+                        <div class="dd-collection-icon" style="background:rgba(99,102,241,0.1);color:#6366f1;">
+                            <i class="fa-solid fa-layer-group"></i>
+                        </div>
+                        <div>
+                            <div class="dd-collection-name" id="ccPreviewName">Collection Name</div>
+                            <div class="dd-collection-meta" id="ccPreviewIndustry" style="display:none;"></div>
+                        </div>
+                    </div>
+                    <p class="dd-collection-desc" id="ccPreviewDesc" style="display:none;"></p>
+                    <div class="dd-collection-footer">
+                        <span class="dd-collection-count"><i class="fa-solid fa-cube"></i> 0 assets</span>
+                    </div>
+                    <div class="dd-collection-tags" id="ccPreviewTags" style="display:none;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div style="padding:1rem 1.25rem;border-top:1px solid #e5e7eb;display:flex;gap:0.75rem;justify-content:flex-end;flex-shrink:0;">
+            <button type="button" class="dd-btn dd-btn-ghost" onclick="closePanel('createCollectionPanel')">Cancel</button>
+            <button type="submit" class="dd-btn dd-btn-primary"><i class="fa-solid fa-plus"></i>Create Collection</button>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var sidebar = document.getElementById('ddSidebar');
+    var overlay = document.getElementById('ddSidebarOverlay');
+    var toggle = document.getElementById('ddSidebarToggle');
+    if (toggle) toggle.addEventListener('click', function() { sidebar.classList.toggle('open'); overlay.classList.toggle('show'); });
+    if (overlay) overlay.addEventListener('click', function() { sidebar.classList.remove('open'); overlay.classList.remove('show'); });
+
+    var dropZone = document.getElementById('addDesignDropZone');
+    var fileInput = document.getElementById('addDesignFileInput');
+    var dropPlaceholder = document.getElementById('addDesignDropPlaceholder');
+    var dropPreview = document.getElementById('addDesignDropPreview');
+    var previewIcon = document.getElementById('addDesignPreviewIcon');
+    var previewName = document.getElementById('addDesignPreviewName');
+    var previewSize = document.getElementById('addDesignPreviewSize');
+    var removeFile = document.getElementById('addDesignRemoveFile');
+    var tagInput = document.getElementById('addDesignTagInput');
+    var tagChips = document.getElementById('addDesignTagChips');
+    var tagsHidden = document.getElementById('addDesignTagsHidden');
+    var tags = [];
+
+    var FILE_ICONS = {
+        'psd': 'fa-brands fa-photoshop', 'ai': 'fa-solid fa-wand-magic-sparkles',
+        'ind': 'fa-solid fa-file-lines', 'pdf': 'fa-solid fa-file-pdf',
+        'zip': 'fa-solid fa-file-zipper', 'rar': 'fa-solid fa-file-zipper',
+        'svg': 'fa-solid fa-bezier-curve', 'png': 'fa-solid fa-file-image',
+        'jpg': 'fa-solid fa-file-image', 'jpeg': 'fa-solid fa-file-image',
+        'gif': 'fa-solid fa-file-image', 'webp': 'fa-solid fa-file-image',
+        'otf': 'fa-solid fa-font', 'ttf': 'fa-solid fa-font', 'woff': 'fa-solid fa-font',
+        'fig': 'fa-brands fa-figma', 'sketch': 'fa-brands fa-sketch',
+        'xd': 'fa-solid fa-pen-ruler', 'mp4': 'fa-solid fa-film',
+        'mp3': 'fa-solid fa-music', 'csv': 'fa-solid fa-file-csv',
+        'xlsx': 'fa-solid fa-file-excel', 'docx': 'fa-solid fa-file-word',
+        'pptx': 'fa-solid fa-file-powerpoint',
+    };
+    var FILE_COLORS = {
+        'psd': '#0078d4', 'ai': '#ff6600', 'ind': '#ff3366', 'pdf': '#ef4444',
+        'zip': '#d97706', 'rar': '#d97706', 'svg': '#7c3aed', 'png': '#7c3aed',
+        'jpg': '#7c3aed', 'jpeg': '#7c3aed', 'gif': '#7c3aed', 'webp': '#7c3aed',
+        'otf': '#0891b2', 'ttf': '#0891b2', 'woff': '#0891b2',
+        'fig': '#a259ff', 'sketch': '#f59e0b', 'xd': '#ff61f6',
+    };
+
+    function formatSize(bytes) {
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+        return (bytes / 1048576).toFixed(1) + ' MB';
+    }
+
+    function getFileExt(name) { return name.split('.').pop().toLowerCase(); }
+
+    function autoDetect(name, size) {
+        var ext = getFileExt(name);
+        var iconClass = FILE_ICONS[ext] || 'fa-solid fa-file';
+        var color = FILE_COLORS[ext] || '#6b7280';
+        previewIcon.innerHTML = '<i class="' + iconClass + '" style="color:' + color + '"></i>';
+        previewName.textContent = name;
+        previewSize.textContent = formatSize(size);
+        dropPlaceholder.style.display = 'none';
+        dropPreview.style.display = 'flex';
+    }
+
+    if (dropZone) {
+        dropZone.addEventListener('click', function(e) { if (e.target.closest('.dd-drop-preview-remove')) return; fileInput.click(); });
+        dropZone.addEventListener('dragover', function(e) { e.preventDefault(); dropZone.classList.add('dd-drop-dragover'); });
+        dropZone.addEventListener('dragleave', function() { dropZone.classList.remove('dd-drop-dragover'); });
+        dropZone.addEventListener('drop', function(e) {
+            e.preventDefault(); dropZone.classList.remove('dd-drop-dragover');
+            if (e.dataTransfer.files.length) { fileInput.files = e.dataTransfer.files; autoDetect(e.dataTransfer.files[0].name, e.dataTransfer.files[0].size); }
+        });
+    }
+    if (fileInput) {
+        fileInput.addEventListener('change', function() { if (this.files && this.files[0]) autoDetect(this.files[0].name, this.files[0].size); });
+    }
+    if (removeFile) {
+        removeFile.addEventListener('click', function(e) {
+            e.stopPropagation(); fileInput.value = '';
+            dropPlaceholder.style.display = ''; dropPreview.style.display = 'none';
+        });
+    }
+
+    if (tagInput) {
+        tagInput.addEventListener('keydown', function(e) {
+            if ((e.key === 'Enter' || e.key === ',') && this.value.trim()) {
+                e.preventDefault();
+                var val = this.value.trim().replace(/,/g, '');
+                if (val && tags.indexOf(val) === -1) { tags.push(val); renderTags(); }
+                this.value = '';
+            }
+            if (e.key === 'Backspace' && !this.value && tags.length) { tags.pop(); renderTags(); }
+        });
+    }
+    function renderTags() {
+        tagChips.innerHTML = tags.map(function(t, i) {
+            return '<span class="dd-tag-chip">' + t + '<button type="button" data-i="' + i + '">&times;</button></span>';
+        }).join('');
+        tagsHidden.value = tags.join(',');
+        tagChips.querySelectorAll('button').forEach(function(b) {
+            b.addEventListener('click', function() { tags.splice(parseInt(this.dataset.i), 1); renderTags(); });
+        });
+    }
+});
+
+function openModal(id) {
+    var el = document.getElementById(id);
+    if (el) { el.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+}
+function closeModal(id) {
+    var el = document.getElementById(id);
+    if (el) { el.style.display = 'none'; document.body.style.overflow = ''; }
+}
+function openPanel(id) {
+    var el = document.getElementById(id);
+    if (el) { el.classList.add('open'); document.body.style.overflow = 'hidden'; }
+}
+function closePanel(id) {
+    var el = document.getElementById(id);
+    if (el) { el.classList.remove('open'); document.body.style.overflow = ''; }
+}
+
+/* ── Create Collection Panel ─────────────────────────────────── */
+(function() {
+    var ccTags = [];
+    var ccPalette = [];
+    var ccFonts = [];
+
+    /* Presets */
+    document.querySelectorAll('.cc-preset').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.cc-preset').forEach(function(b) { b.classList.remove('selected'); });
+            btn.classList.add('selected');
+            var industry = btn.dataset.industry;
+            var color = btn.dataset.color;
+            var tags = btn.dataset.tags;
+            document.getElementById('ccIndustry').value = industry;
+            document.getElementById('ccAccentColor').value = color;
+            document.querySelectorAll('.cc-swatch').forEach(function(s) {
+                s.classList.toggle('selected', s.dataset.color === color);
+            });
+            document.querySelector('#createCollectionForm .dd-collection-card').style.borderLeftColor = color;
+            document.querySelector('#createCollectionForm .dd-collection-icon').style.background = color + '20';
+            document.querySelector('#createCollectionForm .dd-collection-icon').style.color = color;
+            /* Set tags */
+            ccTags = tags.split(',');
+            renderCcTags();
+            updateCcPreview();
+        });
+    });
+
+    /* Swatches */
+    document.querySelectorAll('.cc-swatch').forEach(function(s) {
+        s.addEventListener('click', function() {
+            document.querySelectorAll('.cc-swatch').forEach(function(b) { b.classList.remove('selected'); });
+            s.classList.add('selected');
+            document.getElementById('ccAccentColor').value = s.dataset.color;
+            updateCcAccentColor(s.dataset.color);
+        });
+    });
+    document.getElementById('ccAccentColor').addEventListener('input', function() {
+        document.querySelectorAll('.cc-swatch').forEach(function(b) { b.classList.remove('selected'); });
+        updateCcAccentColor(this.value);
+    });
+
+    function updateCcAccentColor(color) {
+        document.querySelector('#createCollectionForm .dd-collection-card').style.borderLeftColor = color;
+        document.querySelector('#createCollectionForm .dd-collection-icon').style.background = color + '20';
+        document.querySelector('#createCollectionForm .dd-collection-icon').style.color = color;
+        document.getElementById('ccPreviewTags').querySelectorAll('.dd-tag').forEach(function(t) {
+            t.style.background = color + '15';
+            t.style.color = color;
+        });
+    }
+
+    /* Tags */
+    var ccTagInput = document.getElementById('ccTagInput');
+    var ccTagChips = document.getElementById('ccTagChips');
+    ccTagInput.addEventListener('keydown', function(e) {
+        if ((e.key === 'Enter' || e.key === ',') && this.value.trim()) {
+            e.preventDefault();
+            var val = this.value.trim().replace(/,/g, '');
+            if (val && ccTags.indexOf(val) === -1) { ccTags.push(val); renderCcTags(); }
+            this.value = '';
+        }
+        if (e.key === 'Backspace' && !this.value && ccTags.length) { ccTags.pop(); renderCcTags(); }
+    });
+    function renderCcTags() {
+        ccTagChips.innerHTML = ccTags.map(function(t, i) {
+            return '<span class="dd-tag-chip">' + t + '<button type="button" data-i="' + i + '">&times;</button></span>';
+        }).join('');
+        document.getElementById('ccTagsHidden').value = ccTags.join(',');
+        ccTagChips.querySelectorAll('button').forEach(function(b) {
+            b.addEventListener('click', function() { ccTags.splice(parseInt(this.dataset.i), 1); renderCcTags(); updateCcPreview(); });
+        });
+        updateCcPreview();
+    }
+
+    /* Palette */
+    window.addCcPaletteColor = function(color) {
+        color = color || '#6366f1';
+        ccPalette.push(color);
+        renderCcPalette();
+    };
+    function renderCcPalette() {
+        var container = document.getElementById('ccPaletteInputs');
+        container.innerHTML = ccPalette.map(function(c, i) {
+            return '<div class="cc-palette-row">' +
+                '<input type="color" value="' + c + '" data-i="' + i + '" onchange="ccPaletteUpdate(' + i + ',this.value)">' +
+                '<input type="text" class="dd-input" value="' + c + '" data-i="' + i + '" onchange="ccPaletteUpdate(' + i + ',this.value)" placeholder="#000000">' +
+                '<button type="button" class="cc-palette-remove" onclick="ccPaletteRemove(' + i + ')"><i class="fa-solid fa-xmark"></i></button>' +
+            '</div>';
+        }).join('');
+        document.getElementById('ccPaletteHidden').value = ccPalette.join('\n');
+    }
+    window.ccPaletteUpdate = function(i, val) {
+        ccPalette[i] = val;
+        renderCcPalette();
+    };
+    window.ccPaletteRemove = function(i) {
+        ccPalette.splice(i, 1);
+        renderCcPalette();
+    };
+    /* Start with 1 palette slot */
+    addCcPaletteColor('#6366f1');
+
+    /* Fonts */
+    window.addCcFont = function(name) {
+        name = name || '';
+        ccFonts.push(name);
+        renderCcFonts();
+    };
+    function renderCcFonts() {
+        var container = document.getElementById('ccFontInputs');
+        container.innerHTML = ccFonts.map(function(f, i) {
+            return '<div class="cc-font-row">' +
+                '<input type="text" class="dd-input" value="' + f + '" data-i="' + i + '" onchange="ccFontUpdate(' + i + ',this.value)" placeholder="e.g. Inter, Montserrat">' +
+                '<button type="button" class="cc-font-remove" onclick="ccFontRemove(' + i + ')"><i class="fa-solid fa-xmark"></i></button>' +
+            '</div>';
+        }).join('');
+        document.getElementById('ccFontsHidden').value = ccFonts.filter(function(f){return f;}).join('\n');
+    }
+    window.ccFontUpdate = function(i, val) {
+        ccFonts[i] = val;
+        document.getElementById('ccFontsHidden').value = ccFonts.filter(function(f){return f;}).join('\n');
+    };
+    window.ccFontRemove = function(i) {
+        ccFonts.splice(i, 1);
+        renderCcFonts();
+    };
+    /* Start with 1 font slot */
+    addCcFont();
+
+    /* Image Preview */
+    window.ccPreviewImg = function(input) {
+        var label = input.closest('.cc-image-upload');
+        var slot = label.querySelector('.cc-image-slot');
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                slot.innerHTML = '<img src="' + e.target.result + '" alt="Preview"><button type="button" class="cc-image-remove" onclick="ccRemoveImg(event,this)"><i class="fa-solid fa-xmark"></i></button>';
+                label.classList.add('has-image');
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    };
+    window.ccRemoveImg = function(e, btn) {
+        e.preventDefault(); e.stopPropagation();
+        var label = btn.closest('.cc-image-upload');
+        var input = label.querySelector('input[type="file"]');
+        var slot = label.querySelector('.cc-image-slot');
+        var key = label.dataset.key;
+        var icons = {
+            'preview_image': 'fa-image', 'logo_image': 'fa-shapes', 'hero_image': 'fa-image',
+            'business_card_image': 'fa-id-card', 'typography_image': 'fa-font',
+            'presentation_image': 'fa-file-powerpoint', 'letterhead_image': 'fa-envelope-open-text',
+            'social_media_image': 'fa-hashtag', 'email_signature_image': 'fa-envelope',
+            'brand_guidelines_image': 'fa-book-open'
+        };
+        var labels = {
+            'preview_image': 'Cover', 'logo_image': 'Logo', 'hero_image': 'Hero',
+            'business_card_image': 'Business Card', 'typography_image': 'Typography',
+            'presentation_image': 'Presentation', 'letterhead_image': 'Letterhead',
+            'social_media_image': 'Social Media', 'email_signature_image': 'Email Sig',
+            'brand_guidelines_image': 'Guidelines'
+        };
+        slot.innerHTML = '<i class="fa-solid ' + (icons[key]||'fa-image') + '"></i><span>' + (labels[key]||'Image') + '</span>';
+        label.classList.remove('has-image');
+        input.value = '';
+    };
+
+    /* Live Preview */
+    var ccName = document.getElementById('ccName');
+    var ccIndustry = document.getElementById('ccIndustry');
+    var ccDesc = document.getElementById('ccDesc');
+    ccName.addEventListener('input', updateCcPreview);
+    ccIndustry.addEventListener('input', updateCcPreview);
+    ccDesc.addEventListener('input', updateCcPreview);
+
+    function updateCcPreview() {
+        var name = ccName.value.trim() || 'Collection Name';
+        var industry = ccIndustry.value.trim();
+        var desc = ccDesc.value.trim();
+        document.getElementById('ccPreviewName').textContent = name;
+        var indEl = document.getElementById('ccPreviewIndustry');
+        if (industry) { indEl.textContent = industry; indEl.style.display = ''; } else { indEl.style.display = 'none'; }
+        var descEl = document.getElementById('ccPreviewDesc');
+        if (desc) { descEl.textContent = desc; descEl.style.display = ''; } else { descEl.style.display = 'none'; }
+        var tagsEl = document.getElementById('ccPreviewTags');
+        if (ccTags.length) {
+            tagsEl.innerHTML = ccTags.slice(0, 4).map(function(t) { return '<span class="dd-tag">' + t + '</span>'; }).join('');
+            tagsEl.style.display = '';
+        } else {
+            tagsEl.style.display = 'none';
+        }
+    }
+})();
+</script>
+{% endblock %}

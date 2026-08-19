@@ -1,224 +1,444 @@
 {% extends "branding/base.html" %}
-{% load branding_extras %}
 
-{% block title %}Design Resources{% endblock %}
+{% block title %}Design Resources | Designer{% endblock %}
 
 {% block branding_content %}
-<div class="container-fluid py-4">
-
-  {# ── Header ── #}
-  <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
-    <div>
-      <h1 class="h4 fw-bold mb-1"><i class="fa-solid fa-book-open me-2"></i>Design Resources</h1>
-      <p class="text-muted mb-0 small">Shared and personal design assets for the team</p>
-    </div>
-    <div class="d-flex gap-2 flex-wrap">
-      <a href="{% url 'branding:designer_dashboard' %}" class="btn btn-sm btn-outline-secondary">
-        <i class="fa-solid fa-arrow-left me-1"></i>Dashboard
-      </a>
-      <button class="btn btn-sm btn-brand-primary" data-bs-toggle="collapse" data-bs-target="#addResourceForm" aria-expanded="false">
-        <i class="fa-solid fa-plus me-1"></i>Add Resource
-      </button>
-    </div>
-  </div>
-
-  <nav aria-label="breadcrumb" class="mb-3">
-    <ol class="breadcrumb small">
-      <li class="breadcrumb-item"><a href="{% url 'branding:designer_dashboard' %}">Dashboard</a></li>
-      <li class="breadcrumb-item active" aria-current="page">Design Resources</li>
-    </ol>
-  </nav>
-
-  {# ── Add Resource Form (collapsed) ── #}
-  <div class="collapse mb-4" id="addResourceForm">
-    <div class="card border-0 shadow-sm">
-      <div class="card-header bg-white">
-        <h6 class="mb-0 fw-bold"><i class="fa-solid fa-cloud-arrow-up me-1"></i>Add New Resource</h6>
-      </div>
-      <div class="card-body">
-        <form method="post" action="{{ request.path }}" enctype="multipart/form-data">
-          {% csrf_token %}
-          <input type="hidden" name="action" value="add_resource">
-
-          <div class="row g-3">
-            <div class="col-md-6">
-              <label for="res-title" class="form-label small fw-semibold">Title *</label>
-              <input type="text" class="form-control form-control-sm" id="res-title" name="title" required placeholder="e.g. Brand Logo Pack">
+<style>body{background:#f5f5f7!important;}body .branding-page{background:#f5f5f7;padding:0!important;margin:0!important;}body .branding-header,body .branding-footer,body footer{display:none!important;}</style>
+<script>document.body.classList.add('dd-active');document.documentElement.setAttribute('data-dd-theme',window.localStorage.getItem('dd-theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'));</script>
+<div class="dd-layout">
+    <aside class="dd-sidebar" id="ddSidebar">
+        <a class="dd-sidebar-logo" href="{% url 'branding:designer_dashboard' %}">
+            <span class="dd-sidebar-logo-icon"><i class="fa-solid fa-palette"></i></span>
+            <span>
+                <span class="dd-sidebar-logo-text">Branding Studio</span>
+                <span class="dd-sidebar-logo-sub">Designer</span>
+            </span>
+        </a>
+        <nav class="dd-sidebar-nav">
+            <div class="dd-sidebar-section">
+                <div class="dd-sidebar-section-title">Dashboard</div>
+                <a href="{% url 'branding:designer_dashboard' %}" class="dd-nav-item"><i class="fa-solid fa-gauge-high"></i>Overview</a>
+                <a href="{% url 'branding:showcase' %}" class="dd-nav-item"><i class="fa-solid fa-trophy"></i>Showcase</a>
             </div>
-            <div class="col-md-6">
-              <label for="res-category" class="form-label small fw-semibold">Category</label>
-              <select class="form-select form-select-sm" id="res-category" name="category">
+            <div class="dd-sidebar-section">
+                <div class="dd-sidebar-section-title">Design Library</div>
+                <a href="{% url 'branding:design_library' %}" class="dd-nav-item"><i class="fa-solid fa-book-open"></i>Library</a>
+                <a href="{% url 'branding:design_library' %}?tab=collections" class="dd-nav-item"><i class="fa-solid fa-layer-group"></i>My Collections</a>
+                <a href="{% url 'branding:design_library' %}?tab=resources" class="dd-nav-item active"><i class="fa-solid fa-cube"></i>Resources</a>
+                <a href="{% url 'branding:design_library' %}?tab=templates" class="dd-nav-item"><i class="fa-solid fa-file-lines"></i>Templates</a>
+            </div>
+            <div class="dd-sidebar-section">
+                <div class="dd-sidebar-section-title">Workspace</div>
+                <a href="{% url 'branding:my_requests' %}" class="dd-nav-item"><i class="fa-solid fa-folder-open"></i>My Projects</a>
+                <a href="{% url 'branding:kanban' %}" class="dd-nav-item"><i class="fa-solid fa-table-columns"></i>Board</a>
+                <a href="{% url 'branding:workflow_dashboard' %}" class="dd-nav-item"><i class="fa-solid fa-pen-ruler"></i>Workflow</a>
+            </div>
+            <div class="dd-sidebar-section">
+                <div class="dd-sidebar-section-title">Collaboration</div>
+                <a href="{% url 'branding:feedback_list' %}" class="dd-nav-item"><i class="fa-solid fa-message"></i>Feedback</a>
+            </div>
+        </nav>
+        <div class="dd-sidebar-user">
+            <div class="dd-sidebar-avatar">{{ user.username|slice:":1"|upper }}</div>
+            <div class="dd-sidebar-user-info">
+                <div class="dd-sidebar-user-name">{{ user.get_full_name|default:user.username }}</div>
+                <div class="dd-sidebar-user-role">Designer</div>
+            </div>
+        </div>
+    </aside>
+    <div class="dd-sidebar-overlay" id="ddSidebarOverlay"></div>
+
+    <main class="dd-main">
+        <header class="dd-topbar">
+            <div class="dd-topbar-left">
+                <button class="dd-sidebar-toggle" id="ddSidebarToggle"><i class="fa-solid fa-bars"></i></button>
+                <div>
+                    <div class="dd-topbar-title">Design Resources</div>
+                    <div class="dd-topbar-subtitle">{{ total_count }} resource{{ total_count|pluralize }} &middot; {{ total_downloads }} download{{ total_downloads|pluralize }}</div>
+                </div>
+            </div>
+            <div class="dd-topbar-right">
+                <button class="dd-btn dd-btn-primary" onclick="openPanel()"><i class="fa-solid fa-plus"></i>Add Resource</button>
+            </div>
+        </header>
+
+        <div class="dd-content">
+            {% if messages %}
+            {% for msg in messages %}
+            <div class="dd-alert dd-alert-{{ msg.tags }}">{{ msg }}</div>
+            {% endfor %}
+            {% endif %}
+
+            {# ── Metrics ── #}
+            <div class="dd-metrics dd-metrics-3" style="margin-bottom:1.5rem;">
+                <div class="dd-metric">
+                    <div class="dd-metric-icon mi-active"><i class="fa-solid fa-cube"></i></div>
+                    <div class="dd-metric-value">{{ total_count }}</div>
+                    <div class="dd-metric-label">Total Resources</div>
+                </div>
+                <div class="dd-metric">
+                    <div class="dd-metric-icon mi-next"><i class="fa-solid fa-user"></i></div>
+                    <div class="dd-metric-value">{{ mine_count }}</div>
+                    <div class="dd-metric-label">Personal</div>
+                </div>
+                <div class="dd-metric">
+                    <div class="dd-metric-icon mi-today"><i class="fa-solid fa-users"></i></div>
+                    <div class="dd-metric-value">{{ team_count }}</div>
+                    <div class="dd-metric-label">Team Shared</div>
+                </div>
+            </div>
+
+            {# ── Search + Filters ── #}
+            <form method="get" class="dd-search-bar" style="margin-bottom:1rem;">
+                <input type="text" name="q" value="{{ search_query }}" placeholder="Search resources by name, description, or tags..." class="dd-input">
+                <button type="submit" class="dd-btn dd-btn-ghost"><i class="fa-solid fa-search"></i></button>
+            </form>
+
+            <div class="dd-filter-row" style="margin-bottom:1rem;">
+                <a href="?{% if search_query %}q={{ search_query }}&{% endif %}{% if category_filter %}category={{ category_filter }}&{% endif %}" class="dd-filter {% if not visibility %}active{% endif %}">All</a>
+                <a href="?vis=personal{% if search_query %}&q={{ search_query }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}" class="dd-filter {% if visibility == 'personal' %}active{% endif %}"><i class="fa-solid fa-user" style="margin-right:4px;"></i>Personal</a>
+                <a href="?vis=team{% if search_query %}&q={{ search_query }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}" class="dd-filter {% if visibility == 'team' %}active{% endif %}"><i class="fa-solid fa-users" style="margin-right:4px;"></i>Team</a>
+                <a href="?vis=collection{% if search_query %}&q={{ search_query }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}" class="dd-filter {% if visibility == 'collection' %}active{% endif %}"><i class="fa-solid fa-layer-group" style="margin-right:4px;"></i>Collection</a>
+            </div>
+
+            <div class="dd-filter-row" style="margin-bottom:1.5rem;">
+                <a href="?{% if search_query %}q={{ search_query }}&{% endif %}{% if visibility %}vis={{ visibility }}&{% endif %}" class="dd-filter {% if not category_filter %}active{% endif %}">All Categories</a>
                 {% for val, label in categories %}
-                <option value="{{ val }}">{{ label }}</option>
+                <a href="?category={{ val }}{% if search_query %}&q={{ search_query }}{% endif %}{% if visibility %}&vis={{ visibility }}{% endif %}" class="dd-filter {% if category_filter == val %}active{% endif %}">{{ label }}</a>
                 {% endfor %}
-              </select>
             </div>
-            <div class="col-md-6">
-              <label for="res-description" class="form-label small fw-semibold">Description</label>
-              <textarea class="form-control form-control-sm" id="res-description" name="description" rows="2" placeholder="Brief description of this resource..."></textarea>
-            </div>
-            <div class="col-md-6">
-              <label for="res-shared-level" class="form-label small fw-semibold">Visibility</label>
-              <select class="form-select form-select-sm" id="res-shared-level" name="shared_level">
-                <option value="personal">Personal</option>
-                <option value="team">Team Shared</option>
-                <option value="collection">Collection-Specific</option>
-              </select>
-            </div>
-            <div class="col-md-6">
-              <label for="res-url" class="form-label small fw-semibold">URL (optional)</label>
-              <input type="url" class="form-control form-control-sm" id="res-url" name="url" placeholder="https://...">
-            </div>
-            <div class="col-md-6">
-              <label for="res-file" class="form-label small fw-semibold">File Upload</label>
-              <input type="file" class="form-control form-control-sm" id="res-file" name="file">
-            </div>
-            <div class="col-md-6">
-              <label for="res-tags" class="form-label small fw-semibold">Tags (comma-separated)</label>
-              <input type="text" class="form-control form-control-sm" id="res-tags" name="tags" placeholder="e.g. logo, branding, vector">
-            </div>
-            <div class="col-md-6">
-              <label for="res-collection" class="form-label small fw-semibold">Collection (optional)</label>
-              <select class="form-select form-select-sm" id="res-collection" name="collection_id">
-                <option value="">— None —</option>
-                {% for col in collections %}
-                <option value="{{ col.pk }}">{{ col.name }}</option>
+
+            {# ── Resource Grid ── #}
+            {% if resources %}
+            <div class="dd-grid-3">
+                {% for res in resources %}
+                <div class="dd-card dd-resource-card">
+                    <div class="dd-resource-icon">
+                        {% if res.file %}
+                            {% with ext=res.file.name|slice:"-3:" %}
+                            {% if ext == ".psd" or ext == ".ai" or ext == ".ind" %}
+                            <i class="fa-solid fa-palette" style="color:#31a8ff;"></i>
+                            {% elif ext == ".pdf" %}
+                            <i class="fa-solid fa-file-pdf" style="color:#ef4444;"></i>
+                            {% elif ext == ".zip" or ext == ".rar" %}
+                            <i class="fa-solid fa-file-zipper" style="color:#f59e0b;"></i>
+                            {% elif ext == ".svg" or ext == ".png" or ext == ".jpg" or ext == "peg" %}
+                            <i class="fa-solid fa-file-image" style="color:#8b5cf6;"></i>
+                            {% elif ext == ".otf" or ext == ".ttf" or ext == ".woff" %}
+                            <i class="fa-solid fa-font" style="color:#06b6d4;"></i>
+                            {% else %}
+                            <i class="fa-solid fa-file" style="color:#6b7280;"></i>
+                            {% endif %}
+                            {% endwith %}
+                        {% elif res.url %}
+                        <i class="fa-solid fa-arrow-up-right-from-square" style="color:#818cf8;"></i>
+                        {% else %}
+                        <i class="fa-solid fa-cube" style="color:#6b7280;"></i>
+                        {% endif %}
+                    </div>
+                    <div class="dd-resource-body">
+                        <div class="dd-resource-header">
+                            <div class="dd-resource-title">{{ res.title }}</div>
+                            <span class="dd-tag dd-tag-sm {% if res.shared_level == 'team' %}dd-tag-data{% elif res.shared_level == 'collection' %}dd-tag-integration{% else %}dd-tag-automation{% endif %}">{{ res.get_shared_level_display }}</span>
+                        </div>
+                        {% if res.description %}
+                        <p class="dd-resource-desc">{{ res.description|truncatechars:90 }}</p>
+                        {% endif %}
+                        <div class="dd-resource-meta">
+                            <span><i class="fa-solid fa-tag"></i>{{ res.get_category_display }}</span>
+                            {% if res.file %}
+                            <span><i class="fa-solid fa-download"></i>{{ res.download_count }}</span>
+                            {% endif %}
+                            <span><i class="fa-solid fa-clock"></i>{{ res.created_at|date:"M j" }}</span>
+                        </div>
+                        {% if res.tags %}
+                        <div class="dd-resource-tags">
+                            {% for tag in res.tags|slice:":3" %}
+                            <span class="dd-tag">{{ tag }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="dd-resource-actions">
+                        {% if res.file %}
+                        <a href="{{ res.file.url }}" class="dd-btn dd-btn-primary dd-btn-sm" download onclick="event.stopPropagation()"><i class="fa-solid fa-download"></i></a>
+                        {% endif %}
+                        {% if res.url %}
+                        <a href="{{ res.url }}" class="dd-btn dd-btn-ghost dd-btn-sm" target="_blank" rel="noopener" onclick="event.stopPropagation()"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                        {% endif %}
+                        {% if res.owner == user %}
+                        <form method="post" action="{% url 'branding:designer_resources' %}" class="d-inline" onsubmit="return confirm('Delete this resource?')">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="delete_resource">
+                            <input type="hidden" name="resource_id" value="{{ res.pk }}">
+                            <button type="submit" class="dd-btn dd-btn-ghost dd-btn-sm dd-btn-danger" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
                 {% endfor %}
-              </select>
             </div>
-          </div>
-
-          <div class="mt-3">
-            <button type="submit" class="btn btn-sm btn-primary">
-              <i class="fa-solid fa-plus me-1"></i>Add Resource
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  {# ── Category Filter ── #}
-  <div class="d-flex flex-wrap gap-2 mb-4">
-    <a href="{{ request.path }}" class="btn btn-sm rounded-pill {% if not category_filter %}btn-primary{% else %}btn-outline-secondary{% endif %}">
-      All
-    </a>
-    {% for val, label in categories %}
-    <a href="{{ request.path }}?category={{ val }}" class="btn btn-sm rounded-pill {% if category_filter == val %}btn-primary{% else %}btn-outline-secondary{% endif %}">
-      {{ label }}
-    </a>
-    {% endfor %}
-  </div>
-
-  {# ── My Resources ── #}
-  <section class="mb-5">
-    <div class="d-flex align-items-center justify-content-between mb-3">
-      <h5 class="fw-bold mb-0"><i class="fa-solid fa-user me-1 text-primary"></i>My Resources</h5>
-      <span class="badge bg-primary rounded-pill">{{ mine|length }}</span>
-    </div>
-    {% if mine %}
-    <div class="row g-3">
-      {% for res in mine %}
-      <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-        <div class="card h-100 border-0 shadow-sm resource-card">
-          <div class="card-body d-flex flex-column">
-            <div class="d-flex align-items-start justify-content-between mb-2">
-              <h6 class="card-title fw-bold mb-0 text-truncate" title="{{ res.title }}">{{ res.title }}</h6>
-              <span class="badge bg-light text-dark text-uppercase fw-semibold small">{{ res.get_category_display }}</span>
-            </div>
-            {% if res.description %}
-            <p class="card-text text-muted small flex-grow-1">{{ res.description|truncatechars:100 }}</p>
             {% else %}
-            <p class="card-text text-muted small flex-grow-1 fst-italic">No description</p>
+            <div class="dd-empty">
+                <i class="fa-solid fa-book"></i>
+                <p>No resources found{% if search_query %} for "{{ search_query }}"{% endif %}</p>
+                <button class="dd-btn dd-btn-primary" style="margin-top:1rem;" onclick="openPanel()"><i class="fa-solid fa-plus"></i>Add Resource</button>
+            </div>
             {% endif %}
-            <div class="d-flex flex-wrap gap-1 mb-2">
-              {% for tag in res.tags %}
-              <span class="badge bg-secondary bg-opacity-10 text-secondary small">{{ tag }}</span>
-              {% endfor %}
-            </div>
-            <div class="d-flex align-items-center justify-content-between text-muted x-small mt-auto pt-2 border-top">
-              <span><i class="fa-solid fa-download me-1"></i>{{ res.download_count }}</span>
-              <span><i class="fa-solid fa-user me-1"></i>{{ res.owner.get_full_name|default:res.owner.username }}</span>
-            </div>
-            <div class="d-flex gap-1 mt-2">
-              {% if res.file %}
-              <a href="{{ res.file.url }}" class="btn btn-sm btn-outline-primary flex-grow-1" download>
-                <i class="fa-solid fa-download me-1"></i>Download
-              </a>
-              {% endif %}
-              {% if res.url %}
-              <a href="{{ res.url }}" class="btn btn-sm btn-outline-secondary" target="_blank" rel="noopener" title="Open external link">
-                <i class="fa-solid fa-arrow-up-right-from-square"></i>
-              </a>
-              {% endif %}
-            </div>
-          </div>
         </div>
-      </div>
-      {% endfor %}
-    </div>
-    {% else %}
-    <div class="text-center text-muted py-5">
-      <i class="fa-solid fa-inbox fa-2x mb-2 d-block"></i>
-      <p class="small mb-0">No personal resources yet. Add one above!</p>
-    </div>
-    {% endif %}
-  </section>
-
-  {# ── Team Shared Resources ── #}
-  <section class="mb-4">
-    <div class="d-flex align-items-center justify-content-between mb-3">
-      <h5 class="fw-bold mb-0"><i class="fa-solid fa-users me-1 text-success"></i>Team Shared Resources</h5>
-      <span class="badge bg-success rounded-pill">{{ shared|length }}</span>
-    </div>
-    {% if shared %}
-    <div class="row g-3">
-      {% for res in shared %}
-      <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-        <div class="card h-100 border-0 shadow-sm resource-card">
-          <div class="card-body d-flex flex-column">
-            <div class="d-flex align-items-start justify-content-between mb-2">
-              <h6 class="card-title fw-bold mb-0 text-truncate" title="{{ res.title }}">{{ res.title }}</h6>
-              <span class="badge bg-light text-dark text-uppercase fw-semibold small">{{ res.get_category_display }}</span>
-            </div>
-            {% if res.description %}
-            <p class="card-text text-muted small flex-grow-1">{{ res.description|truncatechars:100 }}</p>
-            {% else %}
-            <p class="card-text text-muted small flex-grow-1 fst-italic">No description</p>
-            {% endif %}
-            <div class="d-flex flex-wrap gap-1 mb-2">
-              {% for tag in res.tags %}
-              <span class="badge bg-secondary bg-opacity-10 text-secondary small">{{ tag }}</span>
-              {% endfor %}
-            </div>
-            <div class="d-flex align-items-center justify-content-between text-muted x-small mt-auto pt-2 border-top">
-              <span><i class="fa-solid fa-download me-1"></i>{{ res.download_count }}</span>
-              <span><i class="fa-solid fa-user me-1"></i>{{ res.owner.get_full_name|default:res.owner.username }}</span>
-            </div>
-            <div class="d-flex gap-1 mt-2">
-              {% if res.file %}
-              <a href="{{ res.file.url }}" class="btn btn-sm btn-outline-primary flex-grow-1" download>
-                <i class="fa-solid fa-download me-1"></i>Download
-              </a>
-              {% endif %}
-              {% if res.url %}
-              <a href="{{ res.url }}" class="btn btn-sm btn-outline-secondary" target="_blank" rel="noopener" title="Open external link">
-                <i class="fa-solid fa-arrow-up-right-from-square"></i>
-              </a>
-              {% endif %}
-            </div>
-          </div>
-        </div>
-      </div>
-      {% endfor %}
-    </div>
-    {% else %}
-    <div class="text-center text-muted py-5">
-      <i class="fa-solid fa-inbox fa-2x mb-2 d-block"></i>
-      <p class="small mb-0">No shared resources available{% if category_filter %} for this category{% endif %}.</p>
-    </div>
-    {% endif %}
-  </section>
-
+    </main>
 </div>
+
+{# ── Add Resource Panel ── #}
+<div class="dd-panel-overlay" id="addPanel" style="display:none;" onclick="if(event.target===this)closePanel()"></div>
+<div class="dd-slide-panel" id="addPanelSlide">
+    <form method="post" action="{% url 'branding:designer_resources' %}" enctype="multipart/form-data" id="addResourceForm">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="add_resource">
+
+        <div class="dd-panel-topbar">
+            <button type="button" class="dd-btn dd-btn-ghost dd-btn-sm" onclick="closePanel()"><i class="fa-solid fa-arrow-left"></i></button>
+            <div class="dd-panel-topbar-title">Add Resource</div>
+            <button type="submit" class="dd-btn dd-btn-primary dd-btn-sm" id="submitBtn"><i class="fa-solid fa-check"></i>Save</button>
+        </div>
+
+        <div class="dd-panel-scroll">
+            {# ── Drop Zone ── #}
+            <div class="dd-drop-zone" id="dropZone">
+                <div class="dd-drop-placeholder" id="dropPlaceholder">
+                    <div class="dd-drop-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+                    <div class="dd-drop-text">Drop a file here or <span class="dd-drop-browse">browse</span></div>
+                    <div class="dd-drop-hint">PSD, AI, PDF, ZIP, images, fonts, or any file</div>
+                </div>
+                <div class="dd-drop-preview" id="dropPreview" style="display:none;">
+                    <div class="dd-drop-preview-icon" id="previewIcon"><i class="fa-solid fa-file"></i></div>
+                    <div class="dd-drop-preview-info">
+                        <div class="dd-drop-preview-name" id="previewName"></div>
+                        <div class="dd-drop-preview-size" id="previewSize"></div>
+                    </div>
+                    <button type="button" class="dd-drop-preview-remove" id="removeFile"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+            </div>
+            <input type="file" name="file" id="fileInput" class="d-none">
+
+            {# ── URL Input (alternative) ─}
+            <div class="dd-panel-section">
+                <div class="dd-panel-section-header" onclick="toggleSection('urlSection')">
+                    <span><i class="fa-solid fa-link"></i>Or paste a link</span>
+                    <i class="fa-solid fa-chevron-down dd-panel-chevron" id="urlSectionChevron"></i>
+                </div>
+                <div class="dd-panel-section-body" id="urlSection" style="display:none;">
+                    <input type="url" name="url" class="dd-input" placeholder="https://dribbble.com/shots/..." id="urlInput">
+                </div>
+            </div>
+
+            {# ── Title ── #}
+            <div class="dd-panel-field">
+                <label class="dd-label">Title <span class="dd-required">*</span></label>
+                <input type="text" name="title" class="dd-input" required placeholder="e.g. Acme Brand Guidelines" id="titleInput">
+            </div>
+
+            {# ── Category (visual cards) ── #}
+            <div class="dd-panel-field">
+                <label class="dd-label">Category</label>
+                <div class="dd-category-grid" id="categoryGrid">
+                    <label class="dd-cat-card"><input type="radio" name="category" value="template" class="d-none"><div class="dd-cat-inner"><i class="fa-solid fa-file-lines"></i><span>Template</span></div></label>
+                    <label class="dd-cat-card"><input type="radio" name="category" value="asset" class="d-none"><div class="dd-cat-inner"><i class="fa-solid fa-cube"></i><span>Asset</span></div></label>
+                    <label class="dd-cat-card"><input type="radio" name="category" value="style_guide" class="d-none"><div class="dd-cat-inner"><i class="fa-solid fa-book"></i><span>Style Guide</span></div></label>
+                    <label class="dd-cat-card"><input type="radio" name="category" value="font" class="d-none"><div class="dd-cat-inner"><i class="fa-solid fa-font"></i><span>Font</span></div></label>
+                    <label class="dd-cat-card"><input type="radio" name="category" value="color_palette" class="d-none"><div class="dd-cat-inner"><i class="fa-solid fa-droplet"></i><span>Colors</span></div></label>
+                    <label class="dd-cat-card"><input type="radio" name="category" value="icon" class="d-none"><div class="dd-cat-inner"><i class="fa-solid fa-icons"></i><span>Icons</span></div></label>
+                    <label class="dd-cat-card"><input type="radio" name="category" value="mockup" class="d-none"><div class="dd-cat-inner"><i class="fa-solid fa-mobile-screen"></i><span>Mockup</span></div></label>
+                    <label class="dd-cat-card"><input type="radio" name="category" value="photo" class="d-none"><div class="dd-cat-inner"><i class="fa-solid fa-camera"></i><span>Photo</span></div></label>
+                    <label class="dd-cat-card"><input type="radio" name="category" value="illustration" class="d-none"><div class="dd-cat-inner"><i class="fa-solid fa-pen-nib"></i><span>Illustration</span></div></label>
+                    <label class="dd-cat-card"><input type="radio" name="category" value="document" class="d-none"><div class="dd-cat-inner"><i class="fa-solid fa-file-alt"></i><span>Document</span></div></label>
+                    <label class="dd-cat-card" data-default><input type="radio" name="category" value="other" class="d-none" checked><div class="dd-cat-inner"><i class="fa-solid fa-ellipsis"></i><span>Other</span></div></label>
+                </div>
+            </div>
+
+            {# ── Description ── #}
+            <div class="dd-panel-field">
+                <label class="dd-label">Description</label>
+                <textarea name="description" class="dd-input" rows="2" placeholder="What is this resource for?" id="descInput"></textarea>
+            </div>
+
+            {# ── Tags ── #}
+            <div class="dd-panel-field">
+                <label class="dd-label">Tags</label>
+                <div class="dd-tag-input-wrap" id="tagInputWrap">
+                    <div class="dd-tag-chips" id="tagChips"></div>
+                    <input type="text" name="tags" class="dd-input dd-tag-field" id="tagInput" placeholder="Type and press Enter...">
+                </div>
+                <input type="hidden" name="tags" id="tagsHidden" value="">
+            </div>
+
+            {# ── Visibility + Collection ── #}
+            <div class="dd-panel-field">
+                <label class="dd-label">Visibility</label>
+                <div class="dd-vis-options">
+                    <label class="dd-vis-card"><input type="radio" name="shared_level" value="personal" class="d-none" checked><div class="dd-vis-inner"><i class="fa-solid fa-user"></i><div><strong>Personal</strong><span>Only you</span></div></div></label>
+                    <label class="dd-vis-card"><input type="radio" name="shared_level" value="team" class="d-none"><div class="dd-vis-inner"><i class="fa-solid fa-users"></i><div><strong>Team</strong><span>Everyone</span></div></div></label>
+                    <label class="dd-vis-card"><input type="radio" name="shared_level" value="collection" class="d-none"><div class="dd-vis-inner"><i class="fa-solid fa-layer-group"></i><div><strong>Collection</strong><span>Specific</span></div></div></label>
+                </div>
+            </div>
+
+            <div class="dd-panel-field" id="collectionField" style="display:none;">
+                <label class="dd-label">Collection</label>
+                <select name="collection_id" class="dd-input">
+                    <option value="">Select a collection...</option>
+                    {% for col in collections %}
+                    <option value="{{ col.pk }}">{{ col.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var sidebar = document.getElementById('ddSidebar');
+    var overlay = document.getElementById('ddSidebarOverlay');
+    var toggle = document.getElementById('ddSidebarToggle');
+    if (toggle) toggle.addEventListener('click', function() { sidebar.classList.toggle('open'); overlay.classList.toggle('show'); });
+    if (overlay) overlay.addEventListener('click', function() { sidebar.classList.remove('open'); overlay.classList.remove('show'); });
+
+    var dropZone = document.getElementById('dropZone');
+    var fileInput = document.getElementById('fileInput');
+    var dropPlaceholder = document.getElementById('dropPlaceholder');
+    var dropPreview = document.getElementById('dropPreview');
+    var previewIcon = document.getElementById('previewIcon');
+    var previewName = document.getElementById('previewName');
+    var previewSize = document.getElementById('previewSize');
+    var removeFile = document.getElementById('removeFile');
+    var titleInput = document.getElementById('titleInput');
+    var tagInput = document.getElementById('tagInput');
+    var tagChips = document.getElementById('tagChips');
+    var tagsHidden = document.getElementById('tagsHidden');
+    var tags = [];
+
+    var FILE_ICONS = {
+        'psd': 'fa-brands fa-photoshop', 'ai': 'fa-solid fa-wand-magic-sparkles',
+        'ind': 'fa-solid fa-file-lines', 'pdf': 'fa-solid fa-file-pdf',
+        'zip': 'fa-solid fa-file-zipper', 'rar': 'fa-solid fa-file-zipper',
+        'svg': 'fa-solid fa-bezier-curve', 'png': 'fa-solid fa-file-image',
+        'jpg': 'fa-solid fa-file-image', 'jpeg': 'fa-solid fa-file-image',
+        'gif': 'fa-solid fa-file-image', 'webp': 'fa-solid fa-file-image',
+        'otf': 'fa-solid fa-font', 'ttf': 'fa-solid fa-font', 'woff': 'fa-solid fa-font',
+        'fig': 'fa-brands fa-figma', 'sketch': 'fa-brands fa-sketch',
+        'xd': 'fa-solid fa-pen-ruler', 'mp4': 'fa-solid fa-film',
+        'mp3': 'fa-solid fa-music', 'csv': 'fa-solid fa-file-csv',
+        'xlsx': 'fa-solid fa-file-excel', 'docx': 'fa-solid fa-file-word',
+        'pptx': 'fa-solid fa-file-powerpoint',
+    };
+    var FILE_COLORS = {
+        'psd': '#0078d4', 'ai': '#ff6600', 'ind': '#ff3366', 'pdf': '#ef4444',
+        'zip': '#d97706', 'rar': '#d97706', 'svg': '#7c3aed', 'png': '#7c3aed',
+        'jpg': '#7c3aed', 'jpeg': '#7c3aed', 'gif': '#7c3aed', 'webp': '#7c3aed',
+        'otf': '#0891b2', 'ttf': '#0891b2', 'woff': '#0891b2',
+        'fig': '#a259ff', 'sketch': '#f59e0b', 'xd': '#ff61f6',
+    };
+    var CAT_MAP = {
+        'psd': 'asset', 'ai': 'asset', 'svg': 'asset', 'png': 'asset', 'jpg': 'asset',
+        'jpeg': 'asset', 'gif': 'asset', 'webp': 'asset', 'fig': 'asset', 'sketch': 'asset',
+        'otf': 'font', 'ttf': 'font', 'woff': 'font',
+        'pdf': 'document', 'docx': 'document', 'csv': 'document', 'xlsx': 'document',
+        'zip': 'asset', 'rar': 'asset',
+    };
+
+    function formatSize(bytes) {
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+        return (bytes / 1048576).toFixed(1) + ' MB';
+    }
+
+    function getFileExt(name) { return name.split('.').pop().toLowerCase(); }
+
+    function autoDetect(name, size) {
+        var ext = getFileExt(name);
+        if (!titleInput.value || titleInput.value === titleInput.dataset.autofilled) {
+            var pretty = name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ').replace(/\b\w/g, function(c) { return c.toUpperCase(); });
+            titleInput.value = pretty;
+            titleInput.dataset.autofilled = pretty;
+        }
+        if (CAT_MAP[ext]) {
+            var radio = document.querySelector('.dd-cat-card input[value="' + CAT_MAP[ext] + '"]');
+            if (radio) { radio.checked = true; updateCatStyles(); }
+        }
+        var iconClass = FILE_ICONS[ext] || 'fa-solid fa-file';
+        var color = FILE_COLORS[ext] || '#6b7280';
+        previewIcon.innerHTML = '<i class="' + iconClass + '" style="color:' + color + '"></i>';
+        previewName.textContent = name;
+        previewSize.textContent = formatSize(size);
+        dropPlaceholder.style.display = 'none';
+        dropPreview.style.display = 'flex';
+    }
+
+    if (dropZone) {
+        dropZone.addEventListener('click', function(e) { if (e.target.closest('.dd-drop-preview-remove')) return; fileInput.click(); });
+        dropZone.addEventListener('dragover', function(e) { e.preventDefault(); dropZone.classList.add('dd-drop-dragover'); });
+        dropZone.addEventListener('dragleave', function() { dropZone.classList.remove('dd-drop-dragover'); });
+        dropZone.addEventListener('drop', function(e) {
+            e.preventDefault(); dropZone.classList.remove('dd-drop-dragover');
+            if (e.dataTransfer.files.length) { fileInput.files = e.dataTransfer.files; autoDetect(e.dataTransfer.files[0].name, e.dataTransfer.files[0].size); }
+        });
+    }
+    if (fileInput) {
+        fileInput.addEventListener('change', function() { if (this.files && this.files[0]) autoDetect(this.files[0].name, this.files[0].size); });
+    }
+    if (removeFile) {
+        removeFile.addEventListener('click', function(e) {
+            e.stopPropagation(); fileInput.value = '';
+            dropPlaceholder.style.display = ''; dropPreview.style.display = 'none';
+        });
+    }
+
+    function updateCatStyles() {
+        document.querySelectorAll('.dd-cat-card').forEach(function(c) {
+            c.classList.toggle('active', c.querySelector('input').checked);
+        });
+    }
+    document.querySelectorAll('.dd-cat-card input').forEach(function(r) { r.addEventListener('change', updateCatStyles); });
+    updateCatStyles();
+
+    function updateVisStyles() {
+        document.querySelectorAll('.dd-vis-card').forEach(function(c) {
+            c.classList.toggle('active', c.querySelector('input').checked);
+        });
+        var sel = document.querySelector('.dd-vis-card input:checked');
+        document.getElementById('collectionField').style.display = (sel && sel.value === 'collection') ? '' : 'none';
+    }
+    document.querySelectorAll('.dd-vis-card input').forEach(function(r) { r.addEventListener('change', updateVisStyles); });
+    updateVisStyles();
+
+    if (tagInput) {
+        tagInput.addEventListener('keydown', function(e) {
+            if ((e.key === 'Enter' || e.key === ',') && this.value.trim()) {
+                e.preventDefault();
+                var val = this.value.trim().replace(/,/g, '');
+                if (val && tags.indexOf(val) === -1) { tags.push(val); renderTags(); }
+                this.value = '';
+            }
+            if (e.key === 'Backspace' && !this.value && tags.length) { tags.pop(); renderTags(); }
+        });
+    }
+    function renderTags() {
+        tagChips.innerHTML = tags.map(function(t, i) {
+            return '<span class="dd-tag-chip">' + t + '<button type="button" data-i="' + i + '">&times;</button></span>';
+        }).join('');
+        tagsHidden.value = tags.join(',');
+        tagChips.querySelectorAll('button').forEach(function(b) {
+            b.addEventListener('click', function() { tags.splice(parseInt(this.dataset.i), 1); renderTags(); });
+        });
+    }
+});
+function toggleSection(id) {
+    var el = document.getElementById(id);
+    var chevron = document.getElementById(id + 'Chevron');
+    if (el.style.display === 'none') { el.style.display = ''; if (chevron) chevron.style.transform = 'rotate(180deg)'; }
+    else { el.style.display = 'none'; if (chevron) chevron.style.transform = ''; }
+}
+function openPanel() { document.getElementById('addPanel').style.display = 'flex'; document.getElementById('addPanelSlide').classList.add('open'); document.body.style.overflow = 'hidden'; }
+function closePanel() { document.getElementById('addPanel').style.display = 'none'; document.getElementById('addPanelSlide').classList.remove('open'); document.body.style.overflow = ''; }
+</script>
 {% endblock %}

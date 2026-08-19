@@ -64,14 +64,119 @@
 
 <!-- Collection preview modal -->
 <div class="modal fade" id="collectionPreviewModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content rounded-5 border-0 overflow-hidden">
             <div class="modal-body p-0" id="collectionPreviewBody"></div>
         </div>
+    </div>
+</div>
+
+<!-- Gallery Modal -->
+<div class="lc-modal-overlay" id="lcGalleryModal" style="display:none;">
+    <div class="lc-modal">
+        <button class="lc-modal-close" id="lcModalClose"><i class="fa-solid fa-xmark"></i></button>
+        <div class="lc-modal-header">
+            <div class="lc-modal-title" id="lcModalTitle"></div>
+            <span class="lc-modal-counter" id="lcModalCounter"></span>
+        </div>
+        <div class="lc-modal-body">
+            <button class="lc-modal-arrow lc-modal-prev" id="lcModalPrev"><i class="fa-solid fa-chevron-left"></i></button>
+            <div class="lc-modal-slide" id="lcModalSlide">
+                <img id="lcModalImg" src="" alt="">
+                <div class="lc-modal-label" id="lcModalLabel"></div>
+            </div>
+            <button class="lc-modal-arrow lc-modal-next" id="lcModalNext"><i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+        <div class="lc-modal-dots" id="lcModalDots"></div>
     </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script src="{% static 'js/branding.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var labels = {
+        hero: 'Hero Image', logo: 'Logo', typography: 'Typography',
+        business_card: 'Business Card', presentation: 'Presentation',
+        letterhead: 'Letterhead', email_signature: 'Email Signature',
+        social_media: 'Social Media', brand_guidelines: 'Brand Guidelines'
+    };
+    var keys = ['hero','logo','typography','business_card','presentation','letterhead','email_signature','social_media','brand_guidelines'];
+
+    document.querySelectorAll('.lc-gallery-next').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var card = btn.closest('.collection-card');
+            if (!card) return;
+            var name = card.dataset.name || '';
+            var accent = card.dataset.color || '#6366f1';
+            var items = [];
+            keys.forEach(function(k) {
+                var dk = k.replace(/_/g, '');
+                var url = card.dataset[dk] || card.dataset[k];
+                if (url && url !== 'undefined') items.push({key: k, url: url});
+            });
+            if (!items.length) return;
+            openGallery(items, name, accent);
+        });
+    });
+
+    var modal = document.getElementById('lcGalleryModal');
+    var modalImg = document.getElementById('lcModalImg');
+    var modalLabel = document.getElementById('lcModalLabel');
+    var modalTitle = document.getElementById('lcModalTitle');
+    var modalCounter = document.getElementById('lcModalCounter');
+    var modalDots = document.getElementById('lcModalDots');
+    var current = 0;
+    var galleryItems = [];
+
+    function openGallery(items, name, accent) {
+        galleryItems = items;
+        current = 0;
+        modalTitle.textContent = name;
+        modalTitle.style.color = accent;
+        renderSlide();
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function renderSlide() {
+        var item = galleryItems[current];
+        modalImg.src = item.url;
+        modalLabel.textContent = labels[item.key] || item.key;
+        modalCounter.textContent = (current + 1) + ' / ' + galleryItems.length;
+        modalDots.innerHTML = '';
+        galleryItems.forEach(function(it, i) {
+            var dot = document.createElement('span');
+            dot.className = 'lc-dot' + (i === current ? ' active' : '');
+            dot.addEventListener('click', function() { current = i; renderSlide(); });
+            modalDots.appendChild(dot);
+        });
+    }
+
+    document.getElementById('lcModalPrev').addEventListener('click', function() {
+        current = (current - 1 + galleryItems.length) % galleryItems.length;
+        renderSlide();
+    });
+    document.getElementById('lcModalNext').addEventListener('click', function() {
+        current = (current + 1) % galleryItems.length;
+        renderSlide();
+    });
+    document.getElementById('lcModalClose').addEventListener('click', function() {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+    });
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) { modal.style.display = 'none'; document.body.style.overflow = ''; }
+    });
+    document.addEventListener('keydown', function(e) {
+        if (modal.style.display !== 'flex') return;
+        if (e.key === 'ArrowLeft') { current = (current - 1 + galleryItems.length) % galleryItems.length; renderSlide(); }
+        if (e.key === 'ArrowRight') { current = (current + 1) % galleryItems.length; renderSlide(); }
+        if (e.key === 'Escape') { modal.style.display = 'none'; document.body.style.overflow = ''; }
+    });
+});
+</script>
 {% endblock %}

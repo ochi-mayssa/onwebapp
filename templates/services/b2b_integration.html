@@ -1,0 +1,1424 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans "B2B Integration" %} | OnWebApp{% endblock %}
+
+{% block meta_description %}{% trans "Seamless, automated B2B integration via API integrations across systems. Break down data barriers and ensure secure, real-time data." %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .b2b-hero {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0c4a6e 100%);
+        padding: 8rem 0 5rem;
+        position: relative;
+        overflow: hidden;
+    }
+    .b2b-hero::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: url('{% static "img/Bk.jpeg" %}') center/cover no-repeat;
+        opacity: .18;
+    }
+    .b2b-hero .container { position: relative; z-index: 2; }
+
+    .b2b-pillars {
+        background: var(--bg-body);
+        padding: 5rem 0;
+    }
+    .b2b-divider {
+        width: 60px;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, #1e40af, transparent);
+        margin: 0 auto 2rem;
+        border-radius: 2px;
+    }
+    .b2b-pillar {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 1.5rem;
+        text-align: center;
+        transition: all .4s;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+    .b2b-pillar::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 3px;
+        background: linear-gradient(90deg, #1e40af, transparent 80%);
+        opacity: 0;
+        transition: opacity .4s;
+    }
+    .b2b-pillar:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 32px rgba(0,0,0,.06);
+        border-color: #1e40af;
+    }
+    .b2b-pillar:hover::before { opacity: 1; }
+    .b2b-pillar-num {
+        position: absolute;
+        top: .75rem;
+        right: .75rem;
+        font-size: .6rem;
+        font-weight: 800;
+        color: var(--text-muted);
+        opacity: .3;
+        letter-spacing: .04em;
+    }
+    .b2b-pillar-icon {
+        width: 44px; height: 44px;
+        border-radius: 12px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        background: rgba(30,64,175,.08);
+        color: #1e40af;
+        margin-bottom: .75rem;
+    }
+    .b2b-pillar h6 { font-weight: 700; font-size: .9rem; margin-bottom: .4rem; }
+    .b2b-pillar p { color: var(--text-muted); font-size: .78rem; line-height: 1.6; margin-bottom: 0; }
+
+    .b2b-overview {
+        background: var(--bg-surface-secondary);
+        padding: 5rem 0;
+    }
+    .b2b-eco-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        padding: 2.5rem 2rem;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+    .b2b-eco-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 50% 50%, rgba(30,64,175,.03), transparent 60%);
+        pointer-events: none;
+    }
+    .b2b-eco-title {
+        text-align: center;
+        font-weight: 800;
+        font-size: .78rem;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        color: var(--text-muted);
+        margin-bottom: 2rem;
+    }
+    .b2b-eco-flow {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .b2b-eco-node {
+        width: 130px;
+        padding: .7rem .5rem;
+        border-radius: 12px;
+        text-align: center;
+        font-size: .72rem;
+        font-weight: 700;
+        border: 1.5px solid var(--border-color);
+        background: var(--bg-surface-secondary);
+        color: var(--text-muted);
+        transition: all .4s;
+        position: relative;
+        z-index: 2;
+        opacity: 0;
+        transform: translateY(12px);
+        animation: ecoIn .5s ease forwards;
+    }
+    .b2b-eco-node:hover {
+        border-color: #1e40af;
+        color: #1e40af;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 24px rgba(30,64,175,.1);
+    }
+    .b2b-eco-node i { display: block; font-size: 1.2rem; margin-bottom: .25rem; color: #1e40af; }
+
+    .b2b-eco-node--center {
+        width: 140px;
+        padding: .85rem .6rem;
+        font-size: .8rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #1e40af, #1e3a8a);
+        border: none;
+        color: #fff;
+        box-shadow: 0 8px 28px rgba(30,64,175,.3);
+    }
+    .b2b-eco-node--center i { color: #fff; }
+    .b2b-eco-node--center:hover {
+        transform: scale(1.06);
+        box-shadow: 0 12px 40px rgba(30,64,175,.4);
+        border-color: transparent;
+        color: #fff;
+    }
+
+    .b2b-eco-arrow {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 36px;
+        position: relative;
+        z-index: 1;
+    }
+    .b2b-eco-arrow-line {
+        width: 2px;
+        flex: 1;
+        background: repeating-linear-gradient(180deg, #1e40af 0 4px, transparent 4px 8px);
+        opacity: .4;
+    }
+    .b2b-eco-arrow-head {
+        font-size: .55rem;
+        color: #1e40af;
+        animation: ecoArrowPulse 1.8s ease-in-out infinite;
+    }
+    @keyframes ecoArrowPulse {
+        0%, 100% { opacity: .3; transform: translateY(0); }
+        50% { opacity: .8; transform: translateY(2px); }
+    }
+
+    .b2b-eco-split {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+    }
+    .b2b-eco-branch {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    @keyframes ecoIn {
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .b2b-eco-flow > .b2b-eco-node:nth-child(1) { animation-delay: .1s; }
+    .b2b-eco-flow > .b2b-eco-node--center { animation-delay: .3s; }
+    .b2b-eco-split .b2b-eco-node { animation-delay: .5s; }
+
+    .b2b-content-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        padding: 2rem;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    .b2b-content-section { flex: 1; }
+    .b2b-content-section h6 {
+        font-weight: 700;
+        font-size: .9rem;
+        display: flex;
+        align-items: center;
+        gap: .4rem;
+        margin-bottom: .6rem;
+    }
+    .b2b-content-section p { color: var(--text-muted); line-height: 1.7; font-size: .88rem; margin-bottom: .6rem; }
+    .b2b-content-section ul { list-style: none; padding: 0; margin: 0; }
+    .b2b-content-section ul li {
+        padding: .35rem 0;
+        font-size: .82rem;
+        color: var(--text-muted);
+        display: flex;
+        align-items: flex-start;
+        gap: .5rem;
+    }
+    .b2b-content-section ul li i { color: #1e40af; margin-top: .15rem; flex-shrink: 0; font-size: .7rem; }
+    .b2b-content-divider {
+        width: 100%;
+        height: 1px;
+        background: var(--border-color);
+        margin: 1.2rem 0;
+    }
+    .b2b-api-flow {
+        display: flex;
+        align-items: center;
+        gap: .4rem;
+        margin-top: .5rem;
+    }
+    .b2b-api-flow-node {
+        padding: .35rem .7rem;
+        border-radius: 8px;
+        font-size: .72rem;
+        font-weight: 700;
+        background: var(--bg-surface-secondary);
+        border: 1px solid var(--border-color);
+        color: var(--text-muted);
+    }
+    .b2b-api-flow-line {
+        width: 20px;
+        height: 2px;
+        background: #1e40af;
+        position: relative;
+    }
+    .b2b-api-flow-line::after {
+        content: '';
+        position: absolute;
+        right: -2px; top: -3px;
+        border: 4px solid transparent;
+        border-left: 5px solid #1e40af;
+    }
+
+    @media (max-width: 991.98px) {
+        .b2b-eco-card { margin-bottom: 1.5rem; }
+    }
+
+    .b2b-visual {
+        background: var(--bg-surface-secondary);
+        padding: 5rem 0;
+    }
+    .b2b-video-section { background: var(--bg-body); padding: 2rem 0; }
+    .b2b-video-wrap {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        overflow: hidden;
+        position: relative;
+        box-shadow: 0 8px 32px rgba(0,0,0,.06);
+    }
+    .b2b-video-wrap::before,
+    .b2b-video-wrap::after {
+        content: '';
+        position: absolute;
+        width: 40px; height: 40px;
+        border: 2px solid #1e40af;
+        z-index: 4;
+        opacity: .35;
+        transition: opacity .4s;
+    }
+    .b2b-video-wrap::before {
+        top: 12px; left: 12px;
+        border-right: none; border-bottom: none;
+        border-radius: 8px 0 0 0;
+    }
+    .b2b-video-wrap::after {
+        bottom: 60px; right: 12px;
+        border-left: none; border-top: none;
+        border-radius: 0 0 8px 0;
+    }
+    .b2b-video-wrap:hover::before,
+    .b2b-video-wrap:hover::after { opacity: .7; }
+    .b2b-video-inner {
+        position: relative;
+        padding-top: 38%;
+        background: linear-gradient(135deg, #0f172a, #1e293b);
+        overflow: hidden;
+    }
+    .b2b-video-inner video,
+    .b2b-video-inner iframe {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
+    .b2b-video-placeholder {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        background: linear-gradient(135deg, rgba(15,23,42,.95), rgba(30,41,59,.95));
+        z-index: 2;
+        transition: opacity .5s;
+    }
+    .b2b-video-placeholder.hidden { opacity: 0; pointer-events: none; }
+    .b2b-video-play {
+        width: 56px; height: 56px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #1e40af, #1e3a8a);
+        border: none;
+        color: #fff;
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 8px 32px rgba(30,64,175,.4);
+        transition: all .35s;
+        position: relative;
+    }
+    .b2b-video-play::before {
+        content: '';
+        position: absolute;
+        inset: -8px;
+        border-radius: 50%;
+        border: 2px solid rgba(30,64,175,.3);
+        animation: vPlayRing 2s ease-in-out infinite;
+    }
+    @keyframes vPlayRing {
+        0%, 100% { transform: scale(.9); opacity: .3; }
+        50% { transform: scale(1.15); opacity: .6; }
+    }
+    .b2b-video-play:hover { transform: scale(1.1); box-shadow: 0 12px 40px rgba(30,64,175,.5); }
+    .b2b-video-play i { margin-left: 3px; }
+    .b2b-video-label {
+        font-size: .85rem;
+        font-weight: 600;
+        color: rgba(255,255,255,.7);
+    }
+    .b2b-video-badge {
+        position: absolute;
+        bottom: 1rem;
+        left: 1rem;
+        display: inline-flex;
+        align-items: center;
+        gap: .4rem;
+        padding: .4rem .8rem;
+        border-radius: 8px;
+        background: rgba(0,0,0,.5);
+        backdrop-filter: blur(8px);
+        font-size: .7rem;
+        font-weight: 600;
+        color: rgba(255,255,255,.8);
+        z-index: 3;
+    }
+    .b2b-video-badge i { color: #1e40af; }
+
+    .b2b-video-meta {
+        padding: .85rem 1.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-top: 1px solid var(--border-color);
+    }
+    .b2b-video-meta-left h6 { font-weight: 700; font-size: .9rem; margin-bottom: .15rem; }
+    .b2b-video-meta-left p { color: var(--text-muted); font-size: .78rem; margin-bottom: 0; }
+    .b2b-video-duration {
+        display: inline-flex;
+        align-items: center;
+        gap: .3rem;
+        padding: .3rem .7rem;
+        border-radius: 6px;
+        font-size: .7rem;
+        font-weight: 600;
+        background: rgba(30,64,175,.08);
+        color: #1e40af;
+    }
+
+    @media (max-width: 767.98px) {
+        .b2b-video-play { width: 40px; height: 40px; font-size: .85rem; }
+        .b2b-video-meta { flex-direction: column; gap: .4rem; text-align: center; }
+        .b2b-video-inner { padding-top: 45%; }
+    }
+    .b2b-api-diagram {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: .6rem;
+        flex-wrap: wrap;
+        margin-top: 2rem;
+        position: relative;
+    }
+    .b2b-api-node {
+        width: 100px; height: 100px;
+        border-radius: 14px;
+        background: var(--bg-surface-secondary);
+        border: 1.5px solid var(--border-color);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: .3rem;
+        transition: all .4s;
+        position: relative;
+        z-index: 2;
+        opacity: 0;
+        transform: scale(.8);
+        animation: apiNodeIn .5s ease forwards;
+    }
+    .b2b-api-node:nth-child(1) { animation-delay: .1s; }
+    .b2b-api-node:nth-child(3) { animation-delay: .2s; }
+    .b2b-api-node:nth-child(7) { animation-delay: .3s; }
+    .b2b-api-node:nth-child(9) { animation-delay: .4s; }
+    @keyframes apiNodeIn {
+        to { opacity: 1; transform: scale(1); }
+    }
+    .b2b-api-node:hover {
+        border-color: #1e40af;
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(30,64,175,.12);
+    }
+    .b2b-api-node i { font-size: 1.3rem; color: #1e40af; }
+    .b2b-api-node span { font-size: .65rem; font-weight: 600; color: var(--text-muted); }
+
+    .b2b-api-arrow {
+        font-size: 1rem;
+        color: #1e40af;
+        opacity: 0;
+        animation: apiArrowIn .4s ease forwards;
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: .15rem;
+    }
+    .b2b-api-arrow-label {
+        font-size: .5rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        color: var(--text-muted);
+        opacity: .5;
+        white-space: nowrap;
+    }
+    .b2b-api-arrow:nth-child(2) { animation-delay: .15s; }
+    .b2b-api-arrow:nth-child(4) { animation-delay: .25s; }
+    .b2b-api-arrow:nth-child(6) { animation-delay: .35s; }
+    .b2b-api-arrow:nth-child(8) { animation-delay: .45s; }
+    @keyframes apiArrowIn {
+        to { opacity: .6; }
+    }
+    .b2b-api-arrow i {
+        animation: apiArrowPulse 1.8s ease-in-out infinite;
+    }
+    @keyframes apiArrowPulse {
+        0%, 100% { opacity: .4; transform: translateX(0); }
+        50% { opacity: 1; transform: translateX(3px); }
+    }
+
+    .b2b-api-center {
+        width: 120px; height: 120px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #1e40af, #1e3a8a);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: .3rem;
+        color: #fff;
+        box-shadow: 0 8px 32px rgba(30,64,175,.3);
+        position: relative;
+        z-index: 3;
+        opacity: 0;
+        transform: scale(.7);
+        animation: apiCenterIn .6s ease .2s forwards;
+    }
+    @keyframes apiCenterIn {
+        to { opacity: 1; transform: scale(1); }
+    }
+    .b2b-api-center:hover { transform: scale(1.08); box-shadow: 0 12px 40px rgba(30,64,175,.4); }
+    .b2b-api-center i { font-size: 1.6rem; }
+    .b2b-api-center span { font-size: .65rem; font-weight: 700; }
+
+    .b2b-api-pulse-ring {
+        position: absolute;
+        inset: -12px;
+        border-radius: 50%;
+        border: 2px solid #1e40af;
+        opacity: 0;
+        animation: apiPulseRing 2.5s ease-in-out infinite;
+    }
+    @keyframes apiPulseRing {
+        0% { opacity: 0; transform: scale(.9); }
+        50% { opacity: .3; transform: scale(1.1); }
+        100% { opacity: 0; transform: scale(.9); }
+    }
+
+    .b2b-platform {
+        background: var(--bg-body);
+        padding: 5rem 0;
+    }
+    .b2b-gateway-card {
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+    .b2b-gateway-card h5 {
+        font-weight: 800;
+        font-size: 1.05rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: .5rem;
+        margin-bottom: .6rem;
+    }
+    .b2b-gateway-card h5 i { color: #1e40af; }
+    .b2b-gateway-card p { color: var(--text-muted); line-height: 1.7; font-size: .88rem; margin-bottom: 0; max-width: 700px; margin-left: auto; margin-right: auto; }
+
+    .b2b-platform-diagram {
+        margin-bottom: 2rem;
+        position: relative;
+    }
+    .b2b-pd-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: .5rem;
+        margin-bottom: .4rem;
+        position: relative;
+        z-index: 2;
+    }
+    .b2b-pd-node {
+        width: 80px;
+        padding: .5rem .3rem;
+        border-radius: 10px;
+        text-align: center;
+        font-size: .62rem;
+        font-weight: 600;
+        background: var(--bg-surface-secondary);
+        border: 1.5px solid var(--border-color);
+        color: var(--text-muted);
+        transition: all .4s;
+        opacity: 0;
+        transform: scale(.8);
+        animation: pdIn .4s ease forwards;
+    }
+    .b2b-pd-node:hover {
+        border-color: #1e40af;
+        color: #1e40af;
+        transform: translateY(-2px);
+    }
+    .b2b-pd-node i { display: block; font-size: .9rem; margin-bottom: .15rem; color: #1e40af; }
+
+    .b2b-pd-node--center {
+        width: 120px;
+        padding: .7rem .5rem;
+        font-size: .7rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #1e40af, #1e3a8a);
+        border: none;
+        color: #fff;
+        box-shadow: 0 6px 24px rgba(30,64,175,.25);
+    }
+    .b2b-pd-node--center i { color: #fff; font-size: 1.1rem; }
+    .b2b-pd-node--center:hover { transform: scale(1.05); color: #fff; border-color: transparent; }
+
+    .b2b-pd-arrow {
+        font-size: .7rem;
+        color: #1e40af;
+        opacity: 0;
+        animation: pdArrowIn .3s ease forwards;
+    }
+    .b2b-pd-arrow i {
+        animation: pdArrowPulse 1.8s ease-in-out infinite;
+    }
+    @keyframes pdArrowIn { to { opacity: .5; } }
+    @keyframes pdArrowPulse {
+        0%, 100% { opacity: .3; transform: translateX(0); }
+        50% { opacity: .8; transform: translateX(2px); }
+    }
+    .b2b-pd-arrow-down {
+        display: flex;
+        justify-content: center;
+        margin: .2rem 0;
+    }
+    .b2b-pd-arrow-down i {
+        font-size: .6rem;
+        color: #1e40af;
+        opacity: 0;
+        animation: pdArrowIn .3s ease forwards;
+    }
+    .b2b-pd-arrow-down i {
+        animation-name: pdArrowDownPulse;
+        animation-duration: 1.8s;
+        animation-timing-function: ease-in-out;
+        animation-iteration-count: infinite;
+        animation-fill-mode: forwards;
+        animation-delay: .3s;
+    }
+    @keyframes pdArrowDownPulse {
+        0%, 100% { opacity: .3; transform: translateY(0); }
+        50% { opacity: .8; transform: translateY(2px); }
+    }
+
+    @keyframes pdIn {
+        to { opacity: 1; transform: scale(1); }
+    }
+    .b2b-pd-row:first-child .b2b-pd-node:nth-child(1) { animation-delay: .1s; }
+    .b2b-pd-row:first-child .b2b-pd-node:nth-child(3) { animation-delay: .2s; }
+    .b2b-pd-row:first-child .b2b-pd-node:nth-child(5) { animation-delay: .3s; }
+    .b2b-pd-node--center { animation-delay: .4s; }
+    .b2b-pd-row:last-child .b2b-pd-node:nth-child(1) { animation-delay: .6s; }
+    .b2b-pd-row:last-child .b2b-pd-node:nth-child(3) { animation-delay: .7s; }
+    .b2b-pd-row:last-child .b2b-pd-node:nth-child(5) { animation-delay: .8s; }
+
+    .b2b-pd-label {
+        text-align: center;
+        font-size: .6rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .06em;
+        color: var(--text-muted);
+        opacity: .6;
+        margin: .3rem 0;
+    }
+
+    .b2b-steps {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.2rem;
+        margin-bottom: 2rem;
+    }
+    .b2b-step {
+        text-align: center;
+        transition: all .4s;
+        position: relative;
+        padding: 1.5rem;
+    }
+    .b2b-step:hover {
+        transform: translateY(-4px);
+    }
+    .b2b-step-num {
+        width: 36px; height: 36px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #1e40af, #1e3a8a);
+        color: #fff;
+        font-size: .75rem;
+        font-weight: 800;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: .75rem;
+    }
+    .b2b-step-icon {
+        width: 44px; height: 44px;
+        border-radius: 12px;
+        background: rgba(30,64,175,.08);
+        color: #1e40af;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        margin-bottom: .6rem;
+    }
+    .b2b-step h6 { font-weight: 700; font-size: .88rem; margin-bottom: .4rem; }
+    .b2b-step p { color: var(--text-muted); font-size: .78rem; line-height: 1.6; margin-bottom: 0; }
+    .b2b-step-connector {
+        display: none;
+    }
+    @media (min-width: 768px) {
+        .b2b-step-connector {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+        }
+    }
+
+    .b2b-ia-card {
+        padding: 1.5rem 0;
+    }
+    .b2b-ia-card h5 {
+        font-weight: 800;
+        font-size: 1.05rem;
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        margin-bottom: .5rem;
+    }
+    .b2b-ia-card h5 i { color: #1e40af; }
+    .b2b-ia-card > p { color: var(--text-muted); font-size: .85rem; line-height: 1.7; margin-bottom: 1rem; }
+    .b2b-ia-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .6rem;
+    }
+    .b2b-ia-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: .4rem;
+        padding: .5rem 1rem;
+        border-radius: 999px;
+        font-size: .75rem;
+        font-weight: 600;
+        background: var(--bg-surface-secondary);
+        border: 1px solid var(--border-color);
+        color: var(--text-muted);
+        transition: all .3s;
+    }
+    .b2b-ia-chip:hover {
+        border-color: #1e40af;
+        color: #1e40af;
+        transform: translateY(-2px);
+    }
+    .b2b-ia-chip i { color: #1e40af; font-size: .8rem; }
+
+    @media (max-width: 767.98px) {
+        .b2b-steps { grid-template-columns: 1fr; }
+    }
+
+    .b2b-use-cases { background: var(--bg-surface-secondary); padding: 5rem 0; }
+    .b2b-table-wrap {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        overflow: hidden;
+    }
+    .b2b-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .b2b-table thead th {
+        padding: 1rem 1.25rem;
+        font-size: .7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .06em;
+        color: var(--text-muted);
+        background: var(--bg-surface-secondary);
+        border-bottom: 1px solid var(--border-color);
+        text-align: left;
+    }
+    .b2b-table tbody tr {
+        transition: all .3s;
+        border-bottom: 1px solid var(--border-color);
+        border-left: 3px solid transparent;
+    }
+    .b2b-table tbody tr:last-child { border-bottom: none; }
+    .b2b-table tbody tr:hover { background: rgba(30,64,175,.03); border-left-color: #1e40af; }
+    .b2b-table tbody td {
+        padding: 1rem 1.25rem;
+        font-size: .85rem;
+        color: var(--text-muted);
+        vertical-align: top;
+    }
+    .b2b-table-industry {
+        display: flex;
+        align-items: center;
+        gap: .6rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        white-space: nowrap;
+    }
+    .b2b-table-icon {
+        width: 36px; height: 36px;
+        border-radius: 10px;
+        background: rgba(30,64,175,.08);
+        color: #1e40af;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: .85rem;
+        flex-shrink: 0;
+    }
+    .b2b-table-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    .b2b-table-list li {
+        padding: .2rem 0;
+        display: flex;
+        align-items: flex-start;
+        gap: .4rem;
+        font-size: .82rem;
+    }
+    .b2b-table-list li::before {
+        content: '•';
+        color: #1e40af;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+    .b2b-table-impact li {
+        color: #1e40af;
+        font-weight: 700;
+        font-size: .88rem;
+    }
+    .b2b-table-impact li::before {
+        content: '✓';
+    }
+
+    @media (max-width: 767.98px) {
+        .b2b-table thead { display: none; }
+        .b2b-table tbody tr {
+            display: block;
+            padding: 1rem;
+        }
+        .b2b-table tbody td {
+            display: block;
+            padding: .4rem 0;
+        }
+        .b2b-table tbody td::before {
+            content: attr(data-label);
+            display: block;
+            font-size: .65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            color: var(--text-muted);
+            margin-bottom: .2rem;
+        }
+    }
+
+    .b2b-cta { text-align: center; }
+    .b2b-cta h2 { font-weight: 800; font-size: 2.2rem; color: var(--text-primary); margin-bottom: .75rem; }
+    .b2b-cta p { color: var(--text-muted); max-width: 500px; margin: 0 auto 2rem; font-size: 1rem; line-height: 1.7; }
+    .b2b-trust { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; margin-top: 2rem; }
+    .b2b-trust-badge {
+        display: inline-flex; align-items: center; gap: .4rem;
+        padding: .45rem 1rem; border-radius: 999px;
+        font-size: .75rem; font-weight: 600;
+        color: var(--text-muted); background: var(--bg-surface);
+        border: 1px solid var(--border-color); transition: all .3s;
+    }
+    .b2b-trust-badge:hover { border-color: #1e40af; color: #1e40af; transform: translateY(-1px); }
+    .b2b-trust-badge i { font-size: .85rem; color: #1e40af; }
+
+    .cta-btn-primary {
+        display: inline-flex; align-items: center; gap: .5rem;
+        padding: .9rem 2.2rem; border-radius: 999px;
+        font-weight: 700; font-size: .95rem; color: #fff;
+        background: linear-gradient(135deg, #1e40af, #1e3a8a);
+        border: none; text-decoration: none;
+        transition: all .35s cubic-bezier(.25,.46,.45,.94);
+        box-shadow: 0 4px 24px rgba(30,64,175,.35);
+        position: relative; overflow: hidden;
+    }
+    .cta-btn-primary::after {
+        content: ''; position: absolute; top: -50%; left: -60%;
+        width: 40%; height: 200%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,.12), transparent);
+        transform: skewX(-20deg); transition: left .6s; pointer-events: none;
+    }
+    .cta-btn-primary:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 8px 32px rgba(30,64,175,.5); color: #fff; }
+    .cta-btn-primary:hover::after { left: 130%; }
+    .cta-btn-secondary {
+        display: inline-flex; align-items: center; gap: .5rem;
+        padding: .9rem 2.2rem; border-radius: 999px;
+        font-weight: 700; font-size: .95rem; color: var(--text-primary);
+        background: transparent; border: 2px solid var(--border-color);
+        text-decoration: none; transition: all .35s;
+    }
+    .cta-btn-secondary:hover { border-color: #1e40af; color: #1e40af; transform: translateY(-2px); }
+
+    @media (max-width: 768px) {
+        .b2b-api-node { width: 75px; height: 75px; }
+        .b2b-api-node i { font-size: 1.1rem; }
+        .b2b-api-center { width: 95px; height: 95px; }
+        .b2b-api-center i { font-size: 1.3rem; }
+    }
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const video = document.getElementById('b2bVideo');
+    const placeholder = document.getElementById('b2bVideoPlaceholder');
+    const playBtn = document.getElementById('b2bVideoPlayBtn');
+    if (playBtn && video && placeholder) {
+        playBtn.addEventListener('click', function() {
+            placeholder.classList.add('hidden');
+            video.play();
+        });
+        video.addEventListener('pause', function() {
+            if (video.currentTime === 0 || video.ended) {
+                placeholder.classList.remove('hidden');
+            }
+        });
+        video.addEventListener('click', function() {
+            if (video.paused) { video.play(); }
+            else { video.pause(); }
+        });
+    }
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<!-- HERO -->
+<section class="b2b-hero">
+    <div class="container">
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'home:home' %}" class="text-decoration-none" style="color:#1e40af;">{% trans "Home" %}</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'services:index' %}" class="text-decoration-none" style="color:#1e40af;">{% trans "Services" %}</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'integration:integration_homepage' %}" class="text-decoration-none" style="color:#1e40af;">{% trans "Integration" %}</a></li>
+                <li class="breadcrumb-item active text-secondary" aria-current="page">{% trans "B2B Integration" %}</li>
+            </ol>
+        </nav>
+        <div class="col-lg-8">
+            <span class="badge rounded-pill px-3 py-2 mb-3" style="background:rgba(30,64,175,.12);border:1px solid rgba(30,64,175,.25);color:#1e40af;font-size:.8rem;font-weight:700;letter-spacing:.04em;">
+                <i class="fas fa-handshake me-1"></i> {% trans "B2B Integration" %}
+            </span>
+            <h1 class="display-5 fw-800 text-white mb-3">
+                {% trans "Seamless, Automated B2B Integration" %}
+            </h1>
+            <p class="lead mb-3" style="color:#94a3b8;max-width:560px;">
+                {% trans "From Traditional B2B to API Integration" %}
+            </p>
+            <p class="mb-4" style="color:#94a3b8;max-width:560px;font-size:.95rem;line-height:1.7;">
+                {% trans "Gain seamless, automated, comprehensive B2B integration via API integrations across systems. Break down data barriers and ensure secure, real-time data." %}
+            </p>
+            <div class="d-flex flex-wrap gap-3">
+                <a href="{% url 'contact:contact' %}" class="cta-btn-primary">
+                    {% trans "Request a Quote" %} <i class="fas fa-arrow-right"></i>
+                </a>
+                <a href="#b2b-video" class="cta-btn-secondary" style="color:#fff;border-color:rgba(255,255,255,.25);">
+                    <i class="fas fa-play-circle"></i> {% trans "Watch Demo" %}
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FOUR PILLARS -->
+<section class="b2b-pillars">
+    <div class="container">
+        <div class="row g-3">
+            <div class="col-md-3 col-6 animate-on-scroll slide-up">
+                <div class="b2b-pillar">
+                    <span class="b2b-pillar-num">01</span>
+                    <div class="b2b-pillar-icon"><i class="fas fa-magic"></i></div>
+                    <h6>{% trans "Task Automation" %}</h6>
+                    <p>{% trans "Streamline workflows by automating repetitive tasks across applications and systems." %}</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 animate-on-scroll slide-up" style="transition-delay:.08s;">
+                <div class="b2b-pillar">
+                    <span class="b2b-pillar-num">02</span>
+                    <div class="b2b-pillar-icon"><i class="fas fa-bolt"></i></div>
+                    <h6>{% trans "Real-Time Data" %}</h6>
+                    <p>{% trans "Break down information barriers. APIs perform real-time processing, enabling access to up-to-date information." %}</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 animate-on-scroll slide-up" style="transition-delay:.16s;">
+                <div class="b2b-pillar">
+                    <span class="b2b-pillar-num">03</span>
+                    <div class="b2b-pillar-icon"><i class="fas fa-shield-alt"></i></div>
+                    <h6>{% trans "Security & Encryption" %}</h6>
+                    <p>{% trans "Well-designed APIs provide secure mechanisms to control access and protect data using the latest encryption algorithms." %}</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 animate-on-scroll slide-up" style="transition-delay:.24s;">
+                <div class="b2b-pillar">
+                    <span class="b2b-pillar-num">04</span>
+                    <div class="b2b-pillar-icon"><i class="fas fa-check-double"></i></div>
+                    <h6>{% trans "Standardization" %}</h6>
+                    <p>{% trans "APIs provide a unified way for applications to communicate, simplifying development and maintenance." %}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- OVERVIEW — Ecosystem Diagram + Content Split -->
+<section class="b2b-overview">
+    <div class="container py-5">
+        <div class="section-heading text-center mx-auto animate-on-scroll">
+            <div class="b2b-divider"></div>
+            <span class="section-label">{% trans "Overview" %}</span>
+            <h2>{% trans "What is B2B Integration?" %}</h2>
+        </div>
+        <div class="row g-4 mt-2 align-items-stretch">
+            <!-- LEFT — Ecosystem Diagram -->
+            <div class="col-lg-6 animate-on-scroll slide-up">
+                <div class="b2b-eco-card">
+                    <div class="b2b-eco-title">{% trans "B2B Integration Ecosystem" %}</div>
+                    <div class="b2b-eco-flow">
+                        <!-- Supplier -->
+                        <div class="b2b-eco-node">
+                            <i class="fas fa-truck"></i>
+                            {% trans "Supplier" %}
+                        </div>
+                        <div class="b2b-eco-arrow">
+                            <div class="b2b-eco-arrow-line"></div>
+                            <div class="b2b-eco-arrow-head"><i class="fas fa-caret-down"></i></div>
+                        </div>
+                        <!-- Your Company -->
+                        <div class="b2b-eco-node b2b-eco-node--center">
+                            <i class="fas fa-building"></i>
+                            {% trans "Your Company" %}
+                        </div>
+                        <div class="b2b-eco-arrow">
+                            <div class="b2b-eco-arrow-line"></div>
+                            <div class="b2b-eco-arrow-head"><i class="fas fa-caret-down"></i></div>
+                        </div>
+                        <!-- Partners -->
+                        <div class="b2b-eco-split">
+                            <div class="b2b-eco-branch">
+                                <div class="b2b-eco-arrow">
+                                    <div class="b2b-eco-arrow-line"></div>
+                                    <div class="b2b-eco-arrow-head"><i class="fas fa-caret-down"></i></div>
+                                </div>
+                                <div class="b2b-eco-node">
+                                    <i class="fas fa-server"></i>
+                                    {% trans "Partner (ERP)" %}
+                                </div>
+                            </div>
+                            <div class="b2b-eco-branch">
+                                <div class="b2b-eco-arrow">
+                                    <div class="b2b-eco-arrow-line"></div>
+                                    <div class="b2b-eco-arrow-head"><i class="fas fa-caret-down"></i></div>
+                                </div>
+                                <div class="b2b-eco-node">
+                                    <i class="fas fa-truck-loading"></i>
+                                    {% trans "Partner (TMS)" %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT — Content -->
+            <div class="col-lg-6 animate-on-scroll slide-up" style="transition-delay:.12s;">
+                <div class="b2b-content-card">
+                    <!-- B2B Section -->
+                    <div class="b2b-content-section">
+                        <h6><i class="fas fa-handshake" style="color:#1e40af;"></i> {% trans "Business-to-Business Integration" %}</h6>
+                        <p>{% trans "Automation of business processes and communication between organizations." %}</p>
+                        <ul>
+                            <li><i class="fas fa-check-circle"></i> {% trans "Automated purchase orders & invoices" %}</li>
+                            <li><i class="fas fa-check-circle"></i> {% trans "Real-time inventory visibility" %}</li>
+                            <li><i class="fas fa-check-circle"></i> {% trans "EDI document mapping (X12, EDIFACT, XML)" %}</li>
+                            <li><i class="fas fa-check-circle"></i> {% trans "Secure partner onboarding" %}</li>
+                        </ul>
+                    </div>
+
+                    <div class="b2b-content-divider"></div>
+
+                    <!-- API Section -->
+                    <div class="b2b-content-section">
+                        <h6><i class="fas fa-plug" style="color:#1e40af;"></i> {% trans "API Integration" %}</h6>
+                        <p>{% trans "Real-time data exchange between applications. APIs act as a channel for faster, more accurate business transactions." %}</p>
+                        <div class="b2b-api-flow">
+                            <span class="b2b-api-flow-node">TMS</span>
+                            <div class="b2b-api-flow-line"></div>
+                            <span class="b2b-api-flow-node">API</span>
+                            <div class="b2b-api-flow-line"></div>
+                            <span class="b2b-api-flow-node">ERP</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- VIDEO SECTION -->
+<section class="b2b-video-section" id="b2b-video">
+    <div class="container">
+        <div class="section-heading text-center mx-auto animate-on-scroll">
+            <div class="b2b-divider"></div>
+            <span class="section-label">{% trans "Watch" %}</span>
+            <h2>{% trans "See B2B Integration in Action" %}</h2>
+            <p style="color:var(--text-muted);font-size:.95rem;margin-top:.5rem;">{% trans "Watch how automated partner connectivity transforms business operations" %}</p>
+        </div>
+        <div class="b2b-video-wrap mt-4 animate-on-scroll slide-up">
+            <div class="b2b-video-inner">
+                <video id="b2bVideo" poster="" preload="metadata">
+                    <source src="" type="video/mp4">
+                </video>
+                <div class="b2b-video-placeholder" id="b2bVideoPlaceholder">
+                    <button class="b2b-video-play" id="b2bVideoPlayBtn" aria-label="{% trans 'Play video' %}">
+                        <i class="fas fa-play"></i>
+                    </button>
+                    <span class="b2b-video-label">{% trans "Click to play" %}</span>
+                </div>
+                <div class="b2b-video-badge">
+                    <i class="fas fa-play-circle"></i> {% trans "Explainer Video" %}
+                </div>
+            </div>
+            <div class="b2b-video-meta">
+                <div class="b2b-video-meta-left">
+                    <h6>{% trans "B2B Integration Explainer" %}</h6>
+                    <p>{% trans "Learn how API-driven B2B integration streamlines partner data exchange" %}</p>
+                </div>
+                <div class="b2b-video-duration">
+                    <i class="fas fa-clock"></i> 3:45
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- API DIAGRAM VISUAL -->
+<section class="b2b-visual">
+    <div class="container text-center">
+        <div class="b2b-divider"></div>
+        <h4 class="fw-800 mb-2" style="font-size:1.2rem;">{% trans "API Integration Architecture" %}</h4>
+        <p style="color:var(--text-muted);font-size:.88rem;max-width:600px;margin:0 auto 2rem;">
+            {% trans "A visual representation of API integration connecting multiple systems through a central gateway." %}
+        </p>
+        <div class="b2b-api-diagram">
+            <div class="b2b-api-node">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Shopify</span>
+            </div>
+            <div class="b2b-api-arrow">
+                <i class="fas fa-arrows-alt-h"></i>
+                <span class="b2b-api-arrow-label">REST</span>
+            </div>
+            <div class="b2b-api-node">
+                <i class="fas fa-store"></i>
+                <span>Amazon</span>
+            </div>
+            <div class="b2b-api-arrow">
+                <i class="fas fa-arrows-alt-h"></i>
+                <span class="b2b-api-arrow-label">SOAP</span>
+            </div>
+            <div class="b2b-api-center">
+                <div class="b2b-api-pulse-ring"></div>
+                <i class="fas fa-plug"></i>
+                <span>{% trans "API Gateway" %}</span>
+            </div>
+            <div class="b2b-api-arrow">
+                <i class="fas fa-arrows-alt-h"></i>
+                <span class="b2b-api-arrow-label">EDI</span>
+            </div>
+            <div class="b2b-api-node">
+                <i class="fas fa-server"></i>
+                <span>ERP</span>
+            </div>
+            <div class="b2b-api-arrow">
+                <i class="fas fa-arrows-alt-h"></i>
+                <span class="b2b-api-arrow-label">XML</span>
+            </div>
+            <div class="b2b-api-node">
+                <i class="fas fa-file-invoice"></i>
+                <span>SAP Ariba</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- BUILD A PLATFORM — Three-Step Process with Gateway -->
+<section class="b2b-platform">
+    <div class="container py-5">
+        <div class="section-heading text-center mx-auto animate-on-scroll">
+            <div class="b2b-divider"></div>
+            <span class="section-label">{% trans "Platform" %}</span>
+            <h2>{% trans "Build a B2B Integration Platform" %}</h2>
+        </div>
+
+        <!-- Gateway description -->
+        <div class="b2b-gateway-card animate-on-scroll slide-up">
+            <h5><i class="fas fa-door-open"></i> {% trans "Single Gateway for All B2B Transactions" %}</h5>
+            <p>{% trans "Building a B2B integration platform is a tool for companies to integrate all the complex processes involved in B2B transactions and EDI with their partners through a single gateway. The platform gathers data from source applications, converts it into standardized formats, and sends documents to partners using the appropriate transport protocol." %}</p>
+        </div>
+
+        <!-- Platform Flow Diagram -->
+        <div class="b2b-platform-diagram animate-on-scroll slide-up">
+            <div class="b2b-pd-label">{% trans "Source Systems" %}</div>
+            <div class="b2b-pd-row">
+                <div class="b2b-pd-node">
+                    <i class="fas fa-store"></i>
+                    Shopify
+                </div>
+                <div class="b2b-pd-arrow"><i class="fas fa-arrow-right"></i></div>
+                <div class="b2b-pd-node">
+                    <i class="fas fa-shopping-cart"></i>
+                    Amazon
+                </div>
+                <div class="b2b-pd-arrow"><i class="fas fa-arrow-right"></i></div>
+                <div class="b2b-pd-node">
+                    <i class="fas fa-file-invoice"></i>
+                    SAP
+                </div>
+            </div>
+
+            <div class="b2b-pd-arrow-down"><i class="fas fa-caret-down"></i></div>
+            <div class="b2b-pd-arrow-down"><i class="fas fa-caret-down"></i></div>
+
+            <div class="b2b-pd-row">
+                <div class="b2b-pd-node b2b-pd-node--center">
+                    <i class="fas fa-server"></i>
+                    {% trans "B2B Gateway" %}
+                </div>
+            </div>
+
+            <div class="b2b-pd-arrow-down"><i class="fas fa-caret-down"></i></div>
+            <div class="b2b-pd-arrow-down"><i class="fas fa-caret-down"></i></div>
+
+            <div class="b2b-pd-label">{% trans "Partner Systems" %}</div>
+            <div class="b2b-pd-row">
+                <div class="b2b-pd-node">
+                    <i class="fas fa-warehouse"></i>
+                    {% trans "ERP" %}
+                </div>
+                <div class="b2b-pd-arrow"><i class="fas fa-arrow-right"></i></div>
+                <div class="b2b-pd-node">
+                    <i class="fas fa-truck"></i>
+                    {% trans "TMS" %}
+                </div>
+                <div class="b2b-pd-arrow"><i class="fas fa-arrow-right"></i></div>
+                <div class="b2b-pd-node">
+                    <i class="fas fa-boxes"></i>
+                    {% trans "WMS" %}
+                </div>
+            </div>
+        </div>
+
+        <!-- 3-step process -->
+        <div class="b2b-steps">
+            <div class="b2b-step animate-on-scroll slide-up">
+                <div class="b2b-step-num">1</div>
+                <div class="b2b-step-icon"><i class="fas fa-database"></i></div>
+                <h6>{% trans "Data Collection" %}</h6>
+                <p>{% trans "Gather data from source applications, databases, and partner systems into a unified pipeline." %}</p>
+            </div>
+            <div class="b2b-step animate-on-scroll slide-up" style="transition-delay:.08s;">
+                <div class="b2b-step-num">2</div>
+                <div class="b2b-step-icon"><i class="fas fa-exchange-alt"></i></div>
+                <h6>{% trans "Format Conversion" %}</h6>
+                <p>{% trans "Convert data into standardized EDI formats (X12, EDIFACT, XML) for universal partner compatibility." %}</p>
+            </div>
+            <div class="b2b-step animate-on-scroll slide-up" style="transition-delay:.16s;">
+                <div class="b2b-step-num">3</div>
+                <div class="b2b-step-icon"><i class="fas fa-shield-alt"></i></div>
+                <h6>{% trans "Secure Delivery" %}</h6>
+                <p>{% trans "Send documents to partners via AS2, SFTP, or encrypted API channels with full audit trails." %}</p>
+            </div>
+        </div>
+
+        <!-- IA Engineering features -->
+        <div class="b2b-ia-card animate-on-scroll slide-up">
+            <h5><i class="fas fa-drafting-compass"></i> {% trans "Information Architecture Engineering" %}</h5>
+            <p>{% trans "IA Engineering analyzes relevant systems and infrastructure to integrate them across a hosted cloud platform." %}</p>
+            <div class="b2b-ia-chips">
+                <span class="b2b-ia-chip"><i class="fas fa-cloud"></i> {% trans "Cloud-Native Architecture" %}</span>
+                <span class="b2b-ia-chip"><i class="fas fa-chart-line"></i> {% trans "Scalable Partner Network" %}</span>
+                <span class="b2b-ia-chip"><i class="fas fa-plug"></i> {% trans "Multi-Protocol Support" %}</span>
+                <span class="b2b-ia-chip"><i class="fas fa-tachometer-alt"></i> {% trans "Real-Time Dashboard" %}</span>
+                <span class="b2b-ia-chip"><i class="fas fa-check-double"></i> {% trans "Full Compliance & Audit" %}</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- USE CASES -->
+<section class="b2b-use-cases">
+    <div class="container py-5">
+        <div class="section-heading text-center mx-auto animate-on-scroll">
+            <div class="b2b-divider"></div>
+            <span class="section-label">{% trans "Use Cases" %}</span>
+            <h2>{% trans "B2B Integration Scenarios" %}</h2>
+            <p style="color:var(--text-muted);font-size:.95rem;margin-top:.5rem;">{% trans "Industry Solutions for Seamless Partner Connectivity" %}</p>
+        </div>
+        <div class="b2b-table-wrap mt-4 animate-on-scroll slide-up">
+            <table class="b2b-table">
+                <thead>
+                    <tr>
+                        <th>{% trans "Industry" %}</th>
+                        <th>{% trans "Key Integrations" %}</th>
+                        <th>{% trans "Business Impact" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td data-label="{% trans 'Industry' %}">
+                            <div class="b2b-table-industry">
+                                <div class="b2b-table-icon"><i class="fas fa-industry"></i></div>
+                                <span>{% trans "Manufacturing" %}</span>
+                            </div>
+                        </td>
+                        <td data-label="{% trans 'Key Integrations' %}">
+                            <ul class="b2b-table-list">
+                                <li>{% trans "Supplier portals" %}</li>
+                                <li>{% trans "EDI orders & invoices" %}</li>
+                                <li>{% trans "Inventory sync" %}</li>
+                                <li>{% trans "Logistics coordination" %}</li>
+                            </ul>
+                        </td>
+                        <td data-label="{% trans 'Business Impact' %}">
+                            <ul class="b2b-table-list b2b-table-impact">
+                                <li>{% trans "Faster order-to-delivery" %}</li>
+                                <li>{% trans "Real-time supply chain visibility" %}</li>
+                                <li>{% trans "Reduced operational costs" %}</li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td data-label="{% trans 'Industry' %}">
+                            <div class="b2b-table-industry">
+                                <div class="b2b-table-icon"><i class="fas fa-truck"></i></div>
+                                <span>{% trans "Logistics" %}</span>
+                            </div>
+                        </td>
+                        <td data-label="{% trans 'Key Integrations' %}">
+                            <ul class="b2b-table-list">
+                                <li>{% trans "Freight EDI (X12, EDIFACT)" %}</li>
+                                <li>{% trans "Tracking APIs" %}</li>
+                                <li>{% trans "Documentation automation" %}</li>
+                            </ul>
+                        </td>
+                        <td data-label="{% trans 'Business Impact' %}">
+                            <ul class="b2b-table-list b2b-table-impact">
+                                <li>{% trans "Real-time shipment tracking" %}</li>
+                                <li>{% trans "Automated documentation" %}</li>
+                                <li>{% trans "Improved delivery accuracy" %}</li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td data-label="{% trans 'Industry' %}">
+                            <div class="b2b-table-industry">
+                                <div class="b2b-table-icon"><i class="fas fa-store"></i></div>
+                                <span>{% trans "Retail" %}</span>
+                            </div>
+                        </td>
+                        <td data-label="{% trans 'Key Integrations' %}">
+                            <ul class="b2b-table-list">
+                                <li>{% trans "Marketplace integrations" %}</li>
+                                <li>{% trans "POS data sync" %}</li>
+                                <li>{% trans "Order fulfillment" %}</li>
+                            </ul>
+                        </td>
+                        <td data-label="{% trans 'Business Impact' %}">
+                            <ul class="b2b-table-list b2b-table-impact">
+                                <li>{% trans "Unified inventory view" %}</li>
+                                <li>{% trans "Faster order fulfillment" %}</li>
+                                <li>{% trans "Omnichannel customer experience" %}</li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td data-label="{% trans 'Industry' %}">
+                            <div class="b2b-table-industry">
+                                <div class="b2b-table-icon"><i class="fas fa-university"></i></div>
+                                <span>{% trans "Finance" %}</span>
+                            </div>
+                        </td>
+                        <td data-label="{% trans 'Key Integrations' %}">
+                            <ul class="b2b-table-list">
+                                <li>{% trans "Regulatory reporting" %}</li>
+                                <li>{% trans "Fraud detection" %}</li>
+                                <li>{% trans "Cross-system reconciliation" %}</li>
+                            </ul>
+                        </td>
+                        <td data-label="{% trans 'Business Impact' %}">
+                            <ul class="b2b-table-list b2b-table-impact">
+                                <li>{% trans "Regulatory compliance" %}</li>
+                                <li>{% trans "Reduced fraud risk" %}</li>
+                                <li>{% trans "Full audit trails" %}</li>
+                            </ul>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="py-5" style="background:var(--bg-body);">
+    <div class="container py-4">
+        <div class="b2b-cta">
+            <h2>{% trans "Ready to Connect Your Partners?" %}</h2>
+            <p>{% trans "Start your free B2B integration assessment today. Our architects will map your partner ecosystem and design a custom solution." %}</p>
+            <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
+                <a href="{% url 'contact:contact' %}" class="cta-btn-primary">
+                    {% trans "Get Your Free Assessment" %} <i class="fas fa-arrow-right"></i>
+                </a>
+                <a href="{% url 'integration:integration_homepage' %}" class="cta-btn-secondary">
+                    <i class="fas fa-arrow-left"></i> {% trans "Back to Integration" %}
+                </a>
+            </div>
+            <div class="b2b-trust">
+                <span class="b2b-trust-badge"><i class="fas fa-lock"></i> {% trans "100% Free" %}</span>
+                <span class="b2b-trust-badge"><i class="fas fa-clock"></i> {% trans "30-Min Consult" %}</span>
+                <span class="b2b-trust-badge"><i class="fas fa-user-tie"></i> {% trans "Expert Architects" %}</span>
+                <span class="b2b-trust-badge"><i class="fas fa-ban"></i> {% trans "No Obligation" %}</span>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

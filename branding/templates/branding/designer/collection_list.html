@@ -16,22 +16,26 @@
         </a>
         <nav class="dd-sidebar-nav">
             <div class="dd-sidebar-section">
-                <div class="dd-sidebar-section-title">Workspace</div>
-                <a href="{% url 'branding:designer_dashboard' %}" class="dd-nav-item"><i class="fa-solid fa-gauge-high"></i>Dashboard</a>
-                <a href="{% url 'branding:my_requests' %}" class="dd-nav-item"><i class="fa-solid fa-folder-open"></i>My Projects</a>
+                <div class="dd-sidebar-section-title">Dashboard</div>
+                <a href="{% url 'branding:designer_dashboard' %}" class="dd-nav-item"><i class="fa-solid fa-gauge-high"></i>Overview</a>
+                <a href="{% url 'branding:showcase' %}" class="dd-nav-item"><i class="fa-solid fa-trophy"></i>Showcase</a>
             </div>
             <div class="dd-sidebar-section">
-                <div class="dd-sidebar-section-title">Work</div>
+                <div class="dd-sidebar-section-title">Design Library</div>
+                <a href="{% url 'branding:design_library' %}" class="dd-nav-item"><i class="fa-solid fa-book-open"></i>Library</a>
+                <a href="{% url 'branding:design_library' %}?tab=collections" class="dd-nav-item active"><i class="fa-solid fa-layer-group"></i>My Collections</a>
+                <a href="{% url 'branding:design_library' %}?tab=resources" class="dd-nav-item"><i class="fa-solid fa-cube"></i>Resources</a>
+                <a href="{% url 'branding:design_library' %}?tab=templates" class="dd-nav-item"><i class="fa-solid fa-file-lines"></i>Templates</a>
+            </div>
+            <div class="dd-sidebar-section">
+                <div class="dd-sidebar-section-title">Workspace</div>
+                <a href="{% url 'branding:my_requests' %}" class="dd-nav-item"><i class="fa-solid fa-folder-open"></i>My Projects</a>
                 <a href="{% url 'branding:kanban' %}" class="dd-nav-item"><i class="fa-solid fa-table-columns"></i>Board</a>
                 <a href="{% url 'branding:workflow_dashboard' %}" class="dd-nav-item"><i class="fa-solid fa-pen-ruler"></i>Workflow</a>
-                <a href="{% url 'branding:collection_template_list' %}" class="dd-nav-item active"><i class="fa-solid fa-layer-group"></i>Collections</a>
-                <a href="{% url 'branding:feedback_list' %}" class="dd-nav-item"><i class="fa-solid fa-message"></i>Feedback</a>
             </div>
             <div class="dd-sidebar-section">
-                <div class="dd-sidebar-section-title">Resources</div>
-                <a href="{% url 'branding:designer_templates' %}" class="dd-nav-item"><i class="fa-solid fa-file-lines"></i>Templates</a>
-                <a href="{% url 'branding:designer_resources' %}" class="dd-nav-item"><i class="fa-solid fa-book"></i>Resources</a>
-                <a href="{% url 'branding:showcase' %}" class="dd-nav-item"><i class="fa-solid fa-trophy"></i>Showcase</a>
+                <div class="dd-sidebar-section-title">Collaboration</div>
+                <a href="{% url 'branding:feedback_list' %}" class="dd-nav-item"><i class="fa-solid fa-message"></i>Feedback</a>
             </div>
         </nav>
         <div class="dd-sidebar-user">

@@ -1,0 +1,404 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans "System Integration" %} | OnWebApp{% endblock %}
+
+{% block meta_description %}{% trans "API hub for workflow automation. Connect ERP, CRM, HR, and finance systems with intelligent routing and event-driven architecture." %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .si-hero {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #1e3a5f 100%);
+        padding: 6rem 0 4rem;
+        position: relative;
+        overflow: hidden;
+    }
+    .si-hero::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: url('https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
+        opacity: .12;
+    }
+    .si-hero .container { position: relative; z-index: 2; }
+    .si-feature-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        padding: 2rem;
+        transition: all .3s;
+        height: 100%;
+    }
+    .si-feature-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 16px 48px rgba(0,0,0,.07);
+    }
+    .si-feature-icon {
+        width: 56px; height: 56px;
+        border-radius: 16px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        margin-bottom: 1rem;
+    }
+    .si-video-card {
+        background: #0f172a;
+        border-radius: 20px;
+        overflow: hidden;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 360px;
+    }
+    .si-video-card img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: .5;
+    }
+    .si-play-btn {
+        position: absolute;
+        width: 80px; height: 80px;
+        background: rgba(6,182,212,.9);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 1.6rem;
+        cursor: pointer;
+        border: none;
+        transition: transform .3s, background .3s;
+        box-shadow: 0 8px 40px rgba(6,182,212,.4);
+    }
+    .si-play-btn:hover { transform: scale(1.1); background: #0891b2; }
+    .si-metric-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        padding: 1.75rem;
+        text-align: center;
+        transition: transform .3s;
+    }
+    .si-metric-card:hover { transform: translateY(-3px); }
+    .si-metric-value {
+        font-size: 2.2rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #06b6d4, #3b82f6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    .si-arch-step {
+        display: flex;
+        align-items: flex-start;
+        gap: 1.25rem;
+        padding: 1.5rem 0;
+    }
+    .si-arch-step + .si-arch-step { border-top: 1px solid var(--border-color); }
+    .si-arch-num {
+        width: 44px; height: 44px;
+        min-width: 44px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #06b6d4, #3b82f6);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: .95rem;
+    }
+    .si-cta {
+        background: linear-gradient(135deg, #0f172a, #1e293b);
+        border-radius: 24px;
+        padding: 4rem 2rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    .si-cta::before {
+        content: '';
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%,-50%);
+        width: 500px; height: 500px;
+        background: radial-gradient(circle, rgba(6,182,212,.1), transparent 70%);
+        pointer-events: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- HERO -->
+<section class="si-hero">
+    <div class="container">
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'home:home' %}" class="text-decoration-none" style="color:#06b6d4;">{% trans "Home" %}</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'services:index' %}" class="text-decoration-none" style="color:#06b6d4;">{% trans "Services" %}</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'integration:integration_homepage' %}" class="text-decoration-none" style="color:#06b6d4;">{% trans "Integration" %}</a></li>
+                <li class="breadcrumb-item active text-secondary" aria-current="page">{% trans "System Integration" %}</li>
+            </ol>
+        </nav>
+        <div class="row align-items-center g-5">
+            <div class="col-lg-7">
+                <span class="badge rounded-pill px-3 py-2 mb-3" style="background:rgba(6,182,212,.12);border:1px solid rgba(6,182,212,.25);color:#06b6d4;font-size:.8rem;font-weight:700;letter-spacing:.04em;">
+                    <i class="fas fa-project-diagram me-1"></i> {% trans "System Integration" %}
+                </span>
+                <h1 class="display-5 fw-800 text-white mb-3">
+                    {% trans "API Hub for " %}
+                    <span style="background:linear-gradient(135deg,#06b6d4,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">{% trans "Workflow Automation" %}</span>
+                </h1>
+                <p class="lead mb-4" style="color:#94a3b8;max-width:560px;">
+                    {% trans "APIs act as the central nervous system of your operations. Our integration hub orchestrates workflows across ERP, CRM, HR, and finance — eliminating manual handoffs." %}
+                </p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="{% url 'contact:contact' %}" class="btn btn-primary btn-lg px-5 py-3 rounded-pill fw-700" style="box-shadow:0 0 25px rgba(6,182,212,.35);">
+                        {% trans "Request a Quote" %} <i class="fas fa-arrow-right ms-2"></i>
+                    </a>
+                    <a href="#architecture" class="btn btn-outline-light btn-lg px-5 py-3 rounded-pill fw-700">
+                        {% trans "See How It Works" %}
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-5 d-none d-lg-block">
+                <div class="si-video-card" style="height:340px;">
+                    <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=700&q=80"
+                         alt="{% trans 'System Integration Diagram' %}" loading="lazy">
+                    <button class="si-play-btn" aria-label="{% trans 'Play video' %}">
+                        <i class="fas fa-play ms-1"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- KEY METRICS -->
+<section class="py-5" style="background:var(--bg-body);">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-3 col-6 animate-on-scroll slide-up">
+                <div class="si-metric-card">
+                    <div class="si-metric-value">100+</div>
+                    <div class="text-muted small fw-600">{% trans "Platforms Connected" %}</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 animate-on-scroll slide-up" style="transition-delay:.08s;">
+                <div class="si-metric-card">
+                    <div class="si-metric-value">50ms</div>
+                    <div class="text-muted small fw-600">{% trans "Avg API Response" %}</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 animate-on-scroll slide-up" style="transition-delay:.16s;">
+                <div class="si-metric-card">
+                    <div class="si-metric-value">99.9%</div>
+                    <div class="text-muted small fw-600">{% trans "Gateway Uptime" %}</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 animate-on-scroll slide-up" style="transition-delay:.24s;">
+                <div class="si-metric-card">
+                    <div class="si-metric-value">10M+</div>
+                    <div class="text-muted small fw-600">{% trans "Daily API Calls" %}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CORE CAPABILITIES -->
+<section class="py-5" style="background:var(--bg-surface-secondary);">
+    <div class="container py-5">
+        <div class="section-heading text-center mx-auto animate-on-scroll">
+            <span class="section-label">{% trans "Core Capabilities" %}</span>
+            <h2>{% trans "What Our System Integration Covers" %}</h2>
+            <p class="mx-auto">{% trans "End-to-end API management, orchestration, and workflow automation." %}</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4 animate-on-scroll slide-up">
+                <div class="si-feature-card">
+                    <div class="si-feature-icon" style="background:rgba(6,182,212,.1);color:#06b6d4;">
+                        <i class="fas fa-project-diagram"></i>
+                    </div>
+                    <h5 class="fw-700">{% trans "Central API Gateway" %}</h5>
+                    <p class="text-muted mb-0">{% trans "Intelligent routing, rate limiting, versioning, and authentication for all your API traffic through a single entry point." %}</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4 animate-on-scroll slide-up" style="transition-delay:.08s;">
+                <div class="si-feature-card">
+                    <div class="si-feature-icon" style="background:rgba(59,130,246,.1);color:#3b82f6;">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h5 class="fw-700">{% trans "Event-Driven Architecture" %}</h5>
+                    <p class="text-muted mb-0">{% trans "Pub/sub messaging, webhooks, and event streams enable loosely-coupled systems that react instantly to changes." %}</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4 animate-on-scroll slide-up" style="transition-delay:.16s;">
+                <div class="si-feature-card">
+                    <div class="si-feature-icon" style="background:rgba(139,92,246,.1);color:#8b5cf6;">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                    <h5 class="fw-700">{% trans "Workflow Automation" %}</h5>
+                    <p class="text-muted mb-0">{% trans "Visual workflow builder with 100+ pre-built actions. Orchestrate multi-step business processes across all systems." %}</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4 animate-on-scroll slide-up" style="transition-delay:.24s;">
+                <div class="si-feature-card">
+                    <div class="si-feature-icon" style="background:rgba(16,185,129,.1);color:#10b981;">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h5 class="fw-700">{% trans "Security & Compliance" %}</h5>
+                    <p class="text-muted mb-0">{% trans "OAuth 2.0, JWT, API keys, IP whitelisting. Full audit logs and compliance with SOC 2, GDPR, and HIPAA." %}</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4 animate-on-scroll slide-up" style="transition-delay:.32s;">
+                <div class="si-feature-card">
+                    <div class="si-feature-icon" style="background:rgba(245,158,11,.1);color:#f59e0b;">
+                        <i class="fas fa-heartbeat"></i>
+                    </div>
+                    <h5 class="fw-700">{% trans "Monitoring & Alerting" %}</h5>
+                    <p class="text-muted mb-0">{% trans "Real-time dashboards, latency tracking, error rate monitoring, and auto-recovery with configurable alerts." %}</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4 animate-on-scroll slide-up" style="transition-delay:.4s;">
+                <div class="si-feature-card">
+                    <div class="si-feature-icon" style="background:rgba(236,72,153,.1);color:#ec4899;">
+                        <i class="fas fa-plug"></i>
+                    </div>
+                    <h5 class="fw-700">{% trans "Pre-Built Connectors" %}</h5>
+                    <p class="text-muted mb-0">{% trans "Ready-made integrations for Salesforce, SAP, HubSpot, Slack, Shopify, Stripe, and 100+ popular platforms." %}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ARCHITECTURE -->
+<section id="architecture" class="py-5" style="background:var(--bg-body);">
+    <div class="container py-5">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6 animate-on-scroll slide-up">
+                <span class="section-label">{% trans "How It Works" %}</span>
+                <h2 class="fw-800 mb-4">{% trans "Integration Architecture" %}</h2>
+                <div class="si-arch-step">
+                    <div class="si-arch-num">1</div>
+                    <div>
+                        <h6 class="fw-700 mb-1">{% trans "Register" %}</h6>
+                        <p class="text-muted mb-0 small">{% trans "Onboard your systems via pre-built connectors or custom API adapters. Configure auth and mapping." %}</p>
+                    </div>
+                </div>
+                <div class="si-arch-step">
+                    <div class="si-arch-num">2</div>
+                    <div>
+                        <h6 class="fw-700 mb-1">{% trans "Orchestrate" %}</h6>
+                        <p class="text-muted mb-0 small">{% trans "Design workflows with our visual builder. Set triggers, conditions, and actions across connected systems." %}</p>
+                    </div>
+                </div>
+                <div class="si-arch-step">
+                    <div class="si-arch-num">3</div>
+                    <div>
+                        <h6 class="fw-700 mb-1">{% trans "Execute" %}</h6>
+                        <p class="text-muted mb-0 small">{% trans "Workflows run in real time with retry logic, error handling, and dead-letter queues for reliability." %}</p>
+                    </div>
+                </div>
+                <div class="si-arch-step">
+                    <div class="si-arch-num">4</div>
+                    <div>
+                        <h6 class="fw-700 mb-1">{% trans "Monitor" %}</h6>
+                        <p class="text-muted mb-0 small">{% trans "Track every API call, workflow execution, and system health metric from a unified dashboard." %}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 animate-on-scroll slide-up" style="transition-delay:.15s;">
+                <div class="si-video-card" style="height:420px;">
+                    <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=700&q=80"
+                         alt="{% trans 'System Integration Architecture' %}" loading="lazy">
+                    <button class="si-play-btn" aria-label="{% trans 'Play walkthrough' %}">
+                        <i class="fas fa-play ms-1"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- USE CASES -->
+<section class="py-5" style="background:var(--bg-surface-secondary);">
+    <div class="container py-5">
+        <div class="section-heading text-center mx-auto animate-on-scroll">
+            <span class="section-label">{% trans "Use Cases" %}</span>
+            <h2>{% trans "Real-World System Integration Scenarios" %}</h2>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6 animate-on-scroll slide-up">
+                <div class="card border-0 shadow-sm rounded-4 p-4 h-100" style="background:var(--bg-surface);">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="si-feature-icon me-3" style="background:rgba(6,182,212,.1);color:#06b6d4;width:44px;height:44px;font-size:1rem;">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <h6 class="fw-700 mb-0">{% trans "ERP ↔ CRM Sync" %}</h6>
+                    </div>
+                    <p class="text-muted small mb-0">{% trans "Bi-directional sync between SAP/Oracle ERP and Salesforce/HubSpot CRM. Orders, customers, and inventory stay current across both systems." %}</p>
+                </div>
+            </div>
+            <div class="col-md-6 animate-on-scroll slide-up" style="transition-delay:.08s;">
+                <div class="card border-0 shadow-sm rounded-4 p-4 h-100" style="background:var(--bg-surface);">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="si-feature-icon me-3" style="background:rgba(16,185,129,.1);color:#10b981;width:44px;height:44px;font-size:1rem;">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <h6 class="fw-700 mb-0">{% trans "RPA Orchestration" %}</h6>
+                    </div>
+                    <p class="text-muted small mb-0">{% trans "Trigger robotic process automation bots from API events. Automate invoice processing, data entry, and report generation." %}</p>
+                </div>
+            </div>
+            <div class="col-md-6 animate-on-scroll slide-up" style="transition-delay:.16s;">
+                <div class="card border-0 shadow-sm rounded-4 p-4 h-100" style="background:var(--bg-surface);">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="si-feature-icon me-3" style="background:rgba(139,92,246,.1);color:#8b5cf6;width:44px;height:44px;font-size:1rem;">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <h6 class="fw-700 mb-0">{% trans "Unified Communication" %}</h6>
+                    </div>
+                    <p class="text-muted small mb-0">{% trans "Connect Slack, Teams, email, and CRM notifications into a single event stream. Route alerts to the right teams automatically." %}</p>
+                </div>
+            </div>
+            <div class="col-md-6 animate-on-scroll slide-up" style="transition-delay:.24s;">
+                <div class="card border-0 shadow-sm rounded-4 p-4 h-100" style="background:var(--bg-surface);">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="si-feature-icon me-3" style="background:rgba(245,158,11,.1);color:#f59e0b;width:44px;height:44px;font-size:1rem;">
+                            <i class="fas fa-file-invoice-dollar"></i>
+                        </div>
+                        <h6 class="fw-700 mb-0">{% trans "Finance Automation" %}</h6>
+                    </div>
+                    <p class="text-muted small mb-0">{% trans "Auto-sync invoices between accounting software, banking APIs, and ERP. Reconcile transactions in real time." %}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="py-5" style="background:var(--bg-body);">
+    <div class="container py-4">
+        <div class="si-cta">
+            <div class="position-relative z-1">
+                <h2 class="display-6 fw-800 text-white mb-3">{% trans "Ready to Automate Your Workflows?" %}</h2>
+                <p class="mb-4" style="color:#94a3b8;max-width:520px;margin:0 auto;">
+                    {% trans "Let our architects design a custom integration hub that connects your entire tech stack with intelligent automation." %}
+                </p>
+                <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
+                    <a href="{% url 'contact:contact' %}" class="btn btn-primary btn-lg px-5 py-3 rounded-pill fw-700" style="box-shadow:0 0 30px rgba(6,182,212,.4);">
+                        {% trans "Request a Quote" %} <i class="fas fa-arrow-right ms-2"></i>
+                    </a>
+                    <a href="{% url 'integration:integration_homepage' %}" class="btn btn-outline-light btn-lg px-5 py-3 rounded-pill fw-700">
+                        {% trans "Back to Integration" %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

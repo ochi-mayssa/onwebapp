@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{{ post.title }} | OnWebApp Blog{% endblock %}
+
+{% block extra_css %}
+<style>
+    .blog-detail-hero {
+        position: relative; height: 40vh; min-height: 320px;
+        overflow: hidden; display: flex; align-items: flex-end;
+    }
+    .blog-detail-hero-bg {
+        position: absolute; inset: 0;
+        background: url('{{ post.image }}') center/cover no-repeat;
+    }
+    .blog-detail-hero-bg::after {
+        content: ''; position: absolute; inset: 0;
+        background: linear-gradient(to top, rgba(15,23,42,.85) 0%, rgba(15,23,42,.2) 60%, transparent 100%);
+    }
+    .blog-detail-hero-content {
+        position: relative; z-index: 2; padding: 2.5rem 0;
+    }
+    .blog-detail-tag {
+        display: inline-block; padding: .25rem .8rem;
+        border-radius: 20px; font-size: .75rem; font-weight: 700;
+        margin-bottom: .75rem;
+    }
+    .blog-detail-tag--tips { background: rgba(34,197,94,.2); color: #4ade80; border: 1px solid rgba(34,197,94,.3); }
+    .blog-detail-tag--update { background: rgba(59,130,246,.2); color: #60a5fa; border: 1px solid rgba(59,130,246,.3); }
+    .blog-detail-tag--news { background: rgba(245,158,11,.2); color: #fbbf24; border: 1px solid rgba(245,158,11,.3); }
+    .blog-detail-tag--howto { background: rgba(139,92,246,.2); color: #a78bfa; border: 1px solid rgba(139,92,246,.3); }
+    .blog-detail-hero h1 {
+        font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+        font-weight: 800; color: #fff;
+        line-height: 1.2; margin-bottom: .75rem;
+        max-width: 650px;
+    }
+    .blog-detail-meta {
+        display: flex; align-items: center; gap: 1.25rem;
+        font-size: .85rem; color: rgba(255,255,255,.55);
+    }
+    .blog-detail-meta i { font-size: .8rem; }
+
+    .blog-detail-body {
+        padding: 3.5rem 0 4rem;
+        background: var(--bg-body);
+    }
+    .blog-detail-content {
+        max-width: 680px; margin: 0 auto;
+    }
+    .blog-detail-content h2 {
+        font-weight: 800; font-size: 1.25rem;
+        margin: 2rem 0 .75rem;
+        color: var(--text-primary);
+    }
+    .blog-detail-content p {
+        color: var(--text-muted); font-size: .95rem;
+        line-height: 1.8; margin-bottom: 1rem;
+    }
+    .blog-detail-content ul, .blog-detail-content ol {
+        color: var(--text-muted); font-size: .95rem;
+        line-height: 1.8; margin-bottom: 1rem;
+        padding-left: 1.5rem;
+    }
+    .blog-detail-content li { margin-bottom: .4rem; }
+    .blog-detail-content strong { color: var(--text-primary); }
+
+    .blog-detail-nav {
+        max-width: 680px; margin: 0 auto;
+        padding-top: 2rem;
+        border-top: 1px solid var(--border-color);
+        display: flex; justify-content: space-between; gap: 2rem;
+    }
+    .blog-detail-nav-link {
+        text-decoration: none; color: var(--text-muted);
+        transition: color .2s; flex: 1;
+    }
+    .blog-detail-nav-link:hover { color: #1e40af; }
+    .blog-detail-nav-label {
+        font-size: .7rem; font-weight: 700;
+        text-transform: uppercase; letter-spacing: .06em;
+        margin-bottom: .25rem;
+    }
+    .blog-detail-nav-title {
+        font-weight: 700; font-size: .85rem;
+        line-height: 1.4;
+    }
+    .blog-detail-nav-next { text-align: right; }
+
+    .blog-detail-back {
+        max-width: 680px; margin: 2rem auto 0;
+        text-align: center;
+    }
+    .blog-detail-back a {
+        font-size: .85rem; font-weight: 700; color: #1e40af;
+        text-decoration: none;
+    }
+    .blog-detail-back a:hover { text-decoration: underline; }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="blog-detail-hero">
+    <div class="blog-detail-hero-bg"></div>
+    <div class="container blog-detail-hero-content">
+        <span class="blog-detail-tag {{ post.tag_class }}">{{ post.tag }}</span>
+        <h1>{{ post.title }}</h1>
+        <div class="blog-detail-meta">
+            <span><i class="far fa-calendar me-1"></i> {{ post.date }}</span>
+            <span><i class="far fa-clock me-1"></i> {{ post.read_time }}</span>
+        </div>
+    </div>
+</section>
+
+<section class="blog-detail-body">
+    <div class="container">
+        <div class="blog-detail-content">
+            {{ post.content|safe }}
+
+            <div class="blog-detail-nav">
+                {% if prev_post %}
+                <a href="{% url 'blog:blog_detail' slug=prev_post.slug %}" class="blog-detail-nav-link">
+                    <div class="blog-detail-nav-label"><i class="fas fa-arrow-left me-1"></i> {% trans "Previous" %}</div>
+                    <div class="blog-detail-nav-title">{{ prev_post.title }}</div>
+                </a>
+                {% else %}<div></div>{% endif %}
+                {% if next_post %}
+                <a href="{% url 'blog:blog_detail' slug=next_post.slug %}" class="blog-detail-nav-link blog-detail-nav-next">
+                    <div class="blog-detail-nav-label">{% trans "Next" %} <i class="fas fa-arrow-right ms-1"></i></div>
+                    <div class="blog-detail-nav-title">{{ next_post.title }}</div>
+                </a>
+                {% else %}<div></div>{% endif %}
+            </div>
+
+            <div class="blog-detail-back">
+                <a href="{% url 'blog:index' %}"><i class="fas fa-arrow-left me-1"></i> {% trans "Back to Blog" %}</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block global_cta %}{% endblock %}

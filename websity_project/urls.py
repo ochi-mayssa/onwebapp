@@ -53,6 +53,7 @@ urlpatterns = [
     path('branding/', include('branding.urls', namespace='branding')),
     path('root/', include('root_dashboard.urls', namespace='root_dashboard')),
     path('digital/', include('digital_presence.urls', namespace='digital_presence')),
+    path('integration/', include('integration.urls', namespace='integration')),
 
     # Branding REST API
     path('api/branding/', include('branding.api.urls', namespace='branding-api')),

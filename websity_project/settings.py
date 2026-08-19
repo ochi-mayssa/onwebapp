@@ -275,6 +275,25 @@ STORAGES = {
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# Design upload validation
+MAX_DESIGN_FILE_SIZE = 50 * 1024 * 1024  # 50 MB
+ALLOWED_DESIGN_MIME_TYPES = {
+    'image/png', 'image/jpeg', 'image/webp', 'image/gif', 'image/svg+xml',
+    'application/pdf',
+    'application/postscript',
+    'font/otf', 'font/ttf', 'font/woff', 'font/woff2',
+    'application/x-font-otf', 'application/x-font-ttf', 'application/x-font-woff',
+    'application/zip',
+    'text/plain', 'text/csv',
+}
+ALLOWED_DESIGN_EXTENSIONS = {
+    '.png', '.jpg', '.jpeg', '.webp', '.gif', '.svg',
+    '.pdf', '.ai', '.eps',
+    '.otf', '.ttf', '.woff', '.woff2',
+    '.zip',
+    '.txt', '.csv',
+}
+
 # Authentication redirects
 LOGIN_REDIRECT_URL = 'users:onboarding'
 LOGOUT_REDIRECT_URL = '/'

@@ -198,6 +198,53 @@ document.addEventListener('DOMContentLoaded', function () {
             try { tags = JSON.parse(card.dataset.tags || '[]'); } catch (e) {}
             var examples = [];
             try { examples = JSON.parse(card.dataset.examples || '[]'); } catch (e) {}
+            var palette = [];
+            try { palette = JSON.parse(card.dataset.palette || '[]'); } catch (e) {}
+            var fonts = [];
+            try { fonts = JSON.parse(card.dataset.fonts || '[]'); } catch (e) {}
+
+            var items = [
+                { key: 'hero', label: 'Hero Image', icon: 'fa-image', url: card.dataset.hero },
+                { key: 'logo', label: 'Logo', icon: 'fa-shapes', url: card.dataset.logo },
+                { key: 'typography', label: 'Typography', icon: 'fa-font', url: card.dataset.typography },
+                { key: 'business_card', label: 'Business Card', icon: 'fa-id-card', url: card.dataset.businessCard },
+                { key: 'presentation', label: 'Presentation', icon: 'fa-file-powerpoint', url: card.dataset.presentation },
+                { key: 'letterhead', label: 'Letterhead', icon: 'fa-envelope-open-text', url: card.dataset.letterhead },
+                { key: 'email_signature', label: 'Email Signature', icon: 'fa-envelope', url: card.dataset.emailSignature },
+                { key: 'social_media', label: 'Social Media', icon: 'fa-hashtag', url: card.dataset.socialMedia },
+                { key: 'brand_guidelines', label: 'Brand Guidelines', icon: 'fa-book-open', url: card.dataset.brandGuidelines }
+            ];
+            var validItems = items.filter(function (it) { return it.url && it.url !== 'undefined'; });
+
+            var galleryHtml = '';
+            if (validItems.length > 0) {
+                galleryHtml = '<div class="coll-gallery">' +
+                    validItems.map(function (it) {
+                        return '<div class="coll-gallery-item">' +
+                            '<img src="' + it.url + '" alt="' + it.label + '" loading="lazy">' +
+                            '<div class="coll-gallery-label"><i class="fa-solid ' + it.icon + ' me-1"></i>' + it.label + '</div>' +
+                        '</div>';
+                    }).join('') +
+                '</div>';
+            }
+
+            var paletteHtml = '';
+            if (palette.length > 0) {
+                paletteHtml = '<div class="coll-palette">' +
+                    '<h6 class="fw-700 mb-2"><i class="fa-solid fa-palette me-1"></i>Color Palette</h6>' +
+                    '<div class="d-flex flex-wrap gap-2">' + palette.map(function (c) {
+                        return '<div style="width:36px;height:36px;border-radius:10px;background:' + c + ';border:2px solid #e5e7eb;" title="' + c + '"></div>';
+                    }).join('') + '</div></div>';
+            }
+
+            var fontsHtml = '';
+            if (fonts.length > 0) {
+                fontsHtml = '<div class="coll-fonts">' +
+                    '<h6 class="fw-700 mb-2"><i class="fa-solid fa-font me-1"></i>Typography</h6>' +
+                    '<div class="d-flex flex-wrap gap-2">' + fonts.map(function (f) {
+                        return '<span class="badge bg-light text-dark border px-3 py-2">' + f + '</span>';
+                    }).join('') + '</div></div>';
+            }
 
             body.innerHTML =
                 '<div style="background:linear-gradient(135deg,' + color + '22,' + color + '44);min-height:200px;display:flex;align-items:center;justify-content:center;">' +
@@ -211,9 +258,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     (tags.length ? '<div class="d-flex flex-wrap gap-2 mb-3">' + tags.map(function (t) {
                         return '<span class="badge bg-light text-dark border">' + t + '</span>';
                     }).join('') + '</div>' : '') +
-                    (examples.length ? '<h6 class="fw-700 mb-2">What\'s Included</h6><ul class="mb-0">' + examples.map(function (ex) {
+                    (examples.length ? '<h6 class="fw-700 mb-2">What\'s Included</h6><ul class="mb-3">' + examples.map(function (ex) {
                         return '<li><i class="fa-solid fa-check text-success me-1"></i>' + ex + '</li>';
                     }).join('') + '</ul>' : '') +
+                    galleryHtml +
+                    paletteHtml +
+                    fontsHtml +
                 '</div>';
 
             var bsModal = new bootstrap.Modal(modal);

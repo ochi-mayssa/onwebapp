@@ -1,4 +1,5 @@
 from django.urls import path
+from django.views.generic import RedirectView
 
 from . import views
 
@@ -96,18 +97,18 @@ urlpatterns = [
     path('designer/requests/<int:pk>/feedback-requests/', views.designer_feedback_requests, name='designer_feedback_requests'),
     path('designer/requests/<int:pk>/feedback-requests/<int:fr_id>/', views.designer_feedback_detail, name='designer_feedback_detail'),
 
-    # Designer Workflow — Resources
-    path('designer/resources/', views.designer_resources, name='designer_resources'),
+    # Designer Workflow — Design Library (unified)
+    path('designer/library/', views.design_library, name='design_library'),
 
-    # Designer Workflow — Time Tracking
+    # Redirect old standalone pages to unified library
+    path('designer/resources/', RedirectView.as_view(pattern_name='branding:design_library', query_string=True), name='designer_resources'),
+    path('designer/templates/', RedirectView.as_view(pattern_name='branding:design_library', query_string=True), name='designer_templates'),
+    path('designer/collections/', RedirectView.as_view(pattern_name='branding:design_library', query_string=True), name='designer_collection_list'),
     path('designer/time/', views.designer_time_tracking, name='designer_time_tracking'),
     path('designer/time/export/', views.designer_export_timesheet, name='designer_export_timesheet'),
 
     # Designer Workflow — Notes & Journal
     path('designer/requests/<int:pk>/notes/', views.designer_notes, name='designer_notes'),
-
-    # Designer Workflow — Templates
-    path('designer/templates/', views.designer_templates, name='designer_templates'),
 
     # Designer Workflow — Collection Templates
     path('designer/collection-templates/', views.collection_template_list, name='collection_template_list'),
@@ -117,7 +118,6 @@ urlpatterns = [
     path('designer/collection-templates/<int:pk>/download/', views.collection_template_download, name='collection_template_download'),
 
     # Designer Brand Collections
-    path('designer/collections/', views.designer_collection_list, name='designer_collection_list'),
     path('designer/collections/create/', views.designer_collection_create, name='designer_collection_create'),
     path('designer/collections/<slug:slug>/', views.designer_collection_detail, name='designer_collection_detail'),
     path('designer/collections/<slug:slug>/edit/', views.designer_collection_edit, name='designer_collection_edit'),

@@ -3,8 +3,8 @@
 {% block title %}{{ collection.name }} | Brand Collections{% endblock %}
 
 {% block branding_content %}
-<style>body{background:#09090b!important;}body .branding-page{background:#09090b;padding:0!important;margin:0!important;}body .branding-header,body .branding-footer,body footer{display:none!important;}</style>
-<script>document.body.classList.add('dd-active');</script>
+<style>body{background:#f5f5f7!important;}body .branding-page{background:#f5f5f7;padding:0!important;margin:0!important;}body .branding-header,body .branding-footer,body footer{display:none!important;}</style>
+<script>document.body.classList.add('dd-active');document.documentElement.setAttribute('data-dd-theme','light');</script>
 <div class="dd-layout">
     <aside class="dd-sidebar" id="ddSidebar">
         <a class="dd-sidebar-logo" href="{% url 'branding:designer_dashboard' %}">
@@ -16,22 +16,26 @@
         </a>
         <nav class="dd-sidebar-nav">
             <div class="dd-sidebar-section">
-                <div class="dd-sidebar-section-title">Workspace</div>
-                <a href="{% url 'branding:designer_dashboard' %}" class="dd-nav-item"><i class="fa-solid fa-gauge-high"></i>Dashboard</a>
-                <a href="{% url 'branding:my_requests' %}" class="dd-nav-item"><i class="fa-solid fa-folder-open"></i>My Projects</a>
+                <div class="dd-sidebar-section-title">Dashboard</div>
+                <a href="{% url 'branding:designer_dashboard' %}" class="dd-nav-item"><i class="fa-solid fa-gauge-high"></i>Overview</a>
+                <a href="{% url 'branding:showcase' %}" class="dd-nav-item"><i class="fa-solid fa-trophy"></i>Showcase</a>
             </div>
             <div class="dd-sidebar-section">
-                <div class="dd-sidebar-section-title">Work</div>
+                <div class="dd-sidebar-section-title">Design Library</div>
+                <a href="{% url 'branding:design_library' %}" class="dd-nav-item"><i class="fa-solid fa-book-open"></i>Library</a>
+                <a href="{% url 'branding:design_library' %}?tab=collections" class="dd-nav-item active"><i class="fa-solid fa-layer-group"></i>My Collections</a>
+                <a href="{% url 'branding:design_library' %}?tab=resources" class="dd-nav-item"><i class="fa-solid fa-cube"></i>Resources</a>
+                <a href="{% url 'branding:design_library' %}?tab=templates" class="dd-nav-item"><i class="fa-solid fa-file-lines"></i>Templates</a>
+            </div>
+            <div class="dd-sidebar-section">
+                <div class="dd-sidebar-section-title">Workspace</div>
+                <a href="{% url 'branding:my_requests' %}" class="dd-nav-item"><i class="fa-solid fa-folder-open"></i>My Projects</a>
                 <a href="{% url 'branding:kanban' %}" class="dd-nav-item"><i class="fa-solid fa-table-columns"></i>Board</a>
                 <a href="{% url 'branding:workflow_dashboard' %}" class="dd-nav-item"><i class="fa-solid fa-pen-ruler"></i>Workflow</a>
-                <a href="{% url 'branding:collection_template_list' %}" class="dd-nav-item active"><i class="fa-solid fa-layer-group"></i>Collections</a>
-                <a href="{% url 'branding:feedback_list' %}" class="dd-nav-item"><i class="fa-solid fa-message"></i>Feedback</a>
             </div>
             <div class="dd-sidebar-section">
-                <div class="dd-sidebar-section-title">Resources</div>
-                <a href="{% url 'branding:designer_templates' %}" class="dd-nav-item"><i class="fa-solid fa-file-lines"></i>Templates</a>
-                <a href="{% url 'branding:designer_resources' %}" class="dd-nav-item"><i class="fa-solid fa-book"></i>Resources</a>
-                <a href="{% url 'branding:showcase' %}" class="dd-nav-item"><i class="fa-solid fa-trophy"></i>Showcase</a>
+                <div class="dd-sidebar-section-title">Collaboration</div>
+                <a href="{% url 'branding:feedback_list' %}" class="dd-nav-item"><i class="fa-solid fa-message"></i>Feedback</a>
             </div>
         </nav>
         <div class="dd-sidebar-user">
@@ -54,12 +58,25 @@
                         {{ collection.name }}
                     </div>
                     <div class="dd-topbar-subtitle">
-                        <a href="{% url 'branding:designer_collection_list' %}" style="color:var(--dd-accent);">Collections</a>
+                        <a href="{% url 'branding:design_library' %}?tab=collections" style="color:var(--dd-accent);">Collections</a>
                         &nbsp;/&nbsp;{{ collection.industry|default:collection.client_name|default:"Details" }}
                     </div>
                 </div>
             </div>
             <div class="dd-topbar-right">
+                {% if collection.is_published %}
+                <form method="post" style="display:inline;" onsubmit="return confirm('Remove from client library?')">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="unpublish">
+                    <button type="submit" class="dd-btn dd-btn-ghost" style="color:#ef4444;"><i class="fa-solid fa-eye-slash"></i>Unpublish</button>
+                </form>
+                {% else %}
+                <form method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="publish">
+                    <button type="submit" class="dd-btn dd-btn-ghost" style="color:#10b981;"><i class="fa-solid fa-globe"></i>Publish to Client</button>
+                </form>
+                {% endif %}
                 <a href="{% url 'branding:designer_collection_edit' slug=collection.slug %}" class="dd-btn dd-btn-ghost"><i class="fa-solid fa-pen"></i>Edit</a>
                 <button class="dd-btn dd-btn-primary" onclick="document.getElementById('uploadModal').style.display='flex'"><i class="fa-solid fa-upload"></i>Upload Asset</button>
             </div>
@@ -72,19 +89,63 @@
             {% endfor %}
             {% endif %}
 
-            <div class="dd-detail-grid">
-                <div class="dd-detail-info">
+            {# ── Hero Banner ── #}
+            <div class="cd-hero" style="--cd-accent:{{ collection.accent_color }};">
+                {% if collection.hero_image %}
+                <img src="{{ collection.hero_image.url }}" alt="{{ collection.name }}" class="cd-hero-bg">
+                {% endif %}
+                <div class="cd-hero-overlay"></div>
+                <div class="cd-hero-content">
+                    <div class="cd-hero-badge" style="background:{{ collection.accent_color }};">
+                        <span style="font-size:1.1rem;font-weight:800;color:#fff;">{{ collection.name|slice:":1"|upper }}</span>
+                    </div>
+                    <div>
+                        <h1 class="cd-hero-title">{{ collection.name }}</h1>
+                        <div class="cd-hero-meta">
+                            {% if collection.industry %}<span class="cd-hero-tag"><i class="fa-solid fa-industry"></i>{{ collection.industry }}</span>{% endif %}
+                            {% if collection.is_published %}<span class="cd-hero-tag cd-hero-published"><i class="fa-solid fa-globe"></i>Published</span>{% endif %}
+                            {% if collection.style_tags %}
+                            {% for tag in collection.style_tags|slice:":3" %}
+                            <span class="cd-hero-tag">{{ tag }}</span>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# ── Main Grid ── #}
+            <div class="cd-grid">
+                {# ── Left: Preview Kit + Brand Identity ── #}
+                <div class="cd-sidebar">
+                    {% if collection.preview_items %}
+                    <div class="cd-panel">
+                        <h3 class="cd-panel-title"><i class="fa-solid fa-images"></i>Preview Kit</h3>
+                        <div class="cd-kit-grid">
+                            {% for key, label, icon, image in collection.preview_items %}
+                            <div class="cd-kit-item" data-full="{{ image.url }}">
+                                <img src="{{ image.url }}" alt="{{ label }}" loading="lazy">
+                                <div class="cd-kit-label"><i class="fa-solid {{ icon }}"></i>{{ label }}</div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
                     {% if collection.description %}
-                    <p style="color:var(--dd-text-secondary);margin-bottom:1rem;">{{ collection.description }}</p>
+                    <div class="cd-panel">
+                        <h3 class="cd-panel-title"><i class="fa-solid fa-align-left"></i>About</h3>
+                        <p class="cd-about-text">{{ collection.description }}</p>
+                    </div>
                     {% endif %}
 
                     {% if collection.color_palette %}
-                    <div class="dd-detail-section">
-                        <h4 class="dd-detail-label">Color Palette</h4>
-                        <div class="dd-palette">
+                    <div class="cd-panel">
+                        <h3 class="cd-panel-title"><i class="fa-solid fa-palette"></i>Color Palette</h3>
+                        <div class="cd-palette">
                             {% for color in collection.color_palette %}
-                            <div class="dd-palette-swatch" style="background:{{ color }};" title="{{ color }}">
-                                <span class="dd-palette-hex">{{ color }}</span>
+                            <div class="cd-swatch" style="background:{{ color }};">
+                                <span class="cd-swatch-hex">{{ color }}</span>
                             </div>
                             {% endfor %}
                         </div>
@@ -92,74 +153,84 @@
                     {% endif %}
 
                     {% if collection.fonts %}
-                    <div class="dd-detail-section">
-                        <h4 class="dd-detail-label">Typography</h4>
-                        {% for font in collection.fonts %}
-                        <div class="dd-font-item">{{ font }}</div>
-                        {% endfor %}
+                    <div class="cd-panel">
+                        <h3 class="cd-panel-title"><i class="fa-solid fa-font"></i>Typography</h3>
+                        <div class="cd-fonts">
+                            {% for font in collection.fonts %}
+                            <div class="cd-font-item">
+                                <span class="cd-font-name">{{ font }}</span>
+                                <span class="cd-font-preview" style="font-family:'{{ font }}',sans-serif;">Aa</span>
+                            </div>
+                            {% endfor %}
+                        </div>
                     </div>
                     {% endif %}
 
                     {% if collection.style_tags %}
-                    <div class="dd-detail-section">
-                        <h4 class="dd-detail-label">Style Tags</h4>
-                        <div class="dd-collection-tags">
+                    <div class="cd-panel">
+                        <h3 class="cd-panel-title"><i class="fa-solid fa-tags"></i>Style Tags</h3>
+                        <div class="cd-tags">
                             {% for tag in collection.style_tags %}
-                            <span class="dd-tag">{{ tag }}</span>
+                            <span class="cd-tag">{{ tag }}</span>
                             {% endfor %}
                         </div>
                     </div>
                     {% endif %}
                 </div>
 
-                <div class="dd-detail-assets">
-                    <div class="dd-assets-header">
-                        <h3>Assets <span class="dd-tab-badge">{{ assets|length }}</span></h3>
-                        <div class="dd-filter-row">
-                            <a href="{% url 'branding:designer_collection_detail' slug=collection.slug %}" class="dd-filter {% if not asset_type %}active{% endif %}">All</a>
+                {# ── Right: Assets ── #}
+                <div class="cd-assets">
+                    <div class="cd-assets-header">
+                        <h3 class="cd-assets-title">Assets <span class="cd-count">{{ assets|length }}</span></h3>
+                        <div class="cd-filters">
+                            <a href="{% url 'branding:designer_collection_detail' slug=collection.slug %}" class="cd-filter {% if not asset_type %}active{% endif %}">All</a>
                             {% for code, label in asset_types %}
-                            {% with count=asset_counts|default_if_none:0 %}
-                            <a href="{% url 'branding:designer_collection_detail' slug=collection.slug %}?type={{ code }}" class="dd-filter {% if asset_type == code %}active{% endif %}">{{ label }}</a>
-                            {% endwith %}
+                            <a href="{% url 'branding:designer_collection_detail' slug=collection.slug %}?type={{ code }}" class="cd-filter {% if asset_type == code %}active{% endif %}">{{ label }}</a>
                             {% endfor %}
                         </div>
                     </div>
 
                     {% if assets %}
-                    <div class="dd-grid-3">
+                    <div class="cd-asset-grid">
                         {% for a in assets %}
-                        <div class="dd-card dd-asset-card">
+                        <div class="cd-asset-card">
                             {% if a.is_image and a.thumbnail %}
-                            <img src="{{ a.thumbnail.url }}" alt="{{ a.name }}" class="dd-asset-thumb">
+                            <img src="{{ a.thumbnail.url }}" alt="{{ a.name }}" class="cd-asset-thumb">
                             {% elif a.is_image and a.file %}
-                            <img src="{{ a.file.url }}" alt="{{ a.name }}" class="dd-asset-thumb">
+                            <img src="{{ a.file.url }}" alt="{{ a.name }}" class="cd-asset-thumb">
                             {% elif a.color_hex %}
-                            <div class="dd-asset-color" style="background:{{ a.color_hex }};"></div>
+                            <div class="cd-asset-color" style="background:{{ a.color_hex }};"></div>
                             {% else %}
-                            <div class="dd-asset-icon">
+                            <div class="cd-asset-icon">
                                 <i class="fa-solid {% if a.asset_type == 'logo' %}fa-shapes{% elif a.asset_type == 'typography' %}fa-font{% elif a.asset_type == 'template' %}fa-file-lines{% elif a.asset_type == 'reference' %}fa-image{% elif a.asset_type == 'document' %}fa-file{% else %}fa-cube{% endif %}"></i>
                             </div>
                             {% endif %}
-                            <div class="dd-asset-info">
-                                <div class="dd-asset-name">{{ a.name }}</div>
-                                <div class="dd-asset-meta">{{ a.get_asset_type_display }}{% if a.file_size_display %} &middot; {{ a.file_size_display }}{% endif %}</div>
+                            <div class="cd-asset-body">
+                                <div class="cd-asset-name">{{ a.name }}</div>
+                                <div class="cd-asset-meta">{{ a.get_asset_type_display }}{% if a.file_size_display %} &middot; {{ a.file_size_display }}{% endif %}</div>
                             </div>
-                            <div class="dd-asset-actions">
+                            <div class="cd-asset-actions">
                                 {% if a.file %}
-                                <a href="{{ a.file.url }}" class="dd-btn dd-btn-ghost dd-btn-sm" download title="Download"><i class="fa-solid fa-download"></i></a>
+                                <a href="{{ a.file.url }}" class="cd-asset-btn" download title="Download"><i class="fa-solid fa-download"></i></a>
                                 {% endif %}
                                 <form method="post" action="{% url 'branding:designer_asset_delete' pk=a.pk %}" class="d-inline" onsubmit="return confirm('Delete this asset?')">
                                     {% csrf_token %}
-                                    <button type="submit" class="dd-btn dd-btn-ghost dd-btn-sm dd-btn-danger" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                                    <button type="submit" class="cd-asset-btn cd-asset-btn-danger" title="Delete"><i class="fa-solid fa-trash"></i></button>
                                 </form>
                             </div>
                         </div>
                         {% endfor %}
                     </div>
                     {% else %}
-                    <div class="dd-empty">
-                        <i class="fa-solid fa-cube"></i>
-                        <p>No assets yet. Upload your first asset.</p>
+                    <div class="cd-empty">
+                        <div class="cd-empty-icon">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                        </div>
+                        <h4>No assets yet</h4>
+                        <p>Upload your first design asset to this collection.</p>
+                        <button class="dd-btn dd-btn-primary" onclick="document.getElementById('uploadModal').style.display='flex'">
+                            <i class="fa-solid fa-upload"></i>Upload Asset
+                        </button>
                     </div>
                     {% endif %}
                 </div>
@@ -168,6 +239,7 @@
     </main>
 </div>
 
+{# ── Upload Modal ── #}
 <div class="dd-modal-overlay" id="uploadModal" style="display:none;">
     <div class="dd-modal">
         <div class="dd-modal-header">
@@ -210,6 +282,7 @@
     </div>
 </div>
 
+{# ── Delete Modal ── #}
 <div class="dd-modal-overlay" id="deleteModal" style="display:none;">
     <div class="dd-modal dd-modal-sm">
         <div class="dd-modal-header">
@@ -226,6 +299,12 @@
     </div>
 </div>
 
+{# ── Image Lightbox ── #}
+<div class="cd-lightbox" id="cdLightbox" style="display:none;">
+    <button class="cd-lightbox-close" onclick="document.getElementById('cdLightbox').style.display='none'"><i class="fa-solid fa-xmark"></i></button>
+    <img id="cdLightboxImg" src="" alt="">
+</div>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     var sidebar = document.getElementById('ddSidebar');
@@ -233,6 +312,21 @@ document.addEventListener('DOMContentLoaded', function() {
     var toggle = document.getElementById('ddSidebarToggle');
     if (toggle) toggle.addEventListener('click', function() { sidebar.classList.toggle('open'); overlay.classList.toggle('show'); });
     if (overlay) overlay.addEventListener('click', function() { sidebar.classList.remove('open'); overlay.classList.remove('show'); });
+
+    document.querySelectorAll('.cd-kit-item').forEach(function(item) {
+        item.addEventListener('click', function() {
+            var full = item.dataset.full;
+            if (!full) return;
+            var lightbox = document.getElementById('cdLightbox');
+            var img = document.getElementById('cdLightboxImg');
+            img.src = full;
+            lightbox.style.display = 'flex';
+        });
+    });
+    var lightbox = document.getElementById('cdLightbox');
+    if (lightbox) lightbox.addEventListener('click', function(e) {
+        if (e.target === lightbox) lightbox.style.display = 'none';
+    });
 });
 </script>
 {% endblock %}

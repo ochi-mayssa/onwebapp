@@ -3,481 +3,567 @@
 
 {% block title %}{% trans "OnWebApp — All-in-one Business Automation Platform" %}{% endblock %}
 
-{% block navbar_class %}fixed-top navbar-expand-lg{% endblock %}
-
-{% block extra_head %}
-<!-- Lucide Icons -->
-<script src="https://unpkg.com/lucide@latest"></script>
-<!-- Animate.css for entrance animations -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+{% block extra_css %}
 <style>
-    .hero-section {
-        padding: 180px 0 120px;
+    /* ===== HERO ===== */
+    .home-hero {
+        padding: 10rem 0 6rem;
+        background: var(--bg-body);
         position: relative;
-        background: radial-gradient(circle at 70% 30%, rgba(99, 102, 241, 0.05) 0%, transparent 50%),
-                    radial-gradient(circle at 10% 70%, rgba(6, 182, 212, 0.05) 0%, transparent 50%);
     }
-    .hero-title {
-        font-size: clamp(3rem, 8vw, 4.5rem);
+    .home-hero-title {
+        font-size: clamp(2.5rem, 6vw, 3.8rem);
         font-weight: 800;
-        letter-spacing: -0.04em;
         line-height: 1.1;
-        margin-bottom: 24px;
+        letter-spacing: -.03em;
+        margin-bottom: 1.25rem;
     }
-    .hero-subtitle {
-        font-size: 1.25rem;
-        color: var(--text-secondary);
-        margin-bottom: 40px;
-        max-width: 600px;
-        font-weight: 450;
+    .home-hero-title .text-gradient {
+        background: linear-gradient(135deg, #06b6d4, #3b82f6, #8b5cf6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
     }
-    .hero-preview {
-        border-radius: 24px;
-        box-shadow: var(--card-shadow-xl);
-        border: 1px solid var(--glass-border);
-        background: var(--glass-bg);
-        transform: rotateY(-10deg) rotateX(5deg);
-        transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    .home-hero-sub {
+        font-size: 1.15rem;
+        color: var(--text-muted);
+        max-width: 520px;
+        line-height: 1.7;
+        margin-bottom: 2rem;
     }
-    .hero-preview:hover {
-        transform: rotateY(0) rotateX(0);
+    .home-cta-primary {
+        display: inline-flex; align-items: center; gap: .5rem;
+        padding: .85rem 2rem; border-radius: 50px;
+        background: linear-gradient(135deg, #1e40af, #1e3a8a);
+        color: #fff; font-weight: 700; font-size: .95rem;
+        text-decoration: none; transition: all .3s;
+        box-shadow: 0 4px 16px rgba(30,64,175,.25);
     }
-    .comp-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
-    .comp-row { background: var(--bg-surface-secondary); border-radius: 12px; transition: all 0.3s ease; }
-    .comp-row:hover { background: var(--bg-surface-tertiary); transform: translateX(8px); }
-    .comp-cell { padding: 20px; border-top: 1px solid transparent; border-bottom: 1px solid transparent; }
-    .comp-cell:first-child { border-left: 1px solid transparent; border-top-left-radius: 12px; border-bottom-left-radius: 12px; }
-    .comp-cell:last-child { border-right: 1px solid transparent; border-top-right-radius: 12px; border-bottom-right-radius: 12px; }
-    .x-small { font-size: 0.8rem; }
-    .uppercase { text-transform: uppercase; }
-    .tracking-widest { letter-spacing: 0.15em; }
+    .home-cta-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(30,64,175,.35); color: #fff; }
+    .home-cta-secondary {
+        display: inline-flex; align-items: center; gap: .5rem;
+        padding: .85rem 2rem; border-radius: 50px;
+        background: transparent; border: 1.5px solid var(--border-color);
+        color: var(--text-primary); font-weight: 700; font-size: .95rem;
+        text-decoration: none; transition: all .3s;
+    }
+    .home-cta-secondary:hover { border-color: #1e40af; color: #1e40af; }
+
+    /* ===== STATS BAR ===== */
+    .home-stats {
+        padding: 3rem 0;
+        border-top: 1px solid var(--border-color);
+        border-bottom: 1px solid var(--border-color);
+        background: var(--bg-surface);
+    }
+    .home-stats-grid {
+        display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem;
+        text-align: center;
+    }
+    .home-stat-num {
+        font-size: 2rem; font-weight: 800; color: #1e40af;
+        line-height: 1; margin-bottom: .3rem;
+    }
+    .home-stat-label {
+        font-size: .82rem; color: var(--text-muted); font-weight: 500;
+    }
+
+    /* ===== SERVICES GRID ===== */
+    .home-services { padding: 5rem 0; background: var(--bg-body); }
+    .home-services-grid {
+        display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;
+    }
+    .home-service-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-color);
+        border-radius: 14px; padding: 2rem;
+        transition: all .3s; text-decoration: none;
+        display: block; color: inherit;
+    }
+    .home-service-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 32px rgba(0,0,0,.06);
+        border-color: #1e40af;
+        color: inherit;
+    }
+    .home-service-icon {
+        width: 48px; height: 48px; border-radius: 12px;
+        background: rgba(30,64,175,.08); color: #1e40af;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.2rem; margin-bottom: 1rem;
+    }
+    .home-service-card h6 { font-weight: 700; font-size: 1rem; margin-bottom: .4rem; }
+    .home-service-card p { color: var(--text-muted); font-size: .85rem; line-height: 1.6; margin-bottom: .75rem; }
+    .home-service-link {
+        font-size: .8rem; font-weight: 700; color: #1e40af;
+        display: inline-flex; align-items: center; gap: .3rem;
+    }
+    .home-service-link i { transition: transform .2s; }
+    .home-service-card:hover .home-service-link i { transform: translateX(3px); }
+
+    /* ===== PROBLEM / SOLUTION ===== */
+    .home-problem { padding: 5rem 0; background: var(--bg-surface); }
+    .home-ps-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+    .home-ps-card {
+        border-radius: 16px; padding: 2.5rem;
+        border: 1px solid var(--border-color);
+    }
+    .home-ps-card--problem { background: var(--bg-surface); }
+    .home-ps-card--solution { background: linear-gradient(135deg, #1e40af, #1e3a8a); color: #fff; border: none; }
+    .home-ps-header {
+        display: flex; align-items: center; gap: .75rem;
+        margin-bottom: 1.5rem;
+    }
+    .home-ps-icon {
+        width: 40px; height: 40px; border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1rem;
+    }
+    .home-ps-card--problem .home-ps-icon { background: rgba(239,68,68,.1); color: #ef4444; }
+    .home-ps-card--solution .home-ps-icon { background: rgba(255,255,255,.15); color: #fff; }
+    .home-ps-header h4 { font-weight: 800; font-size: 1.1rem; margin: 0; }
+    .home-ps-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 1.25rem; }
+    .home-ps-list li { display: flex; gap: .75rem; align-items: flex-start; }
+    .home-ps-list li i { margin-top: .2rem; font-size: .85rem; flex-shrink: 0; }
+    .home-ps-card--problem .home-ps-list li i { color: #ef4444; }
+    .home-ps-card--solution .home-ps-list li i { color: #fff; }
+    .home-ps-list li strong { display: block; font-size: .9rem; margin-bottom: .15rem; }
+    .home-ps-list li small { font-size: .82rem; line-height: 1.5; }
+    .home-ps-card--problem li small { color: var(--text-muted); }
+    .home-ps-card--solution li small { color: rgba(255,255,255,.7); }
+
+    /* ===== HOW IT WORKS ===== */
+    .home-how { padding: 5rem 0; background: var(--bg-body); }
+    .home-how-steps {
+        display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem;
+        position: relative;
+    }
+    .home-how-steps::before {
+        content: ''; position: absolute;
+        top: 36px; left: 12%; right: 12%;
+        height: 2px; background: var(--border-color);
+        z-index: 0;
+    }
+    .home-how-step {
+        text-align: center; position: relative; z-index: 1;
+    }
+    .home-how-num {
+        width: 72px; height: 72px; border-radius: 50%;
+        background: var(--bg-surface);
+        border: 2px solid var(--border-color);
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 1.2rem; font-weight: 800; color: #1e40af;
+        transition: all .3s;
+    }
+    .home-how-step:hover .home-how-num {
+        background: #1e40af; color: #fff;
+        border-color: #1e40af;
+        box-shadow: 0 4px 16px rgba(30,64,175,.3);
+    }
+    .home-how-step h6 { font-weight: 700; font-size: .95rem; margin-bottom: .3rem; }
+    .home-how-step p { color: var(--text-muted); font-size: .82rem; line-height: 1.5; margin: 0; }
+
+    /* ===== TESTIMONIALS ===== */
+    .home-testimonials { padding: 5rem 0; background: var(--bg-surface); }
+    .home-test-grid {
+        display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;
+    }
+    .home-test-card {
+        background: var(--bg-body);
+        border: 1px solid var(--border-color);
+        border-radius: 14px; padding: 2rem;
+        position: relative;
+    }
+    .home-test-card::before {
+        content: '\201C';
+        position: absolute; top: 1rem; right: 1.5rem;
+        font-size: 3rem; color: rgba(30,64,175,.08);
+        font-family: Georgia, serif; line-height: 1;
+    }
+    .home-test-stars { color: #f59e0b; font-size: .8rem; margin-bottom: .75rem; letter-spacing: .1em; }
+    .home-test-card blockquote {
+        font-size: .9rem; line-height: 1.7;
+        color: var(--text-muted); margin-bottom: 1.25rem;
+        font-style: italic;
+    }
+    .home-test-author { display: flex; align-items: center; gap: .75rem; }
+    .home-test-avatar {
+        width: 40px; height: 40px; border-radius: 50%;
+        background: linear-gradient(135deg, #1e40af, #1e3a8a);
+        color: #fff; display: flex; align-items: center; justify-content: center;
+        font-size: .75rem; font-weight: 800;
+    }
+    .home-test-name { font-weight: 700; font-size: .85rem; }
+    .home-test-role { font-size: .75rem; color: var(--text-muted); }
+
+    /* ===== PRICING ===== */
+    .home-pricing { padding: 5rem 0; background: var(--bg-body); }
+    .home-price-grid {
+        display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;
+        align-items: stretch;
+    }
+    .home-price-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-color);
+        border-radius: 16px; padding: 2.5rem 2rem;
+        display: flex; flex-direction: column;
+        transition: all .3s;
+    }
+    .home-price-card--popular {
+        border: 2px solid #1e40af;
+        box-shadow: 0 8px 32px rgba(30,64,175,.1);
+        position: relative;
+    }
+    .home-price-badge {
+        position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+        background: #1e40af; color: #fff;
+        padding: .25rem 1rem; border-radius: 20px;
+        font-size: .7rem; font-weight: 700; white-space: nowrap;
+    }
+    .home-price-card h5 { font-weight: 800; font-size: 1.1rem; margin-bottom: .3rem; }
+    .home-price-card .price-desc { color: var(--text-muted); font-size: .82rem; margin-bottom: 1.25rem; }
+    .home-price-amount {
+        font-size: 2.5rem; font-weight: 800; margin-bottom: 1.5rem;
+    }
+    .home-price-amount span { font-size: .9rem; font-weight: 500; color: var(--text-muted); }
+    .home-price-features {
+        list-style: none; padding: 0; margin: 0 0 2rem;
+        display: flex; flex-direction: column; gap: .75rem;
+        flex-grow: 1;
+    }
+    .home-price-features li {
+        display: flex; align-items: center; gap: .5rem;
+        font-size: .85rem; color: var(--text-muted);
+    }
+    .home-price-features li i { color: #22c55e; font-size: .75rem; }
+    .home-price-btn {
+        display: block; text-align: center; padding: .8rem;
+        border-radius: 10px; font-weight: 700; font-size: .9rem;
+        text-decoration: none; transition: all .3s;
+    }
+    .home-price-btn--outline {
+        border: 1.5px solid var(--border-color); color: var(--text-primary);
+        background: transparent;
+    }
+    .home-price-btn--outline:hover { border-color: #1e40af; color: #1e40af; }
+    .home-price-btn--fill {
+        background: #1e40af; color: #fff;
+        border: 1.5px solid #1e40af;
+    }
+    .home-price-btn--fill:hover { background: #1e3a8a; }
+
+    /* ===== FAQ ===== */
+    .home-faq { padding: 5rem 0; background: var(--bg-surface); }
+    .home-faq-list { max-width: 700px; margin: 0 auto; }
+    .home-faq-item {
+        border: 1px solid var(--border-color);
+        border-radius: 12px; margin-bottom: .75rem;
+        background: var(--bg-body);
+        overflow: hidden; transition: all .3s;
+    }
+    .home-faq-item.active { border-color: #1e40af; }
+    .home-faq-q {
+        padding: 1.25rem 1.5rem;
+        display: flex; align-items: center; justify-content: space-between;
+        cursor: pointer; font-weight: 700; font-size: .95rem;
+        user-select: none; transition: color .2s;
+    }
+    .home-faq-q:hover { color: #1e40af; }
+    .home-faq-q i {
+        font-size: .75rem; color: var(--text-muted);
+        transition: transform .3s;
+    }
+    .home-faq-item.active .home-faq-q i { transform: rotate(180deg); color: #1e40af; }
+    .home-faq-a {
+        max-height: 0; overflow: hidden;
+        transition: max-height .3s ease, padding .3s ease;
+    }
+    .home-faq-item.active .home-faq-a {
+        max-height: 300px;
+    }
+    .home-faq-a-inner {
+        padding: 0 1.5rem 1.25rem;
+        color: var(--text-muted); font-size: .88rem; line-height: 1.7;
+    }
+
+    /* ===== FINAL CTA ===== */
+    .home-final-cta {
+        padding: 5rem 0;
+        background: linear-gradient(135deg, #0f172a, #1e293b);
+        text-align: center; color: #fff;
+    }
+    .home-final-cta h2 { font-weight: 800; font-size: 2rem; margin-bottom: .75rem; }
+    .home-final-cta p { color: rgba(255,255,255,.6); font-size: 1rem; margin-bottom: 2rem; max-width: 500px; margin-left: auto; margin-right: auto; }
+    .home-trust-badges {
+        display: flex; justify-content: center; gap: 1.5rem;
+        margin-top: 2rem; flex-wrap: wrap;
+    }
+    .home-trust-badge {
+        display: flex; align-items: center; gap: .4rem;
+        font-size: .78rem; color: rgba(255,255,255,.5);
+    }
+    .home-trust-badge i { color: #22c55e; }
+
+    /* ===== MOBILE ===== */
+    @media (max-width: 991.98px) {
+        .home-hero { padding: 8rem 0 4rem; }
+        .home-stats-grid { grid-template-columns: repeat(2, 1fr); }
+        .home-services-grid { grid-template-columns: 1fr; }
+        .home-ps-grid { grid-template-columns: 1fr; }
+        .home-how-steps { grid-template-columns: repeat(2, 1fr); }
+        .home-how-steps::before { display: none; }
+        .home-test-grid { grid-template-columns: 1fr; }
+        .home-price-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 575.98px) {
+        .home-hero { padding: 7rem 0 3rem; }
+        .home-hero-title { font-size: 2rem; }
+        .home-stats-grid { grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+        .home-how-steps { grid-template-columns: 1fr; }
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<!-- 1. Hero Section -->
-<section class="hero-section">
+<!-- 1. HERO -->
+<section class="home-hero">
     <div class="container">
         <div class="row align-items-center">
-            <div class="col-lg-7 reveal-up">
-                <h1 class="hero-title"><span class="text-gradient">All-in-one</span> <br>Business Automation Platform.</h1>
-                <p class="hero-subtitle">Unified CRM, ERP, Analytics, and RPA in one beautiful system. Streamline your enterprise intelligence and automate growth.</p>
+            <div class="col-lg-8 animate-on-scroll slide-up">
+                <h1 class="home-hero-title">
+                    <span class="text-gradient">{% trans "All-in-one" %}</span><br>
+                    {% trans "Business Automation Platform." %}
+                </h1>
+                <p class="home-hero-sub">
+                    {% trans "Unified CRM, ERP, Analytics, and RPA in one system. Streamline your enterprise intelligence and automate growth." %}
+                </p>
                 <div class="d-flex flex-wrap gap-3">
-                    <a href="{% url 'users:signup' %}" class="btn btn-primary btn-lg px-5 py-3 rounded-pill shadow-lg">{% trans "Get Started" %}</a>
-                    <a href="{% url 'chatbot:chatbot' %}" class="btn btn-outline-primary btn-lg px-5 py-3 rounded-pill"> {% trans "View Demo" %}</a>
-                </div>
-            </div>
-            <div class="col-lg-5 d-none d-lg-block reveal-up delay-200">
-                <div class="hero-preview p-2">
-                    <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80" alt="OnWebApp Dashboard Preview" class="img-fluid rounded-4">
+                    <a href="{% url 'users:signup' %}" class="home-cta-primary">
+                        {% trans "Get Started" %} <i class="fas fa-arrow-right"></i>
+                    </a>
+                    <a href="{% url 'chatbot:chatbot' %}" class="home-cta-secondary">
+                        <i class="fas fa-play-circle"></i> {% trans "View Demo" %}
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- 2. Problem -> Solution Section -->
-<section class="section-padding bg-surface position-relative">
+<!-- 2. STATS BAR -->
+<section class="home-stats">
     <div class="container">
-        <div class="text-center mb-5 reveal-up">
-            <h6 class="text-primary fw-800 uppercase x-small tracking-widest mb-3">Unified Operations</h6>
-            <h2 class="fw-800 display-5 mb-3">Stop juggling <span class="text-danger">scattered tools</span>.</h2>
-            <p class="text-secondary fs-5 mx-auto" style="max-width: 600px;">OnWebApp unifies your entire business operations into a single source of truth.</p>
-        </div>
-        <div class="row g-5 align-items-center">
-            <div class="col-lg-6 reveal-up delay-100">
-                <div class="p-5 rounded-4 bg-surface-secondary border border-color">
-                    <div class="d-flex align-items-center gap-3 mb-4">
-                        <div class="p-3 rounded-3 bg-danger-soft text-danger">
-                            <i data-lucide="alert-circle"></i>
-                        </div>
-                        <h4 class="fw-800 mb-0">The Problem</h4>
-                    </div>
-                    <ul class="list-unstyled vstack gap-4 mb-0">
-                        <li class="d-flex gap-3">
-                            <i data-lucide="x" class="text-danger opacity-50" style="width: 20px;"></i>
-                            <div>
-                                <span class="fw-bold d-block">Fragmented Data</span>
-                                <small class="text-secondary">Data scattered across multiple disconnected apps and spreadsheets.</small>
-                            </div>
-                        </li>
-                        <li class="d-flex gap-3">
-                            <i data-lucide="x" class="text-danger opacity-50" style="width: 20px;"></i>
-                            <div>
-                                <span class="fw-bold d-block">Subscription Fatigue</span>
-                                <small class="text-secondary">High costs for 5+ different software subscriptions and API connectors.</small>
-                            </div>
-                        </li>
-                        <li class="d-flex gap-3">
-                            <i data-lucide="x" class="text-danger opacity-50" style="width: 20px;"></i>
-                            <div>
-                                <span class="fw-bold d-block">Manual Overhead</span>
-                                <small class="text-secondary">Manual data entry causing human errors and operational delays.</small>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
+        <div class="home-stats-grid">
+            <div class="animate-on-scroll slide-up">
+                <div class="home-stat-num" data-count="500">0</div>
+                <div class="home-stat-label">{% trans "Companies Trust Us" %}</div>
             </div>
-            <div class="col-lg-6 reveal-up delay-200">
-                <div class="p-5 rounded-4 bg-primary text-white shadow-lg position-relative overflow-hidden">
-                    <div class="position-absolute top-0 end-0 p-5 opacity-10">
-                        <i data-lucide="zap" style="width: 120px; height: 120px;"></i>
-                    </div>
-                    <div class="d-flex align-items-center gap-3 mb-4">
-                        <div class="p-3 rounded-3 bg-white bg-opacity-20 text-white">
-                            <i data-lucide="check-circle"></i>
-                        </div>
-                        <h4 class="fw-800 mb-0">The OnWebApp Solution</h4>
-                    </div>
-                    <ul class="list-unstyled vstack gap-4 mb-0">
-                        <li class="d-flex gap-3">
-                            <i data-lucide="plus" class="text-white" style="width: 20px;"></i>
-                            <div>
-                                <span class="fw-bold d-block">100% Unified Architecture</span>
-                                <small class="text-white text-opacity-75">Every module shares the same database for instant consistency.</small>
-                            </div>
-                        </li>
-                        <li class="d-flex gap-3">
-                            <i data-lucide="plus" class="text-white" style="width: 20px;"></i>
-                            <div>
-                                <span class="fw-bold d-block">Consolidated Cost</span>
-                                <small class="text-white text-opacity-75">One transparent subscription for CRM, ERP, Analytics, and RPA.</small>
-                            </div>
-                        </li>
-                        <li class="d-flex gap-3">
-                            <i data-lucide="plus" class="text-white" style="width: 20px;"></i>
-                            <div>
-                                <span class="fw-bold d-block">Industrial Automation</span>
-                                <small class="text-white text-opacity-75">Intelligent workflows built into every core business process.</small>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
+            <div class="animate-on-scroll slide-up" style="transition-delay:.08s;">
+                <div class="home-stat-num" data-count="30">0</div>
+                <div class="home-stat-label">{% trans "Services Available" %}</div>
+            </div>
+            <div class="animate-on-scroll slide-up" style="transition-delay:.16s;">
+                <div class="home-stat-num">99.9%</div>
+                <div class="home-stat-label">{% trans "Uptime Guarantee" %}</div>
+            </div>
+            <div class="animate-on-scroll slide-up" style="transition-delay:.24s;">
+                <div class="home-stat-num">24/7</div>
+                <div class="home-stat-label">{% trans "Expert Support" %}</div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- 3. Core Features Section -->
-<section class="section-padding bg-surface-secondary">
+<!-- 3. SERVICES GRID -->
+<section class="home-services">
     <div class="container">
-        <div class="text-center mb-5 reveal-up">
-            <h6 class="text-primary fw-800 uppercase x-small tracking-widest mb-3">Enterprise Suite</h6>
-            <h2 class="fw-800 display-5">Intelligence, <span class="text-primary">Simplified</span>.</h2>
+        <div class="text-center mb-5 animate-on-scroll">
+            <h6 class="fw-800 uppercase x-small tracking-widest mb-3" style="color:#1e40af;">{% trans "What We Offer" %}</h6>
+            <h2 class="fw-800" style="font-size:1.8rem;">{% trans "Everything you need to run your business." %}</h2>
         </div>
-        <div class="row g-4">
-            <div class="col-md-6 col-lg-4 reveal-up delay-100">
-                <div class="card h-100 border-0 shadow-sm hover-lift">
-                    <div class="card-body p-4">
-                        <div class="bg-primary-soft text-primary p-3 rounded-3 d-inline-block mb-4">
-                            <i data-lucide="users"></i>
-                        </div>
-                        <h4 class="fw-bold">CRM System</h4>
-                        <p class="text-secondary small mb-4">Track leads, monitor customer health, and automate engagement with AI-driven insights.</p>
-                        <div class="rounded-3 overflow-hidden border">
-                            <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&q=80" class="img-fluid opacity-75" alt="CRM System Preview" loading="lazy">
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-4 reveal-up delay-200">
-                <div class="card h-100 border-0 shadow-sm hover-lift">
-                    <div class="card-body p-4">
-                        <div class="bg-success-soft text-success p-3 rounded-3 d-inline-block mb-4">
-                            <i data-lucide="package"></i>
-                        </div>
-                        <h4 class="fw-bold">ERP Integration</h4>
-                        <p class="text-secondary small mb-4">Manage stock, orders, and enterprise invoicing with full ERPNext cloud synchronization.</p>
-                        <div class="rounded-3 overflow-hidden border">
-                            <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=400&q=80" class="img-fluid opacity-75" alt="ERP Integration Preview" loading="lazy">
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-4 reveal-up delay-300">
-                <div class="card h-100 border-0 shadow-sm hover-lift">
-                    <div class="card-body p-4">
-                        <div class="bg-info-soft text-info p-3 rounded-3 d-inline-block mb-4">
-                            <i data-lucide="bar-chart-3"></i>
-                        </div>
-                        <h4 class="fw-bold">Live Analytics</h4>
-                        <p class="text-secondary small mb-4">Real-time business intelligence with interactive charts and market distribution mapping.</p>
-                        <div class="rounded-3 overflow-hidden border">
-                            <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&q=80" class="img-fluid opacity-75" alt="Analytics Dashboard Preview" loading="lazy">
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-4 reveal-up delay-100">
-                <div class="card h-100 border-0 shadow-sm hover-lift">
-                    <div class="card-body p-4">
-                        <div class="bg-accent-purple text-white p-3 rounded-3 d-inline-block mb-4" style="--accent-purple: #8b5cf6;">
-                            <i data-lucide="cpu"></i>
-                        </div>
-                        <h4 class="fw-bold">Automation Engine</h4>
-                        <p class="text-secondary small mb-4">Deploy custom RPA workflows that handle repetitive tasks with industrial-grade reliability.</p>
-                        <div class="rounded-3 overflow-hidden border">
-                            <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&q=80" class="img-fluid opacity-75" alt="Automation Engine Preview" loading="lazy">
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-4 reveal-up delay-200">
-                <div class="card h-100 border-0 shadow-sm hover-lift">
-                    <div class="card-body p-4">
-                        <div class="bg-accent-cyan text-white p-3 rounded-3 d-inline-block mb-4" style="--accent-cyan: #06b6d4;">
-                            <i data-lucide="activity"></i>
-                        </div>
-                        <h4 class="fw-bold">Platform Monitoring</h4>
-                        <p class="text-secondary small mb-4">Global uptime checks, Core Web Vitals, and security audits for your entire digital ecosystem.</p>
-                        <div class="rounded-3 overflow-hidden border">
-                            <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=400&q=80" class="img-fluid opacity-75" alt="Platform Monitoring Preview" loading="lazy">
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-4 reveal-up delay-300">
-                <div class="card h-100 border-0 shadow-sm hover-lift">
-                    <div class="card-body p-4">
-                        <div class="bg-accent-pink text-white p-3 rounded-3 d-inline-block mb-4" style="--accent-pink: #ec4899;">
-                            <i data-lucide="share-2"></i>
-                        </div>
-                        <h4 class="fw-bold">Social Tracking</h4>
-                        <p class="text-secondary small mb-4">Monitor brand sentiment and social engagement across all platforms in real-time.</p>
-                        <div class="rounded-3 overflow-hidden border">
-                            <img src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=400&q=80" class="img-fluid opacity-75" alt="Social Tracking Preview" loading="lazy">
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="home-services-grid">
+            <a href="{% url 'services:index' %}" class="home-service-card animate-on-scroll slide-up">
+                <div class="home-service-icon"><i class="fas fa-desktop"></i></div>
+                <h6>{% trans "Platform Monitoring" %}</h6>
+                <p>{% trans "Operational command center for uptime, performance, security, and SEO health across your entire digital ecosystem." %}</p>
+                <span class="home-service-link">{% trans "Learn more" %} <i class="fas fa-arrow-right"></i></span>
+            </a>
+            <a href="{% url 'services:industrial_automation' %}" class="home-service-card animate-on-scroll slide-up" style="transition-delay:.08s;">
+                <div class="home-service-icon"><i class="fas fa-industry"></i></div>
+                <h6>{% trans "Industrial Automation" %}</h6>
+                <p>{% trans "Robust RPA and PLC integration that controls production lines, automated workcells, and factory systems." %}</p>
+                <span class="home-service-link">{% trans "Learn more" %} <i class="fas fa-arrow-right"></i></span>
+            </a>
+            <a href="{% url 'integration:integration_homepage' %}" class="home-service-card animate-on-scroll slide-up" style="transition-delay:.16s;">
+                <div class="home-service-icon"><i class="fas fa-sync-alt"></i></div>
+                <h6>{% trans "ERP & CRM Integration" %}</h6>
+                <p>{% trans "Synchronize ERPNext data with a modern CRM command center. Inventory, sales, invoices — unified and always in sync." %}</p>
+                <span class="home-service-link">{% trans "Learn more" %} <i class="fas fa-arrow-right"></i></span>
+            </a>
+            <a href="{% url 'services:competitor_tracking' %}" class="home-service-card animate-on-scroll slide-up">
+                <div class="home-service-icon"><i class="fas fa-brain"></i></div>
+                <h6>{% trans "Competitor Intelligence" %}</h6>
+                <p>{% trans "Benchmark competitors, track pricing, measure market position and identify strategic opportunities." %}</p>
+                <span class="home-service-link">{% trans "Learn more" %} <i class="fas fa-arrow-right"></i></span>
+            </a>
+            <a href="{% url 'services:seo_analytics' %}" class="home-service-card animate-on-scroll slide-up" style="transition-delay:.08s;">
+                <div class="home-service-icon"><i class="fas fa-search"></i></div>
+                <h6>{% trans "SEO & Digital Presence" %}</h6>
+                <p>{% trans "Keyword rankings, backlink growth, site audits, and brand reputation management across every digital channel." %}</p>
+                <span class="home-service-link">{% trans "Learn more" %} <i class="fas fa-arrow-right"></i></span>
+            </a>
+            <a href="{% url 'integration:integration_homepage' %}" class="home-service-card animate-on-scroll slide-up" style="transition-delay:.16s;">
+                <div class="home-service-icon"><i class="fas fa-plug"></i></div>
+                <h6>{% trans "System Integration" %}</h6>
+                <p>{% trans "API-driven hub connecting ERP, CRM, HR, and finance systems with intelligent routing and event-driven architecture." %}</p>
+                <span class="home-service-link">{% trans "Learn more" %} <i class="fas fa-arrow-right"></i></span>
+            </a>
         </div>
     </div>
 </section>
 
-<!-- 4. How It Works Section -->
-<section class="section-padding bg-surface overflow-hidden">
+<!-- 4. PROBLEM → SOLUTION -->
+<section class="home-problem">
     <div class="container">
-        <div class="text-center mb-5 reveal-up">
-            <h6 class="text-primary fw-800 uppercase x-small tracking-widest mb-3">Workflow</h6>
-            <h2 class="fw-800 display-5">A Seamless Business Flow.</h2>
-            <p class="text-secondary">From lead capture to revenue analytics in one automated loop.</p>
+        <div class="text-center mb-5 animate-on-scroll">
+            <h6 class="fw-800 uppercase x-small tracking-widest mb-3" style="color:#1e40af;">{% trans "Why OnWebApp" %}</h6>
+            <h2 class="fw-800" style="font-size:1.8rem;">{% trans "Stop juggling scattered tools." %}</h2>
         </div>
-        <div class="position-relative">
-            <div class="d-none d-lg-block position-absolute top-50 start-0 end-0 translate-middle-y" style="height: 2px; background: linear-gradient(90deg, transparent, var(--border-color), transparent); z-index: 0;"></div>
-            <div class="row g-4 justify-content-center position-relative" style="z-index: 1;">
-                <div class="col-md-4 col-lg-2 reveal-up delay-100">
-                    <div class="text-center">
-                        <div class="mx-auto mb-4 d-flex align-items-center justify-content-center bg-surface border border-color shadow-sm rounded-circle" style="width: 80px; height: 80px;">
-                            <i data-lucide="user-plus" class="text-primary"></i>
-                        </div>
-                        <h6 class="fw-bold mb-2">Lead In</h6>
-                        <p class="x-small text-secondary mb-0">CRM captures & qualifies leads.</p>
-                    </div>
+        <div class="home-ps-grid">
+            <div class="home-ps-card home-ps-card--problem animate-on-scroll slide-up">
+                <div class="home-ps-header">
+                    <div class="home-ps-icon"><i class="fas fa-exclamation-circle"></i></div>
+                    <h4>{% trans "The Problem" %}</h4>
                 </div>
-                <div class="col-md-4 col-lg-2 reveal-up delay-200">
-                    <div class="text-center">
-                        <div class="mx-auto mb-4 d-flex align-items-center justify-content-center bg-surface border border-color shadow-sm rounded-circle" style="width: 80px; height: 80px;">
-                            <i data-lucide="shopping-cart" class="text-primary"></i>
-                        </div>
-                        <h6 class="fw-bold mb-2">ERP Order</h6>
-                        <p class="x-small text-secondary mb-0">Syncs to inventory & sales.</p>
-                    </div>
-                </div>
-                <div class="col-md-4 col-lg-2 reveal-up delay-300">
-                    <div class="text-center">
-                        <div class="mx-auto mb-4 d-flex align-items-center justify-content-center bg-surface border border-color shadow-sm rounded-circle" style="width: 80px; height: 80px;">
-                            <i data-lucide="file-text" class="text-primary"></i>
-                        </div>
-                        <h6 class="fw-bold mb-2">Invoice</h6>
-                        <p class="x-small text-secondary mb-0">Auto-generated & sent.</p>
-                    </div>
-                </div>
-                <div class="col-md-4 col-lg-2 reveal-up delay-400">
-                    <div class="text-center">
-                        <div class="mx-auto mb-4 d-flex align-items-center justify-content-center bg-surface border border-color shadow-sm rounded-circle" style="width: 80px; height: 80px;">
-                            <i data-lucide="credit-card" class="text-primary"></i>
-                        </div>
-                        <h6 class="fw-bold mb-2">Payment</h6>
-                        <p class="x-small text-secondary mb-0">Securely processed.</p>
-                    </div>
-                </div>
-                <div class="col-md-4 col-lg-2 reveal-up delay-500">
-                    <div class="text-center">
-                        <div class="mx-auto mb-4 d-flex align-items-center justify-content-center bg-surface border border-color shadow-sm rounded-circle" style="width: 80px; height: 80px;">
-                            <i data-lucide="pie-chart" class="text-primary"></i>
-                        </div>
-                        <h6 class="fw-bold mb-2">Insights</h6>
-                        <p class="x-small text-secondary mb-0">Data feeds analytics.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- 5. Live Demo / Preview Section -->
-<section class="section-padding bg-slate-900 text-white position-relative overflow-hidden" style="border-radius: 0 0 64px 64px;">
-    <div class="position-absolute top-50 start-50 translate-middle w-100 h-100" style="background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%); z-index: 0;"></div>
-    <div class="container position-relative" style="z-index: 1;">
-        <div class="row align-items-center g-5">
-            <div class="col-lg-5 reveal-up">
-                <h6 class="text-primary fw-800 uppercase x-small tracking-widest mb-3">Live Interface</h6>
-                <h2 class="fw-800 display-5 mb-4">Experience the <span class="text-white">Command Center</span>.</h2>
-                <p class="text-white text-opacity-60 mb-5 fs-5">Our high-performance interface is designed for decision-makers. Get instant clarity on your business health with our integrated command center.</p>
-                <div class="vstack gap-4">
-                    <div class="p-4 rounded-4 bg-white bg-opacity-5 border border-white border-opacity-10 d-flex align-items-center gap-4">
-                        <div class="p-3 rounded-3 bg-primary bg-opacity-20 text-primary"><i data-lucide="zap"></i></div>
+                <ul class="home-ps-list">
+                    <li>
+                        <i class="fas fa-times-circle"></i>
                         <div>
-                            <h6 class="fw-bold mb-1">Real-time Synchronization</h6>
-                            <p class="small text-white text-opacity-50 mb-0">Zero delay between ERPNext and OnWebApp.</p>
+                            <strong>{% trans "Fragmented Data" %}</strong>
+                            <small>{% trans "Data scattered across multiple disconnected apps and spreadsheets." %}</small>
                         </div>
-                    </div>
-                    <div class="p-4 rounded-4 bg-white bg-opacity-5 border border-white border-opacity-10 d-flex align-items-center gap-4">
-                        <div class="p-3 rounded-3 bg-primary bg-opacity-20 text-primary"><i data-lucide="shield"></i></div>
+                    </li>
+                    <li>
+                        <i class="fas fa-times-circle"></i>
                         <div>
-                            <h6 class="fw-bold mb-1">JWT-Encrypted Security</h6>
-                            <p class="small text-white text-opacity-50 mb-0">Your enterprise data is protected by industry standards.</p>
+                            <strong>{% trans "Subscription Fatigue" %}</strong>
+                            <small>{% trans "High costs for 5+ different software subscriptions and API connectors." %}</small>
                         </div>
-                    </div>
-                </div>
+                    </li>
+                    <li>
+                        <i class="fas fa-times-circle"></i>
+                        <div>
+                            <strong>{% trans "Manual Overhead" %}</strong>
+                            <small>{% trans "Manual data entry causing human errors and operational delays." %}</small>
+                        </div>
+                    </li>
+                </ul>
             </div>
-            <div class="col-lg-7 reveal-up delay-200">
-                <div class="hero-preview-container">
-                    <div class="p-2 bg-white bg-opacity-10 rounded-4 border border-white border-opacity-10">
-                        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1000&q=80" alt="OnWebApp Command Center" class="img-fluid rounded-3 shadow-2xl">
-                    </div>
+            <div class="home-ps-card home-ps-card--solution animate-on-scroll slide-up" style="transition-delay:.1s;">
+                <div class="home-ps-header">
+                    <div class="home-ps-icon"><i class="fas fa-check-circle"></i></div>
+                    <h4>{% trans "The OnWebApp Solution" %}</h4>
                 </div>
+                <ul class="home-ps-list">
+                    <li>
+                        <i class="fas fa-plus-circle"></i>
+                        <div>
+                            <strong>{% trans "100% Unified Architecture" %}</strong>
+                            <small>{% trans "Every module shares the same database for instant consistency." %}</small>
+                        </div>
+                    </li>
+                    <li>
+                        <i class="fas fa-plus-circle"></i>
+                        <div>
+                            <strong>{% trans "Consolidated Cost" %}</strong>
+                            <small>{% trans "One transparent subscription for CRM, ERP, Analytics, and RPA." %}</small>
+                        </div>
+                    </li>
+                    <li>
+                        <i class="fas fa-plus-circle"></i>
+                        <div>
+                            <strong>{% trans "Industrial Automation" %}</strong>
+                            <small>{% trans "Intelligent workflows built into every core business process." %}</small>
+                        </div>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
 </section>
 
-<!-- 6. Why OnWebApp Section (Comparison) -->
-<section class="section-padding bg-surface">
+<!-- 5. HOW IT WORKS -->
+<section class="home-how">
     <div class="container">
-        <div class="text-center mb-5 reveal-up">
-            <h6 class="text-primary fw-800 uppercase x-small tracking-widest mb-3">Why Us?</h6>
-            <h2 class="fw-800 display-5">The smarter alternative to fragmented software stacks.</h2>
+        <div class="text-center mb-5 animate-on-scroll">
+            <h6 class="fw-800 uppercase x-small tracking-widest mb-3" style="color:#1e40af;">{% trans "Workflow" %}</h6>
+            <h2 class="fw-800" style="font-size:1.8rem;">{% trans "A Seamless Business Flow" %}</h2>
+            <p style="color:var(--text-muted);">{% trans "From lead capture to revenue analytics in one automated loop." %}</p>
         </div>
-        <div class="row justify-content-center">
-            <div class="col-lg-10">
-                <div class="p-4 p-md-5 rounded-4 bg-surface-secondary border border-color">
-                    <div class="table-responsive">
-                        <table class="comp-table">
-                            <thead>
-                                <tr>
-                                    <th class="p-4 fw-800 fs-5">Feature</th>
-                                    <th class="p-4 fw-800 fs-5 text-secondary">Traditional Stack</th>
-                                    <th class="p-4 fw-800 fs-5 text-primary">OnWebApp</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr class="comp-row reveal-up">
-                                    <td class="comp-cell fw-bold">Data Architecture</td>
-                                    <td class="comp-cell text-secondary">Siloed / Scattered</td>
-                                    <td class="comp-cell fw-bold text-primary">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <i data-lucide="check-circle-2" class="text-primary" style="width: 18px;"></i>
-                                            100% Unified
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr class="comp-row reveal-up">
-                                    <td class="comp-cell fw-bold">Automation</td>
-                                    <td class="comp-cell text-secondary">Manual / Plugins</td>
-                                    <td class="comp-cell fw-bold text-primary">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <i data-lucide="check-circle-2" class="text-primary" style="width: 18px;"></i>
-                                            Native RPA Engine
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr class="comp-row reveal-up">
-                                    <td class="comp-cell fw-bold">Setup Time</td>
-                                    <td class="comp-cell text-secondary">Weeks of Integration</td>
-                                    <td class="comp-cell fw-bold text-primary">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <i data-lucide="check-circle-2" class="text-primary" style="width: 18px;"></i>
-                                            Instant Sync
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr class="comp-row reveal-up">
-                                    <td class="comp-cell fw-bold">Enterprise Cost</td>
-                                    <td class="comp-cell text-secondary">Multiple Subscriptions</td>
-                                    <td class="comp-cell fw-bold text-primary">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <i data-lucide="check-circle-2" class="text-primary" style="width: 18px;"></i>
-                                            One Fixed Fee
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+        <div class="home-how-steps">
+            <div class="home-how-step animate-on-scroll slide-up">
+                <div class="home-how-num">1</div>
+                <h6>{% trans "Connect" %}</h6>
+                <p>{% trans "Onboard systems via pre-built connectors or custom API adapters." %}</p>
+            </div>
+            <div class="home-how-step animate-on-scroll slide-up" style="transition-delay:.08s;">
+                <div class="home-how-num">2</div>
+                <h6>{% trans "Orchestrate" %}</h6>
+                <p>{% trans "Design workflows with the visual builder. Set triggers and conditions." %}</p>
+            </div>
+            <div class="home-how-step animate-on-scroll slide-up" style="transition-delay:.16s;">
+                <div class="home-how-num">3</div>
+                <h6>{% trans "Execute" %}</h6>
+                <p>{% trans "Workflows run in real time with retry logic and error handling." %}</p>
+            </div>
+            <div class="home-how-step animate-on-scroll slide-up" style="transition-delay:.24s;">
+                <div class="home-how-num">4</div>
+                <h6>{% trans "Monitor" %}</h6>
+                <p>{% trans "Track every call and metric from a unified dashboard." %}</p>
             </div>
         </div>
     </div>
 </section>
 
-<!-- 7. Pricing Section -->
-<section class="section-padding bg-surface-secondary">
+<!-- 6. TESTIMONIALS -->
+<section class="home-testimonials">
     <div class="container">
-        <div class="text-center mb-5 reveal-up">
-            <h6 class="text-primary fw-800 uppercase x-small tracking-widest mb-3">Pricing</h6>
-            <h2 class="fw-800 display-5">Plans for Every Stage.</h2>
-            <p class="text-secondary">Transparent pricing that scales with your business.</p>
+        <div class="text-center mb-5 animate-on-scroll">
+            <h6 class="fw-800 uppercase x-small tracking-widest mb-3" style="color:#1e40af;">{% trans "Testimonials" %}</h6>
+            <h2 class="fw-800" style="font-size:1.8rem;">{% trans "Trusted by industry leaders." %}</h2>
         </div>
-        <div class="row g-4 align-items-stretch">
-            <div class="col-lg-4 reveal-up delay-100">
-                <div class="card h-100 border-0 shadow-sm d-flex flex-column">
-                    <div class="card-body p-5 d-flex flex-column">
-                        <h4 class="fw-800 mb-1">Starter</h4>
-                        <p class="text-secondary small mb-4">Perfect for startups.</p>
-                        <div class="display-5 fw-800 mb-4">$0<span class="fs-6 text-secondary fw-normal">/mo</span></div>
-                        <ul class="list-unstyled vstack gap-3 mb-5 text-secondary small flex-grow-1">
-                            <li class="d-flex align-items-center gap-2"><i data-lucide="check" class="text-success" style="width: 16px;"></i> Basic CRM Dashboard</li>
-                            <li class="d-flex align-items-center gap-2"><i data-lucide="check" class="text-success" style="width: 16px;"></i> 1 ERP Sync Module</li>
-                            <li class="d-flex align-items-center gap-2"><i data-lucide="check" class="text-success" style="width: 16px;"></i> Up to 500 Leads</li>
-                            <li class="d-flex align-items-center gap-2"><i data-lucide="check" class="text-success" style="width: 16px;"></i> Standard Support</li>
-                        </ul>
-                        <a href="{% url 'users:signup' %}" class="btn btn-outline-primary w-100 py-3 rounded-pill">Start Free Trial</a>
+        <div class="home-test-grid">
+            <div class="home-test-card animate-on-scroll slide-up">
+                <div class="home-test-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                <blockquote>{% trans "OnWebApp unified our entire operations. We went from 5 tools to 1 platform and saved 40% on software costs." %}</blockquote>
+                <div class="home-test-author">
+                    <div class="home-test-avatar">SK</div>
+                    <div>
+                        <div class="home-test-name">{% trans "Sarah K." %}</div>
+                        <div class="home-test-role">{% trans "COO, TechScale" %}</div>
                     </div>
                 </div>
             </div>
-            <div class="col-lg-4 reveal-up delay-200">
-                <div class="card h-100 border-primary border-2 shadow-lg d-flex flex-column position-relative">
-                    <div class="position-absolute top-0 start-50 translate-middle">
-                        <span class="badge bg-primary text-white rounded-pill px-4 py-2">Most Popular</span>
-                    </div>
-                    <div class="card-body p-5 d-flex flex-column">
-                        <h4 class="fw-800 mb-1">Professional</h4>
-                        <p class="text-secondary small mb-4">For growing enterprises.</p>
-                        <div class="display-5 fw-800 text-primary mb-4">$49<span class="fs-6 text-secondary fw-normal">/mo</span></div>
-                        <ul class="list-unstyled vstack gap-3 mb-5 small flex-grow-1">
-                            <li class="d-flex align-items-center gap-2"><i data-lucide="check" class="text-success" style="width: 16px;"></i> Advanced CRM + Analytics</li>
-                            <li class="d-flex align-items-center gap-2"><i data-lucide="check" class="text-success" style="width: 16px;"></i> Full ERPNext Integration</li>
-                            <li class="d-flex align-items-center gap-2"><i data-lucide="check" class="text-success" style="width: 16px;"></i> 5 RPA Automations</li>
-                            <li class="d-flex align-items-center gap-2"><i data-lucide="check" class="text-success" style="width: 16px;"></i> Priority Email Support</li>
-                        </ul>
-                        <a href="{% url 'users:signup' %}" class="btn btn-primary w-100 py-3 rounded-pill">Get Pro Now</a>
+            <div class="home-test-card animate-on-scroll slide-up" style="transition-delay:.08s;">
+                <div class="home-test-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                <blockquote>{% trans "The ERP integration was seamless. Our inventory syncs in real-time and the automation engine handles 80% of our repetitive tasks." %}</blockquote>
+                <div class="home-test-author">
+                    <div class="home-test-avatar">MR</div>
+                    <div>
+                        <div class="home-test-name">{% trans "Marcus R." %}</div>
+                        <div class="home-test-role">{% trans "CTO, LogiChain" %}</div>
                     </div>
                 </div>
             </div>
-            <div class="col-lg-4 reveal-up delay-300">
-                <div class="card h-100 border-0 bg-slate-900 text-white d-flex flex-column">
-                    <div class="card-body p-5 d-flex flex-column">
-                        <h4 class="fw-800 mb-1">Enterprise</h4>
-                        <p class="text-white text-opacity-50 small mb-4">Full-scale power.</p>
-                        <div class="display-5 fw-800 mb-4">Custom</div>
-                        <ul class="list-unstyled vstack gap-3 mb-5 text-white text-opacity-75 small flex-grow-1">
-                            <li class="d-flex align-items-center gap-2"><i data-lucide="check" class="text-primary" style="width: 16px;"></i> Unlimited Everything</li>
-                            <li class="d-flex align-items-center gap-2"><i data-lucide="check" class="text-primary" style="width: 16px;"></i> Custom RPA Development</li>
-                            <li class="d-flex align-items-center gap-2"><i data-lucide="check" class="text-primary" style="width: 16px;"></i> Dedicated Account Manager</li>
-                            <li class="d-flex align-items-center gap-2"><i data-lucide="check" class="text-primary" style="width: 16px;"></i> 24/7 Phone Support</li>
-                        </ul>
-                        <a href="{% url 'contact:contact' %}" class="btn btn-white w-100 py-3 rounded-pill">Contact Sales</a>
+            <div class="home-test-card animate-on-scroll slide-up" style="transition-delay:.16s;">
+                <div class="home-test-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                <blockquote>{% trans "Finally a platform that does everything. CRM, analytics, automation — all in one place with a clean interface." %}</blockquote>
+                <div class="home-test-author">
+                    <div class="home-test-avatar">AL</div>
+                    <div>
+                        <div class="home-test-name">{% trans "Aisha L." %}</div>
+                        <div class="home-test-role">{% trans "Founder, BloomDigital" %}</div>
                     </div>
                 </div>
             </div>
@@ -485,72 +571,179 @@
     </div>
 </section>
 
-<!-- 8. Trust Section -->
-<section class="py-5 bg-surface border-top border-bottom">
+<!-- 7. PRICING -->
+<section class="home-pricing">
     <div class="container">
-        <div class="row g-5 align-items-center justify-content-center text-center">
-            <div class="col-6 col-md-3 reveal-up">
-                <div class="mx-auto mb-3 text-primary"><i data-lucide="shield-check" style="width: 40px; height: 40px;"></i></div>
-                <h6 class="fw-bold small mb-1">Enterprise Security</h6>
-                <p class="x-small text-secondary mb-0">JWT & AES-256 Encryption</p>
+        <div class="text-center mb-5 animate-on-scroll">
+            <h6 class="fw-800 uppercase x-small tracking-widest mb-3" style="color:#1e40af;">{% trans "Pricing" %}</h6>
+            <h2 class="fw-800" style="font-size:1.8rem;">{% trans "Plans for Every Stage." %}</h2>
+            <p style="color:var(--text-muted);">{% trans "Transparent pricing that scales with your business." %}</p>
+        </div>
+        <div class="home-price-grid">
+            <!-- Starter -->
+            <div class="home-price-card animate-on-scroll slide-up">
+                <h5>{% trans "Starter" %}</h5>
+                <p class="price-desc">{% trans "Perfect for startups." %}</p>
+                <div class="home-price-amount">$0<span>/{% trans "mo" %}</span></div>
+                <ul class="home-price-features">
+                    <li><i class="fas fa-check"></i> {% trans "Basic CRM Dashboard" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "1 ERP Sync Module" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "Up to 500 Leads" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "Standard Support" %}</li>
+                </ul>
+                <a href="{% url 'users:signup' %}" class="home-price-btn home-price-btn--outline">{% trans "Start Free Trial" %}</a>
             </div>
-            <div class="col-6 col-md-3 reveal-up delay-100">
-                <div class="mx-auto mb-3 text-primary"><i data-lucide="zap" style="width: 40px; height: 40px;"></i></div>
-                <h6 class="fw-bold small mb-1">99.9% Uptime</h6>
-                <p class="x-small text-secondary mb-0">SLA-backed infrastructure</p>
+            <!-- Professional -->
+            <div class="home-price-card home-price-card--popular animate-on-scroll slide-up" style="transition-delay:.08s;">
+                <div class="home-price-badge">{% trans "Most Popular" %}</div>
+                <h5>{% trans "Professional" %}</h5>
+                <p class="price-desc">{% trans "For growing enterprises." %}</p>
+                <div class="home-price-amount" style="color:#1e40af;">$49<span>/{% trans "mo" %}</span></div>
+                <ul class="home-price-features">
+                    <li><i class="fas fa-check"></i> {% trans "Advanced CRM + Analytics" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "Full ERPNext Integration" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "5 RPA Automations" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "Priority Email Support" %}</li>
+                </ul>
+                <a href="{% url 'users:signup' %}" class="home-price-btn home-price-btn--fill">{% trans "Get Pro Now" %}</a>
             </div>
-            <div class="col-6 col-md-3 reveal-up delay-200">
-                <div class="mx-auto mb-3 text-primary"><i data-lucide="database" style="width: 40px; height: 40px;"></i></div>
-                <h6 class="fw-bold small mb-1">Daily Backups</h6>
-                <p class="x-small text-secondary mb-0">Redundant cloud storage</p>
-            </div>
-            <div class="col-6 col-md-3 reveal-up delay-300">
-                <div class="mx-auto mb-3 text-primary"><i data-lucide="users" style="width: 40px; height: 40px;"></i></div>
-                <h6 class="fw-bold small mb-1">Global Support</h6>
-                <p class="x-small text-secondary mb-0">24/7 technical assistance</p>
+            <!-- Enterprise -->
+            <div class="home-price-card animate-on-scroll slide-up" style="transition-delay:.16s;">
+                <h5>{% trans "Enterprise" %}</h5>
+                <p class="price-desc">{% trans "Full-scale power." %}</p>
+                <div class="home-price-amount">{% trans "Custom" %}</div>
+                <ul class="home-price-features">
+                    <li><i class="fas fa-check"></i> {% trans "Unlimited Everything" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "Custom RPA Development" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "Dedicated Account Manager" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "24/7 Phone Support" %}</li>
+                </ul>
+                <a href="{% url 'contact:contact' %}" class="home-price-btn home-price-btn--outline">{% trans "Contact Sales" %}</a>
             </div>
         </div>
     </div>
 </section>
 
-<!-- 9. Final CTA Section -->
-<section class="section-padding bg-primary position-relative overflow-hidden">
-    <div class="position-absolute top-0 start-0 w-100 h-100 opacity-10" style="background-image: radial-gradient(#fff 1px, transparent 1px); background-size: 32px 32px;"></div>
-    <div class="container position-relative text-center text-white" style="z-index: 1;">
-        <div class="reveal-up">
-            <h2 class="fw-800 display-4 mb-4">Start managing your business smarter today.</h2>
-            <p class="text-white text-opacity-75 fs-5 mb-5 mx-auto" style="max-width: 600px;">Join 500+ companies that have unified their operations with OnWebApp. Deploy in minutes, scale for years.</p>
-            <div class="d-flex flex-wrap gap-3 justify-content-center">
-                <a href="{% url 'users:signup' %}" class="btn btn-lg btn-white px-5 py-3 fw-800 rounded-pill shadow-lg">Start Your Free Trial</a>
-                <a href="{% url 'contact:contact' %}" class="btn btn-lg btn-outline-white px-5 py-3 fw-800 rounded-pill">Request a Demo</a>
+<!-- 8. FAQ -->
+<section class="home-faq">
+    <div class="container">
+        <div class="text-center mb-5 animate-on-scroll">
+            <h6 class="fw-800 uppercase x-small tracking-widest mb-3" style="color:#1e40af;">{% trans "FAQ" %}</h6>
+            <h2 class="fw-800" style="font-size:1.8rem;">{% trans "Frequently Asked Questions" %}</h2>
+        </div>
+        <div class="home-faq-list">
+            <div class="home-faq-item active animate-on-scroll slide-up">
+                <div class="home-faq-q">
+                    {% trans "What is OnWebApp?" %}
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="home-faq-a">
+                    <div class="home-faq-a-inner">
+                        {% trans "OnWebApp is an all-in-one business automation platform that unifies CRM, ERP, analytics, and RPA into a single system. It eliminates the need for multiple disconnected tools." %}
+                    </div>
+                </div>
+            </div>
+            <div class="home-faq-item animate-on-scroll slide-up" style="transition-delay:.05s;">
+                <div class="home-faq-q">
+                    {% trans "How does the ERP integration work?" %}
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="home-faq-a">
+                    <div class="home-faq-a-inner">
+                        {% trans "OnWebApp connects directly to ERPNext via API. Inventory, orders, invoices, and customer data sync in real-time. No manual data entry required." %}
+                    </div>
+                </div>
+            </div>
+            <div class="home-faq-item animate-on-scroll slide-up" style="transition-delay:.1s;">
+                <div class="home-faq-q">
+                    {% trans "Can I start with the free plan?" %}
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="home-faq-a">
+                    <div class="home-faq-a-inner">
+                        {% trans "Yes. The Starter plan is completely free and includes a basic CRM dashboard, 1 ERP sync module, and up to 500 leads. No credit card required." %}
+                    </div>
+                </div>
+            </div>
+            <div class="home-faq-item animate-on-scroll slide-up" style="transition-delay:.15s;">
+                <div class="home-faq-q">
+                    {% trans "What industries do you serve?" %}
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="home-faq-a">
+                    <div class="home-faq-a-inner">
+                        {% trans "OnWebApp serves manufacturing, retail, logistics, healthcare, and professional services. Our platform adapts to any industry that needs unified operations." %}
+                    </div>
+                </div>
+            </div>
+            <div class="home-faq-item animate-on-scroll slide-up" style="transition-delay:.2s;">
+                <div class="home-faq-q">
+                    {% trans "How secure is the platform?" %}
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="home-faq-a">
+                    <div class="home-faq-a-inner">
+                        {% trans "We use JWT and AES-256 encryption, SOC 2 compliance, daily backups, and 99.9% uptime SLA. Your data is protected by enterprise-grade security." %}
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </section>
 
+{% endblock %}
+
+{% block extra_js %}
 <script>
-    lucide.createIcons();
-
-    function reveal() {
-        var reveals = document.querySelectorAll(".reveal-up");
-        for (var i = 0; i < reveals.length; i++) {
-            var windowHeight = window.innerHeight;
-            var elementTop = reveals[i].getBoundingClientRect().top;
-            var elementVisible = 100;
-            if (elementTop < windowHeight - elementVisible) {
-                reveals[i].classList.add("animate__animated", "animate__fadeInUp");
-                reveals[i].style.opacity = "1";
+document.addEventListener('DOMContentLoaded', function() {
+    // IntersectionObserver for animate-on-scroll
+    var animElements = document.querySelectorAll('.animate-on-scroll');
+    var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                observer.unobserve(entry.target);
             }
-        }
-    }
-    window.addEventListener("scroll", reveal);
-    window.addEventListener("load", reveal);
+        });
+    }, { threshold: 0.15 });
+    animElements.forEach(function(el) { observer.observe(el); });
+
+    // Counter animation for stats
+    var counters = document.querySelectorAll('[data-count]');
+    var counterObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+                var el = entry.target;
+                var target = parseInt(el.getAttribute('data-count'));
+                var current = 0;
+                var increment = target / 40;
+                var timer = setInterval(function() {
+                    current += increment;
+                    if (current >= target) {
+                        el.textContent = target + '+';
+                        clearInterval(timer);
+                    } else {
+                        el.textContent = Math.floor(current) + '+';
+                    }
+                }, 30);
+                counterObserver.unobserve(el);
+            }
+        });
+    }, { threshold: 0.5 });
+    counters.forEach(function(c) { counterObserver.observe(c); });
+
+    // FAQ accordion
+    var faqItems = document.querySelectorAll('.home-faq-item');
+    faqItems.forEach(function(item) {
+        var question = item.querySelector('.home-faq-q');
+        question.addEventListener('click', function() {
+            var isActive = item.classList.contains('active');
+            // Close all
+            faqItems.forEach(function(i) { i.classList.remove('active'); });
+            // Toggle current
+            if (!isActive) item.classList.add('active');
+        });
+    });
+});
 </script>
-
-<style>
-    .x-small { font-size: 0.8rem; }
-    .uppercase { text-transform: uppercase; }
-    .tracking-widest { letter-spacing: 0.15em; }
-</style>
-
 {% endblock %}

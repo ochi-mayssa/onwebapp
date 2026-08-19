@@ -88,18 +88,85 @@
             <div class="row g-4">
                 {% for c in featured_collections %}
                 <div class="col-md-6 col-lg-4">
-                    <div class="landing-collection">
-                        <div class="landing-collection-cover">
+                    <div class="landing-collection" style="--lc-accent:{{ c.accent_color }};">
+                        <div class="landing-collection-cover"
+                             data-hero="{% if c.hero_image %}{{ c.hero_image.url }}{% endif %}"
+                             data-logo="{% if c.logo_image %}{{ c.logo_image.url }}{% endif %}"
+                             data-business-card="{% if c.business_card_image %}{{ c.business_card_image.url }}{% endif %}"
+                             data-presentation="{% if c.presentation_image %}{{ c.presentation_image.url }}{% endif %}"
+                             data-letterhead="{% if c.letterhead_image %}{{ c.letterhead_image.url }}{% endif %}"
+                             data-email-signature="{% if c.email_signature_image %}{{ c.email_signature_image.url }}{% endif %}"
+                             data-social-media="{% if c.social_media_image %}{{ c.social_media_image.url }}{% endif %}"
+                             data-brand-guidelines="{% if c.brand_guidelines_image %}{{ c.brand_guidelines_image.url }}{% endif %}"
+                             data-typography="{% if c.typography_image %}{{ c.typography_image.url }}{% endif %}"
+                             data-name="{{ c.name }}"
+                             data-accent="{{ c.accent_color }}">
                             {% if c.preview_image %}<img src="{{ c.preview_image.url }}" alt="{{ c.name }}" loading="lazy">
-                            {% else %}<div class="collection-cover-fallback"><span>{{ c.name|slice:":2"|upper }}</span></div>{% endif %}
+                            {% else %}
+                            <div class="collection-cover-fallback" style="background:{{ c.accent_color }};">
+                                <div style="position:absolute;top:0;left:0;right:0;bottom:0;overflow:hidden;">
+                                    <div style="position:absolute;top:15%;left:50%;transform:translateX(-50%);width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.2);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;">
+                                        <span style="font-size:1.4rem;font-weight:800;color:#fff;letter-spacing:-0.02em;">{{ c.name|slice:":1"|upper }}</span>
+                                    </div>
+                                    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;width:80%;">
+                                        <div style="font-size:0.65rem;font-weight:700;color:rgba(255,255,255,0.7);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.25rem;">{{ c.industry|default:"Brand" }}</div>
+                                        <div style="font-size:1.1rem;font-weight:800;color:#fff;line-height:1.2;">{{ c.name }}</div>
+                                    </div>
+                                    <div style="position:absolute;bottom:12%;left:50%;transform:translateX(-50%);display:flex;gap:6px;">
+                                        {% for color in c.color_palette|slice:":5" %}
+                                        <div style="width:16px;height:16px;border-radius:50%;background:{{ color }};border:2px solid rgba(255,255,255,0.4);"></div>
+                                        {% endfor %}
+                                        {% if not c.color_palette %}
+                                        <div style="width:16px;height:16px;border-radius:50%;background:rgba(255,255,255,0.3);border:2px solid rgba(255,255,255,0.4);"></div>
+                                        <div style="width:16px;height:16px;border-radius:50%;background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.4);"></div>
+                                        <div style="width:16px;height:16px;border-radius:50%;background:rgba(0,0,0,0.2);border:2px solid rgba(255,255,255,0.4);"></div>
+                                        {% endif %}
+                                    </div>
+                                    <div style="position:absolute;top:10%;right:-10%;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,0.06);"></div>
+                                    <div style="position:absolute;bottom:5%;left:-8%;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,0.04);"></div>
+                                </div>
+                            </div>
+                            {% endif %}
                             <span class="collection-cat">{{ c.get_category_display }}</span>
+                            <button type="button" class="lc-gallery-btn lc-gallery-next" title="View all images"><i class="fa-solid fa-chevron-right"></i></button>
                         </div>
                         <div class="landing-collection-body">
-                            <h5 class="fw-800 mb-0">{{ c.name }}</h5>
-                            <span class="text-muted small">{{ c.industry }}</span>
-                            <div class="collection-tags mt-2">
+                            <div class="lc-header">
+                                {% if c.logo_image %}
+                                <img src="{{ c.logo_image.url }}" alt="{{ c.name }} logo" class="lc-logo">
+                                {% else %}
+                                <div class="lc-logo lc-logo-fallback" style="background:{{ c.accent_color }};">
+                                    <span>{{ c.name|slice:":1"|upper }}</span>
+                                </div>
+                                {% endif %}
+                                <div>
+                                    <h5 class="lc-name">{{ c.name }}</h5>
+                                    <span class="lc-industry">{{ c.industry }}</span>
+                                </div>
+                            </div>
+                            {% if c.description %}
+                            <p class="lc-desc">{{ c.description|truncatechars:80 }}</p>
+                            {% endif %}
+                            {% if c.color_palette %}
+                            <div class="lc-palette">
+                                {% for color in c.color_palette|slice:":6" %}
+                                <div class="lc-swatch" style="background:{{ color }};" title="{{ color }}"></div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            {% if c.fonts %}
+                            <div class="lc-fonts">
+                                {% for font in c.fonts|slice:":2" %}
+                                <span class="lc-font">{{ font }}</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            <div class="lc-tags">
                                 {% for tag in c.style_tags|slice:":3" %}<span class="style-tag">{{ tag }}</span>{% endfor %}
                             </div>
+                            <a href="{% url 'branding:wizard' %}" class="lc-cta">
+                                View Collection <i class="fa-solid fa-arrow-right"></i>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -122,4 +189,109 @@
         </div>
     </section>
 </div>
+
+<!-- Gallery Modal -->
+<div class="lc-modal-overlay" id="lcGalleryModal" style="display:none;">
+    <div class="lc-modal">
+        <button class="lc-modal-close" id="lcModalClose"><i class="fa-solid fa-xmark"></i></button>
+        <div class="lc-modal-header">
+            <div class="lc-modal-title" id="lcModalTitle"></div>
+            <span class="lc-modal-counter" id="lcModalCounter"></span>
+        </div>
+        <div class="lc-modal-body">
+            <button class="lc-modal-arrow lc-modal-prev" id="lcModalPrev"><i class="fa-solid fa-chevron-left"></i></button>
+            <div class="lc-modal-slide" id="lcModalSlide">
+                <img id="lcModalImg" src="" alt="">
+                <div class="lc-modal-label" id="lcModalLabel"></div>
+            </div>
+            <button class="lc-modal-arrow lc-modal-next" id="lcModalNext"><i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+        <div class="lc-modal-dots" id="lcModalDots"></div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var labels = {
+        hero: 'Hero Image', logo: 'Logo', typography: 'Typography',
+        business_card: 'Business Card', presentation: 'Presentation',
+        letterhead: 'Letterhead', email_signature: 'Email Signature',
+        social_media: 'Social Media', brand_guidelines: 'Brand Guidelines'
+    };
+    var keys = ['hero','logo','typography','business_card','presentation','letterhead','email_signature','social_media','brand_guidelines'];
+
+    document.querySelectorAll('.lc-gallery-next').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var cover = btn.closest('.landing-collection-cover');
+            if (!cover) return;
+            var name = cover.dataset.name || '';
+            var accent = cover.dataset.accent || '#6366f1';
+            var items = [];
+            keys.forEach(function(k) {
+                var url = cover.dataset[k.replace(/_/g, '')] || cover.dataset[k];
+                if (url && url !== 'undefined') items.push({key: k, url: url});
+            });
+            if (!items.length) return;
+            openGallery(items, name, accent);
+        });
+    });
+
+    var modal = document.getElementById('lcGalleryModal');
+    var modalImg = document.getElementById('lcModalImg');
+    var modalLabel = document.getElementById('lcModalLabel');
+    var modalTitle = document.getElementById('lcModalTitle');
+    var modalCounter = document.getElementById('lcModalCounter');
+    var modalDots = document.getElementById('lcModalDots');
+    var current = 0;
+    var galleryItems = [];
+
+    function openGallery(items, name, accent) {
+        galleryItems = items;
+        current = 0;
+        modalTitle.textContent = name;
+        modalTitle.style.color = accent;
+        renderSlide();
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function renderSlide() {
+        var item = galleryItems[current];
+        modalImg.src = item.url;
+        modalLabel.textContent = labels[item.key] || item.key;
+        modalCounter.textContent = (current + 1) + ' / ' + galleryItems.length;
+        modalDots.innerHTML = '';
+        galleryItems.forEach(function(it, i) {
+            var dot = document.createElement('span');
+            dot.className = 'lc-dot' + (i === current ? ' active' : '');
+            dot.addEventListener('click', function() { current = i; renderSlide(); });
+            modalDots.appendChild(dot);
+        });
+    }
+
+    document.getElementById('lcModalPrev').addEventListener('click', function() {
+        current = (current - 1 + galleryItems.length) % galleryItems.length;
+        renderSlide();
+    });
+    document.getElementById('lcModalNext').addEventListener('click', function() {
+        current = (current + 1) % galleryItems.length;
+        renderSlide();
+    });
+    document.getElementById('lcModalClose').addEventListener('click', function() {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+    });
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) { modal.style.display = 'none'; document.body.style.overflow = ''; }
+    });
+    document.addEventListener('keydown', function(e) {
+        if (modal.style.display !== 'flex') return;
+        if (e.key === 'ArrowLeft') { current = (current - 1 + galleryItems.length) % galleryItems.length; renderSlide(); }
+        if (e.key === 'ArrowRight') { current = (current + 1) % galleryItems.length; renderSlide(); }
+        if (e.key === 'Escape') { modal.style.display = 'none'; document.body.style.overflow = ''; }
+    });
+});
+</script>
 {% endblock %}

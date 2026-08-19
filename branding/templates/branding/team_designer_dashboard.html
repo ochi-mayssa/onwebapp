@@ -41,10 +41,10 @@
                     <span class="dd-nav-badge">{{ collection_count }}</span>
                     {% endif %}
                 </a>
-                <a href="{% url 'branding:designer_templates' %}" class="dd-nav-item">
+                <a href="{% url 'branding:design_library' %}?tab=templates" class="dd-nav-item">
                     <i class="fa-solid fa-file-lines"></i>Templates
                 </a>
-                <a href="{% url 'branding:designer_resources' %}" class="dd-nav-item">
+                <a href="{% url 'branding:design_library' %}?tab=resources" class="dd-nav-item">
                     <i class="fa-solid fa-book"></i>Resources
                 </a>
             </div>
@@ -60,6 +60,17 @@
                 </a>
                 <a href="{% url 'branding:notifications' %}" class="dd-nav-item">
                     <i class="fa-solid fa-bell"></i>Notifications
+                </a>
+            </div>
+
+            {# ── Content Management ── #}
+            <div class="dd-sidebar-section">
+                <div class="dd-sidebar-section-title">CONTENT</div>
+                <a href="{% url 'blog:manage_articles' %}" class="dd-nav-item">
+                    <i class="fa-solid fa-newspaper"></i>Articles
+                </a>
+                <a href="{% url 'blog:manage_blog_posts' %}" class="dd-nav-item">
+                    <i class="fa-solid fa-pen-nib"></i>Blog Posts
                 </a>
             </div>
         </nav>
@@ -374,11 +385,11 @@
                                 <div class="dd-action-icon" style="background:rgba(251,191,36,0.1);color:#fbbf24;"><i class="fa-solid fa-layer-group"></i></div>
                                 <span class="dd-action-label">Collections</span>
                             </a>
-                            <a href="{% url 'branding:designer_resources' %}" class="dd-action-card">
+                            <a href="{% url 'branding:design_library' %}?tab=resources" class="dd-action-card">
                                 <div class="dd-action-icon" style="background:rgba(52,211,153,0.1);color:#34d399;"><i class="fa-solid fa-book"></i></div>
                                 <span class="dd-action-label">Resources</span>
                             </a>
-                            <a href="{% url 'branding:designer_templates' %}" class="dd-action-card">
+                            <a href="{% url 'branding:design_library' %}?tab=templates" class="dd-action-card">
                                 <div class="dd-action-icon" style="background:rgba(129,140,248,0.1);color:#818cf8;"><i class="fa-solid fa-file-lines"></i></div>
                                 <span class="dd-action-label">Templates</span>
                             </a>

@@ -177,17 +177,18 @@ def _ensure_plans_exist():
 # Classic views (kept for backward compat)
 # ---------------------------------------------------------------------------
 
-@login_required
-@user_passes_test(is_community_user, login_url='users:onboarding', redirect_field_name=None)
 def home(request):
     _ensure_services_exist()
     _ensure_addons_exist()
-    active_sessions = OnboardingSession.objects.filter(
-        user=request.user, status__in=['draft', 'in_progress']
-    ).order_by('-updated_at')
-    completed_count = OnboardingSession.objects.filter(
-        user=request.user, status='completed'
-    ).count()
+    active_sessions = []
+    completed_count = 0
+    if request.user.is_authenticated:
+        active_sessions = OnboardingSession.objects.filter(
+            user=request.user, status__in=['draft', 'in_progress']
+        ).order_by('-updated_at')
+        completed_count = OnboardingSession.objects.filter(
+            user=request.user, status='completed'
+        ).count()
     return render(request, 'community/home.html', {
         'active_sessions': active_sessions,
         'completed_count': completed_count,

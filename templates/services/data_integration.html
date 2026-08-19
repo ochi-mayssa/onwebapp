@@ -1,0 +1,1730 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans "Data Integration" %} | OnWebApp{% endblock %}
+
+{% block meta_description %}{% trans "Enterprise Data Warehouse, real-time synchronization, data virtualization, and automated ETL pipelines." %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .di-hero {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0c4a6e 100%);
+        padding: 8rem 0 5rem;
+        position: relative;
+        overflow: hidden;
+    }
+    .di-hero::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: url('{% static "img/data.jpg" %}') center/cover no-repeat;
+        opacity: .18;
+    }
+    .di-hero .container { position: relative; z-index: 2; }
+    .di-feature-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        padding: 2rem;
+        transition: all .3s;
+        height: 100%;
+    }
+    .di-feature-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 16px 48px rgba(0,0,0,.07);
+    }
+    .di-feature-icon {
+        width: 56px; height: 56px;
+        border-radius: 16px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        margin-bottom: 1rem;
+    }
+    /* ── 3D Isometric Pipeline ── */
+    .di-pipeline-section {
+        position: relative;
+        overflow: hidden;
+        background:
+            radial-gradient(circle at 30% 60%, rgba(6,182,212,.06) 0%, transparent 50%),
+            radial-gradient(circle at 70% 30%, rgba(139,92,246,.05) 0%, transparent 50%),
+            var(--bg-body);
+    }
+    .di-pipeline-section::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(var(--border-color) 1px, transparent 1px);
+        background-size: 32px 32px;
+        opacity: .25;
+        pointer-events: none;
+    }
+
+    .di-pipeline-scene {
+        perspective: 1200px;
+        perspective-origin: 50% 50%;
+    }
+    .di-pipeline-board {
+        transform-style: preserve-3d;
+        transition: transform .15s ease-out;
+        position: relative;
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    /* ── vertical spine ── */
+    .di-pipeline-spine {
+        position: absolute;
+        left: 50%;
+        top: 0; bottom: 0;
+        width: 4px;
+        transform: translateX(-50%);
+        background: var(--border-color);
+        border-radius: 4px;
+        overflow: visible;
+        z-index: 1;
+    }
+    .di-pipeline-spine-fill {
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%;
+        height: 0%;
+        border-radius: 4px;
+        background: linear-gradient(180deg, #06b6d4, #3b82f6, #8b5cf6, #10b981);
+        transition: height .6s ease;
+        box-shadow: 0 0 20px rgba(6,182,212,.5);
+    }
+
+    /* ── flowing particles ── */
+    .di-pipeline-particle {
+        position: absolute;
+        left: 50%;
+        width: 10px; height: 10px;
+        border-radius: 50%;
+        transform: translateX(-50%);
+        z-index: 2;
+        pointer-events: none;
+    }
+    .di-pipeline-particle:nth-child(1) { background: #06b6d4; box-shadow: 0 0 14px 3px rgba(6,182,212,.6); animation: ppFlow 4s ease-in-out infinite; }
+    .di-pipeline-particle:nth-child(2) { background: #3b82f6; box-shadow: 0 0 14px 3px rgba(59,130,246,.6); animation: ppFlow 4s ease-in-out 1s infinite; }
+    .di-pipeline-particle:nth-child(3) { background: #8b5cf6; box-shadow: 0 0 14px 3px rgba(139,92,246,.6); animation: ppFlow 4s ease-in-out 2s infinite; }
+    .di-pipeline-particle:nth-child(4) { background: #10b981; box-shadow: 0 0 14px 3px rgba(16,185,129,.6); animation: ppFlow 4s ease-in-out 3s infinite; }
+    @keyframes ppFlow {
+        0%   { top: -3%; opacity: 0; transform: translateX(-50%) scale(.4); }
+        8%   { opacity: 1; transform: translateX(-50%) scale(1); }
+        92%  { opacity: 1; transform: translateX(-50%) scale(1); }
+        100% { top: 103%; opacity: 0; transform: translateX(-50%) scale(.4); }
+    }
+
+    /* ── step row ── */
+    .di-pipeline-step {
+        position: relative;
+        display: flex;
+        align-items: center;
+        margin-bottom: 3rem;
+        z-index: 3;
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity .6s, transform .6s cubic-bezier(.25,.46,.45,.94);
+    }
+    .di-pipeline-step.is-visible { opacity: 1; transform: translateY(0); }
+    .di-pipeline-step:last-child { margin-bottom: 0; }
+
+    /* ── node on spine ── */
+    .pp-node {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 64px; height: 64px;
+        border-radius: 50%;
+        background: var(--bg-surface);
+        border: 4px solid var(--step-color, #06b6d4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        color: var(--step-color, #06b6d4);
+        z-index: 5;
+        box-shadow: 0 0 0 6px rgba(0,0,0,.04), 0 8px 32px rgba(0,0,0,.12);
+        transition: all .4s cubic-bezier(.25,.46,.45,.94);
+    }
+    .pp-node::after {
+        content: '';
+        position: absolute;
+        inset: -10px;
+        border-radius: 50%;
+        border: 3px solid var(--step-color, #06b6d4);
+        opacity: 0;
+        animation: ppRing 2.2s ease-in-out infinite;
+    }
+    @keyframes ppRing {
+        0%, 100% { opacity: 0; transform: scale(.9); }
+        50%      { opacity: .5; transform: scale(1.1); }
+    }
+    .di-pipeline-step:hover .pp-node {
+        transform: translateX(-50%) scale(1.2) rotate(-8deg);
+        box-shadow: 0 0 0 8px rgba(0,0,0,.04), 0 12px 40px rgba(0,0,0,.18), 0 0 30px color-mix(in srgb, var(--step-color) 40%, transparent);
+    }
+
+    /* ── connector arm ── */
+    .pp-arm {
+        position: absolute;
+        top: 50%;
+        height: 3px;
+        border-radius: 3px;
+        transform: translateY(-50%);
+        z-index: 2;
+    }
+    .pp-arm::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 3px;
+        background: linear-gradient(90deg, var(--step-color, #06b6d4), transparent);
+    }
+    .di-pipeline-step--left .pp-arm {
+        left: calc(50% + 38px);
+        right: auto;
+        width: calc(50% - 38px - 48px);
+    }
+    .di-pipeline-step--left .pp-arm::before {
+        background: linear-gradient(90deg, var(--step-color, #06b6d4) 0%, var(--step-color, #06b6d4) 40%, transparent 100%);
+    }
+    .di-pipeline-step--right .pp-arm {
+        right: calc(50% + 38px);
+        left: auto;
+        width: calc(50% - 38px - 48px);
+    }
+    .di-pipeline-step--right .pp-arm::before {
+        background: linear-gradient(270deg, var(--step-color, #06b6d4) 0%, var(--step-color, #06b6d4) 40%, transparent 100%);
+    }
+
+    /* ── card ── */
+    .pp-card {
+        width: calc(50% - 70px);
+        background: var(--bg-surface);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        padding: 1.75rem;
+        position: relative;
+        overflow: hidden;
+        transition: all .45s cubic-bezier(.25,.46,.45,.94);
+        box-shadow: 0 4px 24px rgba(0,0,0,.06);
+        transform-style: preserve-3d;
+    }
+    .di-pipeline-step--left .pp-card { margin-right: auto; }
+    .di-pipeline-step--right .pp-card { margin-left: auto; }
+
+    .pp-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 4px;
+        background: linear-gradient(90deg, var(--step-color, #06b6d4), transparent 80%);
+        opacity: 0;
+        transition: opacity .4s;
+    }
+    .pp-card::after {
+        content: '';
+        position: absolute;
+        top: -50%; left: -60%;
+        width: 40%; height: 200%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,.06), transparent);
+        transform: skewX(-20deg);
+        transition: left .6s;
+        pointer-events: none;
+    }
+    .pp-card:hover::after { left: 130%; }
+    .pp-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 20px 60px rgba(0,0,0,.1), 0 0 0 1px var(--step-color, #06b6d4);
+        border-color: var(--step-color, #06b6d4);
+    }
+    .pp-card:hover::before { opacity: 1; }
+
+    .pp-card-head {
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+        margin-bottom: .75rem;
+    }
+    .pp-card-icon {
+        width: 48px; height: 48px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.15rem;
+        background: color-mix(in srgb, var(--step-color, #06b6d4) 10%, transparent);
+        color: var(--step-color, #06b6d4);
+        flex-shrink: 0;
+        position: relative;
+        z-index: 2;
+        transition: all .4s;
+    }
+    .pp-card-icon::after {
+        content: '';
+        position: absolute;
+        inset: -6px;
+        border-radius: 20px;
+        background: var(--step-color, #06b6d4);
+        opacity: 0;
+        filter: blur(14px);
+        transition: opacity .4s;
+        z-index: -1;
+    }
+    .pp-card:hover .pp-card-icon::after { opacity: .3; }
+    .pp-card:hover .pp-card-icon { transform: scale(1.1) rotate(-4deg); }
+
+    .pp-card-num {
+        width: 28px; height: 28px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--step-color, #06b6d4), color-mix(in srgb, var(--step-color, #06b6d4) 60%, #000));
+        color: #fff;
+        font-size: .65rem;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .pp-card h5 {
+        font-weight: 800;
+        font-size: 1.05rem;
+        margin-bottom: .4rem;
+        transition: color .3s;
+    }
+    .pp-card:hover h5 { color: var(--step-color, #06b6d4); }
+    .pp-card p {
+        color: var(--text-muted);
+        font-size: .85rem;
+        line-height: 1.7;
+        margin-bottom: 0;
+    }
+
+    /* ── mobile ── */
+    @media (max-width: 767.98px) {
+        .di-pipeline-board { max-width: 100%; }
+        .pp-node { width: 48px; height: 48px; font-size: 1rem; left: 24px; transform: none; }
+        .di-pipeline-step:hover .pp-node { transform: scale(1.15) rotate(-5deg); }
+        .di-pipeline-spine { left: 24px; }
+        .pp-arm { display: none; }
+        .pp-card { width: calc(100% - 70px); margin-left: auto !important; margin-right: 0 !important; }
+        .di-pipeline-step { padding-left: 0; }
+    }
+    /* ── Key Metrics ── */
+    .di-metrics {
+        position: relative;
+        overflow: hidden;
+        background: var(--bg-body);
+        padding: 3rem 0;
+    }
+
+    .di-metric-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 1.25rem 1rem;
+        text-align: center;
+        transition: all .4s cubic-bezier(.25,.46,.45,.94);
+        position: relative;
+        overflow: hidden;
+        height: 100%;
+    }
+    .di-metric-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 32px rgba(0,0,0,.06);
+        border-color: #06b6d4;
+    }
+
+    .di-metric-icon {
+        width: 40px; height: 40px;
+        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: .95rem;
+        background: rgba(6,182,212,.08);
+        color: #06b6d4;
+        margin-bottom: .6rem;
+        transition: all .4s;
+    }
+    .di-metric-card:hover .di-metric-icon { transform: scale(1.1) rotate(-3deg); }
+
+    .di-metric-value {
+        font-size: 1.6rem;
+        font-weight: 800;
+        line-height: 1;
+        margin-bottom: .25rem;
+        color: #06b6d4;
+    }
+
+    .di-metric-label {
+        font-size: .72rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        margin-bottom: 0;
+        text-transform: uppercase;
+        letter-spacing: .03em;
+    }
+
+    .di-metrics-line {
+        display: none;
+    }
+
+    @media (max-width: 767.98px) {
+        .di-metric-card { padding: 1rem .75rem; }
+        .di-metric-value { font-size: 1.3rem; }
+        .di-metric-icon { width: 34px; height: 34px; font-size: .85rem; }
+    }
+
+    /* ── Core Capabilities — Roadmap v2 ── */
+    .di-capabilities {
+        position: relative;
+        overflow: hidden;
+        background:
+            radial-gradient(circle at 15% 45%, rgba(6,182,212,.07) 0%, transparent 45%),
+            radial-gradient(circle at 85% 25%, rgba(139,92,246,.06) 0%, transparent 45%),
+            radial-gradient(circle at 50% 90%, rgba(236,72,153,.04) 0%, transparent 40%),
+            var(--bg-surface-secondary);
+    }
+    /* subtle dot grid */
+    .di-capabilities::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(var(--border-color) 1px, transparent 1px);
+        background-size: 28px 28px;
+        opacity: .35;
+        pointer-events: none;
+    }
+
+    /* scroll wrapper */
+    .di-cap-track-wrap {
+        position: relative;
+        margin: 0 -1rem;
+    }
+
+    /* arrows — glass style */
+    .di-cap-arrow {
+        position: absolute;
+        top: 42%;
+        transform: translateY(-50%);
+        width: 48px; height: 48px;
+        border-radius: 50%;
+        border: 1px solid rgba(255,255,255,.12);
+        background: rgba(255,255,255,.06);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: .95rem;
+        cursor: pointer;
+        z-index: 10;
+        transition: all .3s;
+        box-shadow: 0 4px 20px rgba(0,0,0,.1);
+    }
+    .di-cap-arrow:hover {
+        background: linear-gradient(135deg, #06b6d4, #3b82f6);
+        color: #fff;
+        border-color: transparent;
+        box-shadow: 0 4px 24px rgba(6,182,212,.35);
+    }
+    .di-cap-arrow--left  { left: 0; }
+    .di-cap-arrow--right { right: 0; }
+
+    /* horizontal scroll track */
+    .di-cap-track {
+        display: flex;
+        gap: 0;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        scroll-behavior: smooth;
+        padding: 2rem 2.5rem 1.5rem;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+    .di-cap-track::-webkit-scrollbar { display: none; }
+
+    /* progress rail */
+    .di-cap-rail {
+        position: relative;
+        margin: 0 2.5rem 2.5rem;
+        height: 4px;
+        background: var(--border-color);
+        border-radius: 4px;
+        overflow: visible;
+    }
+    .di-cap-rail-fill {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, #06b6d4, #3b82f6, #8b5cf6, #10b981, #f59e0b, #ec4899);
+        border-radius: 4px;
+        transition: width .5s ease;
+        position: relative;
+    }
+    /* shimmer on the fill tip */
+    .di-cap-rail-fill::after {
+        content: '';
+        position: absolute;
+        right: -2px; top: 50%;
+        transform: translateY(-50%);
+        width: 12px; height: 12px;
+        border-radius: 50%;
+        background: #fff;
+        box-shadow: 0 0 12px 2px rgba(6,182,212,.6);
+        animation: capPulseDot 1.8s ease-in-out infinite;
+    }
+    @keyframes capPulseDot {
+        0%, 100% { box-shadow: 0 0 6px 2px rgba(6,182,212,.3); }
+        50%      { box-shadow: 0 0 18px 4px rgba(6,182,212,.6); }
+    }
+
+    /* single timeline card */
+    .di-cap-item {
+        flex: 0 0 270px;
+        scroll-snap-align: center;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    /* card — glass morphism */
+    .di-cap-card {
+        background: rgba(255,255,255,.03);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255,255,255,.08);
+        border-radius: 22px;
+        padding: 0;
+        transition: all .45s cubic-bezier(.25,.46,.45,.94);
+        width: 248px;
+        position: relative;
+        overflow: hidden;
+    }
+    /* top accent strip */
+    .di-cap-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 4px;
+        background: linear-gradient(90deg, var(--cap-color, #06b6d4), transparent 80%);
+        opacity: 0;
+        transition: opacity .4s;
+    }
+    /* inner light sweep on hover */
+    .di-cap-card::after {
+        content: '';
+        position: absolute;
+        top: -50%; left: -60%;
+        width: 40%; height: 200%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,.06), transparent);
+        transform: skewX(-20deg);
+        transition: left .6s;
+        pointer-events: none;
+    }
+    .di-cap-card:hover::after { left: 120%; }
+    .di-cap-card:hover {
+        transform: translateY(-10px) scale(1.02);
+        box-shadow:
+            0 24px 64px rgba(0,0,0,.1),
+            0 0 0 1px var(--cap-color, #06b6d4),
+            inset 0 1px 0 rgba(255,255,255,.08);
+        border-color: var(--cap-color, #06b6d4);
+    }
+    .di-cap-card:hover::before { opacity: 1; }
+
+    .di-cap-inner { padding: 1.75rem 1.5rem; }
+
+    .di-cap-icon-wrap {
+        position: relative;
+        display: inline-flex;
+        margin-bottom: 1rem;
+    }
+    .di-cap-icon {
+        width: 60px; height: 60px;
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.35rem;
+        transition: all .4s;
+        position: relative;
+        z-index: 2;
+    }
+    .di-cap-icon::after {
+        content: '';
+        position: absolute;
+        inset: -6px;
+        border-radius: 24px;
+        background: var(--cap-color, #06b6d4);
+        opacity: 0;
+        filter: blur(14px);
+        transition: opacity .4s;
+        z-index: -1;
+    }
+    .di-cap-card:hover .di-cap-icon::after { opacity: .3; }
+    .di-cap-card:hover .di-cap-icon { transform: scale(1.12) rotate(-4deg); }
+
+    /* step number — gradient ring */
+    .di-cap-num {
+        position: absolute;
+        top: -10px; right: -10px;
+        width: 32px; height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--cap-color, #06b6d4), color-mix(in srgb, var(--cap-color, #06b6d4) 60%, #000));
+        color: #fff;
+        font-size: .7rem;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 3;
+        box-shadow: 0 4px 16px rgba(0,0,0,.2);
+        border: 2px solid var(--bg-surface);
+    }
+
+    .di-cap-card h5 {
+        font-weight: 700;
+        font-size: .95rem;
+        margin-bottom: .5rem;
+        transition: color .3s;
+    }
+    .di-cap-card:hover h5 { color: var(--cap-color, #06b6d4); }
+
+    .di-cap-card p {
+        color: var(--text-muted);
+        font-size: .82rem;
+        line-height: 1.65;
+        margin-bottom: 0;
+    }
+
+    /* connector drop-line — animated dashes */
+    .di-cap-drop {
+        width: 2px;
+        height: 28px;
+        background: repeating-linear-gradient(
+            to bottom,
+            var(--border-color) 0 4px,
+            transparent 4px 8px
+        );
+        background-size: 2px 8px;
+        transition: background .3s;
+    }
+    .di-cap-item:hover .di-cap-drop,
+    .di-cap-item.active .di-cap-drop {
+        background: repeating-linear-gradient(
+            to bottom,
+            var(--cap-color, #06b6d4) 0 4px,
+            transparent 4px 8px
+        );
+        background-size: 2px 8px;
+        animation: dashScroll .6s linear infinite;
+    }
+    @keyframes dashScroll {
+        to { background-position: 0 8px; }
+    }
+
+    /* dot on the rail — pulsing ring on active */
+    .di-cap-dot {
+        width: 16px; height: 16px;
+        border-radius: 50%;
+        background: var(--bg-surface);
+        border: 3px solid var(--border-color);
+        position: relative;
+        z-index: 2;
+        transition: all .35s;
+        flex-shrink: 0;
+    }
+    .di-cap-dot::after {
+        content: '';
+        position: absolute;
+        inset: -6px;
+        border-radius: 50%;
+        border: 2px solid var(--cap-color, #06b6d4);
+        opacity: 0;
+        transition: opacity .3s;
+        animation: ringPulse 1.6s ease-in-out infinite;
+    }
+    @keyframes ringPulse {
+        0%, 100% { transform: scale(1); opacity: .4; }
+        50%      { transform: scale(1.5); opacity: 0; }
+    }
+    .di-cap-item:hover .di-cap-dot,
+    .di-cap-item.active .di-cap-dot {
+        border-color: var(--cap-color, #06b6d4);
+        background: var(--cap-color, #06b6d4);
+        box-shadow: 0 0 16px var(--cap-color, #06b6d4);
+    }
+    .di-cap-item:hover .di-cap-dot::after,
+    .di-cap-item.active .di-cap-dot::after { opacity: 1; }
+
+    /* final card (Unified BI) */
+    .di-cap-final-wrap {
+        display: flex;
+        justify-content: center;
+        margin-top: .5rem;
+    }
+    .di-cap-final-drop {
+        width: 2px;
+        height: 24px;
+        background: repeating-linear-gradient(
+            to bottom,
+            #ec4899 0 4px,
+            transparent 4px 8px
+        );
+        background-size: 2px 8px;
+        margin: 0 auto;
+        animation: dashScroll .6s linear infinite;
+    }
+    .di-cap-final-dot {
+        width: 18px; height: 18px;
+        border-radius: 50%;
+        background: #ec4899;
+        border: 3px solid #ec4899;
+        box-shadow: 0 0 18px rgba(236,72,153,.5);
+        margin: 0 auto 0;
+        position: relative;
+        z-index: 2;
+    }
+    .di-cap-final-dot::after {
+        content: '';
+        position: absolute;
+        inset: -8px;
+        border-radius: 50%;
+        border: 2px solid #ec4899;
+        animation: ringPulse 1.6s ease-in-out infinite;
+    }
+    .di-cap-final-card {
+        background: rgba(255,255,255,.03);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255,255,255,.08);
+        border-radius: 22px;
+        padding: 0;
+        width: 280px;
+        transition: all .45s cubic-bezier(.25,.46,.45,.94);
+        position: relative;
+        overflow: hidden;
+    }
+    .di-cap-final-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 4px;
+        background: linear-gradient(90deg, #ec4899, transparent 80%);
+        opacity: 0;
+        transition: opacity .4s;
+    }
+    .di-cap-final-card::after {
+        content: '';
+        position: absolute;
+        top: -50%; left: -60%;
+        width: 40%; height: 200%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,.06), transparent);
+        transform: skewX(-20deg);
+        transition: left .6s;
+        pointer-events: none;
+    }
+    .di-cap-final-card:hover::after { left: 120%; }
+    .di-cap-final-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow:
+            0 20px 56px rgba(0,0,0,.09),
+            0 0 0 1px #ec4899,
+            inset 0 1px 0 rgba(255,255,255,.08);
+        border-color: #ec4899;
+    }
+    .di-cap-final-card:hover::before { opacity: 1; }
+    .di-cap-final-card .di-cap-icon::after { background: #ec4899; }
+
+    /* responsive */
+    @media (max-width: 767.98px) {
+        .di-cap-item { flex: 0 0 230px; }
+        .di-cap-card, .di-cap-final-card { width: 210px; }
+        .di-cap-inner { padding: 1.25rem 1rem; }
+        .di-cap-arrow { display: none; }
+        .di-cap-track { padding: 1.5rem 1rem 1rem; }
+        .di-cap-rail { margin: 0 1rem 2rem; }
+        .di-cap-num { width: 28px; height: 28px; font-size: .65rem; }
+    }
+
+    .di-cta {
+        background: transparent;
+        border-radius: 0;
+        padding: 4rem 2rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    .di-cta::before {
+        content: '';
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%,-50%);
+        width: 500px; height: 500px;
+        background: radial-gradient(circle, rgba(6,182,212,.06), transparent 70%);
+        pointer-events: none;
+    }
+    .di-cta h2 {
+        font-weight: 800;
+        font-size: 2.2rem;
+        color: var(--text-primary);
+        margin-bottom: .75rem;
+    }
+    .di-cta p {
+        color: var(--text-muted);
+        max-width: 500px;
+        margin: 0 auto 2rem;
+        font-size: 1rem;
+        line-height: 1.7;
+    }
+
+    /* Primary CTA — solid brand */
+    .cta-btn-primary {
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+        padding: .9rem 2.2rem;
+        border-radius: 999px;
+        font-weight: 700;
+        font-size: .95rem;
+        color: #fff;
+        background: linear-gradient(135deg, #06b6d4, #0891b2);
+        border: none;
+        text-decoration: none;
+        transition: all .35s cubic-bezier(.25,.46,.45,.94);
+        box-shadow: 0 4px 24px rgba(6,182,212,.35);
+        position: relative;
+        overflow: hidden;
+    }
+    .cta-btn-primary::after {
+        content: '';
+        position: absolute;
+        top: -50%; left: -60%;
+        width: 40%; height: 200%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,.12), transparent);
+        transform: skewX(-20deg);
+        transition: left .6s;
+        pointer-events: none;
+    }
+    .cta-btn-primary:hover {
+        transform: translateY(-2px) scale(1.03);
+        box-shadow: 0 8px 32px rgba(6,182,212,.5);
+        color: #fff;
+    }
+    .cta-btn-primary:hover::after { left: 130%; }
+
+    /* Secondary CTA — ghost outline */
+    .cta-btn-secondary {
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+        padding: .9rem 2.2rem;
+        border-radius: 999px;
+        font-weight: 700;
+        font-size: .95rem;
+        color: var(--text-primary);
+        background: transparent;
+        border: 2px solid var(--border-color);
+        text-decoration: none;
+        transition: all .35s;
+    }
+    .cta-btn-secondary:hover {
+        border-color: #06b6d4;
+        color: #06b6d4;
+        transform: translateY(-2px);
+    }
+
+    /* Trust badges */
+    .cta-trust {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+    .cta-trust-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: .4rem;
+        padding: .45rem 1rem;
+        border-radius: 999px;
+        font-size: .75rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        background: var(--bg-surface);
+        border: 1px solid var(--border-color);
+        transition: all .3s;
+    }
+    .cta-trust-badge:hover {
+        border-color: #06b6d4;
+        color: #06b6d4;
+        transform: translateY(-1px);
+    }
+    .cta-trust-badge i {
+        font-size: .85rem;
+        color: #06b6d4;
+    }
+
+    @media (max-width: 576px) {
+        .di-cta { padding: 2.5rem 1.25rem; }
+        .di-cta h2 { font-size: 1.6rem; }
+        .cta-btn-primary, .cta-btn-secondary { width: 100%; justify-content: center; padding: 1rem; }
+        .cta-trust { gap: .6rem; }
+        .cta-trust-badge { font-size: .7rem; padding: .35rem .75rem; }
+    }
+    /* ── USE CASES SPOTLIGHT CARDS ── */
+    .uc-section {
+        background: var(--bg-body);
+        padding: 5rem 0;
+    }
+    .uc-card {
+        position: relative;
+        border-radius: 50%;
+        width: 200px;
+        height: 200px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        transition: transform .5s cubic-bezier(.25,.46,.45,.94), box-shadow .5s;
+        cursor: pointer;
+        overflow: hidden;
+    }
+    .uc-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(0,0,0,.3) 0%, rgba(0,0,0,.8) 100%);
+        z-index: 1;
+        transition: background .5s;
+    }
+    .uc-card:hover::before {
+        background: radial-gradient(circle, rgba(0,0,0,.2) 0%, rgba(0,0,0,.85) 100%);
+    }
+    .uc-card:hover {
+        transform: translateY(-6px) scale(1.01);
+        box-shadow: 0 32px 64px rgba(0,0,0,.3);
+    }
+    .uc-card-content {
+        position: relative;
+        z-index: 2;
+        padding: 1rem;
+        width: 100%;
+        color: #fff;
+        text-align: center;
+    }
+    .uc-icon {
+        width: 36px; height: 36px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: .9rem;
+        background: rgba(255,255,255,.12);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid rgba(255,255,255,.15);
+        margin-bottom: 1rem;
+        transition: transform .4s, background .3s;
+    }
+    .uc-card:hover .uc-icon {
+        transform: scale(1.1) rotate(-4deg);
+        background: rgba(255,255,255,.2);
+    }
+    .uc-card h5 {
+        font-weight: 800;
+        font-size: .8rem;
+        margin-bottom: 0;
+        letter-spacing: -.01em;
+        text-shadow: 0 2px 8px rgba(0,0,0,.3);
+    }
+    .uc-card p {
+        font-size: .75rem;
+        line-height: 1.5;
+        color: rgba(255,255,255,.85);
+        margin-bottom: .75rem;
+        display: none;
+    }
+    .uc-tags {
+        display: none;
+    }
+    .uc-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: .35rem;
+        padding: .35rem .75rem;
+        border-radius: 999px;
+        font-size: .75rem;
+        font-weight: 600;
+        background: rgba(255,255,255,.1);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        border: 1px solid rgba(255,255,255,.15);
+        color: #fff;
+        white-space: nowrap;
+        transition: background .3s, transform .3s;
+    }
+    .uc-tag:hover {
+        background: rgba(255,255,255,.2);
+        transform: translateY(-1px);
+    }
+    .uc-card .uc-shimmer {
+        position: absolute;
+        top: -50%; left: -60%;
+        width: 40%; height: 200%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,.06), transparent);
+        transform: skewX(-20deg);
+        transition: left .7s;
+        pointer-events: none;
+        z-index: 1;
+    }
+    .uc-card:hover .uc-shimmer { left: 130%; }
+
+    /* stagger */
+    .uc-card.animate-on-scroll { opacity: 0; transform: translateY(40px); transition: opacity .7s, transform .7s cubic-bezier(.25,.46,.45,.94); }
+    .uc-card.animate-on-scroll.is-visible { opacity: 1; transform: translateY(0); }
+    .uc-card.animate-on-scroll:nth-child(2) { transition-delay: .12s; }
+    .uc-card.animate-on-scroll:nth-child(3) { transition-delay: .24s; }
+    .uc-card.animate-on-scroll:nth-child(4) { transition-delay: .36s; }
+
+    @media (max-width: 768px) {
+        .uc-card { width: 140px; height: 140px; }
+        .uc-card h5 { font-size: .7rem; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- HERO -->
+<section class="di-hero">
+    <div class="container">
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'home:home' %}" class="text-decoration-none" style="color:#06b6d4;">{% trans "Home" %}</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'services:index' %}" class="text-decoration-none" style="color:#06b6d4;">{% trans "Services" %}</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'integration:integration_homepage' %}" class="text-decoration-none" style="color:#06b6d4;">{% trans "Integration" %}</a></li>
+                <li class="breadcrumb-item active text-secondary" aria-current="page">{% trans "Data Integration" %}</li>
+            </ol>
+        </nav>
+        <div class="row align-items-center g-5">
+            <div class="col-lg-8">
+                <span class="badge rounded-pill px-3 py-2 mb-3" style="background:rgba(6,182,212,.12);border:1px solid rgba(6,182,212,.25);color:#06b6d4;font-size:.8rem;font-weight:700;letter-spacing:.04em;">
+                    <i class="fas fa-database me-1"></i> {% trans "Data Integration" %}
+                </span>
+                <h1 class="display-5 fw-800 text-white mb-3">
+                    {% trans "Data Warehouse " %}
+                    <span style="background:linear-gradient(135deg,#06b6d4,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">{% trans "& Unified Analytics" %}</span>
+                </h1>
+                <p class="lead mb-4" style="color:#94a3b8;max-width:560px;">
+                    {% trans "Consolidate data from every source into a single Enterprise Data Warehouse. Real-time synchronization, data virtualization, and automated ETL pipelines give you one version of truth." %}
+                </p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="{% url 'contact:contact' %}" class="btn btn-primary btn-lg px-5 py-3 rounded-pill fw-700" style="box-shadow:0 0 25px rgba(6,182,212,.35);">
+                        {% trans "Request a Quote" %} <i class="fas fa-arrow-right ms-2"></i>
+                    </a>
+                    <a href="#architecture" class="btn btn-outline-light btn-lg px-5 py-3 rounded-pill fw-700">
+                        {% trans "See How It Works" %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- DATA DEFINITION -->
+<section class="py-5" style="background:var(--bg-body);">
+    <div class="container py-4">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6 animate-on-scroll slide-up">
+                <span class="section-label">{% trans "What is Data Integration?" %}</span>
+                <h2 class="fw-800 mt-2 mb-3" style="font-size:1.8rem;">{% trans "Unifying Every Data Point Into One Source of Truth" %}</h2>
+                <p style="color:var(--text-muted);line-height:1.8;">
+                    {% trans "Data integration is the process of combining data from different sources into a single, unified view. It involves extracting data from disparate systems, transforming it into a consistent format, and loading it into a central repository — enabling organizations to make faster, smarter decisions." %}
+                </p>
+                <p style="color:var(--text-muted);line-height:1.8;">
+                    {% trans "Whether it's syncing CRM records, merging warehouse inventory, or consolidating clinical data — integration eliminates silos and creates a single version of truth across your entire business." %}
+                </p>
+            </div>
+            <div class="col-lg-6 animate-on-scroll slide-up" style="transition-delay:.12s;">
+                <div class="row g-3">
+                    <div class="col-6">
+                        <div class="p-3 rounded-3 h-100" style="background:var(--bg-surface);border:1px solid var(--border-color);">
+                            <div style="width:36px;height:36px;border-radius:10px;background:rgba(6,182,212,.1);color:#06b6d4;display:flex;align-items:center;justify-content:center;font-size:.85rem;margin-bottom:.6rem;"><i class="fas fa-compress-alt"></i></div>
+                            <h6 class="fw-700 mb-1" style="font-size:.85rem;">{% trans "Extract" %}</h6>
+                            <small style="color:var(--text-muted);font-size:.75rem;">{% trans "Pull data from databases, APIs, files, and SaaS apps." %}</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-3 rounded-3 h-100" style="background:var(--bg-surface);border:1px solid var(--border-color);">
+                            <div style="width:36px;height:36px;border-radius:10px;background:rgba(59,130,246,.1);color:#3b82f6;display:flex;align-items:center;justify-content:center;font-size:.85rem;margin-bottom:.6rem;"><i class="fas fa-random"></i></div>
+                            <h6 class="fw-700 mb-1" style="font-size:.85rem;">{% trans "Transform" %}</h6>
+                            <small style="color:var(--text-muted);font-size:.75rem;">{% trans "Cleanse, deduplicate, and map to a standard schema." %}</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-3 rounded-3 h-100" style="background:var(--bg-surface);border:1px solid var(--border-color);">
+                            <div style="width:36px;height:36px;border-radius:10px;background:rgba(139,92,246,.1);color:#8b5cf6;display:flex;align-items:center;justify-content:center;font-size:.85rem;margin-bottom:.6rem;"><i class="fas fa-database"></i></div>
+                            <h6 class="fw-700 mb-1" style="font-size:.85rem;">{% trans "Load" %}</h6>
+                            <small style="color:var(--text-muted);font-size:.75rem;">{% trans "Push to EDW, data lake, or downstream apps in real time." %}</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-3 rounded-3 h-100" style="background:var(--bg-surface);border:1px solid var(--border-color);">
+                            <div style="width:36px;height:36px;border-radius:10px;background:rgba(16,185,129,.1);color:#10b981;display:flex;align-items:center;justify-content:center;font-size:.85rem;margin-bottom:.6rem;"><i class="fas fa-eye"></i></div>
+                            <h6 class="fw-700 mb-1" style="font-size:.85rem;">{% trans "Visualize" %}</h6>
+                            <small style="color:var(--text-muted);font-size:.75rem;">{% trans "Dashboards, reports, and real-time analytics on unified data." %}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- KEY METRICS -->
+<section class="di-metrics">
+    <div class="container">
+        <div class="row g-3">
+            <div class="col-md-3 col-6 animate-on-scroll slide-up">
+                <div class="di-metric-card">
+                    <div class="di-metric-icon"><i class="fas fa-database"></i></div>
+                    <div class="di-metric-value" data-count="50" data-suffix="+">0+</div>
+                    <div class="di-metric-label">{% trans "Data Sources Supported" %}</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 animate-on-scroll slide-up" style="transition-delay:.08s;">
+                <div class="di-metric-card">
+                    <div class="di-metric-icon"><i class="fas fa-bolt"></i></div>
+                    <div class="di-metric-value" data-count="1" data-prefix="<" data-suffix="s">&lt;1s</div>
+                    <div class="di-metric-label">{% trans "Real-Time Sync Latency" %}</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 animate-on-scroll slide-up" style="transition-delay:.16s;">
+                <div class="di-metric-card">
+                    <div class="di-metric-icon"><i class="fas fa-check-circle"></i></div>
+                    <div class="di-metric-value" data-count="99.99" data-suffix="%" data-decimals="2">0%</div>
+                    <div class="di-metric-label">{% trans "Data Accuracy" %}</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 animate-on-scroll slide-up" style="transition-delay:.24s;">
+                <div class="di-metric-card">
+                    <div class="di-metric-icon"><i class="fas fa-chart-line"></i></div>
+                    <div class="di-metric-value" data-count="80" data-suffix="%">0%</div>
+                    <div class="di-metric-label">{% trans "Faster Reporting" %}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CORE CAPABILITIES — Roadmap -->
+<section class="py-5 di-capabilities" style="background:var(--bg-surface-secondary);">
+    <div class="container py-5 position-relative">
+        <div class="section-heading text-center mx-auto animate-on-scroll">
+            <span class="section-label">{% trans "Core Capabilities" %}</span>
+            <h2>{% trans "What Our Data Integration Covers" %}</h2>
+        </div>
+
+        <!-- scroll arrows + track wrapper -->
+        <div class="di-cap-track-wrap animate-on-scroll slide-up">
+            <button class="di-cap-arrow di-cap-arrow--left" aria-label="{% trans 'Scroll left' %}" id="capLeft">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="di-cap-arrow di-cap-arrow--right" aria-label="{% trans 'Scroll right' %}" id="capRight">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+
+            <div class="di-cap-track" id="capTrack">
+                <!-- 01  EDW -->
+                <div class="di-cap-item" style="--cap-color:#06b6d4;">
+                    <div class="di-cap-card">
+                        <div class="di-cap-inner">
+                            <div class="di-cap-icon-wrap">
+                                <div class="di-cap-icon" style="background:rgba(6,182,212,.1);color:#06b6d4;">
+                                    <i class="fas fa-layer-group"></i>
+                                </div>
+                                <span class="di-cap-num">01</span>
+                            </div>
+                            <h5>{% trans "Enterprise Data Warehouse" %}</h5>
+                            <p>{% trans "Centralized repository for all data from every business system in one queryable layer." %}</p>
+                        </div>
+                    </div>
+                    <div class="di-cap-drop"></div>
+                    <div class="di-cap-dot"></div>
+                </div>
+
+                <!-- 02  Sync -->
+                <div class="di-cap-item" style="--cap-color:#3b82f6;">
+                    <div class="di-cap-card">
+                        <div class="di-cap-inner">
+                            <div class="di-cap-icon-wrap">
+                                <div class="di-cap-icon" style="background:rgba(59,130,246,.1);color:#3b82f6;">
+                                    <i class="fas fa-sync-alt"></i>
+                                </div>
+                                <span class="di-cap-num">02</span>
+                            </div>
+                            <h5>{% trans "Real-Time Sync" %}</h5>
+                            <p>{% trans "Bidirectional data sync with conflict resolution and full audit trails." %}</p>
+                        </div>
+                    </div>
+                    <div class="di-cap-drop"></div>
+                    <div class="di-cap-dot"></div>
+                </div>
+
+                <!-- 03  Virtualization -->
+                <div class="di-cap-item" style="--cap-color:#8b5cf6;">
+                    <div class="di-cap-card">
+                        <div class="di-cap-inner">
+                            <div class="di-cap-icon-wrap">
+                                <div class="di-cap-icon" style="background:rgba(139,92,246,.1);color:#8b5cf6;">
+                                    <i class="fas fa-eye"></i>
+                                </div>
+                                <span class="di-cap-num">03</span>
+                            </div>
+                            <h5>{% trans "Data Virtualization" %}</h5>
+                            <p>{% trans "Query across multiple sources without moving data. Logical views on demand." %}</p>
+                        </div>
+                    </div>
+                    <div class="di-cap-drop"></div>
+                    <div class="di-cap-dot"></div>
+                </div>
+
+                <!-- 04  ETL -->
+                <div class="di-cap-item" style="--cap-color:#10b981;">
+                    <div class="di-cap-card">
+                        <div class="di-cap-inner">
+                            <div class="di-cap-icon-wrap">
+                                <div class="di-cap-icon" style="background:rgba(16,185,129,.1);color:#10b981;">
+                                    <i class="fas fa-cogs"></i>
+                                </div>
+                                <span class="di-cap-num">04</span>
+                            </div>
+                            <h5>{% trans "Automated ETL" %}</h5>
+                            <p>{% trans "Pre-built connectors and drag-and-drop pipeline builders. Auto-recover jobs." %}</p>
+                        </div>
+                    </div>
+                    <div class="di-cap-drop"></div>
+                    <div class="di-cap-dot"></div>
+                </div>
+
+                <!-- 05  Governance -->
+                <div class="di-cap-item" style="--cap-color:#f59e0b;">
+                    <div class="di-cap-card">
+                        <div class="di-cap-inner">
+                            <div class="di-cap-icon-wrap">
+                                <div class="di-cap-icon" style="background:rgba(245,158,11,.1);color:#f59e0b;">
+                                    <i class="fas fa-shield-alt"></i>
+                                </div>
+                                <span class="di-cap-num">05</span>
+                            </div>
+                            <h5>{% trans "Data Governance" %}</h5>
+                            <p>{% trans "Automated profiling, cleansing, and lineage tracking for compliance and trust." %}</p>
+                        </div>
+                    </div>
+                    <div class="di-cap-drop"></div>
+                    <div class="di-cap-dot"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- progress rail -->
+        <div class="di-cap-rail animate-on-scroll slide-up">
+            <div class="di-cap-rail-fill" id="capRailFill"></div>
+        </div>
+
+        <!-- 06  Unified BI — final card below the rail -->
+        <div class="di-cap-final-wrap animate-on-scroll slide-up">
+            <div style="display:flex;flex-direction:column;align-items:center;">
+                <div class="di-cap-final-dot"></div>
+                <div class="di-cap-final-drop"></div>
+                <div class="di-cap-final-card" style="--cap-color:#ec4899;">
+                    <div class="di-cap-inner">
+                        <div class="di-cap-icon-wrap">
+                            <div class="di-cap-icon" style="background:rgba(236,72,153,.1);color:#ec4899;">
+                                <i class="fas fa-chart-bar"></i>
+                            </div>
+                            <span class="di-cap-num" style="background:#ec4899;">06</span>
+                        </div>
+                        <h5 style="color:#ec4899;">{% trans "Unified Analytics & BI" %}</h5>
+                        <p>{% trans "Pre-built dashboards and custom report builders. Connect to Tableau, Power BI, or our native engine." %}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ARCHITECTURE — 3D Isometric Pipeline -->
+<section id="architecture" class="py-5 di-pipeline-section">
+    <div class="container py-5">
+        <div class="section-heading text-center mx-auto animate-on-scroll">
+            <span class="section-label">{% trans "How It Works" %}</span>
+            <h2>{% trans "Integration Architecture" %}</h2>
+        </div>
+
+        <div class="di-pipeline-scene animate-on-scroll slide-up">
+            <div class="di-pipeline-board" id="pipelineBoard">
+
+                <!-- vertical spine -->
+                <div class="di-pipeline-spine">
+                    <div class="di-pipeline-spine-fill" id="pipelineFill"></div>
+                    <div class="di-pipeline-particle"></div>
+                    <div class="di-pipeline-particle"></div>
+                    <div class="di-pipeline-particle"></div>
+                    <div class="di-pipeline-particle"></div>
+                </div>
+
+                <!-- 01 CONNECT — left -->
+                <div class="di-pipeline-step di-pipeline-step--left" style="--step-color:#06b6d4;">
+                    <div class="pp-card">
+                        <div class="pp-card-head">
+                            <div class="pp-card-icon"><i class="fas fa-plug"></i></div>
+                            <div class="pp-card-num">01</div>
+                            <h5 class="mb-0">{% trans "Connect" %}</h5>
+                        </div>
+                        <p>{% trans "Plug in 50+ pre-built connectors — databases, APIs, SaaS apps, files, and IoT streams. Custom adapters for legacy systems." %}</p>
+                    </div>
+                    <div class="pp-arm"></div>
+                    <div class="pp-node"><i class="fas fa-plug"></i></div>
+                </div>
+
+                <!-- 02 TRANSFORM — left -->
+                <div class="di-pipeline-step di-pipeline-step--left" style="--step-color:#3b82f6;">
+                    <div class="pp-card">
+                        <div class="pp-card-head">
+                            <div class="pp-card-icon"><i class="fas fa-exchange-alt"></i></div>
+                            <div class="pp-card-num">02</div>
+                            <h5 class="mb-0">{% trans "Transform" %}</h5>
+                        </div>
+                        <p>{% trans "Apply mapping, cleansing, deduplication, and enrichment rules. Visual drag-and-drop or SQL for complex transformations." %}</p>
+                    </div>
+                    <div class="pp-arm"></div>
+                    <div class="pp-node"><i class="fas fa-exchange-alt"></i></div>
+                </div>
+
+                <!-- 03 LOAD & SYNC — right -->
+                <div class="di-pipeline-step di-pipeline-step--right" style="--step-color:#8b5cf6;">
+                    <div class="pp-node"><i class="fas fa-database"></i></div>
+                    <div class="pp-arm"></div>
+                    <div class="pp-card">
+                        <div class="pp-card-head">
+                            <div class="pp-card-icon"><i class="fas fa-database"></i></div>
+                            <div class="pp-card-num">03</div>
+                            <h5 class="mb-0">{% trans "Load & Sync" %}</h5>
+                        </div>
+                        <p>{% trans "Push data to your EDW, data lake, or downstream apps in real time. Bi-directional sync keeps all systems current." %}</p>
+                    </div>
+                </div>
+
+                <!-- 04 MONITOR & GOVERN — right -->
+                <div class="di-pipeline-step di-pipeline-step--right" style="--step-color:#10b981;">
+                    <div class="pp-node"><i class="fas fa-chart-line"></i></div>
+                    <div class="pp-arm"></div>
+                    <div class="pp-card">
+                        <div class="pp-card-head">
+                            <div class="pp-card-icon"><i class="fas fa-chart-line"></i></div>
+                            <div class="pp-card-num">04</div>
+                            <h5 class="mb-0">{% trans "Monitor & Govern" %}</h5>
+                        </div>
+                        <p>{% trans "Real-time pipeline monitoring, alerting, and data lineage. Quality and compliance at every step." %}</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- USE CASES — Spotlight Cards -->
+<section class="uc-section">
+    <div class="container py-5">
+        <div class="section-heading text-center mx-auto animate-on-scroll">
+            <span class="section-label">{% trans "Use Cases" %}</span>
+            <h2>{% trans "Real-World Data Integration Scenarios" %}</h2>
+        </div>
+        <div class="d-flex flex-wrap justify-content-center gap-4 mt-4">
+            <div class="uc-card animate-on-scroll" data-bs-toggle="modal" data-bs-target="#ucModalManufacturing" style="background-image:url('https://images.unsplash.com/photo-1565043666747-69f6646db940?w=800&q=80');">
+                <div class="uc-shimmer"></div>
+                <div class="uc-card-content">
+                    <div class="uc-icon"><i class="fas fa-industry"></i></div>
+                    <h5>{% trans "Manufacturing" %}</h5>
+                </div>
+            </div>
+            <div class="uc-card animate-on-scroll" data-bs-toggle="modal" data-bs-target="#ucModalRetail" style="background-image:url('https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=800&q=80');">
+                <div class="uc-shimmer"></div>
+                <div class="uc-card-content">
+                    <div class="uc-icon"><i class="fas fa-shopping-cart"></i></div>
+                    <h5>{% trans "Retail & E-Commerce" %}</h5>
+                </div>
+            </div>
+            <div class="uc-card animate-on-scroll" data-bs-toggle="modal" data-bs-target="#ucModalHealthcare" style="background-image:url('https://images.unsplash.com/photo-1538108149393-fbbd81895907?w=800&q=80');">
+                <div class="uc-shimmer"></div>
+                <div class="uc-card-content">
+                    <div class="uc-icon"><i class="fas fa-heartbeat"></i></div>
+                    <h5>{% trans "Healthcare" %}</h5>
+                </div>
+            </div>
+            <div class="uc-card animate-on-scroll" data-bs-toggle="modal" data-bs-target="#ucModalFinance" style="background-image:url('https://images.unsplash.com/photo-1501167786227-4cba60f6d58f?w=800&q=80');">
+                <div class="uc-shimmer"></div>
+                <div class="uc-card-content">
+                    <div class="uc-icon"><i class="fas fa-university"></i></div>
+                    <h5>{% trans "Finance & Banking" %}</h5>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modals -->
+        <div class="modal fade" id="ucModalManufacturing" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content" style="background:var(--bg-surface);border:1px solid var(--border-color);border-radius:20px;overflow:hidden;">
+                    <div class="modal-header border-0 pb-0" style="background:linear-gradient(135deg,#06b6d4 0%,#0891b2 100%);padding:2rem 2rem 1.5rem;">
+                        <div>
+                            <h4 class="fw-800 text-white mb-1">{% trans "Manufacturing" %}</h4>
+                            <p class="mb-0" style="color:rgba(255,255,255,.8);font-size:.9rem;">{% trans "Real-Time Operational Intelligence" %}</p>
+                        </div>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <p class="mb-3">{% trans "Unify shop-floor IoT sensors, ERP inventory data, and quality control systems into a real-time operational dashboard." %}</p>
+                        <div class="row g-3 mb-3">
+                            <div class="col-sm-4">
+                                <div class="p-3 rounded-3" style="background:var(--bg-surface-secondary);">
+                                    <div class="fw-700 mb-1" style="color:#06b6d4;"><i class="fas fa-broadcast-tower me-1"></i> {% trans "IoT Sensors" %}</div>
+                                    <small class="text-muted">{% trans "Real-time shop-floor monitoring with predictive alerts." %}</small>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="p-3 rounded-3" style="background:var(--bg-surface-secondary);">
+                                    <div class="fw-700 mb-1" style="color:#06b6d4;"><i class="fas fa-server me-1"></i> {% trans "ERP" %}</div>
+                                    <small class="text-muted">{% trans "Inventory and production data synced with procurement." %}</small>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="p-3 rounded-3" style="background:var(--bg-surface-secondary);">
+                                    <div class="fw-700 mb-1" style="color:#06b6d4;"><i class="fas fa-check-circle me-1"></i> {% trans "Quality Control" %}</div>
+                                    <small class="text-muted">{% trans "Automated defect detection with trend analytics." %}</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="alert alert-light border-0 rounded-3 mb-0" style="background:rgba(6,182,212,.06);">
+                            <strong>{% trans "Key Outcome:" %}</strong> {% trans "30% reduction in downtime through predictive maintenance alerts." %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="ucModalRetail" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content" style="background:var(--bg-surface);border:1px solid var(--border-color);border-radius:20px;overflow:hidden;">
+                    <div class="modal-header border-0 pb-0" style="background:linear-gradient(135deg,#10b981 0%,#059669 100%);padding:2rem 2rem 1.5rem;">
+                        <div>
+                            <h4 class="fw-800 text-white mb-1">{% trans "Retail & E-Commerce" %}</h4>
+                            <p class="mb-0" style="color:rgba(255,255,255,.8);font-size:.9rem;">{% trans "Unified Customer View" %}</p>
+                        </div>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <p class="mb-3">{% trans "Sync POS, inventory, CRM, and marketplace data. Single view of customer across online and offline channels." %}</p>
+                        <div class="row g-3 mb-3">
+                            <div class="col-sm-4">
+                                <div class="p-3 rounded-3" style="background:var(--bg-surface-secondary);">
+                                    <div class="fw-700 mb-1" style="color:#10b981;"><i class="fas fa-cash-register me-1"></i> {% trans "POS" %}</div>
+                                    <small class="text-muted">{% trans "In-store transactions synced in real time." %}</small>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="p-3 rounded-3" style="background:var(--bg-surface-secondary);">
+                                    <div class="fw-700 mb-1" style="color:#10b981;"><i class="fas fa-boxes me-1"></i> {% trans "Inventory" %}</div>
+                                    <small class="text-muted">{% trans "Stock levels across warehouses and stores." %}</small>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="p-3 rounded-3" style="background:var(--bg-surface-secondary);">
+                                    <div class="fw-700 mb-1" style="color:#10b981;"><i class="fas fa-users me-1"></i> {% trans "CRM" %}</div>
+                                    <small class="text-muted">{% trans "360° customer profiles for personalization." %}</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="alert alert-light border-0 rounded-3 mb-0" style="background:rgba(16,185,129,.06);">
+                            <strong>{% trans "Key Outcome:" %}</strong> {% trans "25% increase in cross-sell revenue through unified customer insights." %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="ucModalHealthcare" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content" style="background:var(--bg-surface);border:1px solid var(--border-color);border-radius:20px;overflow:hidden;">
+                    <div class="modal-header border-0 pb-0" style="background:linear-gradient(135deg,#8b5cf6 0%,#7c3aed 100%);padding:2rem 2rem 1.5rem;">
+                        <div>
+                            <h4 class="fw-800 text-white mb-1">{% trans "Healthcare" %}</h4>
+                            <p class="mb-0" style="color:rgba(255,255,255,.8);font-size:.9rem;">{% trans "HIPAA-Compliant Data Hub" %}</p>
+                        </div>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <p class="mb-3">{% trans "HIPAA-compliant data consolidation from EHRs, labs, billing, and patient portals. Real-time clinical analytics." %}</p>
+                        <div class="row g-3 mb-3">
+                            <div class="col-sm-4">
+                                <div class="p-3 rounded-3" style="background:var(--bg-surface-secondary);">
+                                    <div class="fw-700 mb-1" style="color:#8b5cf6;"><i class="fas fa-file-medical me-1"></i> {% trans "EHR" %}</div>
+                                    <small class="text-muted">{% trans "Epic, Cerner, and custom EHR connectors." %}</small>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="p-3 rounded-3" style="background:var(--bg-surface-secondary);">
+                                    <div class="fw-700 mb-1" style="color:#8b5cf6;"><i class="fas fa-flask me-1"></i> {% trans "Labs" %}</div>
+                                    <small class="text-muted">{% trans "Lab results consolidated into clinical dashboards." %}</small>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="p-3 rounded-3" style="background:var(--bg-surface-secondary);">
+                                    <div class="fw-700 mb-1" style="color:#8b5cf6;"><i class="fas fa-file-invoice-dollar me-1"></i> {% trans "Billing" %}</div>
+                                    <small class="text-muted">{% trans "Claims and billing data unified for reporting." %}</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="alert alert-light border-0 rounded-3 mb-0" style="background:rgba(139,92,246,.06);">
+                            <strong>{% trans "Key Outcome:" %}</strong> {% trans "40% faster clinical reporting with full HIPAA compliance." %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="ucModalFinance" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content" style="background:var(--bg-surface);border:1px solid var(--border-color);border-radius:20px;overflow:hidden;">
+                    <div class="modal-header border-0 pb-0" style="background:linear-gradient(135deg,#f59e0b 0%,#d97706 100%);padding:2rem 2rem 1.5rem;">
+                        <div>
+                            <h4 class="fw-800 text-white mb-1">{% trans "Finance & Banking" %}</h4>
+                            <p class="mb-0" style="color:rgba(255,255,255,.8);font-size:.9rem;">{% trans "Regulatory & Risk Intelligence" %}</p>
+                        </div>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <p class="mb-3">{% trans "Regulatory reporting, fraud detection pipelines, and cross-system reconciliation with full audit trails." %}</p>
+                        <div class="row g-3 mb-3">
+                            <div class="col-sm-4">
+                                <div class="p-3 rounded-3" style="background:var(--bg-surface-secondary);">
+                                    <div class="fw-700 mb-1" style="color:#f59e0b;"><i class="fas fa-file-alt me-1"></i> {% trans "Regulatory" %}</div>
+                                    <small class="text-muted">{% trans "Automated compliance report generation." %}</small>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="p-3 rounded-3" style="background:var(--bg-surface-secondary);">
+                                    <div class="fw-700 mb-1" style="color:#f59e0b;"><i class="fas fa-shield-alt me-1"></i> {% trans "Fraud Detection" %}</div>
+                                    <small class="text-muted">{% trans "Real-time anomaly detection across transactions." %}</small>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="p-3 rounded-3" style="background:var(--bg-surface-secondary);">
+                                    <div class="fw-700 mb-1" style="color:#f59e0b;"><i class="fas fa-receipt me-1"></i> {% trans "Audit Trails" %}</div>
+                                    <small class="text-muted">{% trans "Full lineage and traceability for every record." %}</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="alert alert-light border-0 rounded-3 mb-0" style="background:rgba(245,158,11,.06);">
+                            <strong>{% trans "Key Outcome:" %}</strong> {% trans "60% faster regulatory reporting with zero manual reconciliation." %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- DOWNLOAD -->
+<section class="py-5" style="background:var(--bg-body);">
+    <div class="container py-4">
+        <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-4 p-4 p-md-5 rounded-4" style="background:var(--bg-surface);border:1px solid var(--border-color);box-shadow:0 4px 24px rgba(0,0,0,.04);">
+            <div class="d-flex align-items-center gap-3">
+                <div style="width:52px;height:52px;border-radius:14px;background:rgba(6,182,212,.1);color:#06b6d4;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;">
+                    <i class="fas fa-file-pdf"></i>
+                </div>
+                <div>
+                    <h5 class="fw-800 mb-1" style="font-size:1.1rem;">{% trans "Want to Know More?" %}</h5>
+                    <p class="mb-0" style="color:var(--text-muted);font-size:.88rem;">{% trans "Download our full Data Integration overview — architecture, use cases, and ROI breakdown." %}</p>
+                </div>
+            </div>
+            <a href="{% static 'files/integration.pdf' %}" download class="cta-btn-primary" style="white-space:nowrap;">
+                <i class="fas fa-download"></i> {% trans "Download PDF" %}
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="py-5" style="background:var(--bg-body);">
+    <div class="container py-4">
+        <div class="di-cta">
+            <div class="position-relative z-1">
+                <h2>{% trans "Ready to Unify Your Data?" %}</h2>
+                <p>{% trans "Start your free data integration assessment today. Our architects will map your data landscape and design a custom solution." %}</p>
+                <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
+                    <a href="{% url 'contact:contact' %}" class="cta-btn-primary">
+                        {% trans "Get Your Free Assessment" %} <i class="fas fa-arrow-right"></i>
+                    </a>
+                    <a href="{% url 'integration:integration_homepage' %}" class="cta-btn-secondary">
+                        <i class="fas fa-arrow-left"></i> {% trans "Back to Integration" %}
+                    </a>
+                </div>
+                <div class="cta-trust">
+                    <span class="cta-trust-badge"><i class="fas fa-lock"></i> {% trans "100% Free" %}</span>
+                    <span class="cta-trust-badge"><i class="fas fa-clock"></i> {% trans "30-Min Consult" %}</span>
+                    <span class="cta-trust-badge"><i class="fas fa-user-tie"></i> {% trans "Expert Architects" %}</span>
+                    <span class="cta-trust-badge"><i class="fas fa-ban"></i> {% trans "No Obligation" %}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    /* ── Metric count-up ── */
+    const metricVals = document.querySelectorAll('.di-metric-value[data-count]');
+    let metricsDone = false;
+
+    function animateMetrics() {
+        if (metricsDone) return;
+        const section = document.querySelector('.di-metrics');
+        if (!section) return;
+        const rect = section.getBoundingClientRect();
+        if (rect.top < window.innerHeight * 0.85) {
+            metricsDone = true;
+            metricVals.forEach(el => {
+                const target  = parseFloat(el.dataset.count);
+                const suffix  = el.dataset.suffix || '';
+                const prefix  = el.dataset.prefix || '';
+                const decimals = parseInt(el.dataset.decimals) || 0;
+                const duration = 1800;
+                const start = performance.now();
+
+                function tick(now) {
+                    const elapsed = now - start;
+                    const progress = Math.min(elapsed / duration, 1);
+                    const ease = 1 - Math.pow(1 - progress, 3);
+                    const current = (target * ease).toFixed(decimals);
+                    el.textContent = prefix + current + suffix;
+                    if (progress < 1) requestAnimationFrame(tick);
+                }
+                requestAnimationFrame(tick);
+            });
+        }
+    }
+    window.addEventListener('scroll', animateMetrics, { passive: true });
+    animateMetrics();
+
+    /* ── 3D Pipeline parallax tilt ── */
+    const board = document.getElementById('pipelineBoard');
+    if (board) {
+        const scene = board.closest('.di-pipeline-scene');
+        scene.addEventListener('mousemove', function(e) {
+            const rect = scene.getBoundingClientRect();
+            const x = (e.clientX - rect.left) / rect.width  - 0.5;
+            const y = (e.clientY - rect.top)  / rect.height - 0.5;
+            board.style.transform = 'rotateY(' + (x * 6) + 'deg) rotateX(' + (-y * 4) + 'deg)';
+        });
+        scene.addEventListener('mouseleave', function() {
+            board.style.transform = 'rotateY(0) rotateX(0)';
+        });
+    }
+
+    /* ── Pipeline scroll fill ── */
+    const pFill = document.getElementById('pipelineFill');
+    if (pFill) {
+        function updatePipeline() {
+            const section = document.querySelector('.di-pipeline-section');
+            if (!section) return;
+            const rect = section.getBoundingClientRect();
+            const vh = window.innerHeight;
+            const start = vh * 0.8;
+            const end = -rect.height * 0.3;
+            const progress = Math.max(0, Math.min(1, (start - rect.top) / (start - end)));
+            pFill.style.height = (progress * 100) + '%';
+        }
+        window.addEventListener('scroll', updatePipeline, { passive: true });
+        updatePipeline();
+    }
+
+    /* ── Pipeline steps stagger reveal ── */
+    const ppSteps = document.querySelectorAll('.di-pipeline-step');
+    if (ppSteps.length) {
+        const ppObs = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    ppObs.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.2 });
+        ppSteps.forEach(function(step, i) {
+            step.style.transitionDelay = (i * 0.15) + 's';
+            ppObs.observe(step);
+        });
+    }
+
+    /* ── Capabilities scroll ── */
+    const track  = document.getElementById('capTrack');
+    const fill   = document.getElementById('capRailFill');
+    const leftB  = document.getElementById('capLeft');
+    const rightB = document.getElementById('capRight');
+    const items  = track ? Array.from(track.querySelectorAll('.di-cap-item')) : [];
+    const scrollAmt = 290;
+
+    if (track) {
+        leftB.addEventListener('click',  () => track.scrollBy({ left: -scrollAmt, behavior: 'smooth' }));
+        rightB.addEventListener('click', () => track.scrollBy({ left:  scrollAmt, behavior: 'smooth' }));
+
+        function updateRail() {
+            const max = track.scrollWidth - track.clientWidth;
+            const pct = max > 0 ? (track.scrollLeft / max) * 100 : 0;
+            fill.style.width = Math.min(pct, 100) + '%';
+        }
+
+        function highlightNearest() {
+            const center = track.scrollLeft + track.clientWidth / 2;
+            let closest = null, minDist = Infinity;
+            items.forEach(it => {
+                const d = Math.abs(it.offsetLeft + it.offsetWidth / 2 - center);
+                if (d < minDist) { minDist = d; closest = it; }
+            });
+            items.forEach(it => it.classList.remove('active'));
+            if (closest) closest.classList.add('active');
+        }
+
+        let ticking = false;
+        track.addEventListener('scroll', function() {
+            if (!ticking) {
+                requestAnimationFrame(function() {
+                    updateRail();
+                    highlightNearest();
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        });
+
+        updateRail();
+        highlightNearest();
+    }
+});
+</script>
+{% endblock %}

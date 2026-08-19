@@ -1,0 +1,39 @@
+{% load i18n %}
+<ul class="dropdown-menu shadow-xl border-0 rounded-24 p-3" aria-labelledby="{{ menu_id|default:'integrationMenu' }}" style="min-width: 280px;">
+  <li>
+    <a class="dropdown-item py-2" href="{% url 'integration:integration_homepage' %}">
+      <span class="service-icon"><i class="fas fa-plug text-primary"></i></span>
+      <div class="d-inline-flex flex-column align-items-start">
+        <span>{% trans "Integration Services" %}</span>
+        <span class="x-small text-muted">{% trans "API · ERP · CRM · IoT · Unified Systems" %}</span>
+      </div>
+    </a>
+  </li>
+  <li>
+    <a class="dropdown-item py-2" href="{% url 'integration:system_integration' %}">
+      <span class="service-icon"><i class="fas fa-project-diagram text-primary"></i></span>
+      <div class="d-inline-flex flex-column align-items-start">
+        <span>{% trans "System Integration" %}</span>
+        <span class="x-small text-muted">{% trans "Connect ERP, CRM, HR & Finance systems" %}</span>
+      </div>
+    </a>
+  </li>
+  <li>
+    <a class="dropdown-item py-2" href="{% url 'integration:data_integration' %}">
+      <span class="service-icon"><i class="fas fa-database text-primary"></i></span>
+      <div class="d-inline-flex flex-column align-items-start">
+        <span>{% trans "Data Integration" %}</span>
+        <span class="x-small text-muted">{% trans "ETL · Data Warehouse · Real-time Sync" %}</span>
+      </div>
+    </a>
+  </li>
+  <li>
+    <a class="dropdown-item py-2" href="{% url 'integration:b2b_integration' %}">
+      <span class="service-icon"><i class="fas fa-handshake text-primary"></i></span>
+      <div class="d-inline-flex flex-column align-items-start">
+        <span>{% trans "B2B Integration" %}</span>
+        <span class="x-small text-muted">{% trans "EDI · API Gateway · Partner Onboarding" %}</span>
+      </div>
+    </a>
+  </li>
+</ul>
