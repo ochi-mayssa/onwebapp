@@ -21,4 +21,9 @@ urlpatterns = [
     path('digital-presence/', views.standalone_view, {'section_id': 'digital'}, name='digital'),
     path('automation/scheduler/', views.task_scheduler_view, name='task_scheduler'),
     path('automation/logs/', views.execution_logs_view, name='execution_logs'),
+    path('kpi-test/', views.kpi_test_view, name='kpi_test'),
+    path('ga4/connect/', views.ga4_connect_view, name='ga4_connect'),
+    path('ga4/callback/', views.ga4_callback_view, name='ga4_callback'),
+    path('ga4/disconnect/<int:property_id>/', views.ga4_disconnect_view, name='ga4_disconnect'),
+    path('ga4/fetch/', views.ga4_fetch_view, name='ga4_fetch'),
 ]

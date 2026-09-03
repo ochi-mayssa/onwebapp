@@ -24,7 +24,16 @@
     <meta name="twitter:title" content="{% block twitter_title %}OnWebApp — Business Automation & Branding Platform{% endblock %}">
     <meta name="twitter:description" content="{% block twitter_description %}All-in-one platform for workflow automation, system integration, and brand identity design.{% endblock %}">
     <meta name="twitter:image" content="{% block twitter_image %}{% static 'img/logo.png' %}{% endblock %}">
-    
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-WY55PR801T"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-WY55PR801T');
+    </script>
+
     <!-- Premium Typography: Plus Jakarta Sans & Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -74,17 +83,18 @@
         }
 
         .navbar-brand {
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             letter-spacing: -0.02em;
             font-weight: 800;
         }
 
         .nav-link {
             font-weight: 600;
-            padding: 0.5rem 1.25rem !important;
+            padding: 0.35rem 1rem !important;
             transition: all 0.3s ease;
             color: var(--text-secondary);
             position: relative;
+            font-size: .88rem;
         }
 
         .nav-link::after {
@@ -135,12 +145,13 @@
 
         .dropdown-item {
             border-radius: var(--radius-md);
-            padding: 10px 16px;
+            padding: 8px 14px;
             font-weight: 500;
+            font-size: .85rem;
             transition: all 0.2s ease;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             color: var(--text-secondary);
         }
 
@@ -170,8 +181,8 @@
 
         /* Navbar Scrolled State */
         .navbar-scrolled {
-            padding-top: 0.5rem !important;
-            padding-bottom: 0.5rem !important;
+            padding-top: 0.25rem !important;
+            padding-bottom: 0.25rem !important;
             background: rgba(255, 255, 255, 0.9) !important;
             box-shadow: var(--card-shadow-md);
         }
@@ -305,6 +316,15 @@
             box-shadow: 0 6px 15px var(--primary-glow);
         }
 
+        .navbar .dropdown-menu {
+            z-index: 9999 !important;
+        }
+
+        .dropdown-menu.rounded-24 {
+            border: 1px solid rgba(0,0,0,.06);
+            box-shadow: 0 16px 48px rgba(0,0,0,.12);
+        }
+
         .hamburger {
             width: 20px;
             height: 12px;
@@ -368,6 +388,65 @@
             border: 2px solid var(--bg-body);
         }
         ::-webkit-scrollbar-thumb:hover { background: var(--slate-400); }
+
+        /* ===== TOP BAR ===== */
+        .oh-topbar {
+            background: #0f172a;
+            color: rgba(255,255,255,.7);
+            font-size: .7rem;
+            padding: .25rem 0;
+            position: relative;
+            z-index: 1001;
+        }
+        .oh-topbar a {
+            color: rgba(255,255,255,.7);
+            text-decoration: none;
+            transition: color .2s;
+            font-weight: 500;
+        }
+        .oh-topbar a:hover { color: #fff; }
+        .oh-topbar-left { display: flex; align-items: center; gap: 1.25rem; }
+        .oh-topbar-right { display: flex; align-items: center; gap: 1rem; }
+        .oh-topbar-divider { width: 1px; height: 12px; background: rgba(255,255,255,.15); }
+        .oh-topbar .btn-topbar {
+            background: rgba(255,255,255,.1);
+            border: 1px solid rgba(255,255,255,.15);
+            color: #fff;
+            padding: .25rem .85rem;
+            border-radius: 999px;
+            font-size: .72rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all .2s;
+            display: inline-flex;
+            align-items: center;
+            gap: .35rem;
+        }
+        .oh-topbar .btn-topbar:hover {
+            background: rgba(255,255,255,.2);
+            border-color: rgba(255,255,255,.3);
+            color: #fff;
+        }
+        @media(max-width:991.98px){
+            .oh-topbar-left, .oh-topbar-right { gap: .75rem; }
+            .oh-topbar-left a:not(.btn-topbar), .oh-topbar-right a:not(.btn-topbar) { font-size: .72rem; }
+        }
+        @media(max-width:575.98px){
+            .oh-topbar { display: none; }
+        }
+        /* ── Homepage Footer ── */
+        .oh-footer{padding:3rem 0 1.5rem;background:#0b1120;color:rgba(255,255,255,.6);border-top:1px solid rgba(255,255,255,.06)}
+        .oh-footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:2rem;margin-bottom:2rem}
+        .oh-footer-brand h5{font-weight:800;color:#fff;margin-bottom:.5rem}
+        .oh-footer-brand p{font-size:.82rem;line-height:1.6}
+        .oh-footer-col h6{font-weight:700;color:#fff;font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.75rem}
+        .oh-footer-col a{display:block;font-size:.8rem;color:rgba(255,255,255,.5);text-decoration:none;padding:.25rem 0;transition:color .2s}
+        .oh-footer-col a:hover{color:#fff}
+        .oh-footer-bottom{border-top:1px solid rgba(255,255,255,.06);padding-top:1.25rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;font-size:.75rem}
+        .oh-footer-legal a{color:rgba(255,255,255,.4);text-decoration:none;margin-left:1rem;transition:color .2s}
+        .oh-footer-legal a:hover{color:#fff}
+        @media(max-width:991.98px){.oh-footer-grid{grid-template-columns:1fr 1fr}}
+        @media(max-width:575.98px){.oh-footer-grid{grid-template-columns:1fr}}
     </style>
     
     <script>
@@ -399,21 +478,41 @@
     
     <!-- Minimalist Navigation -->
     {% block navbar %}
-    <nav class="navbar navbar-expand-lg navbar-glass {% block navbar_class %}sticky-top{% endblock %} py-3">
+    <!-- Top Bar -->
+    <div class="oh-topbar">
+        <div class="container d-flex align-items-center justify-content-between">
+            <div class="oh-topbar-left">
+                <a href="{% url 'community:home' %}">{% trans 'Community' %}</a>
+                <a href="{% url 'home:about' %}">{% trans 'About Us' %}</a>
+                <a href="{% url 'branding:landing' %}">{% trans 'Branding' %}</a>
+            </div>
+            <div class="oh-topbar-right">
+                <a href="{% url 'home:help_center' %}">{% trans 'Support' %}</a>
+                <div class="oh-topbar-divider"></div>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'crm:client_tracking_portal' %}" class="btn-topbar"><i class="fas fa-tachometer-alt"></i> {% trans 'Dashboard' %}</a>
+                {% else %}
+                    <a href="{% url 'users:login_view' %}" class="btn-topbar"><i class="fas fa-sign-in-alt"></i> {% trans 'Sign In' %}</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <nav class="navbar navbar-expand-lg navbar-glass {% block navbar_class %}sticky-top{% endblock %} py-2">
         <div class="container">
             {% if user.is_authenticated and user.is_staff and not user.is_superuser %}
                 <a class="navbar-brand py-0 d-flex align-items-center gap-2" href="{% url 'projects:team_member_projects' user.username %}">
-                    <img src="{% static 'img/logo.png' %}" alt="OnWebApp" height="40" class="d-inline-block align-text-top">
+                    <img src="{% static 'img/logo.png' %}" alt="OnWebApp" height="32" class="d-inline-block align-text-top">
                     <span class="fw-800 text-slate-900">OnWebApp</span>
                 </a>
             {% elif '/projects/admin/' in request.path %}
                 <a class="navbar-brand py-0 d-flex align-items-center gap-2" href="{% url 'projects:admin_dashboard' %}">
-                    <img src="{% static 'img/logo.png' %}" alt="OnWebApp" height="35" class="d-inline-block align-text-top me-1">
+                    <img src="{% static 'img/logo.png' %}" alt="OnWebApp" height="28" class="d-inline-block align-text-top me-1">
                     <span class="fw-800">OnWebApp</span> <span class="text-primary fw-medium small">Admin</span>
                 </a>
             {% else %}
                 <a class="navbar-brand py-0 d-flex align-items-center gap-2" href="{% url 'home:home' %}">
-                    <img src="{% static 'img/logo.png' %}" alt="OnWebApp" height="40" class="d-inline-block align-text-top">
+                    <img src="{% static 'img/logo.png' %}" alt="OnWebApp" height="32" class="d-inline-block align-text-top">
                     <span class="fw-800 text-slate-900">OnWebApp</span>
                 </a>
             {% endif %}
@@ -428,67 +527,70 @@
                         </div>
                         <i class="fas fa-chevron-down small opacity-50"></i>
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end shadow-xl border-0 rounded-24 p-3" aria-labelledby="userMenu" style="min-width: 240px;">
-                        <li class="px-3 py-2 mb-2 border-bottom border-light">
-                            <span class="d-block fw-800 text-slate-900">{{ user.username }}</span>
-                            <span class="d-block x-small text-slate-500">{{ user.email }}</span>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-xl border-0 rounded-24 p-3" aria-labelledby="userMenu" style="min-width: 260px;">
+                        <li class="px-3 py-2 mb-2 text-center border-bottom" style="border-color:rgba(0,0,0,.06) !important;">
+                            <div class="user-avatar-sm mx-auto mb-2" style="width:48px;height:48px;font-size:1.1rem;border-radius:50%;">
+                                {{ user.username|slice:":1"|upper }}
+                            </div>
+                            <span class="d-block fw-800" style="color:#111827;font-size:.9rem;">{{ user.username }}</span>
+                            <span class="d-block" style="color:#6b7280;font-size:.72rem;">{{ user.email }}</span>
                         </li>
                         
                         {% if user.is_staff and not user.is_superuser %}
-                            <li><a class="dropdown-item" href="{% url 'projects:team_member_projects' user.username %}">
+                            <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'projects:team_member_projects' user.username %}">
                                 <span class="service-icon"><i class="fas fa-tasks"></i></span>
                                 My Assignments
                             </a></li>
                         {% elif '/projects/admin/' not in request.path %}
-                            <li><a class="dropdown-item" href="{% url 'services:index' %}">
+                            <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'crm:client_tracking_portal' %}">
                                 <span class="service-icon"><i class="fas fa-th-large"></i></span>
-                                {% trans 'Platform Hub' %}
+                                {% trans 'Client Dashboard' %}
                             </a></li>
-                            <li><a class="dropdown-item" href="{% url 'users:profile_dashboard' %}">
+                            <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'users:profile_dashboard' %}">
                                 <span class="service-icon"><i class="fas fa-user-circle"></i></span>
                                 {% trans 'Profile' %}
                             </a></li>
                         {% endif %}
 
                         {% if user.is_staff and user.is_superuser %}
-                            <li><hr class="dropdown-divider opacity-50"></li>
-                            <li class="dropdown-header x-small fw-800 text-primary uppercase tracking-widest p-3 pb-2">Admin Control</li>
-                            <li><a class="dropdown-item" href="{% url 'root_dashboard:command_center' %}">
+                            <li><hr class="dropdown-divider" style="border-color:rgba(0,0,0,.06);margin:.5rem 0;"></li>
+                            <li class="dropdown-header px-3 py-1" style="font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:#6b7280;font-weight:700;">Admin Control</li>
+                            <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'root_dashboard:command_center' %}">
                                 <span class="service-icon" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;"><i class="fas fa-crown"></i></span>
                                 Root Command Center
                             </a></li>
-                            <li><a class="dropdown-item" href="{% monitoring_url %}">
+                            <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% monitoring_url %}">
                                 <span class="service-icon"><i class="fas fa-heartbeat"></i></span>
                                 Platform Monitoring
                             </a></li>
-                            <li><a class="dropdown-item" href="{% url 'projects:platform_dashboard' %}">
+                            <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'projects:platform_dashboard' %}">
                                 <span class="service-icon"><i class="fas fa-tachometer-alt"></i></span>
                                 Platform
                             </a></li>
-                            <li><a class="dropdown-item" href="{% url 'crm:dashboard' %}">
+                            <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'crm:dashboard' %}">
                                 <span class="service-icon"><i class="fas fa-users"></i></span>
                                 CRM Center
                             </a></li>
                         {% endif %}
 
-                        <li><hr class="dropdown-divider opacity-50"></li>
+                        <li><hr class="dropdown-divider" style="border-color:rgba(0,0,0,.06);margin:.5rem 0;"></li>
                         
-                        <!-- Theme & Language inside dropdown to clean up main bar -->
+                        <!-- Theme Toggle -->
                         <li class="px-3 py-2 d-flex justify-content-between align-items-center">
-                            <span class="small fw-600 text-slate-600">{% trans 'Theme' %}</span>
+                            <span style="font-size:.8rem;font-weight:600;color:#374151;">{% trans 'Theme' %}</span>
                             {% if request.resolver_match.url_name != 'login_view' and request.resolver_match.url_name != 'signup' %}
-                            <button id="themeToggle" class="btn btn-xs btn-light rounded-pill px-3 py-1 border-0" title="{% trans 'Toggle theme' %}">
-                                <i id="themeIcon" class="fas fa-moon me-1"></i> <span class="x-small fw-700">Mode</span>
+                            <button id="themeToggle" class="btn btn-sm rounded-pill px-3 py-1 border-0" style="background:#f3f4f6;font-size:.72rem;font-weight:600;color:#374151;" title="{% trans 'Toggle theme' %}">
+                                <i id="themeIcon" class="fas fa-moon me-1"></i> {% trans 'Mode' %}
                             </button>
                             {% endif %}
                         </li>
 
-                        <!-- Language Selector inside dropdown -->
+                        <!-- Language Selector -->
                         <li class="px-3 py-2">
-                            <form action="{% url 'set_language' %}" method="post" class="d-flex align-items-center">
+                            <form action="{% url 'set_language' %}" method="post">
                                 {% csrf_token %}
                                 <input type="hidden" name="next" value="{{ request.path }}">
-                                <select name="language" class="form-select form-select-sm x-small fw-700 rounded-pill bg-light border-0" onchange="this.form.submit()" aria-label="{% trans 'Select language' %}">
+                                <select name="language" class="form-select form-select-sm rounded-pill border-0" style="background:#f3f4f6;font-size:.75rem;font-weight:600;color:#374151;padding:.4rem .75rem;" onchange="this.form.submit()" aria-label="{% trans 'Select language' %}">
                                     {% get_current_language as LANGUAGE_CODE %}
                                     {% get_available_languages as LANGUAGES %}
                                     {% for lang in LANGUAGES %}
@@ -498,8 +600,8 @@
                             </form>
                         </li>
 
-                        <li class="px-3 py-2 border-top border-light mt-2 pt-3">
-                            <a class="btn btn-danger btn-sm w-100 rounded-pill fw-800 py-2" href="{% url 'users:logout' %}">
+                        <li class="px-3 pt-2 mt-1 border-top" style="border-color:rgba(0,0,0,.06) !important;">
+                            <a class="btn btn-sm w-100 rounded-pill fw-700 py-2" style="background:#fee2e2;color:#dc2626;font-size:.8rem;" href="{% url 'users:logout' %}">
                                 <i class="fas fa-sign-out-alt me-2"></i>{% trans 'Log Out' %}
                             </a>
                         </li>
@@ -555,16 +657,24 @@
                 
                     {% if '/projects/admin/' not in request.path %}
                         {% if request.resolver_match.url_name == 'login_view' or request.resolver_match.url_name == 'signup' or '/login/' in request.path or '/signup/' in request.path %}
-                            <!-- Minimal nav for Auth pages: Home + Solutions + Pricing + Community -->
+                            <!-- Minimal nav for Auth pages: Home + Pricing + Community -->
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'home:home' %}">{% trans 'Home' %}</a>
                             </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="servicesMenuAuth" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    {% trans 'Services' %}
+                                </a>
+                                {% include "./_services_dropdown.html" with menu_id="servicesMenuAuth" %}
+                            </li>
+                            <!--
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" id="solutionsMenuAuth" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     {% trans 'Solutions' %}
                                 </a>
                                 {% include "./_solutions_dropdown.html" with menu_id="solutionsMenuAuth" %}
                             </li>
+                            -->
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" id="integrationMenuAuth" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     {% trans 'Integration' %}
@@ -577,29 +687,37 @@
                                 </a>
                                 {% include "./_insights_dropdown.html" with menu_id="insightsMenuAuth" %}
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'home:build_website' %}">{% trans 'Build Website' %}</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'payments:plans' %}">{% trans 'Pricing' %}</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'community:home' %}">{% trans 'Community' %}</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'branding:landing' %}">{% trans 'Branding' %}</a>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="seoMenuAuth" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    {% trans 'SEO' %}
+                                </a>
+                                <ul class="dropdown-menu shadow-xl border-0 rounded-24 p-3" aria-labelledby="seoMenuAuth" style="min-width:220px;">
+                                    <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'seo_analyzer:seo_home_marketing' %}"><i class="fas fa-search me-2" style="color:#1e40af;font-size:.8rem;"></i>{% trans 'SEO Home' %}</a></li>
+                                    <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'seo_analyzer:seo_keyword_marketing' %}"><i class="fas fa-key me-2" style="color:#1e40af;font-size:.8rem;"></i>{% trans 'SEO Keywords' %}</a></li>
+                                    <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'seo_analyzer:seo_content_marketing' %}"><i class="fas fa-file-alt me-2" style="color:#1e40af;font-size:.8rem;"></i>{% trans 'SEO Content' %}</a></li>
+                                    <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'seo_analyzer:seo_url_marketing' %}"><i class="fas fa-link me-2" style="color:#1e40af;font-size:.8rem;"></i>{% trans 'URL for SEO' %}</a></li>
+                                    <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'seo_analyzer:seo_links_marketing' %}"><i class="fas fa-project-diagram me-2" style="color:#1e40af;font-size:.8rem;"></i>{% trans 'SEO Links' %}</a></li>
+                                </ul>
                             </li>
                         {% elif request.resolver_match and request.resolver_match.url_name == 'platform_monitoring' %}
-                        <!-- Legacy services:platform_monitoring page (kept for URL compat) → minimal top nav: Home / Solutions / Pricing / Community -->
+                        <!-- Legacy services:platform_monitoring page (kept for URL compat) → minimal top nav: Home / Pricing / Community -->
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'home:home' %}">{% trans 'Home' %}</a>
                         </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="servicesMenuLegacyPM" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                {% trans 'Services' %}
+                            </a>
+                            {% include "./_services_dropdown.html" with menu_id="servicesMenuLegacyPM" %}
+                        </li>
+                        <!--
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="solutionsMenuLegacyPM" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 {% trans 'Solutions' %}
                             </a>
                             {% include "./_solutions_dropdown.html" with menu_id="solutionsMenuLegacyPM" %}
                         </li>
+                        -->
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="integrationMenuLegacyPM" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 {% trans 'Integration' %}
@@ -612,27 +730,38 @@
                             </a>
                             {% include "./_insights_dropdown.html" with menu_id="insightsMenuLegacyPM" %}
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'payments:plans' %}">{% trans 'Pricing' %}</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'community:home' %}">{% trans 'Community' %}</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'branding:landing' %}">{% trans 'Branding' %}</a>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="seoMenuLegacyPM" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                {% trans 'SEO' %}
+                            </a>
+                            <ul class="dropdown-menu shadow-xl border-0 rounded-24 p-3" aria-labelledby="seoMenuLegacyPM" style="min-width:220px;">
+                                <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'seo_analyzer:seo_home_marketing' %}"><i class="fas fa-search me-2" style="color:#1e40af;font-size:.8rem;"></i>{% trans 'SEO Home' %}</a></li>
+                                <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'seo_analyzer:seo_keyword_marketing' %}"><i class="fas fa-key me-2" style="color:#1e40af;font-size:.8rem;"></i>{% trans 'SEO Keywords' %}</a></li>
+                                <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'seo_analyzer:seo_content_marketing' %}"><i class="fas fa-file-alt me-2" style="color:#1e40af;font-size:.8rem;"></i>{% trans 'SEO Content' %}</a></li>
+                                <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'seo_analyzer:seo_url_marketing' %}"><i class="fas fa-link me-2" style="color:#1e40af;font-size:.8rem;"></i>{% trans 'URL for SEO' %}</a></li>
+                                <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'seo_analyzer:seo_links_marketing' %}"><i class="fas fa-project-diagram me-2" style="color:#1e40af;font-size:.8rem;"></i>{% trans 'SEO Links' %}</a></li>
+                            </ul>
                         </li>
 
                         {% elif request.resolver_match and request.resolver_match.url_name == 'home' %}
-                        <!-- Minimal nav on homepage: Home · Solutions · Pricing · Community ONLY -->
+                        <!-- Minimal nav on homepage: Home · Pricing · Community ONLY -->
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'home:home' %}">{% trans 'Home' %}</a>
                         </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="servicesMenuHome" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                {% trans 'Services' %}
+                            </a>
+                            {% include "./_services_dropdown.html" with menu_id="servicesMenuHome" %}
+                        </li>
+                        <!--
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="solutionsMenuHome" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 {% trans 'Solutions' %}
                             </a>
                             {% include "./_solutions_dropdown.html" with menu_id="solutionsMenuHome" %}
                         </li>
+                        -->
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="integrationMenuHome" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 {% trans 'Integration' %}
@@ -645,26 +774,37 @@
                             </a>
                             {% include "./_insights_dropdown.html" with menu_id="insightsMenuHome" %}
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'payments:plans' %}">{% trans 'Pricing' %}</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'community:home' %}">{% trans 'Community' %}</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'branding:landing' %}">{% trans 'Branding' %}</a>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="seoMenuHome" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                {% trans 'SEO' %}
+                            </a>
+                            <ul class="dropdown-menu shadow-xl border-0 rounded-24 p-3" aria-labelledby="seoMenuHome" style="min-width:220px;">
+                                <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'seo_analyzer:seo_home_marketing' %}"><i class="fas fa-search me-2" style="color:#1e40af;font-size:.8rem;"></i>{% trans 'SEO Home' %}</a></li>
+                                <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'seo_analyzer:seo_keyword_marketing' %}"><i class="fas fa-key me-2" style="color:#1e40af;font-size:.8rem;"></i>{% trans 'SEO Keywords' %}</a></li>
+                                <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'seo_analyzer:seo_content_marketing' %}"><i class="fas fa-file-alt me-2" style="color:#1e40af;font-size:.8rem;"></i>{% trans 'SEO Content' %}</a></li>
+                                <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'seo_analyzer:seo_url_marketing' %}"><i class="fas fa-link me-2" style="color:#1e40af;font-size:.8rem;"></i>{% trans 'URL for SEO' %}</a></li>
+                                <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'seo_analyzer:seo_links_marketing' %}"><i class="fas fa-project-diagram me-2" style="color:#1e40af;font-size:.8rem;"></i>{% trans 'SEO Links' %}</a></li>
+                            </ul>
                         </li>
                     {% else %}
-                        <!-- Full nav elsewhere: Home · Solutions · Pricing · Community ONLY -->
+                        <!-- Full nav elsewhere: Home · Pricing · Community ONLY -->
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'home:home' %}">{% trans 'Home' %}</a>
                         </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="servicesMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                {% trans 'Services' %}
+                            </a>
+                            {% include "./_services_dropdown.html" with menu_id="servicesMenu" %}
+                        </li>
+                        <!--
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="solutionsMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 {% trans 'Solutions' %}
                             </a>
                             {% include "./_solutions_dropdown.html" with menu_id="solutionsMenu" %}
                         </li>
+                        -->
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="integrationMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 {% trans 'Integration' %}
@@ -677,14 +817,17 @@
                             </a>
                             {% include "./_insights_dropdown.html" with menu_id="insightsMenu" %}
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'payments:plans' %}">{% trans 'Pricing' %}</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'community:home' %}">{% trans 'Community' %}</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'branding:landing' %}">{% trans 'Branding' %}</a>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="seoMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                {% trans 'SEO' %}
+                            </a>
+                            <ul class="dropdown-menu shadow-xl border-0 rounded-24 p-3" aria-labelledby="seoMenu" style="min-width:220px;">
+                                <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'seo_analyzer:seo_home_marketing' %}"><i class="fas fa-search me-2" style="color:#1e40af;font-size:.8rem;"></i>{% trans 'SEO Home' %}</a></li>
+                                <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'seo_analyzer:seo_keyword_marketing' %}"><i class="fas fa-key me-2" style="color:#1e40af;font-size:.8rem;"></i>{% trans 'SEO Keywords' %}</a></li>
+                                <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'seo_analyzer:seo_content_marketing' %}"><i class="fas fa-file-alt me-2" style="color:#1e40af;font-size:.8rem;"></i>{% trans 'SEO Content' %}</a></li>
+                                <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'seo_analyzer:seo_url_marketing' %}"><i class="fas fa-link me-2" style="color:#1e40af;font-size:.8rem;"></i>{% trans 'URL for SEO' %}</a></li>
+                                <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'seo_analyzer:seo_links_marketing' %}"><i class="fas fa-project-diagram me-2" style="color:#1e40af;font-size:.8rem;"></i>{% trans 'SEO Links' %}</a></li>
+                            </ul>
                         </li>
                         
                     {% endif %}
@@ -723,96 +866,52 @@
     </div>
     {% endblock %}
 
-    {% block global_cta %}
-    <section class="py-5 position-relative overflow-hidden bg-surface-tertiary border-top">
-        <div style="position: absolute; top: -100px; left: 50%; transform: translateX(-50%); width: 600px; height: 600px; background: radial-gradient(circle, var(--primary-light) 0%, transparent 70%); pointer-events: none;"></div>
-        
-        <div class="container position-relative z-1">
-            <div class="row justify-content-center text-center">
-                <div class="col-lg-8">
-                    <h2 class="display-5 fw-bold text-body mb-4">{% trans "Ready to" %} <span class="text-gradient">{% trans "Automate Your Success?" %}</span></h2>
-                    <p class="lead text-muted mb-5">
-                        {% trans "Join industry leaders who are leveraging our Digital Intelligence Platform to optimize operations, track competitors, and scale faster." %}
-                    </p>
-                    <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
-                        <a href="{% url 'payments:plans' %}" class="btn btn-primary btn-lg px-5 shadow-lg" style="box-shadow: 0 0 20px rgba(0, 229, 255, 0.4);">
-                            {% trans "Get Started Now" %} <i class="fas fa-arrow-right ms-2"></i>
-                        </a>
-                        <a href="{% url 'contact:contact' %}" class="btn btn-outline-secondary btn-lg px-5">
-                            {% trans "Contact Sales" %}
-                        </a>
-                    </div>
-                    <div class="mt-4 pt-3 text-muted small">
-                        <i class="fas fa-check-circle text-success me-2"></i> {% trans "14-day free trial" %}
-                        <span class="mx-3">&bull;</span>
-                        <i class="fas fa-check-circle text-success me-2"></i> {% trans "No credit card required" %}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    {% endblock %}
-
     <!-- Payment Modal -->
     {% include 'includes/payment_modal.html' %}
 
     <!-- Footer -->
     {% block footer %}
-    <footer class="footer bg-surface-secondary pt-5 pb-4 border-top">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-4 mb-4">
-                    <h5 class="text-body mb-3">
-                        <img src="{% static 'img/logo.png' %}" alt="OnWebApp" height="50" class="me-2" style="vertical-align: middle;">
-                    </h5>
-                    <p class="mb-4 text-muted">{% trans "Industrial automation meets digital intelligence. Complete solutions for modern businesses." %}</p>
-                    <div class="d-flex gap-3">
-                        <a href="#" class="text-muted hover-primary"><i class="fab fa-twitter fa-lg"></i></a>
-                        <a href="#" class="text-muted hover-primary"><i class="fab fa-linkedin fa-lg"></i></a>
-                        <a href="#" class="text-muted hover-primary"><i class="fab fa-youtube fa-lg"></i></a>
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-6 mb-4">
-                    <h5 class="text-body mb-3">{% trans "Services" %}</h5>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><a href="{% url 'services:industrial_automation' %}" class="text-muted text-decoration-none hover-primary">{% trans "Industrial Automation" %}</a></li>
-                        <li class="mb-2"><a href="{% url 'services:detail' page='iot-integration' %}" class="text-muted text-decoration-none hover-primary">{% trans "IoT Solutions" %}</a></li>
-                        <li class="mb-2"><a href="{% url 'services:competitor_tracking' %}" class="text-muted text-decoration-none hover-primary">{% trans "Competitor Tracking" %}</a></li>
-                        <li class="mb-2"><a href="{% url 'seo_analyzer:index' %}" class="text-muted text-decoration-none hover-primary">{% trans "SEO Analysis" %}</a></li>
-                    </ul>
-                </div>
-                <div class="col-lg-2 col-md-6 mb-4">
-                    <h5 class="text-body mb-3">{% trans "Company" %}</h5>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><a href="#" class="text-muted text-decoration-none hover-primary">{% trans "About" %}</a></li>
-                        <li class="mb-2"><a href="#" class="text-muted text-decoration-none hover-primary">{% trans "Careers" %}</a></li>
-                        <li class="mb-2"><a href="{% url 'contact:contact' %}" class="text-muted text-decoration-none hover-primary">{% trans "Contact" %}</a></li>
-                        <li class="mb-2"><a href="#" class="text-muted text-decoration-none hover-primary">{% trans "Blog" %}</a></li>
-                    </ul>
-                </div>
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <h5 class="text-body mb-3">{% trans "Stay Updated" %}</h5>
-                    <p class="mb-3 text-muted">{% trans "Get the latest industry insights and platform updates." %}</p>
-                    <div class="d-flex">
-                        <input type="email" class="form-control me-2" placeholder="{% trans 'Your email' %}" aria-label="Email">
-                        <button class="btn btn-primary" type="submit">{% trans "Subscribe" %}</button>
-                    </div>
-                </div>
-            </div>
-            <hr class="my-4 border-secondary">
-            <div class="row align-items-center">
-                <div class="col-md-6">
-                    <p class="mb-0">&copy; 2025 AutomationIQ. {% trans "All rights reserved." %}</p>
-                </div>
-                <div class="col-md-6 text-md-end">
-                    <ul class="list-inline mb-0">
-                        <li class="list-inline-item"><a href="#">{% trans "Privacy" %}</a></li>
-                        <li class="list-inline-item"><a href="#">{% trans "Terms" %}</a></li>
-                        <li class="list-inline-item"><a href="#">{% trans "Cookies" %}</a></li>
-                    </ul>
-                </div>
-            </div>
+    <footer class="oh-footer">
+      <div class="container">
+        <div class="oh-footer-grid">
+          <div class="oh-footer-brand">
+            <h5>OnWebApp</h5>
+            <p>{% trans "More than just a website builder. Built-in AI, automation, integration, and validation for modern enterprises." %}</p>
+          </div>
+          <div class="oh-footer-col">
+            <h6>{% trans "Discover" %}</h6>
+            <a href="#">{% trans "Sitemap" %}</a>
+            <a href="#">{% trans "Case Studies" %}</a>
+            <a href="#">{% trans "Research" %}</a>
+            <a href="{% url 'blog:index' %}">{% trans "Blogs" %}</a>
+            <a href="{% url 'blog:articles' %}">{% trans "Articles" %}</a>
+          </div>
+          <div class="oh-footer-col">
+            <h6>{% trans "Connect" %}</h6>
+            <a href="#">{% trans "Documentation" %}</a>
+            <a href="{% url 'home:webinars' %}">{% trans "Events" %}</a>
+            <a href="#">{% trans "Newsletters" %}</a>
+            <a href="#">{% trans "Support" %}</a>
+            <a href="#">{% trans "Community" %}</a>
+          </div>
+          <div class="oh-footer-col">
+            <h6>{% trans "About" %}</h6>
+            <a href="{% url 'home:about' %}">{% trans "Overview" %}</a>
+            <a href="#">{% trans "Careers" %}</a>
+            <a href="#">{% trans "Leadership" %}</a>
+            <a href="#">{% trans "Newsroom" %}</a>
+            <a href="{% url 'home:security' %}">{% trans "Security & Privacy" %}</a>
+          </div>
         </div>
+        <div class="oh-footer-bottom">
+          <span>&copy; 2027 OnWebApp. {% trans "All rights reserved." %}</span>
+          <div class="oh-footer-legal">
+            <a href="{% url 'home:privacy' %}">{% trans "Privacy Policy" %}</a>
+            <a href="{% url 'home:terms' %}">{% trans "Terms" %}</a>
+            <a href="#">{% trans "Cookie Preferences" %}</a>
+          </div>
+        </div>
+      </div>
     </footer>
     {% endblock %}
 

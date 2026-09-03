@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.html import format_html
 from django.utils import timezone
 from django.views import View
+from django.views.generic import TemplateView
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
 
@@ -1121,3 +1122,10 @@ def free_website_pre_check_view(request):
             "results": results,
         },
     )
+
+
+seo_home_marketing = TemplateView.as_view(template_name="SEO/seo-homePage.html")
+seo_keyword_marketing = TemplateView.as_view(template_name="SEO/seo-keyword.html")
+seo_content_marketing = TemplateView.as_view(template_name="SEO/seo-content.html")
+seo_url_marketing = TemplateView.as_view(template_name="SEO/seo-url.html")
+seo_links_marketing = TemplateView.as_view(template_name="SEO/seo-links.html")

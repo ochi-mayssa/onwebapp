@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}My Account - OnWebApp{% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-expand-lg navbar-glass sticky-top">
+    <div class="container-fluid">
+        <a class="navbar-brand py-0" href="{% url 'crm:client_tracking_portal' %}">
+            <span class="fw-bold">OnWebApp</span> <span class="text-primary fw-normal">Client Portal</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'crm:client_tracking_portal' %}">
+                        <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'crm:client_invoices_view' %}">
+                        <i class="fas fa-receipt me-1"></i>Invoices
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'crm:client_projects_view' %}">
+                        <i class="fas fa-tasks me-1"></i>Projects
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="{% url 'crm:client_account_view' %}">
+                        <i class="fas fa-user-circle me-1"></i>Account
+                    </a>
+                </li>
+                <li class="nav-item ms-3">
+                    <form method="post" action="{% url 'logout' %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                            <i class="fas fa-sign-out-alt me-2"></i>Logout
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 fw-bold mb-1"><i class="fas fa-user-circle me-2 text-primary"></i>My Account</h1>
+            <p class="text-muted mb-0">Manage your account settings and view your subscription</p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Profile Card -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center py-4">
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width:80px;height:80px;background:linear-gradient(135deg,#1e40af,#3b82f6);color:#fff;font-size:2rem;font-weight:700;">
+                        {{ customer.name|first|upper }}
+                    </div>
+                    <h5 class="fw-bold mb-1">{{ customer.name }}</h5>
+                    <p class="text-muted mb-3">{{ customer.email }}</p>
+                    <span class="badge bg-{% if customer.customer_type == 'ENTERPRISE' %}primary{% elif customer.customer_type == 'SMB' %}success{% else %}info{% endif %} rounded-pill px-3 py-2">
+                        {{ customer.get_customer_type_display|default:customer.customer_type }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Health Score -->
+            <div class="card border-0 shadow-sm mt-4">
+                <div class="card-header bg-white py-3">
+                    <h6 class="fw-bold mb-0"><i class="fas fa-heartbeat me-2 text-danger"></i>Account Health</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-muted">Health Score</span>
+                        <span class="fw-bold">{{ health_score|default:"--" }}/100</span>
+                    </div>
+                    <div class="progress mb-3" style="height:8px;">
+                        <div class="progress-bar bg-{% if health_score >= 80 %}success{% elif health_score >= 50 %}warning{% else %}danger{% endif %}" style="width:{{ health_score|default:0 }}%"></div>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-muted">Invoice Health</span>
+                        <span class="fw-bold">{{ invoice_health|default:"--" }}%</span>
+                    </div>
+                    <div class="progress mb-3" style="height:8px;">
+                        <div class="progress-bar bg-info" style="width:{{ invoice_health|default:0 }}%"></div>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-muted">Order Completion</span>
+                        <span class="fw-bold">{{ order_completion|default:"--" }}%</span>
+                    </div>
+                    <div class="progress" style="height:8px;">
+                        <div class="progress-bar bg-primary" style="width:{{ order_completion|default:0 }}%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="col-lg-8">
+            <!-- Subscription -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="fw-bold mb-0"><i class="fas fa-crown me-2 text-warning"></i>Subscription</h6>
+                    {% if subscription %}
+                    <span class="badge bg-success rounded-pill">Active</span>
+                    {% else %}
+                    <span class="badge bg-secondary rounded-pill">No Plan</span>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if subscription %}
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <small class="text-muted d-block">Plan</small>
+                            <span class="fw-bold">{{ subscription.plan.name|default:"Pro" }}</span>
+                        </div>
+                        <div class="col-sm-6">
+                            <small class="text-muted d-block">Billing Cycle</small>
+                            <span class="fw-bold">{{ subscription.get_billing_cycle_display|default:"Monthly" }}</span>
+                        </div>
+                        <div class="col-sm-6">
+                            <small class="text-muted d-block">Renewal Date</small>
+                            <span class="fw-bold">{{ renewal_date|date:"M d, Y"|default:"N/A" }}</span>
+                        </div>
+                        <div class="col-sm-6">
+                            <small class="text-muted d-block">Status</small>
+                            <span class="fw-bold text-success">Active</span>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-3">
+                        <p class="text-muted mb-3">You don't have an active subscription yet.</p>
+                        <a href="/" class="btn btn-primary rounded-pill px-4">
+                            <i class="fas fa-crown me-2"></i>View Plans
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Customer Info -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3">
+                    <h6 class="fw-bold mb-0"><i class="fas fa-info-circle me-2 text-primary"></i>Customer Information</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <small class="text-muted d-block">Customer ID</small>
+                            <span class="fw-bold">{{ customer.erp_customer_id|default:customer.id }}</span>
+                        </div>
+                        <div class="col-sm-6">
+                            <small class="text-muted d-block">Lifecycle Stage</small>
+                            <span class="fw-bold">{{ customer.get_lifecycle_stage_display|default:customer.lifecycle_stage }}</span>
+                        </div>
+                        <div class="col-sm-6">
+                            <small class="text-muted d-block">Site Name</small>
+                            <span class="fw-bold">{{ customer.erp_site_name|default:"-" }}</span>
+                        </div>
+                        <div class="col-sm-6">
+                            <small class="text-muted d-block">Phone</small>
+                            <span class="fw-bold">{{ customer.phone|default:"-" }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h6 class="fw-bold mb-0"><i class="fas fa-cog me-2 text-secondary"></i>Actions</h6>
+                </div>
+                <div class="card-body d-flex flex-wrap gap-2">
+                    <a href="{% url 'users:profile_dashboard' %}" class="btn btn-outline-primary rounded-pill px-4">
+                        <i class="fas fa-user-edit me-2"></i>Edit Profile
+                    </a>
+                    <a href="{% url 'crm:client_tracking_portal' %}" class="btn btn-outline-secondary rounded-pill px-4">
+                        <i class="fas fa-tachometer-alt me-2"></i>Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

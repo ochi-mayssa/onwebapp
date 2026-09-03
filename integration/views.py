@@ -15,3 +15,7 @@ class B2BIntegrationView(TemplateView):
 
 class SystemIntegrationView(TemplateView):
     template_name = 'integration/system_integration.html'
+
+
+class SocialMediaIntegrationView(TemplateView):
+    template_name = 'integration/social_media_integration.html'

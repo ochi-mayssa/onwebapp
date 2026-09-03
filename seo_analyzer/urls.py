@@ -5,6 +5,11 @@ app_name = "seo_analyzer"
 
 urlpatterns = [
     path("", views.SEOHomeView.as_view(), name="index"),
+    path("home/", views.seo_home_marketing, name="seo_home_marketing"),
+    path("keyword/", views.seo_keyword_marketing, name="seo_keyword_marketing"),
+    path("content/", views.seo_content_marketing, name="seo_content_marketing"),
+    path("url/", views.seo_url_marketing, name="seo_url_marketing"),
+    path("links/", views.seo_links_marketing, name="seo_links_marketing"),
     path("free-check/", views.free_website_pre_check_view, name="free_pre_check"),
     path("checker/", views.checker_view, name="checker"),
     path("url-intelligence/", views.url_intelligence_view, name="url_intelligence"),

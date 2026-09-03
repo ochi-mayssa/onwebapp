@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .forms import ConsultationForm, WebsiteBuildForm
 from .models import WebsiteBuildRequest
 
@@ -75,12 +75,29 @@ def build_website(request):
     """Handle website build requests using proper Django Forms."""
     features_list = ["SEO", "Payments", "CMS", "Chatbot", "Automation", "Social"]
     if request.method == 'POST':
-        form = WebsiteBuildForm(request.POST)
-        if form.is_valid():
-            website_request = form.save(commit=False)
+        name = request.POST.get('full_name', '').strip()
+        email = request.POST.get('email', '').strip()
+        company = request.POST.get('company', '')
+        website_type = request.POST.get('project_type', '')
+        budget = request.POST.get('budget', '')
+        timeline = request.POST.get('timeline', '')
+        message = request.POST.get('description', '')
+        features = request.POST.getlist('features', [])
+
+        if name and email:
+            WebsiteBuildRequest.objects.create(
+                user=request.user if request.user.is_authenticated else None,
+                name=name,
+                email=email,
+                company=company,
+                website_type=website_type,
+                budget=budget,
+                timeline=timeline,
+                message=message,
+                features=features,
+            )
             if request.user.is_authenticated:
-                website_request.user = request.user
-            website_request.save()
+                return redirect('crm:client_tracking_portal')
             return render(request, 'home/index.html', {'submitted': True})
     else:
         form = WebsiteBuildForm()

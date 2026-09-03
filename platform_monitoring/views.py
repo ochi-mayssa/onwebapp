@@ -1,8 +1,13 @@
+from django.conf import settings
+from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.urls import reverse, NoReverseMatch
-from datetime import datetime
+from datetime import datetime, timedelta
+import json
 
 
 def _get_seo_statuses():
@@ -626,6 +631,7 @@ def _build_sidebar(active_section, active_sub=None):
     comp = _route('platform_monitoring:competitor')
     soc = _route('services:social_media_tracking')
     dig = _route('platform_monitoring:digital')
+    kpi = _route('platform_monitoring:kpi_test')
 
     seo_links_tree = [
         {'id': 'internal_links', 'label': _('Internal Links'), 'route': _route('seo_analyzer:link_checker'),
@@ -681,6 +687,10 @@ def _build_sidebar(active_section, active_sub=None):
                  'active': active_section == 'social'},
                 {'id': 'digital', 'label': _('Digital Presence'), 'icon': 'fingerprint', 'route': dig,
                  'active': active_section == 'digital'},
+            ]},
+            {'id': 'testing', 'label': _('Testing'), 'items': [
+                {'id': 'kpi_test', 'label': _('KPI Test'), 'icon': 'flask-conical', 'route': kpi,
+                 'active': active_section == 'kpi_test'},
             ]},
         ]
     }
@@ -1007,3 +1017,411 @@ def automation_status_view(request):
         'platform_monitoring/automation_status.html',
         context
     )
+
+
+@login_required
+def kpi_test_view(request):
+    from urllib.parse import urlparse as _urlparse
+    from .models import PerformanceCheck
+    from .services.pagespeed import (
+        validate_url,
+        run_performance_test,
+        get_performance_status_display,
+        format_metric,
+        get_metric_status,
+    )
+
+    if request.method == 'POST':
+        try:
+            body = json.loads(request.body)
+            url = body.get('url', '')
+        except (json.JSONDecodeError, AttributeError):
+            url = request.POST.get('url', '')
+
+        valid, result = validate_url(url)
+        if not valid:
+            return JsonResponse({'success': False, 'error': result})
+
+        test_results = run_performance_test(result)
+
+        if not test_results.get('success'):
+            return JsonResponse({'success': False, 'error': test_results.get('error', 'Unknown error')})
+
+        parsed = _urlparse(test_results['url'])
+        website = parsed.netloc or test_results['url']
+
+        for device_type in ('mobile', 'desktop'):
+            device_data = test_results.get(device_type)
+            if not device_data:
+                continue
+
+            previous = PerformanceCheck.objects.filter(
+                url=test_results['url'],
+                device=device_type,
+            ).order_by('-created_at').first()
+
+            previous_score = previous.performance_score if previous else None
+
+            check = PerformanceCheck.objects.create(
+                website=website,
+                url=test_results['url'],
+                device=device_type,
+                performance_score=device_data['performance_score'],
+                fcp=device_data.get('fcp'),
+                lcp=device_data.get('lcp'),
+                inp=device_data.get('inp'),
+                cls=device_data.get('cls'),
+                ttfb=device_data.get('ttfb'),
+                speed_index=device_data.get('speed_index'),
+                total_blocking_time=device_data.get('total_blocking_time'),
+                status=device_data['status'],
+                recommendations=device_data.get('recommendations', []),
+            )
+
+            device_data['previous_score'] = previous_score
+            if previous_score is not None:
+                diff = device_data['performance_score'] - previous_score
+                if diff > 0:
+                    device_data['trend'] = f'+{diff}'
+                    device_data['trend_direction'] = 'up'
+                    device_data['trend_label'] = 'Improving'
+                elif diff < 0:
+                    device_data['trend'] = str(diff)
+                    device_data['trend_direction'] = 'down'
+                    device_data['trend_label'] = 'Declining'
+                else:
+                    device_data['trend'] = '0'
+                    device_data['trend_direction'] = 'stable'
+                    device_data['trend_label'] = 'Stable'
+            else:
+                device_data['trend'] = None
+                device_data['trend_direction'] = 'none'
+                device_data['trend_label'] = 'No previous data'
+
+        overall = test_results.get('overall', {})
+        if test_results.get('mobile') and test_results.get('desktop'):
+            mobile_score = test_results['mobile']['performance_score']
+            desktop_score = test_results['desktop']['performance_score']
+            overall_score = round((mobile_score + desktop_score) / 2, 1)
+            overall_status = get_performance_status_display(overall_score)
+        elif test_results.get('mobile'):
+            overall_score = test_results['mobile']['performance_score']
+            overall_status = get_performance_status_display(overall_score)
+        elif test_results.get('desktop'):
+            overall_score = test_results['desktop']['performance_score']
+            overall_status = get_performance_status_display(overall_score)
+        else:
+            overall_score = 0
+            overall_status = 'N/A'
+
+        formatted = {
+            'success': True,
+            'website': website,
+            'url': test_results['url'],
+            'overall': {
+                'score': overall_score,
+                'status': overall_status,
+            },
+        }
+
+        for device_type in ('mobile', 'desktop'):
+            device_data = test_results.get(device_type)
+            if device_data:
+                formatted[device_type] = {
+                    'score': device_data['performance_score'],
+                    'status': get_performance_status_display(device_data['performance_score']),
+                    'fcp': format_metric('fcp', device_data.get('fcp')),
+                    'lcp': format_metric('lcp', device_data.get('lcp')),
+                    'inp': format_metric('inp', device_data.get('inp')),
+                    'cls': format_metric('cls', device_data.get('cls')),
+                    'ttfb': format_metric('ttfb', device_data.get('ttfb')),
+                    'speed_index': format_metric('speed_index', device_data.get('speed_index')),
+                    'total_blocking_time': format_metric('total_blocking_time', device_data.get('total_blocking_time')),
+                    'fcp_status': get_metric_status('fcp', device_data.get('fcp')),
+                    'lcp_status': get_metric_status('lcp', device_data.get('lcp')),
+                    'inp_status': get_metric_status('inp', device_data.get('inp')),
+                    'cls_status': get_metric_status('cls', device_data.get('cls')),
+                    'ttfb_status': get_metric_status('ttfb', device_data.get('ttfb')),
+                    'speed_index_status': get_metric_status('speed_index', device_data.get('speed_index')),
+                    'total_blocking_time_status': get_metric_status('total_blocking_time', device_data.get('total_blocking_time')),
+                    'trend': device_data.get('trend'),
+                    'trend_direction': device_data.get('trend_direction'),
+                    'trend_label': device_data.get('trend_label'),
+                    'recommendations': device_data.get('recommendations', []),
+                }
+            else:
+                formatted[device_type] = None
+
+        return JsonResponse(formatted)
+
+    history = PerformanceCheck.objects.order_by('-created_at')[:20]
+    history_by_url = {}
+    for h in history:
+        if h.url not in history_by_url:
+            history_by_url[h.url] = []
+        history_by_url[h.url].append(h)
+
+    chart_data = {}
+    for h in PerformanceCheck.objects.order_by('created_at'):
+        key = f"{h.url}|{h.device}"
+        if key not in chart_data:
+            chart_data[key] = {'labels': [], 'values': [], 'url': h.url, 'device': h.device}
+        chart_data[key]['labels'].append(h.created_at.strftime('%b %d'))
+        chart_data[key]['values'].append(h.performance_score)
+
+    from .models import GA4Property
+    ga4_properties = GA4Property.objects.filter(user=request.user, is_active=True)
+
+    ctx = _base_context(
+        active_section='kpi_test',
+        page_title=_('KPI Test'),
+        page_tagline=_('Test and validate the Website Performance KPI using Google PageSpeed Insights.'),
+    )
+
+    ctx.update({
+        'history': history,
+        'history_by_url': history_by_url,
+        'chart_data': chart_data,
+        'ga4_properties': ga4_properties,
+    })
+
+    return render(request, 'platform_monitoring/kpi_test.html', ctx)
+
+
+# ============================================================
+# GA4 OAuth Flow Views
+# ============================================================
+
+
+@login_required
+def ga4_connect_view(request):
+    from .services.ga4 import get_oauth_authorize_url
+
+    client_id = getattr(settings, 'GA4_CLIENT_ID', '')
+    if not client_id:
+        messages.error(request, _('GA4 Client ID is not configured. Please set GA4_CLIENT_ID in your environment.'))
+        return HttpResponseRedirect(reverse('platform_monitoring:kpi_test'))
+
+    authorize_url = get_oauth_authorize_url()
+    return HttpResponseRedirect(authorize_url)
+
+
+@login_required
+def ga4_callback_view(request):
+    from .services.ga4 import exchange_code_for_tokens, list_ga4_properties, get_valid_credentials
+    from .models import GA4Property
+
+    code = request.GET.get('code')
+    error = request.GET.get('error')
+
+    if error:
+        messages.error(request, _('Google authorization was denied or failed: %(error)s') % {'error': error})
+        return HttpResponseRedirect(reverse('platform_monitoring:kpi_test'))
+
+    if not code:
+        messages.error(request, _('No authorization code received from Google.'))
+        return HttpResponseRedirect(reverse('platform_monitoring:kpi_test'))
+
+    token_data = exchange_code_for_tokens(code)
+    if 'error' in token_data:
+        messages.error(request, _('Failed to exchange authorization code: %(error)s') % {'error': token_data['error']})
+        return HttpResponseRedirect(reverse('platform_monitoring:kpi_test'))
+
+    access_token = token_data.get('access_token')
+    refresh_token = token_data.get('refresh_token')
+    expires_in = token_data.get('expires_in', 3600)
+
+    if not access_token or not refresh_token:
+        messages.error(request, _('Incomplete token data received from Google.'))
+        return HttpResponseRedirect(reverse('platform_monitoring:kpi_test'))
+
+    properties = list_ga4_properties(access_token)
+    if not properties:
+        messages.warning(request, _('Connected to Google but no GA4 properties were found. Make sure you have access to a GA4 property.'))
+        return HttpResponseRedirect(reverse('platform_monitoring:kpi_test'))
+
+    expires_at = timezone.now() + timedelta(seconds=expires_in)
+
+    for prop in properties:
+        GA4Property.objects.update_or_create(
+            user=request.user,
+            property_id=prop['property_id'],
+            defaults={
+                'display_name': prop['display_name'],
+                'account_name': prop['account_name'],
+                'access_token': access_token,
+                'refresh_token': refresh_token,
+                'token_expires_at': expires_at,
+                'is_active': True,
+            },
+        )
+
+    messages.success(request, _('Successfully connected %(count)d GA4 property(ies).') % {'count': len(properties)})
+    return HttpResponseRedirect(reverse('platform_monitoring:kpi_test'))
+
+
+@login_required
+def ga4_disconnect_view(request, property_id):
+    from .models import GA4Property
+
+    if request.method != 'POST':
+        return HttpResponseRedirect(reverse('platform_monitoring:kpi_test'))
+
+    try:
+        prop = GA4Property.objects.get(id=property_id, user=request.user)
+        prop.delete()
+        messages.success(request, _('GA4 property "%(name)s" has been disconnected.') % {'name': prop.display_name})
+    except GA4Property.DoesNotExist:
+        messages.error(request, _('GA4 property not found.'))
+
+    return HttpResponseRedirect(reverse('platform_monitoring:kpi_test'))
+
+
+def ga4_fetch_view(request):
+    from .services.ga4 import (
+        get_valid_credentials,
+        run_ga4_report,
+        run_ga4_traffic_sources_report,
+        run_ga4_previous_period_report,
+        calculate_kpis,
+        calculate_trend,
+        calculate_traffic_sources,
+    )
+    from .models import GA4Property, GA4Report
+
+    if not request.user.is_authenticated:
+        return JsonResponse({'success': False, 'error': 'Authentication required.'}, status=401)
+
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'POST required'}, status=405)
+
+    try:
+        body = json.loads(request.body)
+        property_id = body.get('property_id', '')
+        date_range = body.get('date_range', '30d')
+        demo_mode = body.get('demo', False)
+    except (json.JSONDecodeError, AttributeError):
+        return JsonResponse({'success': False, 'error': 'Invalid request body'}, status=400)
+
+    try:
+        ga4_property = GA4Property.objects.get(
+            property_id=property_id,
+            user=request.user,
+            is_active=True,
+        )
+    except GA4Property.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'GA4 property not found or not connected.'})
+
+    if demo_mode:
+        demo_kpis = {
+            'total_users': 12847,
+            'sessions': 18234,
+            'screen_page_views': 47891,
+            'avg_session_duration': 186.5,
+            'engagement_rate': 62.4,
+            'bounce_rate': 37.6,
+            'sessions_per_user': 1.42,
+        }
+        demo_trends = [
+            {'metric': 'total_users', 'current': 12847, 'previous': 11203, 'change_pct': 14.7, 'direction': 'up'},
+            {'metric': 'sessions', 'current': 18234, 'previous': 15891, 'change_pct': 14.7, 'direction': 'up'},
+            {'metric': 'screen_page_views', 'current': 47891, 'previous': 41205, 'change_pct': 16.2, 'direction': 'up'},
+            {'metric': 'engagement_rate', 'current': 62.4, 'previous': 58.1, 'change_pct': 7.4, 'direction': 'up'},
+            {'metric': 'bounce_rate', 'current': 37.6, 'previous': 41.9, 'change_pct': -10.3, 'direction': 'up'},
+            {'metric': 'avg_session_duration', 'current': 186.5, 'previous': 164.2, 'change_pct': 13.6, 'direction': 'up'},
+            {'metric': 'sessions_per_user', 'current': 1.42, 'previous': 1.35, 'change_pct': 5.2, 'direction': 'up'},
+        ]
+        demo_traffic = [
+            {'source': 'google', 'sessions': 8234, 'users': 6102, 'percentage': 45.2},
+            {'source': 'direct', 'sessions': 4120, 'users': 3218, 'percentage': 22.6},
+            {'source': 'facebook.com', 'sessions': 2891, 'users': 2104, 'percentage': 15.9},
+            {'source': 'linkedin.com', 'sessions': 1547, 'users': 982, 'percentage': 8.5},
+            {'source': 'twitter.com', 'sessions': 892, 'users': 634, 'percentage': 4.9},
+            {'source': 'bing', 'sessions': 340, 'users': 245, 'percentage': 1.9},
+            {'source': 'other', 'sessions': 210, 'users': 162, 'percentage': 1.1},
+        ]
+
+        GA4Report.objects.create(
+            property=ga4_property,
+            date_range=date_range,
+            total_users=demo_kpis['total_users'],
+            sessions=demo_kpis['sessions'],
+            screen_page_views=demo_kpis['screen_page_views'],
+            avg_session_duration=demo_kpis['avg_session_duration'],
+            engagement_rate=demo_kpis['engagement_rate'],
+            bounce_rate=demo_kpis['bounce_rate'],
+            sessions_per_user=demo_kpis['sessions_per_user'],
+            trends=demo_trends,
+            traffic_sources=demo_traffic,
+            raw_data={'demo': True},
+        )
+
+        return JsonResponse({
+            'success': True,
+            'property': {
+                'property_id': ga4_property.property_id,
+                'display_name': ga4_property.display_name,
+                'account_name': ga4_property.account_name,
+            },
+            'date_range': date_range,
+            'kpis': demo_kpis,
+            'trends': demo_trends,
+            'traffic_sources': demo_traffic,
+            'demo': True,
+        })
+
+    access_token = get_valid_credentials(ga4_property)
+    if not access_token:
+        return JsonResponse({'success': False, 'error': 'Failed to authenticate with Google. Please reconnect your GA4 account.'})
+
+    report_data = run_ga4_report(access_token, property_id, date_range)
+    if not report_data or 'error' in report_data:
+        error_msg = report_data.get('error', 'Unknown error') if report_data else 'No response from GA4 API'
+        if 'timed out' in str(error_msg).lower():
+            error_msg = 'GA4 API request timed out. The property may have too much data. Try a shorter date range.'
+        return JsonResponse({'success': False, 'error': f'GA4 API error: {error_msg}'})
+
+    kpis = calculate_kpis(report_data)
+    if not kpis:
+        return JsonResponse({'success': False, 'error': 'No data available for the selected date range. Make sure your GA4 property has traffic data.'})
+
+    try:
+        prev_period_data = run_ga4_previous_period_report(access_token, property_id, date_range)
+        trends = calculate_trend(prev_period_data)
+    except Exception:
+        trends = []
+
+    try:
+        traffic_data = run_ga4_traffic_sources_report(access_token, property_id, date_range)
+        traffic_sources = calculate_traffic_sources(traffic_data)
+    except Exception:
+        traffic_sources = []
+
+    report = GA4Report.objects.create(
+        property=ga4_property,
+        date_range=date_range,
+        total_users=kpis['total_users'],
+        sessions=kpis['sessions'],
+        screen_page_views=kpis['screen_page_views'],
+        avg_session_duration=kpis['avg_session_duration'],
+        engagement_rate=kpis['engagement_rate'],
+        bounce_rate=kpis['bounce_rate'],
+        sessions_per_user=kpis['sessions_per_user'],
+        trends=trends or [],
+        traffic_sources=traffic_sources,
+        raw_data=report_data,
+    )
+
+    return JsonResponse({
+        'success': True,
+        'property': {
+            'property_id': ga4_property.property_id,
+            'display_name': ga4_property.display_name,
+            'account_name': ga4_property.account_name,
+        },
+        'date_range': date_range,
+        'kpis': kpis,
+        'trends': trends or [],
+        'traffic_sources': traffic_sources,
+        'report_id': report.id,
+    })

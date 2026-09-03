@@ -1,0 +1,550 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans "URL Analysis & Optimization for SEO" %} | OnWebApp{% endblock %}
+
+{% block meta_description %}{% trans "Free and premium URL SEO tools: URL intelligence, canonical checker, redirect mapper, URL structure analyzer, and indexability audit." %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .seo-hero {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #1e3a5f 100%);
+        padding: 13rem 0 8rem;
+        position: relative;
+        overflow: hidden;
+    }
+    .seo-hero::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: url('{% static "img/sys.jpg" %}') center/cover no-repeat;
+        opacity: .12;
+    }
+    .seo-hero .container { position: relative; z-index: 2; }
+
+    .seo-hero-particles {
+        position: absolute; inset: 0; z-index: 1; pointer-events: none; overflow: hidden;
+    }
+    .seo-hero-particle {
+        position: absolute; border-radius: 50%;
+        background: rgba(30,64,175,.25);
+        animation: seoFloat linear infinite;
+    }
+    @keyframes seoFloat {
+        0% { transform: translateY(100vh) scale(0); opacity: 0; }
+        10% { opacity: 1; }
+        90% { opacity: 1; }
+        100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+    }
+    .seo-hero .badge {
+        background: linear-gradient(135deg, rgba(30,64,175,.2), rgba(30,64,175,.08)) !important;
+        border-color: rgba(30,64,175,.35) !important;
+        box-shadow: 0 0 20px rgba(30,64,175,.15);
+    }
+
+    .seo-tools { background: var(--bg-body); padding: 5rem 0; }
+    .seo-tool-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 1.5rem;
+        text-align: center;
+        transition: all .4s;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+    .seo-tool-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 3px;
+        background: linear-gradient(90deg, #1e40af, transparent 80%);
+        opacity: 0;
+        transition: opacity .4s;
+    }
+    .seo-tool-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,.06); border-color: #1e40af; }
+    .seo-tool-card:hover::before { opacity: 1; }
+    .seo-tool-icon {
+        width: 48px; height: 48px;
+        border-radius: 12px;
+        display: inline-flex;
+        align-items: center; justify-content: center;
+        font-size: 1.1rem;
+        margin-bottom: .75rem;
+    }
+    .seo-tool-icon.free { background: rgba(34,197,94,.1); color: #22c55e; }
+    .seo-tool-icon.premium { background: rgba(30,64,175,.08); color: #1e40af; }
+    .seo-tool-card .badge {
+        font-size: .65rem; font-weight: 700; letter-spacing: .04em;
+    }
+    .seo-tool-card h5 { font-weight: 700; font-size: .95rem; margin: .6rem 0 .4rem; }
+    .seo-tool-card p { color: var(--text-muted); font-size: .8rem; line-height: 1.6; margin-bottom: 1rem; }
+    .seo-tool-card .btn { font-size: .82rem; font-weight: 700; border-radius: 8px; padding: .5rem 1rem; }
+
+    .seo-overview { background: var(--bg-surface-secondary); padding: 5rem 0; }
+    .seo-split-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        padding: 2rem;
+        height: 100%;
+    }
+    .seo-split-card h6 {
+        font-weight: 700; font-size: .9rem;
+        display: flex; align-items: center; gap: .4rem;
+        margin-bottom: .6rem;
+    }
+    .seo-split-card p { color: var(--text-muted); line-height: 1.7; font-size: .88rem; margin-bottom: .6rem; }
+    .seo-split-card ul { list-style: none; padding: 0; margin: 0; }
+    .seo-split-card ul li {
+        padding: .35rem 0; font-size: .82rem; color: var(--text-muted);
+        display: flex; align-items: flex-start; gap: .5rem;
+    }
+    .seo-split-card ul li i { color: #1e40af; margin-top: .15rem; flex-shrink: 0; font-size: .7rem; }
+
+    .seo-workflow { background: var(--bg-body); padding: 5rem 0; }
+    .seo-step-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2rem; }
+    .seo-step {
+        text-align: center; padding: 1.5rem;
+        transition: all .4s; position: relative;
+    }
+    .seo-step:hover { transform: translateY(-4px); }
+    .seo-step-num {
+        width: 36px; height: 36px; border-radius: 50%;
+        background: linear-gradient(135deg, #1e40af, #1e3a8a);
+        color: #fff; font-size: .75rem; font-weight: 800;
+        display: inline-flex; align-items: center; justify-content: center;
+        margin-bottom: .75rem;
+    }
+    .seo-step-icon {
+        width: 44px; height: 44px; border-radius: 12px;
+        background: rgba(30,64,175,.08); color: #1e40af;
+        display: inline-flex; align-items: center; justify-content: center;
+        font-size: 1rem; margin-bottom: .6rem;
+    }
+    .seo-step h6 { font-weight: 700; font-size: .88rem; margin-bottom: .4rem; }
+    .seo-step p { color: var(--text-muted); font-size: .78rem; line-height: 1.6; margin-bottom: 0; }
+
+    .seo-table { background: var(--bg-surface-secondary); padding: 5rem 0; }
+    .seo-table-wrap {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-color);
+        border-radius: 20px; overflow: hidden;
+    }
+    .seo-compare-table { width: 100%; border-collapse: collapse; }
+    .seo-compare-table thead th {
+        padding: 1rem 1.25rem; font-size: .7rem; font-weight: 700;
+        text-transform: uppercase; letter-spacing: .06em;
+        color: var(--text-muted); background: var(--bg-surface-secondary);
+        border-bottom: 1px solid var(--border-color); text-align: left;
+    }
+    .seo-compare-table thead th:not(:first-child) { text-align: center; }
+    .seo-compare-table thead th .th-icon {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 36px; height: 36px; border-radius: 10px;
+        background: rgba(30,64,175,.2); color: #60a5fa;
+        font-size: .9rem; margin-bottom: .4rem;
+    }
+    .seo-compare-table thead th .th-label { display: block; font-size: .85rem; }
+    .seo-compare-table tbody tr {
+        transition: all .3s;
+        border-bottom: 1px solid var(--border-color);
+        border-left: 3px solid transparent;
+    }
+    .seo-compare-table tbody tr:last-child { border-bottom: none; }
+    .seo-compare-table tbody tr:hover { background: rgba(30,64,175,.03); border-left-color: #1e40af; }
+    .seo-compare-table tbody td {
+        padding: 1rem 1.25rem; font-size: .85rem;
+        color: var(--text-muted); vertical-align: top;
+    }
+    .seo-compare-table tbody td:not(:first-child) { text-align: center; }
+    .seo-compare-table tbody td:first-child {
+        font-weight: 700; color: var(--text-primary);
+        display: flex; align-items: flex-start; gap: .5rem;
+    }
+    .seo-compare-table tbody td:first-child .row-icon {
+        width: 28px; height: 28px; min-width: 28px;
+        border-radius: 7px;
+        background: rgba(30,64,175,.08); color: #1e40af;
+        display: flex; align-items: center; justify-content: center;
+        font-size: .7rem; margin-top: .1rem;
+    }
+    .seo-compare-table .check { color: #22c55e; font-weight: 700; }
+    .seo-compare-table .cross { color: #ef4444; font-weight: 700; }
+
+    .seo-cta { text-align: center; }
+    .seo-cta h2 { font-weight: 800; font-size: 2.2rem; color: var(--text-primary); margin-bottom: .75rem; }
+    .seo-cta p { color: var(--text-muted); max-width: 500px; margin: 0 auto 2rem; font-size: 1rem; line-height: 1.7; }
+    .seo-trust { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; margin-top: 2rem; }
+    .seo-trust-badge {
+        display: inline-flex; align-items: center; gap: .4rem;
+        padding: .45rem 1rem; border-radius: 999px;
+        font-size: .75rem; font-weight: 600;
+        color: var(--text-muted); background: var(--bg-surface);
+        border: 1px solid var(--border-color); transition: all .3s;
+    }
+    .seo-trust-badge:hover { border-color: #1e40af; color: #1e40af; transform: translateY(-1px); }
+    .seo-trust-badge i { font-size: .85rem; color: #1e40af; }
+
+    .cta-btn-primary {
+        display: inline-flex; align-items: center; gap: .5rem;
+        padding: .9rem 2.2rem; border-radius: 999px;
+        font-weight: 700; font-size: .95rem; color: #fff;
+        background: linear-gradient(135deg, #1e40af, #1e3a8a);
+        border: none; text-decoration: none;
+        transition: all .35s cubic-bezier(.25,.46,.45,.94);
+        box-shadow: 0 4px 24px rgba(30,64,175,.35);
+        position: relative; overflow: hidden;
+    }
+    .cta-btn-primary::after {
+        content: ''; position: absolute; top: -50%; left: -60%;
+        width: 40%; height: 200%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,.12), transparent);
+        transform: skewX(-20deg); transition: left .6s; pointer-events: none;
+    }
+    .cta-btn-primary:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 8px 32px rgba(30,64,175,.5); color: #fff; }
+    .cta-btn-primary:hover::after { left: 130%; }
+    .cta-btn-secondary {
+        display: inline-flex; align-items: center; gap: .5rem;
+        padding: .9rem 2.2rem; border-radius: 999px;
+        font-weight: 700; font-size: .95rem; color: var(--text-primary);
+        background: transparent; border: 2px solid var(--border-color);
+        text-decoration: none; transition: all .35s;
+    }
+    .cta-btn-secondary:hover { border-color: #1e40af; color: #1e40af; transform: translateY(-2px); }
+
+    .seo-divider { width: 60px; height: 2px; background: linear-gradient(90deg, transparent, #1e40af, transparent); margin: 0 auto 2rem; border-radius: 2px; }
+
+    .seo-back-to-top {
+        position: fixed; bottom: 2rem; right: 2rem;
+        width: 44px; height: 44px; border-radius: 50%;
+        background: linear-gradient(135deg, #1e40af, #1e3a8a);
+        color: #fff; border: none; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1rem; z-index: 9990;
+        opacity: 0; transform: translateY(20px);
+        transition: all .3s; box-shadow: 0 4px 16px rgba(30,64,175,.3);
+    }
+    .seo-back-to-top.show { opacity: 1; transform: translateY(0); }
+    .seo-back-to-top:hover { transform: translateY(-3px); box-shadow: 0 6px 24px rgba(30,64,175,.4); }
+
+    @media (max-width: 991.98px) { .seo-step-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 767.98px) {
+        .seo-step-grid { grid-template-columns: 1fr; }
+        .seo-compare-table thead { display: none; }
+        .seo-compare-table tbody tr { display: block; padding: 1rem; }
+        .seo-compare-table tbody td { display: block; padding: .4rem 0; text-align: left !important; }
+        .seo-compare-table tbody td::before {
+            content: attr(data-label);
+            display: block; font-size: .65rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: .05em;
+            color: var(--text-muted); margin-bottom: .2rem;
+        }
+        section { padding-top: 3rem !important; padding-bottom: 3rem !important; }
+    }
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var particlesContainer = document.getElementById('seoParticles');
+    if (particlesContainer) {
+        for (var i = 0; i < 20; i++) {
+            var p = document.createElement('div');
+            p.className = 'seo-hero-particle';
+            var size = Math.random() * 4 + 2;
+            p.style.width = size + 'px';
+            p.style.height = size + 'px';
+            p.style.left = Math.random() * 100 + '%';
+            p.style.animationDuration = (Math.random() * 10 + 8) + 's';
+            p.style.animationDelay = (Math.random() * 8) + 's';
+            particlesContainer.appendChild(p);
+        }
+    }
+
+    var backToTop = document.getElementById('seoBackToTop');
+    if (backToTop) {
+        window.addEventListener('scroll', function() {
+            if (window.pageYOffset > 400) {
+                backToTop.classList.add('show');
+            } else {
+                backToTop.classList.remove('show');
+            }
+        });
+        backToTop.addEventListener('click', function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<!-- HERO -->
+<section class="seo-hero">
+    <div class="seo-hero-particles" id="seoParticles"></div>
+    <div class="container">
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'home:home' %}" class="text-decoration-none" style="color:#1e40af;">{% trans "Home" %}</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'services:index' %}" class="text-decoration-none" style="color:#1e40af;">{% trans "Services" %}</a></li>
+                <li class="breadcrumb-item active text-secondary" aria-current="page">{% trans "URL for SEO" %}</li>
+            </ol>
+        </nav>
+        <div class="col-lg-8">
+            <span class="badge rounded-pill px-3 py-2 mb-3" style="background:linear-gradient(135deg, rgba(30,64,175,.2), rgba(30,64,175,.08)) !important;border:1px solid rgba(30,64,175,.35) !important;color:#1e40af;font-size:.8rem;font-weight:700;letter-spacing:.04em;">
+                <i class="fas fa-link me-1"></i> {% trans "URL for SEO" %}
+            </span>
+            <h1 class="display-5 fw-800 mb-3" style="background:linear-gradient(135deg,#06b6d4,#3b82f6,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">
+                {% trans "Analyze & Optimize Every URL" %}
+            </h1>
+            <p class="lead mb-3" style="color:#94a3b8;max-width:560px;">
+                {% trans "Ensure every URL on your website is properly structured, canonicalized, and optimized for maximum search visibility." %}
+            </p>
+            <p class="mb-4" style="color:#94a3b8;max-width:560px;font-size:.95rem;line-height:1.7;">
+                {% trans "From URL structure audits to redirect chain detection — fix the technical URL issues that hold back your rankings." %}
+            </p>
+            <div class="d-flex flex-wrap gap-3">
+                <a href="{% url 'seo_analyzer:url_intelligence' %}" class="cta-btn-primary">
+                    {% trans "URL Intelligence" %} <i class="fas fa-arrow-right"></i>
+                </a>
+                <a href="{% url 'seo_analyzer:checker' %}" class="cta-btn-secondary" style="color:#fff;border-color:rgba(255,255,255,.25);">
+                    <i class="fas fa-play-circle"></i> {% trans "Full Audit" %}
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- TOOLS GRID -->
+<section class="seo-tools">
+    <div class="container">
+        <div class="text-center mx-auto mb-5">
+            <div class="seo-divider"></div>
+            <h2>{% trans "URL Optimization Tools" %}</h2>
+            <p style="color:var(--text-muted);font-size:.92rem;margin-top:.5rem;">{% trans "Everything you need to ensure every URL is SEO-perfect." %}</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6">
+                <div class="seo-tool-card">
+                    <span class="seo-tool-icon free"><i class="fas fa-search"></i></span>
+                    <span class="badge bg-success-subtle text-success mb-2">FREE</span>
+                    <h5>{% trans "URL Quick Check" %}</h5>
+                    <p>{% trans "Instantly check a URL for basic SEO signals — meta tags, canonical, robots, and status code." %}</p>
+                    <a href="{% url 'seo_analyzer:free_pre_check' %}" class="btn btn-success w-100">{% trans "Check URL" %}</a>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="seo-tool-card">
+                    <span class="seo-tool-icon premium"><i class="fas fa-crosshairs"></i></span>
+                    <span class="badge bg-primary-subtle text-primary mb-2">{% trans "Premium" %} &bull; $50</span>
+                    <h5>{% trans "URL Intelligence" %}</h5>
+                    <p>{% trans "Deep analysis of a single URL — structure, canonical signals, indexability, and optimization opportunities." %}</p>
+                    <a href="{% url 'seo_analyzer:url_intelligence' %}" class="btn btn-primary w-100">{% trans "Open URL Intelligence" %}</a>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="seo-tool-card">
+                    <span class="seo-tool-icon premium"><i class="fas fa-exchange-alt"></i></span>
+                    <span class="badge bg-secondary-subtle text-secondary mb-2">{% trans "Redirect Mapper" %}</span>
+                    <h5>{% trans "Redirect Chain Detector" %}</h5>
+                    <p>{% trans "Detect redirect chains, loops, and broken redirect paths that waste crawl budget and hurt rankings." %}</p>
+                    <a href="{% url 'seo_analyzer:url_intelligence' %}" class="btn btn-outline-secondary w-100">{% trans "Map Redirects" %}</a>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="seo-tool-card">
+                    <span class="seo-tool-icon premium"><i class="fas fa-sitemap"></i></span>
+                    <span class="badge bg-info-subtle text-info mb-2">{% trans "Canonical Checker" %}</span>
+                    <h5>{% trans "Canonical Tag Validator" %}</h5>
+                    <p>{% trans "Verify canonical tags are correct, detect self-referencing issues, and prevent duplicate content penalties." %}</p>
+                    <a href="{% url 'seo_analyzer:sitemap' %}" class="btn btn-outline-primary w-100">{% trans "Check Canonicals" %}</a>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="seo-tool-card">
+                    <span class="seo-tool-icon premium"><i class="fas fa-project-diagram"></i></span>
+                    <span class="badge bg-warning-subtle text-warning mb-2">{% trans "Structure Analyzer" %}</span>
+                    <h5>{% trans "URL Structure Analyzer" %}</h5>
+                    <p>{% trans "Analyze URL hierarchy, slug optimization, keyword placement, and folder structure for crawlability." %}</p>
+                    <a href="{% url 'seo_analyzer:backlinks' %}" class="btn btn-outline-warning w-100">{% trans "Analyze Structure" %}</a>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="seo-tool-card">
+                    <span class="seo-tool-icon premium"><i class="fas fa-shield-alt"></i></span>
+                    <span class="badge bg-danger-subtle text-danger mb-2">{% trans "Indexability" %}</span>
+                    <h5>{% trans "URL Indexability Audit" %}</h5>
+                    <p>{% trans "Check if URLs are indexable — detect noindex tags, robots.txt blocks, and canonical issues." %}</p>
+                    <a href="{% url 'seo_analyzer:executive_kpi_dashboard' %}" class="btn btn-outline-danger w-100">{% trans "Audit Indexability" %}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- OVERVIEW -->
+<section class="seo-overview">
+    <div class="container py-5">
+        <div class="text-center mx-auto mb-5">
+            <div class="seo-divider"></div>
+            <h2>{% trans "What is URL Optimization?" %}</h2>
+        </div>
+        <div class="row g-4 align-items-stretch">
+            <div class="col-lg-6">
+                <div class="seo-split-card">
+                    <h6><i class="fas fa-link" style="color:#1e40af;"></i> {% trans "URL Structure & SEO" %}</h6>
+                    <p>{% trans "URL optimization ensures every address on your website is structured for both search engines and users — clean, descriptive, and crawlable." %}</p>
+                    <ul>
+                        <li><i class="fas fa-check-circle"></i> {% trans "Clean, readable URL slugs with target keywords" %}</li>
+                        <li><i class="fas fa-check-circle"></i> {% trans "Proper canonical tag implementation" %}</li>
+                        <li><i class="fas fa-check-circle"></i> {% trans "HTTPS and secure URL protocols" %}</li>
+                        <li><i class="fas fa-check-circle"></i> {% trans "Consistent URL hierarchy and folder structure" %}</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="seo-split-card">
+                    <h6><i class="fas fa-exclamation-triangle" style="color:#1e40af;"></i> {% trans "Common URL Issues" %}</h6>
+                    <p>{% trans "Poor URL structure can silently hurt your rankings. These are the most common URL issues that affect SEO performance." %}</p>
+                    <ul>
+                        <li><i class="fas fa-check-circle"></i> {% trans "Redirect chains and loops wasting crawl budget" %}</li>
+                        <li><i class="fas fa-check-circle"></i> {% trans "Duplicate content from missing canonicals" %}</li>
+                        <li><i class="fas fa-check-circle"></i> {% trans "Dynamic URLs with unnecessary parameters" %}</li>
+                        <li><i class="fas fa-check-circle"></i> {% trans "Too-long URLs that confuse crawlers and users" %}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="seo-workflow">
+    <div class="container py-5">
+        <div class="text-center mx-auto mb-5">
+            <div class="seo-divider"></div>
+            <h2>{% trans "How It Works" %}</h2>
+            <p style="color:var(--text-muted);font-size:.92rem;margin-top:.5rem;">{% trans "Four simple steps to audit and optimize your URLs." %}</p>
+        </div>
+        <div class="seo-step-grid">
+            <div class="seo-step">
+                <div class="seo-step-num">1</div>
+                <div class="seo-step-icon"><i class="fas fa-globe"></i></div>
+                <h6>{% trans "Enter Your URL" %}</h6>
+                <p>{% trans "Paste any URL to analyze its structure, canonical signals, and indexability status." %}</p>
+            </div>
+            <div class="seo-step">
+                <div class="seo-step-num">2</div>
+                <div class="seo-step-icon"><i class="fas fa-cogs"></i></div>
+                <h6>{% trans "Deep Crawl & Analyze" %}</h6>
+                <p>{% trans "Our engine checks redirects, canonical tags, robots directives, and URL structure signals." %}</p>
+            </div>
+            <div class="seo-step">
+                <div class="seo-step-num">3</div>
+                <div class="seo-step-icon"><i class="fas fa-chart-pie"></i></div>
+                <h6>{% trans "Get Your Score" %}</h6>
+                <p>{% trans "Receive a URL health score with prioritized issues and fix recommendations." %}</p>
+            </div>
+            <div class="seo-step">
+                <div class="seo-step-num">4</div>
+                <div class="seo-step-icon"><i class="fas fa-wrench"></i></div>
+                <h6>{% trans "Fix & Validate" %}</h6>
+                <p>{% trans "Implement fixes, re-validate URLs, and ensure every page is properly indexable." %}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- COMPARISON TABLE -->
+<section class="seo-table">
+    <div class="container py-5">
+        <div class="text-center mx-auto mb-5">
+            <div class="seo-divider"></div>
+            <h2>{% trans "Free vs Premium URL Tools" %}</h2>
+            <p style="color:var(--text-muted);font-size:.92rem;margin-top:.5rem;">{% trans "Choose the URL analysis level that fits your needs." %}</p>
+        </div>
+        <div class="seo-table-wrap mx-auto" style="max-width:800px;">
+            <table class="seo-compare-table">
+                <thead>
+                    <tr>
+                        <th>{% trans "Feature" %}</th>
+                        <th>
+                            <div class="th-icon"><i class="fas fa-bolt"></i></div>
+                            <span class="th-label">{% trans "Free" %}</span>
+                        </th>
+                        <th>
+                            <div class="th-icon"><i class="fas fa-crown"></i></div>
+                            <span class="th-label">{% trans "Premium" %}</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="row-icon"><i class="fas fa-dollar-sign"></i></span> {% trans "Cost" %}</td>
+                        <td data-label="{% trans 'Cost' %}"><strong>{% trans "Free" %}</strong></td>
+                        <td data-label="{% trans 'Cost' %}">$50</td>
+                    </tr>
+                    <tr>
+                        <td><span class="row-icon"><i class="fas fa-link"></i></span> {% trans "URLs Analyzed" %}</td>
+                        <td data-label="{% trans 'URLs Analyzed' %}">{% trans "Single URL" %}</td>
+                        <td data-label="{% trans 'URLs Analyzed' %}"><strong>{% trans "Up to 500 URLs" %}</strong></td>
+                    </tr>
+                    <tr>
+                        <td><span class="row-icon"><i class="fas fa-exchange-alt"></i></span> {% trans "Redirect Detection" %}</td>
+                        <td data-label="{% trans 'Redirect Detection' %}"><span class="check"><i class="fas fa-check"></i></span></td>
+                        <td data-label="{% trans 'Redirect Detection' %}"><span class="check"><i class="fas fa-check"></i></span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="row-icon"><i class="fas fa-sitemap"></i></span> {% trans "Canonical Validation" %}</td>
+                        <td data-label="{% trans 'Canonical Validation' %}">{% trans "Basic" %}</td>
+                        <td data-label="{% trans 'Canonical Validation' %}"><strong>{% trans "Deep + Chain Detection" %}</strong></td>
+                    </tr>
+                    <tr>
+                        <td><span class="row-icon"><i class="fas fa-project-diagram"></i></span> {% trans "URL Structure Analysis" %}</td>
+                        <td data-label="{% trans 'URL Structure Analysis' %}"><span class="cross"><i class="fas fa-times"></i></span></td>
+                        <td data-label="{% trans 'URL Structure Analysis' %}"><span class="check"><i class="fas fa-check"></i></span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="row-icon"><i class="fas fa-shield-alt"></i></span> {% trans "Indexability Audit" %}</td>
+                        <td data-label="{% trans 'Indexability Audit' %}"><span class="cross"><i class="fas fa-times"></i></span></td>
+                        <td data-label="{% trans 'Indexability Audit' %}"><span class="check"><i class="fas fa-check"></i></span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="row-icon"><i class="fas fa-file-pdf"></i></span> {% trans "PDF Report Export" %}</td>
+                        <td data-label="{% trans 'PDF Report Export' %}"><span class="cross"><i class="fas fa-times"></i></span></td>
+                        <td data-label="{% trans 'PDF Report Export' %}"><span class="check"><i class="fas fa-check"></i></span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="seo-cta" style="padding:5rem 0;background:var(--bg-body);">
+    <div class="container">
+        <div class="seo-divider"></div>
+        <h2>{% trans "Ready to Optimize Your URLs?" %}</h2>
+        <p>{% trans "Start with a free URL check or run a full premium audit to unlock technical URL insights." %}</p>
+        <div class="d-flex flex-wrap gap-3 justify-content-center">
+            <a href="{% url 'seo_analyzer:url_intelligence' %}" class="cta-btn-primary">
+                {% trans "Free URL Check" %} <i class="fas fa-arrow-right"></i>
+            </a>
+            <a href="{% url 'seo_analyzer:checker' %}" class="cta-btn-secondary">
+                <i class="fas fa-search-plus"></i> {% trans "Run Full URL Audit" %}
+            </a>
+        </div>
+        <div class="seo-trust">
+            <div class="seo-trust-badge"><i class="fas fa-lock"></i> {% trans "Secure & Private" %}</div>
+            <div class="seo-trust-badge"><i class="fas fa-bolt"></i> {% trans "Instant Results" %}</div>
+            <div class="seo-trust-badge"><i class="fas fa-file-pdf"></i> {% trans "PDF Reports" %}</div>
+            <div class="seo-trust-badge"><i class="fas fa-headset"></i> {% trans "24/7 Support" %}</div>
+        </div>
+    </div>
+</section>
+
+<!-- BACK TO TOP -->
+<button class="seo-back-to-top" id="seoBackToTop" aria-label="{% trans 'Back to top' %}">
+    <i class="fas fa-chevron-up"></i>
+</button>
+{% endblock %}

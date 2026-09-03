@@ -1,0 +1,797 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans "SEO Content Strategy & Optimization" %} | OnWebApp{% endblock %}
+
+{% block meta_description %}{% trans "Create SEO content built around search intent, topical authority, keyword opportunities, and measurable organic growth with OnWebApp." %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .seo-hero{background:linear-gradient(135deg,rgba(15,23,42,.3),rgba(30,41,59,.4)),url('{% static "img/content-seo.png" %}') center/cover no-repeat;padding:13rem 0 8rem;position:relative;overflow:hidden}
+    .seo-hero::before{content:'';position:absolute;inset:0;background:transparent;opacity:0}
+    .seo-hero .container{position:relative;z-index:2}
+    .seo-hero-particles{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden}
+    .seo-hero-particle{position:absolute;border-radius:50%;background:rgba(30,64,175,.25);animation:seoFloat linear infinite}
+    @keyframes seoFloat{0%{transform:translateY(100vh) scale(0);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:translateY(-10vh) scale(1);opacity:0}}
+
+    .seo-section{padding:5rem 0}
+    .seo-section-alt{background:var(--bg-surface-secondary);padding:5rem 0}
+    .seo-divider{width:60px;height:2px;background:linear-gradient(90deg,transparent,#1e40af,transparent);margin:0 auto 2rem;border-radius:2px}
+    .seo-section-label{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#1e40af;margin-bottom:.5rem}
+    .seo-section-title{font-weight:800;font-size:2rem;margin-bottom:.6rem}
+    .seo-section-desc{color:var(--text-muted);font-size:.95rem;line-height:1.7;max-width:640px}
+
+    .seo-badge{display:inline-flex;align-items:center;gap:.35rem;font-size:.68rem;font-weight:700;letter-spacing:.04em;padding:.3rem .8rem;border-radius:99px;margin-bottom:1rem}
+    .seo-badge--blue{background:rgba(30,64,175,.1);border:1px solid rgba(30,64,175,.25);color:#1e40af}
+
+    .seo-pillar-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem}
+    .seo-pillar-card{background:var(--bg-surface);border:1px solid var(--border-color);border-radius:16px;padding:2rem;transition:all .3s;height:100%}
+    .seo-pillar-card:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,.06);border-color:#1e40af}
+    .seo-pillar-num{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#1e40af,#1e3a8a);color:#fff;font-size:.8rem;font-weight:800;display:inline-flex;align-items:center;justify-content:center;margin-bottom:.8rem}
+    .seo-pillar-card h6{font-weight:700;font-size:.95rem;margin-bottom:.4rem}
+    .seo-pillar-card p{color:var(--text-muted);font-size:.85rem;line-height:1.6;margin:0}
+
+    /* ── Strategy Connected Flow ── */
+    .seo-strategy-flow{display:flex;align-items:stretch;gap:0;max-width:1100px;margin:0 auto}
+    .seo-strategy-card{flex:1;background:var(--bg-surface);border:1px solid var(--border-color);border-radius:16px;padding:1.8rem 1.5rem;transition:all .3s;position:relative;overflow:hidden}
+    .seo-strategy-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#1e40af,rgba(30,64,175,.3));opacity:0;transition:opacity .3s}
+    .seo-strategy-card:hover{transform:translateY(-4px);border-color:rgba(30,64,175,.25);box-shadow:0 12px 32px rgba(0,0,0,.06)}
+    .seo-strategy-card:hover::before{opacity:1}
+    .seo-strategy-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+    .seo-strategy-num{font-size:2rem;font-weight:800;color:rgba(30,64,175,.08);line-height:1}
+    .seo-strategy-icon{width:40px;height:40px;border-radius:10px;background:rgba(30,64,175,.08);color:#1e40af;display:flex;align-items:center;justify-content:center;font-size:.95rem;transition:all .3s}
+    .seo-strategy-card:hover .seo-strategy-icon{background:#1e40af;color:#fff;transform:scale(1.08)}
+    .seo-strategy-card h6{font-weight:700;font-size:.95rem;margin-bottom:.4rem}
+    .seo-strategy-card>p{color:var(--text-muted);font-size:.82rem;line-height:1.6;margin:0 0 .8rem}
+    .seo-strategy-card ul{list-style:none;padding:0;margin:0}
+    .seo-strategy-card ul li{padding:.25rem 0;font-size:.75rem;color:var(--text-muted);display:flex;align-items:center;gap:.4rem}
+    .seo-strategy-card ul li i{color:#1e40af;font-size:.6rem;flex-shrink:0}
+    .seo-strategy-arrow{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.3rem;padding:0 .3rem;min-width:40px}
+    .seo-strategy-arrow-line{width:20px;height:2px;background:linear-gradient(90deg,rgba(30,64,175,.15),rgba(30,64,175,.3))}
+    .seo-strategy-arrow i{font-size:.7rem;color:rgba(30,64,175,.35)}
+
+    @media(max-width:991.98px){.seo-strategy-flow{flex-wrap:wrap;gap:1rem}.seo-strategy-arrow{display:none}.seo-strategy-card{min-width:calc(50% - .5rem)}}
+    @media(max-width:767.98px){.seo-strategy-card{min-width:100%}}
+
+    .seo-intent-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.5rem}
+    .seo-intent-card{background:var(--bg-surface);border:1px solid var(--border-color);border-radius:16px;padding:2rem;transition:all .3s;height:100%}
+    .seo-intent-card:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,.06);border-color:#1e40af}
+    .seo-intent-card h6{font-weight:800;font-size:1rem;margin-bottom:.4rem;display:flex;align-items:center;gap:.5rem}
+    .seo-intent-card>p{color:var(--text-muted);font-size:.85rem;line-height:1.6;margin:0 0 .8rem}
+    .seo-intent-label{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#1e40af;margin-bottom:.4rem}
+    .seo-intent-tags{display:flex;flex-wrap:wrap;gap:.35rem}
+    .seo-intent-tags span{font-size:.72rem;font-weight:600;color:var(--text-muted);background:rgba(30,64,175,.05);border:1px solid rgba(30,64,175,.1);padding:.25rem .6rem;border-radius:6px}
+
+    .seo-steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem}
+    .seo-step-card{text-align:center;padding:2rem 1.5rem;border-radius:16px;background:var(--bg-surface);border:1px solid var(--border-color);transition:all .3s}
+    .seo-step-card:hover{transform:translateY(-4px);border-color:#1e40af}
+    .seo-step-icon{width:52px;height:52px;border-radius:14px;background:rgba(30,64,175,.08);color:#1e40af;display:inline-flex;align-items:center;justify-content:center;font-size:1.2rem;margin-bottom:.8rem}
+    .seo-step-card h6{font-weight:700;font-size:.9rem;margin-bottom:.4rem}
+    .seo-step-card p{color:var(--text-muted);font-size:.82rem;line-height:1.6;margin:0}
+
+    .seo-feature{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center}
+    .seo-feature.reverse{direction:rtl}.seo-feature.reverse>*{direction:ltr}
+    .seo-feature-text h3{font-weight:800;font-size:1.6rem;margin-bottom:.5rem}
+    .seo-feature-text p{color:var(--text-muted);line-height:1.7;font-size:.92rem;margin-bottom:1rem}
+    .seo-feature-text ul{list-style:none;padding:0;margin:0}
+    .seo-feature-text ul li{padding:.4rem 0;font-size:.85rem;color:var(--text-muted);display:flex;align-items:flex-start;gap:.5rem}
+    .seo-feature-text ul li i{color:#1e40af;margin-top:.15rem;flex-shrink:0;font-size:.75rem}
+    .seo-feature-visual{background:linear-gradient(135deg,rgba(30,64,175,.04),rgba(30,64,175,.01));border:1px solid var(--border-color);border-radius:20px;padding:2.5rem;display:flex;flex-direction:column;gap:1rem}
+    .seo-feature-visual-item{display:flex;align-items:center;gap:.75rem;padding:1rem;border-radius:12px;background:var(--bg-surface);border:1px solid var(--border-color);transition:all .3s}
+    .seo-feature-visual-item:hover{border-color:#1e40af;transform:translateX(4px)}
+    .seo-feature-visual-item i{width:36px;height:36px;border-radius:10px;background:rgba(30,64,175,.08);color:#1e40af;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0}
+    .seo-feature-visual-item span{font-size:.88rem;font-weight:600;color:var(--text-primary)}
+
+    /* ── On-Page List ── */
+    .seo-onpage-list{display:flex;flex-direction:column;gap:0;margin-top:1rem}
+    .seo-onpage-item{display:flex;align-items:flex-start;gap:1rem;padding:1rem 0;border-bottom:1px solid var(--border-color);transition:all .3s}
+    .seo-onpage-item:last-child{border-bottom:none}
+    .seo-onpage-item:hover{padding-left:.5rem}
+    .seo-onpage-icon{width:40px;height:40px;min-width:40px;border-radius:10px;background:rgba(30,64,175,.08);color:#1e40af;display:flex;align-items:center;justify-content:center;font-size:.9rem;transition:all .3s}
+    .seo-onpage-item:hover .seo-onpage-icon{background:#1e40af;color:#fff}
+    .seo-onpage-item h6{font-weight:700;font-size:.9rem;margin-bottom:.15rem}
+    .seo-onpage-item p{color:var(--text-muted);font-size:.8rem;line-height:1.5;margin:0}
+
+    .seo-metric-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+    .seo-metric-card{background:var(--bg-surface);border:1px solid var(--border-color);border-radius:16px;padding:2rem;text-align:center;transition:all .3s}
+    .seo-metric-card:hover{transform:translateY(-4px);border-color:#1e40af}
+    .seo-metric-icon{width:52px;height:52px;border-radius:14px;background:rgba(30,64,175,.08);color:#1e40af;display:inline-flex;align-items:center;justify-content:center;font-size:1.2rem;margin-bottom:.8rem}
+    .seo-metric-card h6{font-weight:700;font-size:.9rem;margin-bottom:.4rem}
+    .seo-metric-card p{color:var(--text-muted);font-size:.82rem;line-height:1.6;margin:0}
+
+    .seo-audit-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+    .seo-audit-card{background:var(--bg-surface);border:1px solid var(--border-color);border-radius:16px;padding:1.8rem;transition:all .3s;height:100%}
+    .seo-audit-card:hover{transform:translateY(-4px);border-color:#1e40af}
+    .seo-audit-icon{width:44px;height:44px;border-radius:12px;background:rgba(30,64,175,.08);color:#1e40af;display:inline-flex;align-items:center;justify-content:center;font-size:1rem;margin-bottom:.7rem}
+    .seo-audit-card h6{font-weight:700;font-size:.9rem;margin-bottom:.3rem}
+    .seo-audit-card p{color:var(--text-muted);font-size:.82rem;line-height:1.6;margin:0}
+
+    /* ── Audit Accordion ── */
+    .seo-audit-accordion{display:flex;flex-direction:column;gap:.75rem}
+    .seo-audit-item{border:1px solid var(--border-color);border-radius:14px;overflow:hidden;transition:all .3s;background:var(--bg-surface)}
+    .seo-audit-item:hover{border-color:rgba(30,64,175,.25)}
+    .seo-audit-item.open{border-color:rgba(30,64,175,.2);box-shadow:0 4px 16px rgba(0,0,0,.04)}
+    .seo-audit-q{padding:1.1rem 1.4rem;font-weight:700;font-size:.9rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:1rem;transition:background .3s}
+    .seo-audit-q:hover{background:rgba(30,64,175,.02)}
+    .seo-audit-q-left{display:flex;align-items:center;gap:1rem;flex:1;min-width:0}
+    .seo-audit-q-icon{width:40px;height:40px;min-width:40px;border-radius:10px;background:rgba(30,64,175,.08);color:#1e40af;display:flex;align-items:center;justify-content:center;font-size:.9rem;transition:all .3s}
+    .seo-audit-item.open .seo-audit-q-icon{background:#1e40af;color:#fff}
+    .seo-audit-q h6{font-weight:700;font-size:.88rem;margin-bottom:.1rem}
+    .seo-audit-q p{color:var(--text-muted);font-size:.75rem;line-height:1.4;margin:0;font-weight:400}
+    .seo-audit-q>i{transition:transform .3s;font-size:.75rem;color:#1e40af;flex-shrink:0}
+    .seo-audit-item.open .seo-audit-q>i{transform:rotate(180deg)}
+    .seo-audit-severity{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:.2rem .6rem;border-radius:6px;background:rgba(30,64,175,.06);color:#1e40af;white-space:nowrap;flex-shrink:0}
+    .seo-audit-a{padding:0 1.4rem;max-height:0;overflow:hidden;transition:all .35s;font-size:.85rem;line-height:1.7;color:var(--text-muted);border-top:1px solid transparent}
+    .seo-audit-item.open .seo-audit-a{max-height:200px;padding:0 1.4rem 1.2rem;border-top-color:var(--border-color)}
+
+    .seo-workflow-steps{display:flex;flex-direction:column;gap:0;max-width:700px;margin:0 auto}
+    .seo-workflow-item{display:flex;align-items:flex-start;gap:1.5rem;padding:1.5rem 0;position:relative}
+    .seo-workflow-item:not(:last-child){border-bottom:1px solid var(--border-color)}
+    .seo-workflow-num{width:40px;height:40px;min-width:40px;border-radius:50%;background:linear-gradient(135deg,#1e40af,#1e3a8a);color:#fff;font-size:.8rem;font-weight:800;display:flex;align-items:center;justify-content:center}
+    .seo-workflow-item h6{font-weight:700;font-size:.95rem;margin-bottom:.2rem}
+    .seo-workflow-item p{color:var(--text-muted);font-size:.85rem;line-height:1.6;margin:0}
+    .seo-workflow-arrow{text-align:center;color:#1e40af;font-size:1rem;margin-top:.5rem}
+
+    /* ── Workflow Orbit ── */
+    .seo-wf-orbit{position:relative;width:600px;height:600px;margin:2rem auto}
+    .seo-wf-orbit-glow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(30,64,175,.06) 0%,transparent 70%);pointer-events:none}
+    .seo-wf-orbit-ring{position:absolute;top:50%;left:50%;width:480px;height:480px;margin-left:-240px;margin-top:-240px;border-radius:50%;border:2px dashed rgba(30,64,175,.1);animation:orbitSpin 60s linear infinite}
+    @keyframes orbitSpin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+    .seo-wf-orbit-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#1e40af,#1e3a8a);color:#fff;display:flex;align-items:center;justify-content:center;z-index:3;box-shadow:0 0 0 4px rgba(30,64,175,.08),0 0 0 12px rgba(30,64,175,.04),0 4px 16px rgba(30,64,175,.3);font-size:1.1rem}
+    .seo-wf-orbit-pulse{position:absolute;inset:-4px;border-radius:50%;border:2px solid rgba(30,64,175,.2);animation:orbitPulse 2.5s ease-in-out infinite}
+    @keyframes orbitPulse{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.15);opacity:0}}
+    .seo-wf-orbit-center i{animation:orbitIconSpin 6s linear infinite}
+    @keyframes orbitIconSpin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+
+    .seo-wf-orbit-item{position:absolute;top:50%;left:50%;transform:rotate(var(--a)) translateY(-230px);z-index:2}
+    .seo-wf-orbit-dot{width:28px;height:28px;border-radius:50%;background:var(--bg-surface);border:2px solid rgba(30,64,175,.2);display:flex;align-items:center;justify-content:center;font-size:.55rem;font-weight:800;color:#1e40af;transition:all .3s;box-shadow:0 2px 6px rgba(0,0,0,.05);position:absolute;top:-14px;left:-14px;z-index:2}
+    .seo-wf-orbit-item:hover .seo-wf-orbit-dot{background:#1e40af;border-color:#1e40af;color:#fff;transform:scale(1.2);box-shadow:0 0 0 5px rgba(30,64,175,.1)}
+    .seo-wf-orbit-card{position:absolute;top:-10px;left:22px;width:140px;background:var(--bg-surface);border:1px solid var(--border-color);border-radius:10px;padding:.7rem .8rem;transform:rotate(calc(-1 * var(--a)));transition:all .3s;box-shadow:0 4px 12px rgba(0,0,0,.04);white-space:normal}
+    .seo-wf-orbit-item:hover .seo-wf-orbit-card{border-color:rgba(30,64,175,.25);box-shadow:0 6px 20px rgba(0,0,0,.08);transform:rotate(calc(-1 * var(--a))) translateY(-3px)}
+    .seo-wf-orbit-card i{font-size:.75rem;color:#1e40af;margin-bottom:.2rem;display:block}
+    .seo-wf-orbit-card h6{font-weight:700;font-size:.72rem;margin-bottom:.15rem;color:var(--text-primary)}
+    .seo-wf-orbit-card p{color:var(--text-muted);font-size:.62rem;line-height:1.45;margin:0}
+
+    @media(max-width:767.98px){
+        .seo-wf-orbit{width:100%;height:auto;min-height:360px}
+        .seo-wf-orbit-ring{width:300px;height:300px;margin-left:-150px;margin-top:-150px}
+        .seo-wf-orbit-glow{width:180px;height:180px}
+        .seo-wf-orbit-center{width:48px;height:48px;font-size:.95rem}
+        .seo-wf-orbit-item{transform:rotate(var(--a)) translateY(-150px)}
+        .seo-wf-orbit-card{width:110px;padding:.5rem .6rem}
+        .seo-wf-orbit-card h6{font-size:.65rem}
+        .seo-wf-orbit-card p{font-size:.58rem}
+    }
+
+    .seo-gap-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.5rem}
+    .seo-gap-card{background:var(--bg-surface);border:1px solid var(--border-color);border-radius:16px;padding:2rem;transition:all .3s;height:100%}
+    .seo-gap-card:hover{transform:translateY(-4px);border-color:#1e40af}
+    .seo-gap-card h6{font-weight:700;font-size:.95rem;margin-bottom:.4rem;display:flex;align-items:center;gap:.5rem}
+    .seo-gap-card h6 i{color:#1e40af;font-size:.85rem}
+    .seo-gap-card p{color:var(--text-muted);font-size:.85rem;line-height:1.6;margin:0}
+
+    .seo-dashboard-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+    .seo-dashboard-card{background:var(--bg-surface);border:1px solid var(--border-color);border-radius:16px;padding:2rem;transition:all .3s;height:100%}
+    .seo-dashboard-card:hover{transform:translateY(-4px);border-color:#1e40af}
+    .seo-dashboard-card h6{font-weight:700;font-size:.95rem;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
+    .seo-dashboard-card h6 i{color:#1e40af}
+    .seo-dashboard-list{list-style:none;padding:0;margin:0}
+    .seo-dashboard-list li{padding:.4rem 0;font-size:.85rem;color:var(--text-muted);display:flex;align-items:center;gap:.5rem}
+    .seo-dashboard-list li i{color:#1e40af;font-size:.7rem;flex-shrink:0}
+
+    .seo-cta-banner{background:linear-gradient(135deg,#0f172a,#1e293b);color:#fff;padding:5rem 0;text-align:center}
+    .seo-cta-banner h2{font-weight:800;font-size:2rem;margin-bottom:.75rem}
+    .seo-cta-banner p{color:rgba(255,255,255,.65);max-width:560px;margin:0 auto 2rem;font-size:.95rem;line-height:1.7}
+
+    .cta-btn-primary{display:inline-flex;align-items:center;gap:.5rem;padding:.9rem 2.2rem;border-radius:999px;font-weight:700;font-size:.95rem;color:#fff;background:linear-gradient(135deg,#1e40af,#1e3a8a);border:none;text-decoration:none;transition:all .35s cubic-bezier(.25,.46,.45,.94);box-shadow:0 4px 24px rgba(30,64,175,.35);position:relative;overflow:hidden}
+    .cta-btn-primary::after{content:'';position:absolute;top:-50%;left:-60%;width:40%;height:200%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent);transform:skewX(-20deg);transition:left .6s;pointer-events:none}
+    .cta-btn-primary:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 8px 32px rgba(30,64,175,.5);color:#fff}
+    .cta-btn-primary:hover::after{left:130%}
+    .cta-btn-secondary{display:inline-flex;align-items:center;gap:.5rem;padding:.9rem 2.2rem;border-radius:999px;font-weight:700;font-size:.95rem;color:rgba(255,255,255,.9);background:transparent;border:2px solid rgba(255,255,255,.25);text-decoration:none;transition:all .35s}
+    .cta-btn-secondary:hover{border-color:#60a5fa;color:#fff;transform:translateY(-2px)}
+
+    .seo-back-to-top{position:fixed;bottom:2rem;right:2rem;width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#1e40af,#1e3a8a);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;z-index:9990;opacity:0;transform:translateY(20px);transition:all .3s;box-shadow:0 4px 16px rgba(30,64,175,.3)}
+    .seo-back-to-top.show{opacity:1;transform:translateY(0)}
+    .seo-back-to-top:hover{transform:translateY(-3px);box-shadow:0 6px 24px rgba(30,64,175,.4)}
+
+    /* ── Performance Tabs ── */
+    .seo-perf-tabs{max-width:700px;margin:0 auto}
+    .seo-perf-tab-nav{display:flex;gap:.5rem;margin-bottom:2rem;justify-content:center}
+    .seo-perf-tab-btn{padding:.7rem 1.5rem;border-radius:10px;border:1px solid var(--border-color);background:var(--bg-surface);color:var(--text-muted);font-weight:700;font-size:.85rem;cursor:pointer;transition:all .3s;display:inline-flex;align-items:center;gap:.4rem}
+    .seo-perf-tab-btn:hover{border-color:rgba(30,64,175,.25);color:#1e40af}
+    .seo-perf-tab-btn.active{background:#1e40af;color:#fff;border-color:#1e40af;box-shadow:0 4px 16px rgba(30,64,175,.25)}
+    .seo-perf-tab-btn i{font-size:.8rem}
+    .seo-perf-tab-content{display:none}
+    .seo-perf-tab-content.active{display:block;animation:tabFade .3s ease}
+    @keyframes tabFade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    .seo-perf-tab-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+    .seo-perf-tab-card{background:var(--bg-surface);border:1px solid var(--border-color);border-radius:16px;padding:2rem;transition:all .3s}
+    .seo-perf-tab-card:hover{transform:translateY(-4px);border-color:rgba(30,64,175,.25);box-shadow:0 8px 24px rgba(0,0,0,.06)}
+    .seo-perf-tab-icon{width:44px;height:44px;border-radius:12px;background:rgba(30,64,175,.08);color:#1e40af;display:flex;align-items:center;justify-content:center;font-size:1rem;margin-bottom:.8rem;transition:all .3s}
+    .seo-perf-tab-card:hover .seo-perf-tab-icon{background:#1e40af;color:#fff}
+    .seo-perf-tab-card h6{font-weight:700;font-size:.9rem;margin-bottom:.3rem}
+    .seo-perf-tab-card p{color:var(--text-muted);font-size:.8rem;line-height:1.5;margin:0 0 1rem}
+    .seo-perf-tab-bar{height:6px;border-radius:99px;background:var(--border-color);overflow:hidden}
+    .seo-perf-tab-bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#1e40af,#3b82f6);transition:width 1s ease}
+
+    @media(max-width:767.98px){.seo-perf-tab-grid{grid-template-columns:1fr}.seo-perf-tab-nav{flex-wrap:wrap}}
+    @media(max-width:767.98px){.seo-pillar-grid,.seo-steps-grid,.seo-intent-grid,.seo-audit-grid,.seo-gap-grid,.seo-metric-grid,.seo-dashboard-grid{grid-template-columns:1fr}section{padding-top:3rem!important;padding-bottom:3rem!important}}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded',function(){
+    var pc=document.getElementById('seoParticles');
+    if(pc){for(var i=0;i<20;i++){var p=document.createElement('div');p.className='seo-hero-particle';var s=Math.random()*4+2;p.style.width=s+'px';p.style.height=s+'px';p.style.left=Math.random()*100+'%';p.style.animationDuration=(Math.random()*10+8)+'s';p.style.animationDelay=(Math.random()*8)+'s';pc.appendChild(p)}}
+    var bt=document.getElementById('seoBackToTop');
+    if(bt){window.addEventListener('scroll',function(){bt.classList.toggle('show',window.pageYOffset>400)});bt.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})})}
+
+    document.querySelectorAll('.seo-perf-tab-btn').forEach(function(btn){
+        btn.addEventListener('click',function(){
+            document.querySelectorAll('.seo-perf-tab-btn').forEach(function(b){b.classList.remove('active')});
+            document.querySelectorAll('.seo-perf-tab-content').forEach(function(c){c.classList.remove('active')});
+            this.classList.add('active');
+            var tab=document.getElementById('tab-'+this.getAttribute('data-tab'));
+            if(tab)tab.classList.add('active');
+        });
+    });
+    document.querySelectorAll('.seo-audit-q').forEach(function(q){
+        q.addEventListener('click',function(){
+            this.parentElement.classList.toggle('open');
+        });
+    });
+});
+</script>
+{% endblock %}
+
+{% block content %}
+
+<!-- HERO -->
+<section class="seo-hero">
+    <div class="seo-hero-particles" id="seoParticles"></div>
+    <div class="container">
+        <div class="col-lg-8">
+            <span class="seo-badge seo-badge--blue"><i class="fas fa-file-alt"></i> {% trans "SEO Content" %}</span>
+            <h1 class="display-5 fw-800 mb-3" style="color:#fff;">{% trans "Content That Ranks. Answers. Converts." %}</h1>
+            <p class="lead mb-2" style="color:rgba(255,255,255,.65);max-width:580px;">
+                {% trans "Create search-focused content designed to attract the right audience, build topical authority, and turn organic traffic into meaningful business results." %}
+            </p>
+            <div class="d-flex flex-wrap gap-3 mt-4">
+                <a href="{% url 'seo_analyzer:free_pre_check' %}" class="cta-btn-primary">{% trans "Create Your Content Strategy" %} <i class="fas fa-arrow-right"></i></a>
+                <a href="{% url 'seo_analyzer:seo_home_marketing' %}" class="cta-btn-secondary">{% trans "Explore SEO Tools" %}</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CONTENT STRATEGY -->
+<section class="seo-section">
+    <div class="container">
+        <div class="text-center mx-auto mb-5">
+            <div class="seo-section-label">{% trans "Content Strategy" %}</div>
+            <h2 class="seo-section-title">{% trans "Build Content Around What People Actually Search" %}</h2>
+            <p class="seo-section-desc mx-auto">{% trans "Great SEO content starts with understanding your audience—not simply adding keywords to a page." %}</p>
+            <p class="seo-section-desc mx-auto mt-2">{% trans "We combine keyword research, search intent, competitor analysis, and topic mapping to create a content strategy built around real search opportunities." %}</p>
+        </div>
+        <div class="seo-strategy-flow">
+            <div class="seo-strategy-card">
+                <div class="seo-strategy-top">
+                    <div class="seo-strategy-num">1</div>
+                    <div class="seo-strategy-icon"><i class="fas fa-search"></i></div>
+                </div>
+                <h6>{% trans "Discover" %}</h6>
+                <p>{% trans "Find valuable keywords, questions, and topics your audience is searching for." %}</p>
+                <ul>
+                    <li><i class="fas fa-check"></i> {% trans "Keyword research" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "Topic discovery" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "Question analysis" %}</li>
+                </ul>
+            </div>
+            <div class="seo-strategy-arrow"><div class="seo-strategy-arrow-line"></div><i class="fas fa-chevron-right"></i></div>
+            <div class="seo-strategy-card">
+                <div class="seo-strategy-top">
+                    <div class="seo-strategy-num">2</div>
+                    <div class="seo-strategy-icon"><i class="fas fa-brain"></i></div>
+                </div>
+                <h6>{% trans "Understand" %}</h6>
+                <p>{% trans "Analyze search intent and determine what users expect to find." %}</p>
+                <ul>
+                    <li><i class="fas fa-check"></i> {% trans "Intent mapping" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "User expectations" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "Content format" %}</li>
+                </ul>
+            </div>
+            <div class="seo-strategy-arrow"><div class="seo-strategy-arrow-line"></div><i class="fas fa-chevron-right"></i></div>
+            <div class="seo-strategy-card">
+                <div class="seo-strategy-top">
+                    <div class="seo-strategy-num">3</div>
+                    <div class="seo-strategy-icon"><i class="fas fa-sitemap"></i></div>
+                </div>
+                <h6>{% trans "Plan" %}</h6>
+                <p>{% trans "Build content clusters and topic structures that strengthen your website's authority." %}</p>
+                <ul>
+                    <li><i class="fas fa-check"></i> {% trans "Topic clusters" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "Pillar pages" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "Internal linking" %}</li>
+                </ul>
+            </div>
+            <div class="seo-strategy-arrow"><div class="seo-strategy-arrow-line"></div><i class="fas fa-chevron-right"></i></div>
+            <div class="seo-strategy-card">
+                <div class="seo-strategy-top">
+                    <div class="seo-strategy-num">4</div>
+                    <div class="seo-strategy-icon"><i class="fas fa-sort-amount-up"></i></div>
+                </div>
+                <h6>{% trans "Prioritize" %}</h6>
+                <p>{% trans "Focus your resources on content opportunities with the greatest potential." %}</p>
+                <ul>
+                    <li><i class="fas fa-check"></i> {% trans "Opportunity scoring" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "Resource allocation" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "Impact analysis" %}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+        </div>
+    </div>
+</section>
+
+<!-- SEARCH INTENT -->
+<section class="seo-section">
+    <div class="container">
+        <div class="text-center mx-auto mb-5">
+            <div class="seo-section-label">{% trans "Search Intent" %}</div>
+        </div>
+        <div style="max-width:900px;margin:0 auto;">
+            <img src="{% static "img/chat.png" %}" alt="{% trans 'Search Intent Types' %}" style="width:100%;height:auto;display:block;" loading="lazy">
+        </div>
+    </div>
+</section>
+
+<!-- TOPICAL AUTHORITY -->
+<section class="seo-section">
+    <div class="container">
+        <div class="text-center mx-auto mb-5">
+            <div class="seo-section-label">{% trans "Topical Authority" %}</div>
+            <h2 class="seo-section-title">{% trans "Become the Source Search Engines Trust" %}</h2>
+            <p class="seo-section-desc mx-auto">{% trans "Ranking for one keyword isn't enough." %}</p>
+            <p class="seo-section-desc mx-auto mt-2">{% trans "Build a connected network of useful content around your most important topics. Strategic internal linking and content clusters help search engines understand your expertise while giving users a deeper journey through your website." %}</p>
+        </div>
+        <div class="seo-steps-grid">
+            <div class="seo-step-card">
+                <div class="seo-step-icon"><i class="fas fa-project-diagram"></i></div>
+                <h6>{% trans "Topic Clusters" %}</h6>
+                <p>{% trans "Organize related content around core topics." %}</p>
+            </div>
+            <div class="seo-step-card">
+                <div class="seo-step-icon"><i class="fas fa-layer-group"></i></div>
+                <h6>{% trans "Pillar Pages" %}</h6>
+                <p>{% trans "Create comprehensive resources targeting broad, valuable subjects." %}</p>
+            </div>
+            <div class="seo-step-card">
+                <div class="seo-step-icon"><i class="fas fa-link"></i></div>
+                <h6>{% trans "Internal Linking" %}</h6>
+                <p>{% trans "Connect related pages and distribute authority throughout your site." %}</p>
+            </div>
+            <div class="seo-step-card">
+                <div class="seo-step-icon"><i class="fas fa-expand-arrows-alt"></i></div>
+                <h6>{% trans "Content Depth" %}</h6>
+                <p>{% trans "Cover important subtopics instead of creating thin, disconnected pages." %}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- AI-ASSISTED CONTENT -->
+<section class="seo-section-alt">
+    <div class="container">
+        <div class="text-center mx-auto mb-5">
+            <div class="seo-section-label">{% trans "AI-Assisted Content" %}</div>
+            <h2 class="seo-section-title">{% trans "Scale Content Without Losing Strategy" %}</h2>
+            <p class="seo-section-desc mx-auto">{% trans "Use AI to accelerate research, ideation, optimization, and content workflows while keeping your strategy focused on users and search quality." %}</p>
+        </div>
+        <div class="seo-feature">
+            <div class="seo-feature-text">
+                <h3>{% trans "AI helps you move faster. Strategy keeps your content valuable." %}</h3>
+                <ul>
+                    <li><i class="fas fa-check"></i> {% trans "Identify topics, questions, entities, and content opportunities" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "Generate structured content frameworks based on search intent" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "Improve headings, keyword coverage, internal links, metadata, and content structure" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "Detect outdated content and identify opportunities to update existing pages" %}</li>
+                </ul>
+            </div>
+            <div class="seo-feature-visual">
+                <div class="seo-feature-visual-item"><i class="fas fa-search"></i> <span>{% trans "Research" %}</span></div>
+                <div class="seo-feature-visual-item"><i class="fas fa-list-ul"></i> <span>{% trans "Outline" %}</span></div>
+                <div class="seo-feature-visual-item"><i class="fas fa-sliders-h"></i> <span>{% trans "Optimize" %}</span></div>
+                <div class="seo-feature-visual-item"><i class="fas fa-sync-alt"></i> <span>{% trans "Refresh" %}</span></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ON-PAGE OPTIMIZATION -->
+<section class="seo-section">
+    <div class="container">
+        <div class="seo-feature">
+            <div class="seo-feature-visual" style="padding:0;overflow:hidden;background:transparent;border:none;">
+                <img src="{% static "img/onPage.png" %}" alt="{% trans 'On-Page SEO Elements' %}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">
+            </div>
+            <div class="seo-feature-text">
+                <div class="seo-section-label">{% trans "On-Page Optimization" %}</div>
+                <h3>{% trans "Every Element Has a Purpose" %}</h3>
+                <p>{% trans "Optimize the elements that help search engines understand your content and users navigate it." %}</p>
+                <div class="seo-onpage-list">
+                    <div class="seo-onpage-item">
+                        <div class="seo-onpage-icon"><i class="fas fa-heading"></i></div>
+                        <div>
+                            <h6>{% trans "Title Tags" %}</h6>
+                            <p>{% trans "Create clear, relevant titles aligned with search intent." %}</p>
+                        </div>
+                    </div>
+                    <div class="seo-onpage-item">
+                        <div class="seo-onpage-icon"><i class="fas fa-align-left"></i></div>
+                        <div>
+                            <h6>{% trans "Meta Descriptions" %}</h6>
+                            <p>{% trans "Improve how your pages appear in search results." %}</p>
+                        </div>
+                    </div>
+                    <div class="seo-onpage-item">
+                        <div class="seo-onpage-icon"><i class="fas fa-sitemap"></i></div>
+                        <div>
+                            <h6>{% trans "Headings" %}</h6>
+                            <p>{% trans "Build logical content structures that improve readability and relevance." %}</p>
+                        </div>
+                    </div>
+                    <div class="seo-onpage-item">
+                        <div class="seo-onpage-icon"><i class="fas fa-key"></i></div>
+                        <div>
+                            <h6>{% trans "Keywords & Entities" %}</h6>
+                            <p>{% trans "Use relevant terminology naturally throughout the content." %}</p>
+                        </div>
+                    </div>
+                    <div class="seo-onpage-item">
+                        <div class="seo-onpage-icon"><i class="fas fa-link"></i></div>
+                        <div>
+                            <h6>{% trans "Internal Links" %}</h6>
+                            <p>{% trans "Connect related pages and strengthen your site's architecture." %}</p>
+                        </div>
+                    </div>
+                    <div class="seo-onpage-item">
+                        <div class="seo-onpage-icon"><i class="fas fa-image"></i></div>
+                        <div>
+                            <h6>{% trans "Images" %}</h6>
+                            <p>{% trans "Optimize image context, filenames, alt text, and performance." %}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CONTENT PERFORMANCE -->
+<section class="seo-section-alt">
+    <div class="container">
+        <div class="text-center mx-auto mb-5">
+            <div class="seo-section-label">{% trans "Content Performance" %}</div>
+            <h2 class="seo-section-title">{% trans "Don't Just Publish. Measure." %}</h2>
+            <p class="seo-section-desc mx-auto">{% trans "Track how your content performs after publication and identify where improvements can create additional growth." %}</p>
+        </div>
+        <div class="seo-perf-tabs">
+            <div class="seo-perf-tab-nav">
+                <button class="seo-perf-tab-btn active" data-tab="visibility"><i class="fas fa-eye"></i> {% trans "Visibility" %}</button>
+                <button class="seo-perf-tab-btn" data-tab="engagement"><i class="fas fa-hand-pointer"></i> {% trans "Engagement" %}</button>
+                <button class="seo-perf-tab-btn" data-tab="conversions"><i class="fas fa-bullseye"></i> {% trans "Conversions" %}</button>
+            </div>
+            <div class="seo-perf-tab-content active" id="tab-visibility">
+                <div class="seo-perf-tab-grid">
+                    <div class="seo-perf-tab-card">
+                        <div class="seo-perf-tab-icon"><i class="fas fa-chart-line"></i></div>
+                        <h6>{% trans "Organic Traffic" %}</h6>
+                        <p>{% trans "Monitor visitors arriving from search engines." %}</p>
+                        <div class="seo-perf-tab-bar"><div class="seo-perf-tab-bar-fill" style="width:78%"></div></div>
+                    </div>
+                    <div class="seo-perf-tab-card">
+                        <div class="seo-perf-tab-icon"><i class="fas fa-trophy"></i></div>
+                        <h6>{% trans "Keyword Rankings" %}</h6>
+                        <p>{% trans "Track positions for your target keywords." %}</p>
+                        <div class="seo-perf-tab-bar"><div class="seo-perf-tab-bar-fill" style="width:65%"></div></div>
+                    </div>
+                </div>
+            </div>
+            <div class="seo-perf-tab-content" id="tab-engagement">
+                <div class="seo-perf-tab-grid">
+                    <div class="seo-perf-tab-card">
+                        <div class="seo-perf-tab-icon"><i class="fas fa-mouse-pointer"></i></div>
+                        <h6>{% trans "Click-Through Rate" %}</h6>
+                        <p>{% trans "See how many searchers click through to your content." %}</p>
+                        <div class="seo-perf-tab-bar"><div class="seo-perf-tab-bar-fill" style="width:52%"></div></div>
+                    </div>
+                    <div class="seo-perf-tab-card">
+                        <div class="seo-perf-tab-icon"><i class="fas fa-clock"></i></div>
+                        <h6>{% trans "Engagement" %}</h6>
+                        <p>{% trans "Measure time on page, bounce rate, and user behavior." %}</p>
+                        <div class="seo-perf-tab-bar"><div class="seo-perf-tab-bar-fill" style="width:71%"></div></div>
+                    </div>
+                </div>
+            </div>
+            <div class="seo-perf-tab-content" id="tab-conversions">
+                <div class="seo-perf-tab-grid">
+                    <div class="seo-perf-tab-card">
+                        <div class="seo-perf-tab-icon"><i class="fas fa-bullseye"></i></div>
+                        <h6>{% trans "Conversions" %}</h6>
+                        <p>{% trans "Track how content drives leads, signups, and sales." %}</p>
+                        <div class="seo-perf-tab-bar"><div class="seo-perf-tab-bar-fill" style="width:44%"></div></div>
+                    </div>
+                    <div class="seo-perf-tab-card">
+                        <div class="seo-perf-tab-icon"><i class="fas fa-search"></i></div>
+                        <h6>{% trans "Search Visibility" %}</h6>
+                        <p>{% trans "Measure how often you appear in search results." %}</p>
+                        <div class="seo-perf-tab-bar"><div class="seo-perf-tab-bar-fill" style="width:83%"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="text-center mt-5">
+            <p class="seo-section-desc mx-auto" style="font-weight:700;color:var(--text-primary);font-size:1rem;">{% trans "Optimize What Matters" %}</p>
+            <p class="seo-section-desc mx-auto">{% trans "Find pages that are gaining traction, losing visibility, or sitting just outside the top search positions. Turn performance data into your next optimization opportunity." %}</p>
+        </div>
+    </div>
+</section>
+
+<!-- CONTENT AUDIT -->
+<section class="seo-section">
+    <div class="container">
+        <div class="text-center mx-auto mb-5">
+            <div class="seo-section-label">{% trans "Content Audit" %}</div>
+            <h2 class="seo-section-title">{% trans "Find What's Holding Your Content Back" %}</h2>
+            <p class="seo-section-desc mx-auto">{% trans "Your existing content may already contain untapped SEO potential. Identify pages that are:" %}</p>
+        </div>
+        <div class="seo-audit-accordion" style="max-width:700px;margin:0 auto;">
+            <div class="seo-audit-item open">
+                <div class="seo-audit-q">
+                    <div class="seo-audit-q-left">
+                        <div class="seo-audit-q-icon"><i class="fas fa-chart-bar"></i></div>
+                        <div>
+                            <h6>{% trans "Underperforming" %}</h6>
+                            <p>{% trans "Pages receiving less traffic than their potential." %}</p>
+                        </div>
+                    </div>
+                    <div class="seo-audit-severity">{% trans "High Priority" %}</div>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="seo-audit-a">
+                    <p>{% trans "These pages have keywords ranking on page 2-3 of search results, or content that targets high-volume queries but isn't performing. Small optimizations — better headings, internal links, refreshed content — can push them onto page 1." %}</p>
+                </div>
+            </div>
+            <div class="seo-audit-item">
+                <div class="seo-audit-q">
+                    <div class="seo-audit-q-left">
+                        <div class="seo-audit-q-icon"><i class="fas fa-clock"></i></div>
+                        <div>
+                            <h6>{% trans "Outdated" %}</h6>
+                            <p>{% trans "Content that needs fresh information or updated references." %}</p>
+                        </div>
+                    </div>
+                    <div class="seo-audit-severity">{% trans "Medium Priority" %}</div>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="seo-audit-a">
+                    <p>{% trans "Old statistics, broken links, outdated screenshots, and references to deprecated tools reduce trust and rankings. Regular content refreshes signal to search engines that your site is maintained and authoritative." %}</p>
+                </div>
+            </div>
+            <div class="seo-audit-item">
+                <div class="seo-audit-q">
+                    <div class="seo-audit-q-left">
+                        <div class="seo-audit-q-icon"><i class="fas fa-copy"></i></div>
+                        <div>
+                            <h6>{% trans "Cannibalizing" %}</h6>
+                            <p>{% trans "Multiple pages competing for the same search intent." %}</p>
+                        </div>
+                    </div>
+                    <div class="seo-audit-severity">{% trans "High Priority" %}</div>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="seo-audit-a">
+                    <p>{% trans "When two or more pages target the same keyword and intent, search engines struggle to decide which to rank. Consolidate, redirect, or differentiate these pages to concentrate authority and improve rankings." %}</p>
+                </div>
+            </div>
+            <div class="seo-audit-item">
+                <div class="seo-audit-q">
+                    <div class="seo-audit-q-left">
+                        <div class="seo-audit-q-icon"><i class="fas fa-file-alt"></i></div>
+                        <div>
+                            <h6>{% trans "Thin" %}</h6>
+                            <p>{% trans "Pages that don't sufficiently answer the user's query." %}</p>
+                        </div>
+                    </div>
+                    <div class="seo-audit-severity">{% trans "Medium Priority" %}</div>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="seo-audit-a">
+                    <p>{% trans "Short, shallow, or incomplete content rarely ranks. Expand thin pages with comprehensive information, examples, visuals, and actionable insights to match what top-ranking competitors provide." %}</p>
+                </div>
+            </div>
+            <div class="seo-audit-item">
+                <div class="seo-audit-q">
+                    <div class="seo-audit-q-left">
+                        <div class="seo-audit-q-icon"><i class="fas fa-unlink"></i></div>
+                        <div>
+                            <h6>{% trans "Disconnected" %}</h6>
+                            <p>{% trans "Content with weak internal linking or unclear topical relationships." %}</p>
+                        </div>
+                    </div>
+                    <div class="seo-audit-severity">{% trans "Low Priority" %}</div>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="seo-audit-a">
+                    <p>{% trans "Pages that exist in isolation — with no internal links pointing to or from them — are harder for crawlers to find and users to discover. Build internal links to connect related content and distribute authority." %}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+        </div>
+    </div>
+</section>
+
+<!-- CONTENT WORKFLOW -->
+<section class="seo-section-alt">
+    <div class="container">
+        <div class="text-center mx-auto mb-5">
+            <div class="seo-section-label">{% trans "Content Workflow" %}</div>
+            <h2 class="seo-section-title">{% trans "From Search Query to Search Visibility" %}</h2>
+            <p class="seo-section-desc mx-auto">{% trans "A continuous cycle of research, creation, and optimization that drives compounding organic growth." %}</p>
+        </div>
+        <div class="seo-wf-orbit">
+            <div class="seo-wf-orbit-ring"></div>
+            <div class="seo-wf-orbit-glow"></div>
+            <div class="seo-wf-orbit-center">
+                <div class="seo-wf-orbit-pulse"></div>
+                <i class="fas fa-sync-alt"></i>
+            </div>
+
+            <div class="seo-wf-orbit-item" style="--a:0deg">
+                <div class="seo-wf-orbit-dot">01</div>
+                <div class="seo-wf-orbit-card">
+                    <i class="fas fa-search"></i>
+                    <h6>{% trans "Research" %}</h6>
+                    <p>{% trans "Discover keywords, questions, competitors, and opportunities." %}</p>
+                </div>
+            </div>
+            <div class="seo-wf-orbit-item" style="--a:51.4deg">
+                <div class="seo-wf-orbit-dot">02</div>
+                <div class="seo-wf-orbit-card">
+                    <i class="fas fa-brain"></i>
+                    <h6>{% trans "Understand" %}</h6>
+                    <p>{% trans "Determine search intent and the content format users expect." %}</p>
+                </div>
+            </div>
+            <div class="seo-wf-orbit-item" style="--a:102.8deg">
+                <div class="seo-wf-orbit-dot">03</div>
+                <div class="seo-wf-orbit-card">
+                    <i class="fas fa-sitemap"></i>
+                    <h6>{% trans "Plan" %}</h6>
+                    <p>{% trans "Build topics, clusters, outlines, and content priorities." %}</p>
+                </div>
+            </div>
+            <div class="seo-wf-orbit-item" style="--a:154.3deg">
+                <div class="seo-wf-orbit-dot">04</div>
+                <div class="seo-wf-orbit-card">
+                    <i class="fas fa-pen-fancy"></i>
+                    <h6>{% trans "Create" %}</h6>
+                    <p>{% trans "Produce useful, structured, search-optimized content." %}</p>
+                </div>
+            </div>
+            <div class="seo-wf-orbit-item" style="--a:205.7deg">
+                <div class="seo-wf-orbit-dot">05</div>
+                <div class="seo-wf-orbit-card">
+                    <i class="fas fa-sliders-h"></i>
+                    <h6>{% trans "Optimize" %}</h6>
+                    <p>{% trans "Improve on-page SEO, internal linking, structure, and relevance." %}</p>
+                </div>
+            </div>
+            <div class="seo-wf-orbit-item" style="--a:257.1deg">
+                <div class="seo-wf-orbit-dot">06</div>
+                <div class="seo-wf-orbit-card">
+                    <i class="fas fa-chart-line"></i>
+                    <h6>{% trans "Measure" %}</h6>
+                    <p>{% trans "Monitor rankings, traffic, engagement, and conversions." %}</p>
+                </div>
+            </div>
+            <div class="seo-wf-orbit-item" style="--a:308.6deg">
+                <div class="seo-wf-orbit-dot">07</div>
+                <div class="seo-wf-orbit-card">
+                    <i class="fas fa-arrow-up"></i>
+                    <h6>{% trans "Improve" %}</h6>
+                    <p>{% trans "Continuously update and expand content based on performance." %}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CONTENT GAP ANALYSIS -->
+<section class="seo-section">
+    <div class="container">
+        <div class="text-center mx-auto mb-5">
+            <div class="seo-section-label">{% trans "Content Gap Analysis" %}</div>
+            <h2 class="seo-section-title">{% trans "Discover What Your Competitors Cover—and You Don't" %}</h2>
+            <p class="seo-section-desc mx-auto">{% trans "Compare your content against competing websites to uncover topics and search opportunities you're missing." %}</p>
+        </div>
+        <div class="seo-gap-grid">
+            <div class="seo-gap-card">
+                <h6><i class="fas fa-search"></i> {% trans "Identify missing topics" %}</h6>
+                <p>{% trans "Discover subjects your competitors rank for that your website doesn't cover." %}</p>
+            </div>
+            <div class="seo-gap-card">
+                <h6><i class="fas fa-lightbulb"></i> {% trans "Find new opportunities" %}</h6>
+                <p>{% trans "Prioritize relevant keywords with realistic ranking potential." %}</p>
+            </div>
+            <div class="seo-gap-card">
+                <h6><i class="fas fa-expand-arrows-alt"></i> {% trans "Strengthen existing pages" %}</h6>
+                <p>{% trans "Expand content where competitors provide deeper coverage." %}</p>
+            </div>
+            <div class="seo-gap-card">
+                <h6><i class="fas fa-shield-alt"></i> {% trans "Build your advantage" %}</h6>
+                <p>{% trans "Create a more complete topical ecosystem around your business." %}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SEO CONTENT DASHBOARD -->
+<section class="seo-section-alt">
+    <div class="container">
+        <div class="text-center mx-auto mb-5">
+            <div class="seo-section-label">{% trans "SEO Content Dashboard" %}</div>
+            <h2 class="seo-section-title">{% trans "Your Content Strategy in One Place" %}</h2>
+            <p class="seo-section-desc mx-auto">{% trans "Monitor the health and performance of your SEO content from a centralized dashboard." %}</p>
+        </div>
+        <div class="seo-dashboard-grid">
+            <div class="seo-dashboard-card">
+                <h6><i class="fas fa-file-alt"></i> {% trans "Content Overview" %}</h6>
+                <ul class="seo-dashboard-list">
+                    <li><i class="fas fa-check-circle"></i> {% trans "Total indexed pages" %}</li>
+                    <li><i class="fas fa-check-circle"></i> {% trans "Optimized pages" %}</li>
+                    <li><i class="fas fa-check-circle"></i> {% trans "Content opportunities" %}</li>
+                    <li><i class="fas fa-check-circle"></i> {% trans "Pages requiring updates" %}</li>
+                </ul>
+            </div>
+            <div class="seo-dashboard-card">
+                <h6><i class="fas fa-chart-line"></i> {% trans "SEO Performance" %}</h6>
+                <ul class="seo-dashboard-list">
+                    <li><i class="fas fa-check-circle"></i> {% trans "Ranking keywords" %}</li>
+                    <li><i class="fas fa-check-circle"></i> {% trans "Organic clicks" %}</li>
+                    <li><i class="fas fa-check-circle"></i> {% trans "Impressions" %}</li>
+                    <li><i class="fas fa-check-circle"></i> {% trans "Average position" %}</li>
+                </ul>
+            </div>
+            <div class="seo-dashboard-card">
+                <h6><i class="fas fa-lightbulb"></i> {% trans "Content Opportunities" %}</h6>
+                <ul class="seo-dashboard-list">
+                    <li><i class="fas fa-check-circle"></i> {% trans "Quick wins" %}</li>
+                    <li><i class="fas fa-check-circle"></i> {% trans "Content gaps" %}</li>
+                    <li><i class="fas fa-check-circle"></i> {% trans "Declining pages" %}</li>
+                    <li><i class="fas fa-check-circle"></i> {% trans "New topic opportunities" %}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="seo-cta-banner">
+    <div class="container">
+        <h2>{% trans "Turn Search Intent Into Business Growth" %}</h2>
+        <p>{% trans "Create content that answers questions, builds authority, earns visibility, and moves users closer to action." %}</p>
+        <div class="d-flex flex-wrap gap-3 justify-content-center">
+            <a href="{% url 'seo_analyzer:free_pre_check' %}" class="cta-btn-primary">{% trans "Build Your SEO Content Strategy" %} <i class="fas fa-arrow-right"></i></a>
+            <a href="{% url 'seo_analyzer:checker' %}" class="cta-btn-secondary">{% trans "Analyze Your Content" %}</a>
+        </div>
+    </div>
+</section>
+
+<!-- BACK TO TOP -->
+<button class="seo-back-to-top" id="seoBackToTop" aria-label="{% trans 'Back to top' %}"><i class="fas fa-chevron-up"></i></button>
+
+{% endblock %}

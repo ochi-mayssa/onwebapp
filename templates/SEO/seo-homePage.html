@@ -1,0 +1,695 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans "SEO Services & SEO Monitoring" %} | OnWebApp{% endblock %}
+
+{% block meta_description %}{% trans "Improve your search visibility with OnWebApp. Audit, optimize, monitor, and grow your website with technical SEO, keyword intelligence, competitor analysis, SEO reports, and AI-powered recommendations." %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ── Hero ── */
+    .seo-hero{background:linear-gradient(135deg,rgba(15,23,42,.65),rgba(30,41,59,.7)),url('{% static "img/seo.png" %}') center/cover no-repeat;padding:13rem 0 8rem;position:relative;overflow:hidden}
+    .seo-hero .container{position:relative;z-index:2}
+    .seo-hero-particles{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden}
+    .seo-hero-particle{position:absolute;border-radius:50%;background:rgba(30,64,175,.25);animation:seoFloat linear infinite}
+    @keyframes seoFloat{0%{transform:translateY(100vh) scale(0);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:translateY(-10vh) scale(1);opacity:0}}
+    .seo-hero .badge{background:linear-gradient(135deg,rgba(30,64,175,.2),rgba(30,64,175,.08))!important;border-color:rgba(30,64,175,.35)!important;box-shadow:0 0 20px rgba(30,64,175,.15)}
+
+    /* ── Reusable ── */
+    .seo-section{padding:5rem 0}
+    .seo-section-alt{background:var(--bg-surface-secondary);padding:5rem 0}
+    .seo-divider{width:60px;height:2px;background:linear-gradient(90deg,transparent,#1e40af,transparent);margin:0 auto 2rem;border-radius:2px}
+    .seo-section-label{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#1e40af;margin-bottom:.5rem}
+    .seo-section-title{font-weight:800;font-size:2rem;margin-bottom:.6rem}
+    .seo-section-desc{color:var(--text-muted);font-size:.95rem;line-height:1.7;max-width:640px}
+    .seo-section-desc mx-auto{margin-left:auto;margin-right:auto}
+    .seo-badge{display:inline-flex;align-items:center;gap:.35rem;font-size:.68rem;font-weight:700;letter-spacing:.04em;padding:.3rem .8rem;border-radius:999px;margin-bottom:1rem}
+    .seo-badge--blue{background:rgba(30,64,175,.1);border:1px solid rgba(30,64,175,.25);color:#1e40af}
+    .seo-badge--green{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);color:#16a34a}
+
+    /* ── Tools Grid ── */
+    .seo-tools{background:var(--bg-body);padding:5rem 0}
+    .seo-tool-card{background:var(--bg-surface);border:1px solid var(--border-color);border-radius:16px;padding:1.5rem;text-align:center;transition:all .4s;height:100%;position:relative;overflow:hidden}
+    .seo-tool-card::before{content:'';position:absolute;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,#1e40af,transparent 80%);opacity:0;transition:opacity .4s}
+    .seo-tool-card:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,.06);border-color:#1e40af}
+    .seo-tool-card:hover::before{opacity:1}
+    .seo-tool-icon{width:48px;height:48px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;font-size:1.1rem;margin-bottom:.75rem}
+    .seo-tool-icon.free{background:rgba(34,197,94,.1);color:#22c55e}
+    .seo-tool-icon.premium{background:rgba(30,64,175,.08);color:#1e40af}
+    .seo-tool-card .badge{font-size:.65rem;font-weight:700;letter-spacing:.04em}
+    .seo-tool-card h5{font-weight:700;font-size:.95rem;margin:.6rem 0 .4rem}
+    .seo-tool-card p{color:var(--text-muted);font-size:.8rem;line-height:1.6;margin-bottom:1rem}
+    .seo-tool-card .btn{font-size:.82rem;font-weight:700;border-radius:8px;padding:.5rem 1rem}
+
+    /* ── Problem / Split ── */
+    .seo-split-card{background:var(--bg-surface);border:1px solid var(--border-color);border-radius:20px;padding:2rem;height:100%}
+    .seo-split-card h6{font-weight:700;font-size:.9rem;display:flex;align-items:center;gap:.4rem;margin-bottom:.6rem}
+    .seo-split-card p{color:var(--text-muted);line-height:1.7;font-size:.88rem;margin-bottom:.6rem}
+    .seo-split-card ul{list-style:none;padding:0;margin:0}
+    .seo-split-card ul li{padding:.35rem 0;font-size:.82rem;color:var(--text-muted);display:flex;align-items:flex-start;gap:.5rem}
+    .seo-split-card ul li i{color:#1e40af;margin-top:.15rem;flex-shrink:0;font-size:.7rem}
+
+    /* ── Feature Cards ── */
+    .seo-feature{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center}
+    .seo-feature.reverse{direction:rtl}.seo-feature.reverse > *{direction:ltr}
+    .seo-feature-text h3{font-weight:800;font-size:1.6rem;margin-bottom:.5rem}
+    .seo-feature-text p{color:var(--text-muted);line-height:1.7;font-size:.92rem;margin-bottom:1rem}
+    .seo-feature-text ul{list-style:none;padding:0;margin:0}
+    .seo-feature-text ul li{padding:.35rem 0;font-size:.85rem;color:var(--text-muted);display:flex;align-items:flex-start;gap:.5rem}
+    .seo-feature-text ul li i{color:#1e40af;margin-top:.15rem;flex-shrink:0;font-size:.75rem}
+    .seo-feature-visual{background:linear-gradient(135deg,rgba(30,64,175,.04),rgba(30,64,175,.01));border:1px solid var(--border-color);border-radius:20px;padding:2.5rem;display:flex;flex-direction:column;gap:1rem}
+    .seo-feature-visual-item{display:flex;align-items:center;gap:.75rem;padding:1rem;border-radius:12px;background:var(--bg-surface);border:1px solid var(--border-color);transition:all .3s}
+    .seo-feature-visual-item:hover{border-color:#1e40af;transform:translateX(4px)}
+    .seo-feature-visual-item i{width:36px;height:36px;border-radius:10px;background:rgba(30,64,175,.08);color:#1e40af;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0}
+    .seo-feature-visual-item span{font-size:.88rem;font-weight:600;color:var(--text-primary)}
+    .seo-feature-link{display:inline-flex;align-items:center;gap:.3rem;font-size:.88rem;font-weight:700;color:#1e40af;margin-top:1rem;text-decoration:none;transition:all .3s}
+    .seo-feature-link:hover{gap:.5rem}
+
+    /* ── Process / Steps ── */
+    .seo-step-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.2rem}
+    .seo-step{text-align:center;padding:1.5rem;transition:all .4s;position:relative}
+    .seo-step:hover{transform:translateY(-4px)}
+    .seo-step-num{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#1e40af,#1e3a8a);color:#fff;font-size:.75rem;font-weight:800;display:inline-flex;align-items:center;justify-content:center;margin-bottom:.75rem}
+    .seo-step h6{font-weight:700;font-size:.88rem;margin-bottom:.4rem}
+    .seo-step p{color:var(--text-muted);font-size:.78rem;line-height:1.6;margin-bottom:0}
+
+    /* ── Intelligence Flow ── */
+    .seo-flow-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem}
+    .seo-flow-card{text-align:center;padding:2rem 1.5rem;border-radius:16px;background:var(--bg-surface);border:1px solid var(--border-color);transition:all .3s}
+    .seo-flow-card:hover{transform:translateY(-4px);box-shadow:0 8px 24px rgba(0,0,0,.05);border-color:#1e40af}
+    .seo-flow-icon{width:52px;height:52px;border-radius:14px;background:rgba(30,64,175,.08);color:#1e40af;display:inline-flex;align-items:center;justify-content:center;font-size:1.2rem;margin-bottom:.8rem}
+    .seo-flow-card h6{font-weight:700;font-size:.9rem;margin-bottom:.4rem}
+    .seo-flow-card p{color:var(--text-muted);font-size:.8rem;line-height:1.6;margin:0}
+
+    /* ── Audit Score ── */
+    .seo-audit-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+    .seo-audit-card{background:var(--bg-surface);border:1px solid var(--border-color);border-radius:16px;padding:2rem;text-align:center;transition:all .3s}
+    .seo-audit-card:hover{transform:translateY(-4px);border-color:#1e40af}
+    .seo-audit-icon{width:52px;height:52px;border-radius:14px;background:rgba(30,64,175,.08);color:#1e40af;display:inline-flex;align-items:center;justify-content:center;font-size:1.2rem;margin-bottom:.8rem}
+    .seo-audit-card h6{font-weight:700;font-size:.9rem;margin-bottom:.4rem}
+    .seo-audit-card p{color:var(--text-muted);font-size:.82rem;line-height:1.6;margin:0}
+
+    /* ── Table ── */
+    .seo-table-wrap{background:var(--bg-surface);border:1px solid var(--border-color);border-radius:20px;overflow:hidden}
+    .seo-compare-table{width:100%;border-collapse:collapse}
+    .seo-compare-table thead th{padding:1rem 1.25rem;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);background:var(--bg-surface-secondary);border-bottom:1px solid var(--border-color);text-align:left}
+    .seo-compare-table thead th:not(:first-child){text-align:center}
+    .seo-compare-table tbody tr{transition:all .3s;border-bottom:1px solid var(--border-color);border-left:3px solid transparent}
+    .seo-compare-table tbody tr:last-child{border-bottom:none}
+    .seo-compare-table tbody tr:hover{background:rgba(30,64,175,.03);border-left-color:#1e40af}
+    .seo-compare-table tbody td{padding:1rem 1.25rem;font-size:.85rem;color:var(--text-muted);vertical-align:top}
+    .seo-compare-table tbody td:not(:first-child){text-align:center}
+    .seo-compare-table tbody td:first-child{font-weight:700;color:var(--text-primary)}
+    .seo-compare-table .check{color:#22c55e;font-weight:700}
+
+    /* ── Teams ── */
+    .seo-teams-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+    .seo-team-card{background:var(--bg-surface);border:1px solid var(--border-color);border-radius:16px;padding:2rem;transition:all .3s}
+    .seo-team-card:hover{transform:translateY(-4px);border-color:#1e40af}
+    .seo-team-icon{width:48px;height:48px;border-radius:12px;background:rgba(30,64,175,.08);color:#1e40af;display:inline-flex;align-items:center;justify-content:center;font-size:1.1rem;margin-bottom:.8rem}
+    .seo-team-card h6{font-weight:700;font-size:.92rem;margin-bottom:.4rem}
+    .seo-team-card p{color:var(--text-muted);font-size:.82rem;line-height:1.6;margin:0}
+
+    /* ── Why Us ── */
+    .seo-why-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+    .seo-why-card{padding:1.5rem;border-radius:14px;background:var(--bg-surface);border:1px solid var(--border-color);transition:all .3s}
+    .seo-why-card:hover{border-color:#1e40af;transform:translateY(-2px)}
+    .seo-why-icon{width:40px;height:40px;border-radius:10px;background:rgba(30,64,175,.08);color:#1e40af;display:inline-flex;align-items:center;justify-content:center;font-size:.9rem;margin-bottom:.6rem}
+    .seo-why-card h6{font-weight:700;font-size:.88rem;margin-bottom:.3rem}
+    .seo-why-card p{color:var(--text-muted);font-size:.8rem;line-height:1.6;margin:0}
+
+    /* ── FAQ ── */
+    .seo-faq-item{border:1px solid var(--border-color);border-radius:12px;overflow:hidden;transition:all .3s;margin-bottom:.75rem}
+    .seo-faq-item:hover{border-color:#1e40af}
+    .seo-faq-q{padding:1.1rem 1.4rem;font-weight:700;font-size:.9rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;background:var(--bg-surface)}
+    .seo-faq-q i{transition:transform .3s;font-size:.8rem;color:#1e40af}
+    .seo-faq-a{padding:0 1.4rem;max-height:0;overflow:hidden;transition:all .35s;font-size:.88rem;line-height:1.7;color:var(--text-muted)}
+    .seo-faq-item.open .seo-faq-a{max-height:300px;padding:0 1.4rem 1.2rem}
+    .seo-faq-item.open .seo-faq-q i{transform:rotate(180deg)}
+
+    /* ── CTA ── */
+    .seo-final-cta{text-align:center;padding:5rem 0;background:linear-gradient(135deg,#0f172a,#1e293b);color:#fff}
+    .seo-final-cta h2{font-weight:800;font-size:2.2rem;margin-bottom:.75rem}
+    .seo-final-cta p{color:rgba(255,255,255,.65);max-width:520px;margin:0 auto 2rem;font-size:1rem;line-height:1.7}
+
+    .cta-btn-primary{display:inline-flex;align-items:center;gap:.5rem;padding:.9rem 2.2rem;border-radius:999px;font-weight:700;font-size:.95rem;color:#fff;background:linear-gradient(135deg,#1e40af,#1e3a8a);border:none;text-decoration:none;transition:all .35s cubic-bezier(.25,.46,.45,.94);box-shadow:0 4px 24px rgba(30,64,175,.35);position:relative;overflow:hidden}
+    .cta-btn-primary::after{content:'';position:absolute;top:-50%;left:-60%;width:40%;height:200%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent);transform:skewX(-20deg);transition:left .6s;pointer-events:none}
+    .cta-btn-primary:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 8px 32px rgba(30,64,175,.5);color:#fff}
+    .cta-btn-primary:hover::after{left:130%}
+    .cta-btn-secondary{display:inline-flex;align-items:center;gap:.5rem;padding:.9rem 2.2rem;border-radius:999px;font-weight:700;font-size:.95rem;color:rgba(255,255,255,.9);background:transparent;border:2px solid rgba(255,255,255,.25);text-decoration:none;transition:all .35s}
+    .cta-btn-secondary:hover{border-color:#60a5fa;color:#fff;transform:translateY(-2px)}
+
+    .seo-trust{display:flex;flex-wrap:wrap;justify-content:center;gap:1rem;margin-top:2rem}
+    .seo-trust-badge{display:inline-flex;align-items:center;gap:.4rem;padding:.45rem 1rem;border-radius:999px;font-size:.75rem;font-weight:600;color:rgba(255,255,255,.6);background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);transition:all .3s}
+    .seo-trust-badge:hover{border-color:rgba(255,255,255,.25);color:rgba(255,255,255,.9);transform:translateY(-1px)}
+    .seo-trust-badge i{font-size:.85rem;color:#60a5fa}
+
+    /* ── Back to Top ── */
+    .seo-back-to-top{position:fixed;bottom:2rem;right:2rem;width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#1e40af,#1e3a8a);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;z-index:9990;opacity:0;transform:translateY(20px);transition:all .3s;box-shadow:0 4px 16px rgba(30,64,175,.3)}
+    .seo-back-to-top.show{opacity:1;transform:translateY(0)}
+    .seo-back-to-top:hover{transform:translateY(-3px);box-shadow:0 6px 24px rgba(30,64,175,.4)}
+
+    /* ── Responsive ── */
+    @media(max-width:991.98px){.seo-feature{grid-template-columns:1fr}.seo-feature.reverse{direction:ltr}.seo-step-grid,.seo-flow-grid{grid-template-columns:repeat(2,1fr)}.seo-audit-grid,.seo-teams-grid,.seo-why-grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:767.98px){.seo-step-grid,.seo-flow-grid,.seo-audit-grid,.seo-teams-grid,.seo-why-grid{grid-template-columns:1fr}.seo-compare-table thead{display:none}.seo-compare-table tbody tr{display:block;padding:1rem}.seo-compare-table tbody td{display:block;padding:.4rem 0;text-align:left!important}.seo-compare-table tbody td::before{content:attr(data-label);display:block;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);margin-bottom:.2rem}section{padding-top:3rem!important;padding-bottom:3rem!important}}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded',function(){
+    var pc=document.getElementById('seoParticles');
+    if(pc){for(var i=0;i<20;i++){var p=document.createElement('div');p.className='seo-hero-particle';var s=Math.random()*4+2;p.style.width=s+'px';p.style.height=s+'px';p.style.left=Math.random()*100+'%';p.style.animationDuration=(Math.random()*10+8)+'s';p.style.animationDelay=(Math.random()*8)+'s';pc.appendChild(p)}}
+    var bt=document.getElementById('seoBackToTop');
+    if(bt){window.addEventListener('scroll',function(){bt.classList.toggle('show',window.pageYOffset>400)});bt.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})})}
+    document.querySelectorAll('.seo-faq-q').forEach(function(q){q.addEventListener('click',function(){this.parentElement.classList.toggle('open')})});
+});
+</script>
+{% endblock %}
+
+{% block content %}
+
+<!-- ═══════════ HERO ═══════════ -->
+<section class="seo-hero">
+    <div class="seo-hero-particles" id="seoParticles"></div>
+    <div class="container">
+        <div class="col-lg-8">
+            <span class="seo-badge seo-badge--blue"><i class="fas fa-search"></i> {% trans "SEO Services" %}</span>
+            <h1 class="display-5 fw-800 mb-3" style="color:#fff;">{% trans "SEO That Gets You Found — And Chosen" %}</h1>
+            <p class="lead mb-3" style="color:rgba(255,255,255,.65);max-width:580px;">
+                {% trans "Build stronger search visibility with data-driven SEO strategies designed to increase organic traffic, improve rankings, and turn more searches into real business opportunities." %}
+            </p>
+            <p class="mb-4" style="color:rgba(255,255,255,.5);font-size:.95rem;font-weight:600;letter-spacing:.03em;">
+                {% trans "Audit. Optimize. Monitor. Grow." %}
+            </p>
+            <div class="d-flex flex-wrap gap-3">
+                <a href="{% url 'seo_analyzer:free_pre_check' %}" class="cta-btn-primary">{% trans "Start Your SEO Audit" %} <i class="fas fa-arrow-right"></i></a>
+                <a href="#seo-tools" class="cta-btn-secondary">{% trans "Explore SEO Services" %}</a>
+            </div>
+            <p class="mt-4" style="color:rgba(255,255,255,.4);font-size:.82rem;">{% trans "Trusted by businesses that want measurable digital growth" %}</p>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ PROBLEM ═══════════ -->
+<section class="seo-section">
+    <div class="container">
+        <div class="text-center mx-auto mb-5">
+            <div class="seo-section-label">{% trans "The Problem" %}</div>
+            <h2 class="seo-section-title">{% trans "Being Online Isn't Enough." %}</h2>
+            <p class="seo-section-desc mx-auto">{% trans "Your website can look great and still remain invisible in search results." %}</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="seo-split-card">
+                    <h6><i class="fas fa-exclamation-triangle" style="color:#ef4444;"></i> {% trans "What's Holding You Back" %}</h6>
+                    <p>{% trans "Slow pages. Technical issues. Missing keywords. Weak content. Broken links. Poor structure. Competitors taking your traffic." %}</p>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="seo-split-card">
+                    <h6><i class="fas fa-lightbulb" style="color:#1e40af;"></i> {% trans "What OnWebApp Does" %}</h6>
+                    <p>{% trans "OnWebApp brings everything together to identify what's holding your website back — and shows you what to do next." %}</p>
+                    <a href="{% url 'seo_analyzer:free_pre_check' %}" class="seo-feature-link">{% trans "Discover what's limiting your visibility" %} <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ TECHNICAL SEO ═══════════ -->
+<section class="seo-section-alt">
+    <div class="container">
+        <div class="seo-feature">
+            <div class="seo-feature-text">
+                <div class="seo-section-label">{% trans "Technical SEO" %}</div>
+                <h3>{% trans "Build a Strong Foundation" %}</h3>
+                <p>{% trans "Make your website easier for search engines to crawl, understand, and index." %}</p>
+                <ul>
+                    <li><i class="fas fa-check"></i> {% trans "Crawlability analysis" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "Indexation checks" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "Broken links detection" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "Sitemap analysis" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "Robots.txt monitoring" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "Canonical checks" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "Structured data validation" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "Page speed insights" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "Mobile usability" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "HTTPS & security checks" %}</li>
+                </ul>
+                <a href="{% url 'seo_analyzer:checker' %}" class="seo-feature-link">{% trans "Explore Technical SEO" %} <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="seo-feature-visual" style="padding:0;overflow:hidden;">
+                <img src="{% static 'img/technicalSeo.png' %}" alt="{% trans 'Technical SEO Analytics Dashboard' %}" style="width:100%;height:100%;object-fit:cover;border-radius:20px;" loading="lazy">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ ON-PAGE SEO ═══════════ -->
+<section class="seo-section">
+    <div class="container">
+        <div class="seo-feature reverse">
+            <div class="seo-feature-text">
+                <div class="seo-section-label">{% trans "On-Page SEO" %}</div>
+                <h3>{% trans "Optimize Every Important Page" %}</h3>
+                <p>{% trans "Improve the elements that help search engines understand your content and users find what they need." %}</p>
+                <ul>
+                    <li><i class="fas fa-check"></i> {% trans "Title & meta description analysis" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "Heading structure" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "Keyword optimization" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "Internal linking" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "Image optimization" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "Content structure" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "URL analysis" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "Duplicate content detection" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "Search intent analysis" %}</li>
+                </ul>
+                <a href="{% url 'seo_analyzer:seo_home_marketing' %}" class="seo-feature-link">{% trans "Optimize Your Pages" %} <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="seo-feature-visual" style="padding:0;overflow:hidden;">
+                <img src="{% static 'img/onpageSeo.png' %}" alt="{% trans 'On-Page SEO Optimization' %}" style="width:100%;height:100%;object-fit:cover;border-radius:20px;" loading="lazy">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ SEO MONITORING ═══════════ -->
+<section class="seo-section-alt">
+    <div class="container">
+        <div class="text-center mx-auto mb-5">
+            <div class="seo-section-label">{% trans "SEO Monitoring" %}</div>
+            <h2 class="seo-section-title">{% trans "Know When Something Changes" %}</h2>
+            <p class="seo-section-desc mx-auto">{% trans "SEO isn't a one-time task. OnWebApp continuously monitors your website so you can identify important changes before they become bigger problems." %}</p>
+        </div>
+        <div class="row g-3">
+            {% for item in "Keyword visibility|Search performance|Technical health|Page availability|Broken links|Indexation issues|Core Web Vitals|Competitor activity"|make_list %}
+            {% endfor %}
+            <div class="col-lg-3 col-md-6"><div class="seo-feature-visual-item"><i class="fas fa-chart-line"></i> <span>{% trans "Keyword Visibility" %}</span></div></div>
+            <div class="col-lg-3 col-md-6"><div class="seo-feature-visual-item"><i class="fas fa-search"></i> <span>{% trans "Search Performance" %}</span></div></div>
+            <div class="col-lg-3 col-md-6"><div class="seo-feature-visual-item"><i class="fas fa-heartbeat"></i> <span>{% trans "Technical Health" %}</span></div></div>
+            <div class="col-lg-3 col-md-6"><div class="seo-feature-visual-item"><i class="fas fa-globe"></i> <span>{% trans "Page Availability" %}</span></div></div>
+            <div class="col-lg-3 col-md-6"><div class="seo-feature-visual-item"><i class="fas fa-unlink"></i> <span>{% trans "Broken Links" %}</span></div></div>
+            <div class="col-lg-3 col-md-6"><div class="seo-feature-visual-item"><i class="fas fa-index"></i> <span>{% trans "Indexation Issues" %}</span></div></div>
+            <div class="col-lg-3 col-md-6"><div class="seo-feature-visual-item"><i class="fas fa-tachometer-alt"></i> <span>{% trans "Core Web Vitals" %}</span></div></div>
+            <div class="col-lg-3 col-md-6"><div class="seo-feature-visual-item"><i class="fas fa-users"></i> <span>{% trans "Competitor Activity" %}</span></div></div>
+        </div>
+        <div class="text-center mt-4">
+            <a href="{% url 'seo_analyzer:monitoring' %}" class="cta-btn-primary">{% trans "Start Monitoring" %} <i class="fas fa-arrow-right"></i></a>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ SEO INTELLIGENCE ═══════════ -->
+<section class="seo-section">
+    <div class="container">
+        <div class="text-center mx-auto mb-5">
+            <div class="seo-section-label">{% trans "SEO Intelligence" %}</div>
+            <h2 class="seo-section-title">{% trans "Turn SEO Data Into Clear Actions" %}</h2>
+            <p class="seo-section-desc mx-auto">{% trans "Stop digging through dozens of tools and spreadsheets. OnWebApp transforms complex SEO data into clear insights and actionable recommendations." %}</p>
+        </div>
+        <div class="seo-flow-grid">
+            <div class="seo-flow-card">
+                <div class="seo-flow-icon"><i class="fas fa-crosshairs"></i></div>
+                <h6>{% trans "Identify" %}</h6>
+                <p>{% trans "Discover technical problems, ranking opportunities, content gaps, and optimization issues." %}</p>
+            </div>
+            <div class="seo-flow-card">
+                <div class="seo-flow-icon"><i class="fas fa-sort-amount-up"></i></div>
+                <h6>{% trans "Prioritize" %}</h6>
+                <p>{% trans "Understand which problems matter most and what should be fixed first." %}</p>
+            </div>
+            <div class="seo-flow-card">
+                <div class="seo-flow-icon"><i class="fas fa-magic"></i></div>
+                <h6>{% trans "Optimize" %}</h6>
+                <p>{% trans "Apply targeted improvements that can strengthen your search visibility." %}</p>
+            </div>
+            <div class="seo-flow-card">
+                <div class="seo-flow-icon"><i class="fas fa-chart-bar"></i></div>
+                <h6>{% trans "Measure" %}</h6>
+                <p>{% trans "Track changes over time and understand how your SEO performance evolves." %}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ SEO AUDIT ═══════════ -->
+<section class="seo-section-alt">
+    <div class="container">
+        <div class="text-center mx-auto mb-5">
+            <div class="seo-section-label">{% trans "SEO Audit" %}</div>
+            <h2 class="seo-section-title">{% trans "See Exactly What Search Engines See" %}</h2>
+            <p class="seo-section-desc mx-auto">{% trans "Get a complete overview of your website's SEO health." %}</p>
+        </div>
+        <div style="margin-bottom:2.5rem;border-radius:20px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.08);">
+            <img src="{% static 'img/what.png' %}" alt="{% trans 'SEO Audit Dashboard' %}" style="width:100%;height:auto;display:block;" loading="lazy">
+        </div>
+        <div class="text-center mt-4">
+            <a href="{% url 'seo_analyzer:free_pre_check' %}" class="cta-btn-primary">{% trans "Run Free SEO Audit" %} <i class="fas fa-arrow-right"></i></a>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ COMPETITOR SEO ═══════════ -->
+<section class="seo-section">
+    <div class="container">
+        <div class="seo-feature">
+            <div class="seo-feature-text">
+                <div class="seo-section-label">{% trans "Competitor SEO" %}</div>
+                <h3>{% trans "Don't Just Track Your Rankings. Understand Your Competition." %}</h3>
+                <p>{% trans "Your competitors are already competing for the searches that matter to your business. Discover where they are winning — and where opportunities are still available." %}</p>
+                <ul>
+                    <li><i class="fas fa-check"></i> {% trans "Keyword visibility" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "Content opportunities" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "Search positioning" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "Backlink signals" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "Competitor pages" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "Ranking movements" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "Content gaps" %}</li>
+                </ul>
+                <p class="mt-3" style="font-weight:700;color:var(--text-primary);">{% trans "Find the Opportunities They're Missing." %}</p>
+                <a href="{% url 'seo_analyzer:seo_home_marketing' %}" class="seo-feature-link">{% trans "Analyze Competitors" %} <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="seo-feature-visual">
+                <div class="seo-feature-visual-item"><i class="fas fa-eye"></i> <span>{% trans "Keyword Visibility" %}</span></div>
+                <div class="seo-feature-visual-item"><i class="fas fa-file-alt"></i> <span>{% trans "Content Opportunities" %}</span></div>
+                <div class="seo-feature-visual-item"><i class="fas fa-arrow-up"></i> <span>{% trans "Ranking Movements" %}</span></div>
+                <div class="seo-feature-visual-item"><i class="fas fa-link"></i> <span>{% trans "Backlink Signals" %}</span></div>
+                <div class="seo-feature-visual-item"><i class="fas fa-puzzle-piece"></i> <span>{% trans "Content Gaps" %}</span></div>
+            </div>
+    </div>
+</section>
+
+<!-- ═══════════ KEYWORD INTELLIGENCE ═══════════ -->
+<section class="seo-section-alt">
+    <div class="container">
+        <div class="seo-feature reverse">
+            <div class="seo-feature-text">
+                <div class="seo-section-label">{% trans "Keyword Intelligence" %}</div>
+                <h3>{% trans "Target Searches That Matter" %}</h3>
+                <p>{% trans "Ranking for the wrong keywords won't grow your business. Identify search opportunities based on relevance, competition, intent, and potential value." %}</p>
+                <ul>
+                    <li><i class="fas fa-check"></i> {% trans "Discover — Find keywords and topics relevant to your audience" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "Compare — Understand competition and search positioning" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "Prioritize — Focus your efforts on opportunities with the highest potential" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "Track — Monitor keyword performance over time" %}</li>
+                </ul>
+                <a href="{% url 'seo_analyzer:seo_home_marketing' %}" class="seo-feature-link">{% trans "Explore Keyword Tools" %} <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="seo-feature-visual" style="padding:0;overflow:hidden;">
+                <img src="https://images.unsplash.com/photo-1553729459-afe8f2e2ed8c?w=600&h=400&fit=crop" alt="{% trans 'Keyword Research Intelligence' %}" style="width:100%;height:100%;object-fit:cover;border-radius:20px;" loading="lazy">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ CONTENT SEO ═══════════ -->
+<section class="seo-section">
+    <div class="container">
+        <div class="seo-feature">
+            <div class="seo-feature-text">
+                <div class="seo-section-label">{% trans "Content SEO" %}</div>
+                <h3>{% trans "Create Content With Search Intent in Mind" %}</h3>
+                <p>{% trans "Great SEO content isn't about adding keywords everywhere. It's about answering the questions your audience is actually searching for." %}</p>
+                <ul>
+                    <li><i class="fas fa-check"></i> {% trans "Content gaps" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "Search intent" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "Related topics" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "Keyword opportunities" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "Internal linking opportunities" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "Underperforming pages" %}</li>
+                    <li><i class="fas fa-check"></i> {% trans "Content optimization opportunities" %}</li>
+                </ul>
+                <p class="mt-3" style="font-weight:700;color:var(--text-primary);">{% trans "Create content that serves both people and search engines." %}</p>
+            </div>
+            <div class="seo-feature-visual" style="padding:0;overflow:hidden;">
+                <img src="https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?w=600&h=400&fit=crop" alt="{% trans 'Content SEO Strategy' %}" style="width:100%;height:100%;object-fit:cover;border-radius:20px;" loading="lazy">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ SEO REPORTS ═══════════ -->
+<section class="seo-section-alt">
+    <div class="container">
+        <div class="text-center mx-auto mb-5">
+            <div class="seo-section-label">{% trans "SEO Reports" %}</div>
+            <h2 class="seo-section-title">{% trans "From SEO Data to Executive Insights" %}</h2>
+            <p class="seo-section-desc mx-auto">{% trans "Give your team a clear view of what's happening across your website." %}</p>
+        </div>
+        <div class="seo-flow-grid">
+            <div class="seo-flow-card">
+                <div class="seo-flow-icon"><i class="fas fa-robot"></i></div>
+                <h6>{% trans "Automated Reports" %}</h6>
+                <p>{% trans "Turn your SEO data into structured reports without manually collecting information." %}</p>
+            </div>
+            <div class="seo-flow-card">
+                <div class="seo-flow-icon"><i class="fas fa-chart-area"></i></div>
+                <h6>{% trans "Performance Trends" %}</h6>
+                <p>{% trans "See how your website's visibility changes over time." %}</p>
+            </div>
+            <div class="seo-flow-card">
+                <div class="seo-flow-icon"><i class="fas fa-list-ol"></i></div>
+                <h6>{% trans "Prioritized Recommendations" %}</h6>
+                <p>{% trans "Focus on the improvements that matter most." %}</p>
+            </div>
+            <div class="seo-flow-card">
+                <div class="seo-flow-icon"><i class="fas fa-share-alt"></i></div>
+                <h6>{% trans "Shareable Insights" %}</h6>
+                <p>{% trans "Make SEO performance easier to communicate with your team and clients." %}</p>
+            </div>
+        </div>
+        <div class="text-center mt-4">
+            <a href="{% url 'seo_analyzer:executive_kpi_dashboard' %}" class="cta-btn-primary">{% trans "Explore SEO Reports" %} <i class="fas fa-arrow-right"></i></a>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ AI-POWERED SEO ═══════════ -->
+<section class="seo-section">
+    <div class="container">
+        <div class="text-center mx-auto mb-5">
+            <div class="seo-section-label">{% trans "AI-Powered SEO" %}</div>
+            <h2 class="seo-section-title">{% trans "Smarter SEO. Less Guesswork." %}</h2>
+            <p class="seo-section-desc mx-auto">{% trans "Use AI to turn large amounts of SEO data into useful insights. OnWebApp can help identify patterns, summarize issues, detect anomalies, and generate recommendations based on your website's performance." %}</p>
+        </div>
+        <div class="seo-flow-grid">
+            <div class="seo-flow-card">
+                <div class="seo-flow-icon"><i class="fas fa-lightbulb"></i></div>
+                <h6>{% trans "AI Recommendations" %}</h6>
+                <p>{% trans "Get practical suggestions based on detected SEO issues." %}</p>
+            </div>
+            <div class="seo-flow-card">
+                <div class="seo-flow-icon"><i class="fas fa-exclamation-circle"></i></div>
+                <h6>{% trans "Anomaly Detection" %}</h6>
+                <p>{% trans "Identify unusual changes in your website's performance." %}</p>
+            </div>
+            <div class="seo-flow-card">
+                <div class="seo-flow-icon"><i class="fas fa-brain"></i></div>
+                <h6>{% trans "Automated Insights" %}</h6>
+                <p>{% trans "Transform complex data into understandable explanations." %}</p>
+            </div>
+            <div class="seo-flow-card">
+                <div class="seo-flow-icon"><i class="fas fa-shield-alt"></i></div>
+                <h6>{% trans "Predictive Monitoring" %}</h6>
+                <p>{% trans "Detect potential problems before they impact your visibility." %}</p>
+            </div>
+        </div>
+        <p class="text-center mt-4" style="color:var(--text-muted);font-size:.92rem;">{% trans "AI doesn't replace your SEO strategy. It makes your strategy faster and smarter." %}</p>
+    </div>
+</section>
+
+<!-- ═══════════ ONE WORKSPACE ═══════════ -->
+<section class="seo-section-alt">
+    <div class="container">
+        <div class="text-center mx-auto mb-5">
+            <div class="seo-section-label">{% trans "One SEO Workspace" %}</div>
+            <h2 class="seo-section-title">{% trans "Everything You Need. In One Place." %}</h2>
+            <p class="seo-section-desc mx-auto">{% trans "Instead of switching between multiple platforms, bring your SEO workflow together." %}</p>
+        </div>
+        <div class="seo-table-wrap mx-auto" style="max-width:800px;">
+            <table class="seo-compare-table">
+                <thead><tr><th>{% trans "Capability" %}</th><th>{% trans "OnWebApp" %}</th></tr></thead>
+                <tbody>
+                    {% for item in "SEO Audit|Technical SEO|On-Page SEO|Keyword Tracking|Competitor Analysis|SEO Monitoring|Broken Link Detection|Sitemap Analysis|Performance Monitoring|SEO Reports|AI Recommendations|Alerts"|make_list %}
+                    {% endfor %}
+                    <tr><td>{% trans "SEO Audit" %}</td><td><span class="check"><i class="fas fa-check-circle"></i></span></td></tr>
+                    <tr><td>{% trans "Technical SEO" %}</td><td><span class="check"><i class="fas fa-check-circle"></i></span></td></tr>
+                    <tr><td>{% trans "On-Page SEO" %}</td><td><span class="check"><i class="fas fa-check-circle"></i></span></td></tr>
+                    <tr><td>{% trans "Keyword Tracking" %}</td><td><span class="check"><i class="fas fa-check-circle"></i></span></td></tr>
+                    <tr><td>{% trans "Competitor Analysis" %}</td><td><span class="check"><i class="fas fa-check-circle"></i></span></td></tr>
+                    <tr><td>{% trans "SEO Monitoring" %}</td><td><span class="check"><i class="fas fa-check-circle"></i></span></td></tr>
+                    <tr><td>{% trans "Broken Link Detection" %}</td><td><span class="check"><i class="fas fa-check-circle"></i></span></td></tr>
+                    <tr><td>{% trans "Sitemap Analysis" %}</td><td><span class="check"><i class="fas fa-check-circle"></i></span></td></tr>
+                    <tr><td>{% trans "Performance Monitoring" %}</td><td><span class="check"><i class="fas fa-check-circle"></i></span></td></tr>
+                    <tr><td>{% trans "SEO Reports" %}</td><td><span class="check"><i class="fas fa-check-circle"></i></span></td></tr>
+                    <tr><td>{% trans "AI Recommendations" %}</td><td><span class="check"><i class="fas fa-check-circle"></i></span></td></tr>
+                    <tr><td>{% trans "Alerts" %}</td><td><span class="check"><i class="fas fa-check-circle"></i></span></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ HOW IT WORKS ═══════════ -->
+<section class="seo-section">
+    <div class="container">
+        <div class="text-center mx-auto mb-5">
+            <div class="seo-section-label">{% trans "How It Works" %}</div>
+            <h2 class="seo-section-title">{% trans "From Audit to Growth in Four Steps" %}</h2>
+        </div>
+        <div class="seo-step-grid">
+            <div class="seo-step">
+                <div class="seo-step-num">01</div>
+                <h6>{% trans "Connect" %}</h6>
+                <p>{% trans "Add your website and configure your monitoring settings." %}</p>
+            </div>
+            <div class="seo-step">
+                <div class="seo-step-num">02</div>
+                <h6>{% trans "Analyze" %}</h6>
+                <p>{% trans "OnWebApp scans your website and identifies technical, content, and performance issues." %}</p>
+            </div>
+            <div class="seo-step">
+                <div class="seo-step-num">03</div>
+                <h6>{% trans "Optimize" %}</h6>
+                <p>{% trans "Follow prioritized recommendations and improve the areas with the greatest potential impact." %}</p>
+            </div>
+            <div class="seo-step">
+                <div class="seo-step-num">04</div>
+                <h6>{% trans "Monitor" %}</h6>
+                <p>{% trans "Track your SEO health continuously and stay informed when something changes." %}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ BUILT FOR TEAMS ═══════════ -->
+<section class="seo-section-alt">
+    <div class="container">
+        <div class="text-center mx-auto mb-5">
+            <div class="seo-section-label">{% trans "Built for Different Teams" %}</div>
+            <h2 class="seo-section-title">{% trans "SEO for the Way You Work" %}</h2>
+        </div>
+        <div class="seo-teams-grid">
+            <div class="seo-team-card">
+                <div class="seo-team-icon"><i class="fas fa-building"></i></div>
+                <h6>{% trans "Businesses" %}</h6>
+                <p>{% trans "Increase organic visibility and attract more qualified visitors." %}</p>
+            </div>
+            <div class="seo-team-card">
+                <div class="seo-team-icon"><i class="fas fa-bullhorn"></i></div>
+                <h6>{% trans "Marketing Teams" %}</h6>
+                <p>{% trans "Centralize SEO data and monitor website performance." %}</p>
+            </div>
+            <div class="seo-team-card">
+                <div class="seo-team-icon"><i class="fas fa-handshake"></i></div>
+                <h6>{% trans "Agencies" %}</h6>
+                <p>{% trans "Manage SEO performance across multiple websites and clients." %}</p>
+            </div>
+            <div class="seo-team-card">
+                <div class="seo-team-icon"><i class="fas fa-city"></i></div>
+                <h6>{% trans "Enterprises" %}</h6>
+                <p>{% trans "Monitor large websites and identify technical issues at scale." %}</p>
+            </div>
+            <div class="seo-team-card">
+                <div class="seo-team-icon"><i class="fas fa-shopping-cart"></i></div>
+                <h6>{% trans "E-commerce" %}</h6>
+                <p>{% trans "Improve product visibility and discover search opportunities." %}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ WHY ONWEBAPP ═══════════ -->
+<section class="seo-section">
+    <div class="container">
+        <div class="text-center mx-auto mb-5">
+            <div class="seo-section-label">{% trans "Why OnWebApp?" %}</div>
+            <h2 class="seo-section-title">{% trans "SEO Should Be Clear, Not Complicated." %}</h2>
+        </div>
+        <div class="seo-why-grid">
+            <div class="seo-why-card">
+                <div class="seo-why-icon"><i class="fas fa-layer-group"></i></div>
+                <h6>{% trans "One Platform" %}</h6>
+                <p>{% trans "Bring audits, monitoring, analytics, and recommendations together." %}</p>
+            </div>
+            <div class="seo-why-card">
+                <div class="seo-why-icon"><i class="fas fa-bullseye"></i></div>
+                <h6>{% trans "Actionable Insights" %}</h6>
+                <p>{% trans "Know what is wrong, why it matters, and what to do next." %}</p>
+            </div>
+            <div class="seo-why-card">
+                <div class="seo-why-icon"><i class="fas fa-sync-alt"></i></div>
+                <h6>{% trans "Continuous Monitoring" %}</h6>
+                <p>{% trans "Don't wait for your next audit to discover a problem." %}</p>
+            </div>
+            <div class="seo-why-card">
+                <div class="seo-why-icon"><i class="fas fa-brain"></i></div>
+                <h6>{% trans "AI-Enhanced" %}</h6>
+                <p>{% trans "Use intelligent analysis to accelerate your SEO workflow." %}</p>
+            </div>
+            <div class="seo-why-card">
+                <div class="seo-why-icon"><i class="fas fa-rocket"></i></div>
+                <h6>{% trans "Built for Growth" %}</h6>
+                <p>{% trans "Designed to scale from a single website to complex digital ecosystems." %}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ FAQ ═══════════ -->
+<section class="seo-section-alt">
+    <div class="container" style="max-width:760px;">
+        <div class="text-center mx-auto mb-5">
+            <div class="seo-section-label">{% trans "FAQ" %}</div>
+            <h2 class="seo-section-title">{% trans "Frequently Asked Questions" %}</h2>
+        </div>
+        <div class="seo-faq-item open">
+            <div class="seo-faq-q">{% trans "What is SEO?" %} <i class="fas fa-chevron-down"></i></div>
+            <div class="seo-faq-a">{% trans "Search Engine Optimization (SEO) is the process of improving a website so that search engines can better understand it and users can discover it through relevant searches." %}</div>
+        </div>
+        <div class="seo-faq-item">
+            <div class="seo-faq-q">{% trans "How long does SEO take to work?" %} <i class="fas fa-chevron-down"></i></div>
+            <div class="seo-faq-a">{% trans "SEO results vary depending on your website, competition, industry, content, and the improvements being made. SEO is generally a long-term growth strategy rather than an instant solution." %}</div>
+        </div>
+        <div class="seo-faq-item">
+            <div class="seo-faq-q">{% trans "Can OnWebApp audit my website?" %} <i class="fas fa-chevron-down"></i></div>
+            <div class="seo-faq-a">{% trans "Yes. OnWebApp can analyze key technical, content, performance, and SEO signals to identify opportunities for improvement." %}</div>
+        </div>
+        <div class="seo-faq-item">
+            <div class="seo-faq-q">{% trans "Does SEO monitoring replace an SEO specialist?" %} <i class="fas fa-chevron-down"></i></div>
+            <div class="seo-faq-a">{% trans "No. Monitoring provides data and insights, while strategic decisions still benefit from human expertise." %}</div>
+        </div>
+        <div class="seo-faq-item">
+            <div class="seo-faq-q">{% trans "Can I monitor my competitors?" %} <i class="fas fa-chevron-down"></i></div>
+            <div class="seo-faq-a">{% trans "Competitor analysis can help you understand changes in search visibility, content opportunities, and competitive positioning." %}</div>
+        </div>
+        <div class="seo-faq-item">
+            <div class="seo-faq-q">{% trans "Does OnWebApp use AI for SEO?" %} <i class="fas fa-chevron-down"></i></div>
+            <div class="seo-faq-a">{% trans "Yes. AI can be used to analyze SEO data, identify patterns, summarize issues, and generate recommendations." %}</div>
+        </div>
+        <div class="seo-faq-item">
+            <div class="seo-faq-q">{% trans "Can I monitor multiple websites?" %} <i class="fas fa-chevron-down"></i></div>
+            <div class="seo-faq-a">{% trans "OnWebApp is designed to support organizations that need to manage and monitor multiple digital properties." %}</div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ FINAL CTA ═══════════ -->
+<section class="seo-final-cta">
+    <div class="container">
+        <h2>{% trans "Your Next Customer Is Already Searching." %}</h2>
+        <p>{% trans "Make sure they can find you. Analyze your website, discover what's holding your SEO back, and turn search visibility into measurable digital growth." %}</p>
+        <div class="d-flex flex-wrap gap-3 justify-content-center">
+            <a href="{% url 'seo_analyzer:free_pre_check' %}" class="cta-btn-primary">{% trans "Start Your SEO Journey" %} <i class="fas fa-arrow-right"></i></a>
+        </div>
+        <div class="seo-trust mt-4">
+            <div class="seo-trust-badge"><i class="fas fa-info-circle"></i> {% trans "No complicated setup" %}</div>
+            <div class="seo-trust-badge"><i class="fas fa-check-circle"></i> {% trans "Clear insights" %}</div>
+            <div class="seo-trust-badge"><i class="fas fa-list-alt"></i> {% trans "Actionable recommendations" %}</div>
+            <div class="seo-trust-badge"><i class="fas fa-sync"></i> {% trans "Continuous monitoring" %}</div>
+        </div>
+    </div>
+</section>
+
+<!-- BACK TO TOP -->
+<button class="seo-back-to-top" id="seoBackToTop" aria-label="{% trans 'Back to top' %}"><i class="fas fa-chevron-up"></i></button>
+
+{% endblock %}

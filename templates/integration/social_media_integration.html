@@ -1,0 +1,464 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans "Social Media Integration | OnWebApp" %}{% endblock %}
+{% block meta_description %}{% trans "Connect your social media platforms, automate posting, track engagement, and unify social intelligence with OnWebApp social media integration." %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ===== HERO ===== */
+    .smi-hero {
+        padding: 8rem 0 5rem;
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+        position: relative; overflow: hidden;
+    }
+    .smi-hero::before {
+        content: ''; position: absolute; inset: 0;
+        background: url("{% static 'img/integration-hero.jpeg' %}") center/cover no-repeat;
+        opacity: .08;
+    }
+    .smi-hero .breadcrumb { position: relative; z-index: 1; margin-bottom: 2rem; }
+    .smi-hero .breadcrumb-item a { color: rgba(255,255,255,.6); text-decoration: none; font-size: .85rem; }
+    .smi-hero .breadcrumb-item.active { color: #94a3b8; font-size: .85rem; }
+    .smi-hero .breadcrumb-item + .breadcrumb-item::before { color: rgba(255,255,255,.3); }
+    .smi-hero h1 { color: #fff; font-size: clamp(2.2rem, 5vw, 3.2rem); font-weight: 800; line-height: 1.1; margin-bottom: 1.25rem; }
+    .smi-hero .lead { color: rgba(255,255,255,.7); font-size: 1.1rem; max-width: 560px; line-height: 1.7; }
+    .smi-hero-badge {
+        display: inline-flex; align-items: center; gap: .5rem;
+        background: rgba(99,102,241,.15); border: 1px solid rgba(99,102,241,.3);
+        padding: .35rem .85rem; border-radius: 20px;
+        font-size: .75rem; font-weight: 600; color: #a5b4fc;
+        margin-bottom: 1.25rem;
+    }
+    .smi-hero-badge i { font-size: .7rem; }
+    .smi-hero-actions { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 2rem; }
+
+    /* ===== CTA BUTTONS ===== */
+    .cta-btn-primary {
+        display: inline-flex; align-items: center; gap: .5rem;
+        padding: .85rem 2rem; border-radius: 999px; font-weight: 700; font-size: .95rem;
+        background: linear-gradient(135deg, #1e40af, #3b82f6); color: #fff;
+        text-decoration: none; border: none; transition: all .3s;
+        box-shadow: 0 4px 16px rgba(30,64,175,.3);
+    }
+    .cta-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(30,64,175,.4); color: #fff; }
+    .cta-btn-secondary {
+        display: inline-flex; align-items: center; gap: .5rem;
+        padding: .85rem 2rem; border-radius: 999px; font-weight: 700; font-size: .95rem;
+        background: transparent; color: rgba(255,255,255,.8);
+        border: 1.5px solid rgba(255,255,255,.2); text-decoration: none; transition: all .3s;
+    }
+    .cta-btn-secondary:hover { border-color: rgba(255,255,255,.5); color: #fff; transform: translateY(-2px); }
+
+    /* ===== OVERVIEW ===== */
+    .smi-overview { padding: 5rem 0; background: var(--bg-body); }
+    .smi-overview-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+    .smi-overview-card {
+        background: var(--bg-surface); border: 1px solid var(--border-color);
+        border-radius: 16px; padding: 2rem; transition: all .3s;
+    }
+    .smi-overview-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,.08); }
+    .smi-overview-icon {
+        width: 48px; height: 48px; border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.1rem; margin-bottom: 1rem;
+    }
+    .smi-overview-card h3 { font-size: 1.05rem; font-weight: 800; margin-bottom: .5rem; }
+    .smi-overview-card p { color: var(--text-muted); font-size: .88rem; line-height: 1.6; margin: 0; }
+
+    /* ===== PLATFORMS ===== */
+    .smi-platforms { padding: 5rem 0; background: var(--bg-surface-secondary); }
+    .smi-platform-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; }
+    .smi-platform-card {
+        background: var(--bg-surface); border: 1px solid var(--border-color);
+        border-radius: 14px; padding: 1.5rem; text-align: center;
+        transition: all .3s;
+    }
+    .smi-platform-card:hover { border-color: #3b82f6; transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,.06); }
+    .smi-platform-icon {
+        width: 56px; height: 56px; border-radius: 14px; margin: 0 auto .75rem;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.4rem; font-weight: 800; color: #fff;
+    }
+    .smi-platform-card h4 { font-size: .95rem; font-weight: 700; margin-bottom: .25rem; }
+    .smi-platform-card p { color: var(--text-muted); font-size: .78rem; margin: 0; }
+
+    /* ===== FEATURES ===== */
+    .smi-features { padding: 5rem 0; background: var(--bg-body); }
+    .smi-feature-row {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 3rem;
+        align-items: center; margin-bottom: 4rem;
+    }
+    .smi-feature-row:last-child { margin-bottom: 0; }
+    .smi-feature-row.reverse { direction: rtl; }
+    .smi-feature-row.reverse > * { direction: ltr; }
+    .smi-feature-content h2 { font-size: 1.6rem; font-weight: 800; margin-bottom: 1rem; line-height: 1.2; }
+    .smi-feature-content p { color: var(--text-muted); font-size: .92rem; line-height: 1.7; margin-bottom: 1rem; }
+    .smi-feature-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: .75rem; }
+    .smi-feature-list li { display: flex; align-items: flex-start; gap: .6rem; font-size: .88rem; color: var(--text-muted); }
+    .smi-feature-list li i { color: #22c55e; margin-top: .2rem; font-size: .8rem; flex-shrink: 0; }
+    .smi-feature-visual {
+        background: var(--bg-surface); border: 1px solid var(--border-color);
+        border-radius: 20px; padding: 2rem; min-height: 300px;
+        display: flex; align-items: center; justify-content: center;
+    }
+    .smi-feature-visual-inner {
+        width: 100%; aspect-ratio: 4/3; border-radius: 12px;
+        background: linear-gradient(135deg, var(--bg-surface-secondary), var(--bg-body));
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: .75rem; color: var(--text-muted);
+    }
+    .smi-feature-visual-inner i { font-size: 2rem; color: #3b82f6; }
+
+    /* ===== WORKFLOW ===== */
+    .smi-workflow { padding: 5rem 0; background: var(--bg-surface-secondary); }
+    .smi-workflow-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; position: relative; }
+    .smi-workflow-steps::before {
+        content: ''; position: absolute; top: 36px; left: 12%; right: 12%;
+        height: 2px; background: var(--border-color); z-index: 0;
+    }
+    .smi-wf-step { text-align: center; position: relative; z-index: 1; }
+    .smi-wf-num {
+        width: 56px; height: 56px; border-radius: 50%;
+        background: linear-gradient(135deg, #1e40af, #3b82f6);
+        color: #fff; font-weight: 800; font-size: 1.1rem;
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 1rem; box-shadow: 0 4px 12px rgba(30,64,175,.25);
+    }
+    .smi-wf-step h4 { font-size: .95rem; font-weight: 700; margin-bottom: .3rem; }
+    .smi-wf-step p { color: var(--text-muted); font-size: .82rem; line-height: 1.5; margin: 0; }
+
+    /* ===== USE CASES TABLE ===== */
+    .smi-use-cases { padding: 5rem 0; background: var(--bg-body); }
+    .smi-table { width: 100%; border-collapse: separate; border-spacing: 0; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-color); }
+    .smi-table th {
+        background: var(--bg-surface-secondary); padding: .85rem 1rem;
+        font-size: .78rem; font-weight: 700; text-transform: uppercase;
+        letter-spacing: .05em; color: var(--text-muted); text-align: left;
+        border-bottom: 1px solid var(--border-color);
+    }
+    .smi-table td { padding: .85rem 1rem; font-size: .88rem; border-bottom: 1px solid var(--border-color); }
+    .smi-table tr:last-child td { border-bottom: none; }
+    .smi-table tr:hover td { background: var(--bg-surface); }
+
+    /* ===== CTA SECTION ===== */
+    .smi-cta { padding: 5rem 0; background: linear-gradient(135deg, #1e40af, #1e3a8a); color: #fff; text-align: center; }
+    .smi-cta h2 { font-size: 2rem; font-weight: 800; margin-bottom: 1rem; }
+    .smi-cta p { color: rgba(255,255,255,.75); font-size: 1rem; max-width: 520px; margin: 0 auto 2rem; }
+    .smi-trust-badges { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; margin-top: 2rem; }
+    .smi-trust-badge {
+        display: inline-flex; align-items: center; gap: .4rem;
+        background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.15);
+        padding: .35rem .75rem; border-radius: 8px;
+        font-size: .75rem; font-weight: 600; color: rgba(255,255,255,.85);
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media(max-width:960px) {
+        .smi-overview-grid { grid-template-columns: repeat(2, 1fr); }
+        .smi-platform-grid { grid-template-columns: repeat(2, 1fr); }
+        .smi-workflow-steps { grid-template-columns: repeat(2, 1fr); }
+        .smi-workflow-steps::before { display: none; }
+        .smi-feature-row { grid-template-columns: 1fr; }
+        .smi-feature-row.reverse { direction: ltr; }
+    }
+    @media(max-width:600px) {
+        .smi-overview-grid, .smi-platform-grid, .smi-workflow-steps { grid-template-columns: 1fr; }
+        .smi-hero { padding: 6rem 0 3rem; }
+        .smi-hero h1 { font-size: 1.8rem; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- 1. HERO -->
+<section class="smi-hero">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'home:home' %}">{% trans "Home" %}</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'services:index' %}">{% trans "Services" %}</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'integration:integration_homepage' %}">{% trans "Integration" %}</a></li>
+                <li class="breadcrumb-item active">{% trans "Social Media Integration" %}</li>
+            </ol>
+        </nav>
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="smi-hero-badge"><i class="fas fa-hashtag"></i>{% trans "Social Intelligence" %}</div>
+                <h1>{% trans "Social Media Integration" %}</h1>
+                <p class="lead">{% trans "Connect all your social platforms, automate content scheduling, track engagement metrics, and unify social intelligence across every channel from a single dashboard." %}</p>
+                <div class="smi-hero-actions">
+                    <a href="{% url 'contact:contact' %}" class="cta-btn-primary">{% trans "Get Started" %} <i class="fas fa-arrow-right"></i></a>
+                    <a href="#smi-overview" class="cta-btn-secondary">{% trans "Learn More" %}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 2. OVERVIEW -->
+<section id="smi-overview" class="smi-overview">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="section-kicker">{% trans "Why Social Media Integration" %}</span>
+            <h2 class="fw-800">{% trans "One platform. Every social channel." %}</h2>
+            <p class="text-muted" style="max-width:560px;margin:0 auto;">{% trans "Stop switching between apps. Manage, schedule, and analyze all your social media from one unified workspace." %}</p>
+        </div>
+        <div class="smi-overview-grid">
+            <div class="smi-overview-card">
+                <div class="smi-overview-icon" style="background:rgba(59,130,246,.1);color:#3b82f6;"><i class="fas fa-plug"></i></div>
+                <h3>{% trans "Unified Dashboard" %}</h3>
+                <p>{% trans "Connect Facebook, Instagram, LinkedIn, Twitter, TikTok, and YouTube. View all feeds, messages, and analytics in one place." %}</p>
+            </div>
+            <div class="smi-overview-card">
+                <div class="smi-overview-icon" style="background:rgba(34,197,94,.1);color:#22c55e;"><i class="fas fa-clock"></i></div>
+                <h3>{% trans "Smart Scheduling" %}</h3>
+                <p>{% trans "Plan weeks of content in advance. Our AI suggests optimal posting times based on your audience activity and engagement patterns." %}</p>
+            </div>
+            <div class="smi-overview-card">
+                <div class="smi-overview-icon" style="background:rgba(168,85,247,.1);color:#a855f7;"><i class="fas fa-chart-line"></i></div>
+                <h3>{% trans "Cross-Channel Analytics" %}</h3>
+                <p>{% trans "Compare performance across platforms. Track reach, engagement, follower growth, and ROI with unified reporting." %}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 3. PLATFORMS -->
+<section class="smi-platforms">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="section-kicker">{% trans "Supported Platforms" %}</span>
+            <h2 class="fw-800">{% trans "Connect every major social network." %}</h2>
+        </div>
+        <div class="smi-platform-grid">
+            <div class="smi-platform-card">
+                <div class="smi-platform-icon" style="background:#1877f2;"><i class="fab fa-facebook-f"></i></div>
+                <h4>Facebook</h4>
+                <p>{% trans "Pages, Groups, Ads, Messenger" %}</p>
+            </div>
+            <div class="smi-platform-card">
+                <div class="smi-platform-icon" style="background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);"><i class="fab fa-instagram"></i></div>
+                <h4>Instagram</h4>
+                <p>{% trans "Feed, Stories, Reels, DMs" %}</p>
+            </div>
+            <div class="smi-platform-card">
+                <div class="smi-platform-icon" style="background:#0a66c2;"><i class="fab fa-linkedin-in"></i></div>
+                <h4>LinkedIn</h4>
+                <p>{% trans "Company Pages, Articles, Ads" %}</p>
+            </div>
+            <div class="smi-platform-card">
+                <div class="smi-platform-icon" style="background:#000;"><i class="fab fa-x-twitter"></i></div>
+                <h4>X (Twitter)</h4>
+                <p>{% trans "Posts, Threads, Spaces, Ads" %}</p>
+            </div>
+            <div class="smi-platform-card">
+                <div class="smi-platform-icon" style="background:#000;"><i class="fab fa-tiktok"></i></div>
+                <h4>TikTok</h4>
+                <p>{% trans "Videos, Lives, Comments" %}</p>
+            </div>
+            <div class="smi-platform-card">
+                <div class="smi-platform-icon" style="background:#ff0000;"><i class="fab fa-youtube"></i></div>
+                <h4>YouTube</h4>
+                <p>{% trans "Videos, Shorts, Community" %}</p>
+            </div>
+            <div class="smi-platform-card">
+                <div class="smi-platform-icon" style="background:#ff4500;"><i class="fab fa-reddit-alien"></i></div>
+                <h4>Reddit</h4>
+                <p>{% trans "Posts, Comments, Moderation" %}</p>
+            </div>
+            <div class="smi-platform-card">
+                <div class="smi-platform-icon" style="background:#bd081c;"><i class="fab fa-pinterest"></i></div>
+                <h4>Pinterest</h4>
+                <p>{% trans "Pins, Boards, Shopping" %}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 4. FEATURES -->
+<section class="smi-features">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="section-kicker">{% trans "Features" %}</span>
+            <h2 class="fw-800">{% trans "Everything you need to master social." %}</h2>
+        </div>
+
+        <div class="smi-feature-row">
+            <div class="smi-feature-content">
+                <h2>{% trans "Content Calendar & Bulk Scheduling" %}</h2>
+                <p>{% trans "Plan, create, and schedule content across all platforms from a single drag-and-drop calendar. Upload hundreds of posts at once with our CSV bulk uploader." %}</p>
+                <ul class="smi-feature-list">
+                    <li><i class="fas fa-check-circle"></i>{% trans "Visual drag-and-drop content calendar" %}</li>
+                    <li><i class="fas fa-check-circle"></i>{% trans "Bulk upload via CSV with auto-optimization" %}</li>
+                    <li><i class="fas fa-check-circle"></i>{% trans "AI-recommended posting times per platform" %}</li>
+                    <li><i class="fas fa-check-circle"></i>{% trans "Content recycling for evergreen posts" %}</li>
+                </ul>
+            </div>
+            <div class="smi-feature-visual">
+                <div class="smi-feature-visual-inner">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>{% trans "Content Calendar" %}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="smi-feature-row reverse">
+            <div class="smi-feature-content">
+                <h2>{% trans "Social Listening & Monitoring" %}</h2>
+                <p>{% trans "Track brand mentions, hashtags, and competitor activity across all platforms in real-time. Get alerts when your brand is trending or when sentiment shifts." %}</p>
+                <ul class="smi-feature-list">
+                    <li><i class="fas fa-check-circle"></i>{% trans "Real-time brand mention tracking" %}</li>
+                    <li><i class="fas fa-check-circle"></i>{% trans "Sentiment analysis with AI scoring" %}</li>
+                    <li><i class="fas fa-check-circle"></i>{% trans "Competitor benchmarking and alerts" %}</li>
+                    <li><i class="fas fa-check-circle"></i>{% trans "Trend detection and opportunity alerts" %}</li>
+                </ul>
+            </div>
+            <div class="smi-feature-visual">
+                <div class="smi-feature-visual-inner">
+                    <i class="fas fa-ear-listen"></i>
+                    <span>{% trans "Social Listening" %}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="smi-feature-row">
+            <div class="smi-feature-content">
+                <h2>{% trans "Unified Inbox & Response Management" %}</h2>
+                <p>{% trans "Manage all comments, DMs, and mentions from every platform in a single inbox. Assign threads to team members, set up auto-replies, and never miss a message." %}</p>
+                <ul class="smi-feature-list">
+                    <li><i class="fas fa-check-circle"></i>{% trans "Single inbox for all social messages" %}</li>
+                    <li><i class="fas fa-check-circle"></i>{% trans "Team assignment and collision detection" %}</li>
+                    <li><i class="fas fa-check-circle"></i>{% trans "AI-powered auto-replies and chatbots" %}</li>
+                    <li><i class="fas fa-check-circle"></i>{% trans "SLA tracking and response time analytics" %}</li>
+                </ul>
+            </div>
+            <div class="smi-feature-visual">
+                <div class="smi-feature-visual-inner">
+                    <i class="fas fa-inbox"></i>
+                    <span>{% trans "Unified Inbox" %}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 5. WORKFLOW -->
+<section class="smi-workflow">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="section-kicker">{% trans "How It Works" %}</span>
+            <h2 class="fw-800">{% trans "Get started in four simple steps." %}</h2>
+        </div>
+        <div class="smi-workflow-steps">
+            <div class="smi-wf-step">
+                <div class="smi-wf-num">1</div>
+                <h4>{% trans "Connect Accounts" %}</h4>
+                <p>{% trans "Securely link your social media accounts via OAuth. No passwords stored." %}</p>
+            </div>
+            <div class="smi-wf-step">
+                <div class="smi-wf-num">2</div>
+                <h4>{% trans "Set Up Calendar" %}</h4>
+                <p>{% trans "Import existing content or create new posts. Set your posting schedule." %}</p>
+            </div>
+            <div class="smi-wf-step">
+                <div class="smi-wf-num">3</div>
+                <h4>{% trans "Automate & Publish" %}</h4>
+                <p>{% trans "Let AI optimize timing, or publish instantly across all channels." %}</p>
+            </div>
+            <div class="smi-wf-step">
+                <div class="smi-wf-num">4</div>
+                <h4>{% trans "Analyze & Optimize" %}</h4>
+                <p>{% trans "Track performance with unified analytics. Refine your strategy with data." %}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 6. USE CASES TABLE -->
+<section class="smi-use-cases">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="section-kicker">{% trans "Use Cases" %}</span>
+            <h2 class="fw-800">{% trans "Built for every industry." %}</h2>
+        </div>
+        <table class="smi-table">
+            <thead>
+                <tr>
+                    <th>{% trans "Industry" %}</th>
+                    <th>{% trans "Use Case" %}</th>
+                    <th>{% trans "Platforms" %}</th>
+                    <th>{% trans "Key Benefit" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>{% trans "E-Commerce" %}</strong></td>
+                    <td>{% trans "Product catalog sync, shoppable posts, review management" %}</td>
+                    <td>Instagram, Facebook, Pinterest</td>
+                    <td>{% trans "35% more social sales" %}</td>
+                </tr>
+                <tr>
+                    <td><strong>{% trans "SaaS" %}</strong></td>
+                    <td>{% trans "Lead gen campaigns, community building, product updates" %}</td>
+                    <td>LinkedIn, Twitter, YouTube</td>
+                    <td>{% trans "3x faster lead response" %}</td>
+                </tr>
+                <tr>
+                    <td><strong>{% trans "Media & Publishing" %}</strong></td>
+                    <td>{% trans "Content distribution, audience growth, cross-platform syndication" %}</td>
+                    <td>All platforms</td>
+                    <td>{% trans "50% wider content reach" %}</td>
+                </tr>
+                <tr>
+                    <td><strong>{% trans "Healthcare" %}</strong></td>
+                    <td>{% trans "Patient education, appointment scheduling, reputation management" %}</td>
+                    <td>Facebook, Instagram, LinkedIn</td>
+                    <td>{% trans "Improved patient trust" %}</td>
+                </tr>
+                <tr>
+                    <td><strong>{% trans "Restaurants & Hospitality" %}</strong></td>
+                    <td>{% trans "Menu promotions, event marketing, review monitoring" %}</td>
+                    <td>Instagram, TikTok, Facebook</td>
+                    <td>{% trans "40% more bookings" %}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- 7. CTA -->
+<section class="smi-cta">
+    <div class="container">
+        <h2>{% trans "Ready to unify your social presence?" %}</h2>
+        <p>{% trans "Connect all your social channels, automate your posting, and gain real-time social intelligence with OnWebApp." %}</p>
+        <div class="d-flex flex-wrap gap-3 justify-content-center">
+            <a href="{% url 'contact:contact' %}" class="cta-btn-primary">{% trans "Get Your Free Assessment" %} <i class="fas fa-arrow-right"></i></a>
+            <a href="{% url 'integration:integration_homepage' %}" class="cta-btn-secondary">{% trans "Back to Integration" %}</a>
+        </div>
+        <div class="smi-trust-badges">
+            <span class="smi-trust-badge"><i class="fas fa-lock"></i>{% trans "100% Free" %}</span>
+            <span class="smi-trust-badge"><i class="fas fa-clock"></i>{% trans "30-Min Consult" %}</span>
+            <span class="smi-trust-badge"><i class="fas fa-user-tie"></i>{% trans "Expert Architects" %}</span>
+            <span class="smi-trust-badge"><i class="fas fa-ban"></i>{% trans "No Obligation" %}</span>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var animElements = document.querySelectorAll('.animate-on-scroll');
+    var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.15 });
+    animElements.forEach(function(el) { observer.observe(el); });
+});
+</script>
+{% endblock %}

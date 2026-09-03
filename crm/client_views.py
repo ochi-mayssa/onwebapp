@@ -14,6 +14,7 @@ from datetime import timedelta
 from .models import Customer, Interaction, ClientTracking, OrderSnapshot
 from projects.models import Project
 from projects.models import Project, Invoice
+from home.models import WebsiteBuildRequest
 from .erp_sync import (
     get_customer_dashboard_data,
     calculate_order_completion_rate,
@@ -83,6 +84,9 @@ def client_tracking_portal(request):
     completed_projects = user_projects.filter(current_status='COMPLETED').count()
     delayed_projects = user_projects.filter(current_status='DELAYED').count()
     
+    # Build requests
+    build_requests = WebsiteBuildRequest.objects.filter(user=request.user).order_by('-created_at')[:5]
+    
     # Activity feed
     recent_interactions = Interaction.objects.filter(
         customer=customer
@@ -117,6 +121,9 @@ def client_tracking_portal(request):
         'completed_projects': completed_projects,
         'delayed_projects': delayed_projects,
         'upcoming_projects': upcoming_projects,
+        
+        # Build Requests
+        'build_requests': build_requests,
         
         # Health & Analytics
         'health_score': customer.current_health_score,

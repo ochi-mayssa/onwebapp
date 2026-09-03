@@ -327,6 +327,14 @@ STRIPE_PUBLISHABLE_KEY = os.environ.get('STRIPE_PUBLISHABLE_KEY', '')
 STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY', '')
 STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET', '')
 
+# Google PageSpeed Insights API key for KPI Performance testing
+PAGESPEED_API_KEY = os.environ.get('PAGESPEED_API_KEY', '')
+
+# Google Analytics 4 (GA4) OAuth 2.0 credentials
+GA4_CLIENT_ID = os.environ.get('GA4_CLIENT_ID', '')
+GA4_CLIENT_SECRET = os.environ.get('GA4_CLIENT_SECRET', '')
+GA4_REDIRECT_URI = os.environ.get('GA4_REDIRECT_URI', f'{SITE_URL}/platform-monitoring/ga4/callback/')
+
 # Celery configuration - default to local Redis broker if not provided.
 # To enable Celery usage in code, check USE_CELERY flag.
 USE_CELERY = os.environ.get('USE_CELERY', 'False').lower() in ('1', 'true', 'yes')

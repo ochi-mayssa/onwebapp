@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}My Projects - OnWebApp{% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-expand-lg navbar-glass sticky-top">
+    <div class="container-fluid">
+        <a class="navbar-brand py-0" href="{% url 'crm:client_tracking_portal' %}">
+            <span class="fw-bold">OnWebApp</span> <span class="text-primary fw-normal">Client Portal</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'crm:client_tracking_portal' %}">
+                        <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'crm:client_invoices_view' %}">
+                        <i class="fas fa-receipt me-1"></i>Invoices
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="{% url 'crm:client_projects_view' %}">
+                        <i class="fas fa-tasks me-1"></i>Projects
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'crm:client_account_view' %}">
+                        <i class="fas fa-user-circle me-1"></i>Account
+                    </a>
+                </li>
+                <li class="nav-item ms-3">
+                    <form method="post" action="{% url 'logout' %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                            <i class="fas fa-sign-out-alt me-2"></i>Logout
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 fw-bold mb-1"><i class="fas fa-tasks me-2 text-primary"></i>My Projects</h1>
+            <p class="text-muted mb-0">Track the progress of your active and completed projects</p>
+        </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-2" style="width:44px;height:44px;background:#eef2ff;">
+                        <i class="fas fa-folder-open text-primary"></i>
+                    </div>
+                    <h3 class="fw-bold mb-0">{{ stats.total }}</h3>
+                    <small class="text-muted">Total</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-2" style="width:44px;height:44px;background:#fef3c7;">
+                        <i class="fas fa-spinner text-warning"></i>
+                    </div>
+                    <h3 class="fw-bold mb-0">{{ stats.active }}</h3>
+                    <small class="text-muted">Active</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-2" style="width:44px;height:44px;background:#dcfce7;">
+                        <i class="fas fa-check-circle text-success"></i>
+                    </div>
+                    <h3 class="fw-bold mb-0">{{ stats.completed }}</h3>
+                    <small class="text-muted">Completed</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-2" style="width:44px;height:44px;background:#fee2e2;">
+                        <i class="fas fa-exclamation-triangle text-danger"></i>
+                    </div>
+                    <h3 class="fw-bold mb-0">{{ stats.delayed }}</h3>
+                    <small class="text-muted">Delayed</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Projects List -->
+    {% if projects %}
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">Project</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th class="pe-4 text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for project in projects %}
+                        <tr>
+                            <td class="ps-4">
+                                <div class="fw-semibold">{{ project.title }}</div>
+                                {% if project.description %}
+                                <small class="text-muted">{{ project.description|truncatewords:12 }}</small>
+                                {% endif %}
+                            </td>
+                            <td><span class="badge bg-light text-dark">{{ project.get_project_type_display|default:project.project_type }}</span></td>
+                            <td>
+                                {% if project.current_status == 'COMPLETED' %}
+                                    <span class="badge bg-success"><i class="fas fa-check me-1"></i>Completed</span>
+                                {% elif project.current_status == 'IN_PROGRESS' %}
+                                    <span class="badge bg-primary"><i class="fas fa-spinner me-1"></i>In Progress</span>
+                                {% elif project.current_status == 'DELAYED' %}
+                                    <span class="badge bg-danger"><i class="fas fa-exclamation me-1"></i>Delayed</span>
+                                {% elif project.current_status == 'CANCELLED' %}
+                                    <span class="badge bg-secondary"><i class="fas fa-ban me-1"></i>Cancelled</span>
+                                {% elif project.current_status == 'PLANNING' %}
+                                    <span class="badge bg-info"><i class="fas fa-compass me-1"></i>Planning</span>
+                                {% else %}
+                                    <span class="badge bg-light text-dark">{{ project.current_status|default:"Draft" }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ project.created_at|date:"M d, Y" }}</td>
+                            <td class="pe-4 text-end">
+                                <a href="{% url 'projects:project_detail' project.pk %}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                    <i class="fas fa-eye me-1"></i>View
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="card border-0 shadow-sm">
+        <div class="card-body text-center py-5">
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width:80px;height:80px;background:#f1f5f9;">
+                <i class="fas fa-folder-open fa-2x text-muted"></i>
+            </div>
+            <h5 class="fw-bold">No projects yet</h5>
+            <p class="text-muted mb-3">You don't have any projects assigned to you yet.</p>
+            <a href="{% url 'home:build_website' %}" class="btn btn-primary rounded-pill px-4">
+                <i class="fas fa-plus me-2"></i>Request a Build
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
