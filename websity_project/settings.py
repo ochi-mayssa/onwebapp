@@ -295,7 +295,8 @@ ALLOWED_DESIGN_EXTENSIONS = {
 }
 
 # Authentication redirects
-LOGIN_REDIRECT_URL = 'users:onboarding'
+LOGIN_URL = 'users:login_view'
+LOGIN_REDIRECT_URL = 'home:home'
 LOGOUT_REDIRECT_URL = '/'
 
 # Default primary key field type

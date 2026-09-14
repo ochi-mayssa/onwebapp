@@ -809,7 +809,7 @@ def wizard_autosave(request):
 # ---------------------------------------------------------------------------
 
 @login_required
-@user_passes_test(is_community_user, login_url='users:onboarding', redirect_field_name=None)
+@user_passes_test(is_community_user, login_url='users:login_view')
 def website_building(request):
     if request.method == 'POST':
         form = WebsiteIntakeForm(request.POST)
@@ -835,7 +835,7 @@ def website_building(request):
 
 
 @login_required
-@user_passes_test(is_community_user, login_url='users:onboarding', redirect_field_name=None)
+@user_passes_test(is_community_user, login_url='users:login_view')
 def package_selection(request):
     _ensure_plans_exist()
     basic_plan = PaymentPlan.objects.get(plan_type='basic_pkg')
