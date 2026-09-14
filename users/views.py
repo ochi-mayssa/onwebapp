@@ -327,38 +327,12 @@ def login_view(request):
 
         if user:
             login(request, user)
-            # log activity
             ActivityLog.objects.create(user=user, action='login', ip_address=_get_client_ip(request), metadata={'method': 'email'})
-            
-            # Branding role redirects (priority: specific roles first)
-            if user.groups.filter(name='TeamDesigners').exists():
-                return redirect('branding:team_designer_dashboard')
-            if user.groups.filter(name='Designers').exists():
-                return redirect('branding:designer_dashboard')
-            if user.groups.filter(name='Supervisors').exists():
-                return redirect('branding:supervisor_dashboard')
-            if user.is_superuser:
-                return redirect('root_dashboard:command_center')
-            if user.is_staff:
-                return redirect('branding:unified_dashboard')
 
-            # Client: check if they have branding requests
-            from branding.models import BrandingRequest
-            if BrandingRequest.objects.filter(user=user).exists():
-                return redirect('branding:my_requests')
-
-            # Check profile for direct redirection
-            try:
-                profile, created = UserProfile.objects.get_or_create(user=user)
-                if profile.service_type:
-                    return redirect('services:index')
-                else:
-                    return redirect('users:onboarding')
-            except Exception:
-                pass
-                
-            # Default to onboarding if no profile/service type found
-            return redirect('users:onboarding')
+            next_url = request.GET.get('next') or request.POST.get('next')
+            if next_url:
+                return redirect(next_url)
+            return redirect('home:home')
         else:
             messages.error(request, 'Invalid email or password')
             return render(request, 'registration/login.html', {'signup_form': signup_form, 'active_panel': 'login'})
