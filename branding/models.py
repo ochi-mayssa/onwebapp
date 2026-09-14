@@ -673,7 +673,7 @@ class BrandingNotification(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.notification_type} → {self.recipient}"
+        return f"{self.notification_type}  {self.recipient}"
 
     def mark_read(self):
         if not self.is_read:
@@ -1080,7 +1080,7 @@ class ProjectReview(models.Model):
     quality_checklist = models.JSONField(
         default=dict,
         blank=True,
-        help_text='Dict mapping checklist key → bool. Keys from QUALITY_CHECKLIST.',
+        help_text='Dict mapping checklist key  bool. Keys from QUALITY_CHECKLIST.',
     )
     notes = models.TextField(blank=True, default='')
     created_at = models.DateTimeField(auto_now_add=True)
@@ -1105,9 +1105,9 @@ class ProjectReview(models.Model):
         return round(checked / total * 100) if total else 0
 
 
-# ────────────────────────────────────────────────────────────────────────────
+# 
 # Design Drafts & Version Control
-# ────────────────────────────────────────────────────────────────────────────
+# 
 
 DRAFT_VERSION_TYPES = [
     ('major', 'Major'),
@@ -1212,9 +1212,9 @@ class DraftVersion(models.Model):
         super().save(*args, **kwargs)
 
 
-# ────────────────────────────────────────────────────────────────────────────
+# 
 # Feedback Requests
-# ────────────────────────────────────────────────────────────────────────────
+# 
 
 FEEDBACK_REQUEST_STATUS = [
     ('PENDING', 'Pending'),
@@ -1279,9 +1279,9 @@ class FeedbackQuestion(models.Model):
         return bool(self.client_answer)
 
 
-# ────────────────────────────────────────────────────────────────────────────
+# 
 # Design Resources Library
-# ────────────────────────────────────────────────────────────────────────────
+# 
 
 RESOURCE_CATEGORIES = [
     ('template', 'Template'),
@@ -1353,9 +1353,9 @@ class DesignResource(models.Model):
         self.save(update_fields=['download_count'])
 
 
-# ────────────────────────────────────────────────────────────────────────────
+# 
 # Time Tracking
-# ────────────────────────────────────────────────────────────────────────────
+# 
 
 TIME_TRACK_PHASES = [
     ('research', 'Research'),
@@ -1432,9 +1432,9 @@ class TimeEntry(models.Model):
         return {'total': total, 'by_phase': list(by_phase), 'entries': entries}
 
 
-# ────────────────────────────────────────────────────────────────────────────
+# 
 # Notes & Journal
-# ────────────────────────────────────────────────────────────────────────────
+# 
 
 NOTE_CATEGORIES = [
     ('design', 'Design Note'),
@@ -1474,9 +1474,9 @@ class DesignNote(models.Model):
         return f"{self.title} — {self.request}"
 
 
-# ────────────────────────────────────────────────────────────────────────────
+# 
 # Design Templates
-# ────────────────────────────────────────────────────────────────────────────
+# 
 
 TEMPLATE_CATEGORIES = [
     ('brief', 'Design Brief'),
@@ -1520,9 +1520,9 @@ class DesignTemplate(models.Model):
         self.save(update_fields=['use_count'])
 
 
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 # Peer Review System
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 
 REVIEW_STATUS = [
     ('PENDING', 'Pending'),
@@ -1604,7 +1604,7 @@ class PeerReview(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        return f"Review: {self.request} → {self.reviewer}"
+        return f"Review: {self.request}  {self.reviewer}"
 
     def complete(self):
         self.status = 'COMPLETED'
@@ -1642,9 +1642,9 @@ class PeerReviewFeedback(models.Model):
         return f"Feedback by {self.author} on {self.review}"
 
 
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 # Internal Comments
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 
 COMMENT_TAGS = [
     ('general', 'General'),
@@ -1738,9 +1738,9 @@ class DesignComment(models.Model):
         return re.findall(r'@(\w+)', self.content)
 
 
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 # Design Handoff System
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 
 HANDOFF_STATUS = [
     ('DRAFT', 'Draft'),
@@ -1873,9 +1873,9 @@ class HandoffNote(models.Model):
         return self.title
 
 
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 # Knowledge Base
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 
 KB_CATEGORIES = [
     ('tips', 'Design Tips'),
@@ -1944,9 +1944,9 @@ class KnowledgeArticle(models.Model):
         super().save(*args, **kwargs)
 
 
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 # Design Showcase
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 
 SHOWCASE_CATEGORIES = [
     ('branding', 'Branding'),
@@ -2004,9 +2004,9 @@ class ShowcaseProject(models.Model):
         self.save(update_fields=['like_count'])
 
 
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 # Figma Integration
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 
 class FigmaConnection(models.Model):
     """A connected Figma account."""
@@ -2093,9 +2093,9 @@ class FigmaComment(models.Model):
         return f"Comment by {self.author_name}: {self.message[:50]}"
 
 
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 # Adobe Creative Cloud Integration
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 
 class AdobeConnection(models.Model):
     """A connected Adobe Creative Cloud account."""
@@ -2164,9 +2164,9 @@ class AdobeAsset(models.Model):
         return f"{self.get_asset_type_display()}: {self.asset_name}"
 
 
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 # Design Tools
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 
 class ColorPalette(models.Model):
     """A saved color palette for quick access."""
@@ -2300,9 +2300,9 @@ class BrandGuidelineCheck(models.Model):
         return f"{self.check_name}: {self.get_result_display()}"
 
 
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 # Slack Integration
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 
 class SlackConnection(models.Model):
     """A connected Slack workspace."""
@@ -2369,9 +2369,9 @@ class SlackMessage(models.Model):
         return f"[{self.get_message_type_display()}] {self.text[:50]}"
 
 
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 # Calendar Integration
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 
 class CalendarConnection(models.Model):
     """A connected calendar account (Google Calendar, etc.)."""
@@ -2448,9 +2448,9 @@ class CalendarEvent(models.Model):
         return f"{self.title} ({self.start_time})"
 
 
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 # Unified Staff Dashboard
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 
 WIDGET_TYPES = [
     ('stats_quick', 'Quick Stats'),
@@ -2599,9 +2599,9 @@ class RoleSwitchLog(models.Model):
         return f"{self.user.username}: {self.from_role} -> {self.to_role}"
 
 
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 # Designer Workflow System
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 
 WORKFLOW_STAGES = [
     ('brief_review', 'Initial Brief Review'),
@@ -2909,9 +2909,9 @@ class CommunicationEntry(models.Model):
         return f"{self.get_interaction_type_display()}: {self.title[:60]}"
 
 
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 # Concept Presentation System
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 
 CONCEPT_TAGS = [
     ('modern', 'Modern'),
@@ -3437,9 +3437,9 @@ class ConceptPresentationSession(models.Model):
         return self.status == 'in_progress'
 
 
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 # Intelligent Questionnaire System
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 
 QUESTION_TYPES = [
     ('multiple_choice', 'Multiple Choice'),
@@ -4017,7 +4017,7 @@ class DesignerCollection(models.Model):
     fonts = models.JSONField(default=list, blank=True)
     accent_color = models.CharField(max_length=9, default='#6366f1')
 
-    # Collection preview kit (designer uploads → published to clients)
+    # Collection preview kit (designer uploads  published to clients)
     preview_image = models.ImageField(upload_to='designer/collections/previews/%Y/%m/', blank=True, null=True)
     hero_image = models.ImageField(upload_to='designer/collections/previews/%Y/%m/', blank=True, null=True)
     logo_image = models.ImageField(upload_to='designer/collections/previews/%Y/%m/', blank=True, null=True)

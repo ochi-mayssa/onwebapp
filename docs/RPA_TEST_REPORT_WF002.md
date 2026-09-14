@@ -50,7 +50,7 @@
 
 ## 4. Certification Result
 
-**Status**: 🔴 **FAIL**
+**Status**:  **FAIL**
 
 **Reason**: Core payment processing logic is missing (Mock only).
 

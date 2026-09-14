@@ -49,7 +49,7 @@
 
 <div class="container py-4 py-lg-5">
 
-    {# ── Hero Header ── #}
+    {#  Hero Header  #}
     <div class="cp-hero mb-4">
         <div class="d-flex align-items-start justify-content-between flex-wrap gap-3" style="position:relative;z-index:1">
             <div>
@@ -69,7 +69,7 @@
         </div>
     </div>
 
-    {# ── Metrics Cards ── #}
+    {#  Metrics Cards  #}
     {% if workflow %}
     <div class="row g-3 mb-4">
         <div class="col-6 col-md-4 col-xl-2">
@@ -121,7 +121,7 @@
         </div>
     </div>
 
-    {# ── Progress Stepper ── #}
+    {#  Progress Stepper  #}
     <div class="cp-progress">
         {% for sk, sl in stages %}
         <div class="cp-step {% if sk in workflow.completed_stages %}done{% endif %} {% if sk == workflow.current_stage %}active{% endif %}" style="background:{% if sk == workflow.current_stage %}#4f46e5{% elif sk in workflow.completed_stages %}#22c55e{% else %}#d1d5db{% endif %}" title="{{ sl }}">
@@ -131,10 +131,10 @@
     </div>
 
     <div class="row g-4">
-        {# ── Left Column ── #}
+        {#  Left Column  #}
         <div class="col-lg-8">
 
-            {# ── Design Versions ── #}
+            {#  Design Versions  #}
             <div class="cp-panel mb-4">
                 <div class="cp-panel-header">
                     <h6><i class="fa-solid fa-code-branch me-2 text-primary"></i>Design Versions</h6>
@@ -163,7 +163,7 @@
                 </div>
             </div>
 
-            {# ── Design Concepts ── #}
+            {#  Design Concepts  #}
             {% if concepts %}
             <div class="cp-panel mb-4">
                 <div class="cp-panel-header">
@@ -193,7 +193,7 @@
             </div>
             {% endif %}
 
-            {# ── Questions & Answers ── #}
+            {#  Questions & Answers  #}
             {% if questions %}
             <div class="cp-panel mb-4">
                 <div class="cp-panel-header">
@@ -215,7 +215,7 @@
             </div>
             {% endif %}
 
-            {# ── Your Feedback ── #}
+            {#  Your Feedback  #}
             {% if feedback_items %}
             <div class="cp-panel mb-4">
                 <div class="cp-panel-header">
@@ -244,10 +244,10 @@
             {% endif %}
         </div>
 
-        {# ── Right Column ── #}
+        {#  Right Column  #}
         <div class="col-lg-4">
 
-            {# ── Project Info ── #}
+            {#  Project Info  #}
             <div class="cp-panel mb-4">
                 <div class="cp-panel-header">
                     <h6><i class="fa-solid fa-circle-info me-2 text-secondary"></i>Project Info</h6>
@@ -291,7 +291,7 @@
                 </div>
             </div>
 
-            {# ── Quick Actions ── #}
+            {#  Quick Actions  #}
             <div class="cp-panel mb-4">
                 <div class="cp-panel-header">
                     <h6><i class="fa-solid fa-bolt me-2 text-warning"></i>Quick Actions</h6>
@@ -316,7 +316,7 @@
                 </div>
             </div>
 
-            {# ── Stage History ── #}
+            {#  Stage History  #}
             {% if stage_logs %}
             <div class="cp-panel mb-4">
                 <div class="cp-panel-header">
@@ -329,7 +329,7 @@
                         <div style="min-width:0;flex:1">
                             <div class="d-flex justify-content-between align-items-start">
                                 <span class="small fw-600">
-                                    {% if log.from_stage %}{{ log.from_stage }} → {% endif %}{{ log.to_stage }}
+                                    {% if log.from_stage %}{{ log.from_stage }}  {% endif %}{{ log.to_stage }}
                                 </span>
                                 <span class="x-small text-muted">{{ log.moved_at|timesince }} ago</span>
                             </div>
@@ -341,7 +341,7 @@
             </div>
             {% endif %}
 
-            {# ── Decisions ── #}
+            {#  Decisions  #}
             {% if decisions %}
             <div class="cp-panel mb-4">
                 <div class="cp-panel-header">
@@ -360,7 +360,7 @@
             </div>
             {% endif %}
 
-            {# ── Activity Timeline ── #}
+            {#  Activity Timeline  #}
             <div class="cp-panel mb-4">
                 <div class="cp-panel-header">
                     <h6><i class="fa-solid fa-stream me-2 text-secondary"></i>Activity</h6>
@@ -384,7 +384,7 @@
         </div>
     </div>
     {% else %}
-    {# ── No Workflow Yet ── #}
+    {#  No Workflow Yet  #}
     <div class="row g-3 mb-4">
         <div class="col-6 col-md-4 col-xl-2">
             <div class="cp-metric">

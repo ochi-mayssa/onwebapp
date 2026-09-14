@@ -4,7 +4,7 @@
 {% block branding_content %}
 <div class="container py-4">
 
-    {# ── Breadcrumb ── #}
+    {#  Breadcrumb  #}
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb small">
             <li class="breadcrumb-item"><a href="{% url 'branding:supervisor_dashboard' %}">Supervisor</a></li>
@@ -13,7 +13,7 @@
         </ol>
     </nav>
 
-    {# ── Header ── #}
+    {#  Header  #}
     <div class="d-flex align-items-start justify-content-between flex-wrap gap-3 mb-4">
         <div class="d-flex align-items-center gap-3">
             <div class="staff-avatar" style="width:56px;height:56px;font-size:1.4rem;">
@@ -34,7 +34,7 @@
         </div>
     </div>
 
-    {# ── Metrics Row ── #}
+    {#  Metrics Row  #}
     <div class="row g-3 mb-4">
         <div class="col-6 col-md-4 col-xl-2">
             <div class="supervisor-card">
@@ -80,7 +80,7 @@
         </div>
     </div>
 
-    {# ── Workload Bar ── #}
+    {#  Workload Bar  #}
     <div class="supervisor-panel mb-4">
         <h6 class="fw-bold mb-2">Workload Capacity</h6>
         <div class="d-flex align-items-center gap-3">
@@ -101,7 +101,7 @@
         </div>
     </div>
 
-    {# ── Tabs ── #}
+    {#  Tabs  #}
     <ul class="nav supervisor-tabs mb-4" role="tablist">
         <li class="nav-item">
             <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-current" type="button">
@@ -130,7 +130,7 @@
 
     <div class="tab-content">
 
-        {# ── Current Projects Tab ── #}
+        {#  Current Projects Tab  #}
         <div class="tab-pane fade show active" id="tab-current">
             {% if current_projects %}
             <div class="supervisor-panel">
@@ -166,7 +166,7 @@
             {% endif %}
         </div>
 
-        {# ── Completed Tab ── #}
+        {#  Completed Tab  #}
         <div class="tab-pane fade" id="tab-completed">
             {% if completed_projects %}
             <div class="supervisor-panel">
@@ -208,7 +208,7 @@
             {% endif %}
         </div>
 
-        {# ── Status Breakdown Tab ── #}
+        {#  Status Breakdown Tab  #}
         <div class="tab-pane fade" id="tab-status">
             <div class="supervisor-panel">
                 {% if status_dist %}
@@ -230,7 +230,7 @@
             </div>
         </div>
 
-        {# ── Notes Tab ── #}
+        {#  Notes Tab  #}
         <div class="tab-pane fade" id="tab-notes">
             {# Add Note Form #}
             <div class="supervisor-panel mb-4">

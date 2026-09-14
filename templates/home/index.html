@@ -1,781 +1,338 @@
 {% extends "base.html" %}
 {% load i18n static %}
 
-{% block title %}{% trans "OnWebApp — More Than Just a Website Builder" %}{% endblock %}
-{% block meta_description %}{% trans "OnWebApp: Built-in AI, automation, integration, and validation. Beyond the ordinary approach to web and application development. GDPR, ISO27001, WCAG compliant." %}{% endblock %}
-{% block og_title %}{% trans "OnWebApp — More Than Just a Website Builder" %}{% endblock %}
-{% block og_description %}{% trans "Built-in AI, automation, integration, and validation on website and application." %}{% endblock %}
-{% block twitter_title %}{% trans "OnWebApp — More Than Just a Website Builder" %}{% endblock %}
-{% block twitter_description %}{% trans "Built-in AI, automation, integration, and validation on website and application." %}{% endblock %}
+{% block title %}{% trans "OnWebApp — Build, Automate, Scale" %}{% endblock %}
+{% block meta_description %}{% trans "OnWebApp: All-in-one platform for web development, AI automation, ERP integration, and digital transformation. GDPR, ISO 27001, WCAG compliant." %}{% endblock %}
+{% block og_title %}{% trans "OnWebApp — Build, Automate, Scale" %}{% endblock %}
+{% block og_description %}{% trans "All-in-one platform for web development, AI automation, ERP integration, and digital transformation." %}{% endblock %}
+{% block twitter_title %}{% trans "OnWebApp — Build, Automate, Scale" %}{% endblock %}
+{% block twitter_description %}{% trans "All-in-one platform for web development, AI automation, ERP integration, and digital transformation." %}{% endblock %}
 
 {% block extra_css %}
 <style>
+/* ===== SCROLL PROGRESS ===== */
+.oh-scroll-progress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,#3b82f6,#8b5cf6,#ec4899);z-index:10000;width:0;transition:width .1s}
+
 /* ===== HERO ===== */
-.oh-hero{padding:9rem 0 5rem;background:var(--bg-body);position:relative;overflow:hidden}
-.oh-hero::before{content:'';position:absolute;top:-200px;right:-200px;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(30,64,175,.06) 0%,transparent 70%);pointer-events:none}
-.oh-hero-title{font-size:clamp(2.2rem,5.5vw,3.5rem);font-weight:800;line-height:1.1;letter-spacing:-.03em;margin-bottom:1rem}
-.oh-hero-sub{font-size:1.1rem;color:var(--text-muted);max-width:580px;line-height:1.7;margin-bottom:2rem}
-.oh-hero-badges{display:flex;flex-wrap:wrap;gap:.6rem;margin-bottom:2.5rem}
-.oh-badge{display:inline-flex;align-items:center;gap:.35rem;padding:.4rem .9rem;border-radius:50px;font-size:.75rem;font-weight:600;border:1px solid var(--border-color);background:var(--bg-surface);color:var(--text-muted)}
-.oh-badge i{font-size:.65rem}
-.oh-cta-primary{display:inline-flex;align-items:center;gap:.5rem;padding:.85rem 2rem;border-radius:50px;background:linear-gradient(135deg,#1e40af,#1e3a8a);color:#fff;font-weight:700;font-size:.95rem;text-decoration:none;transition:all .3s;box-shadow:0 4px 16px rgba(30,64,175,.25)}
-.oh-cta-primary:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(30,64,175,.35);color:#fff}
-.oh-cta-secondary{display:inline-flex;align-items:center;gap:.5rem;padding:.85rem 2rem;border-radius:50px;background:transparent;border:1.5px solid var(--border-color);color:var(--text-primary);font-weight:700;font-size:.95rem;text-decoration:none;transition:all .3s}
-.oh-cta-secondary:hover{border-color:#1e40af;color:#1e40af}
+.oh-hero{padding:11rem 0 7rem;background:linear-gradient(160deg,#0a0f1e 0%,#111827 35%,#0f172a 65%,#0a0f1e 100%);position:relative;overflow:hidden}
+.oh-hero::before{content:'';position:absolute;top:-400px;right:-300px;width:900px;height:900px;border-radius:50%;background:radial-gradient(circle,rgba(59,130,246,.1) 0%,transparent 65%);pointer-events:none;animation:heroPulse 8s ease-in-out infinite}
+.oh-hero::after{content:'';position:absolute;bottom:-300px;left:-200px;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.07) 0%,transparent 65%);pointer-events:none;animation:heroPulse 10s ease-in-out infinite reverse}
+@keyframes heroPulse{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.15);opacity:1}}
+.oh-hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:60px 60px;pointer-events:none}
+.oh-hero-title{font-size:clamp(2.6rem,6.5vw,4.2rem);font-weight:800;line-height:1.05;letter-spacing:-.045em;color:#fff;margin-bottom:1.5rem}
+.oh-hero-title .grad{background:linear-gradient(135deg,#60a5fa,#a78bfa,#f472b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;background-size:200% 200%;animation:gradShift 6s ease infinite}
+@keyframes gradShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.oh-hero-sub{font-size:1.12rem;color:#94a3b8;max-width:520px;line-height:1.8;margin-bottom:2.5rem}
+.oh-hero-badges{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:2.5rem}
+.oh-badge{display:inline-flex;align-items:center;gap:.4rem;padding:.4rem .85rem;border-radius:50px;font-size:.7rem;font-weight:600;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.03);color:#94a3b8;backdrop-filter:blur(8px);transition:all .3s}
+.oh-badge:hover{border-color:rgba(59,130,246,.3);background:rgba(59,130,246,.06);color:#60a5fa}
+.oh-badge i{font-size:.6rem;color:#3b82f6}
+.oh-cta-primary{display:inline-flex;align-items:center;gap:.55rem;padding:.9rem 2.2rem;border-radius:50px;background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;font-weight:700;font-size:.92rem;text-decoration:none;transition:all .35s cubic-bezier(.22,1,.36,1);box-shadow:0 4px 24px rgba(37,99,235,.25),inset 0 1px 0 rgba(255,255,255,.15);position:relative;overflow:hidden}
+.oh-cta-primary::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.15),transparent);opacity:0;transition:opacity .3s}
+.oh-cta-primary:hover{transform:translateY(-3px);box-shadow:0 8px 36px rgba(37,99,235,.35);color:#fff}
+.oh-cta-primary:hover::before{opacity:1}
+.oh-cta-secondary{display:inline-flex;align-items:center;gap:.55rem;padding:.9rem 2.2rem;border-radius:50px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#e2e8f0;font-weight:700;font-size:.92rem;text-decoration:none;transition:all .35s cubic-bezier(.22,1,.36,1);backdrop-filter:blur(8px)}
+.oh-cta-secondary:hover{border-color:rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;transform:translateY(-2px)}
+.oh-hero-stats{display:flex;gap:3rem;margin-top:3.5rem;padding-top:2.5rem;border-top:1px solid rgba(255,255,255,.06)}
+.oh-hero-stat-num{font-size:1.8rem;font-weight:800;color:#fff;line-height:1;background:linear-gradient(135deg,#fff,#94a3b8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.oh-hero-stat-label{font-size:.7rem;color:#64748b;text-transform:uppercase;letter-spacing:.07em;margin-top:.35rem}
+.oh-hero-scroll{position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.5rem;color:rgba(255,255,255,.3);font-size:.65rem;text-transform:uppercase;letter-spacing:.15em;animation:scrollBounce 2s ease-in-out infinite}
+.oh-hero-scroll i{font-size:.75rem}
+@keyframes scrollBounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(6px)}}
 
 /* ===== TRUST BAR ===== */
-.oh-trust{padding:3rem 0;border-top:1px solid var(--border-color);border-bottom:1px solid var(--border-color);background:var(--bg-surface)}
-.oh-trust-grid{display:flex;align-items:center;justify-content:center;gap:3rem;flex-wrap:wrap}
-.oh-trust-item{display:flex;align-items:center;gap:.5rem;font-size:.82rem;font-weight:600;color:var(--text-muted)}
-.oh-trust-item i{color:#1e40af;font-size:1rem}
-
-/* ===== PILLARS ===== */
-/* ===== APPROACH (redesigned) ===== */
-.onwebapp-approach{padding:100px 0 110px;background:#fff;position:relative;overflow:hidden}
-.onwebapp-approach::before{content:'';position:absolute;top:40%;left:50%;transform:translate(-50%,-50%);width:600px;height:400px;background:radial-gradient(ellipse,rgba(168,85,247,.03) 0%,transparent 70%);pointer-events:none}
-.onwebapp-approach::after{content:'';position:absolute;inset:0;background-image:radial-gradient(rgba(20,184,166,.02) 1px,transparent 1px);background-size:40px 40px;pointer-events:none}
-
-.onwebapp-approach-header{text-align:center;margin-bottom:52px;position:relative;z-index:1}
-.onwebapp-approach-eyebrow{display:inline-block;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:#14b8a6;margin-bottom:.85rem;background:rgba(20,184,166,.06);padding:.35rem 1rem;border-radius:2rem}
-.onwebapp-approach-title{font-size:clamp(1.8rem,4vw,2.6rem);font-weight:900;color:#0f172a;letter-spacing:-.03em;line-height:1.1;margin:0}
-.onwebapp-approach-title-accent{position:relative;display:inline-block}
-.onwebapp-approach-title-accent::after{content:'';position:absolute;bottom:-4px;left:0;right:0;height:6px;background:linear-gradient(90deg,rgba(20,184,166,.18),rgba(168,85,247,.18));border-radius:3px}
-.onwebapp-approach-desc{color:#64748b;font-size:.9rem;max-width:540px;margin:1.1rem auto 0;line-height:1.7;position:relative;z-index:1}
-
-.onwebapp-approach-system{position:relative;z-index:1;max-width:1140px;margin:0 auto}
-
-/* connection line */
-.onwebapp-approach-connector{position:absolute;top:52px;left:60px;right:60px;height:2px;z-index:0}
-.onwebapp-approach-connector-line{width:100%;height:100%;background:linear-gradient(90deg,rgba(30,64,175,.15),rgba(30,64,175,.25),rgba(30,64,175,.15));position:relative}
-.onwebapp-approach-connector-line::before{content:'';position:absolute;top:-3px;left:0;right:0;height:8px;background:rgba(30,64,175,.06);filter:blur(6px)}
-.onwebapp-approach-connector-dot{position:absolute;top:50%;transform:translateY(-50%);width:10px;height:10px;border-radius:50%;border:2px solid;background:#fff;z-index:1}
-.onwebapp-approach-connector-dot--1{left:0;border-color:#1e40af}
-.onwebapp-approach-connector-dot--2{left:25%;border-color:#1e40af}
-.onwebapp-approach-connector-dot--3{left:50%;border-color:#1e40af}
-.onwebapp-approach-connector-dot--4{left:75%;border-color:#1e40af}
-.onwebapp-approach-connector-dot--5{right:0;border-color:#1e40af}
-
-/* grid */
-.onwebapp-approach-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:20px;position:relative;z-index:1}
-
-/* card */
-.onwebapp-approach-card{position:relative;background:#fff;border:1px solid #e8ecf1;border-radius:20px;padding:28px 20px 24px;text-align:center;transition:all .35s cubic-bezier(.22,1,.36,1);cursor:default;display:flex;flex-direction:column;align-items:center}
-.onwebapp-approach-card:hover{transform:translateY(-5px);border-color:#d0d7e2;box-shadow:0 12px 36px rgba(0,0,0,.06),0 2px 8px rgba(0,0,0,.03)}
-.onwebapp-approach-card:hover .onwebapp-approach-icon-ring{transform:scale(1.06)}
-.onwebapp-approach-card:hover .onwebapp-approach-icon-ring::before{opacity:.4;inset:-8px}
-.onwebapp-approach-card:hover .onwebapp-approach-cta-arrow{transform:translateX(4px)}
-
-/* icon ring */
-.onwebapp-approach-icon-ring{width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:1.1rem;position:relative;transition:all .4s cubic-bezier(.22,1,.36,1)}
-.onwebapp-approach-icon-ring::before{content:'';position:absolute;inset:-5px;border-radius:50%;border:1.5px solid;opacity:.18;transition:all .4s}
-.onwebapp-approach-icon-ring svg{width:24px;height:24px;position:relative;z-index:1}
-
-/* color: blue (default) */
-.onwebapp-approach-card[data-color="blue"] .onwebapp-approach-icon-ring{background:linear-gradient(145deg,#1e40af,#1e3a8a);color:#fff;box-shadow:0 6px 20px rgba(30,64,175,.2)}
-.onwebapp-approach-card[data-color="blue"] .onwebapp-approach-icon-ring::before{border-color:#1e40af}
-.onwebapp-approach-card[data-color="blue"] .onwebapp-approach-label{color:#1e40af}
-.onwebapp-approach-card[data-color="blue"] .onwebapp-approach-indicator-line{background:rgba(30,64,175,.2)}
-.onwebapp-approach-card[data-color="blue"] .onwebapp-approach-indicator-dot{border-color:rgba(30,64,175,.35)}
-/* color: black (AI featured) */
-.onwebapp-approach-card[data-color="black"] .onwebapp-approach-icon-ring{background:linear-gradient(145deg,#0f172a,#1e293b);color:#fff;box-shadow:0 8px 28px rgba(15,23,42,.25)}
-.onwebapp-approach-card[data-color="black"] .onwebapp-approach-icon-ring::before{border-color:#0f172a;opacity:.25;inset:-7px}
-.onwebapp-approach-card[data-color="black"] .onwebapp-approach-label{color:#0f172a}
-.onwebapp-approach-card[data-color="black"] .onwebapp-approach-indicator-line{background:rgba(15,23,42,.2)}
-.onwebapp-approach-card[data-color="black"] .onwebapp-approach-indicator-dot{border-color:rgba(15,23,42,.35)}
-
-/* AI featured glow */
-.onwebapp-approach-card--featured{border-color:rgba(30,64,175,.15);box-shadow:0 2px 12px rgba(30,64,175,.06)}
-.onwebapp-approach-card--featured::before{content:'';position:absolute;inset:-1px;border-radius:20px;background:linear-gradient(135deg,rgba(30,64,175,.08),transparent 60%);pointer-events:none;z-index:0}
-.onwebapp-approach-card--featured .onwebapp-approach-badge{display:inline-flex}
-.onwebapp-approach-card--featured:hover{border-color:rgba(30,64,175,.25);box-shadow:0 14px 40px rgba(30,64,175,.1)}
-
-/* text */
-.onwebapp-approach-badge{display:none;align-items:center;gap:.3rem;font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#1e40af;background:rgba(30,64,175,.06);padding:.2rem .6rem;border-radius:2rem;margin-bottom:.6rem}
-.onwebapp-approach-label{font-size:.72rem;font-weight:600;margin-bottom:.15rem;letter-spacing:.03em}
-.onwebapp-approach-card-title{font-size:.95rem;font-weight:800;color:#0f172a;margin-bottom:.45rem;line-height:1.25;letter-spacing:-.01em}
-.onwebapp-approach-card-desc{color:#64748b;font-size:.76rem;line-height:1.65;margin:0;flex:1}
-
-/* indicator */
-.onwebapp-approach-indicator{display:flex;flex-direction:column;align-items:center;margin-top:1rem;gap:0}
-.onwebapp-approach-indicator-line{width:1px;height:18px}
-.onwebapp-approach-indicator-dot{width:7px;height:7px;border-radius:50%;border:1.5px solid;background:#fff;margin-top:-1px}
-
-/* CTA */
-.onwebapp-approach-cta{display:inline-flex;align-items:center;gap:.3rem;font-size:.75rem;font-weight:700;color:#1e40af;margin-top:.8rem;opacity:.6;transition:all .25s}
-.onwebapp-approach-card:hover .onwebapp-approach-cta{opacity:1}
-.onwebapp-approach-cta-arrow{transition:transform .3s ease-out;display:inline-block}
-
-/* responsive */
-@media(max-width:1199.98px){
-  .onwebapp-approach-grid{grid-template-columns:repeat(3,1fr);gap:18px}
-  .onwebapp-approach-connector{display:none}
-}
-@media(max-width:991.98px){
-  .onwebapp-approach-grid{grid-template-columns:repeat(2,1fr);gap:16px}
-  .onwebapp-approach{padding:80px 0}
-}
-@media(max-width:575.98px){
-  .onwebapp-approach{padding:60px 0}
-  .onwebapp-approach-grid{grid-template-columns:1fr;max-width:340px;margin:0 auto;gap:14px}
-  .onwebapp-approach-card{padding:24px 20px 20px}
-  .onwebapp-approach-header{margin-bottom:36px}
-}
-@media(prefers-reduced-motion:reduce){
-  .onwebapp-approach-card,.onwebapp-approach-icon-ring,.onwebapp-approach-icon-ring::before,.onwebapp-approach-cta-arrow{transition:none !important;transform:none !important}
-}
+.oh-trust{padding:2.5rem 0;border-top:1px solid rgba(255,255,255,.04);border-bottom:1px solid rgba(255,255,255,.04);background:rgba(15,23,42,.6);overflow:hidden;position:relative}
+.oh-trust::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(59,130,246,.2),transparent)}
+.oh-trust-track{display:flex;align-items:center;gap:3.5rem;animation:ohMarquee 35s linear infinite;width:max-content}
+.oh-trust-track:hover{animation-play-state:paused}
+.oh-trust-item{display:flex;align-items:center;gap:.5rem;font-size:.75rem;font-weight:600;color:#64748b;white-space:nowrap;transition:color .3s}
+.oh-trust-item:hover{color:#94a3b8}
+.oh-trust-item i{color:#3b82f6;font-size:.85rem}
+@keyframes ohMarquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 
 /* ===== SECTION COMMON ===== */
-.oh-section{padding:5rem 0}
-.oh-section-alt{background:var(--bg-surface)}
-.oh-section-title{font-size:clamp(1.6rem,3vw,2rem);font-weight:800;letter-spacing:-.02em;margin-bottom:.5rem}
-.oh-section-sub{color:var(--text-muted);font-size:.95rem;max-width:560px;line-height:1.7}
-.oh-section-label{display:inline-block;font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#1e40af;margin-bottom:.75rem}
+.oh-section{padding:7rem 0;position:relative}
+.oh-section-alt{background:#f8fafc}
+.oh-section-dark{background:#0f172a;color:#fff}
+.oh-section-divider{height:1px;background:linear-gradient(90deg,transparent,rgba(59,130,246,.12),transparent);margin:0 auto;max-width:600px}
+.oh-section-label{display:inline-flex;align-items:center;gap:.4rem;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#3b82f6;margin-bottom:.75rem}
+.oh-section-label::before{content:'';width:16px;height:2px;background:linear-gradient(90deg,#3b82f6,transparent);border-radius:2px}
+.oh-section-title{font-size:clamp(1.8rem,3.5vw,2.5rem);font-weight:800;letter-spacing:-.035em;margin-bottom:.6rem;line-height:1.15;color:#0f172a}
+.oh-section-sub{color:#64748b;font-size:.95rem;max-width:560px;line-height:1.75}
+.oh-section-dark .oh-section-title{color:#fff}
+.oh-section-dark .oh-section-sub{color:rgba(255,255,255,.5)}
 
-/* ===== ERP INTEGRATION ===== */
-.oh-erp-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center}
-.oh-erp-features{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:1.25rem}
-.oh-erp-features li{display:flex;gap:.75rem;align-items:flex-start}
-.oh-erp-features li .icon{width:40px;height:40px;border-radius:10px;background:rgba(30,64,175,.08);color:#1e40af;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0}
-.oh-erp-features li strong{display:block;font-size:.9rem;margin-bottom:.15rem}
-.oh-erp-features li small{font-size:.82rem;color:var(--text-muted);line-height:1.5}
+/* ===== SCROLL REVEAL ===== */
+.oh-reveal{opacity:0;transform:translateY(30px);transition:opacity .7s cubic-bezier(.22,1,.36,1),transform .7s cubic-bezier(.22,1,.36,1)}
+.oh-reveal.is-visible{opacity:1;transform:translateY(0)}
+.oh-reveal-delay-1{transition-delay:.1s}
+.oh-reveal-delay-2{transition-delay:.2s}
+.oh-reveal-delay-3{transition-delay:.3s}
+.oh-reveal-delay-4{transition-delay:.4s}
+.oh-reveal-delay-5{transition-delay:.5s}
 
-/* ===== AUTOMATION ===== */
-.oh-auto-tabs{display:flex;gap:.5rem;margin-bottom:2rem;flex-wrap:wrap}
-.oh-auto-tab{padding:.6rem 1.25rem;border-radius:50px;font-size:.82rem;font-weight:700;border:2px solid var(--border-color);background:var(--bg-surface);color:var(--text-muted);cursor:pointer;transition:all .2s}
-.oh-auto-tab:hover{border-color:#1e40af;color:#1e40af}
-.oh-auto-tab.active{background:linear-gradient(135deg,#1e40af,#1e3a8a);color:#fff;border-color:transparent}
-.oh-auto-panel{display:none}
-.oh-auto-panel.active{display:block}
-.oh-auto-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:2rem}
-.oh-auto-card{background:var(--bg-body);border:1px solid var(--border-color);border-radius:14px;padding:2rem}
-.oh-auto-card h6{font-weight:800;font-size:1rem;margin-bottom:.75rem}
-.oh-auto-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.6rem}
-.oh-auto-list li{display:flex;align-items:center;gap:.5rem;font-size:.85rem;color:var(--text-muted)}
-.oh-auto-list li i{color:#1e40af;font-size:.75rem;flex-shrink:0}
+/* ===== FIVE PILLARS ===== */
+.oh-pillars-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:1.25rem}
+.oh-pillar{background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:2rem 1.25rem;text-align:center;transition:all .4s cubic-bezier(.22,1,.36,1);position:relative;overflow:hidden}
+.oh-pillar::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--pillar-color,#3b82f6),var(--pillar-color-end,#8b5cf6));opacity:0;transition:opacity .35s}
+.oh-pillar::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,var(--pillar-color-end,rgba(139,92,246,.05)),transparent 70%);opacity:0;transition:opacity .35s}
+.oh-pillar:hover{transform:translateY(-8px);box-shadow:0 20px 50px rgba(0,0,0,.07);border-color:transparent}
+.oh-pillar:hover::before{opacity:1}
+.oh-pillar:hover::after{opacity:1}
+.oh-pillar-icon{width:56px;height:56px;border-radius:16px;display:inline-flex;align-items:center;justify-content:center;font-size:1.25rem;margin-bottom:1.25rem;background:var(--pillar-bg);color:var(--pillar-color);transition:all .35s;position:relative;z-index:1}
+.oh-pillar:hover .oh-pillar-icon{background:var(--pillar-color);color:#fff;transform:scale(1.1);box-shadow:0 8px 24px rgba(0,0,0,.1)}
+.oh-pillar-title{font-weight:700;font-size:.92rem;margin-bottom:.4rem;color:#0f172a;position:relative;z-index:1}
+.oh-pillar-desc{color:#64748b;font-size:.76rem;line-height:1.65;margin:0;position:relative;z-index:1}
 
-/* ===== DIGITAL MARKETING ===== */
-.oh-marketing-section{padding:6rem 0 5rem;background:#fff}
-.oh-pyramid{max-width:620px;margin:0 auto;font-family:'Inter',system-ui,-apple-system,sans-serif;display:flex;flex-direction:column;align-items:center;gap:0;position:relative}
+/* ===== ERP SECTION ===== */
+.oh-erp-grid{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
+.oh-erp-img{border-radius:20px;overflow:hidden;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.08)}
+.oh-erp-img::after{content:'';position:absolute;inset:0;border-radius:20px;border:1px solid rgba(255,255,255,.1);pointer-events:none}
+.oh-erp-img img{width:100%;display:block;border-radius:20px;transition:transform .5s}
+.oh-erp-img:hover img{transform:scale(1.03)}
+.oh-erp-list{list-style:none;padding:0;margin:1.5rem 0 0;display:flex;flex-direction:column;gap:1rem}
+.oh-erp-list li{display:flex;gap:.75rem;align-items:flex-start;transition:transform .3s}
+.oh-erp-list li:hover{transform:translateX(4px)}
+.oh-erp-list li .icon{width:44px;height:44px;border-radius:12px;background:rgba(37,99,235,.07);color:#2563eb;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0;transition:all .3s}
+.oh-erp-list li:hover .icon{background:#2563eb;color:#fff}
+.oh-erp-list li strong{display:block;font-size:.88rem;margin-bottom:.15rem;color:#0f172a}
+.oh-erp-list li small{font-size:.82rem;color:#64748b;line-height:1.55}
 
-/* animations */
-@keyframes pyrFadeUp{from{opacity:0;transform:translateY(24px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
-@keyframes pyrGlow{0%,100%{box-shadow:0 0 0 0 rgba(30,64,175,.2)}50%{box-shadow:0 0 24px 4px rgba(30,64,175,.12)}}
-@keyframes pyrBounce{0%,100%{transform:translateY(0);opacity:.35}50%{transform:translateY(4px);opacity:.6}}
-@keyframes pyrLineGrow{from{width:0}to{width:100%}}
+/* ===== AUTOMATION CARDS ===== */
+.oh-auto-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem}
+.oh-auto-card{background:#fff;border:1px solid #e2e8f0;border-radius:18px;overflow:hidden;transition:all .4s cubic-bezier(.22,1,.36,1)}
+.oh-auto-card:hover{transform:translateY(-6px);box-shadow:0 16px 40px rgba(37,99,235,.1);border-color:rgba(59,130,246,.2)}
+.oh-auto-card-img{height:160px;position:relative;overflow:hidden}
+.oh-auto-card-img img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
+.oh-auto-card:hover .oh-auto-card-img img{transform:scale(1.05)}
+.oh-auto-card-img::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(15,23,42,.85) 0%,rgba(15,23,42,.2) 40%,transparent 70%)}
+.oh-auto-card-overlay{position:absolute;bottom:.85rem;left:1.1rem;right:1.1rem;color:#fff;z-index:1}
+.oh-auto-card-overlay small{font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;opacity:.6;display:block;margin-bottom:.2rem}
+.oh-auto-card-overlay span{font-weight:700;font-size:.88rem}
+.oh-auto-card-body{padding:1.1rem 1.25rem}
+.oh-auto-card-body ul{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.45rem}
+.oh-auto-card-body li{display:flex;align-items:flex-start;gap:.45rem;font-size:.75rem;color:#475569;line-height:1.55}
+.oh-auto-card-body li i{color:#2563eb;font-size:.6rem;margin-top:.22rem;flex-shrink:0}
 
-/* top tier - gold accent */
-.oh-pyr-top{background:linear-gradient(135deg,#1e40af 0%,#2563eb 50%,#3b82f6 100%);color:#fff;padding:1rem 3rem;border-radius:14px;width:260px;position:relative;z-index:3;animation:pyrFadeUp .7s ease-out both,pyrGlow 3s ease-in-out 1.5s infinite;cursor:default;transition:transform .3s}
-.oh-pyr-top:hover{transform:scale(1.03)}
-.oh-pyr-top span{font-weight:800;font-size:.95rem;letter-spacing:-.01em;display:block}
-.oh-pyr-top small{display:block;font-size:.6rem;text-transform:uppercase;letter-spacing:.15em;opacity:.6;margin-top:.25rem}
-
-/* tier label line */
-.oh-pyr-label{font-size:.55rem;text-transform:uppercase;letter-spacing:.2em;color:#1e40af;font-weight:700;margin:1.25rem 0 .5rem;position:relative;display:inline-flex;align-items:center;gap:.5rem}
-.oh-pyr-label::before,.oh-pyr-label::after{content:'';height:1px;width:20px;background:rgba(30,64,175,.2)}
-
-/* arrows */
-.oh-pyr-arrow{display:flex;justify-content:center;margin:.4rem 0}
-.oh-pyr-arrow i{color:#1e40af;font-size:.5rem;animation:pyrBounce 1.8s ease-in-out infinite}
-
-/* middle tier - 3 boxes */
-.oh-pyr-mid{display:grid;grid-template-columns:repeat(3,1fr);gap:.65rem;width:460px;animation:pyrFadeUp .7s ease-out .15s both}
-.oh-pyr-box{background:#fafbfd;border:1px solid rgba(0,0,0,.05);border-radius:12px;padding:1.1rem .75rem 1rem;text-align:center;transition:all .35s cubic-bezier(.22,1,.36,1);cursor:default;position:relative;overflow:hidden}
-.oh-pyr-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#1e40af,transparent);opacity:0;transition:opacity .3s}
-.oh-pyr-box:hover{transform:translateY(-4px);border-color:rgba(30,64,175,.2);box-shadow:0 8px 24px rgba(30,64,175,.06)}
-.oh-pyr-box:hover::before{opacity:1}
-.oh-pyr-box-icon{width:34px;height:34px;border-radius:10px;background:rgba(30,64,175,.07);color:#1e40af;display:flex;align-items:center;justify-content:center;margin:0 auto .5rem;font-size:.8rem;transition:all .3s}
-.oh-pyr-box:hover .oh-pyr-box-icon{background:#1e40af;color:#fff;transform:scale(1.08)}
-.oh-pyr-box h6{font-weight:700;font-size:.8rem;margin:0 0 .2rem;color:#0f172a}
-.oh-pyr-box p{color:#64748b;font-size:.68rem;line-height:1.5;margin:0}
-
-/* bottom tier - widest */
-.oh-pyr-base{background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);color:#fff;padding:1.1rem 2.5rem;border-radius:14px;width:520px;animation:pyrFadeUp .7s ease-out .3s both;position:relative;cursor:default;transition:transform .3s}
-.oh-pyr-base:hover{transform:scale(1.01)}
-.oh-pyr-base h6{font-weight:800;font-size:.95rem;margin:0 0 .1rem;letter-spacing:-.01em}
-.oh-pyr-base small{opacity:.4;font-size:.6rem;display:block;letter-spacing:.15em;text-transform:uppercase}
-.oh-pyr-base::after{content:'';position:absolute;bottom:-8px;left:20%;right:20%;height:14px;background:rgba(15,23,42,.06);border-radius:50%;filter:blur(8px)}
-
-/* responsive */
-@media(max-width:575.98px){.oh-pyr-mid{grid-template-columns:1fr;width:260px}.oh-pyr-base{width:260px}}
+/* ===== PYRAMID ===== */
+.oh-pyramid{max-width:580px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:0}
+.oh-pyr-top{background:linear-gradient(135deg,#2563eb,#3b82f6);color:#fff;padding:1.1rem 3rem;border-radius:14px;width:280px;text-align:center;position:relative;z-index:3;box-shadow:0 8px 30px rgba(37,99,235,.2)}
+.oh-pyr-top span{font-weight:800;font-size:.92rem;display:block}
+.oh-pyr-top small{display:block;font-size:.58rem;text-transform:uppercase;letter-spacing:.15em;opacity:.6;margin-top:.2rem}
+.oh-pyr-label{font-size:.55rem;text-transform:uppercase;letter-spacing:.2em;color:#3b82f6;font-weight:700;margin:1rem 0 .5rem;display:inline-flex;align-items:center;gap:.5rem}
+.oh-pyr-label::before,.oh-pyr-label::after{content:'';height:1px;width:24px;background:linear-gradient(90deg,transparent,rgba(37,99,235,.25))}
+.oh-pyr-arrow i{color:#3b82f6;font-size:.5rem}
+.oh-pyr-mid{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;width:440px}
+.oh-pyr-box{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:1.1rem .8rem;text-align:center;transition:all .35s}
+.oh-pyr-box:hover{border-color:#3b82f6;box-shadow:0 10px 30px rgba(37,99,235,.08);transform:translateY(-3px)}
+.oh-pyr-box-icon{width:36px;height:36px;border-radius:10px;background:rgba(37,99,235,.06);color:#2563eb;display:flex;align-items:center;justify-content:center;margin:0 auto .5rem;font-size:.75rem;transition:all .3s}
+.oh-pyr-box:hover .oh-pyr-box-icon{background:#2563eb;color:#fff;transform:scale(1.1)}
+.oh-pyr-box h6{font-weight:700;font-size:.78rem;margin:0 0 .15rem;color:#0f172a}
+.oh-pyr-box p{color:#64748b;font-size:.64rem;line-height:1.55;margin:0}
+.oh-pyr-base{background:linear-gradient(135deg,#0f172a,#1e293b);color:#fff;padding:1.1rem 2.5rem;border-radius:14px;width:500px;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,.15)}
+.oh-pyr-base h6{font-weight:800;font-size:.92rem;margin:0 0 .1rem}
+.oh-pyr-base small{opacity:.4;font-size:.58rem;display:block;letter-spacing:.15em;text-transform:uppercase}
 
 /* ===== AI SECTION ===== */
-.oh-ai{background:linear-gradient(135deg,rgba(15,23,42,.6),rgba(30,41,59,.65)),url("{% static 'img/build.png' %}") center/cover no-repeat;color:#fff;padding:7rem 0}
-.oh-ai-grid{display:grid;grid-template-columns:1fr;gap:3rem;align-items:center;max-width:700px}
-.oh-ai h2{color:#fff;font-size:2.4rem}
-.oh-ai p{color:rgba(255,255,255,.65);font-size:1.05rem;line-height:1.75}
-.oh-ai-features{list-style:none;padding:0;margin:1.5rem 0 0;display:flex;flex-direction:column;gap:1rem}
-.oh-ai-features li{display:flex;gap:.75rem;align-items:flex-start}
+.oh-ai{background:linear-gradient(160deg,rgba(10,15,30,.9),rgba(30,41,59,.85)),url("{% static 'img/build.png' %}") center/cover no-repeat;color:#fff;padding:8rem 0;position:relative;overflow:hidden}
+.oh-ai::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent,rgba(0,0,0,.3));pointer-events:none}
+.oh-ai-grid{display:grid;grid-template-columns:1fr;gap:3rem;align-items:center;max-width:700px;position:relative;z-index:1}
+.oh-ai h2{color:#fff;font-size:2.3rem;font-weight:800;letter-spacing:-.035em}
+.oh-ai p{color:rgba(255,255,255,.55);font-size:1rem;line-height:1.8}
+.oh-ai-features{list-style:none;padding:0;margin:1.5rem 0 0;display:flex;flex-direction:column;gap:1.1rem}
+.oh-ai-features li{display:flex;gap:.8rem;align-items:flex-start;transition:transform .3s}
+.oh-ai-features li:hover{transform:translateX(4px)}
 .oh-ai-features li i{color:#60a5fa;margin-top:.2rem;font-size:.85rem;flex-shrink:0}
-.oh-ai-features li strong{display:block;font-size:.9rem;color:#fff}
-.oh-ai-features li small{font-size:.82rem;color:rgba(255,255,255,.5);line-height:1.5}
+.oh-ai-features li strong{display:block;font-size:.88rem;color:#fff}
+.oh-ai-features li small{font-size:.82rem;color:rgba(255,255,255,.45);line-height:1.55}
 
 /* ===== VALIDATION ===== */
-.oh-validation{padding:5.5rem 0;background:#fff}
-.oh-val-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center;max-width:1000px;margin:0 auto}
-.oh-val-text .oh-section-label{color:#059669}
-.oh-val-text .oh-section-title{text-align:left}
-.oh-val-text .oh-section-sub{text-align:left;max-width:100%;margin:1rem 0 0}
-
-/* dashboard mockup */
-.oh-val-dashboard{background:#0f172a;border-radius:16px;padding:1.25rem;box-shadow:0 20px 60px rgba(0,0,0,.12);position:relative;overflow:hidden}
+.oh-val-grid{display:grid;grid-template-columns:1fr 1fr;gap:3.5rem;align-items:center;max-width:1050px;margin:0 auto}
+.oh-val-dashboard{background:#0f172a;border-radius:18px;padding:1.5rem;box-shadow:0 24px 70px rgba(0,0,0,.15);position:relative;overflow:hidden}
 .oh-val-dashboard::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#10b981,#059669,#10b981)}
-
-/* dashboard top bar */
-.oh-val-bar{display:flex;align-items:center;gap:.4rem;margin-bottom:.85rem}
-.oh-val-bar-dot{width:7px;height:7px;border-radius:50%}
+.oh-val-bar{display:flex;align-items:center;gap:.45rem;margin-bottom:1rem}
+.oh-val-bar-dot{width:8px;height:8px;border-radius:50%}
 .oh-val-bar-dot:nth-child(1){background:#ef4444}
 .oh-val-bar-dot:nth-child(2){background:#f59e0b}
 .oh-val-bar-dot:nth-child(3){background:#10b981}
 .oh-val-bar-title{margin-left:.5rem;font-size:.6rem;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.1em}
-
-/* status row */
-.oh-val-status{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin-bottom:.75rem}
-.oh-val-status-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:.7rem .6rem;text-align:center}
-.oh-val-status-dot{width:5px;height:5px;border-radius:50%;background:#10b981;margin:0 auto .3rem;box-shadow:0 0 6px rgba(16,185,129,.5)}
+.oh-val-status{display:grid;grid-template-columns:repeat(3,1fr);gap:.65rem;margin-bottom:.85rem}
+.oh-val-status-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:.8rem .65rem;text-align:center;transition:all .3s}
+.oh-val-status-card:hover{background:rgba(255,255,255,.06);transform:translateY(-2px)}
+.oh-val-status-dot{width:6px;height:6px;border-radius:50%;background:#10b981;margin:0 auto .35rem;box-shadow:0 0 8px rgba(16,185,129,.5);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
 .oh-val-status-label{font-size:.5rem;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.3);margin-bottom:.15rem}
-.oh-val-status-value{font-size:.95rem;font-weight:800;color:#fff}
-
-/* gauge row */
-.oh-val-gauges{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin-bottom:.75rem}
+.oh-val-status-value{font-size:1rem;font-weight:800;color:#fff}
+.oh-val-gauges{display:grid;grid-template-columns:repeat(3,1fr);gap:.65rem;margin-bottom:.85rem}
 .oh-val-gauge{text-align:center}
-.oh-val-gauge-ring{width:50px;height:50px;border-radius:50%;border:3px solid rgba(255,255,255,.06);margin:0 auto .3rem;position:relative;display:flex;align-items:center;justify-content:center}
+.oh-val-gauge-ring{width:54px;height:54px;border-radius:50%;border:3px solid rgba(255,255,255,.06);margin:0 auto .35rem;position:relative;display:flex;align-items:center;justify-content:center}
 .oh-val-gauge-ring svg{position:absolute;inset:0;transform:rotate(-90deg)}
 .oh-val-gauge-ring circle{fill:none;stroke-width:3;stroke-linecap:round}
-.oh-val-gauge-pct{font-size:.7rem;font-weight:800;color:#fff}
-.oh-val-gauge-label{font-size:.5rem;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.3)}
-
-/* alert feed */
-.oh-val-feed{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);border-radius:8px;padding:.65rem}
-.oh-val-feed-title{font-size:.5rem;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.3);margin-bottom:.4rem}
-.oh-val-feed-item{display:flex;align-items:center;gap:.4rem;padding:.25rem 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.oh-val-gauge-pct{font-size:.72rem;font-weight:800;color:#fff}
+.oh-val-gauge-label{font-size:.48rem;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.3)}
+.oh-val-feed{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);border-radius:10px;padding:.7rem}
+.oh-val-feed-title{font-size:.48rem;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.3);margin-bottom:.45rem}
+.oh-val-feed-item{display:flex;align-items:center;gap:.45rem;padding:.3rem 0;border-bottom:1px solid rgba(255,255,255,.04)}
 .oh-val-feed-item:last-child{border:none}
-.oh-val-feed-dot{width:4px;height:4px;border-radius:50%;flex-shrink:0}
-.oh-val-feed-dot--ok{background:#10b981}
+.oh-val-feed-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.oh-val-feed-dot--ok{background:#10b981;box-shadow:0 0 6px rgba(16,185,129,.4)}
 .oh-val-feed-dot--warn{background:#f59e0b}
-.oh-val-feed-text{font-size:.6rem;color:rgba(255,255,255,.45);flex:1}
+.oh-val-feed-text{font-size:.62rem;color:rgba(255,255,255,.45);flex:1}
 .oh-val-feed-time{font-size:.5rem;color:rgba(255,255,255,.2)}
+.oh-val-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem;margin-top:3rem;max-width:1050px;margin-left:auto;margin-right:auto;border-top:1px solid rgba(0,0,0,.06);padding-top:2.5rem}
+.oh-val-stat{text-align:center}
+.oh-val-stat-num{font-size:1.6rem;font-weight:900;color:#0f172a;letter-spacing:-.03em;line-height:1}
+.oh-val-stat-label{font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;color:#64748b;margin-top:.35rem}
 
-/* stats bar */
-.oh-val-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-top:2.5rem;max-width:1000px;margin-left:auto;margin-right:auto;border-top:1px solid rgba(0,0,0,.06);padding-top:2rem}
-.oh-val-stat{text-align:center;padding:.5rem}
-.oh-val-stat-num{font-size:1.5rem;font-weight:900;color:#0f172a;letter-spacing:-.03em;line-height:1}
-.oh-val-stat-label{font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;color:#64748b;margin-top:.3rem}
+/* ===== SERVICES ===== */
+.oh-svc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+.oh-svc-card{background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:2rem;transition:all .4s cubic-bezier(.22,1,.36,1);position:relative;overflow:hidden}
+.oh-svc-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--svc-color,#2563eb);opacity:0;transition:opacity .35s}
+.oh-svc-card::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,var(--svc-bg,rgba(37,99,235,.03)),transparent 70%);opacity:0;transition:opacity .35s}
+.oh-svc-card:hover{transform:translateY(-6px);box-shadow:0 16px 40px rgba(0,0,0,.06);border-color:transparent}
+.oh-svc-card:hover::before{opacity:1}
+.oh-svc-card:hover::after{opacity:1}
+.oh-svc-card-icon{width:48px;height:48px;border-radius:14px;display:inline-flex;align-items:center;justify-content:center;font-size:1.1rem;margin-bottom:1.25rem;background:var(--svc-bg);color:var(--svc-color);transition:all .35s;position:relative;z-index:1}
+.oh-svc-card:hover .oh-svc-card-icon{background:var(--svc-color);color:#fff;transform:scale(1.08);box-shadow:0 6px 20px rgba(0,0,0,.1)}
+.oh-svc-card h5{font-weight:700;font-size:1rem;margin-bottom:.5rem;color:#0f172a;position:relative;z-index:1}
+.oh-svc-card p{color:#64748b;font-size:.82rem;line-height:1.65;margin:0;position:relative;z-index:1}
+.oh-svc-card-link{display:inline-flex;align-items:center;gap:.35rem;font-size:.78rem;font-weight:700;color:#2563eb;margin-top:1rem;text-decoration:none;transition:all .25s;position:relative;z-index:1}
+.oh-svc-card-link i{transition:transform .25s}
+.oh-svc-card-link:hover{gap:.6rem}
+.oh-svc-card-link:hover i{transform:translateX(2px)}
 
-/* responsive */
-@media(max-width:991.98px){.oh-val-grid{grid-template-columns:1fr;gap:2rem}.oh-val-text .oh-section-title{text-align:center}.oh-val-text .oh-section-sub{text-align:center}}
-@media(max-width:575.98px){.oh-val-stats{grid-template-columns:repeat(2,1fr);gap:.75rem}}
+/* ===== CERTIFICATIONS ===== */
+.oh-cert-grid{display:flex;justify-content:center;gap:1.5rem;flex-wrap:wrap}
+.oh-cert{display:flex;flex-direction:column;align-items:center;text-decoration:none;padding:1.4rem 1.6rem;border-radius:16px;border:1px solid transparent;transition:all .35s;min-width:135px;position:relative;overflow:hidden}
+.oh-cert::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(59,130,246,.03),rgba(139,92,246,.03));opacity:0;transition:opacity .35s}
+.oh-cert:hover{border-color:#e2e8f0;background:#f8fafc;transform:translateY(-4px)}
+.oh-cert:hover::before{opacity:1}
+.oh-cert-icon{width:52px;height:52px;border-radius:50%;border:1.5px solid #e2e8f0;background:#fff;display:flex;align-items:center;justify-content:center;margin-bottom:.7rem;transition:all .35s;position:relative;z-index:1}
+.oh-cert:hover .oh-cert-icon{border-color:#3b82f6;background:linear-gradient(135deg,#eff6ff,#f0f9ff)}
+.oh-cert-icon i{font-size:1.15rem;color:#2563eb;transition:transform .35s}
+.oh-cert:hover .oh-cert-icon i{transform:scale(1.1)}
+.oh-cert-name{font-size:.78rem;font-weight:700;color:#0f172a;margin-bottom:.1rem;position:relative;z-index:1}
+.oh-cert-desc{font-size:.63rem;color:#94a3b8;position:relative;z-index:1}
 
-/* ===== SERVICES GRID ===== */
-/* ===== SERVICES TABLE ===== */
-.oh-services{padding:5.5rem 0;background:#fff}
-.oh-svc-list{max-width:960px;margin:0 auto;display:flex;flex-direction:column;gap:0}
-.oh-svc-row{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center;padding:2.5rem 0;border-bottom:1px solid #f0f0f0}
-.oh-svc-row:last-child{border:none}
-.oh-svc-row:nth-child(even){direction:rtl}
-.oh-svc-row:nth-child(even)>*{direction:ltr}
+/* ===== EVENTS ===== */
+.oh-events-grid{display:grid;grid-template-columns:1.3fr 1fr 1fr;grid-template-rows:1fr 1fr;gap:1.25rem}
+.oh-event{background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:1.85rem;display:flex;flex-direction:column;justify-content:space-between;transition:all .4s cubic-bezier(.22,1,.36,1);cursor:pointer}
+.oh-event:hover{transform:translateY(-5px);border-color:rgba(59,130,246,.15);box-shadow:0 14px 36px rgba(37,99,235,.06)}
+.oh-event-featured{grid-row:1/3;background:linear-gradient(160deg,#0f172a,#1e293b);border-color:transparent}
+.oh-event-featured:hover{box-shadow:0 20px 50px rgba(0,0,0,.15)}
+.oh-event-featured .oh-event-date{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.1)}
+.oh-event-featured .oh-event-date-month{color:#60a5fa}
+.oh-event-featured .oh-event-date-year{color:#fff}
+.oh-event-featured .oh-event-title{color:#fff}
+.oh-event-featured .oh-event-desc{color:rgba(255,255,255,.5)}
+.oh-event-featured .oh-event-cta{color:#60a5fa}
+.oh-event-top{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:1rem}
+.oh-event-date{display:flex;flex-direction:column;align-items:center;min-width:50px;padding:.5rem;border-radius:10px;background:#f1f5f9;border:1px solid #e2e8f0;transition:all .3s}
+.oh-event-date-month{font-size:.55rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#2563eb;line-height:1}
+.oh-event-date-year{font-size:.68rem;font-weight:800;color:#0f172a;line-height:1.2;margin-top:.1rem}
+.oh-event-cat{display:inline-block;padding:.2rem .6rem;border-radius:2rem;font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.oh-event-cat--webinar{background:rgba(20,184,166,.08);color:#0d9488}
+.oh-event-cat--exhibition{background:rgba(37,99,235,.08);color:#2563eb}
+.oh-event-cat--seminar{background:rgba(139,92,246,.08);color:#8b5cf6}
+.oh-event-title{font-size:1rem;font-weight:700;color:#0f172a;line-height:1.3;margin-bottom:.4rem}
+.oh-event-desc{font-size:.8rem;color:#64748b;line-height:1.6;flex:1}
+.oh-event-cta{display:inline-flex;align-items:center;gap:.3rem;font-size:.78rem;font-weight:700;color:#2563eb;margin-top:.75rem;text-decoration:none;transition:gap .25s}
+.oh-event-cta i{transition:transform .25s}
+.oh-event-cta:hover{gap:.5rem}
+.oh-event-cta:hover i{transform:translateX(2px)}
+.oh-event-featured .oh-event-title{font-size:1.25rem}
 
-/* image placeholder */
-.oh-svc-img{width:100%;aspect-ratio:16/10;border-radius:14px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
-.oh-svc-img i{font-size:2.5rem;color:rgba(255,255,255,.9);position:relative;z-index:1}
-.oh-svc-img::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.1),transparent);pointer-events:none}
+/* ===== NEWS ===== */
+.oh-news-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
+.oh-news-featured{grid-column:1;grid-row:1/3;background:#fff;border:1px solid #e2e8f0;border-radius:22px;padding:2.25rem;display:flex;flex-direction:column;justify-content:space-between;transition:all .4s cubic-bezier(.22,1,.36,1);overflow:hidden;position:relative}
+.oh-news-featured::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#3b82f6,#8b5cf6);opacity:0;transition:opacity .35s}
+.oh-news-featured:hover{transform:translateY(-5px);border-color:rgba(59,130,246,.15);box-shadow:0 16px 48px rgba(37,99,235,.06)}
+.oh-news-featured:hover::before{opacity:1}
+.oh-news-badge{display:inline-block;padding:.25rem .65rem;border-radius:2rem;font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.oh-news-badge--ai{background:rgba(20,184,166,.08);color:#0d9488}
+.oh-news-badge--product{background:rgba(37,99,235,.08);color:#2563eb}
+.oh-news-badge--expansion{background:rgba(139,92,246,.08);color:#8b5cf6}
+.oh-news-badge--savings{background:rgba(245,158,11,.08);color:#d97706}
+.oh-news-card{background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:1.6rem;display:flex;flex-direction:column;justify-content:space-between;transition:all .4s cubic-bezier(.22,1,.36,1);min-height:165px}
+.oh-news-card:hover{transform:translateY(-5px);border-color:rgba(59,130,246,.15);box-shadow:0 12px 32px rgba(37,99,235,.06)}
+.oh-news-card-title{font-size:.95rem;font-weight:700;color:#0f172a;line-height:1.3;margin-bottom:.35rem}
+.oh-news-card-desc{font-size:.8rem;color:#64748b;line-height:1.6;flex:1}
+.oh-news-cta{display:inline-flex;align-items:center;gap:.3rem;font-size:.82rem;font-weight:700;color:#2563eb;text-decoration:none;transition:gap .25s}
+.oh-news-cta i{transition:transform .25s}
+.oh-news-cta:hover{gap:.5rem}
+.oh-news-cta:hover i{transform:translateX(2px)}
 
-.oh-svc-img--1{background:linear-gradient(135deg,#1e40af,#3b82f6)}
-.oh-svc-img--1 img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;z-index:0}
-.oh-svc-img--1 i{display:none}
-.oh-svc-img--2{background:linear-gradient(135deg,#7c3aed,#a78bfa)}
-.oh-svc-img--2 img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;z-index:0}
-.oh-svc-img--2 i{display:none}
-.oh-svc-img--3{background:linear-gradient(135deg,#059669,#34d399)}
-.oh-svc-img--3 img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;z-index:0}
-.oh-svc-img--3 i{display:none}
-.oh-svc-img--4{background:linear-gradient(135deg,#dc2626,#f87171)}
-.oh-svc-img--5{background:linear-gradient(135deg,#d97706,#fbbf24)}
-.oh-svc-img--6{background:linear-gradient(135deg,#0891b2,#67e8f9)}
-.oh-svc-img--6 img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;z-index:0}
-.oh-svc-img--6 i{display:none}
-.oh-svc-img--7{background:linear-gradient(135deg,#4f46e5,#818cf8)}
-.oh-svc-img--7 img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;z-index:0}
-.oh-svc-img--7 i{display:none}
-.oh-svc-img--8{background:linear-gradient(135deg,#be185d,#f472b6)}
-
-/* text */
-.oh-svc-content h3{font-size:1.15rem;font-weight:800;color:#111827;margin-bottom:.4rem;line-height:1.3}
-.oh-svc-content p{color:#6b7280;font-size:.88rem;line-height:1.7;margin:0 0 1rem}
-.oh-svc-link{display:inline-flex;align-items:center;gap:.4rem;font-size:.8rem;font-weight:600;color:#1e40af;text-decoration:none;transition:gap .2s}
-.oh-svc-link:hover{gap:.6rem}
-.oh-svc-link i{font-size:.7rem;transition:transform .2s}
-
-/* responsive */
-@media(max-width:767.98px){.oh-svc-row{grid-template-columns:1fr;gap:1.25rem;padding:2rem 0}.oh-svc-row:nth-child(even){direction:ltr}}
-
-/* ===== CERTIFICATIONS (redesigned) ===== */
-.onwebapp-certifications{padding:80px 0;background:#fff;position:relative;border-bottom:1px solid #f1f5f9}
-.onwebapp-certifications-header{text-align:center;margin-bottom:48px}
-.onwebapp-certifications-eyebrow{display:inline-block;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#1e40af;margin-bottom:.75rem;background:rgba(30,64,175,.06);padding:.35rem 1rem;border-radius:2rem}
-.onwebapp-certifications-heading{font-size:clamp(1.5rem,3vw,2rem);font-weight:800;color:#0f172a;letter-spacing:-.02em;margin-bottom:.5rem}
-.onwebapp-certifications-sub{font-size:.88rem;color:#64748b;max-width:460px;margin:0 auto;line-height:1.6}
-
-.onwebapp-certifications-grid{display:flex;justify-content:center;gap:2rem;flex-wrap:wrap}
-.onwebapp-certification-item{display:flex;flex-direction:column;align-items:center;text-decoration:none;position:relative;padding:1.2rem 1.5rem;border-radius:14px;border:1px solid transparent;transition:all .3s ease-out;cursor:default;min-width:140px}
-.onwebapp-certification-item:hover{border-color:#e2e8f0;background:#f8fafc;transform:translateY(-2px)}
-.onwebapp-certification-item:hover .onwebapp-cert-icon{border-color:#c7d2fe;background:#eef2ff}
-.onwebapp-cert-icon{width:52px;height:52px;border-radius:50%;border:1.5px solid #e2e8f0;background:#fff;display:flex;align-items:center;justify-content:center;margin-bottom:.65rem;transition:all .3s ease-out}
-.onwebapp-cert-icon svg{width:22px;height:22px;color:#1e40af}
-.onwebapp-cert-name{font-size:.8rem;font-weight:700;color:#0f172a;margin-bottom:.15rem}
-.onwebapp-cert-desc{font-size:.68rem;color:#94a3b8;font-weight:500}
-
-.onwebapp-cert-tooltip{position:absolute;bottom:calc(100% + 10px);left:50%;transform:translateX(-50%) translateY(4px);background:#0f172a;color:#fff;font-size:.7rem;font-weight:600;padding:.5rem .85rem;border-radius:8px;white-space:nowrap;opacity:0;pointer-events:none;transition:all .25s ease-out;z-index:10;line-height:1.4;text-align:center}
-.onwebapp-cert-tooltip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#0f172a}
-.onwebapp-certification-item:hover .onwebapp-cert-tooltip,.onwebapp-certification-item:focus .onwebapp-cert-tooltip{opacity:1;transform:translateX(-50%) translateY(0)}
-
-/* ===== EVENTS (redesigned) ===== */
-.onwebapp-events{padding:100px 0;background:#f8fafc;position:relative;overflow:hidden}
-.onwebapp-events::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:800px;height:600px;background:radial-gradient(circle,rgba(30,64,175,.03) 0%,transparent 70%);pointer-events:none}
-.onwebapp-events::after{content:'';position:absolute;inset:0;background-image:radial-gradient(rgba(30,64,175,.025) 1px,transparent 1px);background-size:32px 32px;pointer-events:none}
-
-.onwebapp-events-header{text-align:center;margin-bottom:56px;position:relative;z-index:1}
-.onwebapp-events-eyebrow{display:inline-block;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#1e40af;margin-bottom:.75rem;background:rgba(30,64,175,.06);padding:.35rem 1rem;border-radius:2rem}
-.onwebapp-events-heading{font-size:clamp(1.6rem,3.5vw,2.2rem);font-weight:800;color:#0f172a;letter-spacing:-.02em;margin-bottom:.6rem}
-.onwebapp-events-sub{font-size:.9rem;color:#64748b;max-width:520px;margin:0 auto;line-height:1.6}
-
-.onwebapp-events-grid{display:grid;grid-template-columns:1.3fr 1fr;grid-template-rows:1fr 1fr;gap:20px;position:relative;z-index:1}
-
-.onwebapp-event-card{background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:30px;display:flex;flex-direction:column;justify-content:space-between;transition:all .3s ease-out;cursor:pointer;position:relative;overflow:hidden}
-.onwebapp-event-card:hover{transform:translateY(-4px);border-color:#c7d2fe;box-shadow:0 12px 36px rgba(30,64,175,.07)}
-.onwebapp-event-card:hover .onwebapp-event-cta-arrow{transform:translateX(5px)}
-.onwebapp-event-card:hover .onwebapp-event-visual{opacity:.15}
-
-.onwebapp-event-featured{grid-row:1/3;position:relative}
-.onwebapp-event-featured .onwebapp-event-visual{position:absolute;top:0;right:0;width:50%;height:100%;pointer-events:none;z-index:0;opacity:.07;transition:opacity .35s ease-out}
-.onwebapp-event-featured .onwebapp-event-visual svg{width:100%;height:100%}
-
-.onwebapp-event-top{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:1.2rem;position:relative;z-index:1}
-.onwebapp-event-date{display:flex;flex-direction:column;align-items:center;min-width:54px;padding:.6rem .5rem;border-radius:12px;background:#f1f5f9;border:1px solid #e2e8f0;flex-shrink:0}
-.onwebapp-event-date-month{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#1e40af;line-height:1}
-.onwebapp-event-date-year{font-size:.72rem;font-weight:800;color:#0f172a;line-height:1.2;margin-top:.15rem}
-.onwebapp-event-category{display:inline-block;padding:.25rem .7rem;border-radius:2rem;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
-.onwebapp-event-category--webinar{background:rgba(20,184,166,.08);color:#0d9488}
-.onwebapp-event-category--exhibition{background:rgba(30,64,175,.08);color:#1e40af}
-.onwebapp-event-category--seminar{background:rgba(124,58,237,.08);color:#7c3aed}
-
-.onwebapp-event-title{font-size:1.1rem;font-weight:800;color:#0f172a;letter-spacing:-.01em;line-height:1.3;margin-bottom:.5rem;position:relative;z-index:1}
-.onwebapp-event-desc{font-size:.82rem;color:#64748b;line-height:1.6;margin:0;position:relative;z-index:1;flex:1}
-.onwebapp-event-meta{display:flex;align-items:center;gap:.5rem;margin-top:.75rem;position:relative;z-index:1}
-.onwebapp-event-meta-tag{font-size:.65rem;font-weight:600;color:#94a3b8;display:inline-flex;align-items:center;gap:.25rem}
-.onwebapp-event-meta-tag svg{width:12px;height:12px}
-
-.onwebapp-event-bottom{display:flex;align-items:center;justify-content:space-between;margin-top:1.2rem;position:relative;z-index:1}
-.onwebapp-event-cta{display:inline-flex;align-items:center;gap:.35rem;font-size:.82rem;font-weight:700;color:#1e40af;text-decoration:none;transition:color .2s}
-.onwebapp-event-cta:hover{color:#1e3a8a}
-.onwebapp-event-cta-arrow{transition:transform .3s ease-out;display:inline-block}
-
-.onwebapp-event-featured .onwebapp-event-title{font-size:1.35rem}
-.onwebapp-event-featured .onwebapp-event-desc{font-size:.88rem}
-
-@media(max-width:991.98px){
-  .onwebapp-events-grid{grid-template-columns:1fr;grid-template-rows:auto}
-  .onwebapp-event-featured{grid-row:auto}
-}
-@media(max-width:767.98px){
-  .onwebapp-certifications{padding:60px 0}
-  .onwebapp-certifications-grid{gap:.75rem}
-  .onwebapp-certification-item{min-width:0;flex:1 1 calc(50% - .75rem);padding:1rem .75rem}
-  .onwebapp-events{padding:70px 0}
-  .onwebapp-events-grid{gap:16px}
-  .onwebapp-event-card{padding:22px}
-}
-@media(max-width:575.98px){
-  .onwebapp-certification-item{flex:1 1 calc(50% - .5rem);padding:.85rem .5rem}
-  .onwebapp-cert-icon{width:44px;height:44px}
-  .onwebapp-cert-icon svg{width:18px;height:18px}
-  .onwebapp-cert-name{font-size:.72rem}
-  .onwebapp-cert-desc{font-size:.62rem}
-}
-@media(prefers-reduced-motion:reduce){
-  .onwebapp-event-card,.onwebapp-certification-item,.onwebapp-event-cta-arrow,.onwebapp-cert-tooltip{transition:none !important;transform:none !important}
-}
-
-/* ===== NEWS (redesigned) ===== */
-.onwebapp-updates-section{padding:110px 0;background:#fff;position:relative;overflow:hidden}
-.onwebapp-updates-section::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:700px;height:700px;background:radial-gradient(circle,rgba(30,64,175,.04) 0%,transparent 70%);pointer-events:none}
-.onwebapp-updates-section::after{content:'';position:absolute;inset:0;background-image:radial-gradient(rgba(30,64,175,.03) 1px,transparent 1px);background-size:32px 32px;pointer-events:none}
-
-.onwebapp-updates-header{text-align:center;margin-bottom:64px;position:relative;z-index:1}
-.onwebapp-updates-eyebrow{display:inline-block;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#1e40af;margin-bottom:1rem;background:rgba(30,64,175,.06);padding:.4rem 1rem;border-radius:2rem}
-.onwebapp-updates-heading{font-size:clamp(2.1rem,5vw,3.5rem);font-weight:800;color:#0f172a;letter-spacing:-.03em;line-height:1.15;margin-bottom:.75rem}
-.onwebapp-updates-subtitle{font-size:1rem;color:#64748b;max-width:480px;margin:0 auto;line-height:1.6}
-
-.onwebapp-updates-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;position:relative;z-index:1}
-
-.onwebapp-updates-featured{grid-column:1;grid-row:1/3;background:#fff;border:1px solid #e2e8f0;border-radius:20px;padding:36px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden;transition:all .3s ease-out;cursor:pointer}
-.onwebapp-updates-featured:hover{transform:translateY(-4px);border-color:#c7d2fe;box-shadow:0 12px 40px rgba(30,64,175,.08)}
-.onwebapp-updates-featured:hover .onwebapp-updates-visual svg{opacity:.18}
-.onwebapp-updates-featured:hover .onwebapp-updates-cta-arrow{transform:translateX(5px)}
-
-.onwebapp-updates-visual{position:absolute;top:0;right:0;width:55%;height:100%;pointer-events:none;z-index:0}
-.onwebapp-updates-visual svg{width:100%;height:100%;opacity:.08;transition:opacity .35s ease-out}
-
-.onwebapp-updates-meta{display:flex;align-items:center;gap:.6rem;margin-bottom:1.5rem;position:relative;z-index:1}
-.onwebapp-updates-badge{display:inline-block;padding:.3rem .75rem;border-radius:2rem;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
-.onwebapp-updates-badge--ai{background:rgba(20,184,166,.08);color:#0d9488}
-.onwebapp-updates-badge--product{background:rgba(30,64,175,.08);color:#1e40af}
-.onwebapp-updates-badge--expansion{background:rgba(124,58,237,.08);color:#7c3aed}
-.onwebapp-updates-badge--savings{background:rgba(217,119,6,.08);color:#b45309}
-.onwebapp-updates-date{font-size:.7rem;font-weight:600;color:#94a3b8;letter-spacing:.03em}
-
-.onwebapp-updates-featured-title{font-size:1.65rem;font-weight:800;color:#0f172a;letter-spacing:-.02em;line-height:1.2;margin-bottom:.75rem;position:relative;z-index:1}
-.onwebapp-updates-featured-desc{font-size:.92rem;color:#64748b;line-height:1.65;margin-bottom:2rem;position:relative;z-index:1;max-width:400px}
-
-.onwebapp-updates-cta{display:inline-flex;align-items:center;gap:.45rem;font-size:.85rem;font-weight:700;color:#1e40af;position:relative;z-index:1;text-decoration:none;transition:color .2s}
-.onwebapp-updates-cta:hover{color:#1e3a8a}
-.onwebapp-updates-cta-arrow{transition:transform .3s ease-out;display:inline-block}
-
-.onwebapp-updates-secondary{display:flex;flex-direction:column;gap:20px}
-
-.onwebapp-updates-card{background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:28px 28px 26px;display:flex;flex-direction:column;justify-content:space-between;transition:all .3s ease-out;cursor:pointer;position:relative;min-height:180px}
-.onwebapp-updates-card:hover{transform:translateY(-4px);border-color:#c7d2fe;box-shadow:0 10px 32px rgba(30,64,175,.07)}
-.onwebapp-updates-card:hover .onwebapp-updates-card-arrow{transform:translateX(5px)}
-
-.onwebapp-updates-card-meta{display:flex;align-items:center;gap:.6rem;margin-bottom:1rem}
-.onwebapp-updates-card-title{font-size:1.05rem;font-weight:800;color:#0f172a;letter-spacing:-.01em;line-height:1.3;margin-bottom:.4rem}
-.onwebapp-updates-card-desc{font-size:.82rem;color:#64748b;line-height:1.6;margin:0;flex:1}
-
-.onwebapp-updates-card-cta{display:inline-flex;align-items:center;gap:.35rem;font-size:.8rem;font-weight:700;color:#1e40af;margin-top:1rem;text-decoration:none;transition:color .2s}
-.onwebapp-updates-card-cta:hover{color:#1e3a8a}
-.onwebapp-updates-card-arrow{transition:transform .3s ease-out;display:inline-block}
-
-.onwebapp-updates-viewall{text-align:center;margin-top:56px;position:relative;z-index:1}
-.onwebapp-updates-viewall a{display:inline-flex;align-items:center;gap:.4rem;font-size:.88rem;font-weight:700;color:#1e40af;text-decoration:none;transition:all .2s;padding:.5rem 0;border-bottom:2px solid transparent}
-.onwebapp-updates-viewall a:hover{color:#1e3a8a;border-bottom-color:#1e40af}
-.onwebapp-updates-viewall a svg{transition:transform .25s ease-out}
-.onwebapp-updates-viewall a:hover svg{transform:translateX(4px)}
-
-@media(max-width:991.98px){
-  .onwebapp-updates-grid{grid-template-columns:1fr}
-  .onwebapp-updates-featured{grid-column:1;grid-row:auto}
-  .onwebapp-updates-featured-title{font-size:1.4rem}
-}
-@media(max-width:575.98px){
-  .onwebapp-updates-section{padding:70px 20px}
-  .onwebapp-updates-header{margin-bottom:40px}
-  .onwebapp-updates-heading{font-size:1.85rem}
-  .onwebapp-updates-featured{padding:24px}
-  .onwebapp-updates-card{padding:22px;min-height:auto}
-  .onwebapp-updates-featured-title{font-size:1.25rem}
-}
-@media(prefers-reduced-motion:reduce){
-  .onwebapp-updates-featured,.onwebapp-updates-card,.onwebapp-updates-cta-arrow,.onwebapp-updates-card-arrow,.onwebapp-updates-viewall a svg{transition:none !important;transform:none !important}
-}
-
-/* ===== PARTNERSHIPS ===== */
-.oh-partners{padding:4rem 0;background:var(--bg-body);border-top:1px solid var(--border-color)}
-.oh-partner-grid{display:flex;justify-content:center;gap:2.5rem;flex-wrap:wrap;align-items:center}
-.oh-partner{display:flex;align-items:center;gap:.5rem;padding:.75rem 1.25rem;border-radius:10px;border:1px solid var(--border-color);background:var(--bg-surface);font-size:.82rem;font-weight:700;color:var(--text-muted)}
-.oh-partner i{font-size:1.1rem;color:#1e40af}
+/* ===== PARTNERS ===== */
+.oh-partners{padding:4.5rem 0;background:var(--bg-body);border-top:1px solid var(--border-color);border-bottom:1px solid var(--border-color)}
+.oh-partner-grid{display:flex;justify-content:center;gap:1.5rem;flex-wrap:wrap;align-items:center}
+.oh-partner{display:flex;align-items:center;gap:.5rem;padding:.75rem 1.3rem;border-radius:12px;border:1px solid var(--border-color);background:var(--bg-surface);font-size:.8rem;font-weight:700;color:var(--text-muted);transition:all .35s}
+.oh-partner:hover{transform:translateY(-3px);box-shadow:0 6px 16px rgba(0,0,0,.05);border-color:rgba(59,130,246,.15)}
+.oh-partner i{font-size:1rem;color:#2563eb}
 
 /* ===== GLOBAL OFFICES ===== */
-.oh-global{padding:5rem 0;background:var(--bg-surface)}
-.oh-global-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:2rem;align-items:start}
-.oh-global-text p{color:var(--text-muted);font-size:.9rem;line-height:1.7;margin-bottom:1.25rem}
-.oh-office{display:flex;gap:1rem;align-items:flex-start;padding:1rem 0;border-bottom:1px solid var(--border-color)}
+.oh-global{padding:6rem 0;background:var(--bg-surface)}
+.oh-global-grid{display:grid;grid-template-columns:1fr 1fr;gap:3.5rem;align-items:start}
+.oh-global-text p{color:var(--text-muted);font-size:.88rem;line-height:1.75;margin-bottom:1.25rem}
+.oh-office{display:flex;gap:1.1rem;align-items:flex-start;padding:1.1rem 0;border-bottom:1px solid var(--border-color);transition:all .3s}
 .oh-office:last-child{border-bottom:none}
-.oh-office-icon{width:40px;height:40px;border-radius:10px;background:rgba(30,64,175,.08);color:#1e40af;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0}
-.oh-office strong{display:block;font-size:.9rem;margin-bottom:.15rem}
-.oh-office small{font-size:.78rem;color:var(--text-muted);line-height:1.5}
+.oh-office:hover{padding-left:.5rem}
+.oh-office-icon{width:44px;height:44px;border-radius:12px;background:rgba(37,99,235,.07);color:#2563eb;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0;transition:all .3s}
+.oh-office:hover .oh-office-icon{background:#2563eb;color:#fff}
+.oh-office strong{display:block;font-size:.88rem;margin-bottom:.15rem;color:#0f172a}
+.oh-office small{font-size:.78rem;color:var(--text-muted);line-height:1.55}
 
 /* ===== FINAL CTA ===== */
-.oh-final-cta{padding:5rem 0;background:linear-gradient(135deg,#0f172a,#1e293b);text-align:center;color:#fff}
-.oh-final-cta h2{font-weight:800;font-size:2rem;margin-bottom:.75rem;color:#fff}
-.oh-final-cta p{color:rgba(255,255,255,.6);font-size:1rem;margin-bottom:2rem;max-width:520px;margin-left:auto;margin-right:auto}
+.oh-final-cta{padding:7rem 0;background:linear-gradient(160deg,#0a0f1e,#111827,#0f172a);text-align:center;color:#fff;position:relative;overflow:hidden}
+.oh-final-cta::before{content:'';position:absolute;top:-200px;right:-200px;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(59,130,246,.08) 0%,transparent 70%);pointer-events:none}
+.oh-final-cta::after{content:'';position:absolute;bottom:-200px;left:-200px;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.06) 0%,transparent 70%);pointer-events:none}
+.oh-final-cta h2{font-weight:800;font-size:2.4rem;margin-bottom:.85rem;color:#fff;letter-spacing:-.04em;position:relative;z-index:1}
+.oh-final-cta p{color:rgba(255,255,255,.5);font-size:1.05rem;margin-bottom:2.5rem;max-width:520px;margin-left:auto;margin-right:auto;position:relative;z-index:1;line-height:1.75}
 
 /* ===== FOOTER ===== */
-.oh-footer{padding:3rem 0 1.5rem;background:#0b1120;color:rgba(255,255,255,.6);border-top:1px solid rgba(255,255,255,.06)}
-.oh-footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:2rem;margin-bottom:2rem}
-.oh-footer-brand h5{font-weight:800;color:#fff;margin-bottom:.5rem}
-.oh-footer-brand p{font-size:.82rem;line-height:1.6}
-.oh-footer-col h6{font-weight:700;color:#fff;font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.75rem}
-.oh-footer-col a{display:block;font-size:.8rem;color:rgba(255,255,255,.5);text-decoration:none;padding:.25rem 0;transition:color .2s}
-.oh-footer-col a:hover{color:#fff}
-.oh-footer-bottom{border-top:1px solid rgba(255,255,255,.06);padding-top:1.25rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;font-size:.75rem}
-.oh-footer-legal a{color:rgba(255,255,255,.4);text-decoration:none;margin-left:1rem;transition:color .2s}
+.oh-footer{padding:4rem 0 1.5rem;background:#080d1a;color:rgba(255,255,255,.6);border-top:1px solid rgba(255,255,255,.05);position:relative}
+.oh-footer::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(59,130,246,.15),transparent)}
+.oh-footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:2rem;margin-bottom:2.5rem}
+.oh-footer-brand h5{font-weight:800;color:#fff;margin-bottom:.6rem;font-size:1.1rem}
+.oh-footer-brand p{font-size:.82rem;line-height:1.7}
+.oh-footer-col h6{font-weight:700;color:#fff;font-size:.78rem;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.85rem}
+.oh-footer-col a{display:block;font-size:.78rem;color:rgba(255,255,255,.45);text-decoration:none;padding:.3rem 0;transition:all .25s}
+.oh-footer-col a:hover{color:#fff;transform:translateX(3px)}
+.oh-footer-bottom{border-top:1px solid rgba(255,255,255,.05);padding-top:1.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;font-size:.72rem}
+.oh-footer-legal a{color:rgba(255,255,255,.35);text-decoration:none;margin-left:1.25rem;transition:color .25s}
 .oh-footer-legal a:hover{color:#fff}
 
 /* ===== RESPONSIVE ===== */
-@media(max-width:1199.98px){.oh-services-grid{grid-template-columns:repeat(3,1fr)}.oh-news-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:991.98px){.oh-hero{padding:7rem 0 3.5rem}.oh-erp-grid,.oh-ai-grid,.oh-global-grid{grid-template-columns:1fr}.oh-auto-grid{grid-template-columns:1fr}.oh-events-grid{grid-template-columns:1fr}.oh-services-grid{grid-template-columns:repeat(2,1fr)}.oh-news-grid{grid-template-columns:1fr}.oh-footer-grid{grid-template-columns:1fr 1fr}}
-@media(max-width:575.98px){.oh-hero{padding:6rem 0 2.5rem}.oh-hero-title{font-size:1.8rem}.oh-services-grid{grid-template-columns:1fr}.oh-trust-grid{gap:1.5rem}.oh-cert-grid{gap:1.5rem}.oh-footer-grid{grid-template-columns:1fr}}
-
-/* ===== GLOBAL ANIMATION KEYFRAMES ===== */
-@keyframes ohFadeInUp{from{opacity:0;transform:translateY(32px)}to{opacity:1;transform:translateY(0)}}
-@keyframes ohFadeInLeft{from{opacity:0;transform:translateX(-32px)}to{opacity:1;transform:translateX(0)}}
-@keyframes ohFadeInRight{from{opacity:0;transform:translateX(32px)}to{opacity:1;transform:translateX(0)}}
-@keyframes ohScaleIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
-@keyframes ohFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-@keyframes ohFloatSlow{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
-@keyframes ohPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
-@keyframes ohShimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
-@keyframes ohDotTravel{0%{left:0;opacity:0}5%{opacity:1}95%{opacity:1}100%{left:100%;opacity:0}}
-@keyframes ohMarquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
-@keyframes ohGentleRotate{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-@keyframes ohNodeGlow{0%,100%{opacity:.6;r:2.5}50%{opacity:1;r:4}}
-@keyframes ohBarGrow{from{width:0}to{width:var(--bar-width,80%)}}
-@keyframes ohSlideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-@keyframes ohProgressFill{from{width:0}to{width:var(--progress,100%)}}
-@keyframes ohParticleFloat1{0%,100%{transform:translate(0,0) scale(1)}25%{transform:translate(10px,-15px) scale(1.1)}50%{transform:translate(-5px,-25px) scale(.95)}75%{transform:translate(15px,-10px) scale(1.05)}}
-@keyframes ohParticleFloat2{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(-12px,-20px) scale(1.08)}66%{transform:translate(8px,-12px) scale(.92)}}
-@keyframes ohParticleFloat3{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(6px,-30px) scale(1.15)}}
-
-/* ===== SCROLL PROGRESS BAR ===== */
-.oh-scroll-progress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,#1e40af,#3b82f6,#1e40af);z-index:9999;width:0%;transition:width .1s linear;pointer-events:none}
-
-/* ===== FLOATING PARTICLES ===== */
-.oh-particles{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0}
-.oh-particle{position:absolute;border-radius:50%;opacity:.12}
-.oh-particle--1{width:6px;height:6px;background:#1e40af;top:15%;left:10%;animation:ohParticleFloat1 8s ease-in-out infinite}
-.oh-particle--2{width:4px;height:4px;background:#3b82f6;top:25%;left:80%;animation:ohParticleFloat2 10s ease-in-out infinite 1s}
-.oh-particle--3{width:5px;height:5px;background:#60a5fa;top:60%;left:65%;animation:ohParticleFloat3 9s ease-in-out infinite 2s}
-.oh-particle--4{width:3px;height:3px;background:#93c5fd;top:45%;left:25%;animation:ohParticleFloat1 11s ease-in-out infinite 3s}
-.oh-particle--5{width:7px;height:7px;background:#1e40af;top:70%;left:90%;animation:ohParticleFloat2 7s ease-in-out infinite .5s}
-.oh-particle--6{width:4px;height:4px;background:#2563eb;top:80%;left:40%;animation:ohParticleFloat3 12s ease-in-out infinite 4s}
-
-/* AI section particles */
-.oh-ai .oh-particle{background:#60a5fa;opacity:.08}
-.oh-ai .oh-particle--1{top:10%;left:70%;width:5px;height:5px;animation:ohParticleFloat2 9s ease-in-out infinite}
-.oh-ai .oh-particle--2{top:30%;left:15%;width:4px;height:4px;animation:ohParticleFloat1 11s ease-in-out infinite 2s}
-.oh-ai .oh-particle--3{top:55%;left:85%;width:6px;height:6px;animation:ohParticleFloat3 8s ease-in-out infinite 1s}
-.oh-ai .oh-particle--4{top:75%;left:35%;width:3px;height:3px;animation:ohParticleFloat2 13s ease-in-out infinite 3s}
-.oh-ai .oh-particle--5{top:20%;left:50%;width:5px;height:5px;animation:ohParticleFloat1 10s ease-in-out infinite 4s}
-
-/* ===== TRUST BAR MARQUEE ===== */
-.oh-trust-track{display:flex;align-items:center;gap:3rem;animation:ohMarquee 25s linear infinite;width:max-content}
-.oh-trust-grid{overflow:hidden;position:relative}
-.oh-trust-grid::before,.oh-trust-grid::after{content:'';position:absolute;top:0;bottom:0;width:80px;z-index:2;pointer-events:none}
-.oh-trust-grid::before{left:0;background:linear-gradient(90deg,var(--bg-surface),transparent)}
-.oh-trust-grid::after{right:0;background:linear-gradient(-90deg,var(--bg-surface),transparent)}
-.oh-trust-track:hover{animation-play-state:paused}
-
-/* ===== HERO TEXT REVEAL ===== */
-.oh-hero-word{display:inline-block;opacity:0;transform:translateY(20px);animation:ohFadeInUp .5s ease-out forwards}
-.oh-hero-word:nth-child(1){animation-delay:.1s}
-.oh-hero-word:nth-child(2){animation-delay:.2s}
-.oh-hero-word:nth-child(3){animation-delay:.3s}
-.oh-hero-word:nth-child(4){animation-delay:.4s}
-.oh-hero-word:nth-child(5){animation-delay:.5s}
-.oh-hero-word:nth-child(6){animation-delay:.6s}
-.oh-hero-word:nth-child(7){animation-delay:.7s}
-.oh-hero-word:nth-child(8){animation-delay:.8s}
-.oh-hero-word:nth-child(9){animation-delay:.9s}
-.oh-hero-word:nth-child(10){animation-delay:1s}
-
-.oh-hero-sub{opacity:0;animation:ohFadeInUp .6s ease-out 1.1s forwards}
-.oh-hero .d-flex{opacity:0;animation:ohFadeInUp .6s ease-out 1.3s forwards}
-
-/* ===== APPROACH CONNECTOR DOT TRAVEL ===== */
-.oh-connector-travel{position:absolute;top:50%;transform:translateY(-50%);width:8px;height:8px;border-radius:50%;background:linear-gradient(135deg,#1e40af,#3b82f6);box-shadow:0 0 10px rgba(30,64,175,.4);animation:ohDotTravel 4s ease-in-out infinite;z-index:2}
-
-/* ===== APPROACH CARD ENTRANCE ===== */
-.onwebapp-approach-card{opacity:0;transform:translateY(24px)}
-.onwebapp-approach-card.is-visible{animation:ohFadeInUp .5s ease-out forwards}
-.onwebapp-approach-card:nth-child(1).is-visible{animation-delay:0s}
-.onwebapp-approach-card:nth-child(2).is-visible{animation-delay:.1s}
-.onwebapp-approach-card:nth-child(3).is-visible{animation-delay:.2s}
-.onwebapp-approach-card:nth-child(4).is-visible{animation-delay:.3s}
-.onwebapp-approach-card:nth-child(5).is-visible{animation-delay:.4s}
-
-/* ===== ICON RING SCALE IN ===== */
-.onwebapp-approach-icon-ring{transform:scale(0)}
-.onwebapp-approach-card.is-visible .onwebapp-approach-icon-ring{animation:ohScaleIn .4s ease-out .2s forwards}
-
-/* ===== PARALLAX UTILITY ===== */
-[data-parallax]{will-change:transform;transition:transform .1s linear}
-
-/* ===== MAGNETIC CTA ===== */
-.oh-cta-primary{position:relative;transition:all .3s cubic-bezier(.22,1,.36,1)}
-
-/* ===== PYRAMID SCROLL BUILD ===== */
-.oh-pyr-top{opacity:0;transform:translateY(20px)}
-.oh-pyr-mid{opacity:0;transform:translateY(20px)}
-.oh-pyr-base{opacity:0;transform:translateY(20px)}
-.oh-pyr-top.is-visible,.oh-pyr-mid.is-visible,.oh-pyr-base.is-visible{opacity:1;transform:translateY(0);transition:all .6s cubic-bezier(.22,1,.36,1)}
-.oh-pyr-mid.is-visible{transition-delay:.15s}
-.oh-pyr-base.is-visible{transition-delay:.3s}
-
-/* Pyramid box entrance */
-.oh-pyr-box{opacity:0;transform:translateY(16px) scale(.95)}
-.oh-pyr-mid.is-visible .oh-pyr-box{animation:ohFadeInUp .4s ease-out forwards}
-.oh-pyr-mid.is-visible .oh-pyr-box:nth-child(1){animation-delay:.2s}
-.oh-pyr-mid.is-visible .oh-pyr-box:nth-child(2){animation-delay:.3s}
-.oh-pyr-mid.is-visible .oh-pyr-box:nth-child(3){animation-delay:.4s}
-
-/* ===== SERVICES ALTERNATING REVEAL ===== */
-.oh-svc-row{opacity:0;transition:all .6s cubic-bezier(.22,1,.36,1)}
-.oh-svc-row:nth-child(odd){transform:translateX(-30px)}
-.oh-svc-row:nth-child(even){transform:translateX(30px)}
-.oh-svc-row.is-visible{opacity:1;transform:translateX(0)}
-.oh-svc-row:nth-child(even).is-visible{transform:translateX(0)}
-.oh-svc-row .oh-svc-img{opacity:0;transform:scale(.95);transition:all .5s cubic-bezier(.22,1,.36,1) .15s}
-.oh-svc-row.is-visible .oh-svc-img{opacity:1;transform:scale(1)}
-.oh-svc-row .oh-svc-content{opacity:0;transform:translateY(12px);transition:all .5s cubic-bezier(.22,1,.36,1) .25s}
-.oh-svc-row.is-visible .oh-svc-content{opacity:1;transform:translateY(0)}
-
-/* ===== VALIDATION DASHBOARD BAR ANIMATION ===== */
-.oh-val-bar-animated{width:0;transition:width 1s cubic-bezier(.22,1,.36,1)}
-.oh-val-bar-animated.is-visible{width:var(--bar-width)}
-
-/* ===== VALIDATION FEED ITEM ENTRANCE ===== */
-.oh-val-feed-item{opacity:0;transform:translateX(-12px)}
-.oh-val-feed.is-visible .oh-val-feed-item{animation:ohSlideUp .35s ease-out forwards}
-.oh-val-feed.is-visible .oh-val-feed-item:nth-child(1){animation-delay:.1s}
-.oh-val-feed.is-visible .oh-val-feed-item:nth-child(2){animation-delay:.2s}
-.oh-val-feed.is-visible .oh-val-feed-item:nth-child(3){animation-delay:.3s}
-.oh-val-feed.is-visible .oh-val-feed-item:nth-child(4){animation-delay:.4s}
-
-/* ===== GAUGE RING ANIMATION ===== */
-.oh-val-gauge-ring svg circle{stroke-dashoffset:138;transition:stroke-dashoffset 1.2s cubic-bezier(.22,1,.36,1)}
-.oh-val-gauges.is-visible .oh-val-gauge:nth-child(1) svg circle{stroke-dashoffset:7}
-.oh-val-gauges.is-visible .oh-val-gauge:nth-child(2) svg circle{stroke-dashoffset:14}
-.oh-val-gauges.is-visible .oh-val-gauge:nth-child(3) svg circle{stroke-dashoffset:21}
-
-/* ===== VALIDATION STAT COUNTER ===== */
-.oh-val-stat{opacity:0;transform:translateY(16px)}
-.oh-val-stats.is-visible .oh-val-stat{animation:ohFadeInUp .4s ease-out forwards}
-.oh-val-stats.is-visible .oh-val-stat:nth-child(1){animation-delay:0s}
-.oh-val-stats.is-visible .oh-val-stat:nth-child(2){animation-delay:.1s}
-.oh-val-stats.is-visible .oh-val-stat:nth-child(3){animation-delay:.2s}
-.oh-val-stats.is-visible .oh-val-stat:nth-child(4){animation-delay:.3s}
-
-/* ===== EVENTS SVG GENTLE ROTATION ===== */
-.onwebapp-event-featured .onwebapp-event-visual svg{animation:ohGentleRotate 60s linear infinite}
-.onwebapp-event-card:hover .onwebapp-event-visual svg{animation-play-state:paused}
-
-/* ===== NEWS SVG NODE GLOW ===== */
-.onwebapp-updates-visual svg circle{animation:ohNodeGlow 3s ease-in-out infinite}
-.onwebapp-updates-visual svg circle:nth-child(even){animation-delay:1s}
-.onwebapp-updates-visual svg circle:nth-child(3n){animation-delay:2s}
-
-/* ===== PARTNER FLOAT ON HOVER ===== */
-.oh-partner{transition:all .3s ease-out}
-.oh-partner:hover{transform:translateY(-3px);box-shadow:0 4px 12px rgba(0,0,0,.06)}
-
-/* ===== FOOTER COLUMN STAGGER ===== */
-.oh-footer-grid > *{opacity:0;transform:translateY(16px)}
-.oh-footer-grid.is-visible > *{animation:ohFadeInUp .4s ease-out forwards}
-.oh-footer-grid.is-visible > *:nth-child(1){animation-delay:0s}
-.oh-footer-grid.is-visible > *:nth-child(2){animation-delay:.1s}
-.oh-footer-grid.is-visible > *:nth-child(3){animation-delay:.15s}
-.oh-footer-grid.is-visible > *:nth-child(4){animation-delay:.2s}
-
-/* ===== CERTIFICATION ICON PULSE ===== */
-.onwebapp-certification-item{opacity:0;transform:translateY(16px)}
-.onwebapp-certification-item.is-visible{animation:ohFadeInUp .4s ease-out forwards}
-.onwebapp-certification-item:nth-child(1).is-visible{animation-delay:0s}
-.onwebapp-certification-item:nth-child(2).is-visible{animation-delay:.06s}
-.onwebapp-certification-item:nth-child(3).is-visible{animation-delay:.12s}
-.onwebapp-certification-item:nth-child(4).is-visible{animation-delay:.18s}
-.onwebapp-certification-item:nth-child(5).is-visible{animation-delay:.24s}
-
-/* ===== EVENT CARD ENTRANCE ===== */
-.onwebapp-event-card{opacity:0;transform:translateY(24px)}
-.onwebapp-event-card.is-visible{animation:ohFadeInUp .5s ease-out forwards}
-.onwebapp-event-featured.is-visible{animation-delay:0s}
-.onwebapp-event-card:not(.onwebapp-event-featured).is-visible:nth-child(2){animation-delay:.1s}
-.onwebapp-event-card:not(.onwebapp-event-featured).is-visible:nth-child(3){animation-delay:.2s}
-
-/* ===== NEWS CARD ENTRANCE ===== */
-.onwebapp-updates-featured{opacity:0;transform:translateX(-24px)}
-.onwebapp-updates-featured.is-visible{animation:ohFadeInLeft .5s ease-out forwards}
-.onwebapp-updates-card{opacity:0;transform:translateX(24px)}
-.onwebapp-updates-card.is-visible{animation:ohFadeInRight .4s ease-out forwards}
-.onwebapp-updates-card:nth-child(1).is-visible{animation-delay:.1s}
-.onwebapp-updates-card:nth-child(2).is-visible{animation-delay:.2s}
-.onwebapp-updates-card:nth-child(3).is-visible{animation-delay:.3s}
-
-/* ===== OFFICE CARD ENTRANCE ===== */
-.oh-office{opacity:0;transform:translateY(12px)}
-.oh-global-grid.is-visible .oh-office{animation:ohSlideUp .4s ease-out forwards}
-.oh-global-grid.is-visible .oh-office:nth-child(1){animation-delay:.15s}
-.oh-global-grid.is-visible .oh-office:nth-child(2){animation-delay:.25s}
-
-/* ===== GLOBAL TEXT REVEAL ===== */
-.oh-global-text p{opacity:0;transform:translateY(10px)}
-.oh-global-text.is-visible p{animation:ohFadeInUp .4s ease-out forwards}
-.oh-global-text.is-visible p:nth-child(1){animation-delay:.1s}
-.oh-global-text.is-visible p:nth-child(2){animation-delay:.2s}
-.oh-global-text.is-visible p:nth-child(3){animation-delay:.3s}
-
-/* ===== PARTNER ENTRANCE ===== */
-.oh-partner{opacity:0;transform:translateY(12px)}
-.oh-partner.is-visible{animation:ohFadeInUp .35s ease-out forwards}
-.oh-partner:nth-child(1).is-visible{animation-delay:0s}
-.oh-partner:nth-child(2).is-visible{animation-delay:.06s}
-.oh-partner:nth-child(3).is-visible{animation-delay:.12s}
-.oh-partner:nth-child(4).is-visible{animation-delay:.18s}
-
-/* ===== ERP FEATURE ENTRANCE ===== */
-.oh-erp-features li{opacity:0;transform:translateX(-16px)}
-.oh-erp-features.is-visible li{animation:ohFadeInLeft .4s ease-out forwards}
-.oh-erp-features.is-visible li:nth-child(1){animation-delay:.15s}
-.oh-erp-features.is-visible li:nth-child(2){animation-delay:.25s}
-.oh-erp-features.is-visible li:nth-child(3){animation-delay:.35s}
-
-/* ===== AI FEATURE ENTRANCE ===== */
-.oh-ai-features li{opacity:0;transform:translateX(-12px)}
-.oh-ai-features.is-visible li{animation:ohFadeInLeft .4s ease-out forwards}
-.oh-ai-features.is-visible li:nth-child(1){animation-delay:.1s}
-.oh-ai-features.is-visible li:nth-child(2){animation-delay:.2s}
-.oh-ai-features.is-visible li:nth-child(3){animation-delay:.3s}
-.oh-ai-features.is-visible li:nth-child(4){animation-delay:.4s}
-
-/* ===== FINAL CTA ENTRANCE ===== */
-.oh-final-cta > .container > div{opacity:0;transform:translateY(24px)}
-.oh-final-cta > .container > div.is-visible{animation:ohFadeInUp .6s ease-out forwards}
-
-/* ===== PREFERS REDUCED MOTION ===== */
-@media(prefers-reduced-motion:reduce){
-  .oh-scroll-progress{transition:none}
-  .oh-trust-track{animation:none}
-  .oh-hero-word,.oh-hero-sub,.oh-hero .d-flex{animation:none;opacity:1;transform:none}
-  .oh-particle,.oh-particle--1,.oh-particle--2,.oh-particle--3,.oh-particle--4,.oh-particle--5,.oh-particle--6{animation:none}
-  .oh-connector-travel{animation:none;display:none}
-  .onwebapp-approach-card,.onwebapp-approach-icon-ring,.oh-pyr-top,.oh-pyr-mid,.oh-pyr-base,.oh-pyr-box,.oh-svc-row,.oh-val-feed-item,.oh-val-stat,.oh-val-gauge-ring svg circle,.oh-footer-grid > *,.onwebapp-certification-item,.onwebapp-event-card,.onwebapp-updates-featured,.onwebapp-updates-card,.oh-office,.oh-global-text p,.oh-partner,.oh-erp-features li,.oh-ai-features li,.oh-final-cta > .container > div{animation:none !important;opacity:1 !important;transform:none !important;transition:none !important}
-  .onwebapp-event-featured .onwebapp-event-visual svg{animation:none}
-  .onwebapp-updates-visual svg circle{animation:none}
-  .oh-val-bar-animated{transition:none}
-}
+@media(max-width:1199px){.oh-pillars-grid{grid-template-columns:repeat(3,1fr)}.oh-auto-grid{grid-template-columns:repeat(2,1fr)}.oh-svc-grid{grid-template-columns:repeat(2,1fr)}.oh-events-grid{grid-template-columns:1fr 1fr}.oh-event-featured{grid-row:auto}}
+@media(max-width:991px){.oh-hero{padding:8rem 0 5rem}.oh-erp-grid,.oh-ai-grid,.oh-global-grid,.oh-val-grid{grid-template-columns:1fr}.oh-auto-grid{grid-template-columns:repeat(2,1fr)}.oh-svc-grid{grid-template-columns:1fr}.oh-events-grid{grid-template-columns:1fr}.oh-news-grid{grid-template-columns:1fr}.oh-news-featured{grid-column:1;grid-row:auto}.oh-footer-grid{grid-template-columns:1fr 1fr}.oh-pyr-mid{width:100%}.oh-pyr-base{width:100%}}
+@media(max-width:767px){.oh-pillars-grid{grid-template-columns:1fr 1fr}.oh-auto-grid{grid-template-columns:1fr}.oh-cert-grid{gap:.75rem}.oh-cert{min-width:0;flex:1 1 calc(50% - .75rem)}.oh-hero-scroll{display:none}}
+@media(max-width:575px){.oh-hero{padding:7rem 0 4rem}.oh-hero-title{font-size:2rem}.oh-pillars-grid{grid-template-columns:1fr}.oh-pyr-mid{grid-template-columns:1fr;width:260px}.oh-pyr-base{width:260px}.oh-val-stats{grid-template-columns:repeat(2,1fr)}.oh-footer-grid{grid-template-columns:1fr}.oh-hero-stats{flex-wrap:wrap;gap:1.5rem}.oh-hero-badges{gap:.4rem}}
+@media(prefers-reduced-motion:reduce){.oh-trust-track{animation:none}.oh-hero-scroll{animation:none}.oh-val-status-dot{animation:none}.oh-reveal{opacity:1;transform:none;transition:none}.oh-pillar,.oh-auto-card,.oh-svc-card,.oh-event,.oh-news-featured,.oh-news-card,.oh-partner{transition:none !important;transform:none !important}}
 </style>
 {% endblock %}
 
 {% block content %}
 
 <!-- Scroll Progress Bar -->
-<div class="oh-scroll-progress" aria-hidden="true"></div>
+<div class="oh-scroll-progress"></div>
 
-<!-- ==================== 1. HERO ==================== -->
-<section class="oh-hero" style="position:relative;">
-  <div class="oh-particles" aria-hidden="true">
-    <div class="oh-particle oh-particle--1"></div>
-    <div class="oh-particle oh-particle--2"></div>
-    <div class="oh-particle oh-particle--3"></div>
-    <div class="oh-particle oh-particle--4"></div>
-    <div class="oh-particle oh-particle--5"></div>
-    <div class="oh-particle oh-particle--6"></div>
-  </div>
-  <div class="container">
+<!-- ==================== HERO ==================== -->
+<section class="oh-hero">
+  <div class="oh-hero-grid"></div>
+  <div class="container" style="position:relative;z-index:1;">
     <div class="row align-items-center">
-      <div class="col-lg-8 animate-on-scroll slide-up">
+      <div class="col-lg-8">
         <div class="oh-hero-badges">
-          <span class="oh-badge"><i class="fas fa-award"></i> Digital Silk: Top-Rated Company</span>
-          <span class="oh-badge"><i class="fas fa-trophy"></i> Ignite Visibility: Services that Deliver</span>
           <span class="oh-badge"><i class="fas fa-shield-halved"></i> GDPR</span>
           <span class="oh-badge"><i class="fas fa-certificate"></i> ISO 27001</span>
           <span class="oh-badge"><i class="fas fa-universal-access"></i> WCAG</span>
+          <span class="oh-badge"><i class="fas fa-lock"></i> AES-256</span>
+          <span class="oh-badge"><i class="fas fa-server"></i> 99.9% Uptime</span>
         </div>
         <h1 class="oh-hero-title">
-          <span class="oh-hero-word">{% trans "More" %}</span> <span class="oh-hero-word">{% trans "than" %}</span> <span class="oh-hero-word">{% trans "just" %}</span> <span class="oh-hero-word">{% trans "a" %}</span> <span class="oh-hero-word">{% trans "website" %}</span> <span class="oh-hero-word">{% trans "builder," %}</span><br>
-          <span style="color:#1e40af;"><span class="oh-hero-word">{% trans "Built-in" %}</span> <span class="oh-hero-word">{% trans "AI," %}</span> <span class="oh-hero-word">{% trans "automation," %}</span> <span class="oh-hero-word">{% trans "integration," %}</span> <span class="oh-hero-word">{% trans "validation." %}</span></span>
+          {% trans "Build." %} <span class="grad">{% trans "Automate." %}</span> {% trans "Scale." %}
         </h1>
         <p class="oh-hero-sub">
-          {% trans "Built-in AI, automation, integration, validation on website and application. Beyond the ordinary approach to building integrated web experiences." %}
+          {% trans "All-in-one platform for web development, AI automation, ERP integration, and digital transformation. More than just a website builder." %}
         </p>
         <div class="d-flex flex-wrap gap-3">
           <a href="{% url 'contact:contact' %}" class="oh-cta-primary">
@@ -785,132 +342,100 @@
             <i class="fas fa-play-circle"></i> {% trans "View Demo" %}
           </a>
         </div>
+        <div class="oh-hero-stats">
+          <div>
+            <div class="oh-hero-stat-num" data-count="200">0</div>
+            <div class="oh-hero-stat-label">{% trans "Projects Delivered" %}</div>
+          </div>
+          <div>
+            <div class="oh-hero-stat-num" data-count="50">0</div>
+            <div class="oh-hero-stat-label">{% trans "Active Clients" %}</div>
+          </div>
+          <div>
+            <div class="oh-hero-stat-num" data-count="99" data-suffix=".9%">0</div>
+            <div class="oh-hero-stat-label">{% trans "Uptime SLA" %}</div>
+          </div>
+          <div>
+            <div class="oh-hero-stat-num">{% trans "24/7" %}</div>
+            <div class="oh-hero-stat-label">{% trans "Monitoring" %}</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
+  <div class="oh-hero-scroll">
+    <span>{% trans "Scroll" %}</span>
+    <i class="fas fa-chevron-down"></i>
+  </div>
 </section>
 
-<!-- ==================== 2. TRUST BAR ==================== -->
+<!-- ==================== TRUST BAR ==================== -->
 <section class="oh-trust">
   <div class="container">
-    <div class="oh-trust-grid">
-      <div class="oh-trust-track">
-        <div class="oh-trust-item"><i class="fas fa-shield-halved"></i> GDPR Compliant</div>
-        <div class="oh-trust-item"><i class="fas fa-certificate"></i> ISO 27001</div>
-        <div class="oh-trust-item"><i class="fas fa-universal-access"></i> WCAG Guidelines</div>
-        <div class="oh-trust-item"><i class="fas fa-lock"></i> AES-256 Encryption</div>
-        <div class="oh-trust-item"><i class="fas fa-server"></i> 99.9% Uptime</div>
-        <div class="oh-trust-item"><i class="fas fa-shield-halved"></i> GDPR Compliant</div>
-        <div class="oh-trust-item"><i class="fas fa-certificate"></i> ISO 27001</div>
-        <div class="oh-trust-item"><i class="fas fa-universal-access"></i> WCAG Guidelines</div>
-        <div class="oh-trust-item"><i class="fas fa-lock"></i> AES-256 Encryption</div>
-        <div class="oh-trust-item"><i class="fas fa-server"></i> 99.9% Uptime</div>
-      </div>
+    <div class="oh-trust-track">
+      <div class="oh-trust-item"><i class="fas fa-shield-halved"></i> GDPR Compliant</div>
+      <div class="oh-trust-item"><i class="fas fa-certificate"></i> ISO 27001</div>
+      <div class="oh-trust-item"><i class="fas fa-universal-access"></i> WCAG Guidelines</div>
+      <div class="oh-trust-item"><i class="fas fa-lock"></i> AES-256 Encryption</div>
+      <div class="oh-trust-item"><i class="fas fa-server"></i> 99.9% Uptime</div>
+      <div class="oh-trust-item"><i class="fas fa-shield-halved"></i> GDPR Compliant</div>
+      <div class="oh-trust-item"><i class="fas fa-certificate"></i> ISO 27001</div>
+      <div class="oh-trust-item"><i class="fas fa-universal-access"></i> WCAG Guidelines</div>
+      <div class="oh-trust-item"><i class="fas fa-lock"></i> AES-256 Encryption</div>
+      <div class="oh-trust-item"><i class="fas fa-server"></i> 99.9% Uptime</div>
     </div>
   </div>
 </section>
 
-<!-- ==================== 3. FIVE PILLARS ==================== -->
-<section class="onwebapp-approach">
+<!-- ==================== FIVE PILLARS ==================== -->
+<section class="oh-section">
   <div class="container">
-    <div class="onwebapp-approach-header animate-on-scroll">
-      <div class="onwebapp-approach-eyebrow">{% trans "Our Approach" %}</div>
-      <h2 class="onwebapp-approach-title"><span class="onwebapp-approach-title-accent">{% trans "Beyond the Ordinary" %}</span></h2>
-      <p class="onwebapp-approach-desc">{% trans "Five pillars of an excellence approach that powers every website and application we build." %}</p>
+    <div class="text-center mb-5">
+      <div class="oh-section-label">{% trans "Our Approach" %}</div>
+      <h2 class="oh-section-title">{% trans "Five Pillars of Excellence" %}</h2>
+      <p class="oh-section-sub mx-auto">{% trans "A unified approach that powers every website and application we build." %}</p>
     </div>
-
-    <div class="onwebapp-approach-system">
-      <!-- Connection line -->
-      <div class="onwebapp-approach-connector" aria-hidden="true">
-        <div class="onwebapp-approach-connector-line"></div>
-        <div class="oh-connector-travel"></div>
-        <div class="onwebapp-approach-connector-dot onwebapp-approach-connector-dot--1"></div>
-        <div class="onwebapp-approach-connector-dot onwebapp-approach-connector-dot--2"></div>
-        <div class="onwebapp-approach-connector-dot onwebapp-approach-connector-dot--3"></div>
-        <div class="onwebapp-approach-connector-dot onwebapp-approach-connector-dot--4"></div>
-        <div class="onwebapp-approach-connector-dot onwebapp-approach-connector-dot--5"></div>
+    <div class="oh-pillars-grid">
+      <div class="oh-pillar oh-reveal" style="--pillar-color:#2563eb;--pillar-color-end:#3b82f6;--pillar-bg:rgba(37,99,235,.07)">
+        <div class="oh-pillar-icon"><i class="fas fa-link"></i></div>
+        <div class="oh-pillar-title">{% trans "Integration" %}</div>
+        <p class="oh-pillar-desc">{% trans "ERP, API, B2B & B2C — seamless connectivity across all systems." %}</p>
       </div>
-
-      <div class="onwebapp-approach-grid">
-
-        <!-- 1. Integration -->
-        <div class="onwebapp-approach-card animate-on-scroll slide-up" data-color="blue">
-          <div class="onwebapp-approach-icon-ring">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/><circle cx="12" cy="12" r="3"/></svg>
-          </div>
-          <div class="onwebapp-approach-label">{% trans "Built-in" %}</div>
-          <div class="onwebapp-approach-card-title">{% trans "Integration" %}</div>
-          <p class="onwebapp-approach-card-desc">{% trans "B2B & B2C, ERP, API — seamless connectivity across all systems." %}</p>
-          <div class="onwebapp-approach-indicator"><div class="onwebapp-approach-indicator-line"></div><div class="onwebapp-approach-indicator-dot"></div></div>
-          <span class="onwebapp-approach-cta">{% trans "Explore" %} <span class="onwebapp-approach-cta-arrow">&rarr;</span></span>
-        </div>
-
-        <!-- 2. Automation -->
-        <div class="onwebapp-approach-card animate-on-scroll slide-up" data-color="blue" style="transition-delay:60ms;">
-          <div class="onwebapp-approach-icon-ring">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-          </div>
-          <div class="onwebapp-approach-label">{% trans "Built-in" %}</div>
-          <div class="onwebapp-approach-card-title">{% trans "Automation" %}</div>
-          <p class="onwebapp-approach-card-desc">{% trans "Workflows, chatbots, IoT, enterprise automation — all orchestrated." %}</p>
-          <div class="onwebapp-approach-indicator"><div class="onwebapp-approach-indicator-line"></div><div class="onwebapp-approach-indicator-dot"></div></div>
-          <span class="onwebapp-approach-cta">{% trans "Explore" %} <span class="onwebapp-approach-cta-arrow">&rarr;</span></span>
-        </div>
-
-        <!-- 3. Digital Marketing -->
-        <div class="onwebapp-approach-card animate-on-scroll slide-up" data-color="blue" style="transition-delay:120ms;">
-          <div class="onwebapp-approach-icon-ring">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
-          </div>
-          <div class="onwebapp-approach-label">{% trans "Built-in" %}</div>
-          <div class="onwebapp-approach-card-title">{% trans "Digital Marketing" %}</div>
-          <p class="onwebapp-approach-card-desc">{% trans "SEO, social media, structuring strategies for 200+ ranking factors." %}</p>
-          <div class="onwebapp-approach-indicator"><div class="onwebapp-approach-indicator-line"></div><div class="onwebapp-approach-indicator-dot"></div></div>
-          <span class="onwebapp-approach-cta">{% trans "Explore" %} <span class="onwebapp-approach-cta-arrow">&rarr;</span></span>
-        </div>
-
-        <!-- 4. AI (featured) -->
-        <div class="onwebapp-approach-card onwebapp-approach-card--featured animate-on-scroll slide-up" data-color="black" style="transition-delay:180ms;">
-          <span class="onwebapp-approach-badge">
-            <svg viewBox="0 0 12 12" fill="none" width="10" height="10"><circle cx="6" cy="6" r="3" fill="#1e40af"/></svg>
-            {% trans "Core Intelligence" %}
-          </span>
-          <div class="onwebapp-approach-icon-ring">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a4 4 0 014 4c0 1.95-2 3-2 8h-4c0-5-2-6.05-2-8a4 4 0 014-4z"/><path d="M10 14h4M10 18h4M9 22h6"/><path d="M12 2v-0"/></svg>
-          </div>
-          <div class="onwebapp-approach-label">{% trans "Built-in" %}</div>
-          <div class="onwebapp-approach-card-title">{% trans "AI" %}</div>
-          <p class="onwebapp-approach-card-desc">{% trans "Machine learning, predictive analytics, and generative automation." %}</p>
-          <div class="onwebapp-approach-indicator"><div class="onwebapp-approach-indicator-line"></div><div class="onwebapp-approach-indicator-dot"></div></div>
-          <span class="onwebapp-approach-cta">{% trans "Explore" %} <span class="onwebapp-approach-cta-arrow">&rarr;</span></span>
-        </div>
-
-        <!-- 5. Validation -->
-        <div class="onwebapp-approach-card animate-on-scroll slide-up" data-color="blue" style="transition-delay:240ms;">
-          <div class="onwebapp-approach-icon-ring">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
-          </div>
-          <div class="onwebapp-approach-label">{% trans "Built-in" %}</div>
-          <div class="onwebapp-approach-card-title">{% trans "Validation" %}</div>
-          <p class="onwebapp-approach-card-desc">{% trans "From chaos to control — monitoring, quality, and compliance." %}</p>
-          <div class="onwebapp-approach-indicator"><div class="onwebapp-approach-indicator-line"></div><div class="onwebapp-approach-indicator-dot"></div></div>
-          <span class="onwebapp-approach-cta">{% trans "Explore" %} <span class="onwebapp-approach-cta-arrow">&rarr;</span></span>
-        </div>
-
+      <div class="oh-pillar oh-reveal oh-reveal-delay-1" style="--pillar-color:#8b5cf6;--pillar-color-end:#a78bfa;--pillar-bg:rgba(139,92,246,.07)">
+        <div class="oh-pillar-icon"><i class="fas fa-gear"></i></div>
+        <div class="oh-pillar-title">{% trans "Automation" %}</div>
+        <p class="oh-pillar-desc">{% trans "Workflows, chatbots, IoT — orchestrated for peak efficiency." %}</p>
+      </div>
+      <div class="oh-pillar oh-reveal oh-reveal-delay-2" style="--pillar-color:#f59e0b;--pillar-color-end:#fbbf24;--pillar-bg:rgba(245,158,11,.07)">
+        <div class="oh-pillar-icon"><i class="fas fa-chart-line"></i></div>
+        <div class="oh-pillar-title">{% trans "Digital Marketing" %}</div>
+        <p class="oh-pillar-desc">{% trans "SEO, social media, analytics — 200+ ranking factors optimized." %}</p>
+      </div>
+      <div class="oh-pillar oh-reveal oh-reveal-delay-3" style="--pillar-color:#0f172a;--pillar-color-end:#1e293b;--pillar-bg:rgba(15,23,42,.06)">
+        <div class="oh-pillar-icon"><i class="fas fa-brain"></i></div>
+        <div class="oh-pillar-title">{% trans "AI" %}</div>
+        <p class="oh-pillar-desc">{% trans "Machine learning, predictive analytics, generative automation." %}</p>
+      </div>
+      <div class="oh-pillar oh-reveal oh-reveal-delay-4" style="--pillar-color:#10b981;--pillar-color-end:#34d399;--pillar-bg:rgba(16,185,129,.07)">
+        <div class="oh-pillar-icon"><i class="fas fa-shield-halved"></i></div>
+        <div class="oh-pillar-title">{% trans "Validation" %}</div>
+        <p class="oh-pillar-desc">{% trans "Monitoring, quality, compliance — from chaos to control." %}</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ==================== 4. BUILT-IN INTEGRATION (ERP) ==================== -->
+<div class="oh-section-divider"></div>
+
+<!-- ==================== ERP INTEGRATION ==================== -->
 <section class="oh-section oh-section-alt">
   <div class="container">
     <div class="oh-erp-grid">
-      <div class="animate-on-scroll slide-up">
+      <div class="oh-reveal">
         <div class="oh-section-label">{% trans "Built-in Integration" %}</div>
         <h2 class="oh-section-title">{% trans "Website ERP Integration" %}</h2>
-        <p class="oh-section-sub mb-4">{% trans "Improve your operations and save time and money with website integration with an ERP system that best meets your B2B business needs." %}</p>
-        <ul class="oh-erp-features">
+        <p class="oh-section-sub mb-3">{% trans "Improve your operations and save time and money with website integration with an ERP system that best meets your business needs." %}</p>
+        <ul class="oh-erp-list">
           <li>
             <div class="icon"><i class="fas fa-building"></i></div>
             <div>
@@ -921,220 +446,102 @@
           <li>
             <div class="icon"><i class="fas fa-database"></i></div>
             <div>
-              <strong>{% trans "ERP Integration" %}</strong>
+              <strong>{% trans "ERP Systems" %}</strong>
               <small>{% trans "ERPNext, SAP, Oracle, and custom ERP systems — unified through intelligent API connectors." %}</small>
             </div>
           </li>
           <li>
             <div class="icon"><i class="fas fa-link"></i></div>
             <div>
-              <strong>{% trans "API Integration" %}</strong>
-              <small>{% trans "RESTful APIs, webhooks, and event-driven architecture for seamless data exchange between platforms." %}</small>
+              <strong>{% trans "API Architecture" %}</strong>
+              <small>{% trans "RESTful APIs, webhooks, and event-driven architecture for seamless data exchange." %}</small>
             </div>
           </li>
         </ul>
       </div>
-      <div class="animate-on-scroll slide-up" style="transition-delay:.1s;">
-        <img src="{% static 'img/unified-data-flow.jpg' %}" alt="Unified Data Flow - Website, ERP, CRM, IoT Integration Hub" style="width:100%;border-radius:16px;" loading="lazy">
+      <div class="oh-erp-img oh-reveal oh-reveal-delay-2">
+        <img src="{% static 'img/unified-data-flow.jpg' %}" alt="Unified Data Flow" loading="lazy">
       </div>
     </div>
   </div>
 </section>
 
-<!-- ==================== 5. BUILT-IN AUTOMATION ==================== -->
-<section class="oh-section" style="background:#f8fafc;">
+<!-- ==================== AUTOMATION ==================== -->
+<section class="oh-section">
   <div class="container">
-    <div class="text-center mb-5 animate-on-scroll">
+    <div class="text-center mb-5">
       <div class="oh-section-label">{% trans "Built-in Automation" %}</div>
       <h2 class="oh-section-title">{% trans "Enhance Customer Journey" %}</h2>
-      <p class="oh-section-sub mx-auto">{% trans "Integrate website automation with enterprise automation. Design innovative recipes to automate workflows, workloads, and repetitive tasks." %}</p>
+      <p class="oh-section-sub mx-auto">{% trans "Design innovative recipes to automate workflows, workloads, and repetitive tasks across your entire business." %}</p>
     </div>
-
-    <!-- Website Automation -->
-    <div class="text-center mb-4 animate-on-scroll">
-      <div style="display:inline-flex;align-items:center;gap:.6rem;background:#eef2ff;color:#1e40af;padding:.5rem 1.4rem;border-radius:2rem;font-weight:700;font-size:.85rem;">
-        <i class="fas fa-globe"></i> {% trans "Website Automation" %}
+    <div class="oh-auto-grid">
+      <div class="oh-auto-card oh-reveal">
+        <div class="oh-auto-card-img">
+          <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=500&h=300&fit=crop" alt="Customer Journey" loading="lazy">
+          <div class="oh-auto-card-overlay"><small>WF-001</small><span>{% trans "Automated Customer Journey" %}</span></div>
+        </div>
+        <div class="oh-auto-card-body">
+          <ul>
+            <li><i class="fas fa-check-circle"></i> {% trans "Personalized user flows based on behavior" %}</li>
+            <li><i class="fas fa-check-circle"></i> {% trans "Dynamic content delivery and A/B testing" %}</li>
+            <li><i class="fas fa-check-circle"></i> {% trans "Lead scoring and qualification automation" %}</li>
+          </ul>
+        </div>
+      </div>
+      <div class="oh-auto-card oh-reveal oh-reveal-delay-1">
+        <div class="oh-auto-card-img">
+          <img src="https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=500&h=300&fit=crop" alt="Workflow" loading="lazy">
+          <div class="oh-auto-card-overlay"><small>WF-002</small><span>{% trans "Workflow Automation" %}</span></div>
+        </div>
+        <div class="oh-auto-card-body">
+          <ul>
+            <li><i class="fas fa-check-circle"></i> {% trans "Visual workflow builder with drag-and-drop" %}</li>
+            <li><i class="fas fa-check-circle"></i> {% trans "Conditional logic and trigger-based actions" %}</li>
+            <li><i class="fas fa-check-circle"></i> {% trans "Repetitive tasks automated end-to-end" %}</li>
+          </ul>
+        </div>
+      </div>
+      <div class="oh-auto-card oh-reveal oh-reveal-delay-2">
+        <div class="oh-auto-card-img">
+          <img src="https://images.unsplash.com/photo-1677442136019-21780ecad995?w=500&h=300&fit=crop" alt="Chatbot" loading="lazy">
+          <div class="oh-auto-card-overlay"><small>WF-003</small><span>{% trans "Chatbots & AI Assistants" %}</span></div>
+        </div>
+        <div class="oh-auto-card-body">
+          <ul>
+            <li><i class="fas fa-check-circle"></i> {% trans "24/7 AI-powered customer support" %}</li>
+            <li><i class="fas fa-check-circle"></i> {% trans "Natural language processing for inquiries" %}</li>
+            <li><i class="fas fa-check-circle"></i> {% trans "Seamless handoff to human agents" %}</li>
+          </ul>
+        </div>
+      </div>
+      <div class="oh-auto-card oh-reveal oh-reveal-delay-3">
+        <div class="oh-auto-card-img">
+          <img src="https://images.unsplash.com/photo-1576444356170-66073fbf8511?w=500&h=300&fit=crop" alt="Testing" loading="lazy">
+          <div class="oh-auto-card-overlay"><small>WF-004</small><span>{% trans "Test Automation" %}</span></div>
+        </div>
+        <div class="oh-auto-card-body">
+          <ul>
+            <li><i class="fas fa-check-circle"></i> {% trans "Automated regression and performance testing" %}</li>
+            <li><i class="fas fa-check-circle"></i> {% trans "Continuous integration and deployment" %}</li>
+            <li><i class="fas fa-check-circle"></i> {% trans "Quality assurance at every release" %}</li>
+          </ul>
+        </div>
       </div>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem;margin-bottom:3.5rem;" class="oh-auto-cards animate-on-scroll">
-
-      <div style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.05);transition:transform .3s,box-shadow .3s;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 30px rgba(30,64,175,.12)'" onmouseout="this.style.transform='';this.style.boxShadow='0 2px 12px rgba(0,0,0,.05)'">
-        <div style="position:relative;height:170px;overflow:hidden;">
-          <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=500&h=300&fit=crop" alt="Customer Journey" style="width:100%;height:100%;object-fit:cover;">
-          <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(30,64,175,.85),transparent 60%);"></div>
-          <div style="position:absolute;bottom:1rem;left:1rem;right:1rem;color:#fff;">
-            <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;opacity:.8;margin-bottom:.2rem;">WF-001</div>
-            <div style="font-weight:800;font-size:.95rem;">{% trans "Automated Customer Journey" %}</div>
-          </div>
-        </div>
-        <div style="padding:1.1rem 1.2rem;">
-          <ul style="list-style:none;padding:0;margin:0;font-size:.78rem;color:#475569;display:flex;flex-direction:column;gap:.45rem;">
-            <li style="display:flex;align-items:flex-start;gap:.45rem;"><i class="fas fa-check-circle" style="color:#1e40af;font-size:.7rem;margin-top:.15rem;flex-shrink:0;"></i> {% trans "Personalized user flows based on behavior" %}</li>
-            <li style="display:flex;align-items:flex-start;gap:.45rem;"><i class="fas fa-check-circle" style="color:#1e40af;font-size:.7rem;margin-top:.15rem;flex-shrink:0;"></i> {% trans "Dynamic content delivery and A/B testing" %}</li>
-            <li style="display:flex;align-items:flex-start;gap:.45rem;"><i class="fas fa-check-circle" style="color:#1e40af;font-size:.7rem;margin-top:.15rem;flex-shrink:0;"></i> {% trans "Lead scoring and qualification automation" %}</li>
-          </ul>
-        </div>
-      </div>
-
-      <div style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.05);transition:transform .3s,box-shadow .3s;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 30px rgba(30,64,175,.12)'" onmouseout="this.style.transform='';this.style.boxShadow='0 2px 12px rgba(0,0,0,.05)'">
-        <div style="position:relative;height:170px;overflow:hidden;">
-          <img src="https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=500&h=300&fit=crop" alt="Workflow" style="width:100%;height:100%;object-fit:cover;">
-          <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(30,64,175,.85),transparent 60%);"></div>
-          <div style="position:absolute;bottom:1rem;left:1rem;right:1rem;color:#fff;">
-            <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;opacity:.8;margin-bottom:.2rem;">WF-002</div>
-            <div style="font-weight:800;font-size:.95rem;">{% trans "Workflow Automation" %}</div>
-          </div>
-        </div>
-        <div style="padding:1.1rem 1.2rem;">
-          <ul style="list-style:none;padding:0;margin:0;font-size:.78rem;color:#475569;display:flex;flex-direction:column;gap:.45rem;">
-            <li style="display:flex;align-items:flex-start;gap:.45rem;"><i class="fas fa-check-circle" style="color:#1e40af;font-size:.7rem;margin-top:.15rem;flex-shrink:0;"></i> {% trans "Visual workflow builder with drag-and-drop" %}</li>
-            <li style="display:flex;align-items:flex-start;gap:.45rem;"><i class="fas fa-check-circle" style="color:#1e40af;font-size:.7rem;margin-top:.15rem;flex-shrink:0;"></i> {% trans "Conditional logic and trigger-based actions" %}</li>
-            <li style="display:flex;align-items:flex-start;gap:.45rem;"><i class="fas fa-check-circle" style="color:#1e40af;font-size:.7rem;margin-top:.15rem;flex-shrink:0;"></i> {% trans "Repetitive tasks automated end-to-end" %}</li>
-          </ul>
-        </div>
-      </div>
-
-      <div style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.05);transition:transform .3s,box-shadow .3s;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 30px rgba(30,64,175,.12)'" onmouseout="this.style.transform='';this.style.boxShadow='0 2px 12px rgba(0,0,0,.05)'">
-        <div style="position:relative;height:170px;overflow:hidden;">
-          <img src="https://images.unsplash.com/photo-1677442136019-21780ecad995?w=500&h=300&fit=crop" alt="Chatbot AI" style="width:100%;height:100%;object-fit:cover;">
-          <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(30,64,175,.85),transparent 60%);"></div>
-          <div style="position:absolute;bottom:1rem;left:1rem;right:1rem;color:#fff;">
-            <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;opacity:.8;margin-bottom:.2rem;">WF-003</div>
-            <div style="font-weight:800;font-size:.95rem;">{% trans "Chatbots & AI Assistants" %}</div>
-          </div>
-        </div>
-        <div style="padding:1.1rem 1.2rem;">
-          <ul style="list-style:none;padding:0;margin:0;font-size:.78rem;color:#475569;display:flex;flex-direction:column;gap:.45rem;">
-            <li style="display:flex;align-items:flex-start;gap:.45rem;"><i class="fas fa-check-circle" style="color:#1e40af;font-size:.7rem;margin-top:.15rem;flex-shrink:0;"></i> {% trans "24/7 AI-powered customer support" %}</li>
-            <li style="display:flex;align-items:flex-start;gap:.45rem;"><i class="fas fa-check-circle" style="color:#1e40af;font-size:.7rem;margin-top:.15rem;flex-shrink:0;"></i> {% trans "Natural language processing for inquiries" %}</li>
-            <li style="display:flex;align-items:flex-start;gap:.45rem;"><i class="fas fa-check-circle" style="color:#1e40af;font-size:.7rem;margin-top:.15rem;flex-shrink:0;"></i> {% trans "Seamless handoff to human agents" %}</li>
-          </ul>
-        </div>
-      </div>
-
-      <div style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.05);transition:transform .3s,box-shadow .3s;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 30px rgba(30,64,175,.12)'" onmouseout="this.style.transform='';this.style.boxShadow='0 2px 12px rgba(0,0,0,.05)'">
-        <div style="position:relative;height:170px;overflow:hidden;">
-          <img src="https://images.unsplash.com/photo-1576444356170-66073fbf8511?w=500&h=300&fit=crop" alt="Test Automation" style="width:100%;height:100%;object-fit:cover;">
-          <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(30,64,175,.85),transparent 60%);"></div>
-          <div style="position:absolute;bottom:1rem;left:1rem;right:1rem;color:#fff;">
-            <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;opacity:.8;margin-bottom:.2rem;">WF-004</div>
-            <div style="font-weight:800;font-size:.95rem;">{% trans "Test Automation" %}</div>
-          </div>
-        </div>
-        <div style="padding:1.1rem 1.2rem;">
-          <ul style="list-style:none;padding:0;margin:0;font-size:.78rem;color:#475569;display:flex;flex-direction:column;gap:.45rem;">
-            <li style="display:flex;align-items:flex-start;gap:.45rem;"><i class="fas fa-check-circle" style="color:#1e40af;font-size:.7rem;margin-top:.15rem;flex-shrink:0;"></i> {% trans "Automated regression and performance testing" %}</li>
-            <li style="display:flex;align-items:flex-start;gap:.45rem;"><i class="fas fa-check-circle" style="color:#1e40af;font-size:.7rem;margin-top:.15rem;flex-shrink:0;"></i> {% trans "Continuous integration and deployment" %}</li>
-            <li style="display:flex;align-items:flex-start;gap:.45rem;"><i class="fas fa-check-circle" style="color:#1e40af;font-size:.7rem;margin-top:.15rem;flex-shrink:0;"></i> {% trans "Quality assurance at every release" %}</li>
-          </ul>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- Divider -->
-    <div style="display:flex;align-items:center;gap:1rem;margin-bottom:3.5rem;" class="animate-on-scroll">
-      <div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,#cbd5e1,transparent);"></div>
-      <div style="display:inline-flex;align-items:center;gap:.5rem;background:#0f172a;color:#fff;padding:.5rem 1.4rem;border-radius:2rem;font-weight:700;font-size:.85rem;">
-        <i class="fas fa-building"></i> {% trans "Enterprise Automation" %}
-      </div>
-      <div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,#cbd5e1,transparent);"></div>
-    </div>
-
-    <!-- Enterprise Automation -->
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem;" class="oh-auto-cards animate-on-scroll">
-
-      <div style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.05);transition:transform .3s,box-shadow .3s;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 30px rgba(30,64,175,.12)'" onmouseout="this.style.transform='';this.style.boxShadow='0 2px 12px rgba(0,0,0,.05)'">
-        <div style="position:relative;height:170px;overflow:hidden;">
-          <img src="https://images.unsplash.com/photo-1565688534245-05d6b5be184a?w=500&h=300&fit=crop" alt="ERP" style="width:100%;height:100%;object-fit:cover;">
-          <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(15,23,42,.85),transparent 60%);"></div>
-          <div style="position:absolute;bottom:1rem;left:1rem;right:1rem;color:#fff;">
-            <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;opacity:.8;margin-bottom:.2rem;">WF-005</div>
-            <div style="font-weight:800;font-size:.95rem;">{% trans "ERP Automation" %}</div>
-          </div>
-        </div>
-        <div style="padding:1.1rem 1.2rem;">
-          <ul style="list-style:none;padding:0;margin:0;font-size:.78rem;color:#475569;display:flex;flex-direction:column;gap:.45rem;">
-            <li style="display:flex;align-items:flex-start;gap:.45rem;"><i class="fas fa-check-circle" style="color:#1e40af;font-size:.7rem;margin-top:.15rem;flex-shrink:0;"></i> {% trans "Automated procurement and inventory management" %}</li>
-            <li style="display:flex;align-items:flex-start;gap:.45rem;"><i class="fas fa-check-circle" style="color:#1e40af;font-size:.7rem;margin-top:.15rem;flex-shrink:0;"></i> {% trans "Invoice processing and payment workflows" %}</li>
-            <li style="display:flex;align-items:flex-start;gap:.45rem;"><i class="fas fa-check-circle" style="color:#1e40af;font-size:.7rem;margin-top:.15rem;flex-shrink:0;"></i> {% trans "Real-time stock synchronization" %}</li>
-          </ul>
-        </div>
-      </div>
-
-      <div style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.05);transition:transform .3s,box-shadow .3s;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 30px rgba(30,64,175,.12)'" onmouseout="this.style.transform='';this.style.boxShadow='0 2px 12px rgba(0,0,0,.05)'">
-        <div style="position:relative;height:170px;overflow:hidden;">
-          <img src="https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=500&h=300&fit=crop" alt="iPaaS Cloud" style="width:100%;height:100%;object-fit:cover;">
-          <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(15,23,42,.85),transparent 60%);"></div>
-          <div style="position:absolute;bottom:1rem;left:1rem;right:1rem;color:#fff;">
-            <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;opacity:.8;margin-bottom:.2rem;">WF-006</div>
-            <div style="font-weight:800;font-size:.95rem;">{% trans "iPaaS Automation" %}</div>
-          </div>
-        </div>
-        <div style="padding:1.1rem 1.2rem;">
-          <ul style="list-style:none;padding:0;margin:0;font-size:.78rem;color:#475569;display:flex;flex-direction:column;gap:.45rem;">
-            <li style="display:flex;align-items:flex-start;gap:.45rem;"><i class="fas fa-check-circle" style="color:#1e40af;font-size:.7rem;margin-top:.15rem;flex-shrink:0;"></i> {% trans "Cloud-based integration platform as a service" %}</li>
-            <li style="display:flex;align-items:flex-start;gap:.45rem;"><i class="fas fa-check-circle" style="color:#1e40af;font-size:.7rem;margin-top:.15rem;flex-shrink:0;"></i> {% trans "Pre-built connectors for 200+ SaaS apps" %}</li>
-            <li style="display:flex;align-items:flex-start;gap:.45rem;"><i class="fas fa-check-circle" style="color:#1e40af;font-size:.7rem;margin-top:.15rem;flex-shrink:0;"></i> {% trans "Real-time data transformation and routing" %}</li>
-          </ul>
-        </div>
-      </div>
-
-      <div style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.05);transition:transform .3s,box-shadow .3s;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 30px rgba(30,64,175,.12)'" onmouseout="this.style.transform='';this.style.boxShadow='0 2px 12px rgba(0,0,0,.05)'">
-        <div style="position:relative;height:170px;overflow:hidden;">
-          <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=500&h=300&fit=crop" alt="IoT Industrial" style="width:100%;height:100%;object-fit:cover;">
-          <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(15,23,42,.85),transparent 60%);"></div>
-          <div style="position:absolute;bottom:1rem;left:1rem;right:1rem;color:#fff;">
-            <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;opacity:.8;margin-bottom:.2rem;">WF-007</div>
-            <div style="font-weight:800;font-size:.95rem;">{% trans "IoT & Industrial Automation" %}</div>
-          </div>
-        </div>
-        <div style="padding:1.1rem 1.2rem;">
-          <ul style="list-style:none;padding:0;margin:0;font-size:.78rem;color:#475569;display:flex;flex-direction:column;gap:.45rem;">
-            <li style="display:flex;align-items:flex-start;gap:.45rem;"><i class="fas fa-check-circle" style="color:#1e40af;font-size:.7rem;margin-top:.15rem;flex-shrink:0;"></i> {% trans "Robot and kiosk automation systems" %}</li>
-            <li style="display:flex;align-items:flex-start;gap:.45rem;"><i class="fas fa-check-circle" style="color:#1e40af;font-size:.7rem;margin-top:.15rem;flex-shrink:0;"></i> {% trans "Sensor data collection and analysis" %}</li>
-            <li style="display:flex;align-items:flex-start;gap:.45rem;"><i class="fas fa-check-circle" style="color:#1e40af;font-size:.7rem;margin-top:.15rem;flex-shrink:0;"></i> {% trans "Predictive maintenance scheduling" %}</li>
-          </ul>
-        </div>
-      </div>
-
-      <div style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.05);transition:transform .3s,box-shadow .3s;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 30px rgba(30,64,175,.12)'" onmouseout="this.style.transform='';this.style.boxShadow='0 2px 12px rgba(0,0,0,.05)'">
-        <div style="position:relative;height:170px;overflow:hidden;">
-          <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=500&h=300&fit=crop" alt="Infrastructure" style="width:100%;height:100%;object-fit:cover;">
-          <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(15,23,42,.85),transparent 60%);"></div>
-          <div style="position:absolute;bottom:1rem;left:1rem;right:1rem;color:#fff;">
-            <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;opacity:.8;margin-bottom:.2rem;">WF-008</div>
-            <div style="font-weight:800;font-size:.95rem;">{% trans "Infrastructure Automation" %}</div>
-          </div>
-        </div>
-        <div style="padding:1.1rem 1.2rem;">
-          <ul style="list-style:none;padding:0;margin:0;font-size:.78rem;color:#475569;display:flex;flex-direction:column;gap:.45rem;">
-            <li style="display:flex;align-items:flex-start;gap:.45rem;"><i class="fas fa-check-circle" style="color:#1e40af;font-size:.7rem;margin-top:.15rem;flex-shrink:0;"></i> {% trans "Server provisioning and configuration" %}</li>
-            <li style="display:flex;align-items:flex-start;gap:.45rem;"><i class="fas fa-check-circle" style="color:#1e40af;font-size:.7rem;margin-top:.15rem;flex-shrink:0;"></i> {% trans "Auto-scaling and load balancing" %}</li>
-            <li style="display:flex;align-items:flex-start;gap:.45rem;"><i class="fas fa-check-circle" style="color:#1e40af;font-size:.7rem;margin-top:.15rem;flex-shrink:0;"></i> {% trans "Disaster recovery and backup automation" %}</li>
-          </ul>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- Responsive -->
-    <style>
-      @media(max-width:991.98px){.oh-auto-cards{grid-template-columns:repeat(2,1fr) !important;}}
-      @media(max-width:575.98px){.oh-auto-cards{grid-template-columns:1fr !important;}}
-    </style>
   </div>
 </section>
 
-<!-- ==================== 6. DIGITAL MARKETING ==================== -->
-<section class="oh-marketing-section">
+<div class="oh-section-divider"></div>
+
+<!-- ==================== DIGITAL MARKETING ==================== -->
+<section class="oh-section oh-section-alt">
   <div class="container">
-    <div class="text-center mb-5 animate-on-scroll">
+    <div class="text-center mb-5">
       <div class="oh-section-label">{% trans "Built-in Digital Marketing" %}</div>
       <h2 class="oh-section-title">{% trans "Rank High. Stand Out." %}</h2>
       <p class="oh-section-sub mx-auto">{% trans "Website structuring strategies that take into account more than 200 factors that Google considers for ranking." %}</p>
     </div>
-    <div class="oh-pyramid">
+    <div class="oh-pyramid oh-reveal">
       <div class="oh-pyr-top">
         <span>{% trans "Rank High. Stand Out." %}</span>
         <small>{% trans "The Goal" %}</small>
@@ -1168,21 +575,14 @@
   </div>
 </section>
 
-<!-- ==================== 7. BUILT-IN AI ==================== -->
-<section class="oh-ai" style="position:relative;">
-  <div class="oh-particles" aria-hidden="true">
-    <div class="oh-particle oh-particle--1"></div>
-    <div class="oh-particle oh-particle--2"></div>
-    <div class="oh-particle oh-particle--3"></div>
-    <div class="oh-particle oh-particle--4"></div>
-    <div class="oh-particle oh-particle--5"></div>
-  </div>
+<!-- ==================== BUILT-IN AI ==================== -->
+<section class="oh-ai">
   <div class="container">
-    <div class="oh-ai-grid">
-      <div class="animate-on-scroll slide-up">
+    <div class="oh-ai-grid oh-reveal">
+      <div>
         <div class="oh-section-label" style="color:#60a5fa;">{% trans "Built-in AI" %}</div>
-        <h2 class="oh-section-title" style="color:#fff;">{% trans "Stand-out Productivity" %}</h2>
-        <p>{% trans "Let AI and machine learning (ML) predict the future and generate automation. Intelligent systems that learn, adapt, and optimize your operations." %}</p>
+        <h2>{% trans "Stand-out Productivity" %}</h2>
+        <p>{% trans "Let AI and machine learning predict the future and generate automation. Intelligent systems that learn, adapt, and optimize your operations." %}</p>
         <ul class="oh-ai-features">
           <li>
             <i class="fas fa-brain"></i>
@@ -1218,25 +618,22 @@
   </div>
 </section>
 
-<!-- ==================== 8. BUILT-IN VALIDATION ==================== -->
-<section class="oh-validation">
+<!-- ==================== BUILT-IN VALIDATION ==================== -->
+<section class="oh-section">
   <div class="container">
     <div class="oh-val-grid">
-      <!-- Text - Left -->
-      <div class="oh-val-text animate-on-scroll slide-up">
+      <div class="oh-reveal">
         <div class="oh-section-label" style="color:#059669;">{% trans "Built-in Validation" %}</div>
         <h2 class="oh-section-title">{% trans "From Chaos to Control" %}</h2>
-        <p class="oh-section-sub">{% trans "Where we shine — website monitoring, platform dashboards, API design, and comprehensive validation." %}</p>
-        <ul style="list-style:none;padding:0;margin:1.5rem 0 0;display:flex;flex-direction:column;gap:.75rem;">
-          <li style="display:flex;align-items:center;gap:.6rem;font-size:.88rem;color:#334155;"><i class="fas fa-check-circle" style="color:#10b981;font-size:.85rem;"></i> {% trans "24/7 uptime monitoring & instant alerts" %}</li>
-          <li style="display:flex;align-items:center;gap:.6rem;font-size:.88rem;color:#334155;"><i class="fas fa-check-circle" style="color:#10b981;font-size:.85rem;"></i> {% trans "Custom KPI dashboards with real-time data" %}</li>
-          <li style="display:flex;align-items:center;gap:.6rem;font-size:.88rem;color:#334155;"><i class="fas fa-check-circle" style="color:#10b981;font-size:.85rem;"></i> {% trans "API architecture, testing & continuous validation" %}</li>
-          <li style="display:flex;align-items:center;gap:.6rem;font-size:.88rem;color:#334155;"><i class="fas fa-check-circle" style="color:#10b981;font-size:.85rem;"></i> {% trans "Performance, SEO & accessibility scoring" %}</li>
+        <p class="oh-section-sub">{% trans "Website monitoring, platform dashboards, API design, and comprehensive validation." %}</p>
+        <ul style="list-style:none;padding:0;margin:1.5rem 0 0;display:flex;flex-direction:column;gap:.8rem;">
+          <li style="display:flex;align-items:center;gap:.6rem;font-size:.88rem;color:#334155;"><i class="fas fa-check-circle" style="color:#10b981;"></i> {% trans "24/7 uptime monitoring & instant alerts" %}</li>
+          <li style="display:flex;align-items:center;gap:.6rem;font-size:.88rem;color:#334155;"><i class="fas fa-check-circle" style="color:#10b981;"></i> {% trans "Custom KPI dashboards with real-time data" %}</li>
+          <li style="display:flex;align-items:center;gap:.6rem;font-size:.88rem;color:#334155;"><i class="fas fa-check-circle" style="color:#10b981;"></i> {% trans "API architecture, testing & continuous validation" %}</li>
+          <li style="display:flex;align-items:center;gap:.6rem;font-size:.88rem;color:#334155;"><i class="fas fa-check-circle" style="color:#10b981;"></i> {% trans "Performance, SEO & accessibility scoring" %}</li>
         </ul>
       </div>
-
-      <!-- Dashboard Mockup - Right -->
-      <div class="oh-val-dashboard animate-on-scroll slide-up" style="transition-delay:.1s;">
+      <div class="oh-val-dashboard oh-reveal oh-reveal-delay-2">
         <div class="oh-val-bar">
           <div class="oh-val-bar-dot"></div>
           <div class="oh-val-bar-dot"></div>
@@ -1303,379 +700,247 @@
         </div>
       </div>
     </div>
-
-    <!-- Stats Bar -->
-    <div class="oh-val-stats animate-on-scroll slide-up">
-      <div class="oh-val-stat">
-        <div class="oh-val-stat-num">99.9%</div>
+    <div class="oh-val-stats">
+      <div class="oh-val-stat oh-reveal">
+        <div class="oh-val-stat-num" data-count="99" data-suffix=".9%">0</div>
         <div class="oh-val-stat-label">{% trans "Uptime SLA" %}</div>
       </div>
-      <div class="oh-val-stat">
+      <div class="oh-val-stat oh-reveal oh-reveal-delay-1">
         <div class="oh-val-stat-num">&lt;100ms</div>
         <div class="oh-val-stat-label">{% trans "Response Time" %}</div>
       </div>
-      <div class="oh-val-stat">
-        <div class="oh-val-stat-num">24/7</div>
+      <div class="oh-val-stat oh-reveal oh-reveal-delay-2">
+        <div class="oh-val-stat-num">{% trans "24/7" %}</div>
         <div class="oh-val-stat-label">{% trans "Monitoring" %}</div>
       </div>
-      <div class="oh-val-stat">
-        <div class="oh-val-stat-num">50+</div>
+      <div class="oh-val-stat oh-reveal oh-reveal-delay-3">
+        <div class="oh-val-stat-num" data-count="50" data-suffix="+">0</div>
         <div class="oh-val-stat-label">{% trans "Check Points" %}</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ==================== 9. END-TO-END SERVICES ==================== -->
-<section class="oh-services">
+<div class="oh-section-divider"></div>
+
+<!-- ==================== SERVICES ==================== -->
+<section class="oh-section oh-section-alt">
   <div class="container">
-    <div class="text-center mb-5 animate-on-scroll">
+    <div class="text-center mb-5">
       <div class="oh-section-label">{% trans "Our Services" %}</div>
-      <h2 class="oh-section-title">{% trans "End-to-End Web & Mobile App Development" %}</h2>
+      <h2 class="oh-section-title">{% trans "End-to-End Development" %}</h2>
+      <p class="oh-section-sub mx-auto">{% trans "From concept to launch, we deliver complete digital solutions for modern enterprises." %}</p>
     </div>
-    <div class="oh-svc-list">
-      <!-- 1 -->
-      <div class="oh-svc-row animate-on-scroll slide-up">
-        <div class="oh-svc-img oh-svc-img--1">
-          <img src="{% static 'img/ai.png' %}" alt="AI Development Services">
-          <i class="fas fa-robot"></i>
-        </div>
-        <div class="oh-svc-content">
-          <h3>{% trans "AI Development Services" %}</h3>
-          <p>{% trans "Custom AI solutions, machine learning models, and intelligent automation that transform how your business operates." %}</p>
-          <a href="#" class="oh-svc-link">{% trans "Learn more" %} <i class="fas fa-arrow-right"></i></a>
-        </div>
+    <div class="oh-svc-grid">
+      <div class="oh-svc-card oh-reveal" style="--svc-color:#2563eb;--svc-bg:rgba(37,99,235,.07)">
+        <div class="oh-svc-card-icon"><i class="fas fa-robot"></i></div>
+        <h5>{% trans "AI Development" %}</h5>
+        <p>{% trans "Custom AI solutions, machine learning models, and intelligent automation that transform how your business operates." %}</p>
+        <a href="#" class="oh-svc-card-link">{% trans "Learn more" %} <i class="fas fa-arrow-right"></i></a>
       </div>
-      <!-- 2 -->
-      <div class="oh-svc-row animate-on-scroll slide-up">
-        <div class="oh-svc-img oh-svc-img--2">
-          <img src="{% static 'img/ui.png' %}" alt="UI/UX Design & Development">
-          <i class="fas fa-palette"></i>
-        </div>
-        <div class="oh-svc-content">
-          <h3>{% trans "UI/UX Design & Development" %}</h3>
-          <p>{% trans "User-centered design that engages, converts, and delights your users across every touchpoint." %}</p>
-          <a href="#" class="oh-svc-link">{% trans "Learn more" %} <i class="fas fa-arrow-right"></i></a>
-        </div>
+      <div class="oh-svc-card oh-reveal oh-reveal-delay-1" style="--svc-color:#8b5cf6;--svc-bg:rgba(139,92,246,.07)">
+        <div class="oh-svc-card-icon"><i class="fas fa-palette"></i></div>
+        <h5>{% trans "UI/UX Design" %}</h5>
+        <p>{% trans "User-centered design that engages, converts, and delights your users across every touchpoint." %}</p>
+        <a href="#" class="oh-svc-card-link">{% trans "Learn more" %} <i class="fas fa-arrow-right"></i></a>
       </div>
-      <!-- 3 -->
-      <div class="oh-svc-row animate-on-scroll slide-up">
-        <div class="oh-svc-img oh-svc-img--3">
-          <img src="{% static 'img/costum.png' %}" alt="Custom Web Development">
-          <i class="fas fa-code"></i>
-        </div>
-        <div class="oh-svc-content">
-          <h3>{% trans "Custom Web Development" %}</h3>
-          <p>{% trans "Scalable, high-performance web applications built with modern tech stacks for your business." %}</p>
-          <a href="#" class="oh-svc-link">{% trans "Learn more" %} <i class="fas fa-arrow-right"></i></a>
-        </div>
+      <div class="oh-svc-card oh-reveal oh-reveal-delay-2" style="--svc-color:#10b981;--svc-bg:rgba(16,185,129,.07)">
+        <div class="oh-svc-card-icon"><i class="fas fa-code"></i></div>
+        <h5>{% trans "Web Development" %}</h5>
+        <p>{% trans "Scalable, high-performance web applications built with modern tech stacks for your business." %}</p>
+        <a href="#" class="oh-svc-card-link">{% trans "Learn more" %} <i class="fas fa-arrow-right"></i></a>
       </div>
-      <!-- 6 -->
-      <div class="oh-svc-row animate-on-scroll slide-up">
-        <div class="oh-svc-img oh-svc-img--6">
-          <img src="{% static 'img/digital.png' %}" alt="Digital Transformation">
-          <i class="fas fa-arrows-spin"></i>
-        </div>
-        <div class="oh-svc-content">
-          <h3>{% trans "Digital Transformation" %}</h3>
-          <p>{% trans "Modernize legacy systems and digitize business processes for the future." %}</p>
-          <a href="#" class="oh-svc-link">{% trans "Learn more" %} <i class="fas fa-arrow-right"></i></a>
-        </div>
+      <div class="oh-svc-card oh-reveal oh-reveal-delay-3" style="--svc-color:#f59e0b;--svc-bg:rgba(245,158,11,.07)">
+        <div class="oh-svc-card-icon"><i class="fas fa-arrows-spin"></i></div>
+        <h5>{% trans "Digital Transformation" %}</h5>
+        <p>{% trans "Modernize legacy systems and digitize business processes for the future." %}</p>
+        <a href="#" class="oh-svc-card-link">{% trans "Learn more" %} <i class="fas fa-arrow-right"></i></a>
       </div>
-      <!-- 7 -->
-      <div class="oh-svc-row animate-on-scroll slide-up">
-        <div class="oh-svc-img oh-svc-img--7">
-          <img src="{% static 'img/product.png' %}" alt="Digital Product Engineering">
-          <i class="fas fa-gem"></i>
-        </div>
-        <div class="oh-svc-content">
-          <h3>{% trans "Digital Product Engineering" %}</h3>
-          <p>{% trans "From concept to launch — end-to-end product development with agile methodology." %}</p>
-          <a href="#" class="oh-svc-link">{% trans "Learn more" %} <i class="fas fa-arrow-right"></i></a>
-        </div>
+      <div class="oh-svc-card oh-reveal oh-reveal-delay-4" style="--svc-color:#f43f5e;--svc-bg:rgba(244,63,94,.07)">
+        <div class="oh-svc-card-icon"><i class="fas fa-gem"></i></div>
+        <h5>{% trans "Product Engineering" %}</h5>
+        <p>{% trans "From concept to launch — end-to-end product development with agile methodology." %}</p>
+        <a href="#" class="oh-svc-card-link">{% trans "Learn more" %} <i class="fas fa-arrow-right"></i></a>
+      </div>
+      <div class="oh-svc-card oh-reveal oh-reveal-delay-5" style="--svc-color:#0ea5e9;--svc-bg:rgba(14,165,233,.07)">
+        <div class="oh-svc-card-icon"><i class="fas fa-mobile-screen"></i></div>
+        <h5>{% trans "Mobile Apps" %}</h5>
+        <p>{% trans "Native and cross-platform mobile applications for iOS and Android with exceptional UX." %}</p>
+        <a href="#" class="oh-svc-card-link">{% trans "Learn more" %} <i class="fas fa-arrow-right"></i></a>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ==================== 10. CERTIFICATION ==================== -->
-<section class="onwebapp-certifications">
+<!-- ==================== CERTIFICATIONS ==================== -->
+<section class="oh-section">
   <div class="container">
-    <div class="onwebapp-certifications-header animate-on-scroll">
-      <div class="onwebapp-certifications-eyebrow">{% trans "Certifications" %}</div>
-      <h2 class="onwebapp-certifications-heading">{% trans "Certified & Trusted" %}</h2>
-      <p class="onwebapp-certifications-sub">{% trans "Built around recognized standards for security, accessibility, privacy, and trust." %}</p>
+    <div class="text-center mb-5">
+      <div class="oh-section-label">{% trans "Certifications" %}</div>
+      <h2 class="oh-section-title">{% trans "Certified & Trusted" %}</h2>
+      <p class="oh-section-sub mx-auto">{% trans "Built around recognized standards for security, accessibility, privacy, and trust." %}</p>
     </div>
-    <div class="onwebapp-certifications-grid">
-
-      <div class="onwebapp-certification-item animate-on-scroll slide-up" tabindex="0" role="button" aria-label="GDPR — General Data Protection Regulation">
-        <div class="onwebapp-cert-tooltip">General Data Protection Regulation</div>
-        <div class="onwebapp-cert-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
-        </div>
-        <div class="onwebapp-cert-name">GDPR</div>
-        <div class="onwebapp-cert-desc">Privacy</div>
+    <div class="oh-cert-grid">
+      <div class="oh-cert oh-reveal">
+        <div class="oh-cert-icon"><i class="fas fa-shield-halved"></i></div>
+        <div class="oh-cert-name">GDPR</div>
+        <div class="oh-cert-desc">{% trans "Privacy" %}</div>
       </div>
-
-      <div class="onwebapp-certification-item animate-on-scroll slide-up" style="transition-delay:.06s;" tabindex="0" role="button" aria-label="ISO 27001 — Information Security Management">
-        <div class="onwebapp-cert-tooltip">Information Security Management</div>
-        <div class="onwebapp-cert-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-        </div>
-        <div class="onwebapp-cert-name">ISO 27001</div>
-        <div class="onwebapp-cert-desc">Information Security</div>
+      <div class="oh-cert oh-reveal oh-reveal-delay-1">
+        <div class="oh-cert-icon"><i class="fas fa-certificate"></i></div>
+        <div class="oh-cert-name">ISO 27001</div>
+        <div class="oh-cert-desc">{% trans "Information Security" %}</div>
       </div>
-
-      <div class="onwebapp-certification-item animate-on-scroll slide-up" style="transition-delay:.12s;" tabindex="0" role="button" aria-label="WCAG — Web Content Accessibility Guidelines">
-        <div class="onwebapp-cert-tooltip">Web Content Accessibility Guidelines</div>
-        <div class="onwebapp-cert-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="8" r="1.5" fill="currentColor" stroke="none"/><path d="M7 11.5C8 10 9.5 9 12 9s4 1 5 2.5"/><path d="M9 17l1.5-5.5M15 17l-1.5-5.5"/></svg>
-        </div>
-        <div class="onwebapp-cert-name">WCAG</div>
-        <div class="onwebapp-cert-desc">Accessibility</div>
+      <div class="oh-cert oh-reveal oh-reveal-delay-2">
+        <div class="oh-cert-icon"><i class="fas fa-universal-access"></i></div>
+        <div class="oh-cert-name">WCAG</div>
+        <div class="oh-cert-desc">{% trans "Accessibility" %}</div>
       </div>
-
-      <div class="onwebapp-certification-item animate-on-scroll slide-up" style="transition-delay:.18s;" tabindex="0" role="button" aria-label="SOC 2 — Service Organization Control 2">
-        <div class="onwebapp-cert-tooltip">Service Organization Control 2</div>
-        <div class="onwebapp-cert-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/><circle cx="12" cy="16" r="1" fill="currentColor" stroke="none"/></svg>
-        </div>
-        <div class="onwebapp-cert-name">SOC 2</div>
-        <div class="onwebapp-cert-desc">Security Controls</div>
+      <div class="oh-cert oh-reveal oh-reveal-delay-3">
+        <div class="oh-cert-icon"><i class="fas fa-lock"></i></div>
+        <div class="oh-cert-name">SOC 2</div>
+        <div class="oh-cert-desc">{% trans "Security Controls" %}</div>
       </div>
-
-      <div class="onwebapp-certification-item animate-on-scroll slide-up" style="transition-delay:.24s;" tabindex="0" role="button" aria-label="HIPAA — Health Insurance Portability and Accountability Act">
-        <div class="onwebapp-cert-tooltip">Health Insurance Portability &amp; Accountability Act</div>
-        <div class="onwebapp-cert-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-        </div>
-        <div class="onwebapp-cert-name">HIPAA</div>
-        <div class="onwebapp-cert-desc">Healthcare Privacy</div>
+      <div class="oh-cert oh-reveal oh-reveal-delay-4">
+        <div class="oh-cert-icon"><i class="fas fa-heartbeat"></i></div>
+        <div class="oh-cert-name">HIPAA</div>
+        <div class="oh-cert-desc">{% trans "Healthcare Privacy" %}</div>
       </div>
-
     </div>
   </div>
 </section>
 
-<!-- ==================== 11. EVENTS & WEBINARS ==================== -->
-<section class="onwebapp-events">
+<div class="oh-section-divider"></div>
+
+<!-- ==================== EVENTS ==================== -->
+<section class="oh-section oh-section-alt">
   <div class="container">
-    <div class="onwebapp-events-header animate-on-scroll">
-      <div class="onwebapp-events-eyebrow">{% trans "Events" %}</div>
-      <h2 class="onwebapp-events-heading">{% trans "Learn at International Exhibitions" %}</h2>
-      <p class="onwebapp-events-sub">{% trans "Discover new ideas, technologies, and practical insights through our exhibitions, webinars, and seminars." %}</p>
+    <div class="text-center mb-5">
+      <div class="oh-section-label">{% trans "Events" %}</div>
+      <h2 class="oh-section-title">{% trans "Learn at International Exhibitions" %}</h2>
+      <p class="oh-section-sub mx-auto">{% trans "Discover new ideas, technologies, and practical insights through our exhibitions, webinars, and seminars." %}</p>
     </div>
-
-    <div class="onwebapp-events-grid">
-
-      <!-- Featured Event -->
-      <div class="onwebapp-event-card onwebapp-event-featured animate-on-scroll slide-up">
-        <div class="onwebapp-event-visual" aria-hidden="true">
-          <svg viewBox="0 0 400 500" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="200" cy="250" r="120" stroke="#1e40af" stroke-width=".5" stroke-dasharray="4 4"/>
-            <circle cx="200" cy="250" r="80" stroke="#1e40af" stroke-width=".4" stroke-dasharray="3 3"/>
-            <circle cx="200" cy="250" r="40" stroke="#1e40af" stroke-width=".3"/>
-            <circle cx="200" cy="130" r="4" fill="#1e40af"/><circle cx="320" cy="250" r="3" fill="#1e40af"/><circle cx="200" cy="370" r="3.5" fill="#1e40af"/><circle cx="80" cy="250" r="3" fill="#1e40af"/>
-            <circle cx="285" cy="165" r="2.5" fill="#1e40af"/><circle cx="285" cy="335" r="2" fill="#1e40af"/><circle cx="115" cy="335" r="2.5" fill="#1e40af"/><circle cx="115" cy="165" r="2" fill="#1e40af"/>
-            <line x1="200" y1="130" x2="285" y2="165" stroke="#1e40af" stroke-width=".4"/><line x1="285" y1="165" x2="320" y2="250" stroke="#1e40af" stroke-width=".4"/>
-            <line x1="320" y1="250" x2="285" y2="335" stroke="#1e40af" stroke-width=".4"/><line x1="285" y1="335" x2="200" y2="370" stroke="#1e40af" stroke-width=".4"/>
-            <line x1="200" y1="370" x2="115" y2="335" stroke="#1e40af" stroke-width=".4"/><line x1="115" y1="335" x2="80" y2="250" stroke="#1e40af" stroke-width=".4"/>
-            <line x1="80" y1="250" x2="115" y2="165" stroke="#1e40af" stroke-width=".4"/><line x1="115" y1="165" x2="200" y2="130" stroke="#1e40af" stroke-width=".4"/>
-          </svg>
-        </div>
+    <div class="oh-events-grid">
+      <div class="oh-event oh-event-featured oh-reveal">
         <div>
-          <div class="onwebapp-event-top">
-            <div class="onwebapp-event-date">
-              <span class="onwebapp-event-date-month">SEP</span>
-              <span class="onwebapp-event-date-year">2026</span>
+          <div class="oh-event-top">
+            <div class="oh-event-date">
+              <span class="oh-event-date-month">SEP</span>
+              <span class="oh-event-date-year">2026</span>
             </div>
-            <span class="onwebapp-event-category onwebapp-event-category--webinar">{% trans "Webinar" %}</span>
+            <span class="oh-event-cat oh-event-cat--webinar">{% trans "Webinar" %}</span>
           </div>
-          <h3 class="onwebapp-event-title">{% trans "Webinars: UX and Product Development" %}</h3>
-          <p class="onwebapp-event-desc">{% trans "Insider advice from top companies. All based on real case studies and data-driven insights." %}</p>
-          <div class="onwebapp-event-meta">
-            <span class="onwebapp-event-meta-tag">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
-              {% trans "Online" %}
-            </span>
-          </div>
+          <h3 class="oh-event-title">{% trans "Webinars: UX and Product Development" %}</h3>
+          <p class="oh-event-desc">{% trans "Insider advice from top companies. All based on real case studies and data-driven insights." %}</p>
         </div>
-        <div class="onwebapp-event-bottom">
-          <span></span>
-          <span class="onwebapp-event-cta">{% trans "Explore" %} <span class="onwebapp-event-cta-arrow">&rarr;</span></span>
-        </div>
+        <a href="#" class="oh-event-cta">{% trans "Explore" %} <i class="fas fa-arrow-right"></i></a>
       </div>
-
-      <!-- Secondary Events -->
-      <div class="onwebapp-event-card animate-on-scroll slide-up" style="transition-delay:.08s;">
+      <div class="oh-event oh-reveal oh-reveal-delay-1">
         <div>
-          <div class="onwebapp-event-top">
-            <div class="onwebapp-event-date">
-              <span class="onwebapp-event-date-month">OCT</span>
-              <span class="onwebapp-event-date-year">2026</span>
+          <div class="oh-event-top">
+            <div class="oh-event-date">
+              <span class="oh-event-date-month">OCT</span>
+              <span class="oh-event-date-year">2026</span>
             </div>
-            <span class="onwebapp-event-category onwebapp-event-category--exhibition">{% trans "Exhibition" %}</span>
+            <span class="oh-event-cat oh-event-cat--exhibition">{% trans "Exhibition" %}</span>
           </div>
-          <h3 class="onwebapp-event-title">{% trans "International Tech Exhibition" %}</h3>
-          <p class="onwebapp-event-desc">{% trans "Live demonstrations of our AI-powered automation and integration platform at the global tech summit." %}</p>
-          <div class="onwebapp-event-meta">
-            <span class="onwebapp-event-meta-tag">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-              {% trans "International" %}
-            </span>
-          </div>
+          <h3 class="oh-event-title">{% trans "International Tech Exhibition" %}</h3>
+          <p class="oh-event-desc">{% trans "Live demonstrations of our AI-powered automation and integration platform." %}</p>
         </div>
-        <div class="onwebapp-event-bottom">
-          <span></span>
-          <span class="onwebapp-event-cta">{% trans "Explore" %} <span class="onwebapp-event-cta-arrow">&rarr;</span></span>
-        </div>
+        <a href="#" class="oh-event-cta">{% trans "Explore" %} <i class="fas fa-arrow-right"></i></a>
       </div>
-
-      <div class="onwebapp-event-card animate-on-scroll slide-up" style="transition-delay:.16s;">
+      <div class="oh-event oh-reveal oh-reveal-delay-2">
         <div>
-          <div class="onwebapp-event-top">
-            <div class="onwebapp-event-date">
-              <span class="onwebapp-event-date-month">NOV</span>
-              <span class="onwebapp-event-date-year">2026</span>
+          <div class="oh-event-top">
+            <div class="oh-event-date">
+              <span class="oh-event-date-month">NOV</span>
+              <span class="oh-event-date-year">2026</span>
             </div>
-            <span class="onwebapp-event-category onwebapp-event-category--seminar">{% trans "Seminar" %}</span>
+            <span class="oh-event-cat oh-event-cat--seminar">{% trans "Seminar" %}</span>
           </div>
-          <h3 class="onwebapp-event-title">{% trans "Digital Transformation Seminar" %}</h3>
-          <p class="onwebapp-event-desc">{% trans "Workshop on enterprise automation, IoT integration, and building modern web platforms." %}</p>
-          <div class="onwebapp-event-meta">
-            <span class="onwebapp-event-meta-tag">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>
-              {% trans "Workshop" %}
-            </span>
-          </div>
+          <h3 class="oh-event-title">{% trans "Digital Transformation Seminar" %}</h3>
+          <p class="oh-event-desc">{% trans "Workshop on enterprise automation, IoT integration, and modern web platforms." %}</p>
         </div>
-        <div class="onwebapp-event-bottom">
-          <span></span>
-          <span class="onwebapp-event-cta">{% trans "Explore" %} <span class="onwebapp-event-cta-arrow">&rarr;</span></span>
-        </div>
+        <a href="#" class="oh-event-cta">{% trans "Explore" %} <i class="fas fa-arrow-right"></i></a>
       </div>
-
     </div>
   </div>
 </section>
 
-<!-- ==================== 12. NEWS ==================== -->
-<section class="onwebapp-updates-section">
+<!-- ==================== NEWS ==================== -->
+<section class="oh-section">
   <div class="container">
-
-    <!-- Header -->
-    <div class="onwebapp-updates-header animate-on-scroll">
-      <div class="onwebapp-updates-eyebrow">{% trans "OnWebApp Updates" %}</div>
-      <h2 class="onwebapp-updates-heading">{% trans "Built. Improved. Evolving." %}</h2>
-      <p class="onwebapp-updates-subtitle">{% trans "The latest products, capabilities, and ideas from OnWebApp." %}</p>
+    <div class="text-center mb-5">
+      <div class="oh-section-label">{% trans "OnWebApp Updates" %}</div>
+      <h2 class="oh-section-title">{% trans "Built. Improved. Evolving." %}</h2>
+      <p class="oh-section-sub mx-auto">{% trans "The latest products, capabilities, and ideas from OnWebApp." %}</p>
     </div>
-
-    <!-- Grid -->
-    <div class="onwebapp-updates-grid">
-
-      <!-- Featured Card -->
-      <div class="onwebapp-updates-featured animate-on-scroll slide-up">
-        <div class="onwebapp-updates-visual" aria-hidden="true">
-          <svg viewBox="0 0 400 500" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="320" cy="80" r="3" fill="#1e40af"/><circle cx="280" cy="140" r="2" fill="#1e40af"/><circle cx="350" cy="180" r="2.5" fill="#1e40af"/>
-            <circle cx="260" cy="220" r="2" fill="#1e40af"/><circle cx="330" cy="260" r="3" fill="#1e40af"/><circle cx="290" cy="320" r="2" fill="#1e40af"/>
-            <circle cx="360" cy="350" r="2.5" fill="#1e40af"/><circle cx="310" cy="400" r="2" fill="#1e40af"/><circle cx="270" cy="440" r="3" fill="#1e40af"/>
-            <circle cx="340" cy="120" r="1.5" fill="#1e40af"/><circle cx="300" cy="280" r="1.5" fill="#1e40af"/><circle cx="350" cy="420" r="1.5" fill="#1e40af"/>
-            <line x1="320" y1="80" x2="280" y2="140" stroke="#1e40af" stroke-width=".7"/><line x1="280" y1="140" x2="350" y2="180" stroke="#1e40af" stroke-width=".7"/>
-            <line x1="350" y1="180" x2="260" y2="220" stroke="#1e40af" stroke-width=".7"/><line x1="260" y1="220" x2="330" y2="260" stroke="#1e40af" stroke-width=".7"/>
-            <line x1="330" y1="260" x2="290" y2="320" stroke="#1e40af" stroke-width=".7"/><line x1="290" y1="320" x2="360" y2="350" stroke="#1e40af" stroke-width=".7"/>
-            <line x1="360" y1="350" x2="310" y2="400" stroke="#1e40af" stroke-width=".7"/><line x1="310" y1="400" x2="270" y2="440" stroke="#1e40af" stroke-width=".7"/>
-            <line x1="340" y1="120" x2="330" y2="260" stroke="#1e40af" stroke-width=".4" stroke-dasharray="3 3"/>
-            <line x1="300" y1="280" x2="290" y2="320" stroke="#1e40af" stroke-width=".4" stroke-dasharray="3 3"/>
-            <line x1="350" y1="420" x2="310" y2="400" stroke="#1e40af" stroke-width=".4" stroke-dasharray="3 3"/>
-          </svg>
-        </div>
+    <div class="oh-news-grid">
+      <div class="oh-news-featured oh-reveal">
         <div>
-          <div class="onwebapp-updates-meta">
-            <span class="onwebapp-updates-badge onwebapp-updates-badge--ai">{% trans "AI" %}</span>
-            <span class="onwebapp-updates-date">{% trans "AUG 2026" %}</span>
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <span class="oh-news-badge oh-news-badge--ai">{% trans "AI" %}</span>
+            <span class="small fw-600" style="color:#94a3b8;">{% trans "AUG 2026" %}</span>
           </div>
-          <h3 class="onwebapp-updates-featured-title">{% trans "Data Robot for Analysis" %}</h3>
-          <p class="onwebapp-updates-featured-desc">{% trans "New AI-powered data analysis robot for market, customer, and operational insights." %}</p>
-          <span class="onwebapp-updates-cta">{% trans "Explore update" %} <span class="onwebapp-updates-cta-arrow">&rarr;</span></span>
+          <h3 style="font-size:1.4rem;font-weight:800;color:#0f172a;letter-spacing:-.02em;margin-bottom:.5rem;">{% trans "Data Robot for Analysis" %}</h3>
+          <p style="color:#64748b;font-size:.9rem;line-height:1.65;">{% trans "New AI-powered data analysis robot for market, customer, and operational insights." %}</p>
         </div>
+        <a href="#" class="oh-news-cta">{% trans "Explore update" %} <i class="fas fa-arrow-right"></i></a>
       </div>
-
-      <!-- Secondary Cards -->
-      <div class="onwebapp-updates-secondary">
-        <div class="onwebapp-updates-card animate-on-scroll slide-up" style="transition-delay:.06s;">
-          <div>
-            <div class="onwebapp-updates-card-meta">
-              <span class="onwebapp-updates-badge onwebapp-updates-badge--product">{% trans "Product" %}</span>
-              <span class="onwebapp-updates-date">{% trans "AUG 2026" %}</span>
-            </div>
-            <h4 class="onwebapp-updates-card-title">{% trans "Your Website in Android" %}</h4>
-            <p class="onwebapp-updates-card-desc">{% trans "Turn your website into a native Android app with our new conversion engine." %}</p>
+      <div class="oh-news-card oh-reveal oh-reveal-delay-1">
+        <div>
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <span class="oh-news-badge oh-news-badge--product">{% trans "Product" %}</span>
+            <span class="small fw-600" style="color:#94a3b8;">{% trans "AUG 2026" %}</span>
           </div>
-          <span class="onwebapp-updates-card-cta">{% trans "Explore" %} <span class="onwebapp-updates-card-arrow">&rarr;</span></span>
+          <h4 class="oh-news-card-title">{% trans "Your Website in Android" %}</h4>
+          <p class="oh-news-card-desc">{% trans "Turn your website into a native Android app with our new conversion engine." %}</p>
         </div>
-        <div class="onwebapp-updates-card animate-on-scroll slide-up" style="transition-delay:.12s;">
-          <div>
-            <div class="onwebapp-updates-card-meta">
-              <span class="onwebapp-updates-badge onwebapp-updates-badge--expansion">{% trans "Expansion" %}</span>
-              <span class="onwebapp-updates-date">{% trans "JUL 2026" %}</span>
-            </div>
-            <h4 class="onwebapp-updates-card-title">{% trans "New Branches: Riyadh, Al Khobar" %}</h4>
-            <p class="onwebapp-updates-card-desc">{% trans "Expanding our presence in Saudi Arabia to better serve the Gulf region." %}</p>
-          </div>
-          <span class="onwebapp-updates-card-cta">{% trans "Explore" %} <span class="onwebapp-updates-card-arrow">&rarr;</span></span>
-        </div>
-        <div class="onwebapp-updates-card animate-on-scroll slide-up" style="transition-delay:.18s;">
-          <div>
-            <div class="onwebapp-updates-card-meta">
-              <span class="onwebapp-updates-badge onwebapp-updates-badge--savings">{% trans "Savings" %}</span>
-              <span class="onwebapp-updates-date">{% trans "JUL 2026" %}</span>
-            </div>
-            <h4 class="onwebapp-updates-card-title">{% trans "Save Up to 90% on Marketing" %}</h4>
-            <p class="onwebapp-updates-card-desc">{% trans "New innovations for search engines that dramatically reduce wasted marketing expenses." %}</p>
-          </div>
-          <span class="onwebapp-updates-card-cta">{% trans "Explore" %} <span class="onwebapp-updates-card-arrow">&rarr;</span></span>
-        </div>
+        <a href="#" class="oh-news-cta">{% trans "Explore" %} <i class="fas fa-arrow-right"></i></a>
       </div>
-
+      <div class="oh-news-card oh-reveal oh-reveal-delay-2">
+        <div>
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <span class="oh-news-badge oh-news-badge--expansion">{% trans "Expansion" %}</span>
+            <span class="small fw-600" style="color:#94a3b8;">{% trans "JUL 2026" %}</span>
+          </div>
+          <h4 class="oh-news-card-title">{% trans "New Branches: Riyadh, Al Khobar" %}</h4>
+          <p class="oh-news-card-desc">{% trans "Expanding our presence in Saudi Arabia to better serve the Gulf region." %}</p>
+        </div>
+        <a href="#" class="oh-news-cta">{% trans "Explore" %} <i class="fas fa-arrow-right"></i></a>
+      </div>
     </div>
-
-    <!-- View All -->
-    <div class="onwebapp-updates-viewall animate-on-scroll">
-      <a href="#">{% trans "View all updates" %} <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="vertical-align:middle;"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-    </div>
-
   </div>
 </section>
 
-<!-- ==================== 13. PARTNERSHIPS ==================== -->
+<!-- ==================== PARTNERSHIPS ==================== -->
 <section class="oh-partners">
   <div class="container">
-    <div class="text-center mb-4 animate-on-scroll">
+    <div class="text-center mb-4">
       <div class="oh-section-label">{% trans "Partnerships" %}</div>
       <h2 class="oh-section-title">{% trans "Valuable Partnerships" %}</h2>
     </div>
     <div class="oh-partner-grid">
-      <div class="oh-partner animate-on-scroll slide-up"><i class="fas fa-shield-halved"></i> RSD Security Solutions</div>
-      <div class="oh-partner animate-on-scroll slide-up" style="transition-delay:.06s;"><i class="fas fa-cloud"></i> Cloud Partners</div>
-      <div class="oh-partner animate-on-scroll slide-up" style="transition-delay:.12s;"><i class="fas fa-handshake"></i> Technology Alliances</div>
-      <div class="oh-partner animate-on-scroll slide-up" style="transition-delay:.18s;"><i class="fas fa-building"></i> Enterprise Partners</div>
+      <div class="oh-partner oh-reveal"><i class="fas fa-shield-halved"></i> RSD Security Solutions</div>
+      <div class="oh-partner oh-reveal oh-reveal-delay-1"><i class="fas fa-cloud"></i> Cloud Partners</div>
+      <div class="oh-partner oh-reveal oh-reveal-delay-2"><i class="fas fa-handshake"></i> Technology Alliances</div>
+      <div class="oh-partner oh-reveal oh-reveal-delay-3"><i class="fas fa-building"></i> Enterprise Partners</div>
     </div>
   </div>
 </section>
 
-<!-- ==================== 14. GLOBAL OFFICES ==================== -->
+<!-- ==================== GLOBAL OFFICES ==================== -->
 <section class="oh-global">
   <div class="container">
     <div class="oh-global-grid">
-      <div class="oh-global-text animate-on-scroll slide-up">
+      <div class="oh-reveal">
         <div class="oh-section-label">{% trans "Global Presence" %}</div>
         <h2 class="oh-section-title">{% trans "OnWebApp Around the World" %}</h2>
         <p>{% trans "Day after day, our offices are expanding all over the world wherever you are." %}</p>
         <p>{% trans "Thanks to our main office in the Kingdom of Saudi Arabia to cover the Gulf Cooperation Council countries. In addition to our branch in the Hashemite Kingdom of Jordan — Amman — to cover Asia and Africa." %}</p>
         <p>{% trans "Our global offices enable us to provide the highest level of support and cooperation to our customers." %}</p>
       </div>
-      <div class="animate-on-scroll slide-up" style="transition-delay:.1s;">
+      <div class="oh-reveal oh-reveal-delay-2">
         <div class="oh-office">
           <div class="oh-office-icon"><i class="fas fa-building"></i></div>
           <div>
@@ -1700,10 +965,10 @@
   </div>
 </section>
 
-<!-- ==================== 15. FINAL CTA ==================== -->
+<!-- ==================== FINAL CTA ==================== -->
 <section class="oh-final-cta">
   <div class="container">
-    <div class="animate-on-scroll slide-up">
+    <div class="oh-reveal">
       <h2>{% trans "Ready to Build Something Extraordinary?" %}</h2>
       <p>{% trans "Book a consultation for a comprehensive overview of our approach to building integrated websites and applications." %}</p>
       <div class="d-flex flex-wrap gap-3 justify-content-center">
@@ -1718,7 +983,7 @@
   </div>
 </section>
 
-<!-- ==================== 16. FOOTER ==================== -->
+<!-- ==================== FOOTER ==================== -->
 <footer class="oh-footer">
   <div class="container">
     <div class="oh-footer-grid">
@@ -1771,254 +1036,89 @@
 document.addEventListener('DOMContentLoaded', function() {
     var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    /* ========== 1. SCROLL PROGRESS BAR ========== */
+    /* Scroll Progress */
     var progressBar = document.querySelector('.oh-scroll-progress');
-    if (progressBar && !prefersReducedMotion) {
+    if (progressBar) {
         window.addEventListener('scroll', function() {
             var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
             var scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-            var progress = (scrollTop / scrollHeight) * 100;
-            progressBar.style.width = progress + '%';
+            progressBar.style.width = (scrollTop / scrollHeight) * 100 + '%';
         }, { passive: true });
     }
 
-    /* ========== 2. SMOOTH SCROLL FOR ANCHOR LINKS ========== */
+    /* Smooth scroll */
     if (!prefersReducedMotion) {
         document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
             anchor.addEventListener('click', function(e) {
                 var target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    e.preventDefault();
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
+                if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
             });
         });
     }
 
-    /* ========== 3. INTERSECTION OBSERVER FOR SCROLL ANIMATIONS ========== */
-    var animElements = document.querySelectorAll('.animate-on-scroll');
-    var observer = new IntersectionObserver(function(entries) {
+    /* Scroll Reveal */
+    var revealEls = document.querySelectorAll('.oh-reveal');
+    var revealObs = new IntersectionObserver(function(entries) {
         entries.forEach(function(entry) {
             if (entry.isIntersecting) {
                 entry.target.classList.add('is-visible');
-                observer.unobserve(entry.target);
+                revealObs.unobserve(entry.target);
             }
         });
-    }, { threshold: 0.15 });
-    animElements.forEach(function(el) { observer.observe(el); });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+    revealEls.forEach(function(el) { revealObs.observe(el); });
 
-    /* ========== 4. COUNTER ANIMATION FOR STATS ========== */
-    var counters = document.querySelectorAll('[data-count]');
-    var counterObserver = new IntersectionObserver(function(entries) {
+    /* Animated Counters */
+    var counterEls = document.querySelectorAll('[data-count]');
+    var counterObs = new IntersectionObserver(function(entries) {
         entries.forEach(function(entry) {
             if (entry.isIntersecting) {
                 var el = entry.target;
-                var target = parseInt(el.getAttribute('data-count'));
-                var current = 0;
-                var increment = target / 40;
-                var timer = setInterval(function() {
-                    current += increment;
-                    if (current >= target) {
-                        el.textContent = target + '+';
-                        clearInterval(timer);
+                var target = parseInt(el.getAttribute('data-count'), 10);
+                var suffix = el.getAttribute('data-suffix') || '';
+                var prefix = el.getAttribute('data-prefix') || '';
+                var duration = 1800;
+                var start = 0;
+                var startTime = null;
+
+                function step(timestamp) {
+                    if (!startTime) startTime = timestamp;
+                    var progress = Math.min((timestamp - startTime) / duration, 1);
+                    var eased = 1 - Math.pow(1 - progress, 3);
+                    var current = Math.floor(eased * target);
+                    el.textContent = prefix + current + suffix;
+                    if (progress < 1) {
+                        requestAnimationFrame(step);
                     } else {
-                        el.textContent = Math.floor(current) + '+';
+                        el.textContent = prefix + target + suffix;
                     }
-                }, 30);
-                counterObserver.unobserve(el);
+                }
+
+                if (prefersReducedMotion) {
+                    el.textContent = prefix + target + suffix;
+                } else {
+                    requestAnimationFrame(step);
+                }
+                counterObs.unobserve(el);
             }
         });
     }, { threshold: 0.5 });
-    counters.forEach(function(c) { counterObserver.observe(c); });
+    counterEls.forEach(function(el) { counterObs.observe(el); });
 
-    /* ========== 5. PARALLAX EFFECT ========== */
+    /* Magnetic CTA */
     if (!prefersReducedMotion) {
-        var parallaxElements = document.querySelectorAll('[data-parallax]');
-        var ticking = false;
-        function updateParallax() {
-            var scrollY = window.pageYOffset;
-            parallaxElements.forEach(function(el) {
-                var speed = parseFloat(el.getAttribute('data-parallax')) || 0.03;
-                var rect = el.getBoundingClientRect();
-                var centerY = rect.top + rect.height / 2;
-                var offset = (centerY - window.innerHeight / 2) * speed;
-                el.style.transform = 'translateY(' + offset + 'px)';
-            });
-            ticking = false;
-        }
-        window.addEventListener('scroll', function() {
-            if (!ticking) {
-                requestAnimationFrame(updateParallax);
-                ticking = true;
-            }
-        }, { passive: true });
-    }
-
-    /* ========== 6. MAGNETIC CTA BUTTONS ========== */
-    if (!prefersReducedMotion) {
-        var magneticBtns = document.querySelectorAll('.oh-cta-primary');
-        magneticBtns.forEach(function(btn) {
+        document.querySelectorAll('.oh-cta-primary').forEach(function(btn) {
             btn.addEventListener('mousemove', function(e) {
                 var rect = btn.getBoundingClientRect();
                 var x = e.clientX - rect.left - rect.width / 2;
                 var y = e.clientY - rect.top - rect.height / 2;
-                btn.style.transform = 'translate(' + (x * 0.2) + 'px, ' + (y * 0.2) + 'px)';
+                btn.style.transform = 'translate(' + (x * 0.12) + 'px, ' + (y * 0.12) + 'px)';
             });
             btn.addEventListener('mouseleave', function() {
                 btn.style.transform = 'translate(0, 0)';
+                btn.style.transition = 'transform .4s cubic-bezier(.22,1,.36,1)';
             });
         });
-    }
-
-    /* ========== 7. APPROACH CONNECTOR DOT TRAVEL ========== */
-    if (!prefersReducedMotion) {
-        var connectorSection = document.querySelector('.onwebapp-approach-system');
-        var connectorTravel = document.querySelector('.oh-connector-travel');
-        if (connectorSection && connectorTravel) {
-            var connectorObserver = new IntersectionObserver(function(entries) {
-                entries.forEach(function(entry) {
-                    if (entry.isIntersecting) {
-                        connectorTravel.style.animationPlayState = 'running';
-                    } else {
-                        connectorTravel.style.animationPlayState = 'paused';
-                    }
-                });
-            }, { threshold: 0.1 });
-            connectorObserver.observe(connectorSection);
-            connectorTravel.style.animationPlayState = 'paused';
-        }
-    }
-
-    /* ========== 8. SECTION ENTRANCE OBSERVER ========== */
-    if (!prefersReducedMotion) {
-        var sectionTargets = document.querySelectorAll(
-            '.oh-erp-features, .oh-ai-features, .oh-val-feed, .oh-val-gauges, .oh-val-stats, .oh-footer-grid'
-        );
-        var sectionObserver = new IntersectionObserver(function(entries) {
-            entries.forEach(function(entry) {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('is-visible');
-                    sectionObserver.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.2 });
-        sectionTargets.forEach(function(el) { sectionObserver.observe(el); });
-    }
-
-    /* ========== 9. PYRAMID SCROLL BUILD ========== */
-    if (!prefersReducedMotion) {
-        var pyrTargets = document.querySelectorAll('.oh-pyr-top, .oh-pyr-mid, .oh-pyr-base');
-        var pyrObserver = new IntersectionObserver(function(entries) {
-            entries.forEach(function(entry) {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('is-visible');
-                    pyrObserver.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.3 });
-        pyrTargets.forEach(function(el) { pyrObserver.observe(el); });
-    }
-
-    /* ========== 10. SERVICE ROW ALTERNATING REVEAL ========== */
-    if (!prefersReducedMotion) {
-        var svcRows = document.querySelectorAll('.oh-svc-row');
-        var svcObserver = new IntersectionObserver(function(entries) {
-            entries.forEach(function(entry) {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('is-visible');
-                    svcObserver.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.15 });
-        svcRows.forEach(function(el) { svcObserver.observe(el); });
-    }
-
-    /* ========== 11. CERTIFICATION ENTRANCE ========== */
-    if (!prefersReducedMotion) {
-        var certItems = document.querySelectorAll('.onwebapp-certification-item');
-        var certObserver = new IntersectionObserver(function(entries) {
-            entries.forEach(function(entry) {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('is-visible');
-                    certObserver.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.2 });
-        certItems.forEach(function(el) { certObserver.observe(el); });
-    }
-
-    /* ========== 12. EVENT CARD ENTRANCE ========== */
-    if (!prefersReducedMotion) {
-        var eventCards = document.querySelectorAll('.onwebapp-event-card');
-        var eventObserver = new IntersectionObserver(function(entries) {
-            entries.forEach(function(entry) {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('is-visible');
-                    eventObserver.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.15 });
-        eventCards.forEach(function(el) { eventObserver.observe(el); });
-    }
-
-    /* ========== 13. NEWS CARD ENTRANCE ========== */
-    if (!prefersReducedMotion) {
-        var newsFeatured = document.querySelector('.onwebapp-updates-featured');
-        var newsCards = document.querySelectorAll('.onwebapp-updates-card');
-        var newsObserver = new IntersectionObserver(function(entries) {
-            entries.forEach(function(entry) {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('is-visible');
-                    newsObserver.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.15 });
-        if (newsFeatured) newsObserver.observe(newsFeatured);
-        newsCards.forEach(function(el) { newsObserver.observe(el); });
-    }
-
-    /* ========== 14. PARTNER ENTRANCE ========== */
-    if (!prefersReducedMotion) {
-        var partners = document.querySelectorAll('.oh-partner');
-        var partnerObserver = new IntersectionObserver(function(entries) {
-            entries.forEach(function(entry) {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('is-visible');
-                    partnerObserver.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.2 });
-        partners.forEach(function(el) { partnerObserver.observe(el); });
-    }
-
-    /* ========== 15. OFFICE & GLOBAL TEXT ENTRANCE ========== */
-    if (!prefersReducedMotion) {
-        var globalTargets = document.querySelectorAll('.oh-global-text, .oh-global-grid');
-        var globalObserver = new IntersectionObserver(function(entries) {
-            entries.forEach(function(entry) {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('is-visible');
-                    globalObserver.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.2 });
-        globalTargets.forEach(function(el) { globalObserver.observe(el); });
-    }
-
-    /* ========== 16. FINAL CTA ENTRANCE ========== */
-    if (!prefersReducedMotion) {
-        var finalCta = document.querySelector('.oh-final-cta > .container > div');
-        if (finalCta) {
-            var ctaObserver = new IntersectionObserver(function(entries) {
-                entries.forEach(function(entry) {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('is-visible');
-                        ctaObserver.unobserve(entry.target);
-                    }
-                });
-            }, { threshold: 0.3 });
-            ctaObserver.observe(finalCta);
-        }
     }
 });
 </script>

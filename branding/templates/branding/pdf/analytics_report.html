@@ -30,7 +30,7 @@
     line-height: 1.5;
   }
 
-  /* ── Cover ─────────────────────────────────────────────────────── */
+  /*  Cover  */
   .cover {
     border-bottom: 3px solid #6366f1;
     padding-bottom: 18px;
@@ -52,7 +52,7 @@
     color: #94a3b8;
   }
 
-  /* ── Section ───────────────────────────────────────────────────── */
+  /*  Section  */
   .section-title {
     font-size: 12pt;
     font-weight: 800;
@@ -64,7 +64,7 @@
     letter-spacing: 0.4px;
   }
 
-  /* ── KPI row ───────────────────────────────────────────────────── */
+  /*  KPI row  */
   .kpi-row {
     display: flex;
     gap: 12px;
@@ -95,7 +95,7 @@
     margin-top: 4px;
   }
 
-  /* ── Chart container ───────────────────────────────────────────── */
+  /*  Chart container  */
   .chart-row {
     display: flex;
     gap: 16px;
@@ -118,7 +118,7 @@
     width: 100%;
   }
 
-  /* ── Tables ────────────────────────────────────────────────────── */
+  /*  Tables  */
   table {
     width: 100%;
     border-collapse: collapse;
@@ -145,7 +145,7 @@
   .text-center { text-align: center; }
   .fw-bold { font-weight: 700; }
 
-  /* ── Bar indicator ─────────────────────────────────────────────── */
+  /*  Bar indicator  */
   .bar-track {
     display: inline-block;
     height: 7px;
@@ -163,10 +163,10 @@
     border-radius: 999px;
   }
 
-  /* ── Page break ────────────────────────────────────────────────── */
+  /*  Page break  */
   .page-break { page-break-before: always; }
 
-  /* ── No-data message ───────────────────────────────────────────── */
+  /*  No-data message  */
   .no-data {
     background: #f8fafc;
     border: 1px dashed #e2e8f0;
@@ -181,9 +181,9 @@
 </head>
 <body>
 
-<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  -->
 <!-- Cover                                                           -->
-<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  -->
 <div class="cover">
   <h1>Branding Analytics Report</h1>
   <div class="subtitle">Staff Dashboard — Performance &amp; Insights</div>
@@ -192,9 +192,9 @@
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  -->
 <!-- KPI Summary                                                     -->
-<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  -->
 <div class="section-title">Key Metrics</div>
 <div class="kpi-row">
   <div class="kpi-card">
@@ -215,9 +215,9 @@
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  -->
 <!-- Status Distribution                                             -->
-<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  -->
 <div class="section-title">Status Distribution</div>
 <div class="chart-row">
   {% if charts.status_distribution %}
@@ -258,9 +258,9 @@
   </tbody>
 </table>
 
-<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  -->
 <!-- Monthly Trend                                                   -->
-<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  -->
 <div class="page-break"></div>
 <div class="section-title">Monthly Trend</div>
 {% if charts.monthly_trend %}
@@ -286,9 +286,9 @@
 <div class="no-data">No monthly data available for this period.</div>
 {% endif %}
 
-<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  -->
 <!-- Staff Workload + Collection Popularity                          -->
-<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  -->
 <div class="section-title">Staff &amp; Collections</div>
 <div class="chart-row">
   {% if charts.staff_workload %}
@@ -322,9 +322,9 @@
   </tbody>
 </table>
 
-<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  -->
 <!-- Priority + Industry                                             -->
-<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  -->
 <div class="page-break"></div>
 <div class="section-title">Priority &amp; Industry</div>
 <div class="chart-row">
@@ -360,9 +360,9 @@
   </tbody>
 </table>
 
-<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  -->
 <!-- Satisfaction + Completion Time                                  -->
-<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  -->
 <div class="section-title">Satisfaction &amp; Completion Time</div>
 <div class="chart-row">
   {% if charts.satisfaction %}

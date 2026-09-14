@@ -245,7 +245,7 @@ class BrandingRequestAdmin(admin.ModelAdmin):
     date_hierarchy = 'created_at'
     save_on_top = True
 
-    # ── Bulk Actions ──
+    #  Bulk Actions 
     actions = [
         'action_bulk_status_pending',
         'action_bulk_status_assigned',
@@ -262,7 +262,7 @@ class BrandingRequestAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('user', 'designer', 'collection')
 
-    # ── Custom display fields ──
+    #  Custom display fields 
     def request_number_display(self, obj):
         url = reverse('admin:branding_brandingrequest_change', args=[obj.pk])
         return format_html('<a href="{}" style="font-weight:700; color:#4f46e5;">{}</a>', url, obj.request_number or '—')
@@ -314,7 +314,7 @@ class BrandingRequestAdmin(admin.ModelAdmin):
         return self.days_open(obj)
     days_open_display.short_description = 'Days Open'
 
-    # ── Bulk Status Actions ──
+    #  Bulk Status Actions 
     def _bulk_status(self, request, queryset, new_status, label):
         count = queryset.exclude(status=new_status).update(status=new_status, updated_at=timezone.now())
         self.message_user(request, f'{count} request(s) updated to {label}.', messages.SUCCESS)
@@ -334,7 +334,7 @@ class BrandingRequestAdmin(admin.ModelAdmin):
         )
         self.message_user(request, f'{count} request(s) marked as Completed.', messages.SUCCESS)
 
-    # ── Bulk Archive ──
+    #  Bulk Archive 
     def action_bulk_archive(self, request, queryset):
         count = queryset.exclude(status='ARCHIVED').update(
             status='ARCHIVED', updated_at=timezone.now()
@@ -342,7 +342,7 @@ class BrandingRequestAdmin(admin.ModelAdmin):
         self.message_user(request, f'{count} request(s) archived.', messages.SUCCESS)
     action_bulk_archive.short_description = 'Archive selected'
 
-    # ── Bulk Assign Designer ──
+    #  Bulk Assign Designer 
     def action_bulk_assign_designer(self, request, queryset):
         from django.contrib.auth import get_user_model
         User = get_user_model()
@@ -358,7 +358,7 @@ class BrandingRequestAdmin(admin.ModelAdmin):
         self.message_user(request, f'{count} request(s) assigned to {designer.get_full_name() or designer.username}.', messages.SUCCESS)
     action_bulk_assign_designer.short_description = 'Assign designer to selected'
 
-    # ── Export CSV ──
+    #  Export CSV 
     def action_export_csv(self, request, queryset):
         response = HttpResponse(content_type='text/csv; charset=utf-8')
         response['Content-Disposition'] = f'attachment; filename="branding_requests_{timezone.now():%Y%m%d_%H%M}.csv"'
@@ -379,7 +379,7 @@ class BrandingRequestAdmin(admin.ModelAdmin):
         return response
     action_export_csv.short_description = 'Export selected to CSV'
 
-    # ── Send Status Email ──
+    #  Send Status Email 
     def action_send_status_email(self, request, queryset):
         from .emails import send_status_update_email
         sent = 0
@@ -390,7 +390,7 @@ class BrandingRequestAdmin(admin.ModelAdmin):
         self.message_user(request, f'Sent status emails to {sent} client(s).', messages.SUCCESS)
     action_send_status_email.short_description = 'Send status update email'
 
-    # ── Send Bulk Notification ──
+    #  Send Bulk Notification 
     def action_send_bulk_notification(self, request, queryset):
         from .models import BrandingNotification
         title = request.POST.get('notification_title', '')
@@ -411,7 +411,7 @@ class BrandingRequestAdmin(admin.ModelAdmin):
         self.message_user(request, f'Sent notification to {count} client(s).', messages.SUCCESS)
     action_send_bulk_notification.short_description = 'Send bulk notification'
 
-    # ── Fieldsets ──
+    #  Fieldsets 
     fieldsets = (
         (None, {
             'fields': (
@@ -548,7 +548,7 @@ class BrandingFeedbackAdmin(admin.ModelAdmin):
     date_hierarchy = 'created_at'
 
     def rating_display(self, obj):
-        stars = '★' * obj.rating + '☆' * (5 - obj.rating)
+        stars = '' * obj.rating + '' * (5 - obj.rating)
         return format_html('<span class="star">{}</span> ({})', stars, obj.rating)
     rating_display.short_description = 'Rating'
 
@@ -679,9 +679,9 @@ class ProjectReviewAdmin(admin.ModelAdmin):
     checklist_progress_display.short_description = 'Checklist'
 
 
-# ────────────────────────────────────────────────────────────────────────────
+# 
 # Designer Workflow Tools
-# ────────────────────────────────────────────────────────────────────────────
+# 
 
 @admin.register(DesignDraft)
 class DesignDraftAdmin(admin.ModelAdmin):
@@ -770,9 +770,9 @@ class DesignTemplateAdmin(admin.ModelAdmin):
     readonly_fields = ('created_at', 'updated_at')
 
 
-# ────────────────────────────────────────────────────────────────────────────
+# 
 # Collaboration Features
-# ────────────────────────────────────────────────────────────────────────────
+# 
 
 @admin.register(CritiqueTemplate)
 class CritiqueTemplateAdmin(admin.ModelAdmin):
@@ -856,9 +856,9 @@ class ShowcaseProjectAdmin(admin.ModelAdmin):
     readonly_fields = ('created_at', 'updated_at')
 
 
-# ────────────────────────────────────────────────────────────────────────────
+# 
 # Designer Integrations
-# ────────────────────────────────────────────────────────────────────────────
+# 
 
 @admin.register(FigmaConnection)
 class FigmaConnectionAdmin(admin.ModelAdmin):
@@ -972,9 +972,9 @@ class CalendarEventAdmin(admin.ModelAdmin):
     readonly_fields = ('created_at', 'updated_at')
 
 
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 # Unified Staff Dashboard
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 
 @admin.register(WidgetDefinition)
 class WidgetDefinitionAdmin(admin.ModelAdmin):
@@ -1011,9 +1011,9 @@ class RoleSwitchLogAdmin(admin.ModelAdmin):
     readonly_fields = ('switched_at',)
 
 
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 # Designer Workflow System
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 
 @admin.register(ProjectWorkflow)
 class ProjectWorkflowAdmin(admin.ModelAdmin):
@@ -1077,9 +1077,9 @@ class CommunicationEntryAdmin(admin.ModelAdmin):
     readonly_fields = ('created_at',)
 
 
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 # Concept Presentation Admin
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 
 @admin.register(DesignConcept)
 class DesignConceptAdmin(admin.ModelAdmin):

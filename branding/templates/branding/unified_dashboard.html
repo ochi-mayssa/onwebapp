@@ -3,9 +3,9 @@
 
 {% block branding_content %}
 <style>
-/* ═══════════════════════════════════════════════════════════════════════════
+/* 
    Unified Dashboard
-   ═══════════════════════════════════════════════════════════════════════════ */
+    */
 .ud-header{background:linear-gradient(135deg,var(--brand-primary,#4f46e5) 0%,var(--brand-accent,#7c3aed) 100%);color:#fff;border-radius:1rem;padding:1.5rem 2rem;margin-bottom:1.5rem;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem}
 .ud-header h1{margin:0;font-size:1.4rem;font-weight:700}
 .ud-header .subtitle{opacity:.85;font-size:.85rem}
@@ -101,7 +101,7 @@
 </style>
 
 <div class="container-fluid py-3">
-  {# ── Header ── #}
+  {#  Header  #}
   <div class="ud-header">
     <div>
       <h1><i class="fa-solid fa-gauge-high me-2"></i>Staff Dashboard</h1>
@@ -128,7 +128,7 @@
     </div>
   </div>
 
-  {# ── Layout Bar ── #}
+  {#  Layout Bar  #}
   <div class="ud-layout-bar">
     <span class="small text-muted me-1">Layout:</span>
     <button class="btn btn-sm btn-outline-secondary {% if layout == 'default' %}active{% endif %}" onclick="setLayout('default')">Grid</button>
@@ -141,7 +141,7 @@
     </button>
   </div>
 
-  {# ── Widget Grid ── #}
+  {#  Widget Grid  #}
   <div class="ud-grid layout-{{ layout }}" id="widgetGrid" style="--grid-cols:{{ widget_cols }}">
     {% for wid, wdata in widget_data.items %}
     <div class="ud-widget {% if wdata.instance.is_collapsed %}collapsed{% endif %}"
@@ -162,7 +162,7 @@
       </div>
       <div class="ud-widget-body">
         {% with wt=wdata.instance.widget_def.widget_type %}
-          {# ── Stats Widgets ── #}
+          {#  Stats Widgets  #}
           {% if wt == 'stats_quick' %}
           <div class="ud-stat-row">
             <div class="ud-stat-card">
@@ -212,7 +212,7 @@
             <div class="ud-stat-card"><div class="ud-stat-value">{{ wdata.data.completed_week|default:"0" }}</div><div class="ud-stat-label">Done (7d)</div></div>
           </div>
 
-          {# ── Table Widgets ── #}
+          {#  Table Widgets  #}
           {% elif wt == 'table_recent' or wt == 'table_team' or wt == 'table_deadlines' or wt == 'table_timesheet' %}
           {% if wt == 'table_recent' %}
           <table class="ud-table">
@@ -288,7 +288,7 @@
           </table>
           {% endif %}
 
-          {# ── Feed Widgets ── #}
+          {#  Feed Widgets  #}
           {% elif wt == 'feed_activity' %}
           {% for e in wdata.data.events %}
           <div class="ud-feed-item">
@@ -344,13 +344,13 @@
           <div class="text-center text-muted py-3">No upcoming events</div>
           {% endfor %}
 
-          {# ── Chart Widgets (placeholder canvas) ── #}
+          {#  Chart Widgets (placeholder canvas)  #}
           {% elif 'chart' in wt %}
           <div style="position:relative;height:180px">
             <canvas id="chart-{{ wid }}" data-chart-type="{{ wt }}" data-chart-data='{{ wdata.data|to_json }}'></canvas>
           </div>
 
-          {# ── Tool Widgets ── #}
+          {#  Tool Widgets  #}
           {% elif wt == 'tools_shortcuts' %}
           <div class="ud-tool-grid">
             {% for s in wdata.data.shortcuts %}
@@ -394,14 +394,14 @@
     </div>
     {% endfor %}
 
-    {# ── Add Widget Button ── #}
+    {#  Add Widget Button  #}
     <div class="ud-add-widget" onclick="openAddWidget()" title="Add a widget">
       <div><i class="fa-solid fa-plus d-block mb-2" style="font-size:1.5rem"></i>Add Widget</div>
     </div>
   </div>
 </div>
 
-{# ── Add Widget Modal ── #}
+{#  Add Widget Modal  #}
 <div class="ud-modal-overlay" id="addWidgetModal">
   <div class="ud-modal">
     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -422,9 +422,9 @@
 </div>
 
 <script>
-/* ═══════════════════════════════════════════════════════════════════════════
+/* 
    Unified Dashboard — JavaScript
-   ═══════════════════════════════════════════════════════════════════════════ */
+    */
 const CSRF = '{{ csrf_token }}';
 const API = '/branding/staff/';
 
@@ -436,7 +436,7 @@ function post(url, data) {
   }).then(r => r.json());
 }
 
-/* ── Role Switch ── */
+/*  Role Switch  */
 function switchRole(role) {
   post(API + 'switch-role/', {role}).then(r => {
     if (r.ok) location.reload();
@@ -444,7 +444,7 @@ function switchRole(role) {
   });
 }
 
-/* ── Layout ── */
+/*  Layout  */
 function setLayout(layout) {
   post(API + 'save-layout/', {layout}).then(r => {
     if (r.ok) location.reload();
@@ -456,7 +456,7 @@ function toggleCompact() {
   grid.classList.toggle('layout-compact');
 }
 
-/* ── Widget CRUD ── */
+/*  Widget CRUD  */
 function addWidget(type) {
   const form = new FormData();
   form.append('widget_type', type);
@@ -485,7 +485,7 @@ function resetDashboard() {
   post(API + 'reset/').then(r => { if (r.ok) location.reload(); });
 }
 
-/* ── Add Widget Modal ── */
+/*  Add Widget Modal  */
 function openAddWidget() {
   document.getElementById('addWidgetModal').classList.add('show');
 }
@@ -496,7 +496,7 @@ document.getElementById('addWidgetModal').addEventListener('click', function(e) 
   if (e.target === this) closeAddWidget();
 });
 
-/* ── Drag & Drop ── */
+/*  Drag & Drop  */
 let draggedEl = null;
 
 function dragStart(e) {
@@ -547,7 +547,7 @@ function savePositions() {
   post(API + 'save-positions/', {widgets});
 }
 
-/* ── Touch Support ── */
+/*  Touch Support  */
 let touchStartX = 0, touchStartY = 0, touchWidget = null;
 
 document.querySelectorAll('.ud-widget-header').forEach(header => {
@@ -570,7 +570,7 @@ document.querySelectorAll('.ud-widget-header').forEach(header => {
   }, {passive: true});
 });
 
-/* ── Chart Init ── */
+/*  Chart Init  */
 document.querySelectorAll('canvas[data-chart-type]').forEach(canvas => {
   const type = canvas.dataset.chartType;
   try {

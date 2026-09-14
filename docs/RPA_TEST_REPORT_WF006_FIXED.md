@@ -50,7 +50,7 @@
 
 ## 4. Certification Result
 
-**Status**: 🟢 **READY FOR PRODUCTION**
+**Status**:  **READY FOR PRODUCTION**
 
 **Conclusion**:
 The Finance & Billing module is now complete. It supports the full lifecycle of subscriptions (new, renew, fail) and one-off project invoices.

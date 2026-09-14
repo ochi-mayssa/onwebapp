@@ -45,7 +45,7 @@ class BrandingAdminSite(admin.AdminSite):
         thirty_days_ago = today - timezone.timedelta(days=30)
         seven_days_ago = today - timezone.timedelta(days=7)
 
-        # ── Quick Stats ──
+        #  Quick Stats 
         total_requests = BrandingRequest.objects.count()
         active_requests = BrandingRequest.objects.exclude(status__in=['COMPLETED', 'ARCHIVED', 'DRAFT']).count()
         pending_review = BrandingRequest.objects.filter(status='PENDING_REVIEW').count()
@@ -59,35 +59,35 @@ class BrandingAdminSite(admin.AdminSite):
         total_users = User.objects.count()
         total_staff = User.objects.filter(is_staff=True).count()
 
-        # ── Status Distribution ──
+        #  Status Distribution 
         status_dist = list(
             BrandingRequest.objects.values('status')
             .annotate(count=Count('id'))
             .order_by('status')
         )
 
-        # ── Recent Requests ──
+        #  Recent Requests 
         recent_requests = BrandingRequest.objects.select_related('user', 'designer').order_by('-created_at')[:10]
 
-        # ── Pending Messages ──
+        #  Pending Messages 
         unread_messages = BrandingMessage.objects.filter(
             is_read_by_staff=False
         ).select_related('request', 'sender').order_by('-created_at')[:5]
 
-        # ── Recent Feedback ──
+        #  Recent Feedback 
         recent_feedback = BrandingFeedback.objects.select_related('request').order_by('-created_at')[:5]
 
-        # ── System Health ──
+        #  System Health 
         from ..models import WebhookDelivery
         failed_webhooks = WebhookDelivery.objects.filter(status='failed').count()
         total_webhooks = BrandingWebhook.objects.filter(is_active=True).count()
 
-        # ── Storage ──
+        #  Storage 
         storage_used = _get_storage_usage()
         storage_limit = _get_storage_limit()
         storage_pct = round((storage_used / storage_limit * 100) if storage_limit > 0 else 0, 1)
 
-        # ── Activity (last 7 days) ──
+        #  Activity (last 7 days) 
         activity_data = list(
             BrandingRequest.objects.filter(created_at__date__gte=seven_days_ago)
             .annotate(date=timezone.functions.TruncDate('created_at'))

@@ -6,7 +6,7 @@
 {% block branding_content %}
 <div class="container py-4">
 
-    {# ── Header ── #}
+    {#  Header  #}
     <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
         <div>
             <nav aria-label="breadcrumb" class="mb-2">
@@ -29,7 +29,7 @@
         </div>
     </div>
 
-    {# ── Create Handoff Form ── #}
+    {#  Create Handoff Form  #}
     <div class="collapse mb-4" id="createForm">
         <form method="post" action="{{ request.path }}" class="detail-card rounded-4 p-4">
             {% csrf_token %}
@@ -57,7 +57,7 @@
         </form>
     </div>
 
-    {# ── Handoffs List ── #}
+    {#  Handoffs List  #}
     {% if handoffs %}
     <div class="row g-3">
         {% for h in handoffs %}

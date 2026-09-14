@@ -138,7 +138,7 @@ class PlanLimit(models.Model):
         unique_together = ('plan', 'service')
 
     def __str__(self):
-        return f"{self.plan.code} · {self.service.code} → {self.max_usage or 'unlimited'}"
+        return f"{self.plan.code} · {self.service.code}  {self.max_usage or 'unlimited'}"
 
 
 class UserSubscription(models.Model):

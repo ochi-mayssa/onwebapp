@@ -428,3 +428,203 @@ class WizardViewTest(TestCase):
         session.complete()
         self.assertEqual(session.status, 'completed')
         self.assertIsNotNone(session.completed_at)
+
+
+class BrandAssistViewTest(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(
+            username='branduser', password='testpass123', email='brand@test.com',
+        )
+        self.staff = User.objects.create_user(
+            username='staffuser', password='testpass123', email='staff@test.com', is_staff=True,
+        )
+        profile, _ = UserProfile.objects.get_or_create(user=self.user)
+        profile.service_type = 'community'
+        profile.save()
+        self.client.login(username='branduser', password='testpass123')
+
+    def test_brand_assist_renders(self):
+        resp = self.client.get(reverse('community:brand_assist'))
+        self.assertEqual(resp.status_code, 200)
+
+    def test_brand_assist_create_profile(self):
+        resp = self.client.post(reverse('community:brand_assist'), data={
+            'name': 'Test Brand',
+            'industry': 'Tech',
+            'personality': 'modern',
+            'brand_voice': 'formal',
+            'primary_color': '#6366f1',
+            'secondary_color': '#8b5cf6',
+            'accent_color': '#10b981',
+        })
+        self.assertEqual(resp.status_code, 302)
+        profile = BrandProfile.objects.filter(user=self.user, name='Test Brand').first()
+        self.assertIsNotNone(profile)
+        self.assertIn('primary', profile.generated_palette)
+
+    def test_brand_assist_edit_profile(self):
+        profile = BrandProfile.objects.create(
+            user=self.user, name='Old Name', personality='professional',
+            brand_voice='formal', primary_color='#000000',
+        )
+        resp = self.client.post(reverse('community:brand_assist'), data={
+            'name': 'Updated Brand',
+            'industry': 'Finance',
+            'personality': 'luxurious',
+            'brand_voice': 'formal',
+            'primary_color': '#000000',
+            'secondary_color': '#8b5cf6',
+            'accent_color': '#10b981',
+            'profile_id': profile.id,
+        })
+        self.assertEqual(resp.status_code, 302)
+        profile.refresh_from_db()
+        self.assertEqual(profile.name, 'Updated Brand')
+
+    def test_brand_assist_delete_profile(self):
+        profile = BrandProfile.objects.create(
+            user=self.user, name='To Delete', personality='professional',
+            brand_voice='formal', primary_color='#000000',
+        )
+        resp = self.client.post(reverse('community:brand_assist'), data={
+            'delete': profile.id,
+        })
+        self.assertEqual(resp.status_code, 302)
+        self.assertFalse(BrandProfile.objects.filter(id=profile.id).exists())
+
+    def test_brand_assist_staff_can_view_clients(self):
+        self.client.logout()
+        self.client.login(username='staffuser', password='testpass123')
+        resp = self.client.get(reverse('community:brand_assist'))
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn('clients', resp.context)
+
+    def test_brand_assist_staff_can_view_client_profile(self):
+        profile = BrandProfile.objects.create(
+            user=self.user, name='Client Brand', personality='playful',
+            brand_voice='conversational', primary_color='#000000',
+        )
+        self.client.logout()
+        self.client.login(username='staffuser', password='testpass123')
+        resp = self.client.get(reverse('community:brand_assist') + f'?client={self.user.id}&profile={profile.id}')
+        self.assertEqual(resp.status_code, 200)
+
+
+class LegacyViewTest(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(
+            username='legacyuser', password='testpass123', email='legacy@test.com',
+        )
+        profile, _ = UserProfile.objects.get_or_create(user=self.user)
+        profile.service_type = 'community'
+        profile.save()
+        self.client.login(username='legacyuser', password='testpass123')
+
+    def test_home_renders(self):
+        resp = self.client.get(reverse('community:home'))
+        self.assertEqual(resp.status_code, 200)
+
+    def test_website_building_renders(self):
+        resp = self.client.get(reverse('community:website_building'))
+        self.assertEqual(resp.status_code, 200)
+
+    def test_website_building_post_creates_intake(self):
+        resp = self.client.post(reverse('community:website_building'), data={
+            'full_name': 'Test User',
+            'email': 'test@test.com',
+            'phone_number': '1234567890',
+            'country': 'US',
+            'project_type': 'business',
+        })
+        self.assertEqual(resp.status_code, 302)
+        self.assertTrue(WebsiteIntake.objects.filter(user=self.user).exists())
+
+    def test_package_selection_renders(self):
+        from .views import _ensure_plans_exist
+        _ensure_plans_exist()
+        resp = self.client.get(reverse('community:package_selection'))
+        self.assertEqual(resp.status_code, 200)
+
+    def test_dashboard_renders(self):
+        resp = self.client.get(reverse('community:dashboard'))
+        self.assertEqual(resp.status_code, 200)
+
+    def test_unauthenticated_redirects(self):
+        self.client.logout()
+        for url_name in ['dashboard', 'wizard_start', 'website_building', 'package_selection', 'brand_assist']:
+            resp = self.client.get(reverse(f'community:{url_name}'))
+            self.assertIn(resp.status_code, [302, 404])
+
+
+class ValidationTest(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(
+            username='valuser', password='testpass123', email='val@test.com',
+        )
+        profile, _ = UserProfile.objects.get_or_create(user=self.user)
+        profile.service_type = 'community'
+        profile.save()
+        self.client.login(username='valuser', password='testpass123')
+        from .views import _ensure_services_exist, _ensure_addons_exist, _ensure_plans_exist
+        _ensure_services_exist()
+        _ensure_addons_exist()
+        _ensure_plans_exist()
+
+    def test_step2_requires_services(self):
+        self.client.post(reverse('community:wizard_start'))
+        resp = self.client.post(reverse('community:wizard_step', args=[2]), data={})
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(OnboardingSession.objects.count(), 1)
+
+    def test_step3_requires_business_name(self):
+        self.client.post(reverse('community:wizard_start'))
+        self.client.post(reverse('community:wizard_step', args=[2]), data={'services': ['website-dev']})
+        resp = self.client.post(reverse('community:wizard_step', args=[3]), data={
+            'business_name': '',
+            'industry': 'Tech',
+            'business_description': 'Desc',
+            'target_audience': 'All',
+        })
+        self.assertEqual(resp.status_code, 200)
+
+    def test_step3_requires_industry(self):
+        self.client.post(reverse('community:wizard_start'))
+        self.client.post(reverse('community:wizard_step', args=[2]), data={'services': ['website-dev']})
+        resp = self.client.post(reverse('community:wizard_step', args=[3]), data={
+            'business_name': 'Acme',
+            'industry': '',
+            'business_description': 'Desc',
+            'target_audience': 'All',
+        })
+        self.assertEqual(resp.status_code, 200)
+
+    def test_step4_requires_project_name(self):
+        self.client.post(reverse('community:wizard_start'))
+        self.client.post(reverse('community:wizard_step', args=[2]), data={'services': ['website-dev']})
+        self.client.post(reverse('community:wizard_step', args=[3]), data={
+            'business_name': 'Acme', 'industry': 'Tech',
+            'business_description': 'Desc', 'target_audience': 'All',
+        })
+        resp = self.client.post(reverse('community:wizard_step', args=[4]), data={
+            'project_name': '',
+            'project_goals': 'Goals',
+        })
+        self.assertEqual(resp.status_code, 200)
+
+    def test_step5_requires_design_style(self):
+        self.client.post(reverse('community:wizard_start'))
+        self.client.post(reverse('community:wizard_step', args=[2]), data={'services': ['website-dev']})
+        self.client.post(reverse('community:wizard_step', args=[3]), data={
+            'business_name': 'Acme', 'industry': 'Tech',
+            'business_description': 'Desc', 'target_audience': 'All',
+        })
+        self.client.post(reverse('community:wizard_step', args=[4]), data={
+            'project_name': 'Proj', 'project_goals': 'Goals',
+        })
+        resp = self.client.post(reverse('community:wizard_step', args=[5]), data={
+            'design_style': '',
+        })
+        self.assertEqual(resp.status_code, 200)

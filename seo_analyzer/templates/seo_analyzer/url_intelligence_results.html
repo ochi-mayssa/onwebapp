@@ -118,7 +118,7 @@
                 <div class="d-flex flex-column gap-2">
                     {% for step in result.redirect_chain %}
                     <code class="text-break">{{ step }}</code>
-                    {% if not forloop.last %}<div class="text-muted small">↓</div>{% endif %}
+                    {% if not forloop.last %}<div class="text-muted small"></div>{% endif %}
                     {% endfor %}
                 </div>
             </div>
@@ -135,13 +135,13 @@
                 <div class="card-body">
                     <div class="d-flex flex-column gap-2">
                         <div><strong>Protocol:</strong> {{ structure.protocol|default:"Unknown" }}</div>
-                        <div class="text-muted small">↓</div>
+                        <div class="text-muted small"></div>
                         <div><strong>Domain:</strong> {{ structure.domain|default:"Unknown" }}</div>
-                        <div class="text-muted small">↓</div>
+                        <div class="text-muted small"></div>
                         <div><strong>Path:</strong> {{ structure.path|default:"/" }}</div>
-                        <div class="text-muted small">↓</div>
+                        <div class="text-muted small"></div>
                         <div><strong>Slug:</strong> {{ structure.slug|default:"None" }}</div>
-                        <div class="text-muted small">↓</div>
+                        <div class="text-muted small"></div>
                         <div>
                             <strong>Parameters:</strong>
                             {% if parameters.all %}

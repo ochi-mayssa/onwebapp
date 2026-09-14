@@ -164,8 +164,9 @@ def calculate(session):
             'cost': float(feature_cost),
         })
 
-    # 4. Integrations
-    integrations = session.selected_features or []
+    # 4. Integrations (from session.integrations — comma-separated text)
+    integrations_raw = session.integrations or ''
+    integrations = [i.strip() for i in integrations_raw.split(',') if i.strip()] if integrations_raw else []
     integration_cost = Decimal('0')
     for integ in integrations:
         score = COMPLEXITY_INTEGRATIONS.get(integ, 1)

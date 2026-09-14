@@ -873,9 +873,9 @@ def client_profile(request):
     })
 
 
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 # Concept Presentation System
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 
 @login_required
 def concept_list(request, request_pk):
@@ -1116,7 +1116,7 @@ def concept_delete_image(request, pk, img_id):
     return redirect('branding:concept_edit', pk=pk)
 
 
-# ── Client Review Actions ──────────────────────────────────────────────────
+#  Client Review Actions 
 
 @login_required
 @require_POST
@@ -1303,7 +1303,7 @@ def concept_decide(request, pk):
     return redirect('branding:concept_detail', pk=pk)
 
 
-# ── Refinement Process ──────────────────────────────────────────────────────
+#  Refinement Process 
 
 @login_required
 def concept_refinements(request, pk):
@@ -1391,7 +1391,7 @@ def concept_approve_iteration(request, pk, refinement_id, iteration_id):
     return redirect('branding:concept_refinements', pk=pk)
 
 
-# ── Comparison & Analysis ───────────────────────────────────────────────────
+#  Comparison & Analysis 
 
 @login_required
 def concept_compare(request, request_pk):
@@ -1476,7 +1476,7 @@ def concept_feedback_analysis(request, request_pk):
     })
 
 
-# ── Client Decision Dashboard ───────────────────────────────────────────────
+#  Client Decision Dashboard 
 
 @login_required
 def concept_decision_dashboard(request, request_pk):
@@ -1521,7 +1521,7 @@ def concept_decision_dashboard(request, request_pk):
     })
 
 
-# ── Presentation Sessions ───────────────────────────────────────────────────
+#  Presentation Sessions 
 
 @login_required
 def concept_sessions(request, request_pk):
@@ -1592,9 +1592,9 @@ def concept_session_update(request, pk, session_id):
     return redirect('branding:concept_sessions', request_pk=pk)
 
 
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 # Designer Workflow System
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 
 @designer_required
 def workflow_dashboard(request):
@@ -3519,9 +3519,9 @@ def supervisor_dashboard(request):
     })
 
 
-# ────────────────────────────────────────────────────────────────────────────
+# 
 # Supervisor — Designer Detail
-# ────────────────────────────────────────────────────────────────────────────
+# 
 
 @supervisor_required
 def supervisor_designer_detail(request, user_id):
@@ -3529,7 +3529,7 @@ def supervisor_designer_detail(request, user_id):
     now = timezone.now()
     month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
 
-    # ── Metrics ──
+    #  Metrics 
     all_assigned = BrandingRequest.objects.filter(designer=designer).exclude(status='DRAFT')
     active_qs = all_assigned.filter(status__in=ACTIVE_STATUSES)
     completed_qs = all_assigned.filter(status='COMPLETED', completed_at__isnull=False)
@@ -3565,12 +3565,12 @@ def supervisor_designer_detail(request, user_id):
         all_assigned.values('status').annotate(c=Count('id')).order_by('-c')
     )
 
-    # ── Current projects ──
+    #  Current projects 
     current_projects = active_qs.select_related('user').order_by(
         '-priority', 'created_at'
     )[:20]
 
-    # ── Completed projects with ratings ──
+    #  Completed projects with ratings 
     completed_projects = completed_qs.select_related('user').order_by(
         '-completed_at'
     )[:20]
@@ -3583,7 +3583,7 @@ def supervisor_designer_detail(request, user_id):
         ).values_list('request_id', 'rating')
         feedback_map = dict(fbs)
 
-    # ── Notes ──
+    #  Notes 
     notes = DesignerNote.objects.filter(designer=designer).select_related('author')
 
     if request.method == 'POST' and request.POST.get('action') == 'add_note':
@@ -3622,9 +3622,9 @@ def supervisor_designer_detail(request, user_id):
     })
 
 
-# ────────────────────────────────────────────────────────────────────────────
+# 
 # Supervisor — Team Overview
-# ────────────────────────────────────────────────────────────────────────────
+# 
 
 @supervisor_required
 def supervisor_team(request):
@@ -3686,9 +3686,9 @@ def supervisor_team(request):
     })
 
 
-# ────────────────────────────────────────────────────────────────────────────
+# 
 # Supervisor — Team PDF Report
-# ────────────────────────────────────────────────────────────────────────────
+# 
 
 @supervisor_required
 def supervisor_team_pdf(request):
@@ -3697,9 +3697,9 @@ def supervisor_team_pdf(request):
     return report.render_response()
 
 
-# ────────────────────────────────────────────────────────────────────────────
+# 
 # Designer Dashboard
-# ────────────────────────────────────────────────────────────────────────────
+# 
 
 DESIGNER_ACTIVE_STATUSES = ['ASSIGNED', 'DESIGNING', 'WAITING_CLIENT', 'REVISION']
 DESIGNER_UPCOMING_STATUSES = ['IN_REVIEW', 'PENDING_REVIEW']
@@ -3714,7 +3714,7 @@ def designer_dashboard(request):
 
     my_projects = BrandingRequest.objects.filter(designer=me).exclude(status='DRAFT')
 
-    # ── Metrics ──
+    #  Metrics 
     active_qs = my_projects.filter(status__in=DESIGNER_ACTIVE_STATUSES)
     active_count = active_qs.count()
 
@@ -3748,7 +3748,7 @@ def designer_dashboard(request):
     # Days until next deadline
     days_to_next = (next_deadline - today).days if next_deadline else None
 
-    # ── Project Lists ──
+    #  Project Lists 
     active_projects = active_qs.select_related('user', 'collection').order_by(
         '-priority', 'estimated_delivery_date', 'created_at'
     )
@@ -3766,7 +3766,7 @@ def designer_dashboard(request):
     ).select_related('user', 'collection').order_by('-priority', 'created_at')
     upcoming_projects = upcoming_qs[:20]
 
-    # ── Today's Priority (sorted by urgency) ──
+    #  Today's Priority (sorted by urgency) 
     priority_projects = active_qs.select_related('user', 'collection')
     # Overdue first, then by priority weight, then by nearest deadline
     priority_order = {'URGENT': 0, 'HIGH': 1, 'MEDIUM': 2, 'LOW': 3}
@@ -3779,18 +3779,18 @@ def designer_dashboard(request):
         )
     )
 
-    # ── Notifications (recent for me) ──
+    #  Notifications (recent for me) 
     recent_notifications = BrandingNotification.objects.filter(
         recipient=me, is_read=False
     ).select_related('request')[:10]
 
-    # ── Brand Collections ──
+    #  Brand Collections 
     from .models import DesignerCollection, DesignerAsset
     my_collections = DesignerCollection.objects.filter(designer=me, is_active=True)
     collection_count = my_collections.count()
     asset_count = DesignerAsset.objects.filter(collection__designer=me).count()
 
-    # ── Status update handling ──
+    #  Status update handling 
     if request.method == 'POST':
         action = request.POST.get('action')
         req_pk = request.POST.get('request_pk')
@@ -3880,9 +3880,9 @@ def designer_dashboard(request):
     })
 
 
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 # TEAM DESIGNER DASHBOARD
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 
 @team_designer_required
 def team_designer_dashboard(request):
@@ -3894,7 +3894,7 @@ def team_designer_dashboard(request):
 
     my_projects = BrandingRequest.objects.filter(designer=me).exclude(status='DRAFT')
 
-    # ── Metrics ──
+    #  Metrics 
     active_qs = my_projects.filter(status__in=DESIGNER_ACTIVE_STATUSES)
     active_count = active_qs.count()
 
@@ -3925,7 +3925,7 @@ def team_designer_dashboard(request):
 
     days_to_next = (next_deadline - today).days if next_deadline else None
 
-    # ── Project Lists ──
+    #  Project Lists 
     active_projects = active_qs.select_related('user', 'collection').order_by(
         '-priority', 'estimated_delivery_date', 'created_at'
     )
@@ -3943,7 +3943,7 @@ def team_designer_dashboard(request):
     ).select_related('user', 'collection').order_by('-priority', 'created_at')
     upcoming_projects = upcoming_qs[:20]
 
-    # ── Today's Priority (sorted by urgency) ──
+    #  Today's Priority (sorted by urgency) 
     priority_projects = active_qs.select_related('user', 'collection')
     priority_order = {'URGENT': 0, 'HIGH': 1, 'MEDIUM': 2, 'LOW': 3}
     priority_projects = sorted(
@@ -3955,18 +3955,18 @@ def team_designer_dashboard(request):
         )
     )
 
-    # ── Notifications (recent for me) ──
+    #  Notifications (recent for me) 
     recent_notifications = BrandingNotification.objects.filter(
         recipient=me, is_read=False
     ).select_related('request')[:10]
 
-    # ── Brand Collections ──
+    #  Brand Collections 
     from .models import DesignerCollection, DesignerAsset
     my_collections = DesignerCollection.objects.filter(designer=me, is_active=True)
     collection_count = my_collections.count()
     asset_count = DesignerAsset.objects.filter(collection__designer=me).count()
 
-    # ── Status update handling ──
+    #  Status update handling 
     if request.method == 'POST':
         action = request.POST.get('action')
         req_pk = request.POST.get('request_pk')
@@ -4056,9 +4056,9 @@ def team_designer_dashboard(request):
     })
 
 
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 # DESIGNER WORKFLOW TOOLS
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 
 @designer_required
 def designer_drafts(request, pk):
@@ -4532,7 +4532,7 @@ def designer_templates(request):
     })
 
 
-# ── Collection Templates (designer CRUD) ────────────────────────────────────
+#  Collection Templates (designer CRUD) 
 
 @designer_required
 def collection_template_list(request):
@@ -4907,11 +4907,11 @@ def designer_export_timesheet(request):
     return response
 
 
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 # COLLABORATION FEATURES
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 
-# ── Peer Review ──────────────────────────────────────────────────────────
+#  Peer Review 
 
 @login_required
 @staff_member_required
@@ -4985,7 +4985,7 @@ def peer_review_detail(request, pk, review_id):
     })
 
 
-# ── Internal Comments ────────────────────────────────────────────────────
+#  Internal Comments 
 
 @login_required
 @staff_member_required
@@ -5060,7 +5060,7 @@ def comment_mention_search(request, pk):
     return JsonResponse(data, safe=False)
 
 
-# ── Design Handoff ───────────────────────────────────────────────────────
+#  Design Handoff 
 
 @login_required
 @staff_member_required
@@ -5139,7 +5139,7 @@ def handoff_detail(request, pk, handoff_id):
     })
 
 
-# ── Knowledge Base ───────────────────────────────────────────────────────
+#  Knowledge Base 
 
 @login_required
 @staff_member_required
@@ -5197,7 +5197,7 @@ def knowledge_detail(request, slug):
     })
 
 
-# ── Design Showcase ──────────────────────────────────────────────────────
+#  Design Showcase 
 
 @login_required
 @staff_member_required
@@ -5255,11 +5255,11 @@ def showcase_detail(request, showcase_id):
     })
 
 
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 # DESIGNER INTEGRATIONS
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 
-# ── Figma Integration ────────────────────────────────────────────────────
+#  Figma Integration 
 
 @login_required
 @staff_member_required
@@ -5311,7 +5311,7 @@ def figma_integration(request):
     })
 
 
-# ── Adobe CC Integration ─────────────────────────────────────────────────
+#  Adobe CC Integration 
 
 @login_required
 @staff_member_required
@@ -5365,7 +5365,7 @@ def adobe_integration(request):
     })
 
 
-# ── Design Tools ─────────────────────────────────────────────────────────
+#  Design Tools 
 
 @login_required
 @staff_member_required
@@ -5499,7 +5499,7 @@ def design_tools_brand_check(request):
     })
 
 
-# ── Slack Integration ────────────────────────────────────────────────────
+#  Slack Integration 
 
 @login_required
 @staff_member_required
@@ -5553,7 +5553,7 @@ def slack_integration(request):
     })
 
 
-# ── Calendar Integration ─────────────────────────────────────────────────
+#  Calendar Integration 
 
 @login_required
 @staff_member_required
@@ -5645,9 +5645,9 @@ def calendar_integration(request):
     })
 
 
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 # Unified Staff Dashboard
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 
 @staff_member_required
 def unified_dashboard(request):
@@ -5906,11 +5906,11 @@ def reset_dashboard(request):
     return JsonResponse({'ok': True})
 
 
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 # QUESTIONNAIRE SYSTEM
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 
-# ── Designer Management Views ─────────────────────────────────────────────
+#  Designer Management Views 
 
 @designer_required
 def questionnaire_list(request, request_pk):
@@ -6606,7 +6606,7 @@ def preference_profile(request, request_pk):
     })
 
 
-# ── Client-Facing Views ──────────────────────────────────────────────────
+#  Client-Facing Views 
 
 def client_questionnaire(request, token):
     from .models import Questionnaire, QuestionnaireAnswer

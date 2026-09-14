@@ -1,0 +1,708 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans "Mobile App Development" %} | OnWebApp{% endblock %}
+
+{% block meta_description %}{% trans "Native and cross-platform mobile app development for iOS and Android. React Native, Flutter, and native development." %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .sw-hero{background:linear-gradient(135deg,#0f172a 0%,#1e293b 40%,#0f172a 100%);padding:10rem 0 9rem;position:relative;overflow:hidden}
+    .sw-hero::before{content:'';position:absolute;inset:0;background:url('{% static "img/backg.png" %}') center/cover no-repeat;opacity:.15}
+    .sw-hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:200px;background:linear-gradient(to top,var(--bg-body),transparent)}
+    .sw-hero .container{position:relative;z-index:2}
+    .sw-label{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#14b8a6;margin-bottom:.5rem;display:flex;align-items:center;gap:.4rem}
+    .sw-label i{font-size:.35rem}
+    .sw-h{font-weight:800;font-size:2rem;margin-bottom:.6rem}
+    .sw-sub{color:#64748b;font-size:.95rem;line-height:1.7;max-width:640px}
+    .sw-s{padding:5rem 0}
+    .sw-s-alt{background:#f8fafc;padding:5rem 0}
+    .sw-s-dark{background:#0f172a;padding:5rem 0;color:#fff}
+    .sw-c{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:1.75rem;height:100%;transition:all .3s}
+    .sw-c:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(20,184,166,.12);border-color:#14b8a6}
+    .sw-c-icon{width:48px;height:48px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;font-size:1.1rem;margin-bottom:1rem}
+    .sw-c-icon.blue{background:rgba(37,99,235,.1);color:#2563eb}
+    .sw-c-icon.teal{background:rgba(20,184,166,.1);color:#14b8a6}
+    .sw-c-icon.purple{background:rgba(147,51,234,.1);color:#9333ea}
+    .sw-c-icon.amber{background:rgba(245,158,11,.1);color:#f59e0b}
+    .sw-c-icon.rose{background:rgba(244,63,94,.1);color:#f43f5e}
+    .sw-c-icon.emerald{background:rgba(16,185,129,.1);color:#10b981}
+    .sw-c-icon.sky{background:rgba(14,165,233,.1);color:#0ea5e9}
+    .sw-c-icon.indigo{background:rgba(99,102,241,.1);color:#6366f1}
+    .sw-container{max-width:1140px;margin:0 auto;padding:0 1.5rem}
+    .sw-cta-box{background:linear-gradient(135deg,#0d9488,#14b8a6);border-radius:20px;padding:4rem 2rem;text-align:center;margin:0}
+    .sw-step{display:flex;align-items:flex-start;gap:1.5rem;padding:2rem 0;border-bottom:1px solid #e2e8f0}
+    .sw-step:last-child{border-bottom:none}
+    .sw-step-num{flex-shrink:0;width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#14b8a6,#2dd4bf);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:1rem}
+    .sw-alt-row{display:flex;align-items:center;gap:4rem;padding:4rem 0}
+    .sw-alt-row.reverse{flex-direction:row-reverse}
+    .sw-alt-img{flex:1;border-radius:16px;overflow:hidden;position:relative}
+    .sw-alt-text{flex:1}
+    .sw-alt-text h3{font-weight:800;font-size:1.5rem;margin-bottom:1rem}
+    .sw-alt-text p{color:#64748b;line-height:1.7}
+    .sw-service-card{display:flex;gap:1.25rem;padding:1.5rem;border-radius:12px;background:#fff;border:1px solid #e2e8f0;transition:all .3s}
+    .sw-service-card:hover{border-color:#14b8a6;box-shadow:0 8px 24px rgba(20,184,166,.08)}
+    .sw-service-card .sw-svc-icon{flex-shrink:0;width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.95rem}
+    .sw-tech-row{display:flex;align-items:center;gap:1rem;padding:.75rem 1rem;border-radius:8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);transition:all .2s}
+    .sw-tech-row:hover{border-color:rgba(255,255,255,.2);background:rgba(255,255,255,.1)}
+    .sw-tech-row i{font-size:1.2rem;width:28px;text-align:center}
+    .sw-tech-row span{font-weight:600;font-size:.85rem}
+    .sw-faq-item{border-bottom:1px solid #e2e8f0;padding:1.25rem 0}
+    .sw-faq-item:last-child{border-bottom:none}
+    .sw-faq-q{font-weight:700;font-size:.95rem;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:1rem;color:#0f172a}
+    .sw-faq-q i{transition:transform .2s;font-size:.8rem;color:#64748b}
+    .sw-faq-a{color:#64748b;font-size:.88rem;line-height:1.7;max-height:0;overflow:hidden;transition:all .3s}
+    .sw-faq-item.open .sw-faq-a{max-height:300px;padding-top:.75rem}
+    .sw-faq-item.open .sw-faq-q i{transform:rotate(180deg)}
+    .sw-industry-chip{display:inline-flex;align-items:center;gap:.5rem;padding:.5rem 1rem;border-radius:2rem;border:1px solid #e2e8f0;font-size:.82rem;font-weight:600;color:#334155;background:#fff;transition:all .2s}
+    .sw-industry-chip:hover{border-color:#14b8a6;color:#14b8a6;background:rgba(20,184,166,.04)}
+    .sw-hero-stats{display:flex;gap:3rem;margin-top:3rem}
+    .sw-hero-stat{text-align:left}
+    .sw-hero-stat-num{font-size:1.75rem;font-weight:800;color:#fff}
+    .sw-hero-stat-label{font-size:.75rem;color:#64748b;text-transform:uppercase;letter-spacing:.05em}
+    .sw-platform-compare{border-radius:12px;border:1px solid #e2e8f0;overflow:hidden;background:#fff}
+    .sw-platform-compare th{background:#f8fafc;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;color:#64748b;padding:.75rem 1rem;border-bottom:1px solid #e2e8f0}
+    .sw-platform-compare td{padding:.75rem 1rem;font-size:.85rem;color:#334155;border-bottom:1px solid #f1f5f9}
+    .sw-platform-compare tr:last-child td{border-bottom:none}
+    @media(max-width:991px){.sw-alt-row,.sw-alt-row.reverse{flex-direction:column;gap:2rem}.sw-alt-img{width:100%}}
+    @media(max-width:768px){.sw-hero{padding:7rem 0 6rem}.sw-h{font-size:1.6rem}.sw-s{padding:3rem 0}.sw-step{flex-direction:column;text-align:center;align-items:center}.sw-hero-stats{flex-wrap:wrap;gap:1.5rem}.sw-hero-stat{min-width:100px}}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero -->
+<section class="sw-hero">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-7">
+                <div class="sw-label"><i class="fas fa-circle"></i>{% trans "OnWebApp — Mobile Development" %}</div>
+                <h1 class="fw-800 mb-3" style="font-size:3.2rem;line-height:1.08;color:#fff;">{% trans "Mobile Apps " %}<span style="background:linear-gradient(135deg,#14b8a6,#2dd4bf);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">{% trans "Users Love" %}</span></h1>
+                <p style="color:#94a3b8;font-size:1.1rem;max-width:540px;line-height:1.7;">{% trans "We build native and cross-platform mobile applications for iOS and Android that deliver exceptional user experiences." %}</p>
+                <div class="d-flex gap-3 mt-4 flex-wrap">
+                    <a href="{% url 'home:build_website' %}" class="btn btn-success btn-lg rounded-pill px-5 fw-800">{% trans "Start Your Project" %} <i class="fas fa-arrow-right ms-1"></i></a>
+                    <a href="#md-process" class="btn btn-outline-light btn-lg rounded-pill px-4 fw-700">{% trans "Our Process" %}</a>
+                </div>
+                <div class="sw-hero-stats">
+                    <div class="sw-hero-stat">
+                        <div class="sw-hero-stat-num">80+</div>
+                        <div class="sw-hero-stat-label">{% trans "Apps Launched" %}</div>
+                    </div>
+                    <div class="sw-hero-stat">
+                        <div class="sw-hero-stat-num">4.8</div>
+                        <div class="sw-hero-stat-label">{% trans "Avg App Store Rating" %}</div>
+                    </div>
+                    <div class="sw-hero-stat">
+                        <div class="sw-hero-stat-num">10M+</div>
+                        <div class="sw-hero-stat-label">{% trans "Total Downloads" %}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- What We Build -->
+<section class="sw-s">
+    <div class="sw-container">
+        <div class="text-center mb-5">
+            <div class="sw-label justify-content-center"><i class="fas fa-circle"></i>{% trans "What We Build" %}</div>
+            <h2 class="sw-h">{% trans "Mobile Apps for Every Purpose" %}</h2>
+            <p class="sw-sub mx-auto">{% trans "From consumer-facing apps to enterprise mobile solutions, we deliver applications that users genuinely enjoy." %}</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4">
+                <div class="sw-service-card">
+                    <div class="sw-svc-icon" style="background:rgba(20,184,166,.1);color:#14b8a6;"><i class="fas fa-shopping-bag"></i></div>
+                    <div>
+                        <h6 class="fw-700 mb-1">{% trans "Consumer Apps" %}</h6>
+                        <p class="small mb-0" style="color:#64748b;">{% trans "Engaging apps with smooth UX, push notifications, and social features that keep users coming back." %}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="sw-service-card">
+                    <div class="sw-svc-icon" style="background:rgba(37,99,235,.1);color:#2563eb;"><i class="fas fa-building"></i></div>
+                    <div>
+                        <h6 class="fw-700 mb-1">{% trans "Enterprise Mobile" %}</h6>
+                        <p class="small mb-0" style="color:#64748b;">{% trans "Internal tools, field service apps, and mobile ERP solutions for workforce productivity." %}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="sw-service-card">
+                    <div class="sw-svc-icon" style="background:rgba(147,51,234,.1);color:#9333ea;"><i class="fas fa-store"></i></div>
+                    <div>
+                        <h6 class="fw-700 mb-1">{% trans "E-Commerce Apps" %}</h6>
+                        <p class="small mb-0" style="color:#64748b;">{% trans "Mobile shopping experiences with payment integration, order tracking, and loyalty programs." %}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="sw-service-card">
+                    <div class="sw-svc-icon" style="background:rgba(245,158,11,.1);color:#f59e0b;"><i class="fas fa-heartbeat"></i></div>
+                    <div>
+                        <h6 class="fw-700 mb-1">{% trans "Health & Fitness" %}</h6>
+                        <p class="small mb-0" style="color:#64748b;">{% trans "Health tracking, telemedicine, fitness coaching, and wearable-connected applications." %}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="sw-service-card">
+                    <div class="sw-svc-icon" style="background:rgba(244,63,94,.1);color:#f43f5e;"><i class="fas fa-robot"></i></div>
+                    <div>
+                        <h6 class="fw-700 mb-1">{% trans "AI-Powered Apps" %}</h6>
+                        <p class="small mb-0" style="color:#64748b;">{% trans "On-device ML, voice interfaces, image recognition, and intelligent mobile experiences." %}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="sw-service-card">
+                    <div class="sw-svc-icon" style="background:rgba(16,185,129,.1);color:#10b981;"><i class="fas fa-gamepad"></i></div>
+                    <div>
+                        <h6 class="fw-700 mb-1">{% trans "IoT & Wearables" %}</h6>
+                        <p class="small mb-0" style="color:#64748b;">{% trans "Apps that connect to smart devices, wearables, and IoT ecosystems." %}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Why Choose Us -->
+<section class="sw-s sw-s-alt">
+    <div class="sw-container">
+        <div class="text-center mb-5">
+            <div class="sw-label justify-content-center"><i class="fas fa-circle"></i>{% trans "Why OnWebApp" %}</div>
+            <h2 class="sw-h">{% trans "Built for Mobile-First" %}</h2>
+            <p class="sw-sub mx-auto">{% trans "We understand that mobile apps demand speed, reliability, and an intuitive experience from the very first tap." %}</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="sw-c text-center" style="border-top:3px solid #14b8a6;">
+                    <div class="sw-c-icon teal mx-auto"><i class="fas fa-mobile-screen-button"></i></div>
+                    <h6 class="fw-700">{% trans "Pixel-Perfect UI" %}</h6>
+                    <p class="small mb-0" style="color:#64748b;">{% trans "Native look and feel on every device with platform-specific design patterns." %}</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="sw-c text-center" style="border-top:3px solid #2563eb;">
+                    <div class="sw-c-icon blue mx-auto"><i class="fas fa-bolt"></i></div>
+                    <h6 class="fw-700">{% trans "60fps Performance" %}</h6>
+                    <p class="small mb-0" style="color:#64748b;">{% trans "Smooth animations, fast load times, and optimized memory usage." %}</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="sw-c text-center" style="border-top:3px solid #9333ea;">
+                    <div class="sw-c-icon purple mx-auto"><i class="fas fa-shield-halved"></i></div>
+                    <h6 class="fw-700">{% trans "Secure by Default" %}</h6>
+                    <p class="small mb-0" style="color:#64748b;">{% trans "Encrypted storage, secure API calls, biometric auth, and certificate pinning." %}</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="sw-c text-center" style="border-top:3px solid #f59e0b;">
+                    <div class="sw-c-icon amber mx-auto"><i class="fas fa-infinity"></i></div>
+                    <h6 class="fw-700">{% trans "Offline-First" %}</h6>
+                    <p class="small mb-0" style="color:#64748b;">{% trans "Apps that work seamlessly with or without an internet connection." %}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Our Process -->
+<section class="sw-s" id="md-process">
+    <div class="sw-container">
+        <div class="text-center mb-5">
+            <div class="sw-label justify-content-center"><i class="fas fa-circle"></i>{% trans "Our Process" %}</div>
+            <h2 class="sw-h">{% trans "From Idea to App Store" %}</h2>
+            <p class="sw-sub mx-auto">{% trans "A structured approach to delivering high-quality mobile applications on time and on budget." %}</p>
+        </div>
+        <div class="sw-step">
+            <div class="sw-step-num">01</div>
+            <div>
+                <h5 style="font-weight:700;">{% trans "Strategy & Research" %}</h5>
+                <p class="sw-sub mb-2">{% trans "Market research, user personas, competitor analysis, and defining the app's core value proposition." %}</p>
+                <div class="d-flex gap-2 flex-wrap mt-2">
+                    <span class="sw-industry-chip"><i class="fas fa-check" style="color:#14b8a6;font-size:.7rem;"></i>{% trans "Market Analysis" %}</span>
+                    <span class="sw-industry-chip"><i class="fas fa-check" style="color:#14b8a6;font-size:.7rem;"></i>{% trans "User Personas" %}</span>
+                    <span class="sw-industry-chip"><i class="fas fa-check" style="color:#14b8a6;font-size:.7rem;"></i>{% trans "Feature Roadmap" %}</span>
+                </div>
+            </div>
+        </div>
+        <div class="sw-step">
+            <div class="sw-step-num">02</div>
+            <div>
+                <h5 style="font-weight:700;">{% trans "UX/UI Design" %}</h5>
+                <p class="sw-sub mb-2">{% trans "Mobile-first design with intuitive navigation, wireframes, and interactive prototypes." %}</p>
+                <div class="d-flex gap-2 flex-wrap mt-2">
+                    <span class="sw-industry-chip"><i class="fas fa-check" style="color:#14b8a6;font-size:.7rem;"></i>{% trans "Wireframes" %}</span>
+                    <span class="sw-industry-chip"><i class="fas fa-check" style="color:#14b8a6;font-size:.7rem;"></i>{% trans "Interactive Prototype" %}</span>
+                    <span class="sw-industry-chip"><i class="fas fa-check" style="color:#14b8a6;font-size:.7rem;"></i>{% trans "Design System" %}</span>
+                </div>
+            </div>
+        </div>
+        <div class="sw-step">
+            <div class="sw-step-num">03</div>
+            <div>
+                <h5 style="font-weight:700;">{% trans "Development" %}</h5>
+                <p class="sw-sub mb-2">{% trans "Cross-platform (React Native/Flutter) or native iOS/Android development with clean architecture." %}</p>
+                <div class="d-flex gap-2 flex-wrap mt-2">
+                    <span class="sw-industry-chip"><i class="fas fa-check" style="color:#14b8a6;font-size:.7rem;"></i>{% trans "Agile Sprints" %}</span>
+                    <span class="sw-industry-chip"><i class="fas fa-check" style="color:#14b8a6;font-size:.7rem;"></i>{% trans "Code Reviews" %}</span>
+                    <span class="sw-industry-chip"><i class="fas fa-check" style="color:#14b8a6;font-size:.7rem;"></i>{% trans "CI/CD Pipeline" %}</span>
+                </div>
+            </div>
+        </div>
+        <div class="sw-step">
+            <div class="sw-step-num">04</div>
+            <div>
+                <h5 style="font-weight:700;">{% trans "Testing & QA" %}</h5>
+                <p class="sw-sub mb-2">{% trans "Device testing, performance optimization, security audits, and user acceptance testing." %}</p>
+                <div class="d-flex gap-2 flex-wrap mt-2">
+                    <span class="sw-industry-chip"><i class="fas fa-check" style="color:#14b8a6;font-size:.7rem;"></i>{% trans "Device Testing" %}</span>
+                    <span class="sw-industry-chip"><i class="fas fa-check" style="color:#14b8a6;font-size:.7rem;"></i>{% trans "Performance Profiling" %}</span>
+                    <span class="sw-industry-chip"><i class="fas fa-check" style="color:#14b8a6;font-size:.7rem;"></i>{% trans "Security Audits" %}</span>
+                </div>
+            </div>
+        </div>
+        <div class="sw-step">
+            <div class="sw-step-num">05</div>
+            <div>
+                <h5 style="font-weight:700;">{% trans "Launch & Support" %}</h5>
+                <p class="sw-sub mb-2">{% trans "App Store submission, monitoring, updates, and ongoing maintenance." %}</p>
+                <div class="d-flex gap-2 flex-wrap mt-2">
+                    <span class="sw-industry-chip"><i class="fas fa-check" style="color:#14b8a6;font-size:.7rem;"></i>{% trans "App Store Optimization" %}</span>
+                    <span class="sw-industry-chip"><i class="fas fa-check" style="color:#14b8a6;font-size:.7rem;"></i>{% trans "Crash Monitoring" %}</span>
+                    <span class="sw-industry-chip"><i class="fas fa-check" style="color:#14b8a6;font-size:.7rem;"></i>{% trans "Ongoing Updates" %}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Native vs Cross-Platform -->
+<section class="sw-s sw-s-dark">
+    <div class="sw-container">
+        <div class="text-center mb-5">
+            <div class="sw-label justify-content-center" style="color:#2dd4bf;"><i class="fas fa-circle"></i>{% trans "Choose Your Path" %}</div>
+            <h2 class="fw-800" style="color:#fff;">{% trans "Native vs Cross-Platform" %}</h2>
+            <p style="color:#94a3b8;max-width:640px;margin:0 auto;font-size:.95rem;">{% trans "We help you choose the right approach based on your budget, timeline, and performance needs." %}</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="sw-c" style="background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.1);">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <div class="sw-c-icon" style="background:rgba(59,130,246,.15);color:#60a5fa;"><i class="fas fa-microchip"></i></div>
+                        <h5 class="fw-700 mb-0" style="color:#fff;">{% trans "Native Development" %}</h5>
+                    </div>
+                    <p style="color:#94a3b8;font-size:.88rem;">{% trans "Platform-specific code for maximum performance and access to all device features." %}</p>
+                    <div class="mt-3">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="fab fa-apple" style="color:#60a5fa;font-size:1.1rem;"></i>
+                            <span style="color:#e2e8f0;font-size:.85rem;font-weight:600;">{% trans "iOS — Swift / SwiftUI" %}</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="fab fa-android" style="color:#10b981;font-size:1.1rem;"></i>
+                            <span style="color:#e2e8f0;font-size:.85rem;font-weight:600;">{% trans "Android — Kotlin / Jetpack Compose" %}</span>
+                        </div>
+                    </div>
+                    <ul class="list-unstyled mt-3" style="color:#94a3b8;font-size:.82rem;">
+                        <li class="py-2 border-bottom" style="border-color:rgba(255,255,255,.08) !important;"><i class="fas fa-check me-2" style="color:#10b981;"></i>{% trans "Best possible performance" %}</li>
+                        <li class="py-2 border-bottom" style="border-color:rgba(255,255,255,.08) !important;"><i class="fas fa-check me-2" style="color:#10b981;"></i>{% trans "Full access to device APIs" %}</li>
+                        <li class="py-2 border-bottom" style="border-color:rgba(255,255,255,.08) !important;"><i class="fas fa-check me-2" style="color:#10b981;"></i>{% trans "Platform-native UX patterns" %}</li>
+                        <li class="py-2"><i class="fas fa-check me-2" style="color:#10b981;"></i>{% trans "Best for GPU-heavy or real-time apps" %}</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="sw-c" style="background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.1);">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <div class="sw-c-icon" style="background:rgba(45,212,191,.15);color:#2dd4bf;"><i class="fas fa-layer-group"></i></div>
+                        <h5 class="fw-700 mb-0" style="color:#fff;">{% trans "Cross-Platform" %}</h5>
+                    </div>
+                    <p style="color:#94a3b8;font-size:.88rem;">{% trans "Single codebase for both platforms with near-native performance." %}</p>
+                    <div class="mt-3">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="fab fa-react" style="color:#60a5fa;font-size:1.1rem;"></i>
+                            <span style="color:#e2e8f0;font-size:.85rem;font-weight:600;">{% trans "React Native — JavaScript / TypeScript" %}</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="fas fa-diamond" style="color:#10b981;font-size:1.1rem;"></i>
+                            <span style="color:#e2e8f0;font-size:.85rem;font-weight:600;">{% trans "Flutter — Dart" %}</span>
+                        </div>
+                    </div>
+                    <ul class="list-unstyled mt-3" style="color:#94a3b8;font-size:.82rem;">
+                        <li class="py-2 border-bottom" style="border-color:rgba(255,255,255,.08) !important;"><i class="fas fa-check me-2" style="color:#2dd4bf;"></i>{% trans "One codebase, two platforms" %}</li>
+                        <li class="py-2 border-bottom" style="border-color:rgba(255,255,255,.08) !important;"><i class="fas fa-check me-2" style="color:#2dd4bf;"></i>{% trans "Faster time to market" %}</li>
+                        <li class="py-2 border-bottom" style="border-color:rgba(255,255,255,.08) !important;"><i class="fas fa-check me-2" style="color:#2dd4bf;"></i>{% trans "Lower development cost" %}</li>
+                        <li class="py-2"><i class="fas fa-check me-2" style="color:#2dd4bf;"></i>{% trans "Best for most app types" %}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- iOS Deep Dive -->
+<section class="sw-s">
+    <div class="sw-container">
+        <div class="sw-alt-row">
+            <div class="sw-alt-img">
+                <div style="background:linear-gradient(135deg,#1e293b,#334155);border-radius:16px;padding:3rem;display:flex;align-items:center;justify-content:center;min-height:320px;">
+                    <div class="text-center text-white">
+                        <i class="fab fa-apple" style="font-size:4rem;opacity:.3;"></i>
+                        <h4 class="fw-800 mt-3 mb-2">{% trans "iOS Development" %}</h4>
+                        <p style="color:rgba(255,255,255,.7);font-size:.85rem;">{% trans "Swift / SwiftUI / UIKit" %}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="sw-alt-text">
+                <div class="sw-label"><i class="fas fa-circle"></i>{% trans "iOS Development" %}</div>
+                <h3>{% trans "Crafted for Apple" %}</h3>
+                <p>{% trans "We build iOS apps that follow Apple's Human Interface Guidelines, leveraging the full power of the Apple ecosystem including HealthKit, CoreML, ARKit, and Apple Pay." %}</p>
+                <div class="row g-3 mt-3">
+                    <div class="col-6">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-check-circle" style="color:#14b8a6;font-size:.8rem;"></i>
+                            <span class="small fw-600">{% trans "Swift & SwiftUI" %}</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-check-circle" style="color:#14b8a6;font-size:.8rem;"></i>
+                            <span class="small fw-600">{% trans "Core Data & CloudKit" %}</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-check-circle" style="color:#14b8a6;font-size:.8rem;"></i>
+                            <span class="small fw-600">{% trans "ARKit & CoreML" %}</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-check-circle" style="color:#14b8a6;font-size:.8rem;"></i>
+                            <span class="small fw-600">{% trans "Apple Pay & Sign in with Apple" %}</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-check-circle" style="color:#14b8a6;font-size:.8rem;"></i>
+                            <span class="small fw-600">{% trans "Push Notifications & Widgets" %}</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-check-circle" style="color:#14b8a6;font-size:.8rem;"></i>
+                            <span class="small fw-600">{% trans "HealthKit & WatchOS" %}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Android Deep Dive -->
+<section class="sw-s sw-s-alt">
+    <div class="sw-container">
+        <div class="sw-alt-row reverse">
+            <div class="sw-alt-img">
+                <div style="background:linear-gradient(135deg,#065f46,#059669);border-radius:16px;padding:3rem;display:flex;align-items:center;justify-content:center;min-height:320px;">
+                    <div class="text-center text-white">
+                        <i class="fab fa-android" style="font-size:4rem;opacity:.3;"></i>
+                        <h4 class="fw-800 mt-3 mb-2">{% trans "Android Development" %}</h4>
+                        <p style="color:rgba(255,255,255,.7);font-size:.85rem;">{% trans "Kotlin / Jetpack Compose / Material 3" %}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="sw-alt-text">
+                <div class="sw-label"><i class="fas fa-circle"></i>{% trans "Android Development" %}</div>
+                <h3>{% trans "Built for Android" %}</h3>
+                <p>{% trans "We build Android apps using modern Kotlin and Jetpack Compose, following Material Design guidelines and optimized for the wide range of Android devices." %}</p>
+                <div class="row g-3 mt-3">
+                    <div class="col-6">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-check-circle" style="color:#14b8a6;font-size:.8rem;"></i>
+                            <span class="small fw-600">{% trans "Kotlin & Jetpack Compose" %}</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-check-circle" style="color:#14b8a6;font-size:.8rem;"></i>
+                            <span class="small fw-600">{% trans "Material Design 3" %}</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-check-circle" style="color:#14b8a6;font-size:.8rem;"></i>
+                            <span class="small fw-600">{% trans "Room & DataStore" %}</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-check-circle" style="color:#14b8a6;font-size:.8rem;"></i>
+                            <span class="small fw-600">{% trans "Google Pay & Firebase" %}</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-check-circle" style="color:#14b8a6;font-size:.8rem;"></i>
+                            <span class="small fw-600">{% trans "Wear OS & Android TV" %}</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-check-circle" style="color:#14b8a6;font-size:.8rem;"></i>
+                            <span class="small fw-600">{% trans "ML Kit & TensorFlow Lite" %}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Cross-Platform Deep Dive -->
+<section class="sw-s">
+    <div class="sw-container">
+        <div class="sw-alt-row">
+            <div class="sw-alt-img">
+                <div style="background:linear-gradient(135deg,#4338ca,#6366f1);border-radius:16px;padding:3rem;display:flex;align-items:center;justify-content:center;min-height:320px;">
+                    <div class="text-center text-white">
+                        <i class="fas fa-layer-group" style="font-size:4rem;opacity:.3;"></i>
+                        <h4 class="fw-800 mt-3 mb-2">{% trans "Cross-Platform" %}</h4>
+                        <p style="color:rgba(255,255,255,.7);font-size:.85rem;">{% trans "React Native / Flutter" %}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="sw-alt-text">
+                <div class="sw-label"><i class="fas fa-circle"></i>{% trans "Cross-Platform Development" %}</div>
+                <h3>{% trans "One Codebase, Every Platform" %}</h3>
+                <p>{% trans "Save time and budget without sacrificing quality. Our cross-platform apps feel native on both iOS and Android." %}</p>
+                <div class="row g-3 mt-3">
+                    <div class="col-6">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-check-circle" style="color:#14b8a6;font-size:.8rem;"></i>
+                            <span class="small fw-600">{% trans "React Native" %}</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-check-circle" style="color:#14b8a6;font-size:.8rem;"></i>
+                            <span class="small fw-600">{% trans "Flutter & Dart" %}</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-check-circle" style="color:#14b8a6;font-size:.8rem;"></i>
+                            <span class="small fw-600">{% trans "Native Module Bridge" %}</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-check-circle" style="color:#14b8a6;font-size:.8rem;"></i>
+                            <span class="small fw-600">{% trans "Shared Business Logic" %}</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-check-circle" style="color:#14b8a6;font-size:.8rem;"></i>
+                            <span class="small fw-600">{% trans "Platform-Specific UI" %}</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-check-circle" style="color:#14b8a6;font-size:.8rem;"></i>
+                            <span class="small fw-600">{% trans "Over-the-Air Updates" %}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Backend & Infrastructure -->
+<section class="sw-s sw-s-dark">
+    <div class="sw-container">
+        <div class="text-center mb-5">
+            <div class="sw-label justify-content-center" style="color:#2dd4bf;"><i class="fas fa-circle"></i>{% trans "Backend & Infrastructure" %}</div>
+            <h2 class="fw-800" style="color:#fff;">{% trans "Mobile Backend as a Service" %}</h2>
+            <p style="color:#94a3b8;max-width:640px;margin:0 auto;font-size:.95rem;">{% trans "We build and integrate robust backends that power your mobile app with real-time data, auth, and storage." %}</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="sw-tech-row">
+                    <i class="fas fa-fire" style="color:#f59e0b;"></i>
+                    <span style="color:#fff;">{% trans "Firebase" %}</span>
+                </div>
+                <div class="sw-tech-row mt-2">
+                    <i class="fas fa-bolt" style="color:#f59e0b;"></i>
+                    <span style="color:#fff;">{% trans "Supabase" %}</span>
+                </div>
+                <div class="sw-tech-row mt-2">
+                    <i class="fas fa-server" style="color:#60a5fa;"></i>
+                    <span style="color:#fff;">{% trans "AWS Amplify" %}</span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="sw-tech-row">
+                    <i class="fas fa-database" style="color:#60a5fa;"></i>
+                    <span style="color:#fff;">{% trans "Firestore & Realm" %}</span>
+                </div>
+                <div class="sw-tech-row mt-2">
+                    <i class="fas fa-bolt" style="color:#f59e0b;"></i>
+                    <span style="color:#fff;">{% trans "Redis / Memorystore" %}</span>
+                </div>
+                <div class="sw-tech-row mt-2">
+                    <i class="fas fa-database" style="color:#10b981;"></i>
+                    <span style="color:#fff;">{% trans "PostgreSQL / MongoDB" %}</span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="sw-tech-row">
+                    <i class="fas fa-bell" style="color:#f43f5e;"></i>
+                    <span style="color:#fff;">{% trans "Push Notifications" %}</span>
+                </div>
+                <div class="sw-tech-row mt-2">
+                    <i class="fas fa-comments" style="color:#8b5cf6;"></i>
+                    <span style="color:#fff;">{% trans "Real-Time Sync" %}</span>
+                </div>
+                <div class="sw-tech-row mt-2">
+                    <i class="fas fa-image" style="color:#14b8a6;"></i>
+                    <span style="color:#fff;">{% trans "CDN & Media Storage" %}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Industries -->
+<section class="sw-s sw-s-alt">
+    <div class="sw-container">
+        <div class="text-center mb-5">
+            <div class="sw-label justify-content-center"><i class="fas fa-circle"></i>{% trans "Industries We Serve" %}</div>
+            <h2 class="sw-h">{% trans "Mobile Apps Across Industries" %}</h2>
+            <p class="sw-sub mx-auto">{% trans "We've built mobile applications for various industries, each with unique requirements and user expectations." %}</p>
+        </div>
+        <div class="d-flex flex-wrap justify-content-center gap-2">
+            <span class="sw-industry-chip"><i class="fas fa-heartbeat" style="color:#f43f5e;"></i>{% trans "Healthcare" %}</span>
+            <span class="sw-industry-chip"><i class="fas fa-university" style="color:#2563eb;"></i>{% trans "Fintech & Banking" %}</span>
+            <span class="sw-industry-chip"><i class="fas fa-graduation-cap" style="color:#9333ea;"></i>{% trans "Education & E-Learning" %}</span>
+            <span class="sw-industry-chip"><i class="fas fa-shopping-cart" style="color:#14b8a6;"></i>{% trans "Retail & E-Commerce" %}</span>
+            <span class="sw-industry-chip"><i class="fas fa-dumbbell" style="color:#f43f5e;"></i>{% trans "Fitness & Wellness" %}</span>
+            <span class="sw-industry-chip"><i class="fas fa-utensils" style="color:#f59e0b;"></i>{% trans "Food & Delivery" %}</span>
+            <span class="sw-industry-chip"><i class="fas fa-plane" style="color:#0ea5e9;"></i>{% trans "Travel & Hospitality" %}</span>
+            <span class="sw-industry-chip"><i class="fas fa-car" style="color:#6366f1;"></i>{% trans "Transportation & Logistics" %}</span>
+            <span class="sw-industry-chip"><i class="fas fa-home" style="color:#10b981;"></i>{% trans "Real Estate" %}</span>
+            <span class="sw-industry-chip"><i class="fas fa-music" style="color:#8b5cf6;"></i>{% trans "Entertainment & Media" %}</span>
+            <span class="sw-industry-chip"><i class="fas fa-gamepad" style="color:#f43f5e;"></i>{% trans "Gaming" %}</span>
+            <span class="sw-industry-chip"><i class="fas fa-gavel" style="color:#6366f1;"></i>{% trans "Government & Civic" %}</span>
+        </div>
+    </div>
+</section>
+
+<!-- Pricing -->
+<section class="sw-s">
+    <div class="sw-container">
+        <div class="text-center mb-5">
+            <div class="sw-label justify-content-center"><i class="fas fa-circle"></i>{% trans "Pricing" %}</div>
+            <h2 class="sw-h">{% trans "Transparent Pricing" %}</h2>
+            <p class="sw-sub mx-auto">{% trans "Flexible engagement models to fit your budget and timeline." %}</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="sw-c text-center" style="border-top:3px solid #14b8a6;">
+                    <div class="small fw-700 text-uppercase mb-2" style="color:#14b8a6;">{% trans "MVP" %}</div>
+                    <h4 class="fw-800 mb-2">{% trans "Minimum Viable Product" %}</h4>
+                    <p class="small" style="color:#64748b;">{% trans "Perfect for startups validating an idea with core features." %}</p>
+                    <ul class="list-unstyled small text-start mt-3" style="color:#64748b;">
+                        <li class="py-2 border-bottom" style="border-color:#e2e8f0 !important;"><i class="fas fa-check me-2" style="color:#14b8a6;"></i>{% trans "Core feature set" %}</li>
+                        <li class="py-2 border-bottom" style="border-color:#e2e8f0 !important;"><i class="fas fa-check me-2" style="color:#14b8a6;"></i>{% trans "Single platform or cross-platform" %}</li>
+                        <li class="py-2 border-bottom" style="border-color:#e2e8f0 !important;"><i class="fas fa-check me-2" style="color:#14b8a6;"></i>{% trans "Basic backend integration" %}</li>
+                        <li class="py-2"><i class="fas fa-check me-2" style="color:#14b8a6;"></i>{% trans "App Store submission" %}</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="sw-c text-center" style="border-top:3px solid #2563eb;">
+                    <div class="small fw-700 text-uppercase mb-2" style="color:#2563eb;">{% trans "Full App" %}</div>
+                    <h4 class="fw-800 mb-2">{% trans "Production-Ready" %}</h4>
+                    <p class="small" style="color:#64748b;">{% trans "Complete app with all features, polish, and ongoing support." %}</p>
+                    <ul class="list-unstyled small text-start mt-3" style="color:#64748b;">
+                        <li class="py-2 border-bottom" style="border-color:#e2e8f0 !important;"><i class="fas fa-check me-2" style="color:#2563eb;"></i>{% trans "Full feature development" %}</li>
+                        <li class="py-2 border-bottom" style="border-color:#e2e8f0 !important;"><i class="fas fa-check me-2" style="color:#2563eb;"></i>{% trans "iOS & Android" %}</li>
+                        <li class="py-2 border-bottom" style="border-color:#e2e8f0 !important;"><i class="fas fa-check me-2" style="color:#2563eb;"></i>{% trans "Custom backend & admin panel" %}</li>
+                        <li class="py-2"><i class="fas fa-check me-2" style="color:#2563eb;"></i>{% trans "3 months free support" %}</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="sw-c text-center" style="border-top:3px solid #9333ea;">
+                    <div class="small fw-700 text-uppercase mb-2" style="color:#9333ea;">{% trans "Enterprise" %}</div>
+                    <h4 class="fw-800 mb-2">{% trans "Scale & Maintain" %}</h4>
+                    <p class="small" style="color:#64748b;">{% trans "For teams needing continuous development and dedicated resources." %}</p>
+                    <ul class="list-unstyled small text-start mt-3" style="color:#64748b;">
+                        <li class="py-2 border-bottom" style="border-color:#e2e8f0 !important;"><i class="fas fa-check me-2" style="color:#9333ea;"></i>{% trans "Dedicated development team" %}</li>
+                        <li class="py-2 border-bottom" style="border-color:#e2e8f0 !important;"><i class="fas fa-check me-2" style="color:#9333ea;"></i>{% trans "Priority support & SLA" %}</li>
+                        <li class="py-2 border-bottom" style="border-color:#e2e8f0 !important;"><i class="fas fa-check me-2" style="color:#9333ea;"></i>{% trans "Analytics & monitoring" %}</li>
+                        <li class="py-2"><i class="fas fa-check me-2" style="color:#9333ea;"></i>{% trans "Ongoing maintenance & updates" %}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ -->
+<section class="sw-s sw-s-alt">
+    <div class="sw-container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="text-center mb-5">
+                    <div class="sw-label justify-content-center"><i class="fas fa-circle"></i>{% trans "FAQ" %}</div>
+                    <h2 class="sw-h">{% trans "Frequently Asked Questions" %}</h2>
+                </div>
+                <div class="sw-faq-item" onclick="this.classList.toggle('open')">
+                    <div class="sw-faq-q">{% trans "How long does it take to build a mobile app?" %} <i class="fas fa-chevron-down"></i></div>
+                    <div class="sw-faq-a">{% trans "A simple MVP takes 6-10 weeks. A full-featured app typically takes 3-5 months. We provide a detailed timeline during the strategy phase." %}</div>
+                </div>
+                <div class="sw-faq-item" onclick="this.classList.toggle('open')">
+                    <div class="sw-faq-q">{% trans "Should I choose native or cross-platform?" %} <i class="fas fa-chevron-down"></i></div>
+                    <div class="sw-faq-a">{% trans "For most apps, cross-platform (React Native or Flutter) is the best choice — faster to build, lower cost, near-native performance. Choose native only if you need heavy GPU processing, AR/VR, or platform-specific features." %}</div>
+                </div>
+                <div class="sw-faq-item" onclick="this.classList.toggle('open')">
+                    <div class="sw-faq-q">{% trans "Do you handle App Store submission?" %} <i class="fas fa-chevron-down"></i></div>
+                    <div class="sw-faq-a">{% trans "Yes. We handle the entire submission process for both Apple App Store and Google Play Store, including screenshots, descriptions, and compliance requirements." %}</div>
+                </div>
+                <div class="sw-faq-item" onclick="this.classList.toggle('open')">
+                    <div class="sw-faq-q">{% trans "What about ongoing maintenance?" %} <i class="fas fa-chevron-down"></i></div>
+                    <div class="sw-faq-a">{% trans "We offer monthly maintenance plans that include OS updates, bug fixes, performance monitoring, and feature additions. Most clients choose our retainer for continuous support." %}</div>
+                </div>
+                <div class="sw-faq-item" onclick="this.classList.toggle('open')">
+                    <div class="sw-faq-q">{% trans "Can you work with our existing backend?" %} <i class="fas fa-chevron-down"></i></div>
+                    <div class="sw-faq-a">{% trans "Absolutely. We integrate with any REST API, GraphQL, or custom backend. We can also help modernize or extend your existing backend if needed." %}</div>
+                </div>
+                <div class="sw-faq-item" onclick="this.classList.toggle('open')">
+                    <div class="sw-faq-q">{% trans "How do you test across different devices?" %} <i class="fas fa-chevron-down"></i></div>
+                    <div class="sw-faq-a">{% trans "We use a combination of physical devices, cloud device farms (BrowserStack, AWS Device Farm), and automated testing to ensure your app works across screen sizes, OS versions, and hardware configurations." %}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section style="padding:0;">
+    <div class="sw-container" style="padding:5rem 1.5rem;">
+        <div class="sw-cta-box">
+            <h2 class="fw-800 mb-3" style="color:#fff;max-width:600px;margin:0 auto 1rem;">{% trans "Ready to Build Your Mobile App?" %}</h2>
+            <p style="color:rgba(255,255,255,.7);font-size:1rem;max-width:500px;margin:0 auto 2rem;">{% trans "Let's turn your idea into a reality." %}</p>
+            <div class="d-flex gap-3 justify-content-center flex-wrap">
+                <a href="{% url 'home:build_website' %}" class="btn btn-light btn-lg rounded-pill px-5 fw-800">{% trans "Start Your Project" %} <i class="fas fa-arrow-right ms-1"></i></a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

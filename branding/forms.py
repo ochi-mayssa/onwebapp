@@ -108,9 +108,9 @@ class BrandingRequestForm(forms.ModelForm):
         return cleaned
 
 
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 # Concept Presentation Forms
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 
 class DesignConceptForm(forms.ModelForm):
     tags = forms.MultipleChoiceField(

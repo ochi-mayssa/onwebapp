@@ -1,0 +1,764 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans "Software Development Services" %} | OnWebApp{% endblock %}
+
+{% block meta_description %}{% trans "Custom software development: web apps, mobile apps, eCommerce platforms, SaaS, enterprise solutions, AI-powered products, and API development." %}{% endblock %}
+
+{% block extra_css %}
+<style>
+.sw-hero{background:linear-gradient(135deg,#0f172a 0%,#1e293b 40%,#0f172a 100%);padding:10rem 0 9rem;position:relative;overflow:hidden}
+.sw-hero::before{content:'';position:absolute;inset:0;background:url('{% static "img/dev.jpg" %}') center/cover no-repeat;opacity:.35}
+.sw-hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:200px;background:linear-gradient(to top,var(--bg-body),transparent)}
+.sw-hero .container{position:relative;z-index:2}
+.sw-label{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#2563eb;margin-bottom:.5rem;display:flex;align-items:center;gap:.4rem}
+.sw-label i{font-size:.35rem}
+.sw-h{font-weight:800;font-size:2rem;margin-bottom:.6rem}
+.sw-sub{color:#64748b;font-size:.95rem;line-height:1.7;max-width:640px}
+.sw-s{padding:5rem 0}
+.sw-s-alt{background:#f8fafc;padding:5rem 0}
+.sw-s-dark{background:#0f172a;padding:5rem 0}
+.sw-s-gradient{background:linear-gradient(135deg,#1e40af,#3b82f6);padding:5rem 0}
+.sw-c{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:1.75rem;height:100%;transition:all .3s}
+.sw-c:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(37,99,235,.12);border-color:#2563eb}
+.sw-c-dark{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:1.75rem;height:100%;transition:all .3s}
+.sw-c-dark:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(59,130,246,.15);border-color:rgba(59,130,246,.3)}
+.sw-c-icon{width:48px;height:48px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;font-size:1.1rem;margin-bottom:1rem}
+.sw-c-icon.blue{background:rgba(37,99,235,.1);color:#2563eb}
+.sw-c-icon.teal{background:rgba(20,184,166,.1);color:#14b8a6}
+.sw-c-icon.purple{background:rgba(147,51,234,.1);color:#9333ea}
+.sw-c-icon.amber{background:rgba(245,158,11,.1);color:#f59e0b}
+.sw-c-icon.pink{background:rgba(236,72,153,.1);color:#ec4899}
+.sw-container{max-width:1140px;margin:0 auto;padding:0 1.5rem}
+.sw-cta-box{background:linear-gradient(135deg,#1e40af,#3b82f6);border-radius:20px;padding:4rem 2rem;text-align:center;margin:0}
+.sw-step{display:flex;align-items:flex-start;gap:1.5rem;padding:2rem 0;border-bottom:1px solid #e2e8f0}
+.sw-step:last-child{border-bottom:none}
+.sw-step-num{flex-shrink:0;width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#2563eb,#3b82f6);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:1rem}
+.sw-arrow{width:2px;height:40px;background:linear-gradient(180deg,#2563eb,#3b82f6);margin:0 auto}
+.sw-tech-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:1.5rem;text-align:center;transition:all .3s}
+.sw-tech-card:hover{background:rgba(255,255,255,.1);border-color:rgba(59,130,246,.3)}
+.sw-list{list-style:none;padding:0;margin:0}
+.sw-list li{padding:.4rem 0;font-size:.88rem;color:#475569;display:flex;align-items:center;gap:.5rem}
+.sw-list li::before{content:'';width:6px;height:6px;border-radius:50%;background:#2563eb;flex-shrink:0}
+.sw-dev-block{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:2rem;transition:all .3s}
+.sw-dev-block:hover{box-shadow:0 8px 30px rgba(37,99,235,.1);border-color:rgba(37,99,235,.2)}
+.sw-dev-header{display:flex;align-items:center;gap:1rem;margin-bottom:1rem}
+.sw-dev-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.2rem;flex-shrink:0}
+.sw-dev-tag{font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#2563eb;margin-bottom:.15rem}
+.sw-dev-desc{color:#64748b;font-size:.92rem;line-height:1.7;margin-bottom:1rem;}
+.sw-dev-tags{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1rem}
+.sw-tag{display:inline-block;padding:.4rem .85rem;border-radius:20px;font-size:.75rem;font-weight:600;transition:all .2s}
+.sw-tag:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.sw-dev-card{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:1.75rem;height:100%;transition:all .3s}
+.sw-dev-card:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,.08)}
+.sw-dev-card-icon{width:44px;height:44px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;font-size:1rem;margin-bottom:1rem}
+.sw-dev-card h5{font-weight:700;margin-bottom:.5rem}
+.sw-dev-card p{font-size:.88rem;color:#64748b;line-height:1.6}
+.sw-tag-sm{display:inline-block;padding:.3rem .7rem;border-radius:16px;font-size:.7rem;font-weight:600;transition:all .2s}
+.sw-tag-sm:hover{transform:translateY(-1px)}
+.sw-service-row{display:flex;align-items:center;gap:3rem;padding:3rem 0;border-bottom:1px solid #f1f5f9}
+.sw-service-row:last-child{border-bottom:none}
+.sw-mobile-timeline{position:relative;max-width:800px;margin:0 auto}
+.sw-mobile-step{display:flex;align-items:flex-start;gap:2rem;position:relative;padding-bottom:2.5rem}
+.sw-mobile-step:last-child{padding-bottom:0}
+.sw-mobile-step::before{content:'';position:absolute;left:23px;top:48px;bottom:0;width:2px;background:linear-gradient(180deg,#2563eb,#14b8a6)}
+.sw-mobile-step:last-child::before{display:none}
+.sw-mobile-dot{flex-shrink:0;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.9rem;color:#fff;position:relative;z-index:1}
+.sw-mobile-content{flex:1;padding-top:.25rem}
+.sw-mobile-content h5{font-weight:700;font-size:1.05rem;margin-bottom:.3rem}
+.sw-mobile-content p{color:#64748b;font-size:.88rem;line-height:1.6;margin-bottom:.5rem}
+.sw-mobile-tags{display:flex;flex-wrap:wrap;gap:.4rem}
+.sw-mobile-tag{display:inline-block;padding:.25rem .65rem;border-radius:12px;font-size:.7rem;font-weight:600}
+@media(max-width:768px){.sw-mobile-step{gap:1rem}.sw-mobile-dot{width:40px;height:40px;font-size:.8rem}.sw-mobile-step::before{left:19px;top:40px}}
+.sw-service-img{flex-shrink:0;width:400px;height:280px;border-radius:16px;overflow:hidden;position:relative}
+.sw-service-img img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s ease}
+.sw-service-row:hover .sw-service-img img{transform:scale(1.05)}
+.sw-service-img::after{content:'';position:absolute;inset:0;border-radius:16px;pointer-events:none}
+.sw-service-content{flex:1}
+.sw-service-split{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:1.25rem}
+.sw-service-split-item{display:flex;align-items:flex-start;gap:.6rem}
+.sw-service-split-icon{flex-shrink:0;width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.65rem;margin-top:2px}
+@media(max-width:991px){.sw-service-row{flex-direction:column;gap:1.5rem;padding:2rem 0}.sw-service-img{width:100%;height:200px}}
+.sw-divider{height:1px;background:linear-gradient(90deg,transparent,#e2e8f0,transparent);margin:0}
+.pyramid{max-width:700px;margin:0 auto}
+.pyramid-level{display:flex;align-items:center;gap:1.25rem;margin-bottom:0;opacity:0;transform:translateY(20px);animation:pyrFadeIn .5s ease-out forwards}
+.pyramid-level:nth-child(1){animation-delay:.1s}
+.pyramid-level:nth-child(2){animation-delay:.2s}
+.pyramid-level:nth-child(3){animation-delay:.3s}
+.pyramid-level:nth-child(4){animation-delay:.4s}
+.pyramid-level:nth-child(5){animation-delay:.5s}
+.pyramid-level:nth-child(6){animation-delay:.6s}
+.pyramid-level:nth-child(7){animation-delay:.7s}
+@keyframes pyrFadeIn{to{opacity:1;transform:translateY(0)}}
+.pyramid-num{flex-shrink:0;width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#2563eb,#3b82f6);color:#fff;font-weight:800;font-size:.85rem;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 15px rgba(37,99,235,.3)}
+.pyramid-bar{flex:1;border-radius:12px;padding:1rem 1.5rem;position:relative;transition:all .3s ease;cursor:default;overflow:hidden}
+.pyramid-bar::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);transition:left .6s ease}
+.pyramid-bar:hover::after{left:100%}
+.pyramid-bar:hover{transform:translateX(6px);box-shadow:0 8px 30px rgba(37,99,235,.2)}
+.pyramid-bar h6{font-weight:700;font-size:.9rem;margin-bottom:.2rem;color:#fff}
+.pyramid-bar p{font-size:.78rem;margin:0;color:rgba(255,255,255,.7)}
+.pyramid-arrow{text-align:center;padding:.3rem 0;opacity:0;animation:pyrArrowIn .3s ease-out forwards}
+.pyramid-arrow:nth-child(2){animation-delay:.15s}
+.pyramid-arrow:nth-child(4){animation-delay:.25s}
+.pyramid-arrow:nth-child(6){animation-delay:.35s}
+.pyramid-arrow:nth-child(8){animation-delay:.45s}
+.pyramid-arrow:nth-child(10){animation-delay:.55s}
+.pyramid-arrow:nth-child(12){animation-delay:.65s}
+@keyframes pyrArrowIn{to{opacity:1}}
+.pyramid-arrow i{color:#3b82f6;font-size:.9rem;animation:pyrArrowPulse 2s ease-in-out infinite}
+@keyframes pyrArrowPulse{0%,100%{opacity:.4;transform:translateY(0)}50%{opacity:1;transform:translateY(3px)}}
+@media(max-width:768px){.pyramid-bar{padding:.75rem 1rem}.pyramid-bar h6{font-size:.82rem}.pyramid-bar p{font-size:.72rem}.pyramid-num{width:34px;height:34px;font-size:.75rem}}
+@media(max-width:768px){.sw-hero{padding:7rem 0 6rem}.sw-h{font-size:1.6rem}.sw-s{padding:3rem 0}.sw-step{flex-direction:column;text-align:center;align-items:center}}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!--  HERO  -->
+<section class="sw-hero">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <div class="sw-label"><i class="fas fa-circle"></i>{% trans "DEVELOPMENT" %}</div>
+                <h1 class="fw-800 mb-3" style="font-size:3.4rem;line-height:1.06;color:#fff;">{% trans "We Build Digital Products That " %}<span style="background:linear-gradient(135deg,#3b82f6,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">{% trans "Work, Scale, and Grow" %}</span></h1>
+                <p style="color:#94a3b8;font-size:1.1rem;max-width:600px;line-height:1.7;">{% trans "From websites to complex software platforms. OnWebApp transforms ideas, business requirements, and designs into reliable digital products built for real-world use." %}</p>
+                <p style="color:#64748b;font-size:.95rem;max-width:600px;line-height:1.7;margin-top:1rem;">{% trans "Whether you need a high-performance website, a custom web application, a mobile application, enterprise software, or a complete SaaS platform, we design and develop technology around your business." %}</p>
+                <div class="d-flex gap-3 mt-4 flex-wrap">
+                    <a href="{% url 'home:build_website' %}" class="btn btn-primary btn-lg rounded-pill px-5 fw-800">{% trans "Start Your Project" %} <i class="fas fa-arrow-right ms-1"></i></a>
+                    <a href="#sw-what" class="btn btn-outline-light btn-lg rounded-pill px-4 fw-700">{% trans "Explore Our Services" %}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--  ONE DEVELOPMENT PARTNER  -->
+<section class="sw-s" id="sw-partner">
+    <div class="sw-container">
+        <div class="text-center mb-5">
+            <div class="sw-label justify-content-center"><i class="fas fa-circle"></i>{% trans "ONE DEVELOPMENT PARTNER" %}</div>
+            <h2 class="sw-h">{% trans "From First Idea to Production" %}</h2>
+            <p class="sw-sub mx-auto">{% trans "Building software is more than writing code. It requires understanding your business, designing the right architecture, choosing the right technology, and creating a product that can evolve over time." %}</p>
+        </div>
+        <!-- Pyramid Diagram -->
+        <div class="pyramid">
+            <div class="pyramid-level">
+                <div class="pyramid-num">01</div>
+                <div class="pyramid-bar" style="background:linear-gradient(135deg,#1e3a8a,#1e40af);width:100%;">
+                    <h6>{% trans "Agile Methodology" %}</h6>
+                    <p>{% trans "Iterative development with continuous feedback and delivery" %}</p>
+                </div>
+            </div>
+            <div class="pyramid-arrow"><i class="fas fa-arrow-down"></i></div>
+            <div class="pyramid-level">
+                <div class="pyramid-num">02</div>
+                <div class="pyramid-bar" style="background:linear-gradient(135deg,#1e40af,#2563eb);width:92%;margin-left:auto;">
+                    <h6>{% trans "UX/UI" %}</h6>
+                    <p>{% trans "Design user flows, wireframes, and interfaces" %}</p>
+                </div>
+            </div>
+            <div class="pyramid-arrow"><i class="fas fa-arrow-down"></i></div>
+            <div class="pyramid-level">
+                <div class="pyramid-num">03</div>
+                <div class="pyramid-bar" style="background:linear-gradient(135deg,#2563eb,#3b82f6);width:84%;margin-left:auto;">
+                    <h6>{% trans "Development" %}</h6>
+                    <p>{% trans "Build frontend, backend, APIs, and integrations" %}</p>
+                </div>
+            </div>
+            <div class="pyramid-arrow"><i class="fas fa-arrow-down"></i></div>
+            <div class="pyramid-level">
+                <div class="pyramid-num">04</div>
+                <div class="pyramid-bar" style="background:linear-gradient(135deg,#3b82f6,#60a5fa);width:76%;margin-left:auto;">
+                    <h6>{% trans "Testing" %}</h6>
+                    <p>{% trans "Validate functionality, performance, and security" %}</p>
+                </div>
+            </div>
+            <div class="pyramid-arrow"><i class="fas fa-arrow-down"></i></div>
+            <div class="pyramid-level">
+                <div class="pyramid-num">05</div>
+                <div class="pyramid-bar" style="background:linear-gradient(135deg,#60a5fa,#93c5fd);width:68%;margin-left:auto;">
+                    <h6>{% trans "Deployment" %}</h6>
+                    <p>{% trans "Launch to production with monitoring in place" %}</p>
+                </div>
+            </div>
+            <div class="pyramid-arrow"><i class="fas fa-arrow-down"></i></div>
+            <div class="pyramid-level">
+                <div class="pyramid-num">06</div>
+                <div class="pyramid-bar" style="background:linear-gradient(135deg,#93c5fd,#bfdbfe);width:60%;margin-left:auto;color:#1e3a8a;">
+                    <h6 style="color:#1e3a8a;">{% trans "Optimization" %}</h6>
+                    <p style="color:#1e40af;">{% trans "Improve performance, scale, and evolve" %}</p>
+                </div>
+            </div>
+        </div>
+        <div class="text-center">
+            <p style="color:#64748b;font-size:.9rem;font-weight:600;">{% trans "One team. One workflow. One product vision." %}</p>
+        </div>
+    </div>
+</section>
+
+<div class="sw-divider"></div>
+
+<!--  WHAT WE DEVELOP  -->
+<section class="sw-s sw-s-alt" id="sw-what">
+    <div class="sw-container">
+        <div class="text-center mb-5">
+            <div class="sw-label justify-content-center"><i class="fas fa-circle"></i>{% trans "WHAT WE DEVELOP" %}</div>
+            <h2 class="sw-h">{% trans "Technology Built Around Your Business" %}</h2>
+        </div>
+
+        <!-- Web Development -->
+        <div class="sw-service-row">
+            <div class="sw-service-img">
+                <img src="{% static 'img/web.png' %}" alt="Web Development">
+                <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(37,99,235,.15),transparent);border-radius:16px;"></div>
+            </div>
+            <div class="sw-service-content">
+                <div class="sw-dev-tag">{% trans "WEB DEVELOPMENT" %}</div>
+                <h3 class="fw-800 mb-2">{% trans "Websites That Convert" %}</h3>
+                <p style="color:#64748b;font-size:.92rem;line-height:1.7;">{% trans "Modern, responsive, and high-performance websites built to represent your brand and convert visitors into customers." %}</p>
+                <div class="sw-service-split">
+                    <div class="sw-service-split-item">
+                        <div class="sw-service-split-icon" style="background:rgba(37,99,235,.1);color:#2563eb;"><i class="fas fa-check"></i></div>
+                        <div><strong style="font-size:.85rem;">{% trans "Corporate Websites" %}</strong><p style="font-size:.78rem;color:#64748b;margin:0;">{% trans "Professional online presence" %}</p></div>
+                    </div>
+                    <div class="sw-service-split-item">
+                        <div class="sw-service-split-icon" style="background:rgba(37,99,235,.1);color:#2563eb;"><i class="fas fa-check"></i></div>
+                        <div><strong style="font-size:.85rem;">{% trans "eCommerce" %}</strong><p style="font-size:.78rem;color:#64748b;margin:0;">{% trans "Online stores that sell" %}</p></div>
+                    </div>
+                    <div class="sw-service-split-item">
+                        <div class="sw-service-split-icon" style="background:rgba(37,99,235,.1);color:#2563eb;"><i class="fas fa-check"></i></div>
+                        <div><strong style="font-size:.85rem;">{% trans "Landing Pages" %}</strong><p style="font-size:.78rem;color:#64748b;margin:0;">{% trans "High-converting campaigns" %}</p></div>
+                    </div>
+                    <div class="sw-service-split-item">
+                        <div class="sw-service-split-icon" style="background:rgba(37,99,235,.1);color:#2563eb;"><i class="fas fa-check"></i></div>
+                        <div><strong style="font-size:.85rem;">{% trans "Customer Portals" %}</strong><p style="font-size:.78rem;color:#64748b;margin:0;">{% trans "Self-service experiences" %}</p></div>
+                    </div>
+                </div>
+                <a href="{% url 'home:web_development' %}" class="btn btn-primary rounded-pill px-4 fw-700 mt-3">{% trans "Build Your Website" %} <i class="fas fa-arrow-right ms-1"></i></a>
+            </div>
+        </div>
+
+        <!-- Web Application Development -->
+        <div class="sw-service-row">
+            <div class="sw-service-content">
+                <div class="sw-dev-tag" style="color:#7c3aed;">{% trans "WEB APPLICATION DEVELOPMENT" %}</div>
+                <h3 class="fw-800 mb-2">{% trans "Powerful Web Applications" %}</h3>
+                <p style="color:#64748b;font-size:.92rem;line-height:1.7;">{% trans "Turn complex business requirements into powerful web applications that users can access from anywhere." %}</p>
+                <div class="sw-service-split">
+                    <div class="sw-service-split-item">
+                        <div class="sw-service-split-icon" style="background:rgba(124,58,237,.1);color:#7c3aed;"><i class="fas fa-check"></i></div>
+                        <div><strong style="font-size:.85rem;">{% trans "SaaS Platforms" %}</strong><p style="font-size:.78rem;color:#64748b;margin:0;">{% trans "Multi-tenant architecture" %}</p></div>
+                    </div>
+                    <div class="sw-service-split-item">
+                        <div class="sw-service-split-icon" style="background:rgba(124,58,237,.1);color:#7c3aed;"><i class="fas fa-check"></i></div>
+                        <div><strong style="font-size:.85rem;">{% trans "Dashboards" %}</strong><p style="font-size:.78rem;color:#64748b;margin:0;">{% trans "Real-time data visualization" %}</p></div>
+                    </div>
+                    <div class="sw-service-split-item">
+                        <div class="sw-service-split-icon" style="background:rgba(124,58,237,.1);color:#7c3aed;"><i class="fas fa-check"></i></div>
+                        <div><strong style="font-size:.85rem;">{% trans "Workflow Apps" %}</strong><p style="font-size:.78rem;color:#64748b;margin:0;">{% trans "Automate business processes" %}</p></div>
+                    </div>
+                    <div class="sw-service-split-item">
+                        <div class="sw-service-split-icon" style="background:rgba(124,58,237,.1);color:#7c3aed;"><i class="fas fa-check"></i></div>
+                        <div><strong style="font-size:.85rem;">{% trans "Marketplace" %}</strong><p style="font-size:.78rem;color:#64748b;margin:0;">{% trans "Multi-vendor platforms" %}</p></div>
+                    </div>
+                </div>
+                <a href="{% url 'home:web_development' %}" class="btn rounded-pill px-4 fw-700 mt-3" style="background:#7c3aed;color:#fff;">{% trans "Build a Web Application" %} <i class="fas fa-arrow-right ms-1"></i></a>
+            </div>
+            <div class="sw-service-img">
+                <img src="{% static 'img/mob.jpg' %}" alt="Web Application Development">
+                <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(124,58,237,.15),transparent);border-radius:16px;"></div>
+            </div>
+        </div>
+
+        <!-- Application Development -->
+        <div class="sw-service-row">
+            <div class="sw-service-img">
+                <img src="{% static 'img/cost.jpg' %}" alt="Application Development">
+                <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(20,184,166,.15),transparent);border-radius:16px;"></div>
+            </div>
+            <div class="sw-service-content">
+                <div class="sw-dev-tag" style="color:#14b8a6;">{% trans "APPLICATION DEVELOPMENT" %}</div>
+                <h3 class="fw-800 mb-2">{% trans "Custom Applications" %}</h3>
+                <p style="color:#64748b;font-size:.92rem;line-height:1.7;">{% trans "Create custom applications designed around the way your users and teams actually work." %}</p>
+                <div class="sw-service-split">
+                    <div class="sw-service-split-item">
+                        <div class="sw-service-split-icon" style="background:rgba(20,184,166,.1);color:#14b8a6;"><i class="fas fa-check"></i></div>
+                        <div><strong style="font-size:.85rem;">{% trans "Custom Apps" %}</strong><p style="font-size:.78rem;color:#64748b;margin:0;">{% trans "Tailored to your workflow" %}</p></div>
+                    </div>
+                    <div class="sw-service-split-item">
+                        <div class="sw-service-split-icon" style="background:rgba(20,184,166,.1);color:#14b8a6;"><i class="fas fa-check"></i></div>
+                        <div><strong style="font-size:.85rem;">{% trans "Mobile Apps" %}</strong><p style="font-size:.78rem;color:#64748b;margin:0;">{% trans "iOS and Android native" %}</p></div>
+                    </div>
+                    <div class="sw-service-split-item">
+                        <div class="sw-service-split-icon" style="background:rgba(20,184,166,.1);color:#14b8a6;"><i class="fas fa-check"></i></div>
+                        <div><strong style="font-size:.85rem;">{% trans "Cross-Platform" %}</strong><p style="font-size:.78rem;color:#64748b;margin:0;">{% trans "One codebase, all platforms" %}</p></div>
+                    </div>
+                    <div class="sw-service-split-item">
+                        <div class="sw-service-split-icon" style="background:rgba(20,184,166,.1);color:#14b8a6;"><i class="fas fa-check"></i></div>
+                        <div><strong style="font-size:.85rem;">{% trans "API-Driven" %}</strong><p style="font-size:.78rem;color:#64748b;margin:0;">{% trans "Connected experiences" %}</p></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Software Development -->
+        <div class="sw-service-row">
+            <div class="sw-service-content">
+                <div class="sw-dev-tag" style="color:#0d9488;">{% trans "SOFTWARE DEVELOPMENT" %}</div>
+                <h3 class="fw-800 mb-2">{% trans "Business-Specific Software" %}</h3>
+                <p style="color:#64748b;font-size:.92rem;line-height:1.7;">{% trans "Build software that solves specific business problems instead of forcing your workflow to fit generic tools." %}</p>
+                <div class="sw-service-split">
+                    <div class="sw-service-split-item">
+                        <div class="sw-service-split-icon" style="background:rgba(13,148,136,.1);color:#0d9488;"><i class="fas fa-check"></i></div>
+                        <div><strong style="font-size:.85rem;">{% trans "Business Operations" %}</strong><p style="font-size:.78rem;color:#64748b;margin:0;">{% trans "Streamline daily tasks" %}</p></div>
+                    </div>
+                    <div class="sw-service-split-item">
+                        <div class="sw-service-split-icon" style="background:rgba(13,148,136,.1);color:#0d9488;"><i class="fas fa-check"></i></div>
+                        <div><strong style="font-size:.85rem;">{% trans "Automation" %}</strong><p style="font-size:.78rem;color:#64748b;margin:0;">{% trans "Eliminate repetitive work" %}</p></div>
+                    </div>
+                    <div class="sw-service-split-item">
+                        <div class="sw-service-split-icon" style="background:rgba(13,148,136,.1);color:#0d9488;"><i class="fas fa-check"></i></div>
+                        <div><strong style="font-size:.85rem;">{% trans "Enterprise" %}</strong><p style="font-size:.78rem;color:#64748b;margin:0;">{% trans "Large-scale solutions" %}</p></div>
+                    </div>
+                    <div class="sw-service-split-item">
+                        <div class="sw-service-split-icon" style="background:rgba(13,148,136,.1);color:#0d9488;"><i class="fas fa-check"></i></div>
+                        <div><strong style="font-size:.85rem;">{% trans "Analytics" %}</strong><p style="font-size:.78rem;color:#64748b;margin:0;">{% trans "Data-driven insights" %}</p></div>
+                    </div>
+                </div>
+            </div>
+            <div class="sw-service-img">
+                <img src="{% static 'img/Business.jpeg' %}" alt="Software Development">
+                <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(13,148,136,.15),transparent);border-radius:16px;"></div>
+            </div>
+        </div>
+
+        <!-- SaaS -->
+        <div class="sw-service-row">
+            <div class="sw-service-img">
+                <img src="{% static 'img/sas.jpg' %}" alt="SaaS Development">
+                <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(147,51,234,.15),transparent);border-radius:16px;"></div>
+            </div>
+            <div class="sw-service-content">
+                <div class="sw-dev-tag" style="color:#9333ea;">{% trans "SAAS DEVELOPMENT" %}</div>
+                <h3 class="fw-800 mb-2">{% trans "Scalable SaaS Platforms" %}</h3>
+                <p style="color:#64748b;font-size:.92rem;line-height:1.7;">{% trans "Turn your product idea into a scalable software-as-a-service platform." %}</p>
+                <div class="sw-service-split">
+                    <div class="sw-service-split-item">
+                        <div class="sw-service-split-icon" style="background:rgba(147,51,234,.1);color:#9333ea;"><i class="fas fa-check"></i></div>
+                        <div><strong style="font-size:.85rem;">{% trans "Multi-Tenant" %}</strong><p style="font-size:.78rem;color:#64748b;margin:0;">{% trans "Shared infrastructure" %}</p></div>
+                    </div>
+                    <div class="sw-service-split-item">
+                        <div class="sw-service-split-icon" style="background:rgba(147,51,234,.1);color:#9333ea;"><i class="fas fa-check"></i></div>
+                        <div><strong style="font-size:.85rem;">{% trans "Subscriptions" %}</strong><p style="font-size:.78rem;color:#64748b;margin:0;">{% trans "Recurring billing" %}</p></div>
+                    </div>
+                    <div class="sw-service-split-item">
+                        <div class="sw-service-split-icon" style="background:rgba(147,51,234,.1);color:#9333ea;"><i class="fas fa-check"></i></div>
+                        <div><strong style="font-size:.85rem;">{% trans "Permissions" %}</strong><p style="font-size:.78rem;color:#64748b;margin:0;">{% trans "Role-based access" %}</p></div>
+                    </div>
+                    <div class="sw-service-split-item">
+                        <div class="sw-service-split-icon" style="background:rgba(147,51,234,.1);color:#9333ea;"><i class="fas fa-check"></i></div>
+                        <div><strong style="font-size:.85rem;">{% trans "Integrations" %}</strong><p style="font-size:.78rem;color:#64748b;margin:0;">{% trans "Connect everything" %}</p></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enterprise -->
+        <div class="sw-service-row" style="border-bottom:none;">
+            <div class="sw-service-content">
+                <div class="sw-dev-tag" style="color:#f59e0b;">{% trans "ENTERPRISE SOFTWARE" %}</div>
+                <h3 class="fw-800 mb-2">{% trans "Enterprise-Grade Systems" %}</h3>
+                <p style="color:#64748b;font-size:.92rem;line-height:1.7;">{% trans "Reliable systems that support complex organizations and large-scale workflows." %}</p>
+                <div class="sw-service-split">
+                    <div class="sw-service-split-item">
+                        <div class="sw-service-split-icon" style="background:rgba(245,158,11,.1);color:#f59e0b;"><i class="fas fa-check"></i></div>
+                        <div><strong style="font-size:.85rem;">{% trans "Security" %}</strong><p style="font-size:.78rem;color:#64748b;margin:0;">{% trans "Enterprise-grade protection" %}</p></div>
+                    </div>
+                    <div class="sw-service-split-item">
+                        <div class="sw-service-split-icon" style="background:rgba(245,158,11,.1);color:#f59e0b;"><i class="fas fa-check"></i></div>
+                        <div><strong style="font-size:.85rem;">{% trans "Scalability" %}</strong><p style="font-size:.78rem;color:#64748b;margin:0;">{% trans "Grows with your org" %}</p></div>
+                    </div>
+                    <div class="sw-service-split-item">
+                        <div class="sw-service-split-icon" style="background:rgba(245,158,11,.1);color:#f59e0b;"><i class="fas fa-check"></i></div>
+                        <div><strong style="font-size:.85rem;">{% trans "Integration" %}</strong><p style="font-size:.78rem;color:#64748b;margin:0;">{% trans "Connect existing tools" %}</p></div>
+                    </div>
+                    <div class="sw-service-split-item">
+                        <div class="sw-service-split-icon" style="background:rgba(245,158,11,.1);color:#f59e0b;"><i class="fas fa-check"></i></div>
+                        <div><strong style="font-size:.85rem;">{% trans "Reliability" %}</strong><p style="font-size:.78rem;color:#64748b;margin:0;">{% trans "99.9% uptime" %}</p></div>
+                    </div>
+                </div>
+            </div>
+            <div class="sw-service-img">
+                <img src="{% static 'img/enterprise-software.webp' %}" alt="Enterprise Software">
+                <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(245,158,11,.15),transparent);border-radius:16px;"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--  MOBILE DEVELOPMENT  -->
+<section class="sw-s" id="sw-mobile">
+    <div class="sw-container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-5">
+                <div class="sw-label"><i class="fas fa-circle"></i>{% trans "MOBILE DEVELOPMENT" %}</div>
+                <h2 class="fw-800 mb-3" style="font-size:2rem;">{% trans "Powerful Applications Beyond the Browser" %}</h2>
+                <p style="color:#64748b;line-height:1.7;">{% trans "Your users don't always sit behind a desktop. We create mobile experiences that bring your product directly to users." %}</p>
+                <div class="d-flex gap-3 mt-4 flex-wrap">
+                    <a href="{% url 'home:mobile_development' %}" class="btn btn-primary rounded-pill px-4 fw-700">{% trans "Start Your App" %} <i class="fas fa-arrow-right ms-1"></i></a>
+                </div>
+            </div>
+            <div class="col-lg-7">
+                <div class="sw-mobile-timeline">
+                    <!-- Step 1 -->
+                    <div class="sw-mobile-step">
+                        <div class="sw-mobile-dot" style="background:linear-gradient(135deg,#2563eb,#3b82f6);">01</div>
+                        <div class="sw-mobile-content">
+                            <h5>{% trans "Strategy & Research" %}</h5>
+                            <p>{% trans "Define your audience, platform, and core features before writing a single line of code." %}</p>
+                            <div class="sw-mobile-tags">
+                                <span class="sw-mobile-tag" style="background:rgba(37,99,235,.08);color:#2563eb;">{% trans "Market Analysis" %}</span>
+                                <span class="sw-mobile-tag" style="background:rgba(37,99,235,.08);color:#2563eb;">{% trans "User Personas" %}</span>
+                                <span class="sw-mobile-tag" style="background:rgba(37,99,235,.08);color:#2563eb;">{% trans "Feature Planning" %}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Step 2 -->
+                    <div class="sw-mobile-step">
+                        <div class="sw-mobile-dot" style="background:linear-gradient(135deg,#7c3aed,#8b5cf6);">02</div>
+                        <div class="sw-mobile-content">
+                            <h5>{% trans "UX/UI Design" %}</h5>
+                            <p>{% trans "Mobile-first design with intuitive navigation, gestures, and platform-native patterns." %}</p>
+                            <div class="sw-mobile-tags">
+                                <span class="sw-mobile-tag" style="background:rgba(124,58,237,.08);color:#7c3aed;">{% trans "Wireframes" %}</span>
+                                <span class="sw-mobile-tag" style="background:rgba(124,58,237,.08);color:#7c3aed;">{% trans "Prototypes" %}</span>
+                                <span class="sw-mobile-tag" style="background:rgba(124,58,237,.08);color:#7c3aed;">{% trans "Design System" %}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Step 3 -->
+                    <div class="sw-mobile-step">
+                        <div class="sw-mobile-dot" style="background:linear-gradient(135deg,#14b8a6,#2dd4bf);">03</div>
+                        <div class="sw-mobile-content">
+                            <h5>{% trans "Development" %}</h5>
+                            <p>{% trans "Cross-platform or native development with clean architecture and optimized performance." %}</p>
+                            <div class="sw-mobile-tags">
+                                <span class="sw-mobile-tag" style="background:rgba(20,184,166,.08);color:#14b8a6;">{% trans "React Native" %}</span>
+                                <span class="sw-mobile-tag" style="background:rgba(20,184,166,.08);color:#14b8a6;">{% trans "Flutter" %}</span>
+                                <span class="sw-mobile-tag" style="background:rgba(20,184,166,.08);color:#14b8a6;">{% trans "Swift" %}</span>
+                                <span class="sw-mobile-tag" style="background:rgba(20,184,166,.08);color:#14b8a6;">{% trans "Kotlin" %}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Step 4 -->
+                    <div class="sw-mobile-step">
+                        <div class="sw-mobile-dot" style="background:linear-gradient(135deg,#f59e0b,#fbbf24);">04</div>
+                        <div class="sw-mobile-content">
+                            <h5>{% trans "Testing & QA" %}</h5>
+                            <p>{% trans "Device testing, performance optimization, and crash-free user experience." %}</p>
+                            <div class="sw-mobile-tags">
+                                <span class="sw-mobile-tag" style="background:rgba(245,158,11,.08);color:#f59e0b;">{% trans "Device Testing" %}</span>
+                                <span class="sw-mobile-tag" style="background:rgba(245,158,11,.08);color:#f59e0b;">{% trans "Performance" %}</span>
+                                <span class="sw-mobile-tag" style="background:rgba(245,158,11,.08);color:#f59e0b;">{% trans "Security" %}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Step 5 -->
+                    <div class="sw-mobile-step">
+                        <div class="sw-mobile-dot" style="background:linear-gradient(135deg,#ec4899,#f472b6);">05</div>
+                        <div class="sw-mobile-content">
+                            <h5>{% trans "Launch & Growth" %}</h5>
+                            <p>{% trans "App Store submission, monitoring, updates, and continuous improvement." %}</p>
+                            <div class="sw-mobile-tags">
+                                <span class="sw-mobile-tag" style="background:rgba(236,72,153,.08);color:#ec4899;">{% trans "App Store" %}</span>
+                                <span class="sw-mobile-tag" style="background:rgba(236,72,153,.08);color:#ec4899;">{% trans "Analytics" %}</span>
+                                <span class="sw-mobile-tag" style="background:rgba(236,72,153,.08);color:#ec4899;">{% trans "Updates" %}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="sw-divider"></div>
+
+<!--  API + AI + BACKEND  -->
+<section class="sw-s sw-s-alt" id="sw-api">
+    <div class="sw-container">
+        <div class="text-center mb-5">
+            <div class="sw-label justify-content-center"><i class="fas fa-circle"></i>{% trans "CORE CAPABILITIES" %}</div>
+            <h2 class="sw-h">{% trans "The Technology Behind Every Product" %}</h2>
+        </div>
+        <div class="row g-5 align-items-start">
+            <!-- API -->
+            <div class="col-lg-4">
+                <div class="sw-label">{% trans "API DEVELOPMENT" %}</div>
+                <h3 class="fw-800 mb-3">{% trans "Connect Your Systems" %}</h3>
+                <p style="color:#64748b;font-size:.92rem;line-height:1.7;margin-bottom:1.25rem;">{% trans "Modern products need to communicate. We design and develop APIs that allow applications, services, and third-party platforms to work together." %}</p>
+                <ul class="sw-list">
+                    <li>{% trans "REST APIs" %}</li>
+                    <li>{% trans "Backend APIs" %}</li>
+                    <li>{% trans "Authentication APIs" %}</li>
+                    <li>{% trans "Third-Party Integrations" %}</li>
+                    <li>{% trans "Webhooks" %}</li>
+                    <li>{% trans "API Documentation" %}</li>
+                </ul>
+            </div>
+            <!-- AI -->
+            <div class="col-lg-4">
+                <div class="sw-label" style="color:#9333ea;">{% trans "AI-POWERED DEVELOPMENT" %}</div>
+                <h3 class="fw-800 mb-3">{% trans "Build Smarter Applications" %}</h3>
+                <p style="color:#64748b;font-size:.92rem;line-height:1.7;margin-bottom:1.25rem;">{% trans "Artificial intelligence can become part of your product—not just an external tool. We integrate AI capabilities into applications." %}</p>
+                <ul class="sw-list">
+                    <li>{% trans "AI Assistants" %}</li>
+                    <li>{% trans "Intelligent Search" %}</li>
+                    <li>{% trans "Recommendation Systems" %}</li>
+                    <li>{% trans "Content Generation" %}</li>
+                    <li>{% trans "RAG Applications" %}</li>
+                    <li>{% trans "AI-Powered Dashboards" %}</li>
+                </ul>
+            </div>
+            <!-- Backend -->
+            <div class="col-lg-4">
+                <div class="sw-label" style="color:#14b8a6;">{% trans "DATABASE & BACKEND" %}</div>
+                <h3 class="fw-800 mb-3">{% trans "The Engine Behind Your Product" %}</h3>
+                <p style="color:#64748b;font-size:.92rem;line-height:1.7;margin-bottom:1.25rem;">{% trans "A strong frontend needs a reliable backend. We build systems that manage logic, data, users, permissions, and integrations." %}</p>
+                <ul class="sw-list">
+                    <li>{% trans "Database Architecture" %}</li>
+                    <li>{% trans "Authentication & Authorization" %}</li>
+                    <li>{% trans "Data Processing" %}</li>
+                    <li>{% trans "Background Tasks" %}</li>
+                    <li>{% trans "Reporting" %}</li>
+                    <li>{% trans "Automation" %}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--  CUSTOM SOLUTIONS + MODERNIZATION  -->
+<section class="sw-s sw-s-dark">
+    <div class="sw-container">
+        <div class="row g-5">
+            <div class="col-lg-6">
+                <div class="sw-label" style="color:#60a5fa;"><i class="fas fa-circle"></i>{% trans "CUSTOM SOFTWARE SOLUTIONS" %}</div>
+                <h3 class="fw-800 mb-3" style="color:#fff;">{% trans "If Off-the-Shelf Software Doesn't Fit, Build Your Own" %}</h3>
+                <p style="color:#94a3b8;">{% trans "Every business has processes that don't fit perfectly into generic software. Instead of changing your workflow to fit the software, we build the software around your workflow." %}</p>
+                <div class="mt-4">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:.5rem 1rem;color:#fca5a5;font-size:.82rem;">{% trans "Manual Processes" %}</div>
+                        <i class="fas fa-arrow-right" style="color:#60a5fa;"></i>
+                        <div style="background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);border-radius:8px;padding:.5rem 1rem;color:#93c5fd;font-size:.82rem;">{% trans "One Connected Digital System" %}</div>
+                    </div>
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:.5rem 1rem;color:#fca5a5;font-size:.82rem;">{% trans "Disconnected Tools" %}</div>
+                        <i class="fas fa-arrow-right" style="color:#60a5fa;"></i>
+                        <div style="background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);border-radius:8px;padding:.5rem 1rem;color:#93c5fd;font-size:.82rem;">{% trans "One Connected Digital System" %}</div>
+                    </div>
+                    <div class="d-flex align-items-center gap-3">
+                        <div style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:.5rem 1rem;color:#fca5a5;font-size:.82rem;">{% trans "Repetitive Tasks" %}</div>
+                        <i class="fas fa-arrow-right" style="color:#60a5fa;"></i>
+                        <div style="background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);border-radius:8px;padding:.5rem 1rem;color:#93c5fd;font-size:.82rem;">{% trans "One Connected Digital System" %}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="sw-label" style="color:#60a5fa;"><i class="fas fa-circle"></i>{% trans "LEGACY SYSTEM MODERNIZATION" %}</div>
+                <h3 class="fw-800 mb-3" style="color:#fff;">{% trans "Modernize Without Starting From Zero" %}</h3>
+                <p style="color:#94a3b8;">{% trans "Old systems can become expensive to maintain, difficult to integrate, and slow to evolve. We help organizations modernize existing technology." %}</p>
+                <div class="row mt-4">
+                    <div class="col-6">
+                        <ul class="sw-list" style="color:#cbd5e1;">
+                            <li style="color:#cbd5e1;">{% trans "Architecture Improvements" %}</li>
+                            <li style="color:#cbd5e1;">{% trans "API Development" %}</li>
+                            <li style="color:#cbd5e1;">{% trans "Database Modernization" %}</li>
+                            <li style="color:#cbd5e1;">{% trans "UI Modernization" %}</li>
+                        </ul>
+                    </div>
+                    <div class="col-6">
+                        <ul class="sw-list" style="color:#cbd5e1;">
+                            <li style="color:#cbd5e1;">{% trans "System Integrations" %}</li>
+                            <li style="color:#cbd5e1;">{% trans "Performance Optimization" %}</li>
+                            <li style="color:#cbd5e1;">{% trans "Cloud Deployment" %}</li>
+                            <li style="color:#cbd5e1;">{% trans "Incremental Rebuilding" %}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--  INTEGRATIONS + AUTOMATION  -->
+<section class="sw-s">
+    <div class="sw-container">
+        <div class="row g-5">
+            <div class="col-lg-6">
+                <div class="sw-label"><i class="fas fa-circle"></i>{% trans "THIRD-PARTY INTEGRATIONS" %}</div>
+                <h3 class="fw-800 mb-3">{% trans "Make Your Tools Work Together" %}</h3>
+                <p class="sw-sub mb-3">{% trans "Your software shouldn't exist in isolation. We connect your applications with external platforms and services." %}</p>
+                <div class="row">
+                    <div class="col-6">
+                        <ul class="sw-list">
+                            <li>{% trans "Payment Platforms" %}</li>
+                            <li>{% trans "Authentication Providers" %}</li>
+                            <li>{% trans "Email Services" %}</li>
+                            <li>{% trans "CRM Systems" %}</li>
+                        </ul>
+                    </div>
+                    <div class="col-6">
+                        <ul class="sw-list">
+                            <li>{% trans "Analytics Platforms" %}</li>
+                            <li>{% trans "Cloud Services" %}</li>
+                            <li>{% trans "AI Services" %}</li>
+                            <li>{% trans "External APIs" %}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="sw-label"><i class="fas fa-circle"></i>{% trans "AUTOMATION & WORKFLOW" %}</div>
+                <h3 class="fw-800 mb-3">{% trans "Replace Repetitive Work With Intelligent Workflows" %}</h3>
+                <p class="sw-sub mb-3">{% trans "Identify repetitive processes and turn them into automated workflows." %}</p>
+                <div class="row">
+                    <div class="col-6">
+                        <ul class="sw-list">
+                            <li><strong>{% trans "Data Entry" %}</strong> — {% trans "Move information between systems automatically" %}</li>
+                            <li><strong>{% trans "Notifications" %}</strong> — {% trans "Trigger alerts when important events occur" %}</li>
+                            <li><strong>{% trans "Approvals" %}</strong> — {% trans "Create structured approval workflows" %}</li>
+                        </ul>
+                    </div>
+                    <div class="col-6">
+                        <ul class="sw-list">
+                            <li><strong>{% trans "Reports" %}</strong> — {% trans "Generate recurring reports automatically" %}</li>
+                            <li><strong>{% trans "Data Processing" %}</strong> — {% trans "Process information without manual intervention" %}</li>
+                            <li><strong>{% trans "Business Rules" %}</strong> — {% trans "Execute actions based on events and conditions" %}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--  QUALITY & SECURITY  -->
+<section class="sw-s" id="sw-quality">
+    <div class="sw-container">
+        <div class="text-center mb-5">
+            <div class="sw-label justify-content-center"><i class="fas fa-circle"></i>{% trans "QUALITY & SECURITY" %}</div>
+            <h2 class="sw-h">{% trans "Built for More Than the Demo" %}</h2>
+            <p class="sw-sub mx-auto">{% trans "A product isn't finished when it works on one computer." %}</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4 col-lg-2">
+                <div class="sw-c text-center" style="border-top:3px solid #2563eb;">
+                    <div class="sw-c-icon blue mx-auto"><i class="fas fa-bolt"></i></div>
+                    <h6 style="font-weight:700;">{% trans "Performance" %}</h6>
+                    <p style="font-size:.78rem;">{% trans "Fast and efficient experiences." %}</p>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg-2">
+                <div class="sw-c text-center" style="border-top:3px solid #14b8a6;">
+                    <div class="sw-c-icon teal mx-auto"><i class="fas fa-shield-halved"></i></div>
+                    <h6 style="font-weight:700;">{% trans "Security" %}</h6>
+                    <p style="font-size:.78rem;">{% trans "Protect users, data, and infrastructure." %}</p>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg-2">
+                <div class="sw-c text-center" style="border-top:3px solid #9333ea;">
+                    <div class="sw-c-icon purple mx-auto"><i class="fas fa-chart-line"></i></div>
+                    <h6 style="font-weight:700;">{% trans "Scalability" %}</h6>
+                    <p style="font-size:.78rem;">{% trans "Prepare architecture for future growth." %}</p>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg-2">
+                <div class="sw-c text-center" style="border-top:3px solid #f59e0b;">
+                    <div class="sw-c-icon amber mx-auto"><i class="fas fa-universal-access"></i></div>
+                    <h6 style="font-weight:700;">{% trans "Accessibility" %}</h6>
+                    <p style="font-size:.78rem;">{% trans "Usable by a broader range of people." %}</p>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg-2">
+                <div class="sw-c text-center" style="border-top:3px solid #ec4899;">
+                    <div class="sw-c-icon pink mx-auto"><i class="fas fa-code"></i></div>
+                    <h6 style="font-weight:700;">{% trans "Maintainability" %}</h6>
+                    <p style="font-size:.78rem;">{% trans "Code organized for future development." %}</p>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg-2">
+                <div class="sw-c text-center" style="border-top:3px solid #2563eb;">
+                    <div class="sw-c-icon blue mx-auto"><i class="fas fa-check-circle"></i></div>
+                    <h6 style="font-weight:700;">{% trans "Reliability" %}</h6>
+                    <p style="font-size:.78rem;">{% trans "Systems users can depend on." %}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="sw-divider"></div>
+
+<!--  EVERY STAGE  -->
+<section class="sw-s sw-s-alt" id="sw-stages">
+    <div class="sw-container">
+        <div class="text-center mb-5">
+            <div class="sw-label justify-content-center"><i class="fas fa-circle"></i>{% trans "DEVELOPMENT FOR EVERY STAGE" %}</div>
+            <h2 class="sw-h">{% trans "From First MVP to Enterprise Platform" %}</h2>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="sw-c" style="border-top:3px solid #3b82f6;">
+                    <h5>{% trans "MVP" %}</h5>
+                    <p>{% trans "Validate your idea quickly with the essential features." %}</p>
+                    <div style="font-size:.75rem;font-weight:700;color:#3b82f6;">{% trans "Focus: Speed + Validation + Core Functionality" %}</div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="sw-c" style="border-top:3px solid #14b8a6;">
+                    <h5>{% trans "Growth" %}</h5>
+                    <p>{% trans "Improve your product as users, features, and requirements increase." %}</p>
+                    <div style="font-size:.75rem;font-weight:700;color:#14b8a6;">{% trans "Focus: Performance + Features + Optimization" %}</div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="sw-c" style="border-top:3px solid #9333ea;">
+                    <h5>{% trans "Scale" %}</h5>
+                    <p>{% trans "Build the architecture needed for larger workloads." %}</p>
+                    <div style="font-size:.75rem;font-weight:700;color:#9333ea;">{% trans "Focus: Scalability + Security + Reliability" %}</div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="sw-c" style="border-top:3px solid #f59e0b;">
+                    <h5>{% trans "Enterprise" %}</h5>
+                    <p>{% trans "Support complex organizations, workflows, and operational requirements." %}</p>
+                    <div style="font-size:.75rem;font-weight:700;color:#f59e0b;">{% trans "Focus: Governance + Integration + Security" %}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--  CTA  -->
+<section style="padding:0;margin:0;">
+    <div class="sw-cta-box" style="max-width:100%;border-radius:0;margin:0;">
+            <h2 class="fw-800 mb-3" style="color:#fff;max-width:700px;margin:0 auto 1rem;">{% trans "Have an Idea? Let's Build It." %}</h2>
+            <p style="color:rgba(255,255,255,.7);font-size:1.05rem;max-width:640px;margin:0 auto 1.5rem;">{% trans "From a simple website to a complex enterprise platform, OnWebApp turns ideas into reliable digital products." %}</p>
+            <div class="d-flex flex-wrap justify-content-center gap-2 mb-4" style="max-width:700px;margin-left:auto;margin-right:auto;">
+                <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:.35rem .85rem;color:#fff;font-size:.78rem;font-weight:600;">{% trans "Web Development" %}</span>
+                <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:.35rem .85rem;color:#fff;font-size:.78rem;font-weight:600;">{% trans "Application Development" %}</span>
+                <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:.35rem .85rem;color:#fff;font-size:.78rem;font-weight:600;">{% trans "Software Development" %}</span>
+                <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:.35rem .85rem;color:#fff;font-size:.78rem;font-weight:600;">{% trans "SaaS" %}</span>
+                <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:.35rem .85rem;color:#fff;font-size:.78rem;font-weight:600;">{% trans "Mobile Applications" %}</span>
+                <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:.35rem .85rem;color:#fff;font-size:.78rem;font-weight:600;">{% trans "AI-Powered Products" %}</span>
+            </div>
+            <p style="color:rgba(255,255,255,.6);font-size:.9rem;margin-bottom:1.5rem;">{% trans "One partner to take your product from idea  design  development  production." %}</p>
+            <div class="d-flex gap-3 justify-content-center flex-wrap">
+                <a href="{% url 'home:build_website' %}" class="btn btn-light btn-lg rounded-pill px-5 fw-800">{% trans "Start Your Development Project" %} <i class="fas fa-arrow-right ms-1"></i></a>
+                <a href="{% url 'home:build_website' %}" class="btn btn-outline-light btn-lg rounded-pill px-4 fw-700">{% trans "Talk to Our Development Team" %}</a>
+            </div>
+        </div>
+</section>
+
+{% endblock %}

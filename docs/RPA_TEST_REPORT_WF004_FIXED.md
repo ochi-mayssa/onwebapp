@@ -48,7 +48,7 @@
 
 ## 4. Certification Result
 
-**Status**: 🟢 **READY FOR PRODUCTION**
+**Status**:  **READY FOR PRODUCTION**
 
 **Conclusion**:
 The Social Media Intelligence module now supports the full suite of required platforms (Twitter, Facebook, LinkedIn). Data ingestion is robust and dashboard reporting is complete.

@@ -28,6 +28,6 @@
 ---
 
 ## 3. Certification Result
-**Status**: 🔴 **FAIL**
+**Status**:  **FAIL**
 
 **Reason**: Workflow relies on simulation; no functional automation logic exists.

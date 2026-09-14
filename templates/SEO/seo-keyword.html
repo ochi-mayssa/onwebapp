@@ -7,7 +7,7 @@
 
 {% block extra_css %}
 <style>
-    /* ── Hero ── */
+    /*  Hero  */
     .seo-hero{background:linear-gradient(135deg,rgba(15,23,42,.65),rgba(30,41,59,.7)),url('{% static "img/keyword.jpg" %}') center/cover no-repeat;padding:13rem 0 8rem;position:relative;overflow:hidden}
     .seo-hero::before{content:'';position:absolute;inset:0;background:url('{% static "img/sys.jpg" %}') center/cover no-repeat;opacity:.12}
     .seo-hero .container{position:relative;z-index:2}
@@ -15,7 +15,7 @@
     .seo-hero-particle{position:absolute;border-radius:50%;background:rgba(30,64,175,.25);animation:seoFloat linear infinite}
     @keyframes seoFloat{0%{transform:translateY(100vh) scale(0);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:translateY(-10vh) scale(1);opacity:0}}
 
-    /* ── Reusable ── */
+    /*  Reusable  */
     .seo-section{padding:5rem 0}
     .seo-section-alt{background:var(--bg-surface-secondary);padding:5rem 0}
     .seo-divider{width:60px;height:2px;background:linear-gradient(90deg,transparent,#1e40af,transparent);margin:0 auto 2rem;border-radius:2px}
@@ -23,11 +23,11 @@
     .seo-section-title{font-weight:800;font-size:2rem;margin-bottom:.6rem}
     .seo-section-desc{color:var(--text-muted);font-size:.95rem;line-height:1.7;max-width:640px}
 
-    /* ── Badge ── */
+    /*  Badge  */
     .seo-badge{display:inline-flex;align-items:center;gap:.35rem;font-size:.68rem;font-weight:700;letter-spacing:.04em;padding:.3rem .8rem;border-radius:999px;margin-bottom:1rem}
     .seo-badge--blue{background:rgba(30,64,175,.1);border:1px solid rgba(30,64,175,.25);color:#1e40af}
 
-    /* ── Pillar Cards ── */
+    /*  Pillar Cards  */
     .seo-pillar-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
     .seo-pillar-card{background:var(--bg-surface);border:1px solid var(--border-color);border-radius:16px;padding:2rem;transition:all .3s;height:100%}
     .seo-pillar-card:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,.06);border-color:#1e40af}
@@ -35,7 +35,7 @@
     .seo-pillar-card h6{font-weight:700;font-size:.95rem;margin-bottom:.4rem}
     .seo-pillar-card p{color:var(--text-muted);font-size:.85rem;line-height:1.6;margin:0}
 
-    /* ── Steps ── */
+    /*  Steps  */
     .seo-steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem}
     .seo-step-card{text-align:center;padding:2rem 1.5rem;border-radius:16px;background:var(--bg-surface);border:1px solid var(--border-color);transition:all .3s}
     .seo-step-card:hover{transform:translateY(-4px);border-color:#1e40af}
@@ -43,7 +43,7 @@
     .seo-step-card h6{font-weight:700;font-size:.9rem;margin-bottom:.4rem}
     .seo-step-card p{color:var(--text-muted);font-size:.82rem;line-height:1.6;margin:0}
 
-    /* ── Search Intent Pyramid ── */
+    /*  Search Intent Pyramid  */
     .seo-intent-layout{display:flex;align-items:stretch;gap:3rem;max-width:950px;margin:0 auto}
     .seo-intent-meter{display:flex;flex-direction:column;align-items:center;gap:.4rem;min-width:50px;padding:0 .5rem}
     .seo-intent-meter-track{position:relative;width:6px;height:100%;min-height:320px;border-radius:99px;background:var(--border-color);overflow:visible}
@@ -117,7 +117,7 @@
         .seo-pyramid-connector{display:none}
     }
 
-    /* ── Metric Cards ── */
+    /*  Metric Cards  */
     .seo-metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem}
     .seo-metric-card{background:var(--bg-surface);border:1px solid var(--border-color);border-radius:16px;padding:2rem;text-align:center;transition:all .3s}
     .seo-metric-card:hover{transform:translateY(-4px);border-color:#1e40af}
@@ -125,7 +125,7 @@
     .seo-metric-card h6{font-weight:700;font-size:.9rem;margin-bottom:.4rem}
     .seo-metric-card p{color:var(--text-muted);font-size:.82rem;line-height:1.6;margin:0}
 
-    /* ── Feature Split ── */
+    /*  Feature Split  */
     .seo-feature{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center}
     .seo-feature.reverse{direction:rtl}.seo-feature.reverse>*{direction:ltr}
     .seo-feature-text h3{font-weight:800;font-size:1.6rem;margin-bottom:.5rem}
@@ -139,7 +139,7 @@
     .seo-feature-visual-item i{width:36px;height:36px;border-radius:10px;background:rgba(30,64,175,.08);color:#1e40af;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0}
     .seo-feature-visual-item span{font-size:.88rem;font-weight:600;color:var(--text-primary)}
 
-    /* ── Automation Flow ── */
+    /*  Automation Flow  */
     .seo-auto-flow{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;align-items:center}
     .seo-auto-step{text-align:center;padding:2rem}
     .seo-auto-step .step-num{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#1e40af,#1e3a8a);color:#fff;font-size:.85rem;font-weight:800;display:inline-flex;align-items:center;justify-content:center;margin-bottom:.8rem}
@@ -147,7 +147,7 @@
     .seo-auto-step p{color:var(--text-muted);font-size:.82rem;line-height:1.6;margin:0}
     .seo-auto-arrow{font-size:1.5rem;color:#1e40af;text-align:center}
 
-    /* ── AI Stats Bar ── */
+    /*  AI Stats Bar  */
     .seo-ai-stats{display:flex;align-items:center;justify-content:center;gap:0;background:var(--bg-surface);border:1px solid var(--border-color);border-radius:16px;padding:2rem 3rem;margin-bottom:3.5rem;max-width:800px;margin-left:auto;margin-right:auto}
     .seo-ai-stat{text-align:center;padding:0 1.5rem}
     .seo-ai-stat-num{font-size:2.2rem;font-weight:800;color:#1e40af;line-height:1}
@@ -155,7 +155,7 @@
     .seo-ai-stat-label{font-size:.75rem;font-weight:600;color:var(--text-muted);margin-top:.3rem;text-transform:uppercase;letter-spacing:.04em}
     .seo-ai-stat-divider{width:1px;height:40px;background:var(--border-color)}
 
-    /* ── AI Vertical Timeline ── */
+    /*  AI Vertical Timeline  */
     .seo-ai-timeline{position:relative;max-width:700px;margin:0 auto;padding:1rem 0}
     .seo-ai-timeline-line{position:absolute;left:28px;top:0;bottom:0;width:2px;background:linear-gradient(180deg,#1e40af 0%,rgba(30,64,175,.15) 100%)}
     .seo-ai-timeline-item{position:relative;display:flex;gap:2rem;padding-bottom:2.5rem}
@@ -179,12 +179,12 @@
         .seo-ai-timeline-card{padding:1.2rem 1.4rem}
     }
 
-    /* ── CTA Banner ── */
+    /*  CTA Banner  */
     .seo-cta-banner{background:linear-gradient(135deg,#0f172a,#1e293b);color:#fff;padding:5rem 0;text-align:center}
     .seo-cta-banner h2{font-weight:800;font-size:2rem;margin-bottom:.75rem}
     .seo-cta-banner p{color:rgba(255,255,255,.65);max-width:560px;margin:0 auto 2rem;font-size:.95rem;line-height:1.7}
 
-    /* ── FAQ ── */
+    /*  FAQ  */
     .seo-faq-item{border:1px solid var(--border-color);border-radius:12px;overflow:hidden;transition:all .3s;margin-bottom:.75rem}
     .seo-faq-item:hover{border-color:#1e40af}
     .seo-faq-q{padding:1.1rem 1.4rem;font-weight:700;font-size:.9rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;background:var(--bg-surface)}
@@ -193,7 +193,7 @@
     .seo-faq-item.open .seo-faq-a{max-height:300px;padding:0 1.4rem 1.2rem}
     .seo-faq-item.open .seo-faq-q i{transform:rotate(180deg)}
 
-    /* ── Related ── */
+    /*  Related  */
     .seo-related-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.5rem}
     .seo-related-card{background:var(--bg-surface);border:1px solid var(--border-color);border-radius:16px;padding:2rem;transition:all .3s;text-decoration:none;color:inherit}
     .seo-related-card:hover{transform:translateY(-4px);border-color:#1e40af;color:inherit}
@@ -201,7 +201,7 @@
     .seo-related-card h6{font-weight:700;font-size:.95rem;margin-bottom:.3rem}
     .seo-related-card p{color:var(--text-muted);font-size:.85rem;line-height:1.6;margin:0}
 
-    /* ── Buttons ── */
+    /*  Buttons  */
     .cta-btn-primary{display:inline-flex;align-items:center;gap:.5rem;padding:.9rem 2.2rem;border-radius:999px;font-weight:700;font-size:.95rem;color:#fff;background:linear-gradient(135deg,#1e40af,#1e3a8a);border:none;text-decoration:none;transition:all .35s cubic-bezier(.25,.46,.45,.94);box-shadow:0 4px 24px rgba(30,64,175,.35);position:relative;overflow:hidden}
     .cta-btn-primary::after{content:'';position:absolute;top:-50%;left:-60%;width:40%;height:200%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent);transform:skewX(-20deg);transition:left .6s;pointer-events:none}
     .cta-btn-primary:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 8px 32px rgba(30,64,175,.5);color:#fff}
@@ -209,12 +209,12 @@
     .cta-btn-secondary{display:inline-flex;align-items:center;gap:.5rem;padding:.9rem 2.2rem;border-radius:999px;font-weight:700;font-size:.95rem;color:rgba(255,255,255,.9);background:transparent;border:2px solid rgba(255,255,255,.25);text-decoration:none;transition:all .35s}
     .cta-btn-secondary:hover{border-color:#60a5fa;color:#fff;transform:translateY(-2px)}
 
-    /* ── Back to Top ── */
+    /*  Back to Top  */
     .seo-back-to-top{position:fixed;bottom:2rem;right:2rem;width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#1e40af,#1e3a8a);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;z-index:9990;opacity:0;transform:translateY(20px);transition:all .3s;box-shadow:0 4px 16px rgba(30,64,175,.3)}
     .seo-back-to-top.show{opacity:1;transform:translateY(0)}
     .seo-back-to-top:hover{transform:translateY(-3px);box-shadow:0 6px 24px rgba(30,64,175,.4)}
 
-    /* ── Responsive ── */
+    /*  Responsive  */
     @media(max-width:991.98px){.seo-feature{grid-template-columns:1fr}.seo-feature.reverse{direction:ltr}.seo-steps-grid,.seo-intent-grid,.seo-metric-grid{grid-template-columns:repeat(2,1fr)}.seo-auto-flow{grid-template-columns:1fr}.seo-auto-arrow{transform:rotate(90deg)}.seo-related-grid{grid-template-columns:1fr}}
     @media(max-width:767.98px){.seo-pillar-grid,.seo-steps-grid,.seo-intent-grid,.seo-metric-grid{grid-template-columns:1fr}section{padding-top:3rem!important;padding-bottom:3rem!important}}
 </style>
@@ -256,7 +256,7 @@ document.addEventListener('DOMContentLoaded',function(){
 
 {% block content %}
 
-<!-- ═══════════ HERO ═══════════ -->
+<!--  HERO  -->
 <section class="seo-hero">
     <div class="seo-hero-particles" id="seoParticles"></div>
     <div class="container">
@@ -276,7 +276,7 @@ document.addEventListener('DOMContentLoaded',function(){
     </div>
 </section>
 
-<!-- ═══════════ GUIDE + PILLARS ═══════════ -->
+<!--  GUIDE + PILLARS  -->
 <section class="seo-section">
     <div class="container">
         <div class="text-center mx-auto mb-5">
@@ -304,7 +304,7 @@ document.addEventListener('DOMContentLoaded',function(){
     </div>
 </section>
 
-<!-- ═══════════ SECRET METHODS ═══════════ -->
+<!--  SECRET METHODS  -->
 <section class="seo-section">
     <div class="container">
         <div class="seo-feature">
@@ -327,7 +327,7 @@ document.addEventListener('DOMContentLoaded',function(){
     </div>
 </section>
 
-<!-- ═══════════ SEARCH INTENT ═══════════ -->
+<!--  SEARCH INTENT  -->
 <section class="seo-section">
     <div class="container">
         <div class="text-center mx-auto mb-5">
@@ -343,7 +343,7 @@ document.addEventListener('DOMContentLoaded',function(){
     </div>
 </section>
 
-<!-- ═══════════ LET AI DO THE WORK ═══════════ -->
+<!--  LET AI DO THE WORK  -->
 <section class="seo-section">
     <div class="container">
         <div class="text-center mx-auto mb-5">
@@ -419,7 +419,7 @@ document.addEventListener('DOMContentLoaded',function(){
     </div>
 </section>
 
-<!-- ═══════════ KEYWORD METRICS ═══════════ -->
+<!--  KEYWORD METRICS  -->
 <section class="seo-section">
     <div class="container">
         <div class="text-center mx-auto mb-5">
@@ -453,7 +453,7 @@ document.addEventListener('DOMContentLoaded',function(){
     </div>
 </section>
 
-<!-- ═══════════ STRUGGLING WITH TRAFFIC ═══════════ -->
+<!--  STRUGGLING WITH TRAFFIC  -->
 <section class="seo-section">
     <div class="container">
         <div class="text-center mx-auto mb-5">
@@ -470,7 +470,7 @@ document.addEventListener('DOMContentLoaded',function(){
     </div>
 </section>
 
-<!-- ═══════════ 24/7 SUPPORT ═══════════ -->
+<!--  24/7 SUPPORT  -->
 <section class="seo-section">
     <div class="container text-center">
         <div class="seo-section-label">{% trans "24/7 Support" %}</div>
@@ -482,7 +482,7 @@ document.addEventListener('DOMContentLoaded',function(){
     </div>
 </section>
 
-<!-- ═══════════ FAQ ═══════════ -->
+<!--  FAQ  -->
 <section class="seo-section-alt">
     <div class="container" style="max-width:760px;">
         <div class="text-center mx-auto mb-5">
@@ -516,7 +516,7 @@ document.addEventListener('DOMContentLoaded',function(){
     </div>
 </section>
 
-<!-- ═══════════ RELATED ═══════════ -->
+<!--  RELATED  -->
 <section class="seo-section">
     <div class="container">
         <div class="text-center mx-auto mb-5">

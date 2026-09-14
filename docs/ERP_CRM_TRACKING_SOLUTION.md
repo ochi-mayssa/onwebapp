@@ -311,10 +311,10 @@ urlpatterns = [
 ## Implementation Steps
 
 ### Phase 1: Backend Integration (Week 1-2)
-1. ✅ Setup ERPNext API authentication
-2. ✅ Create aggregation function `fetch_erp_customer_data(user)`
-3. ✅ Expose REST API endpoint `/customer-dashboard`
-4. ✅ Add WebSocket server for real-time updates
+1.  Setup ERPNext API authentication
+2.  Create aggregation function `fetch_erp_customer_data(user)`
+3.  Expose REST API endpoint `/customer-dashboard`
+4.  Add WebSocket server for real-time updates
 
 ### Phase 2: Frontend Portal (Week 2-3)
 1. Create client tracking portal template
@@ -383,13 +383,13 @@ def client_tracking_portal(request):
 
 ## Expected Outcomes
 
-✅ Clients can see real-time order status  
-✅ Invoice tracking with payment status  
-✅ Resource allocation visibility  
-✅ Activity feed with live updates  
-✅ No page refresh needed (WebSocket)  
-✅ Better customer satisfaction  
-✅ Reduced support tickets  
+ Clients can see real-time order status  
+ Invoice tracking with payment status  
+ Resource allocation visibility  
+ Activity feed with live updates  
+ No page refresh needed (WebSocket)  
+ Better customer satisfaction  
+ Reduced support tickets  
 
 ---
 

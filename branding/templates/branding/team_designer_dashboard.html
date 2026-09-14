@@ -7,7 +7,7 @@
 <style>body{background:#09090b!important;}body .branding-page{background:#09090b;padding:0!important;margin:0!important;}body .branding-header,body .branding-footer,body footer{display:none!important;}</style>
 <script>document.body.classList.add('dd-active');</script>
 <div class="dd-layout">
-    {# ── Sidebar (Restricted for Team Designers) ── #}
+    {#  Sidebar (Restricted for Team Designers)  #}
     <aside class="dd-sidebar" id="ddSidebar">
         <a class="dd-sidebar-logo" href="{% url 'branding:team_designer_dashboard' %}">
             <span class="dd-sidebar-logo-icon"><i class="fa-solid fa-palette"></i></span>
@@ -18,7 +18,7 @@
         </a>
 
         <nav class="dd-sidebar-nav">
-            {# ── Workspace ── #}
+            {#  Workspace  #}
             <div class="dd-sidebar-section">
                 <div class="dd-sidebar-section-title">WORKSPACE</div>
                 <a href="{% url 'branding:team_designer_dashboard' %}" class="dd-nav-item active">
@@ -32,7 +32,7 @@
                 </a>
             </div>
 
-            {# ── Branding ── #}
+            {#  Branding  #}
             <div class="dd-sidebar-section">
                 <div class="dd-sidebar-section-title">BRANDING</div>
                 <a href="{% url 'branding:collection_template_list' %}" class="dd-nav-item">
@@ -49,7 +49,7 @@
                 </a>
             </div>
 
-            {# ── Activity ── #}
+            {#  Activity  #}
             <div class="dd-sidebar-section">
                 <div class="dd-sidebar-section-title">ACTIVITY</div>
                 <a href="{% url 'branding:feedback_list' %}" class="dd-nav-item">
@@ -63,7 +63,7 @@
                 </a>
             </div>
 
-            {# ── Content Management ── #}
+            {#  Content Management  #}
             <div class="dd-sidebar-section">
                 <div class="dd-sidebar-section-title">CONTENT</div>
                 <a href="{% url 'blog:manage_articles' %}" class="dd-nav-item">
@@ -86,9 +86,9 @@
 
     <div class="dd-sidebar-overlay" id="ddSidebarOverlay"></div>
 
-    {# ── Main Content ── #}
+    {#  Main Content  #}
     <main class="dd-main">
-        {# ── Top Bar ── #}
+        {#  Top Bar  #}
         <header class="dd-topbar">
             <div class="dd-topbar-left">
                 <button class="dd-sidebar-toggle" id="ddSidebarToggle">
@@ -113,10 +113,10 @@
             </div>
         </header>
 
-        {# ── Content ── #}
+        {#  Content  #}
         <div class="dd-content">
 
-            {# ── Priority Alerts Bar ── #}
+            {#  Priority Alerts Bar  #}
             {% if overdue_count > 0 or today_deadline_count > 0 or waiting_feedback_count > 0 %}
             <div class="dd-alert-bar">
                 {% if overdue_count > 0 %}
@@ -140,7 +140,7 @@
             </div>
             {% endif %}
 
-            {# ── Workspace Metrics ── #}
+            {#  Workspace Metrics  #}
             <div class="dd-metrics dd-metrics-5">
                 <div class="dd-metric">
                     <div class="dd-metric-icon mi-active"><i class="fa-solid fa-layer-group"></i></div>
@@ -169,11 +169,11 @@
                 </div>
             </div>
 
-            {# ── Main Grid ── #}
+            {#  Main Grid  #}
             <div class="dd-main-grid">
-                {# ── Left: Projects ── #}
+                {#  Left: Projects  #}
                 <div class="dd-main-col">
-                    {# ── Today's Priority ── #}
+                    {#  Today's Priority  #}
                     {% if priority_projects %}
                     <div class="dd-panel">
                         <div class="dd-panel-header">
@@ -200,7 +200,7 @@
                     </div>
                     {% endif %}
 
-                    {# ── Projects ── #}
+                    {#  Projects  #}
                     <div class="dd-panel">
                         <div class="dd-tabs" role="tablist">
                             <button class="dd-tab active" data-bs-toggle="tab" data-bs-target="#tab-active" type="button">
@@ -218,7 +218,7 @@
                         </div>
 
                         <div class="tab-content">
-                            {# ── Active Tab ── #}
+                            {#  Active Tab  #}
                             <div class="tab-pane fade show active" id="tab-active">
                                 {% if active_projects %}
                                 {% for r in active_projects %}
@@ -273,7 +273,7 @@
                                 {% endif %}
                             </div>
 
-                            {# ── Feedback Tab ── #}
+                            {#  Feedback Tab  #}
                             <div class="tab-pane fade" id="tab-feedback">
                                 {% if waiting_projects %}
                                 {% for r in waiting_projects %}
@@ -303,7 +303,7 @@
                                 {% endif %}
                             </div>
 
-                            {# ── Completed Tab ── #}
+                            {#  Completed Tab  #}
                             <div class="tab-pane fade" id="tab-completed">
                                 {% if completed_projects %}
                                 {% for r in completed_projects %}
@@ -335,7 +335,7 @@
                                 {% endif %}
                             </div>
 
-                            {# ── Upcoming Tab ── #}
+                            {#  Upcoming Tab  #}
                             <div class="tab-pane fade" id="tab-upcoming">
                                 {% if upcoming_projects %}
                                 {% for r in upcoming_projects %}
@@ -369,9 +369,9 @@
                     </div>
                 </div>
 
-                {# ── Right Panel ── #}
+                {#  Right Panel  #}
                 <div class="dd-right-col">
-                    {# ── Quick Actions ── #}
+                    {#  Quick Actions  #}
                     <div class="dd-panel">
                         <div class="dd-panel-header">
                             <span class="dd-panel-title"><i class="fa-solid fa-bolt"></i>Quick Actions</span>
@@ -396,7 +396,7 @@
                         </div>
                     </div>
 
-                    {# ── Brand Library ── #}
+                    {#  Brand Library  #}
                     <div class="dd-panel">
                         <div class="dd-panel-header">
                             <span class="dd-panel-title"><i class="fa-solid fa-layer-group"></i>Brand Library</span>
@@ -431,7 +431,7 @@
                         {% endif %}
                     </div>
 
-                    {# ── Recent Activity ── #}
+                    {#  Recent Activity  #}
                     <div class="dd-panel">
                         <div class="dd-panel-header">
                             <span class="dd-panel-title"><i class="fa-solid fa-clock-rotate-left"></i>Recent Activity</span>

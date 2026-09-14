@@ -69,7 +69,7 @@
             {% endfor %}
             {% endif %}
 
-            {# ── Metrics ── #}
+            {#  Metrics  #}
             <div class="dd-metrics dd-metrics-3" style="margin-bottom:1.5rem;">
                 <div class="dd-metric">
                     <div class="dd-metric-icon mi-active"><i class="fa-solid fa-cube"></i></div>
@@ -88,7 +88,7 @@
                 </div>
             </div>
 
-            {# ── Search + Filters ── #}
+            {#  Search + Filters  #}
             <form method="get" class="dd-search-bar" style="margin-bottom:1rem;">
                 <input type="text" name="q" value="{{ search_query }}" placeholder="Search resources by name, description, or tags..." class="dd-input">
                 <button type="submit" class="dd-btn dd-btn-ghost"><i class="fa-solid fa-search"></i></button>
@@ -108,7 +108,7 @@
                 {% endfor %}
             </div>
 
-            {# ── Resource Grid ── #}
+            {#  Resource Grid  #}
             {% if resources %}
             <div class="dd-grid-3">
                 {% for res in resources %}
@@ -189,7 +189,7 @@
     </main>
 </div>
 
-{# ── Add Resource Panel ── #}
+{#  Add Resource Panel  #}
 <div class="dd-panel-overlay" id="addPanel" style="display:none;" onclick="if(event.target===this)closePanel()"></div>
 <div class="dd-slide-panel" id="addPanelSlide">
     <form method="post" action="{% url 'branding:designer_resources' %}" enctype="multipart/form-data" id="addResourceForm">
@@ -203,7 +203,7 @@
         </div>
 
         <div class="dd-panel-scroll">
-            {# ── Drop Zone ── #}
+            {#  Drop Zone  #}
             <div class="dd-drop-zone" id="dropZone">
                 <div class="dd-drop-placeholder" id="dropPlaceholder">
                     <div class="dd-drop-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
@@ -221,7 +221,7 @@
             </div>
             <input type="file" name="file" id="fileInput" class="d-none">
 
-            {# ── URL Input (alternative) ─}
+            {#  URL Input (alternative) }
             <div class="dd-panel-section">
                 <div class="dd-panel-section-header" onclick="toggleSection('urlSection')">
                     <span><i class="fa-solid fa-link"></i>Or paste a link</span>
@@ -232,13 +232,13 @@
                 </div>
             </div>
 
-            {# ── Title ── #}
+            {#  Title  #}
             <div class="dd-panel-field">
                 <label class="dd-label">Title <span class="dd-required">*</span></label>
                 <input type="text" name="title" class="dd-input" required placeholder="e.g. Acme Brand Guidelines" id="titleInput">
             </div>
 
-            {# ── Category (visual cards) ── #}
+            {#  Category (visual cards)  #}
             <div class="dd-panel-field">
                 <label class="dd-label">Category</label>
                 <div class="dd-category-grid" id="categoryGrid">
@@ -256,13 +256,13 @@
                 </div>
             </div>
 
-            {# ── Description ── #}
+            {#  Description  #}
             <div class="dd-panel-field">
                 <label class="dd-label">Description</label>
                 <textarea name="description" class="dd-input" rows="2" placeholder="What is this resource for?" id="descInput"></textarea>
             </div>
 
-            {# ── Tags ── #}
+            {#  Tags  #}
             <div class="dd-panel-field">
                 <label class="dd-label">Tags</label>
                 <div class="dd-tag-input-wrap" id="tagInputWrap">
@@ -272,7 +272,7 @@
                 <input type="hidden" name="tags" id="tagsHidden" value="">
             </div>
 
-            {# ── Visibility + Collection ── #}
+            {#  Visibility + Collection  #}
             <div class="dd-panel-field">
                 <label class="dd-label">Visibility</label>
                 <div class="dd-vis-options">

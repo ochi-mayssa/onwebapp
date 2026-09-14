@@ -20,7 +20,7 @@
         <div class="dd-content">
             {% if seo.available %}
 
-            {# ── Alert Banner ── #}
+            {#  Alert Banner  #}
             {% if seo.total_issues > 0 %}
             <div class="dd-alert-banner {% if seo.critical_issues > 0 %}dd-alert-banner-critical{% else %}dd-alert-banner-warning{% endif %}">
                 <div class="dd-alert-banner-icon" style="background:{% if seo.critical_issues > 0 %}rgba(239,68,68,0.15);color:#ef4444{% else %}rgba(251,191,36,0.15);color:#fbbf24{% endif %};">
@@ -38,7 +38,7 @@
             </div>
             {% endif %}
 
-            {# ── Score Metrics ── #}
+            {#  Score Metrics  #}
             <div class="dd-metrics dd-metrics-5">
                 <div class="dd-metric" style="border-top:3px solid {% if seo.health_score and seo.health_score >= 70 %}#22c55e{% elif seo.health_score and seo.health_score >= 40 %}#fbbf24{% else %}#ef4444{% endif %};">
                     <div class="dd-metric-value">{% if seo.health_score is not None %}{{ seo.health_score|floatformat:0 }}%{% else %}—{% endif %}</div>
@@ -77,7 +77,7 @@
                 </div>
             </div>
 
-            {# ── Page Stats ── #}
+            {#  Page Stats  #}
             <div class="dd-metrics dd-metrics-6" style="margin-top:8px;">
                 <div class="dd-metric" style="border-top:3px solid #818cf8;">
                     <div class="dd-metric-value">{{ seo.pages_crawled|intcomma }}</div>
@@ -105,7 +105,7 @@
                 </div>
             </div>
 
-            {# ── Health Breakdown + Score Trend ── #}
+            {#  Health Breakdown + Score Trend  #}
             <div class="dd-grid-2" style="margin-top:16px;">
                 <div class="dd-panel">
                     <div class="dd-panel-header">
@@ -146,7 +146,7 @@
                 </div>
             </div>
 
-            {# ── SEO Issues ── #}
+            {#  SEO Issues  #}
             <div id="issues-section" class="dd-issue-grid" style="margin-top:16px;">
                 <div class="dd-panel">
                     <div class="dd-panel-header">
@@ -223,7 +223,7 @@
                 </div>
             </div>
 
-            {# ── Audit History ── #}
+            {#  Audit History  #}
             <div class="dd-panel" style="margin-top:16px;">
                 <div class="dd-panel-header">
                     <span class="dd-panel-title"><i class="fa-solid fa-clock-rotate-left" style="color:#22d3ee;"></i>Audit History</span>

@@ -4,120 +4,942 @@
 {% block forum_title %}{% if edit %}Edit: {{ post.title }}{% else %}Create Post{% endif %}{% endblock %}
 
 {% block forum_content %}
-<div class="forum-card p-4">
-    <h4 class="fw-800 mb-1">{% if edit %}Edit Post{% else %}Create a Post{% endif %}</h4>
-    <p class="text-secondary small mb-4">
-        {% if edit %}Update your post below.{% else %}Share your knowledge, ask questions, or showcase your work.{% endif %}
-    </p>
+<div class="post-create-wrapper">
+    <!-- Breadcrumb -->
+    <nav class="mb-3">
+        <div class="d-flex align-items-center gap-2 small">
+            <a href="{% url 'forum:home' %}" class="text-decoration-none" style="color:var(--text-secondary);">Forum</a>
+            <span style="color:var(--text-secondary);">/</span>
+            <span class="fw-700" style="color:var(--text-primary);">{% if edit %}Edit Post{% else %}New Post{% endif %}</span>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <div class="post-create-header mb-4">
+        <div class="d-flex align-items-center gap-3">
+            <div class="post-create-icon">
+                <i class="fas {% if edit %}fa-pen-to-square{% else %}fa-pen-fancy{% endif %}"></i>
+            </div>
+            <div>
+                <h2 class="fw-800 mb-0 post-create-title">{% if edit %}Edit Post{% else %}Create a Post{% endif %}</h2>
+                <p class="mb-0 post-create-subtitle">{% if edit %}Update your post below{% else %}Share knowledge, ask questions, or showcase your work{% endif %}</p>
+            </div>
+        </div>
+    </div>
 
     <form method="post" id="postForm" action="{% if edit %}{% url 'forum:post_edit' post.slug %}{% else %}{% url 'forum:post_create' %}{% endif %}">
         {% csrf_token %}
         {% if form.non_field_errors %}
-        <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+        <div class="post-create-alert post-create-alert-error mb-4">
+            <i class="fas fa-circle-exclamation me-2"></i>
+            {{ form.non_field_errors }}
+        </div>
         {% endif %}
 
-        <div class="mb-3">
-            <label class="form-label small fw-600">Title</label>
-            {{ form.title }}
-            {% if form.title.errors %}<div class="text-danger small mt-1">{{ form.title.errors }}</div>{% endif %}
-        </div>
+        <div class="row g-4">
+            <!-- Main Column -->
+            <div class="col-lg-8">
+                <div class="post-create-card">
+                    <!-- Post Type Selector -->
+                    {% if not edit %}
+                    <div class="post-type-selector mb-4">
+                        <label class="post-create-label mb-2">Post Type</label>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <label class="post-type-option active" data-type="discussion">
+                                <input type="radio" name="post_type" value="discussion" class="d-none" checked>
+                                <div class="post-type-card">
+                                    <i class="fas fa-comments"></i>
+                                    <span class="fw-700">Discussion</span>
+                                    <span class="post-type-desc">Start a conversation</span>
+                                </div>
+                            </label>
+                            <label class="post-type-option" data-type="question">
+                                <input type="radio" name="post_type" value="question" class="d-none">
+                                <div class="post-type-card">
+                                    <i class="fas fa-circle-question"></i>
+                                    <span class="fw-700">Question</span>
+                                    <span class="post-type-desc">Ask the community</span>
+                                </div>
+                            </label>
+                            <label class="post-type-option" data-type="showcase">
+                                <input type="radio" name="post_type" value="showcase" class="d-none">
+                                <div class="post-type-card">
+                                    <i class="fas fa-rocket"></i>
+                                    <span class="fw-700">Showcase</span>
+                                    <span class="post-type-desc">Share your project</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    {% endif %}
 
-        <div class="row g-3 mb-3">
-            <div class="col-md-6">
-                <label class="form-label small fw-600">Category</label>
-                {{ form.category }}
-            </div>
-            <div class="col-md-6">
-                <label class="form-label small fw-600">Tags</label>
-                {{ form.tags_input }}
-            </div>
-        </div>
+                    <!-- Title -->
+                    <div class="mb-4">
+                        <label class="post-create-label">
+                            Title
+                            <span class="post-create-required">*</span>
+                        </label>
+                        {{ form.title }}
+                        <div class="d-flex justify-content-between mt-1">
+                            <div class="text-danger small">{{ form.title.errors }}</div>
+                            <div class="small" style="color:var(--text-secondary);">
+                                <span id="titleCount">0</span>/150
+                            </div>
+                        </div>
+                    </div>
 
-        <div class="mb-3">
-            <label class="form-label small fw-600">Content <span class="text-secondary">(Markdown supported)</span></label>
-            {{ form.content }}
-            {% if form.content.errors %}<div class="text-danger small mt-1">{{ form.content.errors }}</div>{% endif %}
-        </div>
+                    <!-- Category & Tags -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="post-create-label">
+                                Category
+                                <span class="post-create-required">*</span>
+                            </label>
+                            {{ form.category }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="post-create-label">Tags</label>
+                            {{ form.tags_input }}
+                            <div class="small mt-1" style="color:var(--text-secondary);">
+                                Comma-separated (e.g. django, react, seo)
+                            </div>
+                        </div>
+                    </div>
 
-        <div class="mb-3">
-            <label class="form-label small fw-600">Featured Image URL</label>
-            {{ form.featured_image }}
-        </div>
+                    <!-- Content -->
+                    <div class="mb-4">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <label class="post-create-label mb-0">
+                                Content
+                                <span class="post-create-required">*</span>
+                            </label>
+                            <div class="d-flex gap-1">
+                                <button type="button" class="post-create-toolbar-btn active" data-tab="write" id="writeTab">
+                                    <i class="fas fa-pen me-1"></i>Write
+                                </button>
+                                <button type="button" class="post-create-toolbar-btn" data-tab="preview" id="previewTab">
+                                    <i class="fas fa-eye me-1"></i>Preview
+                                </button>
+                            </div>
+                        </div>
 
-        <div class="mb-3">
-            <label class="form-label small fw-600">Status</label>
-            {{ form.status }}
-        </div>
+                        <!-- Editor -->
+                        <div id="writePanel">
+                            {{ form.content }}
+                        </div>
 
-        <!-- Showcase toggle -->
-        <div class="mb-4 p-3 rounded-3" style="background:var(--bg-surface-secondary,#f8fafc);">
-            <div class="form-check">
-                {{ form.is_showcase }}
-                <label class="form-check-label fw-600" for="{{ form.is_showcase.id_for_label }}">
-                    This is a Showcase project
-                </label>
-                <div class="text-secondary small">Share your project for community feedback.</div>
-            </div>
-            <div class="row g-3 mt-2 showcase-fields" id="showcaseFields">
-                <div class="col-md-6">
-                    <label class="form-label small fw-600">Project Name</label>
-                    {{ form.project_name }}
+                        <!-- Preview -->
+                        <div id="previewPanel" class="post-create-preview d-none">
+                            <div class="post-create-preview-content" id="previewContent">
+                                <div class="post-create-empty-preview">
+                                    <i class="fas fa-eye-slash mb-2"></i>
+                                    <p>Nothing to preview yet. Start writing...</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            <div class="text-danger small">{{ form.content.errors }}</div>
+                            <div class="small" style="color:var(--text-secondary);">
+                                <span id="contentCount">0</span> characters &bull; ~<span id="readingTime">0</span> min read
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Featured Image -->
+                    <div class="mb-4">
+                        <label class="post-create-label">Featured Image</label>
+                        <div class="post-create-input-group">
+                            <span class="post-create-input-icon">
+                                <i class="fas fa-image"></i>
+                            </span>
+                            {{ form.featured_image }}
+                        </div>
+                        <div class="small mt-1" style="color:var(--text-secondary);">
+                            Paste an image URL to display at the top of your post
+                        </div>
+                    </div>
+
+                    <!-- Status -->
+                    <div class="mb-4">
+                        <label class="post-create-label">Status</label>
+                        {{ form.status }}
+                    </div>
+
+                    <!-- Showcase Toggle -->
+                    <div class="post-create-showcase mb-3" id="showcaseSection">
+                        <div class="d-flex align-items-start gap-3">
+                            <div class="post-create-toggle-wrapper">
+                                {{ form.is_showcase }}
+                                <label class="post-create-toggle" for="{{ form.is_showcase.id_for_label }}"></label>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="fw-700 mb-1">This is a Showcase project</div>
+                                <div class="small" style="color:var(--text-secondary);">
+                                    Showcase posts appear in the dedicated showcase section with project details and links.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Showcase Fields -->
+                        <div class="showcase-fields mt-3 d-none" id="showcaseFields">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="post-create-label">Project Name</label>
+                                    {{ form.project_name }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="post-create-label">Tech Stack</label>
+                                    {{ form.tech_stack }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="post-create-label">GitHub Link</label>
+                                    <div class="post-create-input-group">
+                                        <span class="post-create-input-icon">
+                                            <i class="fab fa-github"></i>
+                                        </span>
+                                        {{ form.github_link }}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="post-create-label">Live Demo</label>
+                                    <div class="post-create-input-group">
+                                        <span class="post-create-input-icon">
+                                            <i class="fas fa-external-link-alt"></i>
+                                        </span>
+                                        {{ form.live_demo }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex align-items-center justify-content-between pt-4 border-top" style="border-color:var(--border-color) !important;">
+                        <a href="{% if edit %}{% url 'forum:post_detail' post.slug %}{% else %}{% url 'forum:home' %}{% endif %}" class="post-create-btn-outline">
+                            <i class="fas fa-xmark me-1"></i>Cancel
+                        </a>
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="post-create-btn-secondary" name="status" value="draft">
+                                <i class="fas fa-save me-1"></i>Save Draft
+                            </button>
+                            <button type="submit" class="post-create-btn-primary">
+                                {% if edit %}Update Post{% else %}Publish Post{% endif %}
+                                <i class="fas fa-arrow-right ms-2"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label small fw-600">Tech Stack</label>
-                    {{ form.tech_stack }}
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Post Type Info -->
+                <div class="post-create-sidebar-card mb-3" id="postTypeInfo">
+                    <h6 class="post-create-sidebar-title">
+                        <i class="fas fa-lightbulb me-2"></i>Discussion Post
+                    </h6>
+                    <ul class="post-create-tips-list">
+                        <li>Share your thoughts or opinions on a topic</li>
+                        <li>Start a conversation with the community</li>
+                        <li>Get feedback on ideas or approaches</li>
+                    </ul>
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label small fw-600">GitHub Link</label>
-                    {{ form.github_link }}
+
+                <!-- Writing Tips -->
+                <div class="post-create-sidebar-card mb-3">
+                    <h6 class="post-create-sidebar-title">
+                        <i class="fas fa-pen-nib me-2"></i>Writing Tips
+                    </h6>
+                    <ul class="post-create-tips-list">
+                        <li>Use a clear, descriptive title</li>
+                        <li>Break content into paragraphs</li>
+                        <li>Add code blocks with triple backticks</li>
+                        <li>Include relevant tags for discoverability</li>
+                        <li>Add images to illustrate your points</li>
+                    </ul>
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label small fw-600">Live Demo</label>
-                    {{ form.live_demo }}
+
+                <!-- Markdown Reference -->
+                <div class="post-create-sidebar-card mb-3">
+                    <h6 class="post-create-sidebar-title">
+                        <i class="fas fa-code me-2"></i>Markdown Reference
+                    </h6>
+                    <div class="post-create-markdown-grid">
+                        <div class="post-create-md-item">
+                            <code>**bold**</code>
+                            <span>Bold text</span>
+                        </div>
+                        <div class="post-create-md-item">
+                            <code>*italic*</code>
+                            <span>Italic text</span>
+                        </div>
+                        <div class="post-create-md-item">
+                            <code>`code`</code>
+                            <span>Inline code</span>
+                        </div>
+                        <div class="post-create-md-item">
+                            <code>```lang</code>
+                            <span>Code block</span>
+                        </div>
+                        <div class="post-create-md-item">
+                            <code>[text](url)</code>
+                            <span>Link</span>
+                        </div>
+                        <div class="post-create-md-item">
+                            <code>> quote</code>
+                            <span>Blockquote</span>
+                        </div>
+                        <div class="post-create-md-item">
+                            <code>- item</code>
+                            <span>List item</span>
+                        </div>
+                        <div class="post-create-md-item">
+                            <code>## heading</code>
+                            <span>Heading</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Guidelines -->
+                <div class="post-create-sidebar-card">
+                    <h6 class="post-create-sidebar-title">
+                        <i class="fas fa-shield-halved me-2"></i>Community Guidelines
+                    </h6>
+                    <ul class="post-create-tips-list">
+                        <li>Be respectful and constructive</li>
+                        <li>Search before posting duplicates</li>
+                        <li>Use appropriate categories</li>
+                        <li>No spam or self-promotion</li>
+                        <li>Mark solutions when resolved</li>
+                    </ul>
                 </div>
             </div>
-        </div>
-
-        <div class="d-flex justify-content-between align-items-center">
-            <a href="{% if edit %}{% url 'forum:post_detail' post.slug %}{% else %}{% url 'forum:home' %}{% endif %}" class="btn btn-outline-secondary rounded-pill px-4">Cancel</a>
-            <button type="submit" class="btn btn-primary rounded-pill px-5 fw-700">
-                {% if edit %}Update Post{% else %}Publish Post{% endif %}
-                <i class="fas fa-arrow-right ms-2"></i>
-            </button>
         </div>
     </form>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const showcaseCheck = document.querySelector('#{{ form.is_showcase.id_for_label }}');
-    const showcaseFields = document.getElementById('showcaseFields');
-    function toggleShowcase() {
-        showcaseFields.style.display = showcaseCheck.checked ? 'flex' : 'none';
-    }
-    if (showcaseCheck) {
-        toggleShowcase();
-        showcaseCheck.addEventListener('change', toggleShowcase);
+    // Title character counter
+    const titleInput = document.querySelector('#{{ form.title.id_for_label }}');
+    const titleCount = document.getElementById('titleCount');
+    if (titleInput && titleCount) {
+        titleInput.addEventListener('input', () => {
+            titleCount.textContent = titleInput.value.length;
+        });
+        titleCount.textContent = titleInput.value.length;
     }
 
-    // Form submission handling - ensure no interference
-    const postForm = document.getElementById('postForm');
-    if (postForm) {
-        postForm.addEventListener('submit', function(e) {
-            // Log for debugging
-            console.log('Form submitting to:', postForm.action);
-            // Don't prevent default - allow normal submission
+    // Content character counter and reading time
+    const contentInput = document.querySelector('#{{ form.content.id_for_label }}');
+    const contentCount = document.getElementById('contentCount');
+    const readingTime = document.getElementById('readingTime');
+    if (contentInput && contentCount && readingTime) {
+        contentInput.addEventListener('input', () => {
+            const len = contentInput.value.length;
+            contentCount.textContent = len;
+            readingTime.textContent = Math.max(1, Math.ceil(len / 1000));
         });
-        
-        // Ensure submit button works
-        const submitBtn = postForm.querySelector('button[type="submit"]');
-        if (submitBtn) {
-            submitBtn.addEventListener('click', function(e) {
-                console.log('Submit button clicked');
-                // Don't prevent default
-            });
+        contentCount.textContent = contentInput.value.length;
+        readingTime.textContent = Math.max(1, Math.ceil(contentInput.value.length / 1000));
+    }
+
+    // Post type selector
+    const postTypeOptions = document.querySelectorAll('.post-type-option');
+    const typeInfo = document.getElementById('postTypeInfo');
+    const showcaseCheck = document.querySelector('#{{ form.is_showcase.id_for_label }}');
+    const showcaseFields = document.getElementById('showcaseFields');
+
+    const typeDescriptions = {
+        discussion: {
+            title: 'Discussion Post',
+            icon: 'fa-comments',
+            tips: [
+                'Share your thoughts or opinions on a topic',
+                'Start a conversation with the community',
+                'Get feedback on ideas or approaches'
+            ]
+        },
+        question: {
+            title: 'Question Post',
+            icon: 'fa-circle-question',
+            tips: [
+                'Describe your problem clearly',
+                'Include code samples if relevant',
+                'Mark the best answer as solution'
+            ]
+        },
+        showcase: {
+            title: 'Showcase Post',
+            icon: 'fa-rocket',
+            tips: [
+                'Highlight your project achievements',
+                'Include screenshots or demo links',
+                'Share your tech stack and process'
+            ]
         }
+    };
+
+    postTypeOptions.forEach(option => {
+        option.addEventListener('click', () => {
+            postTypeOptions.forEach(o => o.classList.remove('active'));
+            option.classList.add('active');
+            const type = option.dataset.type;
+
+            // Update info card
+            const info = typeDescriptions[type];
+            typeInfo.innerHTML = `
+                <h6 class="post-create-sidebar-title">
+                    <i class="fas ${info.icon} me-2"></i>${info.title}
+                </h6>
+                <ul class="post-create-tips-list">
+                    ${info.tips.map(t => `<li>${t}</li>`).join('')}
+                </ul>
+            `;
+
+            // Toggle showcase
+            if (type === 'showcase') {
+                showcaseCheck.checked = true;
+                showcaseFields.classList.remove('d-none');
+            } else {
+                showcaseCheck.checked = false;
+                showcaseFields.classList.add('d-none');
+            }
+        });
+    });
+
+    // Showcase toggle
+    if (showcaseCheck) {
+        showcaseCheck.addEventListener('change', () => {
+            showcaseFields.classList.toggle('d-none', !showcaseCheck.checked);
+        });
+    }
+
+    // Markdown preview
+    const writeTab = document.getElementById('writeTab');
+    const previewTab = document.getElementById('previewTab');
+    const writePanel = document.getElementById('writePanel');
+    const previewPanel = document.getElementById('previewPanel');
+    const previewContent = document.getElementById('previewContent');
+
+    if (writeTab && previewTab) {
+        writeTab.addEventListener('click', () => {
+            writeTab.classList.add('active');
+            previewTab.classList.remove('active');
+            writePanel.classList.remove('d-none');
+            previewPanel.classList.add('d-none');
+        });
+
+        previewTab.addEventListener('click', () => {
+            previewTab.classList.add('active');
+            writeTab.classList.remove('active');
+            previewPanel.classList.remove('d-none');
+            writePanel.classList.add('d-none');
+
+            // Simple markdown preview
+            const content = contentInput.value;
+            if (content.trim()) {
+                let html = content
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                    .replace(/`([^`]+)`/g, '<code>$1</code>')
+                    .replace(/^### (.*$)/gm, '<h3>$1</h3>')
+                    .replace(/^## (.*$)/gm, '<h2>$1</h2>')
+                    .replace(/^# (.*$)/gm, '<h1>$1</h1>')
+                    .replace(/^> (.*$)/gm, '<blockquote>$1</blockquote>')
+                    .replace(/^- (.*$)/gm, '<li>$1</li>')
+                    .replace(/\n/g, '<br>');
+                previewContent.innerHTML = html;
+            } else {
+                previewContent.innerHTML = `
+                    <div class="post-create-empty-preview">
+                        <i class="fas fa-eye-slash mb-2"></i>
+                        <p>Nothing to preview yet. Start writing...</p>
+                    </div>
+                `;
+            }
+        });
     }
 });
 </script>
+
+<style>
+/* Post Create Page */
+.post-create-wrapper {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.post-create-header {
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+}
+
+.post-create-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 0.5rem;
+    background: var(--text-primary);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.post-create-title {
+    font-size: 1.35rem;
+    color: var(--text-primary);
+}
+
+.post-create-subtitle {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+/* Form Card */
+.post-create-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    padding: 2rem;
+}
+
+/* Labels */
+.post-create-label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.post-create-required {
+    color: #ef4444;
+    margin-left: 2px;
+}
+
+/* Post Type Selector */
+.post-type-selector {
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.post-type-option {
+    cursor: pointer;
+}
+
+.post-type-card {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border: 2px solid var(--border-color);
+    background: var(--bg-surface);
+    text-align: center;
+    transition: all 0.2s;
+    min-width: 120px;
+}
+
+.post-type-card i {
+    font-size: 1.5rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+    display: block;
+    transition: color 0.2s;
+}
+
+.post-type-card span {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    transition: color 0.2s;
+}
+
+.post-type-card .post-type-desc {
+    font-size: 0.7rem;
+    font-weight: 400;
+    margin-top: 0.25rem;
+}
+
+.post-type-option.active .post-type-card {
+    border-color: var(--text-primary);
+    background: var(--bg-surface-secondary);
+}
+
+.post-type-option.active .post-type-card i,
+.post-type-option.active .post-type-card span {
+    color: var(--text-primary);
+}
+
+.post-type-option:hover .post-type-card {
+    border-color: var(--text-primary);
+}
+
+/* Input Styling */
+.post-create-card .wizard-input,
+.post-create-card input[type="text"],
+.post-create-card input[type="url"],
+.post-create-card input[type="email"],
+.post-create-card select,
+.post-create-card textarea {
+    width: 100%;
+    padding: 0.65rem 0.85rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--border-color);
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    transition: all 0.2s;
+}
+
+.post-create-card .wizard-input:focus,
+.post-create-card input:focus,
+.post-create-card select:focus,
+.post-create-card textarea:focus {
+    outline: none;
+    border-color: var(--text-primary);
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+}
+
+.post-create-card textarea {
+    min-height: 280px;
+    resize: vertical;
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 0.82rem;
+    line-height: 1.6;
+}
+
+/* Input with icon */
+.post-create-input-group {
+    position: relative;
+}
+
+.post-create-input-icon {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    z-index: 1;
+}
+
+.post-create-input-group input {
+    padding-left: 2.25rem !important;
+}
+
+/* Preview */
+.post-create-preview {
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    min-height: 280px;
+    background: var(--bg-surface);
+}
+
+.post-create-preview-content {
+    padding: 1rem;
+    font-size: 0.85rem;
+    line-height: 1.7;
+    color: var(--text-primary);
+}
+
+.post-create-preview-content h1,
+.post-create-preview-content h2,
+.post-create-preview-content h3 {
+    font-weight: 700;
+    margin: 1rem 0 0.5rem;
+}
+
+.post-create-preview-content blockquote {
+    border-left: 3px solid var(--text-primary);
+    padding-left: 1rem;
+    margin: 1rem 0;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+.post-create-preview-content code {
+    background: var(--bg-surface-secondary);
+    padding: 0.15rem 0.4rem;
+    border-radius: 0.25rem;
+    font-size: 0.82rem;
+}
+
+.post-create-empty-preview {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 240px;
+    color: var(--text-secondary);
+}
+
+.post-create-empty-preview i {
+    font-size: 2rem;
+    opacity: 0.3;
+}
+
+.post-create-empty-preview p {
+    font-size: 0.85rem;
+}
+
+/* Toolbar */
+.post-create-toolbar-btn {
+    padding: 0.35rem 0.75rem;
+    border-radius: 0.375rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: 1px solid var(--border-color);
+    background: var(--bg-surface);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.post-create-toolbar-btn:hover {
+    border-color: var(--text-primary);
+    color: var(--text-primary);
+}
+
+.post-create-toolbar-btn.active {
+    background: var(--text-primary);
+    color: #fff;
+    border-color: var(--text-primary);
+}
+
+/* Showcase */
+.post-create-showcase {
+    padding: 1.25rem;
+    border-radius: 0.5rem;
+    background: var(--bg-surface-secondary);
+    border: 1px solid var(--border-color);
+}
+
+.post-create-toggle-wrapper {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.post-create-toggle {
+    display: block;
+    width: 40px;
+    height: 22px;
+    border-radius: 11px;
+    background: var(--border-color);
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.post-create-toggle::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #fff;
+    top: 3px;
+    left: 3px;
+    transition: all 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.post-create-toggle-wrapper input:checked + .post-create-toggle {
+    background: var(--text-primary);
+}
+
+.post-create-toggle-wrapper input:checked + .post-create-toggle::after {
+    left: 21px;
+}
+
+/* Alert */
+.post-create-alert {
+    padding: 1rem 1.25rem;
+    border-radius: 0.5rem;
+    font-size: 0.85rem;
+}
+
+.post-create-alert-error {
+    background: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+[data-theme="dark"] .post-create-alert-error {
+    background: rgba(239, 68, 68, 0.1);
+    color: #fca5a5;
+    border-color: rgba(239, 68, 68, 0.2);
+}
+
+/* Buttons */
+.post-create-btn-primary {
+    padding: 0.6rem 1.5rem;
+    border-radius: 2rem;
+    font-size: 0.82rem;
+    font-weight: 700;
+    border: none;
+    background: var(--text-primary);
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.post-create-btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.post-create-btn-secondary {
+    padding: 0.6rem 1.25rem;
+    border-radius: 2rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    border: 1px solid var(--border-color);
+    background: var(--bg-surface);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.post-create-btn-secondary:hover {
+    border-color: var(--text-primary);
+    color: var(--text-primary);
+}
+
+.post-create-btn-outline {
+    padding: 0.6rem 1.25rem;
+    border-radius: 2rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    border: 1px solid var(--border-color);
+    background: transparent;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.post-create-btn-outline:hover {
+    border-color: var(--text-primary);
+    color: var(--text-primary);
+}
+
+/* Sidebar Cards */
+.post-create-sidebar-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+}
+
+.post-create-sidebar-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.post-create-tips-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.post-create-tips-list li {
+    position: relative;
+    padding: 0.4rem 0 0.4rem 1.25rem;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.post-create-tips-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.75rem;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--text-secondary);
+    opacity: 0.4;
+}
+
+/* Markdown Reference */
+.post-create-markdown-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+}
+
+.post-create-md-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem;
+    border-radius: 0.375rem;
+    background: var(--bg-surface-secondary);
+}
+
+.post-create-md-item code {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    background: none;
+    padding: 0;
+}
+
+.post-create-md-item span {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+}
+
+/* Responsive */
+@media (max-width: 991px) {
+    .post-create-card {
+        padding: 1.25rem;
+    }
+
+    .post-type-card {
+        min-width: 100px;
+        padding: 0.75rem;
+    }
+
+    .post-type-card i {
+        font-size: 1.25rem;
+    }
+}
+
+@media (max-width: 575px) {
+    .post-type-selector .d-flex {
+        flex-direction: column;
+    }
+
+    .post-type-card {
+        text-align: left;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .post-type-card i {
+        margin-bottom: 0;
+    }
+
+    .post-create-md-item {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.25rem;
+    }
+}
+</style>
 {% endblock %}

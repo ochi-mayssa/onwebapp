@@ -13,9 +13,9 @@ except ImportError:
     from django.contrib.auth.decorators import login_required as designer_required
 
 
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 # PUBLIC VIEWS
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 
 def index(request):
     """Blog landing page"""
@@ -76,9 +76,9 @@ def blog_detail(request, slug):
     })
 
 
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 # MANAGEMENT VIEWS (Designer Dashboard)
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 
 @designer_required
 def manage_articles(request):

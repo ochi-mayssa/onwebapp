@@ -6,7 +6,7 @@
 {% block branding_content %}
 <div class="container py-4">
 
-    {# ── Header ── #}
+    {#  Header  #}
     <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
         <div>
             <nav aria-label="breadcrumb" class="mb-2">
@@ -21,7 +21,7 @@
         </div>
     </div>
 
-    {# ── Connection Status Card ── #}
+    {#  Connection Status Card  #}
     <div class="detail-card rounded-4 p-4 mb-4">
         <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
             <div class="d-flex align-items-center gap-3">
@@ -83,7 +83,7 @@
     </div>
 
     {% if connection %}
-    {# ── Import Design Form ── #}
+    {#  Import Design Form  #}
     <div class="collapse mb-4" id="importDesignForm">
         <form method="post" action="{{ request.path }}" class="detail-card rounded-4 p-4">
             {% csrf_token %}
@@ -121,7 +121,7 @@
         </form>
     </div>
 
-    {# ── Imported Designs ── #}
+    {#  Imported Designs  #}
     <div class="d-flex align-items-center justify-content-between mb-3">
         <h5 class="fw-bold mb-0"><i class="fa-solid fa-layer-group me-2 text-muted"></i>Imported Designs</h5>
         <button type="button" class="btn btn-sm btn-brand-primary" data-bs-toggle="collapse" data-bs-target="#importDesignForm">

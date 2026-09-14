@@ -206,7 +206,40 @@ def handle_successful_checkout(session):
     stripe_sub_id = session.get('subscription')
     metadata = session.get('metadata', {})
     plan_id = metadata.get('plan_id')
-    
+    brand_profile_id = metadata.get('brand_profile_id')
+
+    # 0. Handle Branding payment (pay add-ons total to unlock download)
+    if brand_profile_id:
+        from community.models import BrandProfile
+        try:
+            bp = BrandProfile.objects.get(id=brand_profile_id)
+            bp.payment_status = 'paid'
+            bp.paid_at = timezone.now()
+            if session.get('id'):
+                bp.stripe_session_id = session['id']
+            bp.save(update_fields=['payment_status', 'paid_at', 'stripe_session_id', 'updated_at'])
+            ActivityLog.objects.create(
+                user=bp.user,
+                action="Brand Kit Paid",
+                metadata={'brand_profile_id': bp.id, 'brand': bp.name,
+                          'addons': metadata.get('addons', ''),
+                          'amount': session.get('amount_total', 0) / 100 if session.get('amount_total') else float(bp.addons_total)},
+            )
+            admins = User.objects.filter(is_superuser=True)
+            for admin in admins:
+                WorkflowNotification.objects.create(
+                    recipient=admin,
+                    notification_type='STATUS',
+                    message=f"Brand Kit PAID: {bp.user.username} paid for {bp.name}",
+                    severity='LOW',
+                )
+            print(f"Brand kit {bp.id} marked PAID for {bp.user.username}")
+        except BrandProfile.DoesNotExist:
+            print(f"BrandProfile {brand_profile_id} not found during checkout handling")
+        except Exception as e:
+            print(f"Error handling brand checkout: {e}")
+        return
+
     if not client_reference_id or not plan_id:
         print("Missing user or plan ID in webhook metadata")
         return

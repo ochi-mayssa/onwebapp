@@ -35,7 +35,7 @@ The Branding Service lets clients submit a structured brand identity request thr
 4. **Brand Collection** — pick a curated identity collection from a filterable library.
 
 After submission the request enters the staff pipeline:
-`PENDING_REVIEW → IN_REVIEW → ASSIGNED → DESIGNING → WAITING_CLIENT → REVISION → APPROVED → COMPLETED` (or `ARCHIVED`), all tracked in a timeline.
+`PENDING_REVIEW  IN_REVIEW  ASSIGNED  DESIGNING  WAITING_CLIENT  REVISION  APPROVED  COMPLETED` (or `ARCHIVED`), all tracked in a timeline.
 
 Staff workflow tools include a **filters + stat-cards dashboard**, a **drag-and-drop Kanban board**, per-request **milestone stepper**, **priority** and **estimated-delivery** controls, **internal notes**, **asset versioning** (replace + snapshot), and an in-app **notification center** with unread badge in the header.
 
@@ -45,37 +45,37 @@ Staff workflow tools include a **filters + stat-cards dashboard**, a **drag-and-
 
 ```
 branding/
-├── admin.py                 # Admin registrations (request + assets/timeline/versions/notifications)
-├── apps.py
-├── context_processors.py    # branding_context: unread notification count for the header badge
-├── forms.py                 # Staff edit form (BrandingRequestForm incl. priority + EDD)
-├── management/
-│   └── commands/
-│       └── seed_brand_collections.py   # Seeds 24 collections + generated covers
-├── migrations/
-│   ├── 0001_initial.py
-│   └── 0002_brandingassetversion_brandingnotification_and_more.py
-├── models.py                # BrandCollection, BrandingRequest, BrandingAsset,
-│                            # BrandingAssetVersion, BrandingTimeline, BrandingNotification
-├── templatetags/
-│   └── branding_extras.py   # get_item, status_label, join_display, duration_display filters
-├── templates/
-│   └── branding/
-│       ├── base.html
-│       ├── dashboard.html
-│       ├── kanban.html
-│       ├── landing.html
-│       ├── notifications.html
-│       ├── partials/
-│       │   ├── collection_card.html
-│       │   └── wizard_step.html
-│       ├── request_detail.html
-│       ├── request_edit.html
-│       ├── submitted.html
-│       └── wizard.html
-├── tests.py                 # 24 wizard + dashboard/kanban/notification tests
-├── urls.py                  # app_name = 'branding'
-└── views.py
+ admin.py                 # Admin registrations (request + assets/timeline/versions/notifications)
+ apps.py
+ context_processors.py    # branding_context: unread notification count for the header badge
+ forms.py                 # Staff edit form (BrandingRequestForm incl. priority + EDD)
+ management/
+    commands/
+        seed_brand_collections.py   # Seeds 24 collections + generated covers
+ migrations/
+    0001_initial.py
+    0002_brandingassetversion_brandingnotification_and_more.py
+ models.py                # BrandCollection, BrandingRequest, BrandingAsset,
+                            # BrandingAssetVersion, BrandingTimeline, BrandingNotification
+ templatetags/
+    branding_extras.py   # get_item, status_label, join_display, duration_display filters
+ templates/
+    branding/
+        base.html
+        dashboard.html
+        kanban.html
+        landing.html
+        notifications.html
+        partials/
+           collection_card.html
+           wizard_step.html
+        request_detail.html
+        request_edit.html
+        submitted.html
+        wizard.html
+ tests.py                 # 24 wizard + dashboard/kanban/notification tests
+ urls.py                  # app_name = 'branding'
+ views.py
 ```
 
 ---
@@ -109,7 +109,7 @@ The branding project intake captured through the wizard.
 | Field | Type | Notes |
 | --- | --- | --- |
 | `request_number` | CharField | Auto `BR-{year}-{pk:05d}`, unique |
-| `user` | FK → AUTH_USER_MODEL | related_name `branding_requests` |
+| `user` | FK  AUTH_USER_MODEL | related_name `branding_requests` |
 | `status` | CharField | `STATUS_CHOICES`: DRAFT, PENDING_REVIEW, IN_REVIEW, ASSIGNED, DESIGNING, WAITING_CLIENT, REVISION, APPROVED, COMPLETED, ARCHIVED |
 | `priority` | CharField | `PRIORITY_CHOICES`: LOW, MEDIUM, HIGH, URGENT (default MEDIUM, indexed with status) |
 | `estimated_delivery_date` | DateField | Nullable |
@@ -118,8 +118,8 @@ The branding project intake captured through the wizard.
 | Step 1 fields | | `company_name`, `industry`, `website`, `country`, `business_description` |
 | Step 2 fields | | `company_description`, `target_audience`, `brand_values` (JSON), `preferred_colors` (JSON), `current_branding` (JSON) |
 | Step 3 fields | | `additional_notes` |
-| Step 4 | | `collection` FK → BrandCollection |
-| Workflow | | `designer` FK → user, `internal_notes` |
+| Step 4 | | `collection` FK  BrandCollection |
+| Workflow | | `designer` FK  user, `internal_notes` |
 
 Helpers: `log()` appends a timeline entry; `is_draft` property; `completion_time_display` formats turnaround; `save()` assigns `request_number` on first save.
 
@@ -131,12 +131,12 @@ Snapshot of an asset created by staff via "replace" — the old file becomes a v
 
 | Field | Notes |
 | --- | --- |
-| `asset` | FK → BrandingAsset (related_name `versions`) |
+| `asset` | FK  BrandingAsset (related_name `versions`) |
 | `file` | Stored under the asset folder |
 | `version_number` | Sequential, starts at 1 |
 | `original_name`, `content_type`, `size` | Snapshot of the replaced file |
 | `note` | Reason / changelog |
-| `uploaded_by` | FK → user |
+| `uploaded_by` | FK  user |
 | `created_at` | |
 
 ### `BrandingTimeline`
@@ -188,7 +188,7 @@ All routes under `app_name = 'branding'`:
 - `dashboard` excludes `DRAFT` and supports **all** filters — `?q=` (company/request number/client), `?status=`, `?industry=`, `?collection=`, `?designer=`, `?priority=`, `?date_from=` / `?date_to=` — paginates by 12, and computes per-status counts plus monthly volume and average completion time.
 - `kanban` groups requests into 7 columns (ARCHIVED excluded); `kanban_update` handles drag-and-drop JSON moves and logs/notifies via `_set_status`.
 - `_set_status` centralizes transitions: timeline logging, client notification on status change, `completed_at` bookkeeping, and manager notification on completion.
-- `assign_designer` flips `PENDING_REVIEW`/`IN_REVIEW` → `ASSIGNED` and notifies the designer.
+- `assign_designer` flips `PENDING_REVIEW`/`IN_REVIEW`  `ASSIGNED` and notifies the designer.
 - `replace_asset` snapshots the previous file as a `BrandingAssetVersion`, then swaps in the new file and logs `FILE_UPDATE`.
 - `context_processors.branding_context` (registered in `websity_project/settings.py`) exposes `unread_notifications` for the header bell badge.
 
@@ -248,7 +248,7 @@ Seeds 24 brand collections across the 8 categories, generates placeholder cover 
 
 1. Client visits `/branding/`, reads the landing page, starts the wizard.
 2. Fills steps 1–4 (data auto-saved), uploads assets, picks a collection.
-3. Submits → request becomes `PENDING_REVIEW`, all staff are notified, redirect to `/branding/requests/<request_number>/`.
+3. Submits  request becomes `PENDING_REVIEW`, all staff are notified, redirect to `/branding/requests/<request_number>/`.
 4. Staff see it on `/branding/dashboard/` (or the Kanban board), open the detail, set priority + delivery date, assign a designer, change status, add internal notes, replace asset files.
 5. Designers and the client receive in-app notifications (and best-effort email) on assignment and status changes; completion notifies managers.
 6. Timeline records every status change, assignment, note, upload, file replacement, priority change and delivery update.

@@ -1004,9 +1004,9 @@ def _analyze_digital_marketing_intelligence(text_intel, image_intel, video_intel
             f"Why is {target_keyword} important?",
             f"How to get started with {target_keyword}?"
         ] if marketing_relevance in ["High", "Medium"] else [],
-        "suggested_linkedin_post": f"📊 Just published our latest guide on {target_keyword}! Check out key insights and best practices. #Marketing #SEO #{target_keyword.replace(' ', '')}" if marketing_relevance in ["High", "Medium"] else "",
+        "suggested_linkedin_post": f" Just published our latest guide on {target_keyword}! Check out key insights and best practices. #Marketing #SEO #{target_keyword.replace(' ', '')}" if marketing_relevance in ["High", "Medium"] else "",
         "suggested_facebook_caption": f"Want to master {target_keyword}? We've got you covered! Read our complete guide here." if marketing_relevance in ["High", "Medium"] else "",
-        "suggested_instagram_caption": f"✨ New post alert! Discover everything you need to know about {target_keyword} 🔥 #Marketing #GrowthHacks" if marketing_relevance in ["High", "Medium"] else "",
+        "suggested_instagram_caption": f" New post alert! Discover everything you need to know about {target_keyword}  #Marketing #GrowthHacks" if marketing_relevance in ["High", "Medium"] else "",
         "suggested_internal_links": [
             "Related blog post on content strategy",
             "SEO best practices guide"

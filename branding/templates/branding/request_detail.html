@@ -566,7 +566,7 @@
                 </div>
 
                 {% if user.is_staff %}
-                {# ── Supervisor Review Tab ── #}
+                {#  Supervisor Review Tab  #}
                 <div class="tab-pane fade" id="tab-review" role="tabpanel">
                     <div class="d-flex align-items-center justify-content-between mb-4">
                         <h6 class="fw-800 mb-0"><i class="fa-solid fa-clipboard-check me-2"></i>Supervisor Review</h6>
@@ -583,7 +583,7 @@
                         {% endif %}
                     </div>
 
-                    {# ── Quality Checklist ── #}
+                    {#  Quality Checklist  #}
                     <div class="detail-card rounded-4 p-4 mb-4">
                         <h6 class="fw-700 mb-3"><i class="fa-solid fa-list-check me-1"></i>Quality Checklist</h6>
                         <form method="post">
@@ -622,7 +622,7 @@
                         {% endwith %}
                     </div>
 
-                    {# ── Review Actions ── #}
+                    {#  Review Actions  #}
                     <div class="detail-card rounded-4 p-4 mb-4">
                         <h6 class="fw-700 mb-3"><i class="fa-solid fa-gavel me-1"></i>Review Decision</h6>
                         <form method="post">
@@ -651,7 +651,7 @@
                         </form>
                     </div>
 
-                    {# ── Review History ── #}
+                    {#  Review History  #}
                     {% if review.updated_at != review.created_at %}
                     <div class="detail-card rounded-4 p-4">
                         <h6 class="fw-700 mb-2"><i class="fa-solid fa-clock-rotate-left me-1"></i>Review History</h6>
@@ -926,14 +926,14 @@
 (function () {
     'use strict';
 
-    /* ── Bootstrap tab init ─────────────────────────────────────────── */
+    /*  Bootstrap tab init  */
     if (typeof bootstrap !== 'undefined') {
         document.querySelectorAll('#detailTabs [data-bs-toggle="pill"]').forEach(function (tab) {
             new bootstrap.Tab(tab);
         });
     }
 
-    /* ── Constants ──────────────────────────────────────────────────── */
+    /*  Constants  */
     var CSRF_TOKEN = (document.querySelector('[name=csrfmiddlewaretoken]') || {}).value
         || (document.cookie.match(/csrftoken=([^;]+)/) || [])[1] || '';
     var REQUEST_PK = '{{ branding_request.pk }}';
@@ -947,7 +947,7 @@
         markOne: '/branding/messages/',
     };
 
-    /* ── DOM refs ───────────────────────────────────────────────────── */
+    /*  DOM refs  */
     var thread       = document.getElementById('messagesThread');
     var msgInput     = document.getElementById('messageInput');
     var sendBtn      = document.getElementById('sendMessageBtn');
@@ -968,7 +968,7 @@
     var isMessagesTabActive = false;
     var hasScrolledToBottom = false;
 
-    /* ── Helpers ────────────────────────────────────────────────────── */
+    /*  Helpers  */
     function ajax(url, opts) {
         var defaults = {
             method: 'GET',
@@ -1012,7 +1012,7 @@
         lastPollEl.textContent = 'Last check: ' + h + ':' + m + ':' + s;
     }
 
-    /* ── Build message HTML ─────────────────────────────────────────── */
+    /*  Build message HTML  */
     function buildMessageHTML(msg) {
         var roleClass = msg.sender_is_staff ? 'message-staff' : 'message-client';
         var roleBadge = msg.sender_is_staff
@@ -1065,7 +1065,7 @@
             + '</div>';
     }
 
-    /* ── Send message ───────────────────────────────────────────────── */
+    /*  Send message  */
     function sendMessage() {
         var content = msgInput.value.trim();
         if (!content) return;
@@ -1116,7 +1116,7 @@
         });
     }
 
-    /* ── Poll for new messages ──────────────────────────────────────── */
+    /*  Poll for new messages  */
     function poll() {
         if (!isMessagesTabActive) return;
 
@@ -1177,7 +1177,7 @@
         if (pollTimer) { clearTimeout(pollTimer); pollTimer = null; }
     }
 
-    /* ── Mark messages as read ──────────────────────────────────────── */
+    /*  Mark messages as read  */
     function markAllRead() {
         ajax(URLS.read, { method: 'POST' }).then(function (data) {
             if (data.ok && data.marked > 0) {
@@ -1209,7 +1209,7 @@
         }
     }
 
-    /* ── Tab activation tracking ────────────────────────────────────── */
+    /*  Tab activation tracking  */
     var msgTabBtn = document.querySelector('[data-bs-target="#tab-messages"]');
     if (msgTabBtn) {
         msgTabBtn.addEventListener('shown.bs.tab', function () {
@@ -1227,7 +1227,7 @@
         });
     }
 
-    /* ── Reply handling ─────────────────────────────────────────────── */
+    /*  Reply handling  */
     thread.addEventListener('click', function (e) {
         var btn = e.target.closest('.reply-btn');
         if (!btn) return;
@@ -1244,7 +1244,7 @@
         replyPreview.classList.add('d-none');
     }
 
-    /* ── Input events ───────────────────────────────────────────────── */
+    /*  Input events  */
     messageForm.addEventListener('submit', function (e) {
         e.preventDefault();
         sendMessage();
@@ -1269,7 +1269,7 @@
         }
     }
 
-    /* ── Initial scroll + mark-read if tab is already active ────────── */
+    /*  Initial scroll + mark-read if tab is already active  */
     if (messagesTab && messagesTab.classList.contains('show')) {
         isMessagesTabActive = true;
         scrollToBottom(false);
@@ -1279,7 +1279,7 @@
     }
 })();
 
-/* ── Feedback star rating ─────────────────────────────────────────── */
+/*  Feedback star rating  */
 (function () {
     'use strict';
     var container = document.getElementById('starRatingInput');

@@ -16,7 +16,7 @@
         </a>
 
         <div class="d-flex align-items-center gap-2">
-            {# ── Role-Based Navigation ── #}
+            {#  Role-Based Navigation  #}
             {% if user.is_authenticated %}
                 {% for item in role_nav %}
                 {% if item.class == 'branding-nav-brand' %}
@@ -30,7 +30,7 @@
                 {% endif %}
                 {% endfor %}
             {% else %}
-                {# ── Public Links (not authenticated) ── #}
+                {#  Public Links (not authenticated)  #}
                 <a href="{% url 'branding:wizard' %}" class="branding-nav-link d-none d-sm-inline-flex">
                     <i class="fa-solid fa-wand-magic-sparkles me-2"></i>Start a Project
                 </a>

@@ -7,15 +7,6 @@ import sys
 def main():
     """Run administrative tasks."""
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'websity_project.settings')
-    # Ensure Python stdlib directory appears before project root on sys.path
-    # so stdlib modules (like `platform`) are preferred over local packages
-    try:
-        import sysconfig
-        stdlib = sysconfig.get_paths().get('stdlib')
-        if stdlib and stdlib not in sys.path:
-            sys.path.insert(0, stdlib)
-    except Exception:
-        pass
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:

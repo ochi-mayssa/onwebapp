@@ -14,14 +14,14 @@
         </ol>
     </nav>
 
-    {# ── Cover Image ── #}
+    {#  Cover Image  #}
     {% if project.cover_image %}
     <div class="mb-4 rounded-4 overflow-hidden">
         <img src="{{ project.cover_image.url }}" alt="{{ project.title }}" class="w-100" style="max-height:480px;object-fit:cover;">
     </div>
     {% endif %}
 
-    {# ── Project Header ── #}
+    {#  Project Header  #}
     <div class="d-flex align-items-start justify-content-between flex-wrap gap-3 mb-4">
         <div>
             <h3 class="fw-bold mb-1">{{ project.title }}</h3>
@@ -43,13 +43,13 @@
 
     <div class="row g-4">
         <div class="col-lg-8">
-            {# ── Description ── #}
+            {#  Description  #}
             <div class="detail-card rounded-4 p-4 mb-4">
                 <h6 class="fw-bold mb-3"><i class="fa-solid fa-align-left me-2 text-muted"></i>Description</h6>
                 <div class="small text-muted" style="white-space:pre-wrap;">{{ project.description }}</div>
             </div>
 
-            {# ── Tags ── #}
+            {#  Tags  #}
             {% if project.tags_list %}
             <div class="detail-card rounded-4 p-4 mb-4">
                 <h6 class="fw-bold mb-3"><i class="fa-solid fa-tags me-2 text-muted"></i>Tags</h6>
@@ -61,7 +61,7 @@
             </div>
             {% endif %}
 
-            {# ── Related Projects ── #}
+            {#  Related Projects  #}
             {% if related %}
             <div class="mb-4">
                 <h5 class="fw-bold mb-3"><i class="fa-solid fa-layer-group me-2 text-muted"></i>Related Projects</h5>
@@ -99,7 +99,7 @@
         </div>
 
         <div class="col-lg-4">
-            {# ── Stats & Actions ── #}
+            {#  Stats & Actions  #}
             <div class="detail-card rounded-4 p-4 mb-4">
                 <h6 class="fw-bold mb-3"><i class="fa-solid fa-chart-simple me-2 text-muted"></i>Stats</h6>
                 <div class="d-flex align-items-center gap-4 mb-3">

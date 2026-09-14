@@ -115,6 +115,36 @@ def video_explainer(request):
     return render(request, 'home/video_explainer.html')
 
 
+def ux_design(request):
+    """Marketing page for UX design services."""
+    return render(request, 'Design/UX Design.html')
+
+
+def ui_design(request):
+    """Marketing page for UI design services."""
+    return render(request, 'Design/UI Design.html')
+
+
+def software_home(request):
+    """Software development services landing page."""
+    return render(request, 'software/home.html')
+
+
+def web_development(request):
+    """Web development services page."""
+    return render(request, 'software/web_development.html')
+
+
+def mobile_development(request):
+    """Mobile app development services page."""
+    return render(request, 'software/mobile_development.html')
+
+
+def ecommerce_development(request):
+    """eCommerce development services page."""
+    return render(request, 'software/ecommerce_development.html')
+
+
 def api_status(request):
     """Simple API status endpoint to respond to health checks."""
     from django.http import JsonResponse

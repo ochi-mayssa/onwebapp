@@ -1,0 +1,629 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans "eCommerce Development" %} | OnWebApp{% endblock %}
+
+{% block meta_description %}{% trans "Custom eCommerce development: Shopify, WooCommerce, Magento, and custom platforms. Payment integration, inventory management, and scaling." %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .sw-hero{background:linear-gradient(135deg,#0f172a 0%,#1e293b 40%,#0f172a 100%);padding:10rem 0 9rem;position:relative;overflow:hidden}
+    .sw-hero::before{content:'';position:absolute;inset:0;background:url('{% static "img/backg.png" %}') center/cover no-repeat;opacity:.15}
+    .sw-hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:200px;background:linear-gradient(to top,var(--bg-body),transparent)}
+    .sw-hero .container{position:relative;z-index:2}
+    .sw-label{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9333ea;margin-bottom:.5rem;display:flex;align-items:center;gap:.4rem}
+    .sw-label i{font-size:.35rem}
+    .sw-h{font-weight:800;font-size:2rem;margin-bottom:.6rem}
+    .sw-sub{color:#64748b;font-size:.95rem;line-height:1.7;max-width:640px}
+    .sw-s{padding:5rem 0}
+    .sw-s-alt{background:#f8fafc;padding:5rem 0}
+    .sw-s-dark{background:#0f172a;padding:5rem 0;color:#fff}
+    .sw-c{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:1.75rem;height:100%;transition:all .3s}
+    .sw-c:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(147,51,234,.12);border-color:#9333ea}
+    .sw-c-icon{width:48px;height:48px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;font-size:1.1rem;margin-bottom:1rem}
+    .sw-c-icon.blue{background:rgba(37,99,235,.1);color:#2563eb}
+    .sw-c-icon.teal{background:rgba(20,184,166,.1);color:#14b8a6}
+    .sw-c-icon.purple{background:rgba(147,51,234,.1);color:#9333ea}
+    .sw-c-icon.amber{background:rgba(245,158,11,.1);color:#f59e0b}
+    .sw-c-icon.rose{background:rgba(244,63,94,.1);color:#f43f5e}
+    .sw-c-icon.emerald{background:rgba(16,185,129,.1);color:#10b981}
+    .sw-c-icon.sky{background:rgba(14,165,233,.1);color:#0ea5e9}
+    .sw-c-icon.indigo{background:rgba(99,102,241,.1);color:#6366f1}
+    .sw-container{max-width:1140px;margin:0 auto;padding:0 1.5rem}
+    .sw-cta-box{background:linear-gradient(135deg,#7c3aed,#9333ea);border-radius:20px;padding:4rem 2rem;text-align:center;margin:0}
+    .sw-step{display:flex;align-items:flex-start;gap:1.5rem;padding:2rem 0;border-bottom:1px solid #e2e8f0}
+    .sw-step:last-child{border-bottom:none}
+    .sw-step-num{flex-shrink:0;width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#9333ea,#a855f7);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:1rem}
+    .sw-alt-row{display:flex;align-items:center;gap:4rem;padding:4rem 0}
+    .sw-alt-row.reverse{flex-direction:row-reverse}
+    .sw-alt-img{flex:1;border-radius:16px;overflow:hidden;position:relative}
+    .sw-alt-text{flex:1}
+    .sw-alt-text h3{font-weight:800;font-size:1.5rem;margin-bottom:1rem}
+    .sw-alt-text p{color:#64748b;line-height:1.7}
+    .sw-service-card{display:flex;gap:1.25rem;padding:1.5rem;border-radius:12px;background:#fff;border:1px solid #e2e8f0;transition:all .3s}
+    .sw-service-card:hover{border-color:#9333ea;box-shadow:0 8px 24px rgba(147,51,234,.08)}
+    .sw-service-card .sw-svc-icon{flex-shrink:0;width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.95rem}
+    .sw-tech-row{display:flex;align-items:center;gap:1rem;padding:.75rem 1rem;border-radius:8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);transition:all .2s}
+    .sw-tech-row:hover{border-color:rgba(255,255,255,.2);background:rgba(255,255,255,.1)}
+    .sw-tech-row i{font-size:1.2rem;width:28px;text-align:center}
+    .sw-tech-row span{font-weight:600;font-size:.85rem}
+    .sw-faq-item{border-bottom:1px solid #e2e8f0;padding:1.25rem 0}
+    .sw-faq-item:last-child{border-bottom:none}
+    .sw-faq-q{font-weight:700;font-size:.95rem;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:1rem;color:#0f172a}
+    .sw-faq-q i{transition:transform .2s;font-size:.8rem;color:#64748b}
+    .sw-faq-a{color:#64748b;font-size:.88rem;line-height:1.7;max-height:0;overflow:hidden;transition:all .3s}
+    .sw-faq-item.open .sw-faq-a{max-height:300px;padding-top:.75rem}
+    .sw-faq-item.open .sw-faq-q i{transform:rotate(180deg)}
+    .sw-industry-chip{display:inline-flex;align-items:center;gap:.5rem;padding:.5rem 1rem;border-radius:2rem;border:1px solid #e2e8f0;font-size:.82rem;font-weight:600;color:#334155;background:#fff;transition:all .2s}
+    .sw-industry-chip:hover{border-color:#9333ea;color:#9333ea;background:rgba(147,51,234,.04)}
+    .sw-hero-stats{display:flex;gap:3rem;margin-top:3rem}
+    .sw-hero-stat{text-align:left}
+    .sw-hero-stat-num{font-size:1.75rem;font-weight:800;color:#fff}
+    .sw-hero-stat-label{font-size:.75rem;color:#64748b;text-transform:uppercase;letter-spacing:.05em}
+    .sw-feature-pill{display:flex;align-items:center;gap:.5rem;padding:.5rem 1rem;border-radius:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);font-size:.82rem;font-weight:600;color:#e2e8f0;transition:all .2s}
+    .sw-feature-pill:hover{border-color:rgba(255,255,255,.2);background:rgba(255,255,255,.1)}
+    .sw-feature-pill i{font-size:.9rem}
+    @media(max-width:991px){.sw-alt-row,.sw-alt-row.reverse{flex-direction:column;gap:2rem}.sw-alt-img{width:100%}}
+    @media(max-width:768px){.sw-hero{padding:7rem 0 6rem}.sw-h{font-size:1.6rem}.sw-s{padding:3rem 0}.sw-step{flex-direction:column;text-align:center;align-items:center}.sw-hero-stats{flex-wrap:wrap;gap:1.5rem}.sw-hero-stat{min-width:100px}}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero -->
+<section class="sw-hero">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-7">
+                <div class="sw-label"><i class="fas fa-circle"></i>{% trans "OnWebApp — eCommerce Development" %}</div>
+                <h1 class="fw-800 mb-3" style="font-size:3.2rem;line-height:1.08;color:#fff;">{% trans "eCommerce Platforms " %}<span style="background:linear-gradient(135deg,#9333ea,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">{% trans "That Convert" %}</span></h1>
+                <p style="color:#94a3b8;font-size:1.1rem;max-width:540px;line-height:1.7;">{% trans "We build custom eCommerce platforms with payment integration, inventory management, and conversion optimization." %}</p>
+                <div class="d-flex gap-3 mt-4 flex-wrap">
+                    <a href="{% url 'home:build_website' %}" class="btn btn-primary btn-lg rounded-pill px-5 fw-800">{% trans "Start Your Project" %} <i class="fas fa-arrow-right ms-1"></i></a>
+                    <a href="#ec-process" class="btn btn-outline-light btn-lg rounded-pill px-4 fw-700">{% trans "Our Process" %}</a>
+                </div>
+                <div class="sw-hero-stats">
+                    <div class="sw-hero-stat">
+                        <div class="sw-hero-stat-num">120+</div>
+                        <div class="sw-hero-stat-label">{% trans "Stores Launched" %}</div>
+                    </div>
+                    <div class="sw-hero-stat">
+                        <div class="sw-hero-stat-num">$50M+</div>
+                        <div class="sw-hero-stat-label">{% trans "Revenue Generated" %}</div>
+                    </div>
+                    <div class="sw-hero-stat">
+                        <div class="sw-hero-stat-num">3.2x</div>
+                        <div class="sw-hero-stat-label">{% trans "Avg Conversion Lift" %}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- What We Build -->
+<section class="sw-s">
+    <div class="sw-container">
+        <div class="text-center mb-5">
+            <div class="sw-label justify-content-center"><i class="fas fa-circle"></i>{% trans "What We Build" %}</div>
+            <h2 class="sw-h">{% trans "eCommerce Solutions for Every Business" %}</h2>
+            <p class="sw-sub mx-auto">{% trans "From startups to enterprise, we build online stores that drive revenue and scale with your growth." %}</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4">
+                <div class="sw-service-card">
+                    <div class="sw-svc-icon" style="background:rgba(147,51,234,.1);color:#9333ea;"><i class="fas fa-store"></i></div>
+                    <div>
+                        <h6 class="fw-700 mb-1">{% trans "B2C Online Stores" %}</h6>
+                        <p class="small mb-0" style="color:#64748b;">{% trans "Consumer-facing stores with product catalogs, wishlists, reviews, and personalized shopping experiences." %}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="sw-service-card">
+                    <div class="sw-svc-icon" style="background:rgba(37,99,235,.1);color:#2563eb;"><i class="fas fa-building"></i></div>
+                    <div>
+                        <h6 class="fw-700 mb-1">{% trans "B2B Wholesale" %}</h6>
+                        <p class="small mb-0" style="color:#64748b;">{% trans "Bulk ordering, tiered pricing, customer-specific catalogs, and purchase order management." %}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="sw-service-card">
+                    <div class="sw-svc-icon" style="background:rgba(20,184,166,.1);color:#14b8a6;"><i class="fas fa-shopping-cart"></i></div>
+                    <div>
+                        <h6 class="fw-700 mb-1">{% trans "Marketplaces" %}</h6>
+                        <p class="small mb-0" style="color:#64748b;">{% trans "Multi-vendor platforms with seller dashboards, commission management, and escrow payments." %}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="sw-service-card">
+                    <div class="sw-svc-icon" style="background:rgba(244,63,94,.1);color:#f43f5e;"><i class="fas fa-box-open"></i></div>
+                    <div>
+                        <h6 class="fw-700 mb-1">{% trans "Subscription Commerce" %}</h6>
+                        <p class="small mb-0" style="color:#64748b;">{% trans "Recurring billing, subscription management, churn prevention, and customer portals." %}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="sw-service-card">
+                    <div class="sw-svc-icon" style="background:rgba(245,158,11,.1);color:#f59e0b;"><i class="fas fa-utensils"></i></div>
+                    <div>
+                        <h6 class="fw-700 mb-1">{% trans "Food & Grocery Delivery" %}</h6>
+                        <p class="small mb-0" style="color:#64748b;">{% trans "Order management, delivery tracking, real-time inventory, and restaurant/producer integrations." %}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="sw-service-card">
+                    <div class="sw-svc-icon" style="background:rgba(16,185,129,.1);color:#10b981;"><i class="fas fa-hand-holding-heart"></i></div>
+                    <div>
+                        <h6 class="fw-700 mb-1">{% trans "D2C Brands" %}</h6>
+                        <p class="small mb-0" style="color:#64748b;">{% trans "Direct-to-consumer storefronts with brand storytelling, loyalty programs, and social commerce." %}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Why Choose Us -->
+<section class="sw-s sw-s-alt">
+    <div class="sw-container">
+        <div class="text-center mb-5">
+            <div class="sw-label justify-content-center"><i class="fas fa-circle"></i>{% trans "Why OnWebApp" %}</div>
+            <h2 class="sw-h">{% trans "Built to Sell" %}</h2>
+            <p class="sw-sub mx-auto">{% trans "We don't just build stores. We build revenue engines optimized for conversion and growth." %}</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="sw-c text-center" style="border-top:3px solid #9333ea;">
+                    <div class="sw-c-icon purple mx-auto"><i class="fas fa-bullseye"></i></div>
+                    <h6 class="fw-700">{% trans "Conversion-Focused" %}</h6>
+                    <p class="small mb-0" style="color:#64748b;">{% trans "Every design decision is tested against conversion metrics and user behavior data." %}</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="sw-c text-center" style="border-top:3px solid #2563eb;">
+                    <div class="sw-c-icon blue mx-auto"><i class="fas fa-bolt"></i></div>
+                    <h6 class="fw-700">{% trans "Blazing Fast" %}</h6>
+                    <p class="small mb-0" style="color:#64748b;">{% trans "Sub-2-second load times. Every 100ms of delay costs 1%% in conversions." %}</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="sw-c text-center" style="border-top:3px solid #14b8a6;">
+                    <div class="sw-c-icon teal mx-auto"><i class="fas fa-shield-halved"></i></div>
+                    <h6 class="fw-700">{% trans "PCI Compliant" %}</h6>
+                    <p class="small mb-0" style="color:#64748b;">{% trans "Secure payment processing, fraud detection, and data encryption built in." %}</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="sw-c text-center" style="border-top:3px solid #f59e0b;">
+                    <div class="sw-c-icon amber mx-auto"><i class="fas fa-chart-line"></i></div>
+                    <h6 class="fw-700">{% trans "Analytics-Driven" %}</h6>
+                    <p class="small mb-0" style="color:#64748b;">{% trans "Built-in analytics, A/B testing, and data-driven optimization recommendations." %}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Our Process -->
+<section class="sw-s" id="ec-process">
+    <div class="sw-container">
+        <div class="text-center mb-5">
+            <div class="sw-label justify-content-center"><i class="fas fa-circle"></i>{% trans "Our Process" %}</div>
+            <h2 class="sw-h">{% trans "From Store Setup to Launch" %}</h2>
+            <p class="sw-sub mx-auto">{% trans "A structured approach to building high-converting eCommerce platforms that scale." %}</p>
+        </div>
+        <div class="sw-step">
+            <div class="sw-step-num">01</div>
+            <div>
+                <h5 style="font-weight:700;">{% trans "Strategy & Planning" %}</h5>
+                <p class="sw-sub mb-2">{% trans "Business analysis, platform selection, payment gateway setup, and scalability planning." %}</p>
+                <div class="d-flex gap-2 flex-wrap mt-2">
+                    <span class="sw-industry-chip"><i class="fas fa-check" style="color:#9333ea;font-size:.7rem;"></i>{% trans "Business Analysis" %}</span>
+                    <span class="sw-industry-chip"><i class="fas fa-check" style="color:#9333ea;font-size:.7rem;"></i>{% trans "Platform Selection" %}</span>
+                    <span class="sw-industry-chip"><i class="fas fa-check" style="color:#9333ea;font-size:.7rem;"></i>{% trans "Payment Strategy" %}</span>
+                </div>
+            </div>
+        </div>
+        <div class="sw-step">
+            <div class="sw-step-num">02</div>
+            <div>
+                <h5 style="font-weight:700;">{% trans "Store Design" %}</h5>
+                <p class="sw-sub mb-2">{% trans "Conversion-focused design with product pages, checkout flow, and mobile optimization." %}</p>
+                <div class="d-flex gap-2 flex-wrap mt-2">
+                    <span class="sw-industry-chip"><i class="fas fa-check" style="color:#9333ea;font-size:.7rem;"></i>{% trans "Conversion UX" %}</span>
+                    <span class="sw-industry-chip"><i class="fas fa-check" style="color:#9333ea;font-size:.7rem;"></i>{% trans "Product Pages" %}</span>
+                    <span class="sw-industry-chip"><i class="fas fa-check" style="color:#9333ea;font-size:.7rem;"></i>{% trans "Checkout Optimization" %}</span>
+                </div>
+            </div>
+        </div>
+        <div class="sw-step">
+            <div class="sw-step-num">03</div>
+            <div>
+                <h5 style="font-weight:700;">{% trans "Development" %}</h5>
+                <p class="sw-sub mb-2">{% trans "Custom features, payment integration, inventory management, and third-party integrations." %}</p>
+                <div class="d-flex gap-2 flex-wrap mt-2">
+                    <span class="sw-industry-chip"><i class="fas fa-check" style="color:#9333ea;font-size:.7rem;"></i>{% trans "Custom Features" %}</span>
+                    <span class="sw-industry-chip"><i class="fas fa-check" style="color:#9333ea;font-size:.7rem;"></i>{% trans "Payment Integration" %}</span>
+                    <span class="sw-industry-chip"><i class="fas fa-check" style="color:#9333ea;font-size:.7rem;"></i>{% trans "Third-Party APIs" %}</span>
+                </div>
+            </div>
+        </div>
+        <div class="sw-step">
+            <div class="sw-step-num">04</div>
+            <div>
+                <h5 style="font-weight:700;">{% trans "Testing & Optimization" %}</h5>
+                <p class="sw-sub mb-2">{% trans "Payment testing, performance optimization, SEO setup, and conversion rate optimization." %}</p>
+                <div class="d-flex gap-2 flex-wrap mt-2">
+                    <span class="sw-industry-chip"><i class="fas fa-check" style="color:#9333ea;font-size:.7rem;"></i>{% trans "Payment Testing" %}</span>
+                    <span class="sw-industry-chip"><i class="fas fa-check" style="color:#9333ea;font-size:.7rem;"></i>{% trans "Performance Tuning" %}</span>
+                    <span class="sw-industry-chip"><i class="fas fa-check" style="color:#9333ea;font-size:.7rem;"></i>{% trans "SEO & CRO" %}</span>
+                </div>
+            </div>
+        </div>
+        <div class="sw-step">
+            <div class="sw-step-num">05</div>
+            <div>
+                <h5 style="font-weight:700;">{% trans "Launch & Growth" %}</h5>
+                <p class="sw-sub mb-2">{% trans "Go-live support, analytics setup, marketing integration, and ongoing optimization." %}</p>
+                <div class="d-flex gap-2 flex-wrap mt-2">
+                    <span class="sw-industry-chip"><i class="fas fa-check" style="color:#9333ea;font-size:.7rem;"></i>{% trans "Go-Live Support" %}</span>
+                    <span class="sw-industry-chip"><i class="fas fa-check" style="color:#9333ea;font-size:.7rem;"></i>{% trans "Analytics & Tracking" %}</span>
+                    <span class="sw-industry-chip"><i class="fas fa-check" style="color:#9333ea;font-size:.7rem;"></i>{% trans "Ongoing Optimization" %}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Platform Comparison -->
+<section class="sw-s sw-s-dark">
+    <div class="sw-container">
+        <div class="text-center mb-5">
+            <div class="sw-label justify-content-center" style="color:#c084fc;"><i class="fas fa-circle"></i>{% trans "Platform Guide" %}</div>
+            <h2 class="fw-800" style="color:#fff;">{% trans "Choose the Right Platform" %}</h2>
+            <p style="color:#94a3b8;max-width:640px;margin:0 auto;font-size:.95rem;">{% trans "We help you pick the platform that fits your business model, budget, and growth plans." %}</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="sw-c" style="background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.1);">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <div class="sw-c-icon" style="background:rgba(147,51,234,.2);color:#c084fc;"><i class="fab fa-shopify"></i></div>
+                        <h5 class="fw-700 mb-0" style="color:#fff;">{% trans "Shopify" %}</h5>
+                    </div>
+                    <p style="color:#94a3b8;font-size:.88rem;">{% trans "Fully managed eCommerce. Best for small to mid-size stores that want fast setup." %}</p>
+                    <ul class="list-unstyled mt-3" style="color:#94a3b8;font-size:.82rem;">
+                        <li class="py-2 border-bottom" style="border-color:rgba(255,255,255,.08) !important;"><i class="fas fa-check me-2" style="color:#10b981;"></i>{% trans "No server management" %}</li>
+                        <li class="py-2 border-bottom" style="border-color:rgba(255,255,255,.08) !important;"><i class="fas fa-check me-2" style="color:#10b981;"></i>{% trans "Built-in payment processing" %}</li>
+                        <li class="py-2 border-bottom" style="border-color:rgba(255,255,255,.08) !important;"><i class="fas fa-check me-2" style="color:#10b981;"></i>{% trans "App ecosystem (8000+ apps)" %}</li>
+                        <li class="py-2"><i class="fas fa-check me-2" style="color:#10b981;"></i>{% trans "Shopify POS for retail" %}</li>
+                    </ul>
+                    <div class="mt-3" style="color:#94a3b8;font-size:.8rem;">
+                        <strong style="color:#c084fc;">Best for:</strong> {% trans "Small to mid-size B2C stores, quick launches" %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="sw-c" style="background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.1);">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <div class="sw-c-icon" style="background:rgba(37,99,235,.2);color:#60a5fa;"><i class="fab fa-wordpress"></i></div>
+                        <h5 class="fw-700 mb-0" style="color:#fff;">{% trans "WooCommerce" %}</h5>
+                    </div>
+                    <p style="color:#94a3b8;font-size:.88rem;">{% trans "WordPress-based eCommerce. Best for content-heavy stores with full customization needs." %}</p>
+                    <ul class="list-unstyled mt-3" style="color:#94a3b8;font-size:.82rem;">
+                        <li class="py-2 border-bottom" style="border-color:rgba(255,255,255,.08) !important;"><i class="fas fa-check me-2" style="color:#10b981;"></i>{% trans "Full code ownership" %}</li>
+                        <li class="py-2 border-bottom" style="border-color:rgba(255,255,255,.08) !important;"><i class="fas fa-check me-2" style="color:#10b981;"></i>{% trans "50,000+ plugins" %}</li>
+                        <li class="py-2 border-bottom" style="border-color:rgba(255,255,255,.08) !important;"><i class="fas fa-check me-2" style="color:#10b981;"></i>{% trans "Content + commerce integration" %}</li>
+                        <li class="py-2"><i class="fas fa-check me-2" style="color:#10b981;"></i>{% trans "SEO-friendly out of the box" %}</li>
+                    </ul>
+                    <div class="mt-3" style="color:#94a3b8;font-size:.8rem;">
+                        <strong style="color:#60a5fa;">Best for:</strong> {% trans "Content-driven stores, blogs with commerce" %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="sw-c" style="background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.1);">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <div class="sw-c-icon" style="background:rgba(20,184,166,.2);color:#2dd4bf;"><i class="fas fa-code"></i></div>
+                        <h5 class="fw-700 mb-0" style="color:#fff;">{% trans "Custom Build" %}</h5>
+                    </div>
+                    <p style="color:#94a3b8;font-size:.88rem;">{% trans "Tailor-made solutions with Django, Node.js, or Laravel. Best for unique business models." %}</p>
+                    <ul class="list-unstyled mt-3" style="color:#94a3b8;font-size:.82rem;">
+                        <li class="py-2 border-bottom" style="border-color:rgba(255,255,255,.08) !important;"><i class="fas fa-check me-2" style="color:#10b981;"></i>{% trans "Unlimited customization" %}</li>
+                        <li class="py-2 border-bottom" style="border-color:rgba(255,255,255,.08) !important;"><i class="fas fa-check me-2" style="color:#10b981;"></i>{% trans "No platform lock-in" %}</li>
+                        <li class="py-2 border-bottom" style="border-color:rgba(255,255,255,.08) !important;"><i class="fas fa-check me-2" style="color:#10b981;"></i>{% trans "Custom business logic" %}</li>
+                        <li class="py-2"><i class="fas fa-check me-2" style="color:#10b981;"></i>{% trans "Headless commerce ready" %}</li>
+                    </ul>
+                    <div class="mt-3" style="color:#94a3b8;font-size:.8rem;">
+                        <strong style="color:#2dd4bf;">Best for:</strong> {% trans "Enterprise, unique models, multi-vendor" %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Deep Dive -->
+<section class="sw-s">
+    <div class="sw-container">
+        <div class="text-center mb-5">
+            <div class="sw-label justify-content-center"><i class="fas fa-circle"></i>{% trans "Core Features" %}</div>
+            <h2 class="sw-h">{% trans "Everything Your Store Needs" %}</h2>
+            <p class="sw-sub mx-auto">{% trans "We build stores with the features that actually drive sales and streamline operations." %}</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="sw-c" style="border-top:3px solid #9333ea;">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="sw-c-icon purple"><i class="fas fa-credit-card"></i></div>
+                        <h6 class="fw-700 mb-0">{% trans "Payment Processing" %}</h6>
+                    </div>
+                    <p class="small" style="color:#64748b;">{% trans "Stripe, PayPal, Apple Pay, Google Pay, Klarna, and local payment methods. Multi-currency support with automatic conversion." %}</p>
+                    <div class="d-flex gap-2 flex-wrap mt-2">
+                        <span class="sw-industry-chip" style="font-size:.72rem;padding:.3rem .6rem;"><i class="fab fa-stripe" style="color:#9333ea;"></i>{% trans "Stripe" %}</span>
+                        <span class="sw-industry-chip" style="font-size:.72rem;padding:.3rem .6rem;"><i class="fab fa-paypal" style="color:#2563eb;"></i>{% trans "PayPal" %}</span>
+                        <span class="sw-industry-chip" style="font-size:.72rem;padding:.3rem .6rem;"><i class="fab fa-apple-pay" style="color:#333;"></i>{% trans "Apple Pay" %}</span>
+                        <span class="sw-industry-chip" style="font-size:.72rem;padding:.3rem .6rem;"><i class="fab fa-google-pay" style="color:#14b8a6;"></i>{% trans "Google Pay" %}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="sw-c" style="border-top:3px solid #2563eb;">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="sw-c-icon blue"><i class="fas fa-boxes-stacked"></i></div>
+                        <h6 class="fw-700 mb-0">{% trans "Inventory Management" %}</h6>
+                    </div>
+                    <p class="small" style="color:#64748b;">{% trans "Real-time stock tracking, multi-warehouse support, low stock alerts, and automated reorder points." %}</p>
+                    <div class="d-flex gap-2 flex-wrap mt-2">
+                        <span class="sw-industry-chip" style="font-size:.72rem;padding:.3rem .6rem;">{% trans "Real-Time Tracking" %}</span>
+                        <span class="sw-industry-chip" style="font-size:.72rem;padding:.3rem .6rem;">{% trans "Multi-Warehouse" %}</span>
+                        <span class="sw-industry-chip" style="font-size:.72rem;padding:.3rem .6rem;">{% trans "Auto-Reorder" %}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="sw-c" style="border-top:3px solid #14b8a6;">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="sw-c-icon teal"><i class="fas fa-truck-fast"></i></div>
+                        <h6 class="fw-700 mb-0">{% trans "Shipping & Fulfillment" %}</h6>
+                    </div>
+                    <p class="small" style="color:#64748b;">{% trans "Multi-carrier shipping rates, real-time tracking, print shipping labels, and dropshipping integrations." %}</p>
+                    <div class="d-flex gap-2 flex-wrap mt-2">
+                        <span class="sw-industry-chip" style="font-size:.72rem;padding:.3rem .6rem;">{% trans "USPS / UPS / FedEx" %}</span>
+                        <span class="sw-industry-chip" style="font-size:.72rem;padding:.3rem .6rem;">{% trans "Real-Time Rates" %}</span>
+                        <span class="sw-industry-chip" style="font-size:.72rem;padding:.3rem .6rem;">{% trans "Dropship Ready" %}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="sw-c" style="border-top:3px solid #f59e0b;">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="sw-c-icon amber"><i class="fas fa-tags"></i></div>
+                        <h6 class="fw-700 mb-0">{% trans "Promotions & Pricing" %}</h6>
+                    </div>
+                    <p class="small" style="color:#64748b;">{% trans "Discount codes, flash sales, bulk pricing, tiered discounts, loyalty points, and abandoned cart recovery." %}</p>
+                    <div class="d-flex gap-2 flex-wrap mt-2">
+                        <span class="sw-industry-chip" style="font-size:.72rem;padding:.3rem .6rem;">{% trans "Coupon Engine" %}</span>
+                        <span class="sw-industry-chip" style="font-size:.72rem;padding:.3rem .6rem;">{% trans "Loyalty Points" %}</span>
+                        <span class="sw-industry-chip" style="font-size:.72rem;padding:.3rem .6rem;">{% trans "Cart Recovery" %}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="sw-c" style="border-top:3px solid #f43f5e;">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="sw-c-icon rose"><i class="fas fa-magnifying-glass-chart"></i></div>
+                        <h6 class="fw-700 mb-0">{% trans "SEO & Marketing" %}</h6>
+                    </div>
+                    <p class="small" style="color:#64748b;">{% trans "SEO-optimized URLs, meta tags, sitemaps, Google Shopping integration, Facebook Pixel, and email marketing." %}</p>
+                    <div class="d-flex gap-2 flex-wrap mt-2">
+                        <span class="sw-industry-chip" style="font-size:.72rem;padding:.3rem .6rem;">{% trans "Google Shopping" %}</span>
+                        <span class="sw-industry-chip" style="font-size:.72rem;padding:.3rem .6rem;">{% trans "Facebook Pixel" %}</span>
+                        <span class="sw-industry-chip" style="font-size:.72rem;padding:.3rem .6rem;">{% trans "Email Automation" %}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="sw-c" style="border-top:3px solid #6366f1;">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="sw-c-icon indigo"><i class="fas fa-chart-pie"></i></div>
+                        <h6 class="fw-700 mb-0">{% trans "Analytics & Reports" %}</h6>
+                    </div>
+                    <p class="small" style="color:#64748b;">{% trans "Sales dashboards, customer analytics, product performance, and custom report generation." %}</p>
+                    <div class="d-flex gap-2 flex-wrap mt-2">
+                        <span class="sw-industry-chip" style="font-size:.72rem;padding:.3rem .6rem;">{% trans "Sales Dashboards" %}</span>
+                        <span class="sw-industry-chip" style="font-size:.72rem;padding:.3rem .6rem;">{% trans "Customer LTV" %}</span>
+                        <span class="sw-industry-chip" style="font-size:.72rem;padding:.3rem .6rem;">{% trans "Custom Reports" %}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Integrations -->
+<section class="sw-s sw-s-alt">
+    <div class="sw-container">
+        <div class="text-center mb-5">
+            <div class="sw-label justify-content-center"><i class="fas fa-circle"></i>{% trans "Integrations" %}</div>
+            <h2 class="sw-h">{% trans "Connect Your Entire Business" %}</h2>
+            <p class="sw-sub mx-auto">{% trans "We integrate your store with the tools you already use." %}</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="sw-c text-center">
+                    <div class="sw-c-icon purple mx-auto"><i class="fas fa-envelope"></i></div>
+                    <h6 class="fw-700">{% trans "Email & CRM" %}</h6>
+                    <p class="small" style="color:#64748b;">{% trans "Klaviyo, Mailchimp, HubSpot, Salesforce — automated campaigns and customer data sync." %}</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="sw-c text-center">
+                    <div class="sw-c-icon blue mx-auto"><i class="fas fa-chart-bar"></i></div>
+                    <h6 class="fw-700">{% trans "Analytics" %}</h6>
+                    <p class="small" style="color:#64748b;">{% trans "Google Analytics, Meta Pixel, TikTok Pixel, Hotjar — full funnel tracking and attribution." %}</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="sw-c text-center">
+                    <div class="sw-c-icon teal mx-auto"><i class="fas fa-warehouse"></i></div>
+                    <h6 class="fw-700">{% trans "ERP & Accounting" %}</h6>
+                    <p class="small" style="color:#64748b;">{% trans "ERPNext, QuickBooks, Xero, NetSuite — inventory sync, invoicing, and financial reporting." %}</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="sw-c text-center">
+                    <div class="sw-c-icon amber mx-auto"><i class="fas fa-headset"></i></div>
+                    <h6 class="fw-700">{% trans "Support & Chat" %}</h6>
+                    <p class="small" style="color:#64748b;">{% trans "Zendesk, Intercom, LiveChat, Tidio — real-time customer support and chatbot integration." %}</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="sw-c text-center">
+                    <div class="sw-c-icon rose mx-auto"><i class="fas fa-share-nodes"></i></div>
+                    <h6 class="fw-700">{% trans "Social Commerce" %}</h6>
+                    <p class="small" style="color:#64748b;">{% trans "Instagram Shopping, Facebook Shops, TikTok Shopping, Pinterest — sell directly on social platforms." %}</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="sw-c text-center">
+                    <div class="sw-c-icon emerald mx-auto"><i class="fas fa-cubes"></i></div>
+                    <h6 class="fw-700">{% trans "3PL & Fulfillment" %}</h6>
+                    <p class="small" style="color:#64748b;">{% trans "ShipStation, ShipBob, Amazon FBA, Shopify Fulfillment — automated order routing and label printing." %}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Industries -->
+<section class="sw-s">
+    <div class="sw-container">
+        <div class="text-center mb-5">
+            <div class="sw-label justify-content-center"><i class="fas fa-circle"></i>{% trans "Industries We Serve" %}</div>
+            <h2 class="sw-h">{% trans "eCommerce Across Verticals" %}</h2>
+            <p class="sw-sub mx-auto">{% trans "We've built online stores for various industries, each with unique catalog, shipping, and compliance needs." %}</p>
+        </div>
+        <div class="d-flex flex-wrap justify-content-center gap-2">
+            <span class="sw-industry-chip"><i class="fas fa-tshirt" style="color:#9333ea;"></i>{% trans "Fashion & Apparel" %}</span>
+            <span class="sw-industry-chip"><i class="fas fa-heartbeat" style="color:#f43f5e;"></i>{% trans "Health & Beauty" %}</span>
+            <span class="sw-industry-chip"><i class="fas fa-couch" style="color:#f59e0b;"></i>{% trans "Home & Furniture" %}</span>
+            <span class="sw-industry-chip"><i class="fas fa-utensils" style="color:#14b8a6;"></i>{% trans "Food & Beverage" %}</span>
+            <span class="sw-industry-chip"><i class="fas fa-laptop" style="color:#2563eb;"></i>{% trans "Electronics & Tech" %}</span>
+            <span class="sw-industry-chip"><i class="fas fa-baby" style="color:#ec4899;"></i>{% trans "Kids & Baby" %}</span>
+            <span class="sw-industry-chip"><i class="fas fa-dumbbell" style="color:#f43f5e;"></i>{% trans "Sports & Outdoors" %}</span>
+            <span class="sw-industry-chip"><i class="fas fa-book" style="color:#6366f1;"></i>{% trans "Books & Media" %}</span>
+            <span class="sw-industry-chip"><i class="fas fa-paw" style="color:#f59e0b;"></i>{% trans "Pet Supplies" %}</span>
+            <span class="sw-industry-chip"><i class="fas fa-seedling" style="color:#10b981;"></i>{% trans "Garden & Outdoor" %}</span>
+            <span class="sw-industry-chip"><i class="fas fa-gem" style="color:#8b5cf6;"></i>{% trans "Jewelry & Luxury" %}</span>
+            <span class="sw-industry-chip"><i class="fas fa-car" style="color:#64748b;"></i>{% trans "Automotive Parts" %}</span>
+        </div>
+    </div>
+</section>
+
+<!-- Pricing -->
+<section class="sw-s sw-s-alt">
+    <div class="sw-container">
+        <div class="text-center mb-5">
+            <div class="sw-label justify-content-center"><i class="fas fa-circle"></i>{% trans "Pricing" %}</div>
+            <h2 class="sw-h">{% trans "Transparent Pricing" %}</h2>
+            <p class="sw-sub mx-auto">{% trans "Flexible plans for every stage of your eCommerce journey." %}</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="sw-c text-center" style="border-top:3px solid #14b8a6;">
+                    <div class="small fw-700 text-uppercase mb-2" style="color:#14b8a6;">{% trans "Starter" %}</div>
+                    <h4 class="fw-800 mb-2">{% trans "Shopify / WooCommerce" %}</h4>
+                    <p class="small" style="color:#64748b;">{% trans "Perfect for new stores getting started quickly." %}</p>
+                    <ul class="list-unstyled small text-start mt-3" style="color:#64748b;">
+                        <li class="py-2 border-bottom" style="border-color:#e2e8f0 !important;"><i class="fas fa-check me-2" style="color:#14b8a6;"></i>{% trans "Theme customization" %}</li>
+                        <li class="py-2 border-bottom" style="border-color:#e2e8f0 !important;"><i class="fas fa-check me-2" style="color:#14b8a6;"></i>{% trans "Product setup (up to 100)" %}</li>
+                        <li class="py-2 border-bottom" style="border-color:#e2e8f0 !important;"><i class="fas fa-check me-2" style="color:#14b8a6;"></i>{% trans "Payment integration" %}</li>
+                        <li class="py-2"><i class="fas fa-check me-2" style="color:#14b8a6;"></i>{% trans "Basic analytics" %}</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="sw-c text-center" style="border-top:3px solid #9333ea;">
+                    <div class="small fw-700 text-uppercase mb-2" style="color:#9333ea;">{% trans "Growth" %}</div>
+                    <h4 class="fw-800 mb-2">{% trans "Custom / Headless" %}</h4>
+                    <p class="small" style="color:#64748b;">{% trans "For stores ready to scale with custom features." %}</p>
+                    <ul class="list-unstyled small text-start mt-3" style="color:#64748b;">
+                        <li class="py-2 border-bottom" style="border-color:#e2e8f0 !important;"><i class="fas fa-check me-2" style="color:#9333ea;"></i>{% trans "Custom UI/UX design" %}</li>
+                        <li class="py-2 border-bottom" style="border-color:#e2e8f0 !important;"><i class="fas fa-check me-2" style="color:#9333ea;"></i>{% trans "Advanced features" %}</li>
+                        <li class="py-2 border-bottom" style="border-color:#e2e8f0 !important;"><i class="fas fa-check me-2" style="color:#9333ea;"></i>{% trans "3rd-party integrations" %}</li>
+                        <li class="py-2"><i class="fas fa-check me-2" style="color:#9333ea;"></i>{% trans "3 months free support" %}</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="sw-c text-center" style="border-top:3px solid #f59e0b;">
+                    <div class="small fw-700 text-uppercase mb-2" style="color:#f59e0b;">{% trans "Enterprise" %}</div>
+                    <h4 class="fw-800 mb-2">{% trans "Multi-Vendor / Marketplace" %}</h4>
+                    <p class="small" style="color:#64748b;">{% trans "Complex platforms with multiple sellers and custom logic." %}</p>
+                    <ul class="list-unstyled small text-start mt-3" style="color:#64748b;">
+                        <li class="py-2 border-bottom" style="border-color:#e2e8f0 !important;"><i class="fas fa-check me-2" style="color:#f59e0b;"></i>{% trans "Multi-vendor architecture" %}</li>
+                        <li class="py-2 border-bottom" style="border-color:#e2e8f0 !important;"><i class="fas fa-check me-2" style="color:#f59e0b;"></i>{% trans "Custom commission logic" %}</li>
+                        <li class="py-2 border-bottom" style="border-color:#e2e8f0 !important;"><i class="fas fa-check me-2" style="color:#f59e0b;"></i>{% trans "Dedicated infrastructure" %}</li>
+                        <li class="py-2"><i class="fas fa-check me-2" style="color:#f59e0b;"></i>{% trans "Ongoing maintenance & SLA" %}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ -->
+<section class="sw-s">
+    <div class="sw-container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="text-center mb-5">
+                    <div class="sw-label justify-content-center"><i class="fas fa-circle"></i>{% trans "FAQ" %}</div>
+                    <h2 class="sw-h">{% trans "Frequently Asked Questions" %}</h2>
+                </div>
+                <div class="sw-faq-item" onclick="this.classList.toggle('open')">
+                    <div class="sw-faq-q">{% trans "Which platform should I choose?" %} <i class="fas fa-chevron-down"></i></div>
+                    <div class="sw-faq-a">{% trans "For quick launches with minimal technical overhead, Shopify. For content-driven stores, WooCommerce. For unique business models or large catalogs, a custom build gives you full control." %}</div>
+                </div>
+                <div class="sw-faq-item" onclick="this.classList.toggle('open')">
+                    <div class="sw-faq-q">{% trans "How long does it take to build an online store?" %} <i class="fas fa-chevron-down"></i></div>
+                    <div class="sw-faq-a">{% trans "A Shopify store can launch in 2-4 weeks. A WooCommerce store takes 4-8 weeks. A custom platform takes 8-16 weeks depending on complexity." %}</div>
+                </div>
+                <div class="sw-faq-item" onclick="this.classList.toggle('open')">
+                    <div class="sw-faq-q">{% trans "Do you handle payment gateway setup?" %} <i class="fas fa-chevron-down"></i></div>
+                    <div class="sw-faq-a">{% trans "Yes. We integrate Stripe, PayPal, Apple Pay, Google Pay, Klarna, and local payment methods. We also handle multi-currency and tax calculation." %}</div>
+                </div>
+                <div class="sw-faq-item" onclick="this.classList.toggle('open')">
+                    <div class="sw-faq-q">{% trans "Can you migrate my existing store?" %} <i class="fas fa-chevron-down"></i></div>
+                    <div class="sw-faq-a">{% trans "Yes. We handle full migrations including products, customers, orders, and SEO redirects. We ensure zero data loss and preserve your search rankings." %}</div>
+                </div>
+                <div class="sw-faq-item" onclick="this.classList.toggle('open')">
+                    <div class="sw-faq-q">{% trans "How do you optimize for conversions?" %} <i class="fas fa-chevron-down"></i></div>
+                    <div class="sw-faq-a">{% trans "We use A/B testing, heatmap analysis, checkout funnel optimization, page speed improvements, and data-driven design decisions to maximize your conversion rate." %}</div>
+                </div>
+                <div class="sw-faq-item" onclick="this.classList.toggle('open')">
+                    <div class="sw-faq-q">{% trans "Do you provide ongoing support after launch?" %} <i class="fas fa-chevron-down"></i></div>
+                    <div class="sw-faq-a">{% trans "Yes. We offer maintenance plans that include bug fixes, security patches, performance monitoring, and feature additions. Most clients choose our monthly retainer." %}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section style="padding:0;">
+    <div class="sw-container" style="padding:5rem 1.5rem;">
+        <div class="sw-cta-box">
+            <h2 class="fw-800 mb-3" style="color:#fff;max-width:600px;margin:0 auto 1rem;">{% trans "Ready to Launch Your Online Store?" %}</h2>
+            <p style="color:rgba(255,255,255,.7);font-size:1rem;max-width:500px;margin:0 auto 2rem;">{% trans "Let's build an eCommerce platform that drives sales." %}</p>
+            <div class="d-flex gap-3 justify-content-center flex-wrap">
+                <a href="{% url 'home:build_website' %}" class="btn btn-light btn-lg rounded-pill px-5 fw-800">{% trans "Start Your Project" %} <i class="fas fa-arrow-right ms-1"></i></a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

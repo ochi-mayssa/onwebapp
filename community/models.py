@@ -210,6 +210,11 @@ class OnboardingAddon(models.Model):
 
 
 class WebsiteIntake(models.Model):
+    """
+    .. deprecated::
+        Use OnboardingSession instead. This model is kept for backward compatibility
+        with the legacy website_building view and will be removed in a future release.
+    """
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     full_name = models.CharField(max_length=255)
     company_name = models.CharField(max_length=255, blank=True)
@@ -274,8 +279,27 @@ class BrandProfile(models.Model):
     generated_typography = models.JSONField(default=dict, blank=True, help_text='Generated typography suggestions')
     generated_voice_examples = models.JSONField(default=list, blank=True, help_text='Brand voice examples')
 
+    # --- Branding payment (pay add-ons total to unlock download) ---
+    PAYMENT_STATUS_CHOICES = [
+        ('unpaid', 'Unpaid'),
+        ('pending', 'Payment Pending'),
+        ('paid', 'Paid'),
+    ]
+    selected_addons = models.JSONField(default=list, blank=True, help_text='List of OnboardingAddon slugs e.g. ["logo-addon", "brand-addon"]')
+    addons_total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='unpaid')
+    stripe_session_id = models.CharField(max_length=255, blank=True)
+    paid_at = models.DateTimeField(null=True, blank=True)
+    # Final deliverables uploaded by staff (logo files, guidelines PDF)
+    logo_final = models.FileField(upload_to='branding/deliverables/', blank=True, null=True)
+    guidelines_file = models.FileField(upload_to='branding/deliverables/', blank=True, null=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    @property
+    def is_paid(self):
+        return self.payment_status == 'paid'
 
     class Meta:
         ordering = ['-updated_at']

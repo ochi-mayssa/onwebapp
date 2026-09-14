@@ -6,7 +6,7 @@
 {% block branding_content %}
 <div class="container py-4">
 
-    {# ── Breadcrumb & Header ── #}
+    {#  Breadcrumb & Header  #}
     <nav aria-label="breadcrumb" class="mb-2">
         <ol class="breadcrumb mb-0 small">
             <li class="breadcrumb-item"><a href="{% url 'branding:designer_dashboard' %}" class="text-decoration-none"><i class="fa-solid fa-palette me-1"></i>My Work</a></li>
@@ -28,10 +28,10 @@
 
     <div class="row g-4">
 
-        {# ── Left Column ── #}
+        {#  Left Column  #}
         <div class="col-lg-8">
 
-            {# ── Handoff Info Card ── #}
+            {#  Handoff Info Card  #}
             <div class="detail-card rounded-4 p-4 mb-4">
                 <div class="d-flex align-items-start justify-content-between mb-3">
                     <h6 class="fw-bold mb-0"><i class="fa-solid fa-circle-info me-2 text-primary"></i>Handoff Information</h6>
@@ -74,7 +74,7 @@
                 </dl>
             </div>
 
-            {# ── Action Buttons ── #}
+            {#  Action Buttons  #}
             {% if handoff.status == 'DRAFT' or handoff.status == 'READY' %}
             <div class="d-flex gap-2 mb-4">
                 {% if handoff.status == 'DRAFT' %}
@@ -98,7 +98,7 @@
             </div>
             {% endif %}
 
-            {# ── Deliverables Section ── #}
+            {#  Deliverables Section  #}
             <div class="detail-card rounded-4 p-4 mb-4">
                 <h6 class="fw-bold mb-3"><i class="fa-solid fa-cloud-arrow-up me-2 text-primary"></i>Deliverables</h6>
 
@@ -170,7 +170,7 @@
                 {% endif %}
             </div>
 
-            {# ── Notes Section ── #}
+            {#  Notes Section  #}
             <div class="detail-card rounded-4 p-4">
                 <h6 class="fw-bold mb-3"><i class="fa-solid fa-sticky-note me-2 text-warning"></i>Notes</h6>
 
@@ -228,7 +228,7 @@
             </div>
         </div>
 
-        {# ── Right Column: Sidebar ── #}
+        {#  Right Column: Sidebar  #}
         <div class="col-lg-4">
             <div class="detail-card rounded-4 p-4 mb-4">
                 <h6 class="fw-bold mb-3"><i class="fa-solid fa-circle-info me-2 text-primary"></i>Quick Info</h6>

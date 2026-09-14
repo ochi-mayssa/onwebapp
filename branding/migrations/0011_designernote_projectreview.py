@@ -32,7 +32,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('status', models.CharField(choices=[('PENDING', 'Pending Review'), ('APPROVED', 'Approved'), ('REJECTED', 'Rejected'), ('REVISION_REQUESTED', 'Revision Requested')], default='PENDING', max_length=20)),
-                ('quality_checklist', models.JSONField(blank=True, default=dict, help_text='Dict mapping checklist key → bool. Keys from QUALITY_CHECKLIST.')),
+                ('quality_checklist', models.JSONField(blank=True, default=dict, help_text='Dict mapping checklist key  bool. Keys from QUALITY_CHECKLIST.')),
                 ('notes', models.TextField(blank=True, default='')),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),

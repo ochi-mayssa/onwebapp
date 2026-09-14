@@ -1,0 +1,980 @@
+{% extends "community/base_community.html" %}
+{% load static i18n %}
+
+{% block title %}Brand Assist | OnWebApp Community{% endblock %}
+
+{% block community_content %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@400;500;700&family=Fredoka+One&family=Helvetica+Neue:wght@400;500;700&family=Inter:wght@400;500;600;700&family=Lato:wght@400;700&family=Nunito:wght@400;600;700&family=Open+Sans:wght@400;600;700&family=Playfair+Display:wght@400;600;700;800&family=Quicksand:wght@400;500;600;700&family=Roboto+Condensed:wght@400;700&family=Source+Sans+Pro:wght@400;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+
+<div class="brand-assist-page">
+
+    <!-- Hero Header -->
+    <div class="brand-hero position-relative overflow-hidden mb-5">
+        <div class="position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(135deg, rgba(99,102,241,0.08) 0%, rgba(16,185,129,0.06) 50%, rgba(139,92,246,0.05) 100%);"></div>
+        <div class="position-absolute" style="top: -60px; right: -60px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(99,102,241,0.1) 0%, transparent 70%); border-radius: 50%;"></div>
+        <div class="position-absolute" style="bottom: -40px; left: -40px; width: 200px; height: 200px; background: radial-gradient(circle, rgba(16,185,129,0.08) 0%, transparent 70%); border-radius: 50%;"></div>
+        <div class="container position-relative py-5">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-4">
+                <div>
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <div class="brand-hero-icon rounded-4 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; background: linear-gradient(135deg, #6366f1, #8b5cf6);">
+                            <i class="fas fa-wand-magic-sparkles text-white fa-lg"></i>
+                        </div>
+                        <span class="badge bg-primary-soft text-primary rounded-pill px-3 py-1 fw-700">Community Tool</span>
+                    </div>
+                    <h1 class="fw-800 mb-2" style="font-size: 2.2rem;">Brand Assist</h1>
+                    <p class="text-secondary mb-0" style="font-size: 1.05rem; max-width: 500px;">Define your brand personality, colors, and voice — see your brand identity come alive instantly.</p>
+                </div>
+                <div class="d-flex gap-2 align-items-center flex-wrap">
+                    {% if is_staff and clients %}
+                    <div class="dropdown">
+                        <button class="btn btn-white rounded-pill px-4 fw-700 dropdown-toggle shadow-sm" data-bs-toggle="dropdown">
+                            <i class="fas fa-user me-1 text-primary"></i> {{ selected_client.get_full_name|default:selected_client.username }}
+                        </button>
+                        <ul class="dropdown-menu shadow-lg border-0 rounded-4 p-2" style="max-height: 300px; overflow-y: auto;">
+                            {% for c in clients %}
+                            <li>
+                                <a class="dropdown-item rounded-3 py-2 fw-600 {% if selected_client.id == c.id %}active{% endif %}" href="?client={{ c.id }}">
+                                    <span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: {% if selected_client.id == c.id %}#fff{% else %}#6366f1{% endif %};"></span>
+                                    {{ c.get_full_name|default:c.username }}
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                    {% if profiles %}
+                    <div class="dropdown">
+                        <button class="btn btn-white rounded-pill px-4 fw-700 dropdown-toggle shadow-sm" data-bs-toggle="dropdown">
+                            <i class="fas fa-bookmark me-1 text-success"></i> Saved ({{ profiles|length }})
+                        </button>
+                        <ul class="dropdown-menu shadow-lg border-0 rounded-4 p-2">
+                            {% for p in profiles %}
+                            <li>
+                                <a class="dropdown-item rounded-3 py-2 fw-600 {% if active_profile.id == p.id %}active{% endif %}" href="?profile={{ p.id }}{% if is_staff and selected_client %}&client={{ selected_client.id }}{% endif %}">
+                                    <span class="d-inline-block rounded-circle me-2" style="width: 14px; height: 14px; background: {{ p.primary_color }}; border: 2px solid {% if active_profile.id == p.id %}#fff{% else %}#e5e7eb{% endif %};"></span>
+                                    {{ p.name }}
+                                </a>
+                            </li>
+                            {% endfor %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item rounded-3 py-2 fw-600" href="{% url 'community:brand_assist' %}{% if is_staff and selected_client %}?client={{ selected_client.id }}{% endif %}"><i class="fas fa-plus me-2 text-success"></i>New Profile</a></li>
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if is_staff and selected_client %}
+    <div class="container">
+        <div class="alert border-0 rounded-4 py-3 mb-4 d-flex align-items-center gap-3" style="background: linear-gradient(135deg, rgba(13,202,240,0.08), rgba(13,202,240,0.03)); border-left: 4px solid #0dcaf0 !important;">
+            <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; background: rgba(13,202,240,0.15);">
+                <i class="fas fa-pen-fancy text-info"></i>
+            </div>
+            <span class="fw-600">Designing brand for <strong class="text-info">{{ selected_client.get_full_name|default:selected_client.username }}</strong></span>
+            <a href="{% url 'community:brand_assist' %}" class="ms-auto btn btn-sm btn-outline-info rounded-pill px-3 fw-700">My Brands</a>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="container">
+        <div class="row g-4">
+            <!-- Form Panel -->
+            <div class="col-lg-5">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden brand-form-card">
+                    <div class="card-body p-0">
+                        <form method="post" id="brandForm">
+                            {% csrf_token %}
+                            {% if is_staff and selected_client %}
+                            <input type="hidden" name="client_user" value="{{ selected_client.id }}">
+                            {% endif %}
+                            {% if active_profile %}
+                            <input type="hidden" name="profile_id" value="{{ active_profile.id }}">
+                            {% endif %}
+
+                            <!-- Section: Identity -->
+                            <div class="brand-section">
+                                <div class="brand-section-header" data-bs-toggle="collapse" data-bs-target="#sectionIdentity" aria-expanded="true">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="brand-section-num">1</div>
+                                        <div>
+                                            <h6 class="fw-800 mb-0">Brand Identity</h6>
+                                            <small class="text-secondary">Name, industry, and description</small>
+                                        </div>
+                                    </div>
+                                    <i class="fas fa-chevron-down text-secondary brand-chevron"></i>
+                                </div>
+                                <div class="collapse show" id="sectionIdentity">
+                                    <div class="brand-section-body">
+                                        {% for field in form %}
+                                        {% if field.name == 'name' or field.name == 'industry' or field.name == 'tagline' or field.name == 'description' or field.name == 'target_audience' or field.name == 'logo_description' %}
+                                        <div class="mb-3">
+                                            <label class="form-label fw-700 small text-secondary">{{ field.label }}</label>
+                                            {{ field }}
+                                            {% if field.errors %}
+                                            <div class="text-danger small fw-600 mt-1">{{ field.errors.0 }}</div>
+                                            {% endif %}
+                                        </div>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Section: Personality -->
+                            <div class="brand-section">
+                                <div class="brand-section-header" data-bs-toggle="collapse" data-bs-target="#sectionPersonality" aria-expanded="true">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="brand-section-num">2</div>
+                                        <div>
+                                            <h6 class="fw-800 mb-0">Personality & Voice</h6>
+                                            <small class="text-secondary">How your brand feels and speaks</small>
+                                        </div>
+                                    </div>
+                                    <i class="fas fa-chevron-down text-secondary brand-chevron"></i>
+                                </div>
+                                <div class="collapse show" id="sectionPersonality">
+                                    <div class="brand-section-body">
+                                        {% for field in form %}
+                                        {% if field.name == 'personality' or field.name == 'brand_voice' %}
+                                        <div class="mb-3">
+                                            <label class="form-label fw-700 small text-secondary">{{ field.label }}</label>
+                                            {{ field }}
+                                            {% if field.errors %}
+                                            <div class="text-danger small fw-600 mt-1">{{ field.errors.0 }}</div>
+                                            {% endif %}
+                                        </div>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Section: Colors -->
+                            <div class="brand-section">
+                                <div class="brand-section-header" data-bs-toggle="collapse" data-bs-target="#sectionColors" aria-expanded="true">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="brand-section-num">3</div>
+                                        <div>
+                                            <h6 class="fw-800 mb-0">Color Palette</h6>
+                                            <small class="text-secondary">Primary, secondary, and accent colors</small>
+                                        </div>
+                                    </div>
+                                    <i class="fas fa-chevron-down text-secondary brand-chevron"></i>
+                                </div>
+                                <div class="collapse show" id="sectionColors">
+                                    <div class="brand-section-body">
+                                        <div class="row g-3">
+                                            {% for field in form %}
+                                            {% if field.name == 'primary_color' or field.name == 'secondary_color' or field.name == 'accent_color' %}
+                                            <div class="col-4">
+                                                <label class="form-label fw-700 small text-secondary d-block">{{ field.label }}</label>
+                                                <div class="color-picker-wrap position-relative">
+                                                    {{ field }}
+                                                    <div class="color-picker-preview rounded-3" id="preview_{{ field.name }}"></div>
+                                                </div>
+                                            </div>
+                                            {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Submit -->
+                            <div class="p-4 pt-3" style="background: linear-gradient(180deg, transparent, rgba(99,102,241,0.02));">
+                                <div class="d-flex gap-2">
+                                    <button type="submit" class="btn brand-submit-btn flex-grow-1 rounded-pill py-3 fw-800">
+                                        <i class="fas fa-wand-magic-sparkles me-2"></i>{% if active_profile %}Update & Regenerate{% else %}Generate Brand Kit{% endif %}
+                                    </button>
+                                    {% if active_profile %}
+                                    <button type="submit" name="delete" value="{{ active_profile.id }}" class="btn btn-outline-danger rounded-pill px-4 fw-700" onclick="return confirm('Delete this brand profile?')" title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preview Panel -->
+            <div class="col-lg-7">
+                <div class="brand-preview-panel" id="previewCard">
+                    {% if active_profile and active_profile.generated_palette %}
+                    <!-- Saved profile preview -->
+                    <div class="brand-preview-header">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="brand-preview-icon rounded-3 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; background: {{ active_profile.generated_palette.primary }};">
+                                <i class="fas fa-palette text-white"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-800 mb-0" id="previewName">{{ active_profile.name }}</h5>
+                                <small class="text-secondary">{{ active_profile.get_personality_display }} &bull; {{ active_profile.get_brand_voice_display }}</small>
+                            </div>
+                        </div>
+                        <span class="badge bg-light text-secondary rounded-pill fw-600">{{ active_profile.updated_at|date:"M d, Y" }}</span>
+                    </div>
+                    <div class="brand-preview-body">
+
+                        <!-- Tagline -->
+                        <div class="brand-preview-section" id="previewTaglineWrap" style="{% if not active_profile.tagline %}display:none{% endif %}">
+                            <div class="brand-preview-label">Tagline</div>
+                            <p class="brand-preview-tagline" id="previewTagline">{{ active_profile.tagline }}</p>
+                        </div>
+
+                        <!-- Live Mini Mockup -->
+                        <div class="brand-preview-section">
+                            <div class="brand-preview-label">Live Preview</div>
+                            <div class="brand-mockup rounded-4 overflow-hidden border" id="brandMockup" style="border-color: {{ active_profile.generated_palette.muted }}20 !important;">
+                                <div class="brand-mockup-hero p-4 text-center" style="background: {{ active_profile.generated_palette.primary }};">
+                                    <h4 class="fw-800 mb-1" style="color: #fff; font-family: '{{ active_profile.generated_typography.headings }}', serif;">{{ active_profile.name|default:"Your Brand" }}</h4>
+                                    <p class="mb-0 small" style="color: rgba(255,255,255,0.85); font-family: '{{ active_profile.generated_typography.body }}', sans-serif;">{{ active_profile.tagline|default:"Your tagline here" }}</p>
+                                </div>
+                                <div class="p-3" style="background: {{ active_profile.generated_palette.background }};">
+                                    <div class="d-flex gap-2 mb-3">
+                                        <div class="rounded-pill px-3 py-1 small fw-600" style="background: {{ active_profile.generated_palette.accent }}; color: #fff;">Feature 1</div>
+                                        <div class="rounded-pill px-3 py-1 small fw-600" style="background: {{ active_profile.generated_palette.secondary }}; color: #fff;">Feature 2</div>
+                                    </div>
+                                    <p class="small mb-0" style="color: {{ active_profile.generated_palette.text }}; font-family: '{{ active_profile.generated_typography.body }}', sans-serif;">This is how your content would look with your brand colors and typography applied.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Color Palette -->
+                        <div class="brand-preview-section">
+                            <div class="brand-preview-label">Color Palette</div>
+                            <div class="brand-swatches">
+                                {% with palette=active_profile.generated_palette %}
+                                <div class="brand-swatch" onclick="copyHex('{{ palette.primary }}')">
+                                    <div class="brand-swatch-color" style="background: {{ palette.primary }};"></div>
+                                    <span class="brand-swatch-name">Primary</span>
+                                    <span class="brand-swatch-hex">{{ palette.primary }}</span>
+                                </div>
+                                <div class="brand-swatch" onclick="copyHex('{{ palette.secondary }}')">
+                                    <div class="brand-swatch-color" style="background: {{ palette.secondary }};"></div>
+                                    <span class="brand-swatch-name">Secondary</span>
+                                    <span class="brand-swatch-hex">{{ palette.secondary }}</span>
+                                </div>
+                                <div class="brand-swatch" onclick="copyHex('{{ palette.accent }}')">
+                                    <div class="brand-swatch-color" style="background: {{ palette.accent }};"></div>
+                                    <span class="brand-swatch-name">Accent</span>
+                                    <span class="brand-swatch-hex">{{ palette.accent }}</span>
+                                </div>
+                                <div class="brand-swatch" onclick="copyHex('{{ palette.background }}')">
+                                    <div class="brand-swatch-color" style="background: {{ palette.background }}; border: 1px solid #e5e7eb;"></div>
+                                    <span class="brand-swatch-name">Background</span>
+                                    <span class="brand-swatch-hex">{{ palette.background }}</span>
+                                </div>
+                                <div class="brand-swatch" onclick="copyHex('{{ palette.text }}')">
+                                    <div class="brand-swatch-color" style="background: {{ palette.text }};"></div>
+                                    <span class="brand-swatch-name">Text</span>
+                                    <span class="brand-swatch-hex">{{ palette.text }}</span>
+                                </div>
+                                <div class="brand-swatch" onclick="copyHex('{{ palette.muted }}')">
+                                    <div class="brand-swatch-color" style="background: {{ palette.muted }};"></div>
+                                    <span class="brand-swatch-name">Muted</span>
+                                    <span class="brand-swatch-hex">{{ palette.muted }}</span>
+                                </div>
+                                {% endwith %}
+                            </div>
+                            <div class="text-center mt-2">
+                                <small class="text-secondary"><i class="fas fa-click me-1"></i>Click a swatch to copy hex</small>
+                            </div>
+                        </div>
+
+                        <!-- Typography -->
+                        <div class="brand-preview-section">
+                            <div class="brand-preview-label">Typography</div>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="brand-type-card rounded-3 p-3" style="background: {{ active_profile.generated_palette.muted }}10;">
+                                        <small class="text-secondary fw-700 uppercase x-small" style="letter-spacing: 0.1em;">Headings</small>
+                                        <p class="fw-800 mb-0 mt-1 brand-type-preview" id="previewHeadings" style="font-family: '{{ active_profile.generated_typography.headings }}', serif; font-size: 1.4rem;">{{ active_profile.generated_typography.headings }}</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="brand-type-card rounded-3 p-3" style="background: {{ active_profile.generated_palette.muted }}10;">
+                                        <small class="text-secondary fw-700 uppercase x-small" style="letter-spacing: 0.1em;">Body</small>
+                                        <p class="mb-0 mt-1 brand-type-preview" id="previewBody" style="font-family: '{{ active_profile.generated_typography.body }}', sans-serif;">{{ active_profile.generated_typography.body }}</p>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="brand-type-card rounded-3 p-3" style="background: {{ active_profile.generated_palette.muted }}10;">
+                                        <small class="text-secondary fw-700 uppercase x-small" style="letter-spacing: 0.1em;">Style</small>
+                                        <p class="fw-600 mb-0 mt-1" id="previewTypeStyle">{{ active_profile.generated_typography.style }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Brand Voice -->
+                        <div class="brand-preview-section">
+                            <div class="brand-preview-label">Brand Voice</div>
+                            <div id="previewVoice">
+                                {% for example in active_profile.generated_voice_examples %}
+                                <div class="brand-voice-card rounded-3 p-3 mb-2">
+                                    <i class="fas fa-quote-left me-2" style="color: {{ active_profile.generated_palette.primary }}; opacity: 0.4;"></i>
+                                    <span class="fw-600">{{ example }}</span>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Logo Direction -->
+                        <div id="previewLogoWrap" style="{% if not active_profile.logo_description %}display:none{% endif %}">
+                            <div class="brand-preview-section">
+                                <div class="brand-preview-label">Logo Direction</div>
+                                <div class="brand-voice-card rounded-3 p-3">
+                                    <i class="fas fa-pen-nib me-2 text-secondary opacity-50"></i>
+                                    <span class="fw-600" id="previewLogo">{{ active_profile.logo_description }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Branding Services & Payment -->
+                        <div class="brand-preview-section">
+                            <div class="brand-preview-label">Branding Services & Payment</div>
+                            {% if active_profile.payment_status == 'paid' %}
+                            <div class="rounded-4 p-4 text-center" style="background: linear-gradient(135deg, rgba(16,185,129,0.12), rgba(16,185,129,0.04)); border: 1px solid rgba(16,185,129,0.3);">
+                                <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 52px; height: 52px; background: #10b981;">
+                                    <i class="fas fa-check text-white fa-lg"></i>
+                                </div>
+                                <h6 class="fw-800 mb-1">Paid & Unlocked</h6>
+                                <p class="text-secondary small mb-3">Services: {{ active_profile.selected_addons|join:", "|default:"—" }} &bull; Total ${{ active_profile.addons_total }}</p>
+                                <div class="d-flex gap-2 justify-content-center flex-wrap">
+                                    <a href="{% url 'community:brand_download' active_profile.id %}" class="btn btn-success rounded-pill px-4 fw-800">
+                                        <i class="fas fa-download me-2"></i>Download Brand Kit
+                                    </a>
+                                    {% if active_profile.logo_final %}
+                                    <a href="{{ active_profile.logo_final.url }}" class="btn btn-outline-success rounded-pill px-4 fw-700" download>
+                                        <i class="fas fa-image me-2"></i>Logo Files
+                                    </a>
+                                    {% endif %}
+                                    {% if active_profile.guidelines_file %}
+                                    <a href="{{ active_profile.guidelines_file.url }}" class="btn btn-outline-success rounded-pill px-4 fw-700" download>
+                                        <i class="fas fa-file-pdf me-2"></i>Guidelines PDF
+                                    </a>
+                                    {% endif %}
+                                </div>
+                                {% if not active_profile.logo_final %}
+                                <p class="text-secondary x-small mt-3 mb-0"><i class="fas fa-clock me-1"></i>Our designers are preparing your final logo files — the brand kit above is yours now, logo files will appear here when ready.</p>
+                                {% endif %}
+                            </div>
+                            {% else %}
+                            <div class="rounded-4 p-4" style="background: #f8fafc; border: 1px dashed #cbd5e1;">
+                                <p class="small text-secondary mb-3"><i class="fas fa-lock me-1"></i>Preview is free. Pick the services you want us to create, pay the total, and your download unlocks.</p>
+                                <form method="post" action="{% url 'community:brand_save_addons' active_profile.id %}">
+                                    {% csrf_token %}
+                                    {% for addon in branding_addons %}
+                                    <label class="d-flex align-items-center gap-3 rounded-3 p-3 mb-2 bg-white border" style="cursor: pointer;">
+                                        <input type="checkbox" name="addons" value="{{ addon.slug }}" class="form-check-input" style="width: 18px; height: 18px;"
+                                            {% if addon.slug in active_profile.selected_addons %}checked{% endif %}
+                                            {% if active_profile.payment_status == 'pending' %}disabled{% endif %}>
+                                        <span class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 38px; height: 38px; background: rgba(99,102,241,0.1);">
+                                            <i class="{{ addon.icon }} text-primary"></i>
+                                        </span>
+                                        <span class="flex-grow-1">
+                                            <span class="fw-800 d-block">{{ addon.name }}</span>
+                                            <small class="text-secondary">{{ addon.description }}</small>
+                                        </span>
+                                        <span class="fw-800 text-primary">${{ addon.price }}</span>
+                                    </label>
+                                    {% endfor %}
+                                    <div class="d-flex align-items-center justify-content-between mt-3 mb-3">
+                                        <span class="fw-700 text-secondary">Total</span>
+                                        <span class="fw-800" style="font-size: 1.3rem;">${{ active_profile.addons_total }}</span>
+                                    </div>
+                                    {% if active_profile.payment_status == 'pending' %}
+                                    <div class="alert alert-warning rounded-3 small mb-3"><i class="fas fa-hourglass-half me-1"></i>Payment in progress — your download unlocks automatically once confirmed. <a href="{% url 'community:brand_download' active_profile.id %}">Try download</a></div>
+                                    {% endif %}
+                                    <div class="d-flex gap-2 flex-wrap">
+                                        <button type="submit" class="btn btn-outline-primary rounded-pill px-4 fw-700" {% if active_profile.payment_status == 'pending' %}disabled{% endif %}>Save Selection</button>
+                                        <button type="button" id="brandPayBtn" class="btn btn-primary rounded-pill px-4 fw-800 flex-grow-1" {% if not active_profile.selected_addons or active_profile.payment_status == 'pending' %}disabled{% endif %}>
+                                            <i class="fas fa-credit-card me-2"></i>Pay ${{ active_profile.addons_total }} to Unlock
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                    </div>
+
+                    {% else %}
+                    <!-- Empty / Live state -->
+                    <div id="previewEmpty" class="{% if active_profile %}d-none{% endif %}">
+                        <div class="brand-preview-empty text-center p-5">
+                            <div class="brand-empty-illustration mx-auto mb-4">
+                                <div class="brand-empty-circle" style="background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(139,92,246,0.1));">
+                                    <i class="fas fa-palette" style="font-size: 2.5rem; color: #6366f1;"></i>
+                                </div>
+                                <div class="brand-empty-dots">
+                                    <span class="brand-empty-dot" style="background: #6366f1;"></span>
+                                    <span class="brand-empty-dot" style="background: #8b5cf6;"></span>
+                                    <span class="brand-empty-dot" style="background: #10b981;"></span>
+                                </div>
+                            </div>
+                            <h4 class="fw-800 mb-2">Your Brand Kit Awaits</h4>
+                            <p class="text-secondary mb-0" style="max-width: 320px; margin: auto;">Start filling out the form and watch your brand identity come together in real-time.</p>
+                        </div>
+                    </div>
+
+                    <div id="previewShell" class="{% if not active_profile %}d-none{% endif %}">
+                        <div class="brand-preview-header">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="brand-preview-icon rounded-3 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; background: linear-gradient(135deg, #6366f1, #8b5cf6);" id="livePreviewIcon">
+                                    <i class="fas fa-palette text-white"></i>
+                                </div>
+                                <div>
+                                    <h5 class="fw-800 mb-0" id="liveName">Your Brand</h5>
+                                    <small class="text-secondary" id="liveSubtitle">Professional &bull; Formal</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="brand-preview-body">
+
+                            <div class="brand-preview-section d-none" id="liveTaglineWrap">
+                                <div class="brand-preview-label">Tagline</div>
+                                <p class="brand-preview-tagline" id="liveTagline"></p>
+                            </div>
+
+                            <!-- Live Mini Mockup -->
+                            <div class="brand-preview-section">
+                                <div class="brand-preview-label">Live Preview</div>
+                                <div class="brand-mockup rounded-4 overflow-hidden border" id="liveMockup" style="border-color: #e5e7eb !important;">
+                                    <div class="brand-mockup-hero p-4 text-center" id="liveMockupHero" style="background: #6366f1;">
+                                        <h4 class="fw-800 mb-1 text-white" id="liveMockupTitle" style="font-family: 'Playfair Display', serif;">Your Brand</h4>
+                                        <p class="mb-0 small text-white opacity-75" id="liveMockupTagline" style="font-family: 'Inter', sans-serif;">Your tagline here</p>
+                                    </div>
+                                    <div class="p-3" id="liveMockupBody" style="background: #ffffff;">
+                                        <div class="d-flex gap-2 mb-3">
+                                            <div class="rounded-pill px-3 py-1 small fw-600 text-white" id="liveMockupBadge1" style="background: #10b981;">Feature 1</div>
+                                            <div class="rounded-pill px-3 py-1 small fw-600 text-white" id="liveMockupBadge2" style="background: #8b5cf6;">Feature 2</div>
+                                        </div>
+                                        <p class="small mb-0" id="liveMockupText" style="color: #1a1a2e; font-family: 'Inter', sans-serif;">This is how your content would look with your brand colors and typography applied.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="brand-preview-section">
+                                <div class="brand-preview-label">Color Palette</div>
+                                <div class="brand-swatches">
+                                    <div class="brand-swatch" onclick="copyHex(this.querySelector('.brand-swatch-hex').textContent)">
+                                        <div class="brand-swatch-color" id="liveSwatchPrimary"></div>
+                                        <span class="brand-swatch-name">Primary</span>
+                                        <span class="brand-swatch-hex" id="liveHexPrimary"></span>
+                                    </div>
+                                    <div class="brand-swatch" onclick="copyHex(this.querySelector('.brand-swatch-hex').textContent)">
+                                        <div class="brand-swatch-color" id="liveSwatchSecondary"></div>
+                                        <span class="brand-swatch-name">Secondary</span>
+                                        <span class="brand-swatch-hex" id="liveHexSecondary"></span>
+                                    </div>
+                                    <div class="brand-swatch" onclick="copyHex(this.querySelector('.brand-swatch-hex').textContent)">
+                                        <div class="brand-swatch-color" id="liveSwatchAccent"></div>
+                                        <span class="brand-swatch-name">Accent</span>
+                                        <span class="brand-swatch-hex" id="liveHexAccent"></span>
+                                    </div>
+                                    <div class="brand-swatch" onclick="copyHex(this.querySelector('.brand-swatch-hex').textContent)">
+                                        <div class="brand-swatch-color" id="liveSwatchBg" style="border: 1px solid #e5e7eb;"></div>
+                                        <span class="brand-swatch-name">Background</span>
+                                        <span class="brand-swatch-hex" id="liveHexBg"></span>
+                                    </div>
+                                    <div class="brand-swatch" onclick="copyHex(this.querySelector('.brand-swatch-hex').textContent)">
+                                        <div class="brand-swatch-color" id="liveSwatchText"></div>
+                                        <span class="brand-swatch-name">Text</span>
+                                        <span class="brand-swatch-hex" id="liveHexText"></span>
+                                    </div>
+                                    <div class="brand-swatch" onclick="copyHex(this.querySelector('.brand-swatch-hex').textContent)">
+                                        <div class="brand-swatch-color" id="liveSwatchMuted"></div>
+                                        <span class="brand-swatch-name">Muted</span>
+                                        <span class="brand-swatch-hex" id="liveHexMuted"></span>
+                                    </div>
+                                </div>
+                                <div class="text-center mt-2">
+                                    <small class="text-secondary"><i class="fas fa-click me-1"></i>Click a swatch to copy hex</small>
+                                </div>
+                            </div>
+
+                            <div class="brand-preview-section">
+                                <div class="brand-preview-label">Typography</div>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="brand-type-card rounded-3 p-3" id="liveTypeCardHeadings">
+                                            <small class="text-secondary fw-700 uppercase x-small" style="letter-spacing: 0.1em;">Headings</small>
+                                            <p class="fw-800 mb-0 mt-1" id="liveHeadings" style="font-size: 1.4rem;"></p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="brand-type-card rounded-3 p-3" id="liveTypeCardBody">
+                                            <small class="text-secondary fw-700 uppercase x-small" style="letter-spacing: 0.1em;">Body</small>
+                                            <p class="mb-0 mt-1" id="liveBody"></p>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="brand-type-card rounded-3 p-3" id="liveTypeCardStyle">
+                                            <small class="text-secondary fw-700 uppercase x-small" style="letter-spacing: 0.1em;">Style</small>
+                                            <p class="fw-600 mb-0 mt-1" id="liveTypeStyle"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="brand-preview-section">
+                                <div class="brand-preview-label">Brand Voice</div>
+                                <div id="liveVoice"></div>
+                            </div>
+
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast for copy feedback -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1080">
+    <div id="copyToast" class="toast align-items-center text-white border-0 rounded-3" role="alert" style="background: #1a1a2e;">
+        <div class="d-flex">
+            <div class="toast-body fw-600">
+                <i class="fas fa-check-circle me-2 text-success"></i><span id="copyToastText">Copied!</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Brand Assist Page Styles */
+.brand-assist-page { min-height: 60vh; }
+
+/* Hero */
+.brand-hero { background: #fff; border-bottom: 1px solid rgba(0,0,0,0.04); }
+.brand-hero-icon { box-shadow: 0 4px 12px rgba(99,102,241,0.3); }
+
+/* Form Card */
+.brand-form-card { position: relative; }
+.brand-form-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #6366f1, #8b5cf6, #10b981);
+    border-radius: 1rem 1rem 0 0;
+}
+
+/* Form Sections */
+.brand-section { border-bottom: 1px solid #f1f5f9; }
+.brand-section:last-of-type { border-bottom: none; }
+.brand-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+.brand-section-header:hover { background: #f8fafc; }
+.brand-section-num {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+}
+.brand-chevron { transition: transform 0.2s; font-size: 0.75rem; }
+.brand-section-header[aria-expanded="true"] .brand-chevron { transform: rotate(180deg); }
+.brand-section-body { padding: 0 1.25rem 1.25rem; }
+
+/* Color Picker */
+.color-picker-wrap { position: relative; }
+.color-picker-wrap input[type="color"] {
+    width: 100%; height: 44px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 4px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+.color-picker-wrap input[type="color"]:hover { border-color: #6366f1; }
+.color-picker-preview {
+    position: absolute;
+    bottom: -6px; right: -6px;
+    width: 20px; height: 20px;
+    border: 2px solid #fff;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+    pointer-events: none;
+}
+
+/* Submit Button */
+.brand-submit-btn {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: #fff;
+    border: none;
+    font-size: 1rem;
+    letter-spacing: 0.02em;
+    box-shadow: 0 4px 16px rgba(99,102,241,0.3);
+    transition: all 0.2s;
+}
+.brand-submit-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 24px rgba(99,102,241,0.4);
+    color: #fff;
+}
+.brand-submit-btn:active { transform: translateY(0); }
+
+/* Preview Panel */
+.brand-preview-panel {
+    background: #fff;
+    border-radius: 1rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 8px 32px rgba(0,0,0,0.04);
+    overflow: hidden;
+    position: sticky;
+    top: 24px;
+}
+.brand-preview-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid #f1f5f9;
+    background: linear-gradient(180deg, #fafbfc, #fff);
+}
+.brand-preview-icon { box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+.brand-preview-body { padding: 1.5rem; }
+.brand-preview-section { margin-bottom: 1.75rem; }
+.brand-preview-section:last-child { margin-bottom: 0; }
+.brand-preview-label {
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #94a3b8;
+    margin-bottom: 0.75rem;
+}
+.brand-preview-tagline {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+    font-style: italic;
+}
+
+/* Mini Mockup */
+.brand-mockup { box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+.brand-mockup-hero { transition: background 0.3s; }
+
+/* Swatches */
+.brand-swatches { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+.brand-swatch {
+    cursor: pointer;
+    text-align: center;
+    transition: transform 0.15s;
+}
+.brand-swatch:hover { transform: translateY(-2px); }
+.brand-swatch-color {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 10px;
+    margin-bottom: 4px;
+    transition: box-shadow 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+.brand-swatch:hover .brand-swatch-color {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.brand-swatch-name {
+    display: block;
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #64748b;
+}
+.brand-swatch-hex {
+    display: block;
+    font-size: 0.6rem;
+    color: #94a3b8;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+}
+
+/* Typography Cards */
+.brand-type-card { transition: background 0.2s; }
+
+/* Voice Cards */
+.brand-voice-card {
+    background: #f8fafc;
+    border-left: 3px solid #e2e8f0;
+    transition: border-color 0.2s, background 0.2s;
+}
+.brand-voice-card:hover {
+    border-left-color: #6366f1;
+    background: #f1f5f9;
+}
+
+/* Empty State */
+.brand-preview-empty { min-height: 400px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.brand-empty-illustration { position: relative; width: 120px; height: 120px; }
+.brand-empty-circle {
+    width: 100%; height: 100%;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    animation: brand-float 3s ease-in-out infinite;
+}
+.brand-empty-dots {
+    position: absolute;
+    bottom: -8px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 6px;
+}
+.brand-empty-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    opacity: 0.6;
+}
+@keyframes brand-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .brand-swatches { grid-template-columns: repeat(3, 1fr); }
+    .brand-preview-panel { position: static; }
+    .brand-hero .d-flex { flex-direction: column; align-items: flex-start !important; }
+}
+</style>
+
+<script>
+function copyHex(hex) {
+    navigator.clipboard.writeText(hex).then(function() {
+        var toast = document.getElementById('copyToast');
+        document.getElementById('copyToastText').textContent = hex + ' copied!';
+        var bsToast = new bootstrap.Toast(toast, { delay: 1500 });
+        bsToast.show();
+    });
+}
+
+(function() {
+    var PALETTE_OVERRIDES = {
+        luxurious:  { background: '#0a0a0a', text: '#f5f0e8', muted: '#a09080' },
+        playful:    { background: '#fff9f0', accent: '#f59e0b' },
+        minimal:    { background: '#fafafa', text: '#333333', muted: '#999999' },
+        edgy:       { background: '#0d0d0d', text: '#e0e0e0', accent: '#ef4444' },
+        friendly:   { background: '#fef9ef', accent: '#ec4899' },
+        innovative: { background: '#f0f9ff', accent: '#06b6d4' },
+        professional: { background: '#ffffff', text: '#1a1a2e', muted: '#6b7280' },
+    };
+    var TYPOGRAPHY = {
+        professional: { headings: 'Playfair Display', body: 'Inter', style: 'Serif headings, sans-serif body' },
+        playful:      { headings: 'Fredoka One', body: 'Nunito', style: 'Rounded, friendly' },
+        luxurious:    { headings: 'Cormorant Garamond', body: 'Lato', style: 'Elegant serif, clean sans' },
+        minimal:      { headings: 'Helvetica Neue', body: 'Open Sans', style: 'Clean, neutral' },
+        edgy:         { headings: 'Bebas Neue', body: 'Roboto Condensed', style: 'Bold, condensed' },
+        friendly:     { headings: 'Quicksand', body: 'Source Sans Pro', style: 'Soft, approachable' },
+        innovative:   { headings: 'Space Grotesk', body: 'DM Sans', style: 'Modern, geometric' },
+    };
+    var VOICE = {
+        formal:        ['We are committed to delivering exceptional value.', 'Our solutions meet the highest industry standards.'],
+        conversational: ['Hey there! Let us help you build something amazing.', "We've got your back every step of the way."],
+        humorous:      ["Let's make your website so good, your competitors will cry.", "We code so you can put your feet up."],
+        inspirational: ['Empower your vision. Build your legacy.', 'Dream big. We will build it together.'],
+        direct:        ['We build websites that work. Period.', 'No fluff. Just results-driven development.'],
+        storytelling:  ['Every brand has a story. Let us tell yours.', 'From a simple idea to a digital masterpiece.'],
+    };
+    var PERSONALITY_LABELS = {
+        professional: 'Professional & Corporate', playful: 'Playful & Creative',
+        luxurious: 'Luxurious & Premium', minimal: 'Minimal & Clean',
+        edgy: 'Edgy & Bold', friendly: 'Friendly & Approachable',
+        innovative: 'Innovative & Tech-forward',
+    };
+    var VOICE_LABELS = {
+        formal: 'Formal & Authoritative', conversational: 'Conversational & Friendly',
+        humorous: 'Humorous & Witty', inspirational: 'Inspirational & Motivating',
+        direct: 'Direct & Professional', storytelling: 'Storytelling & Narrative',
+    };
+
+    function getVal(n) { var el = document.querySelector('[name="'+n+'"]'); return el ? el.value.trim() : ''; }
+    function buildPalette() {
+        var p = getVal('primary_color') || '#6366f1', s = getVal('secondary_color') || '#8b5cf6';
+        var a = getVal('accent_color') || '#10b981', per = getVal('personality') || 'professional';
+        var o = PALETTE_OVERRIDES[per] || PALETTE_OVERRIDES.professional;
+        return { primary: p, secondary: s, accent: o.accent || a, background: o.background, text: o.text, muted: o.muted };
+    }
+    function updateColorPreviews() {
+        ['primary_color','secondary_color','accent_color'].forEach(function(n) {
+            var el = document.getElementById('preview_'+n);
+            var inp = document.querySelector('[name="'+n+'"]');
+            if (el && inp) el.style.backgroundColor = inp.value || '#6366f1';
+        });
+    }
+
+    function updatePreview() {
+        var palette = buildPalette();
+        var typo = TYPOGRAPHY[getVal('personality') || 'professional'] || TYPOGRAPHY.professional;
+        var voiceExamples = VOICE[getVal('brand_voice') || 'formal'] || VOICE.formal;
+        var personality = getVal('personality') || 'professional';
+        var brandVoice = getVal('brand_voice') || 'formal';
+        var name = getVal('name') || 'Your Brand';
+        var tagline = getVal('tagline');
+        var logoDesc = getVal('logo_description');
+
+        var isSaved = '{{ active_profile.generated_palette|yesno:"1,0" }}' === '1';
+
+        if (!isSaved) {
+            var empty = document.getElementById('previewEmpty');
+            var shell = document.getElementById('previewShell');
+            if (empty && !empty.classList.contains('d-none')) { empty.classList.add('d-none'); shell.classList.remove('d-none'); }
+        }
+
+        var pre = isSaved ? '' : 'live';
+
+        // Swatches
+        ['Primary','Secondary','Accent','Bg','Text','Muted'].forEach(function(c) {
+            var key = c === 'Bg' ? 'background' : c === 'Text' ? 'text' : c === 'Muted' ? 'muted' : c.toLowerCase();
+            var color = palette[key];
+            var swatchEl = document.getElementById((isSaved ? 'swatch' : 'liveSwatch') + c);
+            var hexEl = document.getElementById((isSaved ? '' : 'live') + 'Hex' + c.replace('Bg','Bg').replace('Text','Text').replace('Muted','Muted'));
+            if (isSaved) {
+                var hexMap = {Primary:'hexPrimary',Secondary:'hexSecondary',Accent:'hexAccent',Bg:'hexBg',Text:'hexText',Muted:'hexMuted'};
+                hexEl = document.getElementById(hexMap[c]);
+            }
+            if (swatchEl) swatchEl.style.backgroundColor = color;
+            if (hexEl) hexEl.textContent = color;
+        });
+
+        // Typography
+        var hId = (isSaved ? '' : 'live') + 'Headings';
+        var bId = (isSaved ? '' : 'live') + 'Body';
+        var sId = (isSaved ? '' : 'live') + 'TypeStyle';
+        var hEl = document.getElementById(hId), bEl = document.getElementById(bId), sEl = document.getElementById(sId);
+        if (hEl) { hEl.textContent = typo.headings; hEl.style.fontFamily = "'" + typo.headings + "', serif"; }
+        if (bEl) { bEl.textContent = typo.body; bEl.style.fontFamily = "'" + typo.body + "', sans-serif"; }
+        if (sEl) sEl.textContent = typo.style;
+
+        // Voice
+        var vId = (isSaved ? '' : 'live') + 'Voice';
+        var vEl = document.getElementById(vId);
+        if (vEl) {
+            vEl.innerHTML = voiceExamples.map(function(ex) {
+                return '<div class="brand-voice-card rounded-3 p-3 mb-2"><i class="fas fa-quote-left me-2" style="color:' + palette.primary + '; opacity:0.4;"></i><span class="fw-600">' + ex + '</span></div>';
+            }).join('');
+        }
+
+        // Tags
+        var pId = (isSaved ? '' : 'live') + 'Personality';
+        var vlId = (isSaved ? '' : 'live') + 'VoiceLabel';
+        var pEl2 = document.getElementById(pId), vlEl = document.getElementById(vlId);
+        if (pEl2) pEl2.textContent = PERSONALITY_LABELS[personality] || personality;
+        if (vlEl) vlEl.textContent = VOICE_LABELS[brandVoice] || brandVoice;
+
+        // Name
+        if (!isSaved) {
+            var nEl = document.getElementById('liveName');
+            var subEl = document.getElementById('liveSubtitle');
+            if (nEl) nEl.textContent = name;
+            if (subEl) subEl.textContent = (PERSONALITY_LABELS[personality] || personality) + ' \u2022 ' + (VOICE_LABELS[brandVoice] || brandVoice);
+        } else {
+            var nEl2 = document.getElementById('previewName');
+            if (nEl2 && name !== 'Your Brand') nEl2.textContent = name;
+        }
+
+        // Tagline
+        var tId = isSaved ? 'previewTagline' : 'liveTagline';
+        var twId = isSaved ? 'previewTaglineWrap' : 'liveTaglineWrap';
+        var tEl = document.getElementById(tId), twEl = document.getElementById(twId);
+        if (tEl) tEl.textContent = tagline || '';
+        if (twEl) twEl.style.display = tagline ? '' : 'none';
+
+        // Logo
+        if (isSaved) {
+            var lEl = document.getElementById('previewLogo');
+            var lwEl = document.getElementById('previewLogoWrap');
+            if (lEl) lEl.textContent = logoDesc || '';
+            if (lwEl) lwEl.style.display = logoDesc ? '' : 'none';
+        }
+
+        // Mini Mockup
+        var mockupHero = document.getElementById(isSaved ? 'brandMockup' : 'liveMockupHero');
+        var mockupTitle = document.getElementById(isSaved ? null : 'liveMockupTitle');
+        var mockupTag = document.getElementById(isSaved ? null : 'liveMockupTagline');
+        var mockupBody = document.getElementById(isSaved ? null : 'liveMockupBody');
+        var mockupB1 = document.getElementById(isSaved ? null : 'liveMockupBadge1');
+        var mockupB2 = document.getElementById(isSaved ? null : 'liveMockupBadge2');
+        var mockupTxt = document.getElementById(isSaved ? null : 'liveMockupText');
+
+        if (!isSaved) {
+            if (mockupHero) mockupHero.style.background = palette.primary;
+            if (mockupTitle) { mockupTitle.textContent = name; mockupTitle.style.fontFamily = "'" + typo.headings + "', serif"; }
+            if (mockupTag) { mockupTag.textContent = tagline || 'Your tagline here'; mockupTag.style.fontFamily = "'" + typo.body + "', sans-serif"; }
+            if (mockupBody) mockupBody.style.background = palette.background;
+            if (mockupB1) mockupB1.style.background = palette.accent;
+            if (mockupB2) mockupB2.style.background = palette.secondary;
+            if (mockupTxt) { mockupTxt.style.color = palette.text; mockupTxt.style.fontFamily = "'" + typo.body + "', sans-serif"; }
+        }
+
+        updateColorPreviews();
+    }
+
+    // Color picker live sync
+    ['primary_color','secondary_color','accent_color'].forEach(function(n) {
+        var inp = document.querySelector('[name="'+n+'"]');
+        if (inp) inp.addEventListener('input', updateColorPreviews);
+    });
+
+    document.getElementById('brandForm').addEventListener('input', updatePreview);
+    document.getElementById('brandForm').addEventListener('change', updatePreview);
+    updatePreview();
+})();
+
+{% if active_profile and active_profile.payment_status != 'paid' %}
+// Branding checkout — pay add-ons total to unlock download
+(function() {
+    var payBtn = document.getElementById('brandPayBtn');
+    if (!payBtn) return;
+    // Enable pay button live when at least one addon checked
+    document.querySelectorAll('input[name="addons"]').forEach(function(cb) {
+        cb.addEventListener('change', function() {
+            var any = document.querySelectorAll('input[name="addons"]:checked').length > 0;
+            payBtn.disabled = !any;
+        });
+    });
+    payBtn.addEventListener('click', function() {
+        payBtn.disabled = true;
+        payBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Redirecting to payment...';
+        fetch("{% url 'community:brand_checkout' active_profile.id %}", {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data.checkout_url) {
+                window.location.href = data.checkout_url;
+            } else {
+                alert(data.error || 'Checkout failed. Please try again.');
+                payBtn.disabled = false;
+                payBtn.innerHTML = '<i class="fas fa-credit-card me-2"></i>Pay to Unlock';
+            }
+        })
+        .catch(function(err) {
+            console.error(err);
+            alert('Checkout failed. Please try again.');
+            payBtn.disabled = false;
+            payBtn.innerHTML = '<i class="fas fa-credit-card me-2"></i>Pay to Unlock';
+        });
+    });
+})();
+{% endif %}
+</script>
+{% endblock %}

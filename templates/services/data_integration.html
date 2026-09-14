@@ -42,7 +42,7 @@
         font-size: 1.3rem;
         margin-bottom: 1rem;
     }
-    /* ── 3D Isometric Pipeline ── */
+    /*  3D Isometric Pipeline  */
     .di-pipeline-section {
         position: relative;
         overflow: hidden;
@@ -73,7 +73,7 @@
         margin: 0 auto;
     }
 
-    /* ── vertical spine ── */
+    /*  vertical spine  */
     .di-pipeline-spine {
         position: absolute;
         left: 50%;
@@ -96,7 +96,7 @@
         box-shadow: 0 0 20px rgba(6,182,212,.5);
     }
 
-    /* ── flowing particles ── */
+    /*  flowing particles  */
     .di-pipeline-particle {
         position: absolute;
         left: 50%;
@@ -117,7 +117,7 @@
         100% { top: 103%; opacity: 0; transform: translateX(-50%) scale(.4); }
     }
 
-    /* ── step row ── */
+    /*  step row  */
     .di-pipeline-step {
         position: relative;
         display: flex;
@@ -131,7 +131,7 @@
     .di-pipeline-step.is-visible { opacity: 1; transform: translateY(0); }
     .di-pipeline-step:last-child { margin-bottom: 0; }
 
-    /* ── node on spine ── */
+    /*  node on spine  */
     .pp-node {
         position: absolute;
         left: 50%;
@@ -167,7 +167,7 @@
         box-shadow: 0 0 0 8px rgba(0,0,0,.04), 0 12px 40px rgba(0,0,0,.18), 0 0 30px color-mix(in srgb, var(--step-color) 40%, transparent);
     }
 
-    /* ── connector arm ── */
+    /*  connector arm  */
     .pp-arm {
         position: absolute;
         top: 50%;
@@ -200,7 +200,7 @@
         background: linear-gradient(270deg, var(--step-color, #06b6d4) 0%, var(--step-color, #06b6d4) 40%, transparent 100%);
     }
 
-    /* ── card ── */
+    /*  card  */
     .pp-card {
         width: calc(50% - 70px);
         background: var(--bg-surface);
@@ -304,7 +304,7 @@
         margin-bottom: 0;
     }
 
-    /* ── mobile ── */
+    /*  mobile  */
     @media (max-width: 767.98px) {
         .di-pipeline-board { max-width: 100%; }
         .pp-node { width: 48px; height: 48px; font-size: 1rem; left: 24px; transform: none; }
@@ -314,7 +314,7 @@
         .pp-card { width: calc(100% - 70px); margin-left: auto !important; margin-right: 0 !important; }
         .di-pipeline-step { padding-left: 0; }
     }
-    /* ── Key Metrics ── */
+    /*  Key Metrics  */
     .di-metrics {
         position: relative;
         overflow: hidden;
@@ -380,7 +380,7 @@
         .di-metric-icon { width: 34px; height: 34px; font-size: .85rem; }
     }
 
-    /* ── Core Capabilities — Roadmap v2 ── */
+    /*  Core Capabilities — Roadmap v2  */
     .di-capabilities {
         position: relative;
         overflow: hidden;
@@ -879,7 +879,7 @@
         .cta-trust { gap: .6rem; }
         .cta-trust-badge { font-size: .7rem; padding: .35rem .75rem; }
     }
-    /* ── USE CASES SPOTLIGHT CARDS ── */
+    /*  USE CASES SPOTLIGHT CARDS  */
     .uc-section {
         background: var(--bg-body);
         padding: 5rem 0;
@@ -1598,7 +1598,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
 
-    /* ── Metric count-up ── */
+    /*  Metric count-up  */
     const metricVals = document.querySelectorAll('.di-metric-value[data-count]');
     let metricsDone = false;
 
@@ -1632,7 +1632,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('scroll', animateMetrics, { passive: true });
     animateMetrics();
 
-    /* ── 3D Pipeline parallax tilt ── */
+    /*  3D Pipeline parallax tilt  */
     const board = document.getElementById('pipelineBoard');
     if (board) {
         const scene = board.closest('.di-pipeline-scene');
@@ -1647,7 +1647,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    /* ── Pipeline scroll fill ── */
+    /*  Pipeline scroll fill  */
     const pFill = document.getElementById('pipelineFill');
     if (pFill) {
         function updatePipeline() {
@@ -1664,7 +1664,7 @@ document.addEventListener('DOMContentLoaded', function() {
         updatePipeline();
     }
 
-    /* ── Pipeline steps stagger reveal ── */
+    /*  Pipeline steps stagger reveal  */
     const ppSteps = document.querySelectorAll('.di-pipeline-step');
     if (ppSteps.length) {
         const ppObs = new IntersectionObserver(function(entries) {
@@ -1681,7 +1681,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    /* ── Capabilities scroll ── */
+    /*  Capabilities scroll  */
     const track  = document.getElementById('capTrack');
     const fill   = document.getElementById('capRailFill');
     const leftB  = document.getElementById('capLeft');

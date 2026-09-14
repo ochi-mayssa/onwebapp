@@ -1,11 +1,11 @@
-# 🚨 Project Health & Audit Report
+#  Project Health & Audit Report
 
-## 🔴 Critical Issues (Fixed)
+##  Critical Issues (Fixed)
 These items were causing potential crashes or broken functionality. I have updated `requirements.txt` to include them.
 1.  **Missing `channels` & `daphne`**: The project is configured for WebSockets (`settings.CHANNEL_LAYERS`, `asgi.py`), but these libraries were missing from dependencies.
 2.  **Missing `weasyprint`**: Used in `rpa_dashboard` and `projects` for PDF generation but was not installed.
 
-## ⚠️ Potential Issues (Action Required)
+##  Potential Issues (Action Required)
 1.  **Missing Tests**:
     - Core apps like `crm` have empty `tests.py` files.
     - **Recommendation**: Create basic unit tests for models and views.
@@ -16,11 +16,11 @@ These items were causing potential crashes or broken functionality. I have updat
     - `settings.py` uses hardcoded defaults for `SECRET_KEY` and `DEBUG=True`.
     - **Recommendation**: Ensure the production environment has a `.env` file with strong secrets.
 
-## 🔍 Code Specifics
+##  Code Specifics
 - **Template Structure**: The file `templates/services/industrial_automation.html` has deep nesting (10+ levels). While syntactically correct, it is fragile.
 - **Static Files**: `static/` folder exists but ensure `python manage.py collectstatic` is run before deployment.
 
-## ✅ Next Steps
+##  Next Steps
 1.  Run `pip install -r requirements.txt` to sync dependencies.
 2.  Approve moving cluttered files to organized folders.
 3.  Start writing tests for the `crm` app.

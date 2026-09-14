@@ -492,9 +492,9 @@ class AnalyticsReport:
         return rows
 
 
-# ────────────────────────────────────────────────────────────────────────────
+# 
 # Team Performance Report (Supervisor)
-# ────────────────────────────────────────────────────────────────────────────
+# 
 
 class TeamPerformanceReport:
     """PDF report summarizing team performance metrics."""

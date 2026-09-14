@@ -136,9 +136,9 @@ def seed_all_widget_definitions():
         _ensure_widget_def(widget_type)
 
 
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 # Widget Data Providers
-# ═══════════════════════════════════════════════════════════════════════════
+# 
 
 @register_widget('stats_quick')
 def _stats_quick(request, config):

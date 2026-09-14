@@ -54,7 +54,7 @@
 
 ## 4. Certification Result
 
-**Status**: 🔴 **FAIL**
+**Status**:  **FAIL**
 
 **Reason**: Missing error monitoring and alerting for data pipelines.
 

@@ -7,7 +7,7 @@
 
 {% block extra_css %}
 <style>
-    /* ── Hero ── */
+    /*  Hero  */
     .seo-hero{background:linear-gradient(135deg,rgba(15,23,42,.65),rgba(30,41,59,.7)),url('{% static "img/seo.png" %}') center/cover no-repeat;padding:13rem 0 8rem;position:relative;overflow:hidden}
     .seo-hero .container{position:relative;z-index:2}
     .seo-hero-particles{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden}
@@ -15,7 +15,7 @@
     @keyframes seoFloat{0%{transform:translateY(100vh) scale(0);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:translateY(-10vh) scale(1);opacity:0}}
     .seo-hero .badge{background:linear-gradient(135deg,rgba(30,64,175,.2),rgba(30,64,175,.08))!important;border-color:rgba(30,64,175,.35)!important;box-shadow:0 0 20px rgba(30,64,175,.15)}
 
-    /* ── Reusable ── */
+    /*  Reusable  */
     .seo-section{padding:5rem 0}
     .seo-section-alt{background:var(--bg-surface-secondary);padding:5rem 0}
     .seo-divider{width:60px;height:2px;background:linear-gradient(90deg,transparent,#1e40af,transparent);margin:0 auto 2rem;border-radius:2px}
@@ -27,7 +27,7 @@
     .seo-badge--blue{background:rgba(30,64,175,.1);border:1px solid rgba(30,64,175,.25);color:#1e40af}
     .seo-badge--green{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);color:#16a34a}
 
-    /* ── Tools Grid ── */
+    /*  Tools Grid  */
     .seo-tools{background:var(--bg-body);padding:5rem 0}
     .seo-tool-card{background:var(--bg-surface);border:1px solid var(--border-color);border-radius:16px;padding:1.5rem;text-align:center;transition:all .4s;height:100%;position:relative;overflow:hidden}
     .seo-tool-card::before{content:'';position:absolute;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,#1e40af,transparent 80%);opacity:0;transition:opacity .4s}
@@ -41,7 +41,7 @@
     .seo-tool-card p{color:var(--text-muted);font-size:.8rem;line-height:1.6;margin-bottom:1rem}
     .seo-tool-card .btn{font-size:.82rem;font-weight:700;border-radius:8px;padding:.5rem 1rem}
 
-    /* ── Problem / Split ── */
+    /*  Problem / Split  */
     .seo-split-card{background:var(--bg-surface);border:1px solid var(--border-color);border-radius:20px;padding:2rem;height:100%}
     .seo-split-card h6{font-weight:700;font-size:.9rem;display:flex;align-items:center;gap:.4rem;margin-bottom:.6rem}
     .seo-split-card p{color:var(--text-muted);line-height:1.7;font-size:.88rem;margin-bottom:.6rem}
@@ -49,7 +49,7 @@
     .seo-split-card ul li{padding:.35rem 0;font-size:.82rem;color:var(--text-muted);display:flex;align-items:flex-start;gap:.5rem}
     .seo-split-card ul li i{color:#1e40af;margin-top:.15rem;flex-shrink:0;font-size:.7rem}
 
-    /* ── Feature Cards ── */
+    /*  Feature Cards  */
     .seo-feature{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center}
     .seo-feature.reverse{direction:rtl}.seo-feature.reverse > *{direction:ltr}
     .seo-feature-text h3{font-weight:800;font-size:1.6rem;margin-bottom:.5rem}
@@ -65,7 +65,7 @@
     .seo-feature-link{display:inline-flex;align-items:center;gap:.3rem;font-size:.88rem;font-weight:700;color:#1e40af;margin-top:1rem;text-decoration:none;transition:all .3s}
     .seo-feature-link:hover{gap:.5rem}
 
-    /* ── Process / Steps ── */
+    /*  Process / Steps  */
     .seo-step-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.2rem}
     .seo-step{text-align:center;padding:1.5rem;transition:all .4s;position:relative}
     .seo-step:hover{transform:translateY(-4px)}
@@ -73,7 +73,7 @@
     .seo-step h6{font-weight:700;font-size:.88rem;margin-bottom:.4rem}
     .seo-step p{color:var(--text-muted);font-size:.78rem;line-height:1.6;margin-bottom:0}
 
-    /* ── Intelligence Flow ── */
+    /*  Intelligence Flow  */
     .seo-flow-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem}
     .seo-flow-card{text-align:center;padding:2rem 1.5rem;border-radius:16px;background:var(--bg-surface);border:1px solid var(--border-color);transition:all .3s}
     .seo-flow-card:hover{transform:translateY(-4px);box-shadow:0 8px 24px rgba(0,0,0,.05);border-color:#1e40af}
@@ -81,7 +81,7 @@
     .seo-flow-card h6{font-weight:700;font-size:.9rem;margin-bottom:.4rem}
     .seo-flow-card p{color:var(--text-muted);font-size:.8rem;line-height:1.6;margin:0}
 
-    /* ── Audit Score ── */
+    /*  Audit Score  */
     .seo-audit-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
     .seo-audit-card{background:var(--bg-surface);border:1px solid var(--border-color);border-radius:16px;padding:2rem;text-align:center;transition:all .3s}
     .seo-audit-card:hover{transform:translateY(-4px);border-color:#1e40af}
@@ -89,7 +89,7 @@
     .seo-audit-card h6{font-weight:700;font-size:.9rem;margin-bottom:.4rem}
     .seo-audit-card p{color:var(--text-muted);font-size:.82rem;line-height:1.6;margin:0}
 
-    /* ── Table ── */
+    /*  Table  */
     .seo-table-wrap{background:var(--bg-surface);border:1px solid var(--border-color);border-radius:20px;overflow:hidden}
     .seo-compare-table{width:100%;border-collapse:collapse}
     .seo-compare-table thead th{padding:1rem 1.25rem;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);background:var(--bg-surface-secondary);border-bottom:1px solid var(--border-color);text-align:left}
@@ -102,7 +102,7 @@
     .seo-compare-table tbody td:first-child{font-weight:700;color:var(--text-primary)}
     .seo-compare-table .check{color:#22c55e;font-weight:700}
 
-    /* ── Teams ── */
+    /*  Teams  */
     .seo-teams-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
     .seo-team-card{background:var(--bg-surface);border:1px solid var(--border-color);border-radius:16px;padding:2rem;transition:all .3s}
     .seo-team-card:hover{transform:translateY(-4px);border-color:#1e40af}
@@ -110,7 +110,7 @@
     .seo-team-card h6{font-weight:700;font-size:.92rem;margin-bottom:.4rem}
     .seo-team-card p{color:var(--text-muted);font-size:.82rem;line-height:1.6;margin:0}
 
-    /* ── Why Us ── */
+    /*  Why Us  */
     .seo-why-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
     .seo-why-card{padding:1.5rem;border-radius:14px;background:var(--bg-surface);border:1px solid var(--border-color);transition:all .3s}
     .seo-why-card:hover{border-color:#1e40af;transform:translateY(-2px)}
@@ -118,7 +118,7 @@
     .seo-why-card h6{font-weight:700;font-size:.88rem;margin-bottom:.3rem}
     .seo-why-card p{color:var(--text-muted);font-size:.8rem;line-height:1.6;margin:0}
 
-    /* ── FAQ ── */
+    /*  FAQ  */
     .seo-faq-item{border:1px solid var(--border-color);border-radius:12px;overflow:hidden;transition:all .3s;margin-bottom:.75rem}
     .seo-faq-item:hover{border-color:#1e40af}
     .seo-faq-q{padding:1.1rem 1.4rem;font-weight:700;font-size:.9rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;background:var(--bg-surface)}
@@ -127,7 +127,7 @@
     .seo-faq-item.open .seo-faq-a{max-height:300px;padding:0 1.4rem 1.2rem}
     .seo-faq-item.open .seo-faq-q i{transform:rotate(180deg)}
 
-    /* ── CTA ── */
+    /*  CTA  */
     .seo-final-cta{text-align:center;padding:5rem 0;background:linear-gradient(135deg,#0f172a,#1e293b);color:#fff}
     .seo-final-cta h2{font-weight:800;font-size:2.2rem;margin-bottom:.75rem}
     .seo-final-cta p{color:rgba(255,255,255,.65);max-width:520px;margin:0 auto 2rem;font-size:1rem;line-height:1.7}
@@ -144,12 +144,12 @@
     .seo-trust-badge:hover{border-color:rgba(255,255,255,.25);color:rgba(255,255,255,.9);transform:translateY(-1px)}
     .seo-trust-badge i{font-size:.85rem;color:#60a5fa}
 
-    /* ── Back to Top ── */
+    /*  Back to Top  */
     .seo-back-to-top{position:fixed;bottom:2rem;right:2rem;width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#1e40af,#1e3a8a);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;z-index:9990;opacity:0;transform:translateY(20px);transition:all .3s;box-shadow:0 4px 16px rgba(30,64,175,.3)}
     .seo-back-to-top.show{opacity:1;transform:translateY(0)}
     .seo-back-to-top:hover{transform:translateY(-3px);box-shadow:0 6px 24px rgba(30,64,175,.4)}
 
-    /* ── Responsive ── */
+    /*  Responsive  */
     @media(max-width:991.98px){.seo-feature{grid-template-columns:1fr}.seo-feature.reverse{direction:ltr}.seo-step-grid,.seo-flow-grid{grid-template-columns:repeat(2,1fr)}.seo-audit-grid,.seo-teams-grid,.seo-why-grid{grid-template-columns:repeat(2,1fr)}}
     @media(max-width:767.98px){.seo-step-grid,.seo-flow-grid,.seo-audit-grid,.seo-teams-grid,.seo-why-grid{grid-template-columns:1fr}.seo-compare-table thead{display:none}.seo-compare-table tbody tr{display:block;padding:1rem}.seo-compare-table tbody td{display:block;padding:.4rem 0;text-align:left!important}.seo-compare-table tbody td::before{content:attr(data-label);display:block;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);margin-bottom:.2rem}section{padding-top:3rem!important;padding-bottom:3rem!important}}
 </style>
@@ -166,7 +166,7 @@ document.addEventListener('DOMContentLoaded',function(){
 
 {% block content %}
 
-<!-- ═══════════ HERO ═══════════ -->
+<!--  HERO  -->
 <section class="seo-hero">
     <div class="seo-hero-particles" id="seoParticles"></div>
     <div class="container">
@@ -188,7 +188,7 @@ document.addEventListener('DOMContentLoaded',function(){
     </div>
 </section>
 
-<!-- ═══════════ PROBLEM ═══════════ -->
+<!--  PROBLEM  -->
 <section class="seo-section">
     <div class="container">
         <div class="text-center mx-auto mb-5">
@@ -214,7 +214,7 @@ document.addEventListener('DOMContentLoaded',function(){
     </div>
 </section>
 
-<!-- ═══════════ TECHNICAL SEO ═══════════ -->
+<!--  TECHNICAL SEO  -->
 <section class="seo-section-alt">
     <div class="container">
         <div class="seo-feature">
@@ -243,7 +243,7 @@ document.addEventListener('DOMContentLoaded',function(){
     </div>
 </section>
 
-<!-- ═══════════ ON-PAGE SEO ═══════════ -->
+<!--  ON-PAGE SEO  -->
 <section class="seo-section">
     <div class="container">
         <div class="seo-feature reverse">
@@ -271,7 +271,7 @@ document.addEventListener('DOMContentLoaded',function(){
     </div>
 </section>
 
-<!-- ═══════════ SEO MONITORING ═══════════ -->
+<!--  SEO MONITORING  -->
 <section class="seo-section-alt">
     <div class="container">
         <div class="text-center mx-auto mb-5">
@@ -297,7 +297,7 @@ document.addEventListener('DOMContentLoaded',function(){
     </div>
 </section>
 
-<!-- ═══════════ SEO INTELLIGENCE ═══════════ -->
+<!--  SEO INTELLIGENCE  -->
 <section class="seo-section">
     <div class="container">
         <div class="text-center mx-auto mb-5">
@@ -330,7 +330,7 @@ document.addEventListener('DOMContentLoaded',function(){
     </div>
 </section>
 
-<!-- ═══════════ SEO AUDIT ═══════════ -->
+<!--  SEO AUDIT  -->
 <section class="seo-section-alt">
     <div class="container">
         <div class="text-center mx-auto mb-5">
@@ -347,7 +347,7 @@ document.addEventListener('DOMContentLoaded',function(){
     </div>
 </section>
 
-<!-- ═══════════ COMPETITOR SEO ═══════════ -->
+<!--  COMPETITOR SEO  -->
 <section class="seo-section">
     <div class="container">
         <div class="seo-feature">
@@ -377,7 +377,7 @@ document.addEventListener('DOMContentLoaded',function(){
     </div>
 </section>
 
-<!-- ═══════════ KEYWORD INTELLIGENCE ═══════════ -->
+<!--  KEYWORD INTELLIGENCE  -->
 <section class="seo-section-alt">
     <div class="container">
         <div class="seo-feature reverse">
@@ -400,7 +400,7 @@ document.addEventListener('DOMContentLoaded',function(){
     </div>
 </section>
 
-<!-- ═══════════ CONTENT SEO ═══════════ -->
+<!--  CONTENT SEO  -->
 <section class="seo-section">
     <div class="container">
         <div class="seo-feature">
@@ -426,7 +426,7 @@ document.addEventListener('DOMContentLoaded',function(){
     </div>
 </section>
 
-<!-- ═══════════ SEO REPORTS ═══════════ -->
+<!--  SEO REPORTS  -->
 <section class="seo-section-alt">
     <div class="container">
         <div class="text-center mx-auto mb-5">
@@ -462,7 +462,7 @@ document.addEventListener('DOMContentLoaded',function(){
     </div>
 </section>
 
-<!-- ═══════════ AI-POWERED SEO ═══════════ -->
+<!--  AI-POWERED SEO  -->
 <section class="seo-section">
     <div class="container">
         <div class="text-center mx-auto mb-5">
@@ -496,7 +496,7 @@ document.addEventListener('DOMContentLoaded',function(){
     </div>
 </section>
 
-<!-- ═══════════ ONE WORKSPACE ═══════════ -->
+<!--  ONE WORKSPACE  -->
 <section class="seo-section-alt">
     <div class="container">
         <div class="text-center mx-auto mb-5">
@@ -528,7 +528,7 @@ document.addEventListener('DOMContentLoaded',function(){
     </div>
 </section>
 
-<!-- ═══════════ HOW IT WORKS ═══════════ -->
+<!--  HOW IT WORKS  -->
 <section class="seo-section">
     <div class="container">
         <div class="text-center mx-auto mb-5">
@@ -560,7 +560,7 @@ document.addEventListener('DOMContentLoaded',function(){
     </div>
 </section>
 
-<!-- ═══════════ BUILT FOR TEAMS ═══════════ -->
+<!--  BUILT FOR TEAMS  -->
 <section class="seo-section-alt">
     <div class="container">
         <div class="text-center mx-auto mb-5">
@@ -597,7 +597,7 @@ document.addEventListener('DOMContentLoaded',function(){
     </div>
 </section>
 
-<!-- ═══════════ WHY ONWEBAPP ═══════════ -->
+<!--  WHY ONWEBAPP  -->
 <section class="seo-section">
     <div class="container">
         <div class="text-center mx-auto mb-5">
@@ -634,7 +634,7 @@ document.addEventListener('DOMContentLoaded',function(){
     </div>
 </section>
 
-<!-- ═══════════ FAQ ═══════════ -->
+<!--  FAQ  -->
 <section class="seo-section-alt">
     <div class="container" style="max-width:760px;">
         <div class="text-center mx-auto mb-5">
@@ -672,7 +672,7 @@ document.addEventListener('DOMContentLoaded',function(){
     </div>
 </section>
 
-<!-- ═══════════ FINAL CTA ═══════════ -->
+<!--  FINAL CTA  -->
 <section class="seo-final-cta">
     <div class="container">
         <h2>{% trans "Your Next Customer Is Already Searching." %}</h2>

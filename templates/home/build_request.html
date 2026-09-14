@@ -33,7 +33,7 @@
       min-height: 100vh;
     }
 
-    /* ── Top nav bar ── */
+    /*  Top nav bar  */
     .top-bar {
       background: rgba(255,255,255,.85);
       backdrop-filter: blur(16px);
@@ -78,7 +78,7 @@
     }
     .top-bar .back-link:hover { color: var(--primary); }
 
-    /* ── Hero ── */
+    /*  Hero  */
     .hero {
       text-align: center;
       padding: 3rem 1.5rem 2rem;
@@ -119,7 +119,7 @@
       margin: 0 auto;
     }
 
-    /* ── Stepper ── */
+    /*  Stepper  */
     .stepper-wrap {
       max-width: 680px;
       margin: 0 auto 2rem;
@@ -192,7 +192,7 @@
     .step-item.active .step-label { color: var(--primary); font-weight: 700; }
     .step-item.done .step-label { color: var(--primary); }
 
-    /* ── Main layout ── */
+    /*  Main layout  */
     .page-wrap {
       max-width: 1140px;
       margin: 0 auto;
@@ -203,7 +203,7 @@
       align-items: start;
     }
 
-    /* ── Form card ── */
+    /*  Form card  */
     .form-card {
       background: var(--surface);
       border-radius: var(--radius-lg);
@@ -230,7 +230,7 @@
     }
     form { padding: 0; }
 
-    /* ── Step panels ── */
+    /*  Step panels  */
     .step-panel {
       display: none;
       padding: 2rem;
@@ -242,7 +242,7 @@
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    /* ── Tier cards ── */
+    /*  Tier cards  */
     .tier-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -313,7 +313,7 @@
       margin-top: .1rem;
     }
 
-    /* ── Feature tags ── */
+    /*  Feature tags  */
     .tier-features {
       display: flex;
       flex-wrap: wrap;
@@ -330,7 +330,7 @@
       border-radius: 1rem;
     }
 
-    /* ── Form groups ── */
+    /*  Form groups  */
     .section-title {
       display: flex;
       align-items: center;
@@ -371,7 +371,7 @@
     }
     textarea { resize: vertical; min-height: 80px; }
 
-    /* ── Feature checkboxes ── */
+    /*  Feature checkboxes  */
     .features-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
@@ -403,7 +403,7 @@
       flex-shrink: 0;
     }
 
-    /* ── Drag & drop upload ── */
+    /*  Drag & drop upload  */
     .file-drop {
       border: 2px dashed var(--border);
       border-radius: var(--radius);
@@ -446,7 +446,7 @@
     }
     .file-pill i { font-size: .6rem; cursor: pointer; }
 
-    /* ── Budget slider visual ── */
+    /*  Budget slider visual  */
     .budget-options {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -470,7 +470,7 @@
       color: var(--primary);
     }
 
-    /* ── Buttons ── */
+    /*  Buttons  */
     .btn-row {
       display: flex;
       gap: .75rem;
@@ -520,7 +520,7 @@
     }
     .btn-ghost:hover { border-color: var(--text-muted); color: var(--text); }
 
-    /* ── Success panel ── */
+    /*  Success panel  */
     .success-panel {
       display: none;
       text-align: center;
@@ -546,7 +546,7 @@
     .success-panel h2 { font-size: 1.3rem; font-weight: 800; margin-bottom: .5rem; }
     .success-panel p { color: var(--text-muted); font-size: .85rem; }
 
-    /* ── Sidebar ── */
+    /*  Sidebar  */
     .sidebar {
       display: flex;
       flex-direction: column;
@@ -674,7 +674,7 @@
     .portfolio-thumb:hover { transform: scale(1.03); }
     .portfolio-thumb i { font-size: 1.2rem; }
 
-    /* ── Spinner ── */
+    /*  Spinner  */
     .spinner {
       display: inline-block;
       width: 18px;
@@ -686,7 +686,7 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── Mobile ── */
+    /*  Mobile  */
     @media (max-width: 860px) {
       .page-wrap { grid-template-columns: 1fr; }
       .sidebar { position: static; }
@@ -754,7 +754,7 @@
     <form id="projectForm" action="{% url 'home:build_website' %}" method="post" enctype="multipart/form-data">
       {% csrf_token %}
 
-      <!-- ═══ STEP 1: Package ═══ -->
+      <!--  STEP 1: Package  -->
       <div class="step-panel active" data-panel="1">
         <div class="section-title"><i class="fas fa-layer-group"></i> Choose your package</div>
         <div class="tier-grid" id="tierSelector">
@@ -800,7 +800,7 @@
         </div>
       </div>
 
-      <!-- ═══ STEP 2: Client & Project ═══ -->
+      <!--  STEP 2: Client & Project  -->
       <div class="step-panel" data-panel="2">
         <div class="section-title"><i class="fas fa-user-circle"></i> Your details</div>
         <div class="row-2">
@@ -836,7 +836,7 @@
         </div>
       </div>
 
-      <!-- ═══ STEP 3: Features & Design ═══ -->
+      <!--  STEP 3: Features & Design  -->
       <div class="step-panel" data-panel="3">
         <div class="section-title"><i class="fas fa-puzzle-piece"></i> Must‑have features</div>
         <div class="features-grid">
@@ -882,7 +882,7 @@
         </div>
       </div>
 
-      <!-- ═══ STEP 4: Budget & Submit ═══ -->
+      <!--  STEP 4: Budget & Submit  -->
       <div class="step-panel" data-panel="4">
         <div class="section-title"><i class="fas fa-chart-line"></i> Budget & timeline</div>
         <div class="form-group">
@@ -926,7 +926,7 @@
         </div>
       </div>
 
-      <!-- ═══ SUCCESS ═══ -->
+      <!--  SUCCESS  -->
       <div class="success-panel" id="successPanel">
         <div class="success-icon"><i class="fas fa-check"></i></div>
         <h2>Request submitted!</h2>
@@ -994,7 +994,7 @@
 </div>
 
 <script>
-/* ── Step navigation ── */
+/*  Step navigation  */
 let currentStep = 1;
 const totalSteps = 4;
 
@@ -1013,7 +1013,7 @@ function goStep(n) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-/* ── Tier selector ── */
+/*  Tier selector  */
 document.querySelectorAll('.tier-card').forEach(card => {
   card.addEventListener('click', () => {
     document.querySelectorAll('.tier-card').forEach(c => c.classList.remove('active'));
@@ -1022,7 +1022,7 @@ document.querySelectorAll('.tier-card').forEach(card => {
   });
 });
 
-/* ── Budget selector ── */
+/*  Budget selector  */
 document.querySelectorAll('.budget-opt').forEach(opt => {
   opt.addEventListener('click', () => {
     document.querySelectorAll('.budget-opt').forEach(o => o.classList.remove('active'));
@@ -1031,7 +1031,7 @@ document.querySelectorAll('.budget-opt').forEach(opt => {
   });
 });
 
-/* ── File drop ── */
+/*  File drop  */
 const fileDrop = document.getElementById('fileDrop');
 const fileInput = fileDrop.querySelector('input[type="file"]');
 const fileList = document.getElementById('fileList');
@@ -1056,7 +1056,7 @@ function showFiles(files) {
   });
 }
 
-/* ── Form submit ── */
+/*  Form submit  */
 document.getElementById('projectForm').addEventListener('submit', () => {
   const btn = document.getElementById('submitBtn');
   const loader = document.getElementById('loader');

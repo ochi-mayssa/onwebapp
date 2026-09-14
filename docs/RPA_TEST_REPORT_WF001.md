@@ -60,7 +60,7 @@
 
 ## 4. Certification Result
 
-**Status**: 🔴 **FAIL**
+**Status**:  **FAIL**
 
 **Reason**: Critical business requirement "Admin receives notification" is not implemented.
 

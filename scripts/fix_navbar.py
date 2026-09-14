@@ -98,9 +98,9 @@ if old_broken in content:
     content = content.replace(old_broken, new_fixed)
     with open('templates/base.html', 'w', encoding='utf-8') as f:
         f.write(content)
-    print("✅ Navbar structure fixed!")
+    print(" Navbar structure fixed!")
 else:
-    print("❌ Could not find the broken section")
+    print(" Could not find the broken section")
     print(f"Looking for:\n{old_broken}\n")
     # Try to find what's actually there
     idx = content.find('<!-- Services Navigation Menu -->')

@@ -38,7 +38,7 @@ from .serializers import (
 )
 
 
-# ── Brand Collection ──────────────────────────────────────────────────────
+#  Brand Collection 
 
 class BrandCollectionViewSet(viewsets.ReadOnlyModelViewSet):
     """List and retrieve brand collections.
@@ -61,7 +61,7 @@ class BrandCollectionViewSet(viewsets.ReadOnlyModelViewSet):
         return [IsAuthenticated()]
 
 
-# ── Branding Request ─────────────────────────────────────────────────────
+#  Branding Request 
 
 class BrandingRequestViewSet(viewsets.ModelViewSet):
     """CRUD for branding requests.
@@ -98,7 +98,7 @@ class BrandingRequestViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user, status='DRAFT')
 
-    # ── Custom actions ────────────────────────────────────────────────
+    #  Custom actions 
 
     @action(detail=True, methods=['post'], permission_classes=[IsStaffUser])
     def assign_designer(self, request, pk=None):
@@ -198,7 +198,7 @@ def branding_request_to_dict(req):
     return BrandingRequestDetailSerializer(req, context={'request': None}).data
 
 
-# ── Branding Asset ────────────────────────────────────────────────────────
+#  Branding Asset 
 
 class BrandingAssetViewSet(viewsets.ModelViewSet):
     """CRUD for assets on a branding request.
@@ -229,7 +229,7 @@ class BrandingAssetViewSet(viewsets.ModelViewSet):
         serializer.save(request=req)
 
 
-# ── Branding Notification ─────────────────────────────────────────────────
+#  Branding Notification 
 
 class BrandingNotificationViewSet(viewsets.ReadOnlyModelViewSet):
     """List and mark-read for notifications.
@@ -264,7 +264,7 @@ class BrandingNotificationViewSet(viewsets.ReadOnlyModelViewSet):
         return Response({'marked': updated})
 
 
-# ── Branding Message (standalone) ─────────────────────────────────────────
+#  Branding Message (standalone) 
 
 class BrandingMessageViewSet(viewsets.ModelViewSet):
     """Standalone message CRUD.
@@ -292,7 +292,7 @@ class BrandingMessageViewSet(viewsets.ModelViewSet):
         serializer.save(sender=self.request.user)
 
 
-# ── Branding Timeline (read-only) ─────────────────────────────────────────
+#  Branding Timeline (read-only) 
 
 class BrandingTimelineViewSet(viewsets.ReadOnlyModelViewSet):
     """Read-only timeline endpoint for audit trail."""
@@ -310,7 +310,7 @@ class BrandingTimelineViewSet(viewsets.ReadOnlyModelViewSet):
         return [IsAuthenticated()]
 
 
-# ── Branding Feedback (staff list + client create) ───────────────────────
+#  Branding Feedback (staff list + client create) 
 
 class BrandingFeedbackViewSet(viewsets.ModelViewSet):
     """List feedback (staff) or retrieve own feedback (client).
@@ -343,7 +343,7 @@ class BrandingFeedbackViewSet(viewsets.ModelViewSet):
         return Response(BrandingFeedbackSerializer(fb, context={'request': request}).data)
 
 
-# ── Webhooks (staff only) ────────────────────────────────────────────────
+#  Webhooks (staff only) 
 
 class BrandingWebhookViewSet(viewsets.ModelViewSet):
     """CRUD for webhook endpoints (staff only).

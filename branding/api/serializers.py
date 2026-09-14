@@ -31,7 +31,7 @@ from ..models import (
 User = get_user_model()
 
 
-# ── User (minimal) ────────────────────────────────────────────────────────
+#  User (minimal) 
 
 class UserSummarySerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()
@@ -44,7 +44,7 @@ class UserSummarySerializer(serializers.ModelSerializer):
         return obj.get_full_name() or obj.username
 
 
-# ── Brand Collection ──────────────────────────────────────────────────────
+#  Brand Collection 
 
 class BrandCollectionListSerializer(serializers.ModelSerializer):
     preview_items_count = serializers.SerializerMethodField()
@@ -83,7 +83,7 @@ class BrandCollectionDetailSerializer(serializers.ModelSerializer):
         ]
 
 
-# ── Branding Request ─────────────────────────────────────────────────────
+#  Branding Request 
 
 class BrandingRequestListSerializer(serializers.ModelSerializer):
     user = UserSummarySerializer(read_only=True)
@@ -146,7 +146,7 @@ class BrandingRequestCreateSerializer(serializers.ModelSerializer):
         ]
 
 
-# ── Branding Asset ────────────────────────────────────────────────────────
+#  Branding Asset 
 
 class BrandingAssetVersionSerializer(serializers.ModelSerializer):
     uploaded_by = UserSummarySerializer(read_only=True)
@@ -193,7 +193,7 @@ class BrandingAssetDetailSerializer(serializers.ModelSerializer):
         ]
 
 
-# ── Branding Notification ─────────────────────────────────────────────────
+#  Branding Notification 
 
 class BrandingNotificationSerializer(serializers.ModelSerializer):
     notification_type_display = serializers.CharField(source='get_notification_type_display', read_only=True)
@@ -207,7 +207,7 @@ class BrandingNotificationSerializer(serializers.ModelSerializer):
         read_only_fields = ['is_read']
 
 
-# ── Branding Message ──────────────────────────────────────────────────────
+#  Branding Message 
 
 class BrandingMessageSerializer(serializers.ModelSerializer):
     sender = UserSummarySerializer(read_only=True)
@@ -232,7 +232,7 @@ class BrandingMessageSerializer(serializers.ModelSerializer):
         return BrandingMessageSerializer(replies, many=True, context=self.context).data
 
 
-# ── Branding Timeline ─────────────────────────────────────────────────────
+#  Branding Timeline 
 
 class BrandingTimelineSerializer(serializers.ModelSerializer):
     actor = UserSummarySerializer(read_only=True)
@@ -246,7 +246,7 @@ class BrandingTimelineSerializer(serializers.ModelSerializer):
         ]
 
 
-# ── Branding Feedback ─────────────────────────────────────────────────────
+#  Branding Feedback 
 
 class BrandingFeedbackSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()
@@ -270,7 +270,7 @@ class BrandingFeedbackSerializer(serializers.ModelSerializer):
         }
 
 
-# ── Client Profile ────────────────────────────────────────────────────────
+#  Client Profile 
 
 class BrandingClientProfileSerializer(serializers.ModelSerializer):
     favorite_collections = BrandCollectionListSerializer(many=True, read_only=True)
@@ -284,7 +284,7 @@ class BrandingClientProfileSerializer(serializers.ModelSerializer):
         ]
 
 
-# ── Webhooks ──────────────────────────────────────────────────────────────
+#  Webhooks 
 
 class WebhookDeliverySerializer(serializers.ModelSerializer):
     class Meta:
@@ -327,7 +327,7 @@ class BrandingWebhookCreateSerializer(serializers.ModelSerializer):
         fields = ['name', 'url', 'events', 'secret', 'is_active']
 
 
-# ── GDPR Serializers ─────────────────────────────────────────────────────
+#  GDPR Serializers 
 
 class ConsentRecordSerializer(serializers.ModelSerializer):
     consent_type_display = serializers.CharField(source='get_consent_type_display', read_only=True)

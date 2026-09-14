@@ -391,41 +391,52 @@
 
         /* ===== TOP BAR ===== */
         .oh-topbar {
-            background: #0f172a;
+            background: linear-gradient(160deg,#0a0f1e,#111827);
             color: rgba(255,255,255,.7);
             font-size: .7rem;
-            padding: .25rem 0;
+            padding: .3rem 0;
             position: relative;
             z-index: 1001;
+            border-bottom: 1px solid rgba(255,255,255,.04);
+        }
+        .oh-topbar::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg,transparent,rgba(59,130,246,.12),transparent);
         }
         .oh-topbar a {
             color: rgba(255,255,255,.7);
             text-decoration: none;
-            transition: color .2s;
+            transition: all .25s;
             font-weight: 500;
         }
         .oh-topbar a:hover { color: #fff; }
-        .oh-topbar-left { display: flex; align-items: center; gap: 1.25rem; }
+        .oh-topbar-left { display: flex; align-items: center; gap: 1.5rem; }
         .oh-topbar-right { display: flex; align-items: center; gap: 1rem; }
-        .oh-topbar-divider { width: 1px; height: 12px; background: rgba(255,255,255,.15); }
+        .oh-topbar-divider { width: 1px; height: 14px; background: rgba(255,255,255,.1); }
         .oh-topbar .btn-topbar {
-            background: rgba(255,255,255,.1);
-            border: 1px solid rgba(255,255,255,.15);
+            background: rgba(255,255,255,.08);
+            border: 1px solid rgba(255,255,255,.1);
             color: #fff;
-            padding: .25rem .85rem;
+            padding: .28rem .9rem;
             border-radius: 999px;
-            font-size: .72rem;
+            font-size: .7rem;
             font-weight: 600;
             text-decoration: none;
-            transition: all .2s;
+            transition: all .3s;
             display: inline-flex;
             align-items: center;
             gap: .35rem;
         }
         .oh-topbar .btn-topbar:hover {
-            background: rgba(255,255,255,.2);
-            border-color: rgba(255,255,255,.3);
+            background: rgba(255,255,255,.15);
+            border-color: rgba(255,255,255,.25);
             color: #fff;
+            transform: translateY(-1px);
         }
         @media(max-width:991.98px){
             .oh-topbar-left, .oh-topbar-right { gap: .75rem; }
@@ -434,16 +445,17 @@
         @media(max-width:575.98px){
             .oh-topbar { display: none; }
         }
-        /* ── Homepage Footer ── */
-        .oh-footer{padding:3rem 0 1.5rem;background:#0b1120;color:rgba(255,255,255,.6);border-top:1px solid rgba(255,255,255,.06)}
-        .oh-footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:2rem;margin-bottom:2rem}
-        .oh-footer-brand h5{font-weight:800;color:#fff;margin-bottom:.5rem}
-        .oh-footer-brand p{font-size:.82rem;line-height:1.6}
-        .oh-footer-col h6{font-weight:700;color:#fff;font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.75rem}
-        .oh-footer-col a{display:block;font-size:.8rem;color:rgba(255,255,255,.5);text-decoration:none;padding:.25rem 0;transition:color .2s}
-        .oh-footer-col a:hover{color:#fff}
-        .oh-footer-bottom{border-top:1px solid rgba(255,255,255,.06);padding-top:1.25rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;font-size:.75rem}
-        .oh-footer-legal a{color:rgba(255,255,255,.4);text-decoration:none;margin-left:1rem;transition:color .2s}
+        /*  Homepage Footer  */
+        .oh-footer{padding:4rem 0 1.5rem;background:#080d1a;color:rgba(255,255,255,.6);border-top:1px solid rgba(255,255,255,.05);position:relative}
+        .oh-footer::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(59,130,246,.15),transparent)}
+        .oh-footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:2rem;margin-bottom:2.5rem}
+        .oh-footer-brand h5{font-weight:800;color:#fff;margin-bottom:.6rem;font-size:1.1rem}
+        .oh-footer-brand p{font-size:.82rem;line-height:1.7}
+        .oh-footer-col h6{font-weight:700;color:#fff;font-size:.78rem;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.85rem}
+        .oh-footer-col a{display:block;font-size:.78rem;color:rgba(255,255,255,.45);text-decoration:none;padding:.3rem 0;transition:all .25s}
+        .oh-footer-col a:hover{color:#fff;transform:translateX(3px)}
+        .oh-footer-bottom{border-top:1px solid rgba(255,255,255,.05);padding-top:1.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;font-size:.72rem}
+        .oh-footer-legal a{color:rgba(255,255,255,.35);text-decoration:none;margin-left:1.25rem;transition:color .25s}
         .oh-footer-legal a:hover{color:#fff}
         @media(max-width:991.98px){.oh-footer-grid{grid-template-columns:1fr 1fr}}
         @media(max-width:575.98px){.oh-footer-grid{grid-template-columns:1fr}}
@@ -491,8 +503,6 @@
                 <div class="oh-topbar-divider"></div>
                 {% if user.is_authenticated %}
                     <a href="{% url 'crm:client_tracking_portal' %}" class="btn-topbar"><i class="fas fa-tachometer-alt"></i> {% trans 'Dashboard' %}</a>
-                {% else %}
-                    <a href="{% url 'users:login_view' %}" class="btn-topbar"><i class="fas fa-sign-in-alt"></i> {% trans 'Sign In' %}</a>
                 {% endif %}
             </div>
         </div>
@@ -635,10 +645,6 @@
                         </li>
                     </ul>
                 </div>
-
-                <a class="btn btn-glass btn-sm px-4 rounded-pill" href="{% url 'users:login_view' %}">
-                    {% trans 'Sign In' %}
-                </a>
             {% endif %}
             
             <!-- Mobile menu toggle -->
@@ -666,6 +672,18 @@
                                     {% trans 'Services' %}
                                 </a>
                                 {% include "./_services_dropdown.html" with menu_id="servicesMenuAuth" %}
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="designMenuAuth" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    {% trans 'Design' %}
+                                </a>
+                                {% include "./_design_dropdown.html" with menu_id="designMenuAuth" %}
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="softwareMenuAuth" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    {% trans 'Software' %}
+                                </a>
+                                {% include "./_software_dropdown.html" with menu_id="softwareMenuAuth" %}
                             </li>
                             <!--
                             <li class="nav-item dropdown">
@@ -700,7 +718,7 @@
                                 </ul>
                             </li>
                         {% elif request.resolver_match and request.resolver_match.url_name == 'platform_monitoring' %}
-                        <!-- Legacy services:platform_monitoring page (kept for URL compat) → minimal top nav: Home / Pricing / Community -->
+                        <!-- Legacy services:platform_monitoring page (kept for URL compat)  minimal top nav: Home / Pricing / Community -->
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'home:home' %}">{% trans 'Home' %}</a>
                         </li>
@@ -709,6 +727,18 @@
                                 {% trans 'Services' %}
                             </a>
                             {% include "./_services_dropdown.html" with menu_id="servicesMenuLegacyPM" %}
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="designMenuLegacyPM" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                {% trans 'Design' %}
+                            </a>
+                            {% include "./_design_dropdown.html" with menu_id="designMenuLegacyPM" %}
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="softwareMenuLegacyPM" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                {% trans 'Software' %}
+                            </a>
+                            {% include "./_software_dropdown.html" with menu_id="softwareMenuLegacyPM" %}
                         </li>
                         <!--
                         <li class="nav-item dropdown">
@@ -754,6 +784,18 @@
                             </a>
                             {% include "./_services_dropdown.html" with menu_id="servicesMenuHome" %}
                         </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="designMenuHome" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                {% trans 'Design' %}
+                            </a>
+                            {% include "./_design_dropdown.html" with menu_id="designMenuHome" %}
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="softwareMenuHome" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                {% trans 'Software' %}
+                            </a>
+                            {% include "./_software_dropdown.html" with menu_id="softwareMenuHome" %}
+                        </li>
                         <!--
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="solutionsMenuHome" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -796,6 +838,18 @@
                                 {% trans 'Services' %}
                             </a>
                             {% include "./_services_dropdown.html" with menu_id="servicesMenu" %}
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="designMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                {% trans 'Design' %}
+                            </a>
+                            {% include "./_design_dropdown.html" with menu_id="designMenu" %}
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="softwareMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                {% trans 'Software' %}
+                            </a>
+                            {% include "./_software_dropdown.html" with menu_id="softwareMenu" %}
                         </li>
                         <!--
                         <li class="nav-item dropdown">
@@ -1137,7 +1191,7 @@
     <div class="chatbot-panel" id="chatbotPanel" role="dialog" aria-hidden="true">
         <div class="chatbot-header d-flex align-items-center justify-content-between">
             <div>OnWebApp Bot</div>
-            <button id="chatbotClose" class="btn btn-sm btn-light">✕</button>
+            <button id="chatbotClose" class="btn btn-sm btn-light"></button>
         </div>
         <div class="chatbot-body" id="chatbotBody">
             <div class="chatbot-message"><strong>OnWebApp Bot:</strong> {% trans 'Hi — ask me about services, pricing, or diagnostics.' %}</div>

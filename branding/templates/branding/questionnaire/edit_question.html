@@ -227,7 +227,7 @@
                             <span class="badge bg-info-subtle text-info rounded-pill x-small">If Q{{ condition.source_question }}</span>
                             <span class="x-small text-muted fw-700">{{ condition.operator|default:"equals" }}</span>
                             <span class="x-small">{{ condition.value }}</span>
-                            <span class="x-small text-muted">→ Show this question</span>
+                            <span class="x-small text-muted"> Show this question</span>
                         </div>
                         <form method="post" action="{% url 'branding:questionnaire_delete_condition' cid=condition.pk %}" class="d-inline" onsubmit="return confirm('Delete this condition?');">
                             {% csrf_token %}

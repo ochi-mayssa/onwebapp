@@ -1,0 +1,691 @@
+{% extends 'community/base_community.html' %}
+{% load static i18n %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --c-primary: #4f46e5;
+        --c-primary-light: #eef2ff;
+        --c-dark: #0f172a;
+        --c-body: #334155;
+        --c-muted: #64748b;
+        --c-faint: #94a3b8;
+        --c-border: #e2e8f0;
+        --c-bg: #ffffff;
+        --c-bg-alt: #f8fafc;
+        --c-warm: #fef3c7;
+        --c-warm-dark: #d97706;
+    }
+
+    /*  Animations  */
+    .c-reveal {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity .7s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1);
+    }
+    .c-reveal.visible { opacity: 1; transform: translateY(0); }
+    .c-reveal-left {
+        opacity: 0;
+        transform: translateX(-40px);
+        transition: opacity .7s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1);
+    }
+    .c-reveal-left.visible { opacity: 1; transform: translateX(0); }
+    .c-reveal-right {
+        opacity: 0;
+        transform: translateX(40px);
+        transition: opacity .7s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1);
+    }
+    .c-reveal-right.visible { opacity: 1; transform: translateX(0); }
+    .c-reveal-scale {
+        opacity: 0;
+        transform: scale(.95);
+        transition: opacity .6s cubic-bezier(.22,1,.36,1), transform .6s cubic-bezier(.22,1,.36,1);
+    }
+    .c-reveal-scale.visible { opacity: 1; transform: scale(1); }
+    .c-stagger-1 { transition-delay: .05s; }
+    .c-stagger-2 { transition-delay: .12s; }
+    .c-stagger-3 { transition-delay: .19s; }
+    .c-stagger-4 { transition-delay: .26s; }
+    .c-stagger-5 { transition-delay: .33s; }
+    .c-stagger-6 { transition-delay: .40s; }
+
+    /*  Buttons  */
+    .c-btn-primary {
+        display: inline-flex; align-items: center; gap: .5rem;
+        padding: .85rem 2rem; background: var(--c-primary); color: #fff;
+        font-size: .9rem; font-weight: 700; border-radius: 10px;
+        border: none; text-decoration: none; transition: all .2s;
+    }
+    .c-btn-primary:hover { background: #4338ca; color: #fff; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(79,70,229,.25); }
+    .c-btn-outline {
+        display: inline-flex; align-items: center; gap: .5rem;
+        padding: .85rem 2rem; background: transparent; color: var(--c-dark);
+        font-size: .9rem; font-weight: 700; border-radius: 10px;
+        border: 2px solid var(--c-border); text-decoration: none; transition: all .2s;
+    }
+    .c-btn-outline:hover { border-color: var(--c-primary); color: var(--c-primary); transform: translateY(-1px); }
+    .c-btn-secondary {
+        display: inline-flex; align-items: center; gap: .5rem;
+        padding: .85rem 2rem; background: transparent; color: var(--c-body);
+        font-size: .9rem; font-weight: 700; border-radius: 10px;
+        border: 1.5px solid var(--c-border); text-decoration: none; transition: all .2s;
+    }
+    .c-btn-secondary:hover { border-color: var(--c-primary); color: var(--c-primary); }
+    .c-btn-white {
+        display: inline-flex; align-items: center; gap: .5rem;
+        padding: .85rem 2rem; background: #fff; color: var(--c-dark);
+        font-size: .9rem; font-weight: 700; border-radius: 10px;
+        border: none; text-decoration: none; transition: all .2s;
+    }
+    .c-btn-white:hover { background: var(--c-primary-light); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(255,255,255,.2); }
+
+    /*  Section system  */
+    .c-sec { padding: 5.5rem 0; }
+    .c-sec-alt { background: var(--c-bg-alt); }
+    .c-sec-label {
+        display: inline-flex; align-items: center; gap: .5rem;
+        font-size: .68rem; font-weight: 700; letter-spacing: .12em;
+        text-transform: uppercase; color: var(--c-primary); margin-bottom: .6rem;
+    }
+    .c-sec-label::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--c-primary); }
+    .c-sec-title { font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 800; color: var(--c-dark); letter-spacing: -.01em; margin-bottom: .4rem; }
+    .c-sec-sub { font-size: .95rem; color: var(--c-muted); max-width: 520px; line-height: 1.6; }
+    .c-sep { width: 100%; height: 1px; background: var(--c-border); }
+
+    /*  Hero  */
+    .c-hero {
+        padding: 6rem 0 5rem;
+        position: relative; overflow: hidden;
+        background: linear-gradient(160deg, #fafbff 0%, #f1f0ff 40%, #eef2ff 100%);
+    }
+    .c-hero::before {
+        content: ''; position: absolute; top: -30%; right: -10%;
+        width: 600px; height: 600px;
+        background: radial-gradient(circle, rgba(79,70,229,.07) 0%, transparent 70%);
+        border-radius: 50%; pointer-events: none;
+    }
+    .c-hero .container { position: relative; }
+    .c-hero-eyebrow {
+        display: inline-flex; align-items: center; gap: .5rem;
+        font-size: .7rem; font-weight: 700; letter-spacing: .14em;
+        text-transform: uppercase; color: var(--c-primary); margin-bottom: 1.5rem;
+    }
+    .c-hero-eyebrow::before { content: ''; width: 24px; height: 2px; background: var(--c-primary); border-radius: 1px; }
+    .c-hero h1 {
+        font-size: clamp(2.2rem, 4.5vw, 3.2rem);
+        font-weight: 800; line-height: 1.12;
+        color: var(--c-dark); letter-spacing: -.02em; margin-bottom: 1.25rem;
+    }
+    .c-hero h1 em { font-style: normal; color: var(--c-primary); }
+    .c-hero-sub {
+        font-size: 1.05rem; line-height: 1.7;
+        color: var(--c-muted); max-width: 540px; margin-bottom: 2.5rem;
+    }
+    .c-hero-sub em { font-style: normal; color: var(--c-body); font-weight: 600; }
+    .c-hero-actions { display: flex; gap: .75rem; flex-wrap: wrap; align-items: center; margin-bottom: .75rem; }
+    .c-hero-trust {
+        font-size: .78rem; color: var(--c-faint); display: flex; align-items: center; gap: .5rem;
+    }
+    .c-hero-trust i { color: var(--c-primary); }
+
+    /*  Why Choose  */
+    .c-why {
+        padding: 2rem 1.5rem; border-radius: 14px;
+        border: 1px solid var(--c-border); background: var(--c-bg);
+        transition: all .25s; height: 100%;
+    }
+    .c-why:hover { border-color: var(--c-primary); box-shadow: 0 8px 30px rgba(79,70,229,.06); transform: translateY(-3px); }
+    .c-why-ic { font-size: 1.5rem; margin-bottom: .75rem; }
+    .c-why h5 { font-size: .95rem; font-weight: 700; color: var(--c-dark); margin-bottom: .35rem; }
+    .c-why p { font-size: .85rem; color: var(--c-muted); line-height: 1.6; margin: 0; }
+
+    /*  Problem  */
+    .c-problem-item {
+        display: flex; gap: 1rem; padding: 1rem 0;
+        border-bottom: 1px solid var(--c-bg-alt);
+    }
+    .c-problem-item:last-child { border-bottom: none; }
+    .c-problem-item i { color: var(--c-muted); font-size: .85rem; margin-top: .15rem; flex-shrink: 0; }
+    .c-problem-item p { font-size: .9rem; color: var(--c-body); margin: 0; line-height: 1.6; }
+    .c-problem-item strong { color: var(--c-dark); }
+
+    /*  Services  */
+    .c-svc {
+        border-radius: 16px; overflow: hidden;
+        border: 1px solid var(--c-border); background: var(--c-bg);
+        transition: all .3s; height: 100%;
+    }
+    .c-svc:hover { border-color: var(--c-primary); box-shadow: 0 12px 40px rgba(79,70,229,.08); transform: translateY(-4px); }
+    .c-svc-top {
+        padding: 2rem 1.75rem 1.5rem;
+        background: linear-gradient(135deg, var(--c-primary-light) 0%, #e0e7ff 100%);
+        border-bottom: 1px solid var(--c-border);
+    }
+    .c-svc-top .ic { font-size: 2rem; margin-bottom: .75rem; }
+    .c-svc-top h4 { font-size: 1.15rem; font-weight: 800; color: var(--c-dark); margin-bottom: .25rem; }
+    .c-svc-top p { font-size: .85rem; color: var(--c-muted); margin: 0; }
+    .c-svc-body { padding: 1.5rem 1.75rem; }
+    .c-svc-body h6 { font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--c-faint); margin-bottom: .75rem; }
+    .c-svc-list { list-style: none; padding: 0; margin: 0 0 1.25rem; }
+    .c-svc-list li {
+        font-size: .85rem; color: var(--c-body); padding: .35rem 0;
+        display: flex; align-items: center; gap: .5rem;
+    }
+    .c-svc-list li::before {
+        content: ''; width: 5px; height: 5px; border-radius: 50%;
+        background: var(--c-primary); flex-shrink: 0;
+    }
+    .c-svc-tag {
+        font-size: .72rem; font-weight: 600; color: var(--c-primary);
+        background: var(--c-primary-light); padding: .35rem .75rem;
+        border-radius: 6px; display: inline-block;
+    }
+
+    /*  Steps  */
+    .c-step {
+        display: flex; gap: 1.25rem; padding: 1.5rem;
+        border-radius: 14px; border: 1px solid var(--c-border);
+        background: var(--c-bg); transition: all .25s; align-items: flex-start;
+    }
+    .c-step:hover { border-color: var(--c-primary); box-shadow: 0 4px 20px rgba(79,70,229,.06); }
+    .c-step-num {
+        width: 48px; height: 48px; border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: .85rem; font-weight: 800; color: var(--c-primary);
+        background: var(--c-primary-light); flex-shrink: 0;
+    }
+    .c-step h5 { font-size: .95rem; font-weight: 700; color: var(--c-dark); margin: 0 0 .25rem; }
+    .c-step p { font-size: .85rem; color: var(--c-muted); margin: 0; line-height: 1.5; }
+
+    /*  Testimonials  */
+    .c-test {
+        padding: 2rem; border-radius: 14px;
+        border: 1px solid var(--c-border); background: var(--c-bg);
+        transition: all .25s; height: 100%;
+        display: flex; flex-direction: column;
+    }
+    .c-test:hover { border-color: var(--c-primary); box-shadow: 0 4px 20px rgba(79,70,229,.06); }
+    .c-test-quote {
+        font-size: .92rem; color: var(--c-body); line-height: 1.7;
+        font-style: italic; margin-bottom: 1.25rem; flex: 1;
+    }
+    .c-test-quote::before { content: '\201C'; color: var(--c-primary); font-size: 1.5rem; font-weight: 800; margin-right: .25rem; }
+    .c-test-author { display: flex; align-items: center; gap: .75rem; }
+    .c-test-av {
+        width: 40px; height: 40px; border-radius: 50%;
+        background: var(--c-primary-light); display: flex; align-items: center; justify-content: center;
+        font-weight: 700; font-size: .8rem; color: var(--c-primary); flex-shrink: 0;
+    }
+    .c-test-name { font-size: .82rem; font-weight: 700; color: var(--c-dark); }
+    .c-test-role { font-size: .72rem; color: var(--c-faint); }
+
+    /*  FAQ  */
+    .c-faq {
+        border-bottom: 1px solid var(--c-border); padding: 1.25rem 0;
+    }
+    .c-faq:last-child { border-bottom: none; }
+    .c-faq-q {
+        font-size: .92rem; font-weight: 700; color: var(--c-dark);
+        cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+        transition: color .2s;
+    }
+    .c-faq-q:hover { color: var(--c-primary); }
+    .c-faq-q i { font-size: .75rem; color: var(--c-faint); transition: transform .3s; }
+    .c-faq.open .c-faq-q i { transform: rotate(180deg); }
+    .c-faq-a {
+        font-size: .88rem; color: var(--c-muted); line-height: 1.7;
+        max-height: 0; overflow: hidden; transition: max-height .3s, padding .3s;
+    }
+    .c-faq.open .c-faq-a { max-height: 200px; padding-top: .75rem; }
+    .c-faq-a a { color: var(--c-primary); text-decoration: none; font-weight: 600; }
+    .c-faq-a a:hover { text-decoration: underline; }
+
+    /*  Stats  */
+    .c-stat-row {
+        display: flex; justify-content: center; gap: 3rem; flex-wrap: wrap;
+        padding: 3rem 0; border-top: 1px solid var(--c-border); border-bottom: 1px solid var(--c-border);
+    }
+    .c-stat { text-align: center; padding: .5rem; min-width: 160px; }
+    .c-stat-num { font-size: clamp(1.8rem, 3vw, 2.4rem); font-weight: 800; color: var(--c-dark); line-height: 1; margin-bottom: .3rem; letter-spacing: -.02em; }
+    .c-stat-label { font-size: .78rem; color: var(--c-muted); }
+
+    /*  CTA  */
+    .c-final {
+        background: var(--c-dark); padding: 5rem 0; text-align: center;
+        position: relative; overflow: hidden;
+    }
+    .c-final::before {
+        content: ''; position: absolute; top: -50%; right: -10%;
+        width: 500px; height: 500px;
+        background: radial-gradient(circle, rgba(79,70,229,.15) 0%, transparent 70%);
+        border-radius: 50%; pointer-events: none;
+    }
+    .c-final h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 800; color: #fff; margin-bottom: .5rem; position: relative; }
+    .c-final p { font-size: 1rem; color: var(--c-faint); margin-bottom: 2rem; position: relative; max-width: 500px; margin-left: auto; margin-right: auto; }
+    .c-final-actions { display: flex; gap: .75rem; justify-content: center; flex-wrap: wrap; position: relative; margin-bottom: 1rem; }
+    .c-final-sub { font-size: .82rem; color: var(--c-faint); position: relative; }
+    .c-final-sub a { color: var(--c-primary); text-decoration: none; font-weight: 600; }
+    .c-final-sub a:hover { text-decoration: underline; }
+
+    /*  Footer  */
+    .c-foot {
+        background: var(--c-dark); border-top: 1px solid rgba(255,255,255,.08);
+        padding: 1.5rem 0; text-align: center;
+    }
+    .c-foot p { font-size: .75rem; color: rgba(255,255,255,.35); margin: 0; }
+</style>
+{% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-expand-lg navbar-community sticky-top">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center" href="{% url 'community:home' %}">
+            <i class="fas fa-users text-success me-2 fa-lg"></i>
+            <span class="fw-bold text-heading">OnWebApp <span class="text-success fw-normal">Community</span></span>
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#communityNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="communityNav">
+            <ul class="navbar-nav ms-auto align-items-center">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'community:dashboard' %}"><i class="fas fa-tachometer-alt me-1"></i> Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'community:wizard_start' %}?new=1"><i class="fas fa-magic me-1"></i> New Project</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'community:brand_assist' %}"><i class="fas fa-paint-brush me-1"></i> Brand Assist</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'forum:home' %}"><i class="fas fa-comments me-1"></i> Forum</a>
+                </li>
+                <li class="nav-item ms-lg-3">
+                    <span class="text-muted small me-2">{{ user.username }}</span>
+                    <a href="{% url 'users:logout' %}" class="btn btn-outline-secondary btn-sm">Log Out</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+{% endblock %}
+
+{% block community_content %}
+
+<!--  HERO  -->
+<section class="c-hero">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-7">
+                <div class="c-reveal-left">
+                    <div class="c-hero-eyebrow">ONWEBAPP COMMUNITY SERVICES</div>
+                    <h1>Your Mission Deserves a <em>Digital Presence</em> That Matches It</h1>
+                    <p class="c-hero-sub">Premium websites and branding — built exclusively for <em>community initiatives</em>.</p>
+                    <p class="c-hero-sub">You didn't start your project to wrestle with hosting, plugins, and design tools. You started it to change something. So let us handle the tech — you go make the impact.</p>
+                    <div class="c-hero-actions">
+                        <a href="{% url 'community:wizard_start' %}?new=1" class="c-btn-primary">Start Your Project <i class="fas fa-arrow-right"></i></a>
+                        <a href="{% url 'forum:home' %}" class="c-btn-outline"><i class="fas fa-comments me-1"></i> Community Forum</a>
+                    </div>
+                    <div class="c-hero-trust">
+                        <i class="fas fa-check-circle"></i> Trusted by 200+ community projects worldwide
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--  WHY CHOOSE  -->
+<section class="c-sec">
+    <div class="container">
+        <div class="c-sec-head text-center c-reveal">
+            <div class="c-sec-label justify-content-center">WHY TEAMS CHOOSE ONWEBAPP</div>
+            <h2 class="c-sec-title">Built for Purpose, Not Profit</h2>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3 c-reveal c-stagger-1">
+                <div class="c-why">
+                    <div class="c-why-ic"></div>
+                    <h5>Live in Days, Not Months</h5>
+                    <p>Our streamlined process gets your project online fast — without cutting corners.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3 c-reveal c-stagger-2">
+                <div class="c-why">
+                    <div class="c-why-ic"></div>
+                    <h5>Quality That Earns Trust</h5>
+                    <p>Industry-standard design and development, so your community sees you as the real deal.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3 c-reveal c-stagger-3">
+                <div class="c-why">
+                    <div class="c-why-ic"></div>
+                    <h5>A Real Human, Always Available</h5>
+                    <p>Skip the ticket queues. Talk directly to our team whenever you need us.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3 c-reveal c-stagger-4">
+                <div class="c-why">
+                    <div class="c-why-ic"></div>
+                    <h5>Built for Community, Not Corporations</h5>
+                    <p>We work exclusively with community initiatives — so we understand your constraints, your budget, and your mission.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--  THE PROBLEM  -->
+<section class="c-sec c-sec-alt">
+    <div class="container">
+        <div class="row align-items-start g-5">
+            <div class="col-lg-5 c-reveal-left">
+                <div class="c-sec-label">THE PROBLEM WE SOLVE</div>
+                <h2 class="c-sec-title" style="font-size:clamp(1.4rem,2.5vw,1.8rem);">Most community projects start with passion and a shoestring budget. Then reality hits.</h2>
+            </div>
+            <div class="col-lg-7 c-reveal-right">
+                <div class="c-problem-item">
+                    <i class="fas fa-circle-xmark"></i>
+                    <p><strong>Website builders feel overwhelming</strong> — endless templates, hidden fees, and tech jargon.</p>
+                </div>
+                <div class="c-problem-item">
+                    <i class="fas fa-circle-xmark"></i>
+                    <p><strong>Agencies are too expensive</strong> — quotes in the thousands before you've even launched.</p>
+                </div>
+                <div class="c-problem-item">
+                    <i class="fas fa-circle-xmark"></i>
+                    <p><strong>DIY eats your time</strong> — hours spent fiddling with design instead of serving your community.</p>
+                </div>
+                <div class="c-problem-item">
+                    <i class="fas fa-circle-xmark"></i>
+                    <p><strong>Generic tools don't fit</strong> — enterprise software built for profit, not purpose.</p>
+                </div>
+                <div style="margin-top:1.5rem;padding:1.25rem;border-radius:12px;background:var(--c-primary-light);border:1px solid rgba(79,70,229,.1);">
+                    <p style="font-size:.9rem;color:var(--c-body);margin:0;line-height:1.7;">We built OnWebApp to fix all of that. <strong style="color:var(--c-primary);">Premium digital services, priced and designed for the people doing the most important work.</strong></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--  SERVICES  -->
+<section class="c-sec">
+    <div class="container">
+        <div class="c-sec-head text-center c-reveal">
+            <div class="c-sec-label justify-content-center">EVERYTHING YOU NEED</div>
+            <h2 class="c-sec-title">To Show Up Strong Online</h2>
+            <p class="c-sec-sub mx-auto">Three core services. One goal: a digital presence your community is proud of.</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-lg-4 c-reveal c-stagger-1">
+                <div class="c-svc">
+                    <div class="c-svc-top">
+                        <div class="ic"></div>
+                        <h4>Website Building</h4>
+                        <p>A custom website that looks incredible on every device — and works as hard as you do.</p>
+                    </div>
+                    <div class="c-svc-body">
+                        <h6>What's Included</h6>
+                        <ul class="c-svc-list">
+                            <li>Responsive mobile-first design</li>
+                            <li>SEO optimization built in</li>
+                            <li>Easy-to-use content management</li>
+                            <li>Secure, reliable hosting setup</li>
+                            <li>Accessibility best practices (WCAG-friendly)</li>
+                            <li>Analytics & performance tracking</li>
+                        </ul>
+                        <div class="c-svc-tag">Perfect for: nonprofits, local clubs, grassroots movements, faith groups, and mutual aid networks.</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 c-reveal c-stagger-2">
+                <div class="c-svc">
+                    <div class="c-svc-top">
+                        <div class="ic"></div>
+                        <h4>Brand Assist</h4>
+                        <p>An identity people remember — and rally behind.</p>
+                    </div>
+                    <div class="c-svc-body">
+                        <h6>What's Included</h6>
+                        <ul class="c-svc-list">
+                            <li>Logo design & refinement</li>
+                            <li>Color palette selection</li>
+                            <li>Typography guidelines</li>
+                            <li>Social media asset kit</li>
+                            <li>Brand voice & messaging guide</li>
+                            <li>Print-ready templates (flyers, posters, business cards)</li>
+                        </ul>
+                        <div class="c-svc-tag">Perfect for: new initiatives finding their feet, or established projects ready for a refresh.</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 c-reveal c-stagger-3">
+                <div class="c-svc">
+                    <div class="c-svc-top">
+                        <div class="ic"></div>
+                        <h4>Community Forum</h4>
+                        <p>Where your people connect, learn, and grow together.</p>
+                    </div>
+                    <div class="c-svc-body">
+                        <h6>What's Included</h6>
+                        <ul class="c-svc-list">
+                            <li>Discussions & Q&A</li>
+                            <li>Project showcase</li>
+                            <li>Trending topics</li>
+                            <li>Community events</li>
+                            <li>Private groups & member profiles</li>
+                            <li>Moderation tools & spam protection</li>
+                        </ul>
+                        <div class="c-svc-tag">Perfect for: member organizations, alumni networks, volunteer teams, and learning communities.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--  STEPS  -->
+<section class="c-sec c-sec-alt">
+    <div class="container">
+        <div class="c-sec-head text-center c-reveal">
+            <div class="c-sec-label justify-content-center">HOW IT WORKS</div>
+            <h2 class="c-sec-title">From Idea to Impact in Three Steps</h2>
+        </div>
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-4 c-reveal c-stagger-1">
+                <div class="c-step" style="flex-direction:column;text-align:center;align-items:center;">
+                    <div class="c-step-num">01</div>
+                    <div>
+                        <h5>Tell Us What You Need</h5>
+                        <p>Choose a service, fill out a quick brief. That's it — no lengthy onboarding, no sales calls.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 c-reveal c-stagger-2">
+                <div class="c-step" style="flex-direction:column;text-align:center;align-items:center;">
+                    <div class="c-step-num">02</div>
+                    <div>
+                        <h5>We Build It Together</h5>
+                        <p>Our team gets to work, sharing updates and folding in your feedback at every stage.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 c-reveal c-stagger-3">
+                <div class="c-step" style="flex-direction:column;text-align:center;align-items:center;">
+                    <div class="c-step-num">03</div>
+                    <div>
+                        <h5>Launch, Grow, Repeat</h5>
+                        <p>Get your finished website or brand assets — and start reaching more people.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--  TESTIMONIALS  -->
+<section class="c-sec">
+    <div class="container">
+        <div class="c-sec-head text-center c-reveal">
+            <div class="c-sec-label justify-content-center">TESTIMONIALS</div>
+            <h2 class="c-sec-title">What Community Leaders Are Saying</h2>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4 c-reveal c-stagger-1">
+                <div class="c-test">
+                    <div class="c-test-quote">We went from a blank page to a fully live website in under two weeks. The team just got our mission — no explaining required.</div>
+                    <div class="c-test-author">
+                        <div class="c-test-av">AO</div>
+                        <div>
+                            <div class="c-test-name">Amara O.</div>
+                            <div class="c-test-role">Community Garden Collective</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 c-reveal c-stagger-2">
+                <div class="c-test">
+                    <div class="c-test-quote">The branding package made us look like a national organization. Our donations doubled within three months.</div>
+                    <div class="c-test-author">
+                        <div class="c-test-av">DR</div>
+                        <div>
+                            <div class="c-test-name">Daniel R.</div>
+                            <div class="c-test-role">Youth Mentorship Network</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 c-reveal c-stagger-3">
+                <div class="c-test">
+                    <div class="c-test-quote">Finally, a service that speaks our language and respects our budget. We felt like partners, not clients.</div>
+                    <div class="c-test-author">
+                        <div class="c-test-av">PS</div>
+                        <div>
+                            <div class="c-test-name">Priya S.</div>
+                            <div class="c-test-role">Neighborhood Food Bank</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--  FAQ  -->
+<section class="c-sec c-sec-alt">
+    <div class="container">
+        <div class="row g-5">
+            <div class="col-lg-5 c-reveal-left">
+                <div class="c-sec-label">FAQ</div>
+                <h2 class="c-sec-title" style="font-size:clamp(1.4rem,2.5vw,1.8rem);">Common Questions, Answered</h2>
+                <p class="c-sec-sub" style="margin-top:.75rem;">Everything you need to know before getting started.</p>
+            </div>
+            <div class="col-lg-7 c-reveal-right">
+                <div class="c-faq open">
+                    <div class="c-faq-q" onclick="this.parentElement.classList.toggle('open')">Do I need any technical skills? <i class="fas fa-chevron-down"></i></div>
+                    <div class="c-faq-a">None at all. We handle everything from setup to launch — and give you a simple dashboard to manage things afterward.</div>
+                </div>
+                <div class="c-faq">
+                    <div class="c-faq-q" onclick="this.parentElement.classList.toggle('open')">How long does a typical project take? <i class="fas fa-chevron-down"></i></div>
+                    <div class="c-faq-a">Most websites go live within 2–3 weeks. Branding packages typically take 1–2 weeks. Need it faster? Ask about our priority track.</div>
+                </div>
+                <div class="c-faq">
+                    <div class="c-faq-q" onclick="this.parentElement.classList.toggle('open')">What does it cost? <i class="fas fa-chevron-down"></i></div>
+                    <div class="c-faq-a">Pricing is scaled for community budgets — far below typical agency rates. <a href="{% url 'community:wizard_start' %}?new=1">View pricing </a></div>
+                </div>
+                <div class="c-faq">
+                    <div class="c-faq-q" onclick="this.parentElement.classList.toggle('open')">Can I make changes after launch? <i class="fas fa-chevron-down"></i></div>
+                    <div class="c-faq-a">Absolutely. Every site comes with an easy-to-use CMS, plus ongoing support if you'd rather have us handle updates.</div>
+                </div>
+                <div class="c-faq">
+                    <div class="c-faq-q" onclick="this.parentElement.classList.toggle('open')">What if I already have a website or logo? <i class="fas fa-chevron-down"></i></div>
+                    <div class="c-faq-a">Great — we can redesign, refine, or build alongside what you already have. Just tell us what's working and what isn't.</div>
+                </div>
+                <div class="c-faq">
+                    <div class="c-faq-q" onclick="this.parentElement.classList.toggle('open')">Do you offer ongoing support? <i class="fas fa-chevron-down"></i></div>
+                    <div class="c-faq-a">Yes. Every project includes dedicated post-launch support, with optional maintenance plans for long-term peace of mind.</div>
+                </div>
+                <div class="c-faq">
+                    <div class="c-faq-q" onclick="this.parentElement.classList.toggle('open')">Is my data safe? <i class="fas fa-chevron-down"></i></div>
+                    <div class="c-faq-a">Always. We use secure hosting, encrypted connections, and industry-standard data practices. Your community's information stays protected.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--  STATS  -->
+<section class="c-sec">
+    <div class="container">
+        <div class="c-sec-head text-center c-reveal">
+            <div class="c-sec-label justify-content-center">BY THE NUMBERS</div>
+        </div>
+        <div class="c-reveal">
+            <div class="c-stat-row">
+                <div class="c-stat">
+                    <div class="c-stat-num">{{ stats.members|default:"200+" }}</div>
+                    <div class="c-stat-label">Community projects launched</div>
+                </div>
+                <div class="c-stat">
+                    <div class="c-stat-num">14</div>
+                    <div class="c-stat-label">Days average time to launch</div>
+                </div>
+                <div class="c-stat">
+                    <div class="c-stat-num">98%</div>
+                    <div class="c-stat-label">Client satisfaction rate</div>
+                </div>
+                <div class="c-stat">
+                    <div class="c-stat-num">24/7</div>
+                    <div class="c-stat-label">Access to your support team</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--  FINAL CTA  -->
+<section class="c-final c-reveal-scale">
+    <div class="container">
+        <h2>Ready to Make a Bigger Impact?</h2>
+        <p>Join the community projects already trusting OnWebApp to power their digital presence.</p>
+        <div class="c-final-actions">
+            <a href="{% url 'community:wizard_start' %}?new=1" class="c-btn-white">Get Started Free <i class="fas fa-arrow-right"></i></a>
+            <a href="{% url 'forum:home' %}" class="c-btn-outline" style="border-color:rgba(255,255,255,.25);color:#fff;"><i class="fas fa-comments me-1"></i> Community Forum</a>
+        </div>
+        <div class="c-final-sub">
+            No commitment. Just momentum.<br>
+            Still have questions? <a href="{% url 'community:dashboard' %}">Talk to our team </a> — we usually reply within a few hours.
+        </div>
+    </div>
+</section>
+
+<!--  FOOTER  -->
+<div class="c-foot">
+    <div class="container">
+        <p>&copy; 2026 OnWebApp Community Services. Simplified for your focus.</p>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block footer %}{% endblock %}
+
+{% block extra_js %}
+<script>
+(function(){
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.c-reveal, .c-reveal-left, .c-reveal-right, .c-reveal-scale').forEach(el => {
+        observer.observe(el);
+    });
+})();
+</script>
+{% endblock %}

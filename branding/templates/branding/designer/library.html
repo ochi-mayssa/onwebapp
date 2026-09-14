@@ -7,7 +7,7 @@
 <style>body{background:#f5f5f7!important;}body .branding-page{background:#f5f5f7;padding:0!important;margin:0!important;}body .branding-header,body .branding-footer,body footer{display:none!important;}.dd-main .dd-collection-card{background:#fff!important;border-color:#e5e7eb!important;color:#111827!important;}.dd-main .dd-collection-card:hover{border-color:#6366f1!important;box-shadow:0 8px 24px rgba(99,102,241,.08)!important;}.dd-main .dd-collection-name{color:#111827!important;}.dd-main .dd-collection-meta{color:#6b7280!important;}.dd-main .dd-collection-desc{color:#6b7280!important;}.dd-main .dd-collection-count{color:#6b7280!important;}.dd-main .dd-collection-date{color:#9ca3af!important;}.dd-main .dd-tag{background:#f3f4f6!important;color:#374151!important;border-color:#e5e7eb!important;}.dd-main .dd-card{background:#fff!important;border-color:#e5e7eb!important;}.dd-main .dd-empty{color:#6b7280!important;}.dd-main .dd-empty i{color:#d1d5db!important;}</style>
 <script>document.body.classList.add('dd-active');</script>
 <div class="dd-layout">
-    {# ── Sidebar ── #}
+    {#  Sidebar  #}
     <aside class="dd-sidebar" id="ddSidebar">
         <a class="dd-sidebar-logo" href="{% url 'branding:designer_dashboard' %}">
             <span class="dd-sidebar-logo-icon"><i class="fa-solid fa-palette"></i></span>
@@ -18,7 +18,7 @@
         </a>
 
         <nav class="dd-sidebar-nav">
-            {# ── Dashboard ── #}
+            {#  Dashboard  #}
             <div class="dd-sidebar-section">
                 <div class="dd-sidebar-section-title">Dashboard</div>
                 <a href="{% url 'branding:designer_dashboard' %}" class="dd-nav-item">
@@ -29,7 +29,7 @@
                 </a>
             </div>
 
-            {# ── Design Library ── #}
+            {#  Design Library  #}
             <div class="dd-sidebar-section">
                 <div class="dd-sidebar-section-title">Design Library</div>
                 <a href="{% url 'branding:design_library' %}" class="dd-nav-item active">
@@ -46,7 +46,7 @@
                 </a>
             </div>
 
-            {# ── Workspace ── #}
+            {#  Workspace  #}
             <div class="dd-sidebar-section">
                 <div class="dd-sidebar-section-title">Workspace</div>
                 <a href="{% url 'branding:my_requests' %}" class="dd-nav-item">
@@ -60,7 +60,7 @@
                 </a>
             </div>
 
-            {# ── Collaboration ── #}
+            {#  Collaboration  #}
             <div class="dd-sidebar-section">
                 <div class="dd-sidebar-section-title">Collaboration</div>
                 <a href="{% url 'branding:feedback_list' %}" class="dd-nav-item">
@@ -80,7 +80,7 @@
 
     <div class="dd-sidebar-overlay" id="ddSidebarOverlay"></div>
 
-    {# ── Main Content ── #}
+    {#  Main Content  #}
     <main class="dd-main">
         <header class="dd-topbar">
             <div class="dd-topbar-left">
@@ -102,13 +102,13 @@
             {% endfor %}
             {% endif %}
 
-            {# ── Search Bar ── #}
+            {#  Search Bar  #}
             <form method="get" class="dd-search-bar" style="margin-bottom:1.5rem;">
                 <input type="text" name="q" value="{{ search_query }}" placeholder="Search collections, resources, or templates..." class="dd-input">
                 <button type="submit" class="dd-btn dd-btn-ghost"><i class="fa-solid fa-search"></i></button>
             </form>
 
-            {# ── Tab Filters ── #}
+            {#  Tab Filters  #}
             <div class="dd-filter-row" style="margin-bottom:1.5rem;">
                 <a href="?tab=collections{% if search_query %}&q={{ search_query }}{% endif %}" class="dd-filter {% if tab == 'collections' %}active{% endif %}">
                     <i class="fa-solid fa-layer-group" style="margin-right:4px;"></i>Collections
@@ -124,12 +124,12 @@
                 </a>
             </div>
 
-            {# ── Collections Tab ── #}
+            {#  Collections Tab  #}
             {% if tab == 'collections' %}
             <div class="dd-tab-content active">
                 {% if my_collections %}
                 <div class="dd-grid-3">
-                    {# ── New Collection Card ── #}
+                    {#  New Collection Card  #}
                     <div class="dd-card dd-collection-card" style="border:2px dashed var(--dd-border);cursor:pointer;display:flex;align-items:center;justify-content:center;min-height:180px;" onclick="openPanel('createCollectionPanel')">
                         <div style="text-align:center;">
                             <div style="width:48px;height:48px;border-radius:12px;background:var(--dd-bg-elevated);display:inline-flex;align-items:center;justify-content:center;margin-bottom:0.75rem;">
@@ -178,11 +178,11 @@
             </div>
             {% endif %}
 
-            {# ── Resources Tab ── #}
+            {#  Resources Tab  #}
             {% if tab == 'resources' %}
             <div class="dd-tab-content active">
 
-                {# ── My Resources ── #}
+                {#  My Resources  #}
                 <div style="margin-bottom:2rem;">
                     <h5 style="font-weight:700;margin-bottom:0.75rem;"><i class="fa-solid fa-user" style="margin-right:0.5rem;color:var(--dd-text-muted);"></i>My Resources</h5>
                     {% if my_resources %}
@@ -263,7 +263,7 @@
                     {% endif %}
                 </div>
 
-                {# ── Team Shared ── #}
+                {#  Team Shared  #}
                 <div>
                     <h5 style="font-weight:700;margin-bottom:0.75rem;"><i class="fa-solid fa-users" style="margin-right:0.5rem;color:var(--dd-text-muted);"></i>Team Shared</h5>
                     {% if team_resources %}
@@ -337,11 +337,11 @@
             </div>
             {% endif %}
 
-            {# ── Templates Tab ── #}
+            {#  Templates Tab  #}
             {% if tab == 'templates' %}
             <div class="dd-tab-content active">
 
-                {# ── My Templates ── #}
+                {#  My Templates  #}
                 <div style="margin-bottom:2rem;">
                     <h5 style="font-weight:700;margin-bottom:0.75rem;"><i class="fa-solid fa-user" style="margin-right:0.5rem;color:var(--dd-text-muted);"></i>My Templates</h5>
                     {% if my_templates %}
@@ -368,7 +368,7 @@
                     {% endif %}
                 </div>
 
-                {# ── Team Templates ── #}
+                {#  Team Templates  #}
                 <div>
                     <h5 style="font-weight:700;margin-bottom:0.75rem;"><i class="fa-solid fa-users" style="margin-right:0.5rem;color:var(--dd-text-muted);"></i>Team Templates</h5>
                     {% if shared_templates %}
@@ -397,7 +397,7 @@
     </main>
 </div>
 
-{# ── Add Design Modal ── #}
+{#  Add Design Modal  #}
 <div class="dd-modal-overlay" id="addDesignModal" style="display:none;" onclick="if(event.target===this)closeModal('addDesignModal')">
     <div class="dd-modal">
         <form method="post" action="{% url 'branding:design_library' %}" enctype="multipart/form-data">
@@ -410,13 +410,13 @@
             </div>
 
             <div class="dd-modal-body">
-                {# ── Title ── #}
+                {#  Title  #}
                 <div class="dd-panel-field">
                     <label class="dd-label">Title <span class="dd-required">*</span></label>
                     <input type="text" name="title" class="dd-input" required placeholder="e.g. Acme Brand Guidelines">
                 </div>
 
-                {# ── File Upload Zone ── #}
+                {#  File Upload Zone  #}
                 <div class="dd-panel-field">
                     <label class="dd-label">File</label>
                     <div class="dd-drop-zone" id="addDesignDropZone">
@@ -437,13 +437,13 @@
                     <input type="file" name="file" id="addDesignFileInput" class="d-none">
                 </div>
 
-                {# ── URL Input ── #}
+                {#  URL Input  #}
                 <div class="dd-panel-field">
                     <label class="dd-label">Or paste a URL</label>
                     <input type="url" name="url" class="dd-input" placeholder="https://dribbble.com/shots/...">
                 </div>
 
-                {# ── Category ── #}
+                {#  Category  #}
                 <div class="dd-panel-field">
                     <label class="dd-label">Category</label>
                     <select name="category" class="dd-input">
@@ -454,7 +454,7 @@
                     </select>
                 </div>
 
-                {# ── Visibility ── #}
+                {#  Visibility  #}
                 <div class="dd-panel-field">
                     <label class="dd-label">Visibility</label>
                     <select name="visibility" class="dd-input">
@@ -464,7 +464,7 @@
                     </select>
                 </div>
 
-                {# ── Collection ── #}
+                {#  Collection  #}
                 <div class="dd-panel-field">
                     <label class="dd-label">Collection</label>
                     <select name="collection_id" class="dd-input">
@@ -475,13 +475,13 @@
                     </select>
                 </div>
 
-                {# ── Description ── #}
+                {#  Description  #}
                 <div class="dd-panel-field">
                     <label class="dd-label">Description</label>
                     <textarea name="description" class="dd-input" rows="3" placeholder="Describe this design asset..."></textarea>
                 </div>
 
-                {# ── Tags ── #}
+                {#  Tags  #}
                 <div class="dd-panel-field">
                     <label class="dd-label">Tags</label>
                     <div class="dd-tag-input-wrap" id="addDesignTagInputWrap">
@@ -491,7 +491,7 @@
                     <input type="hidden" name="tags" id="addDesignTagsHidden" value="">
                 </div>
 
-                {# ── Color Hex ── #}
+                {#  Color Hex  #}
                 <div class="dd-panel-field">
                     <label class="dd-label">Color Hex</label>
                     <div style="display:flex;align-items:center;gap:0.75rem;">
@@ -500,7 +500,7 @@
                     </div>
                 </div>
 
-                {# ── Font Name ── #}
+                {#  Font Name  #}
                 <div class="dd-panel-field">
                     <label class="dd-label">Font Name</label>
                     <input type="text" name="font_name" class="dd-input" placeholder="e.g. Inter, Montserrat, Fira Code">
@@ -515,8 +515,8 @@
     </div>
 </div>
 
-{# ── Create Collection Modal ── #}
-{# ── Create Collection Panel ── #}
+{#  Create Collection Modal  #}
+{#  Create Collection Panel  #}
 <div class="dd-slide-panel" id="createCollectionPanel">
     <div class="dd-panel-topbar">
         <div class="dd-panel-topbar-title">Create Collection</div>
@@ -530,7 +530,7 @@
         <input type="hidden" name="fonts" id="ccFontsHidden">
 
         <div class="dd-panel-scroll">
-            {# ── Industry Presets ── #}
+            {#  Industry Presets  #}
             <div>
                 <label class="dd-label" style="margin-bottom:0.5rem;">Quick Start</label>
                 <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;" id="ccPresets">
@@ -555,13 +555,13 @@
                 </div>
             </div>
 
-            {# ── Name ── #}
+            {#  Name  #}
             <div class="dd-panel-field">
                 <label class="dd-label">Collection Name <span class="dd-required">*</span></label>
                 <input type="text" name="name" id="ccName" class="dd-input" required placeholder="e.g. Acme Corp Brand Identity">
             </div>
 
-            {# ── Industry + Client row ── #}
+            {#  Industry + Client row  #}
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
                 <div class="dd-panel-field">
                     <label class="dd-label">Industry</label>
@@ -573,13 +573,13 @@
                 </div>
             </div>
 
-            {# ── Description ── #}
+            {#  Description  #}
             <div class="dd-panel-field">
                 <label class="dd-label">Description</label>
                 <textarea name="description" id="ccDesc" class="dd-input" rows="2" placeholder="Describe this brand collection..."></textarea>
             </div>
 
-            {# ── Accent Color ── #}
+            {#  Accent Color  #}
             <div class="dd-panel-field">
                 <label class="dd-label">Accent Color</label>
                 <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;" id="ccColorSwatches">
@@ -597,7 +597,7 @@
                 </div>
             </div>
 
-            {# ── Style Tags ── #}
+            {#  Style Tags  #}
             <div class="dd-panel-field">
                 <label class="dd-label">Style Tags</label>
                 <div class="dd-tag-input-wrap">
@@ -606,21 +606,21 @@
                 </div>
             </div>
 
-            {# ── Color Palette ── #}
+            {#  Color Palette  #}
             <div class="dd-panel-field">
                 <label class="dd-label">Color Palette <span class="dd-hint">(brand colors)</span></label>
                 <div id="ccPaletteInputs" style="display:flex;flex-direction:column;gap:0.5rem;"></div>
                 <button type="button" class="dd-btn dd-btn-ghost dd-btn-sm" style="margin-top:0.5rem;" onclick="addCcPaletteColor()"><i class="fa-solid fa-plus"></i>Add Color</button>
             </div>
 
-            {# ── Typography ── #}
+            {#  Typography  #}
             <div class="dd-panel-field">
                 <label class="dd-label">Typography <span class="dd-hint">(font names)</span></label>
                 <div id="ccFontInputs" style="display:flex;flex-direction:column;gap:0.5rem;"></div>
                 <button type="button" class="dd-btn dd-btn-ghost dd-btn-sm" style="margin-top:0.5rem;" onclick="addCcFont()"><i class="fa-solid fa-plus"></i>Add Font</button>
             </div>
 
-            {# ── Preview Images ── #}
+            {#  Preview Images  #}
             <div class="dd-panel-field">
                 <label class="dd-label">Preview Images <span class="dd-hint">(visual kit for clients)</span></label>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;" id="ccImageGrid">
@@ -667,7 +667,7 @@
                 </div>
             </div>
 
-            {# ── Live Preview ── #}
+            {#  Live Preview  #}
             <div class="dd-panel-field">
                 <label class="dd-label">Preview</label>
                 <div class="dd-card dd-collection-card" id="ccPreview" style="pointer-events:none;border-left:3px solid #6366f1;">
@@ -816,7 +816,7 @@ function closePanel(id) {
     if (el) { el.classList.remove('open'); document.body.style.overflow = ''; }
 }
 
-/* ── Create Collection Panel ─────────────────────────────────── */
+/*  Create Collection Panel  */
 (function() {
     var ccTags = [];
     var ccPalette = [];

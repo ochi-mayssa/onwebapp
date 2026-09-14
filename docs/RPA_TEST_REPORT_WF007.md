@@ -39,7 +39,7 @@
 
 ## 3. Certification Result
 
-**Status**: 🟢 **READY FOR PRODUCTION**
+**Status**:  **READY FOR PRODUCTION**
 
 **Conclusion**:
 The HR & Operations module is fully implemented with automated workflows for Onboarding, Leave Management, and Incident Reporting. All notifications are integrated correctly.

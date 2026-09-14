@@ -16,4 +16,7 @@ urlpatterns = [
     path('website-building/', views.website_building, name='website_building'),
     path('website-building/packages/', views.package_selection, name='package_selection'),
     path('brand-assist/', views.brand_assist, name='brand_assist'),
+    path('brand-assist/<int:profile_id>/save-addons/', views.brand_save_addons, name='brand_save_addons'),
+    path('brand-assist/<int:profile_id>/checkout/', views.brand_checkout, name='brand_checkout'),
+    path('brand-assist/<int:profile_id>/download/', views.brand_download, name='brand_download'),
 ]

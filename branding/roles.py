@@ -351,7 +351,7 @@ def get_role_dropdown_items(user):
     return items
 
 
-# ── Decorators ────────────────────────────────────────────────────────────
+#  Decorators 
 
 def designer_required(view_func):
     """Decorator: user must be a designer or superuser."""

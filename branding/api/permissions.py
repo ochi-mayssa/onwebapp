@@ -29,7 +29,7 @@ class IsOwnerOrStaff(BasePermission):
         # BrandingRequest has a `user` FK
         if hasattr(obj, 'user'):
             return obj.user_id == request.user.id
-        # BrandingFeedback has a `request` FK → check request.user
+        # BrandingFeedback has a `request` FK  check request.user
         if hasattr(obj, 'request') and hasattr(obj.request, 'user'):
             return obj.request.user_id == request.user.id
         # BrandingNotification has a `recipient` FK

@@ -357,10 +357,10 @@
                                 <td class="ps-0" style="width: 35%;"><div class="small fw-800 text-secondary uppercase tracking-wider">HTTPS</div></td>
                                 <td>
                                     {% if result.https %}
-                                    <span class="badge bg-success-soft text-success rounded-pill px-3 py-1 fw-800">Active ✓</span>
+                                    <span class="badge bg-success-soft text-success rounded-pill px-3 py-1 fw-800">Active </span>
                                     <span class="small text-muted ms-2">Final URL served over secure HTTPS</span>
                                     {% else %}
-                                    <span class="badge bg-danger-soft text-danger rounded-pill px-3 py-1 fw-800">Missing ✗</span>
+                                    <span class="badge bg-danger-soft text-danger rounded-pill px-3 py-1 fw-800">Missing </span>
                                     <span class="small text-muted ms-2">Page was served over unencrypted HTTP</span>
                                     {% endif %}
                                 </td>
@@ -522,9 +522,9 @@
                                 <td>
                                     {% if result.on_page.canonical_exists %}
                                     {% if result.on_page.canonical_self %}
-                                    <span class="badge bg-success-soft text-success rounded-pill px-3 py-1 fw-800">Self-canonical ✓</span>
+                                    <span class="badge bg-success-soft text-success rounded-pill px-3 py-1 fw-800">Self-canonical </span>
                                     {% else %}
-                                    <span class="badge bg-danger-soft text-danger rounded-pill px-3 py-1 fw-800">Different canonical ⚠</span>
+                                    <span class="badge bg-danger-soft text-danger rounded-pill px-3 py-1 fw-800">Different canonical </span>
                                     {% endif %}
                                     <div class="small text-slate-700 mt-1"><code class="x-small">{{ result.on_page.canonical_url }}</code></div>
                                     {% else %}

@@ -19,6 +19,12 @@ urlpatterns = [
     path('demo/', views.demo_request, name='demo_request'),
     path('events/', views.webinars, name='webinars'),
     path('build/', views.build_website, name='build_website'),
+    path('design/ux/', views.ux_design, name='ux_design'),
+    path('design/ui/', views.ui_design, name='ui_design'),
+    path('software/', views.software_home, name='software_home'),
+    path('software/web-development/', views.web_development, name='web_development'),
+    path('software/mobile-development/', views.mobile_development, name='mobile_development'),
+    path('software/ecommerce-development/', views.ecommerce_development, name='ecommerce_development'),
     path('design-system/', views.design_system, name='design_system'),
     path('overview/', views.video_explainer, name='video_explainer'),
 ]

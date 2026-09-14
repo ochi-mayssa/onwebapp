@@ -78,9 +78,9 @@ class Command(BaseCommand):
         # Sync orders
         if sync_customer_orders(customer):
             if verbose:
-                self.stdout.write(f'✓ Synced orders for {customer.name}')
+                self.stdout.write(f' Synced orders for {customer.name}')
         else:
-            self.stderr.write(f'✗ Failed to sync orders for {customer.name}')
+            self.stderr.write(f' Failed to sync orders for {customer.name}')
             return False
         
         # Sync invoices
@@ -104,9 +104,9 @@ class Command(BaseCommand):
                 )
             
             if verbose:
-                self.stdout.write(f'✓ Synced {len(invoices)} invoices for {customer.name}')
+                self.stdout.write(f' Synced {len(invoices)} invoices for {customer.name}')
         except Exception as e:
-            self.stderr.write(f'✗ Failed to sync invoices for {customer.name}: {str(e)}')
+            self.stderr.write(f' Failed to sync invoices for {customer.name}: {str(e)}')
             return False
         
         # Sync stock allocations
@@ -128,15 +128,15 @@ class Command(BaseCommand):
                 )
             
             if verbose:
-                self.stdout.write(f'✓ Synced {len(stock)} stock items for {customer.name}')
+                self.stdout.write(f' Synced {len(stock)} stock items for {customer.name}')
         except Exception as e:
-            self.stderr.write(f'✗ Failed to sync stock for {customer.name}: {str(e)}')
+            self.stderr.write(f' Failed to sync stock for {customer.name}: {str(e)}')
             return False
         
         # Update last sync time
         tracking.save()
         
         if verbose:
-            self.stdout.write(f'✓ Completed sync for {customer.name}')
+            self.stdout.write(f' Completed sync for {customer.name}')
         
         return True

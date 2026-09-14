@@ -74,7 +74,7 @@ community/
 templates (global):
   templates/community/
     base_community.html        # Community-specific base layout
-    home.html                  # Landing page with hero CTA → wizard
+    home.html                  # Landing page with hero CTA  wizard
     dashboard.html             # Dashboard with Smart Onboarding card
     website_intake.html        # Legacy intake form
     website_building.html      # Legacy alternate intake form
@@ -126,12 +126,12 @@ The core model — stores all wizard state as a single row.
 
 | Field | Type | Purpose |
 |---|---|---|
-| `user` | FK → User | Session owner |
+| `user` | FK  User | Session owner |
 | `session_key` | CharField(64, unique) | UUID4 session identifier |
 | `status` | CharField | `draft`, `in_progress`, `completed`, `abandoned` |
 | `current_step` | IntegerField(1–13) | Current wizard step |
 | `completed_steps` | JSONField | List of completed step numbers |
-| `selected_services` | ManyToMany → ServiceType | Step 2 |
+| `selected_services` | ManyToMany  ServiceType | Step 2 |
 | `business_name` | CharField(255) | Step 3 |
 | `industry` | CharField(100) | Step 3 |
 | `business_description` | TextField | Step 3 |
@@ -147,7 +147,7 @@ The core model — stores all wizard state as a single row.
 | `selected_package` | CharField(50) | Step 8 |
 | `selected_addons` | JSONField | Step 9 |
 | `payment_method` | CharField(50) | Step 12 |
-| `linked_project` | FK → Project | Generated workspace |
+| `linked_project` | FK  Project | Generated workspace |
 
 **Helper methods:** `mark_step_complete()`, `get_progress_pct()`, `get_step_name()`, `get_estimated_time_left()`, `get_selected_services_list()`, `get_features_list()`, `get_addons_list()`, `get_package_display()`, `get_design_style_display()`, `complete()`
 
@@ -173,16 +173,16 @@ The core model — stores all wizard state as a single row.
 Dataclass with fields: `budget_low`, `budget_high`, `timeline_weeks`, `complexity`, `recommended_package`, `selected_features`, `package_scores`
 
 Properties:
-- `total_cost` → average budget string
-- `total_days` → `timeline_weeks * 7`
+- `total_cost`  average budget string
+- `total_days`  `timeline_weeks * 7`
 
 ### calculate(session)
 
 Rule-based estimation engine (AI-ready — `calculate()` internals are swappable):
 
 - Base cost from `selected_services` (first service slug determines base)
-- Complexity multiplier from `selected_features` count (5+ → Complex)
-- Design style multiplier (modern/bold → 1.3x, elegant → 1.2x)
+- Complexity multiplier from `selected_features` count (5+  Complex)
+- Design style multiplier (modern/bold  1.3x, elegant  1.2x)
 - Package scores map to `basic_pkg`/`standard_pkg`/`advanced_pkg`/`enterprise_pkg`
 
 ### get_package_comparison(session)
@@ -277,7 +277,7 @@ base.html
 | 2 | `step_02_services.html` | Service type selection cards (radio-style, JS highlight) |
 | 3 | `step_03_business.html` | Text inputs for name, industry, description, audience |
 | 4 | `step_04_project.html` | Project name, goals, budget range dropdown, target date |
-| 5 | `step_05_design.html` | Design style cards, color pickers (input ↔ hex sync JS), typography select |
+| 5 | `step_05_design.html` | Design style cards, color pickers (input  hex sync JS), typography select |
 | 6 | `step_06_features.html` | Feature checkboxes with icons |
 | 7 | `step_07_estimate.html` | Budget, timeline, complexity results; feature breakdown; Next button |
 | 8 | `step_08_package.html` | Package comparison table with fit indicator, radio selection |
@@ -293,8 +293,8 @@ base.html
 |---|---|---|
 | `templates/base.html` | Lines ~587, 629 | Community nav link added |
 | `templates/community/home.html` | Hero CTA + service card | Redirects to `wizard_start` |
-| `templates/community/dashboard.html` | Smart Onboarding card | Shows status, step, progress; empty state CTA → wizard |
-| `templates/community/base_community.html` | Nav | "New Project" link → `wizard_start` |
+| `templates/community/dashboard.html` | Smart Onboarding card | Shows status, step, progress; empty state CTA  wizard |
+| `templates/community/base_community.html` | Nav | "New Project" link  `wizard_start` |
 
 ---
 
@@ -435,29 +435,5 @@ def is_community_user(user):
 
 ## Known Issues
 
-### 1. Missing URL: `community:project_detail`
-`templates/community/project_detail.html:318` references `{% url 'community:project_detail' project.id %}` but no such URL pattern exists in `community/urls.py`. Use `projects:project_detail` instead.
-
-### 2. Missing URL: `community:project_message`
-Same template references `{% url 'community:project_message' project.id %}` — not defined in `community/urls.py`.
-
-### 3. Duplicate Dashboard Templates
-Two `dashboard.html` files exist (`community/templates/community/dashboard.html` and `templates/community/dashboard.html`). Since `DIRS` is searched before `APP_DIRS`, the global version wins.
-
-### 4. Inconsistent Template Inheritance
-Some legacy templates extend `base.html` directly instead of `base_community.html`.
-
-### 5. Two Intake Form Implementations
-Legacy `website_intake.html` (ModelForm) and `website_building.html` (raw HTML) co-exist.
-
-### 6. `brand_assist` Is a Placeholder
-No actual branding functionality implemented.
-
-### 7. Step 12 Payment Is a Passthrough
+### 1. Step 12 Payment Is a Passthrough
 Payment step sets `payment_completed = True` without real Stripe integration. Replace with actual Stripe Checkout session creation for production.
-
-### 8. No Rate Limiting on Autosave
-The `wizard_autosave` endpoint accepts unlimited POST requests. Consider adding throttling.
-
-### 9. Email Only on Console Backend
-`EMAIL_BACKEND` defaults to console unless `EMAIL_HOST_USER/PASSWORD` env vars are set. Real emails require SMTP configuration.

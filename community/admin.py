@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import ServiceType, OnboardingSession, OnboardingAddon, BrandProfile
+from .models import ServiceType, OnboardingSession, OnboardingAddon, BrandProfile, WebsiteIntake
 
 
 @admin.register(ServiceType)
@@ -38,7 +38,26 @@ class OnboardingSessionAdmin(admin.ModelAdmin):
 
 @admin.register(BrandProfile)
 class BrandProfileAdmin(admin.ModelAdmin):
-    list_display = ('name', 'user', 'industry', 'personality', 'created_at')
-    list_filter = ('personality', 'brand_voice')
+    list_display = ('name', 'user', 'industry', 'personality', 'payment_status', 'addons_total', 'created_at')
+    list_filter = ('personality', 'brand_voice', 'payment_status')
     search_fields = ('name', 'user__username', 'industry')
     ordering = ('-created_at',)
+    readonly_fields = ('generated_palette', 'generated_typography', 'generated_voice_examples', 'created_at', 'updated_at', 'paid_at')
+    fieldsets = (
+        ('Brand', {'fields': ('user', 'name', 'industry', 'tagline', 'description', 'target_audience')}),
+        ('Design inputs', {'fields': ('personality', 'brand_voice', 'primary_color', 'secondary_color', 'accent_color', 'typography_preference', 'logo_description')}),
+        ('Payment (pay add-ons total to unlock download)', {'fields': ('payment_status', 'selected_addons', 'addons_total', 'stripe_session_id', 'paid_at')}),
+        ('Deliverables (staff upload — only downloadable when Paid)', {'fields': ('logo_final', 'guidelines_file')}),
+        ('Generated kit', {'fields': ('generated_palette', 'generated_typography', 'generated_voice_examples')}),
+        ('Timestamps', {'fields': ('created_at', 'updated_at')}),
+    )
+
+
+@admin.register(WebsiteIntake)
+class WebsiteIntakeAdmin(admin.ModelAdmin):
+    list_display = ('full_name', 'company_name', 'email', 'project_type', 'created_at')
+    list_filter = ('project_type',)
+    search_fields = ('full_name', 'company_name', 'email')
+    readonly_fields = ('created_at',)
+    def has_add_permission(self, request):
+        return False

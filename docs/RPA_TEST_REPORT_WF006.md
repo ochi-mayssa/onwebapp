@@ -29,6 +29,6 @@
 ---
 
 ## 3. Certification Result
-**Status**: 🔴 **FAIL**
+**Status**:  **FAIL**
 
 **Reason**: Incomplete Billing Lifecycle (Renewals/Failures missing).

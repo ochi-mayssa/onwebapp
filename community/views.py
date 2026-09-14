@@ -1,5 +1,6 @@
 import json
 import logging
+import time
 from decimal import Decimal
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
@@ -10,6 +11,7 @@ from django.core.mail import send_mail
 from django.http import JsonResponse
 from django.core.paginator import Paginator
 from django.utils import timezone
+from django.views.decorators.http import require_POST
 from users.models import UserProfile, ActivityLog, UserSubscription
 from payments.models import UserPaymentSelection, PaymentPlan
 from projects.models import Project, ProjectPhase, PhaseTask
@@ -24,9 +26,28 @@ from .services import calculate, get_package_comparison
 
 logger = logging.getLogger(__name__)
 
+_seeded = False
+
+
+def _seed_data_once():
+    global _seeded
+    if not _seeded:
+        _ensure_services_exist()
+        _ensure_addons_exist()
+        _ensure_plans_exist()
+        _seeded = True
+
 
 def is_community_user(user):
-    return user.is_authenticated and hasattr(user, 'profile') and user.profile.service_type == 'community'
+    if not user.is_authenticated:
+        return False
+    profile, _ = UserProfile.objects.get_or_create(user=user)
+    return profile.service_type == 'community'
+
+
+# Branding services clients pay for (add-ons total to unlock download).
+# Slugs must match OnboardingAddon entries seeded in _ensure_addons_exist().
+BRANDING_ADDON_SLUGS = ['logo-addon', 'brand-addon', 'social-kit']
 
 
 DESIGN_STYLES = [
@@ -178,8 +199,7 @@ def _ensure_plans_exist():
 # ---------------------------------------------------------------------------
 
 def home(request):
-    _ensure_services_exist()
-    _ensure_addons_exist()
+    _seed_data_once()
     active_sessions = []
     completed_count = 0
     if request.user.is_authenticated:
@@ -189,14 +209,38 @@ def home(request):
         completed_count = OnboardingSession.objects.filter(
             user=request.user, status='completed'
         ).count()
+    
+    # Community statistics
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+    members_count = User.objects.filter(is_active=True).count()
+    projects_count = OnboardingSession.objects.filter(status='completed').count()
+    discussions_count = 0
+    try:
+        from forum.models import ForumPost
+        discussions_count = ForumPost.objects.filter(status='published').count()
+    except Exception:
+        pass
+    topics_count = 0
+    try:
+        from forum.models import ForumCategory
+        topics_count = ForumCategory.objects.count()
+    except Exception:
+        pass
+    
     return render(request, 'community/home.html', {
         'active_sessions': active_sessions,
         'completed_count': completed_count,
+        'stats': {
+            'members': members_count,
+            'projects': projects_count,
+            'discussions': discussions_count,
+            'topics': topics_count,
+        },
     })
 
 
 @login_required
-@user_passes_test(is_community_user, login_url='users:onboarding', redirect_field_name=None)
 def dashboard(request):
     user = request.user
     profile, _ = UserProfile.objects.get_or_create(user=user)
@@ -244,11 +288,14 @@ def dashboard(request):
         'forum_comments_count': forum_comments_count,
         'badges_count': badges_count,
     }
+    brand_profiles = BrandProfile.objects.filter(user=user).order_by('-updated_at')[:6]
+
     return render(request, 'community/dashboard.html', {
         'profile': profile, 'subscription': active_sub, 'last_selection': last_selection,
         'activities': activities, 'projects': projects,
         'pending_approvals': pending_approvals, 'delayed_phases': delayed_phases,
         'recent_activities': recent_activities, 'active_session': active_session, 'stats': stats,
+        'brand_profiles': brand_profiles,
     })
 
 
@@ -257,11 +304,8 @@ def dashboard(request):
 # ---------------------------------------------------------------------------
 
 @login_required
-@user_passes_test(is_community_user, login_url='users:onboarding', redirect_field_name=None)
 def wizard_start(request):
-    _ensure_services_exist()
-    _ensure_addons_exist()
-    _ensure_plans_exist()
+    _seed_data_once()
 
     existing = OnboardingSession.objects.filter(
         user=request.user, status__in=['draft', 'in_progress']
@@ -300,7 +344,6 @@ def wizard_start(request):
 
 
 @login_required
-@user_passes_test(is_community_user, login_url='users:onboarding', redirect_field_name=None)
 def wizard_step(request, step):
     step = int(step)
     if step < 1 or step > 13:
@@ -343,6 +386,13 @@ def _handle_step2(request, session):
 
     if request.method == 'POST':
         selected_slugs = request.POST.getlist('services')
+        if not selected_slugs:
+            messages.error(request, 'Please select at least one service.')
+            return render(request, 'community/wizard/step_02_service.html', {
+                'session': session, 'services': services, 'selected_slugs': [],
+            })
+        valid_slugs = set(services.values_list('slug', flat=True))
+        selected_slugs = [s for s in selected_slugs if s in valid_slugs]
         session.selected_services.set(ServiceType.objects.filter(slug__in=selected_slugs))
         session.mark_step_complete(2)
         session.current_step = 3
@@ -358,12 +408,24 @@ def _handle_step2(request, session):
 
 def _handle_step3(request, session):
     if request.method == 'POST':
-        session.business_name = request.POST.get('business_name', '')
-        session.industry = request.POST.get('industry', '')
-        session.business_description = request.POST.get('business_description', '')
-        session.target_audience = request.POST.get('target_audience', '')
-        session.existing_website = request.POST.get('existing_website', '')
-        session.competitors = request.POST.get('competitors', '')
+        business_name = request.POST.get('business_name', '').strip()
+        industry = request.POST.get('industry', '').strip()
+        business_description = request.POST.get('business_description', '').strip()
+        target_audience = request.POST.get('target_audience', '').strip()
+
+        if not business_name:
+            messages.error(request, 'Business name is required.')
+            return render(request, 'community/wizard/step_03_business.html', {'session': session})
+        if not industry:
+            messages.error(request, 'Industry is required.')
+            return render(request, 'community/wizard/step_03_business.html', {'session': session})
+
+        session.business_name = business_name
+        session.industry = industry
+        session.business_description = business_description
+        session.target_audience = target_audience
+        session.existing_website = request.POST.get('existing_website', '').strip()
+        session.competitors = request.POST.get('competitors', '').strip()
         session.mark_step_complete(3)
         session.current_step = 4
         session.save()
@@ -376,16 +438,23 @@ def _handle_step3(request, session):
 
 def _handle_step4(request, session):
     if request.method == 'POST':
-        session.project_name = request.POST.get('project_name', '')
-        session.project_goals = request.POST.get('project_goals', '')
-        session.budget_range = request.POST.get('budget_range', '')
-        launch = request.POST.get('target_launch_date', '')
+        project_name = request.POST.get('project_name', '').strip()
+        project_goals = request.POST.get('project_goals', '').strip()
+
+        if not project_name:
+            messages.error(request, 'Project name is required.')
+            return render(request, 'community/wizard/step_04_project.html', {'session': session})
+
+        session.project_name = project_name
+        session.project_goals = project_goals
+        session.budget_range = request.POST.get('budget_range', '').strip()
+        launch = request.POST.get('target_launch_date', '').strip()
         if launch:
             try:
                 session.target_launch_date = launch
             except Exception:
                 pass
-        session.additional_notes = request.POST.get('additional_notes', '')
+        session.additional_notes = request.POST.get('additional_notes', '').strip()
         session.mark_step_complete(4)
         session.current_step = 5
         session.save()
@@ -398,11 +467,20 @@ def _handle_step4(request, session):
 
 def _handle_step5(request, session):
     if request.method == 'POST':
-        session.design_style = request.POST.get('design_style', '')
-        session.primary_color = request.POST.get('primary_color', '#6366f1')
-        session.accent_color = request.POST.get('accent_color', '#8b5cf6')
-        session.typography_style = request.POST.get('typography_style', '')
-        session.inspiration_sites = request.POST.get('inspiration_sites', '')
+        design_style = request.POST.get('design_style', '').strip()
+        if not design_style:
+            messages.error(request, 'Please select a design style.')
+            return render(request, 'community/wizard/step_05_design.html', {
+                'session': session,
+                'design_styles': DESIGN_STYLES,
+                'typography_styles': TYPOGRAPHY_STYLES,
+            })
+
+        session.design_style = design_style
+        session.primary_color = request.POST.get('primary_color', '#6366f1').strip()
+        session.accent_color = request.POST.get('accent_color', '#8b5cf6').strip()
+        session.typography_style = request.POST.get('typography_style', '').strip()
+        session.inspiration_sites = request.POST.get('inspiration_sites', '').strip()
         session.mark_step_complete(5)
         session.current_step = 6
         session.save()
@@ -509,15 +587,12 @@ def _handle_step10(request, session):
 
 
 def _handle_step11(request, session):
-    if session.estimation_data:
-        estimation = calculate(session)
-    else:
-        estimation = calculate(session)
+    estimation = calculate(session)
+    if not session.estimation_data:
         session.estimation_data = estimation.to_dict()
+        session.save(update_fields=['estimation_data', 'updated_at'])
 
     if request.method == 'POST':
-        if not session.estimation_data:
-            session.estimation_data = estimation.to_dict()
         session.selected_package = estimation.recommended_package
         session.mark_step_complete(11)
         session.current_step = 12
@@ -685,9 +760,16 @@ def _send_completion_email(session, project):
 # ---------------------------------------------------------------------------
 
 @login_required
+@require_POST
 def wizard_autosave(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'POST required'}, status=405)
+
+    throttle_key = f'autosave_{request.user.id}'
+    last_save = request.session.get(throttle_key, 0)
+    if time.time() - last_save < 2.0:
+        return JsonResponse({'status': 'throttled'}, status=429)
+    request.session[throttle_key] = time.time()
 
     try:
         data = json.loads(request.body)
@@ -714,6 +796,8 @@ def wizard_autosave(request):
     allowed = field_map.get(step, [])
     for key, value in field_updates.items():
         if key in allowed:
+            if isinstance(value, str):
+                value = value.strip()
             setattr(session, key, value)
 
     session.save()
@@ -814,6 +898,9 @@ def brand_assist(request):
         'form': form,
         'profiles': profiles,
         'active_profile': active_profile,
+        'branding_addons': OnboardingAddon.objects.filter(
+            slug__in=BRANDING_ADDON_SLUGS, is_active=True
+        ).order_by('order'),
     }
     if is_staff:
         from django.contrib.auth import get_user_model
@@ -877,3 +964,267 @@ def _generate_brand_kit(profile):
     profile.generated_palette = palette
     profile.generated_typography = typography
     profile.generated_voice_examples = voice_examples
+
+
+# ---------------------------------------------------------------------------
+# Branding payments — free preview, pay add-ons total to unlock download
+# ---------------------------------------------------------------------------
+
+def _get_brand_profile_for_user(request, profile_id, target_user):
+    return get_object_or_404(BrandProfile, id=profile_id, user=target_user)
+
+
+def _calc_branding_total(slugs):
+    addons = OnboardingAddon.objects.filter(slug__in=slugs, is_active=True)
+    total = sum((a.price for a in addons), Decimal('0'))
+    return addons, total
+
+
+@login_required
+@require_POST
+def brand_save_addons(request, profile_id):
+    """Save which branding services (logo / identity / social kit) the client wants."""
+    profile = _get_brand_profile_for_user(request, profile_id, request.user)
+    if profile.payment_status == 'paid':
+        messages.info(request, 'This brand kit is already paid — add-ons are locked.')
+        return redirect(f"{reverse('community:brand_assist')}?profile={profile.id}")
+    slugs = request.POST.getlist('addons')
+    allowed = set(BRANDING_ADDON_SLUGS)
+    clean = [s for s in slugs if s in allowed]
+    _, total = _calc_branding_total(clean)
+    profile.selected_addons = clean
+    profile.addons_total = total
+    profile.save(update_fields=['selected_addons', 'addons_total', 'updated_at'])
+    messages.success(request, f'Branding services updated — total: ${total:.2f}.')
+    return redirect(f"{reverse('community:brand_assist')}?profile={profile.id}")
+
+
+@login_required
+@require_POST
+def brand_checkout(request, profile_id):
+    """Create a Stripe Checkout Session for the selected branding add-ons total."""
+    import stripe
+    profile = _get_brand_profile_for_user(request, profile_id, request.user)
+    if profile.payment_status == 'paid':
+        return JsonResponse({'checkout_url': f"{reverse('community:brand_assist')}?profile={profile.id}"})
+    
+    # Rate limit: 1 checkout per 10 seconds per user
+    throttle_key = f'brand_checkout_{request.user.id}'
+    last_call = request.session.get(throttle_key, 0)
+    if time.time() - last_call < 10.0:
+        return JsonResponse({'error': 'Please wait before trying again.'}, status=429)
+    request.session[throttle_key] = time.time()
+    
+    slugs = profile.selected_addons or []
+    addons, total = _calc_branding_total(slugs)
+    if not addons or total <= 0:
+        return JsonResponse({'error': 'Select at least one branding service first.'}, status=400)
+    domain_url = getattr(django_settings, 'SITE_URL', 'http://localhost:8000')
+    success_url = domain_url + reverse('community:brand_assist') + f'?profile={profile.id}&payment_success=true'
+    cancel_url = domain_url + reverse('community:brand_assist') + f'?profile={profile.id}&payment_cancelled=true'
+    if not getattr(django_settings, 'STRIPE_SECRET_KEY', ''):
+        # Demo mode without Stripe keys — mark pending so staff can confirm manually.
+        profile.payment_status = 'pending'
+        profile.save(update_fields=['payment_status', 'updated_at'])
+        return JsonResponse({'checkout_url': cancel_url, 'demo': True})
+    try:
+        stripe.api_key = django_settings.STRIPE_SECRET_KEY
+        line_items = [{
+            'price_data': {
+                'currency': 'usd',
+                'product_data': {
+                    'name': f"{a.name} — {profile.name}",
+                    'description': a.description,
+                },
+                'unit_amount': int(a.price * 100),
+            },
+            'quantity': 1,
+        } for a in addons]
+        session = stripe.checkout.Session.create(
+            payment_method_types=['card'],
+            line_items=line_items,
+            mode='payment',
+            success_url=success_url,
+            cancel_url=cancel_url,
+            client_reference_id=request.user.id,
+            metadata={
+                'brand_profile_id': profile.id,
+                'user_id': request.user.id,
+                'addons': ','.join(slugs),
+            },
+        )
+        profile.payment_status = 'pending'
+        profile.stripe_session_id = session.id
+        profile.save(update_fields=['payment_status', 'stripe_session_id', 'updated_at'])
+        return JsonResponse({'checkout_url': session.url})
+    except Exception as e:
+        logger.exception('Brand checkout error')
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@login_required
+def brand_download(request, profile_id):
+    """Download the brand kit — only unlocked after payment."""
+    profile = _get_brand_profile_for_user(request, profile_id, request.user)
+    
+    # Rate limit: 1 download per 5 seconds per user
+    throttle_key = f'brand_download_{request.user.id}'
+    last_call = request.session.get(throttle_key, 0)
+    if time.time() - last_call < 5.0:
+        messages.error(request, 'Please wait before downloading again.')
+        return redirect(f"{reverse('community:brand_assist')}?profile={profile.id}")
+    request.session[throttle_key] = time.time()
+    
+    # Instant-verify: if returning from Stripe and webhook hasn't fired yet.
+    if profile.payment_status != 'paid' and profile.stripe_session_id:
+        try:
+            import stripe
+            stripe.api_key = django_settings.STRIPE_SECRET_KEY
+            sess = stripe.checkout.Session.retrieve(profile.stripe_session_id)
+            if sess.get('payment_status') == 'paid':
+                profile.payment_status = 'paid'
+                profile.paid_at = timezone.now()
+                profile.save(update_fields=['payment_status', 'paid_at', 'updated_at'])
+        except Exception:
+            pass
+    if profile.payment_status != 'paid':
+        messages.error(request, 'Pay for your branding services first to unlock the download.')
+        return redirect(f"{reverse('community:brand_assist')}?profile={profile.id}")
+    
+    # Generate PDF brand kit
+    from django.http import HttpResponse
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib import colors
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.units import mm, cm
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable
+    from reportlab.lib.enums import TA_CENTER, TA_LEFT
+    import io
+    
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4, topMargin=2*cm, bottomMargin=2*cm)
+    styles = getSampleStyleSheet()
+    story = []
+    
+    # Custom styles
+    title_style = ParagraphStyle('CustomTitle', parent=styles['Title'], fontSize=24, spaceAfter=20, textColor=colors.HexColor('#1a1a2e'))
+    heading_style = ParagraphStyle('CustomHeading', parent=styles['Heading2'], fontSize=14, spaceAfter=10, spaceBefore=20, textColor=colors.HexColor('#6366f1'))
+    body_style = ParagraphStyle('CustomBody', parent=styles['Normal'], fontSize=10, spaceAfter=8, leading=14)
+    label_style = ParagraphStyle('Label', parent=styles['Normal'], fontSize=9, textColor=colors.HexColor('#6b7280'), spaceAfter=2)
+    
+    # Title
+    story.append(Paragraph(f"Brand Kit — {profile.name}", title_style))
+    story.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor('#e5e7eb'), spaceAfter=20))
+    
+    # Brand Info
+    story.append(Paragraph("Brand Information", heading_style))
+    info_data = [
+        ['Brand Name', profile.name],
+        ['Industry', profile.industry or '—'],
+        ['Tagline', profile.tagline or '—'],
+        ['Personality', profile.get_personality_display()],
+        ['Brand Voice', profile.get_brand_voice_display()],
+    ]
+    if profile.description:
+        info_data.append(['Description', profile.description[:200]])
+    if profile.target_audience:
+        info_data.append(['Target Audience', profile.target_audience[:200]])
+    
+    info_table = Table(info_data, colWidths=[4*cm, 12*cm])
+    info_table.setStyle(TableStyle([
+        ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+        ('TOPPADDING', (0, 0), (-1, -1), 4),
+    ]))
+    story.append(info_table)
+    story.append(Spacer(1, 20))
+    
+    # Color Palette
+    palette = profile.generated_palette or {}
+    if palette:
+        story.append(Paragraph("Color Palette", heading_style))
+        color_data = [['Color', 'Hex Code', 'Preview']]
+        color_map = {
+            'primary': palette.get('primary', '#000000'),
+            'secondary': palette.get('secondary', '#000000'),
+            'accent': palette.get('accent', '#000000'),
+            'background': palette.get('background', '#ffffff'),
+            'text': palette.get('text', '#000000'),
+            'muted': palette.get('muted', '#6b7280'),
+        }
+        for name, hex_code in color_map.items():
+            color_data.append([name.title(), hex_code, ''])
+        
+        color_table = Table(color_data, colWidths=[4*cm, 4*cm, 8*cm])
+        color_table.setStyle(TableStyle([
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('BACKGROUND', (2, 1), (2, -1), colors.white),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#e5e7eb')),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+            ('TOPPADDING', (0, 0), (-1, -1), 8),
+        ]))
+        story.append(color_table)
+        story.append(Spacer(1, 20))
+    
+    # Typography
+    typo = profile.generated_typography or {}
+    if typo:
+        story.append(Paragraph("Typography", heading_style))
+        typo_data = [
+            ['Element', 'Font', 'Style'],
+            ['Headings', typo.get('headings', '—'), typo.get('style', '—')],
+            ['Body', typo.get('body', '—'), ''],
+        ]
+        typo_table = Table(typo_data, colWidths=[4*cm, 6*cm, 6*cm])
+        typo_table.setStyle(TableStyle([
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#e5e7eb')),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+            ('TOPPADDING', (0, 0), (-1, -1), 8),
+        ]))
+        story.append(typo_table)
+        story.append(Spacer(1, 20))
+    
+    # Brand Voice Examples
+    voices = profile.generated_voice_examples or []
+    if voices:
+        story.append(Paragraph("Brand Voice Examples", heading_style))
+        for voice in voices:
+            story.append(Paragraph(f"• {voice}", body_style))
+        story.append(Spacer(1, 20))
+    
+    # Services Paid
+    story.append(Paragraph("Payment Information", heading_style))
+    addons_list = profile.selected_addons or []
+    payment_data = [
+        ['Services Paid', ', '.join(addons_list) if addons_list else '—'],
+        ['Total Paid', f"${profile.addons_total:.2f}"],
+        ['Paid At', profile.paid_at.strftime('%B %d, %Y') if profile.paid_at else '—'],
+    ]
+    payment_table = Table(payment_data, colWidths=[4*cm, 12*cm])
+    payment_table.setStyle(TableStyle([
+        ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#e5e7eb')),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+        ('TOPPADDING', (0, 0), (-1, -1), 8),
+    ]))
+    story.append(payment_table)
+    story.append(Spacer(1, 30))
+    
+    # Footer
+    story.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor('#e5e7eb'), spaceAfter=10))
+    footer_style = ParagraphStyle('Footer', parent=styles['Normal'], fontSize=8, textColor=colors.HexColor('#9ca3af'), alignment=TA_CENTER)
+    story.append(Paragraph("Generated by OnWebApp Brand Assist — onwebapp.com", footer_style))
+    
+    # Build PDF
+    doc.build(story)
+    buffer.seek(0)
+    
+    response = HttpResponse(buffer.getvalue(), content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="brand-kit-{profile.name.lower().replace(" ", "-")}-{profile.id}.pdf"'
+    return response

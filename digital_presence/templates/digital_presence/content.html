@@ -20,7 +20,7 @@
         <div class="dd-content">
             {% if content.available %}
 
-            {# ── Alert Banner ── #}
+            {#  Alert Banner  #}
             {% if content.missing_h1 > 0 or content.missing_meta > 0 or content.missing_alt > 0 %}
             <div class="dd-alert-banner dd-alert-banner-warning">
                 <div class="dd-alert-banner-icon" style="background:rgba(251,191,36,0.15);color:#fbbf24;">
@@ -38,7 +38,7 @@
             </div>
             {% endif %}
 
-            {# ── Content Metrics ── #}
+            {#  Content Metrics  #}
             <div class="dd-metrics dd-metrics-5">
                 <div class="dd-metric" style="border-top:3px solid #818cf8;">
                     <div class="dd-metric-value">{{ content.pages_audited|intcomma }}</div>
@@ -65,7 +65,7 @@
                 </div>
             </div>
 
-            {# ── Content Health Progress ── #}
+            {#  Content Health Progress  #}
             <div class="dd-panel" style="margin-top:16px;">
                 <div class="dd-panel-header">
                     <span class="dd-panel-title"><i class="fa-solid fa-chart-bar" style="color:#818cf8;"></i>Content Health</span>
@@ -101,7 +101,7 @@
                 </div>
             </div>
 
-            {# ── Content Needs Attention ── #}
+            {#  Content Needs Attention  #}
             {% if content.missing_h1 > 0 or content.missing_meta > 0 or content.missing_alt > 0 %}
             <div id="issues-section" class="dd-panel" style="margin-top:16px;">
                 <div class="dd-panel-header">
@@ -136,7 +136,7 @@
             </div>
             {% endif %}
 
-            {# ── Content Opportunities ── #}
+            {#  Content Opportunities  #}
             {% if opportunities.available and opportunities.opportunities %}
             <div class="dd-panel" style="margin-top:16px;">
                 <div class="dd-panel-header">

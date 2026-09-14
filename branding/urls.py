@@ -189,7 +189,7 @@ urlpatterns = [
     path('designer/workflow/<int:pk>/communication/', views.workflow_add_communication, name='workflow_add_communication'),
     path('designer/workflow/<int:pk>/communication/<int:comm_id>/toggle-action/', views.workflow_toggle_action, name='workflow_toggle_action'),
 
-    # ── Concept Presentation System ──────────────────────────────────────────
+    #  Concept Presentation System 
     path('request/<int:request_pk>/concepts/', views.concept_list, name='concept_list'),
     path('request/<int:request_pk>/concepts/create/', views.concept_create, name='concept_create'),
     path('request/<int:request_pk>/concepts/compare/', views.concept_compare, name='concept_compare'),
@@ -215,7 +215,7 @@ urlpatterns = [
     path('concept/<int:pk>/refinement/<int:refinement_id>/iteration/<int:iteration_id>/approve/', views.concept_approve_iteration, name='concept_approve_iteration'),
     path('request/<int:pk>/session/<int:session_id>/update/', views.concept_session_update, name='concept_session_update'),
 
-    # ── Intelligent Questionnaire System ─────────────────────────────────────
+    #  Intelligent Questionnaire System 
     path('request/<int:request_pk>/questionnaires/', views.questionnaire_list, name='questionnaire_list'),
     path('request/<int:request_pk>/questionnaires/create/', views.questionnaire_create, name='questionnaire_create'),
     path('request/<int:request_pk>/questionnaires/from-template/<int:template_id>/', views.questionnaire_from_template, name='questionnaire_from_template'),

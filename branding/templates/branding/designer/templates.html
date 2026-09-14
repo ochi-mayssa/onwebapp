@@ -6,7 +6,7 @@
 {% block branding_content %}
 <div class="container py-4">
 
-    {# ── Header ── #}
+    {#  Header  #}
     <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
         <div>
             <nav aria-label="breadcrumb" class="mb-2">
@@ -25,7 +25,7 @@
         </div>
     </div>
 
-    {# ── Add Template Form (Collapsible) ── #}
+    {#  Add Template Form (Collapsible)  #}
     <div class="collapse mb-4" id="addTemplateForm">
         <form method="post" action="{{ request.path }}" class="detail-card rounded-4 p-4">
             {% csrf_token %}
@@ -74,7 +74,7 @@
         </form>
     </div>
 
-    {# ── Category Filter ── #}
+    {#  Category Filter  #}
     <div class="d-flex flex-wrap gap-2 mb-4">
         <a href="{{ request.path }}" class="btn btn-sm {% if not category_filter %}btn-brand-primary{% else %}btn-outline-secondary{% endif %} rounded-pill">
             All
@@ -86,7 +86,7 @@
         {% endfor %}
     </div>
 
-    {# ── My Templates ── #}
+    {#  My Templates  #}
     <div class="mb-5">
         <h5 class="fw-bold mb-3"><i class="fa-solid fa-user me-2 text-muted"></i>My Templates</h5>
         {% if mine %}
@@ -136,7 +136,7 @@
         {% endif %}
     </div>
 
-    {# ── Team Templates ── #}
+    {#  Team Templates  #}
     <div class="mb-4">
         <h5 class="fw-bold mb-3"><i class="fa-solid fa-users me-2 text-muted"></i>Team Templates</h5>
         {% if shared %}
@@ -186,7 +186,7 @@
 
 </div>
 
-{# ── Use Template Modal ── #}
+{#  Use Template Modal  #}
 <div class="modal fade" id="useTemplateModal" tabindex="-1" aria-labelledby="useTemplateModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content rounded-4 border-0 shadow-xl">

@@ -6,7 +6,7 @@
 {% block branding_content %}
 <div class="container py-4">
 
-    {# ── Header ── #}
+    {#  Header  #}
     <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
         <div>
             <nav aria-label="breadcrumb" class="mb-2">
@@ -20,7 +20,7 @@
         </div>
     </div>
 
-    {# ── Category Filters ── #}
+    {#  Category Filters  #}
     <div class="d-flex gap-2 flex-wrap mb-4">
         <a href="{% url 'branding:collection_template_list' %}" class="btn btn-sm {% if not category_filter %}btn-brand-primary{% else %}btn-outline-secondary{% endif %}">All</a>
         {% for value, label in categories %}
@@ -28,7 +28,7 @@
         {% endfor %}
     </div>
 
-    {# ── Collections Grid ── #}
+    {#  Collections Grid  #}
     <div class="row g-3">
         {% for col in collections %}
         <div class="col-md-6 col-lg-4">

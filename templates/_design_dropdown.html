@@ -1,0 +1,15 @@
+{% load i18n %}
+<ul class="dropdown-menu shadow-xl border-0 rounded-24 p-3" aria-labelledby="{{ menu_id|default:'designMenu' }}" style="min-width: 220px;">
+  <li>
+    <a class="dropdown-item py-2 px-3" href="{% url 'home:ux_design' %}">
+      <i class="fas fa-compass-drafting me-2" style="color:#7c3aed;font-size:.8rem;"></i>
+      {% trans "UX Design" %}
+    </a>
+  </li>
+  <li>
+    <a class="dropdown-item py-2 px-3" href="{% url 'home:ui_design' %}">
+      <i class="fas fa-pen-nib me-2" style="color:#0d9488;font-size:.8rem;"></i>
+      {% trans "UI Design" %}
+    </a>
+  </li>
+</ul>

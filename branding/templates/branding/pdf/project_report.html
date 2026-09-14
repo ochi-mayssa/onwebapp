@@ -32,7 +32,7 @@
     line-height: 1.55;
   }
 
-  /* ── Cover header ──────────────────────────────────────────────── */
+  /*  Cover header  */
   .cover {
     margin-bottom: 28px;
     border-bottom: 3px solid #6366f1;
@@ -89,7 +89,7 @@
     margin-top: 6px;
   }
 
-  /* ── Section headers ───────────────────────────────────────────── */
+  /*  Section headers  */
   .section-title {
     font-size: 12pt;
     font-weight: 800;
@@ -101,7 +101,7 @@
     letter-spacing: 0.4px;
   }
 
-  /* ── Info grid ─────────────────────────────────────────────────── */
+  /*  Info grid  */
   .info-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -128,7 +128,7 @@
     grid-column: 1 / -1;
   }
 
-  /* ── Description blocks ────────────────────────────────────────── */
+  /*  Description blocks  */
   .desc-block {
     background: #f8fafc;
     border: 1px solid #e2e8f0;
@@ -142,7 +142,7 @@
     font-size: 9.5pt;
   }
 
-  /* ── Tags ──────────────────────────────────────────────────────── */
+  /*  Tags  */
   .tag-list {
     display: flex;
     flex-wrap: wrap;
@@ -159,7 +159,7 @@
     font-weight: 600;
   }
 
-  /* ── Collection card ───────────────────────────────────────────── */
+  /*  Collection card  */
   .collection-card {
     border: 1px solid #e2e8f0;
     border-radius: 10px;
@@ -183,7 +183,7 @@
     color: #475569;
   }
 
-  /* ── Color palette ─────────────────────────────────────────────── */
+  /*  Color palette  */
   .palette-row {
     display: flex;
     gap: 8px;
@@ -196,7 +196,7 @@
     border: 1px solid #e2e8f0;
   }
 
-  /* ── Timeline ──────────────────────────────────────────────────── */
+  /*  Timeline  */
   .timeline {
     margin: 0 0 10px 0;
     padding: 0;
@@ -247,7 +247,7 @@
     margin-top: 2px;
   }
 
-  /* ── Asset table ───────────────────────────────────────────────── */
+  /*  Asset table  */
   .asset-table {
     width: 100%;
     border-collapse: collapse;
@@ -272,7 +272,7 @@
     border-bottom: none;
   }
 
-  /* ── Feedback box ──────────────────────────────────────────────── */
+  /*  Feedback box  */
   .feedback-box {
     border: 1px solid #e2e8f0;
     border-radius: 10px;
@@ -296,7 +296,7 @@
     margin-top: 6px;
   }
 
-  /* ── Notes block ───────────────────────────────────────────────── */
+  /*  Notes block  */
   .notes-block {
     background: #fffbeb;
     border: 1px solid #fde68a;
@@ -316,7 +316,7 @@
     margin: 0;
   }
 
-  /* ── Page break helper ─────────────────────────────────────────── */
+  /*  Page break helper  */
   .page-break {
     page-break-before: always;
   }
@@ -324,9 +324,9 @@
 </head>
 <body>
 
-<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  -->
 <!-- Cover Header                                                    -->
-<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  -->
 <div class="cover">
   <div class="cover-row">
     <div style="display:flex;align-items:center;gap:14px;">
@@ -343,9 +343,9 @@
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  -->
 <!-- Project Overview                                                -->
-<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  -->
 <div class="section-title">Project Overview</div>
 <div class="info-grid">
   <div class="info-item">
@@ -405,9 +405,9 @@
 </div>
 {% endif %}
 
-<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  -->
 <!-- Brand Identity                                                  -->
-<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  -->
 <div class="section-title">Brand Identity</div>
 
 {% if request.company_description %}
@@ -456,9 +456,9 @@
 </div>
 {% endif %}
 
-<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  -->
 <!-- Selected Collection                                             -->
-<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  -->
 {% if collection %}
 <div class="section-title">Selected Collection</div>
 <div class="collection-card">
@@ -497,9 +497,9 @@
 </div>
 {% endif %}
 
-<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  -->
 <!-- Deliverables / Assets                                           -->
-<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  -->
 <div class="page-break"></div>
 <div class="section-title">Deliverables</div>
 
@@ -532,9 +532,9 @@
 </div>
 {% endif %}
 
-<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  -->
 <!-- Internal Notes                                                  -->
-<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  -->
 {% if request.internal_notes %}
 <div class="section-title">Designer Notes</div>
 <div class="notes-block">
@@ -550,9 +550,9 @@
 </div>
 {% endif %}
 
-<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  -->
 <!-- Project Timeline                                                -->
-<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  -->
 <div class="section-title">Project Timeline</div>
 
 {% if timeline %}
@@ -583,9 +583,9 @@
 </div>
 {% endif %}
 
-<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  -->
 <!-- Client Feedback                                                 -->
-<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  -->
 {% if feedback %}
 <div class="section-title">Client Feedback</div>
 <div class="feedback-box">

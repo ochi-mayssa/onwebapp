@@ -475,7 +475,7 @@ class ProductionSEOAuditTests(TestCase):
     # 3. Scores are deterministic from same inputs
     # ------------------------------------------------------------------
     def test_kpi_scores_are_deterministic(self):
-        """Test 3: KPI engine must be deterministic — identical inputs → identical scores."""
+        """Test 3: KPI engine must be deterministic — identical inputs  identical scores."""
         fetch_ok = {"https": True, "http_status": 200}
         on_page = {
             "title_exists": True, "title_length": 45,
@@ -583,7 +583,7 @@ class ProductionSEOAuditTests(TestCase):
     # 9. Broken link classification by status code
     # ------------------------------------------------------------------
     def test_broken_link_classification_severity(self):
-        """Test 9: 404→High, 410→High, 5xx→Critical, Timeout→Warning."""
+        """Test 9: 404High, 410High, 5xxCritical, TimeoutWarning."""
         from services.processors import _check_internal_links
         mock_session = MagicMock()
         def _make_resp(code):
@@ -618,7 +618,7 @@ class ProductionSEOAuditTests(TestCase):
     # 10. Recommendation generated only for a detected issue
     # ------------------------------------------------------------------
     def test_recommendation_generated_only_for_detected_issue(self):
-        """Test 10: No canonical issue → no canonical recommendation. Missing title → title recommendation appears."""
+        """Test 10: No canonical issue  no canonical recommendation. Missing title  title recommendation appears."""
         fetch_ok = {"https": True, "http_status": 200}
         # Case A: Title missing, but canonical is fine
         on_page_missing_title = {
@@ -683,7 +683,7 @@ class ProductionSEOAuditTests(TestCase):
     # 12. Inaccessible website does NOT fall back to simulated data
     # ------------------------------------------------------------------
     def test_inaccessible_site_no_simulated_fallback(self):
-        """Test 12: DNS / Timeout / connection errors → real error payload, NO simulated scores."""
+        """Test 12: DNS / Timeout / connection errors  real error payload, NO simulated scores."""
         with patch("services.processors._fetch_page") as mock_fetch:
             mock_fetch.return_value = {
                 "original_url": "https://this-domain-does-not-exist-xyz123.invalid",
@@ -742,7 +742,7 @@ class ProductionSEOAuditTests(TestCase):
     # 14. Image ALT coverage is computed honestly — split into with/empty/missing
     # ------------------------------------------------------------------
     def test_image_alt_coverage_honest_computation(self):
-        """Original sample: 1 descriptive ALT + 1 missing ALT attribute → 50% coverage."""
+        """Original sample: 1 descriptive ALT + 1 missing ALT attribute  50% coverage."""
         html = self._sample_html()
         on_page = _analyze_on_page_seo(html, "https://example.com", "example.com")
         self.assertEqual(on_page["images_total"], 2)
@@ -790,7 +790,7 @@ class ProductionSEOAuditTests(TestCase):
         """ALT-REG-3. Only images_missing_alt>0 triggers the 'Missing ALT Attribute' issue.
         Empty alt="" alone should NOT generate the missing-ALT Medium-severity issue."""
         fetch_ok = {"https": True, "http_status": 200}
-        # Case A: 2 alt="" + 0 missing → NO Medium 'Missing ALT Attribute' issue, but INFO Review Empty ALT
+        # Case A: 2 alt="" + 0 missing  NO Medium 'Missing ALT Attribute' issue, but INFO Review Empty ALT
         on_page_empty_only = {
             "images_total": 2,
             "images_with_alt": 0,
@@ -808,7 +808,7 @@ class ProductionSEOAuditTests(TestCase):
         issue_titles = [i["issue"] for i in issues]
         self.assertNotIn("Images Missing ALT Attribute", issue_titles)
         self.assertIn("Review Empty ALT Text", issue_titles)
-        # Case B: 1 missing alt attribute → Medium Missing ALT Attribute
+        # Case B: 1 missing alt attribute  Medium Missing ALT Attribute
         on_page_missing = {**on_page_empty_only, "images_missing_alt": 1, "images_empty_alt": 1,
                            "images_total": 2, "images_alt_attribute_percentage": 50.0, "images_alt_percentage": 50.0}
         issues2 = _generate_issues(fetch_ok, on_page_missing, {"links_checked": 0, "broken_links": []})
@@ -912,7 +912,7 @@ class ProductionSEOAuditTests(TestCase):
     # 15. Overall health is weighted average of real sub-KPIs
     # ------------------------------------------------------------------
     def test_overall_health_is_weighted_average_of_measured_kpis(self):
-        """If Tech=100, On-Page=100, Link Health=100 → Overall must equal 100."""
+        """If Tech=100, On-Page=100, Link Health=100  Overall must equal 100."""
         fetch = {"https": True, "http_status": 200}
         onp = {
             "title_exists": True, "title_length": 45,

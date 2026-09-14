@@ -1,0 +1,902 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans "UX Design Services" %} | OnWebApp{% endblock %}
+
+{% block meta_description %}{% trans "User experience design that converts: UX research, user journeys, wireframes, prototypes, and usability testing with OnWebApp." %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .ux-hero{background:url("{% static 'img/he.jpg' %}") center/cover no-repeat;padding:12rem 0 11rem;position:relative;overflow:hidden}
+    .ux-hero::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(88,28,135,.85),rgba(157,23,77,.7) 55%,rgba(59,130,246,.6))}
+    .ux-hero .container{position:relative;z-index:2}
+    .ux-s{padding:5rem 0}
+    .ux-s-alt{background:#faf5ff;padding:5rem 0}
+    .ux-s-dark{background:#0f0a1a;padding:5rem 0}
+    .ux-s-teal{background:linear-gradient(135deg,#3b0764,#7e22ce 55%,#a855f7);padding:5rem 0}
+    .ux-label{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9333ea;margin-bottom:.5rem;display:flex;align-items:center;gap:.4rem}
+    .ux-label i{font-size:.35rem}
+    .ux-h{font-weight:800;font-size:2rem;margin-bottom:.6rem}
+    .ux-sub{color:#64748b;font-size:.95rem;line-height:1.7;max-width:640px}
+    .ux-container{max-width:1140px;margin:0 auto;padding:0 1.5rem}
+    .ux-c{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:1.75rem;height:100%;transition:all .3s}
+    .ux-c:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(147,51,234,.12);border-color:#9333ea}
+    .ux-c-icon{width:48px;height:48px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;font-size:1.1rem;margin-bottom:1rem}
+    .ux-c-icon.teal{background:rgba(147,51,234,.1);color:#9333ea}
+    .ux-c-icon.purple{background:rgba(236,72,153,.1);color:#ec4899}
+    .ux-c-icon.blue{background:rgba(59,130,246,.1);color:#3b82f6}
+    .ux-c-icon.amber{background:rgba(168,85,247,.1);color:#a855f7}
+    .ux-step{display:flex;align-items:flex-start;gap:1.5rem;padding:2rem 0;border-bottom:1px solid #e2e8f0}
+    .ux-step:last-child{border-bottom:none}
+    .ux-step-num{flex-shrink:0;width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#9333ea,#ec4899);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:.9rem}
+    .ux-check{list-style:none;padding:0;margin:0}
+    .ux-check li{padding:.3rem 0;font-size:.9rem;color:#475569;display:flex;align-items:center;gap:.5rem}
+    .ux-check li i{color:#9333ea;font-size:.8rem}
+    .ux-cta-box{background:linear-gradient(135deg,#3b0764,#7e22ce 55%,#a855f7);border-radius:32px;padding:5rem 3rem;text-align:center;position:relative;overflow:hidden}
+    .ux-cta-box::before{content:'';position:absolute;top:-80px;right:-80px;width:280px;height:280px;background:radial-gradient(circle,rgba(236,72,153,.2),transparent 70%);border-radius:50%}
+    .ux-split{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center}
+    .ux-flow{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;font-size:.85rem}
+    .ux-flow span{background:rgba(147,51,234,.1);border:1px solid rgba(147,51,234,.2);color:#9333ea;padding:.3rem .7rem;border-radius:20px;font-weight:600;font-size:.8rem}
+    .ux-flow i{color:#94a3b8;font-size:.7rem}
+    .ux-deliver{background:#1e1033;border-radius:16px;padding:1.5rem;height:100%}
+    .ux-deliver h6{color:#fff;font-weight:700;font-size:.9rem;margin-bottom:1rem;border-bottom:1px solid rgba(255,255,255,.1);padding-bottom:.5rem}
+    .ux-deliver ul{list-style:none;padding:0;margin:0}
+    .ux-deliver ul li{padding:.25rem 0;font-size:.82rem;color:rgba(255,255,255,.6);display:flex;align-items:center;gap:.4rem}
+    .ux-deliver ul li i{color:#a855f7;font-size:.7rem}
+    .ux-faq .accordion-body{font-size:.9rem;color:#64748b;line-height:1.7;padding:0 0 1rem}
+    /* Scroll animations */
+    .ux-fade{opacity:0;transform:translateY(30px);transition:opacity .6s ease,transform .6s ease}
+    .ux-fade.visible{opacity:1;transform:translateY(0)}
+    /* Glass morphism cards */
+    .ux-glass{background:rgba(255,255,255,.7);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.3);border-radius:16px;padding:1.75rem;height:100%;transition:all .3s}
+    .ux-glass:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(147,51,234,.15);border-color:rgba(147,51,234,.3)}
+    .ux-glass-dark{background:rgba(30,16,51,.6);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:1.75rem;height:100%;transition:all .3s}
+    .ux-glass-dark:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(147,51,234,.2);border-color:rgba(147,51,234,.3)}
+    /* Section nav dots */
+    .ux-nav{position:fixed;right:1.5rem;top:50%;transform:translateY(-50%);z-index:1000;display:flex;flex-direction:column;gap:.75rem}
+    .ux-nav-dot{width:10px;height:10px;border-radius:50%;background:rgba(147,51,234,.2);border:2px solid #9333ea;cursor:pointer;transition:all .3s}
+    .ux-nav-dot.active{background:#9333ea;transform:scale(1.3)}
+    .ux-nav-dot:hover{background:rgba(147,51,234,.5)}
+    .ux-nav-tooltip{position:absolute;right:20px;background:#1e1033;color:#fff;padding:.3rem .7rem;border-radius:6px;font-size:.7rem;font-weight:600;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .2s}
+    .ux-nav-dot:hover .ux-nav-tooltip{opacity:1}
+    @media(max-width:768px){.ux-s,.ux-s-alt,.ux-s-dark,.ux-s-teal{padding:3rem 0}.ux-split{grid-template-columns:1fr}.ux-hero{padding:6rem 0 5rem}.ux-hero h1{font-size:2.5rem}.ux-cta-box{padding:3rem 1.5rem}.ux-nav{display:none}}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero -->
+<section class="ux-hero text-white" id="hero">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-7">
+                <span class="badge bg-white bg-opacity-10 border border-white border-opacity-25 text-white rounded-pill px-3 py-2 mb-3 fw-700" style="background:rgba(168,85,247,.3);border-color:rgba(168,85,247,.5);">UX DESIGN</span>
+                <h1 class="fw-800 mb-3" style="font-size:5rem;line-height:1.02;">{% trans "We Design the Experience Behind Better Digital Products" %}</h1>
+                <p class="lead opacity-75 mb-2" style="font-size:1.1rem;">{% trans "Understand your users. Simplify their journey. Build with confidence." %}</p>
+                <p class="opacity-75 mb-4">{% trans "At OnWebApp, UX design is the bridge between your business idea and the product your users actually experience. We help you understand your users, structure complex requirements, simplify workflows, and validate product decisions before development begins." %}</p>
+                <div class="d-flex gap-3 flex-wrap">
+                    <a href="{% url 'home:build_website' %}" class="btn btn-light btn-lg rounded-pill px-5 fw-800">{% trans "Start Your UX Project" %} <i class="fas fa-arrow-right ms-1"></i></a>
+                    <a href="#sec-process" class="btn btn-outline-light btn-lg rounded-pill px-4 fw-700">{% trans "Explore Our UX Process" %}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Overview: IA + AI + UX -->
+<section class="ux-s" id="sec-overview">
+    <div class="ux-container">
+        <div class="text-center mb-5 ux-fade">
+            <div class="ux-label justify-content-center"><i class="fas fa-circle"></i>{% trans "Overview" %}</div>
+            <h2 class="ux-h" style="max-width:750px;margin:0 auto;">{% trans "UX Design Based on Information Architecture and Artificial Intelligence" %}</h2>
+            <p class="ux-sub mx-auto">{% trans "User Experience (UX) design is based on Information Architecture (IA) and Artificial Intelligence (AI) to create UX that satisfies the user and enhances search engine optimization (SEO)." %}</p>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <div class="col-lg-8 ux-fade">
+                <div class="ux-c" style="padding:2rem;">
+                    <p class="ux-sub" style="max-width:none;">{% trans "The ONWEBAPP application focuses on the results of machine learning (ML) and deep learning (DL) models to analyze past user data, understand their behavior, emotions, needs, and preferences, and predict their future behavior." %}</p>
+                </div>
+            </div>
+            <div class="col-lg-4 ux-fade">
+                <div class="ux-c" style="padding:2rem;text-align:center;background:linear-gradient(135deg,#3b0764,#7e22ce);border:none;">
+                    <div style="font-size:2.5rem;margin-bottom:.75rem;"><i class="fas fa-brain" style="color:#d8b4fe;"></i></div>
+                    <h5 style="color:#fff;font-weight:800;">{% trans "AI + IA + UX" %}</h5>
+                    <p style="color:rgba(255,255,255,.7);font-size:.85rem;margin:0;">{% trans "The true backbone of successful UX" %}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4 ux-fade">
+                <div class="ux-c" style="border-left:3px solid #9333ea;padding:2rem;">
+                    <div style="font-size:2rem;margin-bottom:.75rem;"><i class="fas fa-layer-group" style="color:#9333ea;"></i></div>
+                    <h5 style="font-weight:700;">{% trans "The True Backbone" %}</h5>
+                    <p style="color:#64748b;font-size:.9rem;">{% trans "The true backbone of successful UX is Information Architecture (IA)." %}</p>
+                </div>
+            </div>
+            <div class="col-md-4 ux-fade">
+                <div class="ux-c" style="border-left:3px solid #ec4899;padding:2rem;">
+                    <div style="font-size:2rem;margin-bottom:.75rem;"><i class="fas fa-robot" style="color:#ec4899;"></i></div>
+                    <h5 style="font-weight:700;">{% trans "AI: From Data to Design" %}</h5>
+                    <p style="color:#64748b;font-size:.9rem;">{% trans "From analyzing user behavior data to UX Design." %}</p>
+                </div>
+            </div>
+            <div class="col-md-4 ux-fade">
+                <div class="ux-c" style="border-left:3px solid #a855f7;padding:2rem;">
+                    <div style="font-size:2rem;margin-bottom:.75rem;"><i class="fas fa-wand-magic-sparkles" style="color:#a855f7;"></i></div>
+                    <h5 style="font-weight:700;">{% trans "UX for Automation" %}</h5>
+                    <p style="color:#64748b;font-size:.9rem;">{% trans "UX Design for successful automation." %}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- UX for Automation + SEO -->
+<section class="ux-s ux-s-dark" id="sec-automation">
+    <div class="ux-container">
+        <div class="row g-5 align-items-center">
+            <div class="col-lg-6 ux-fade">
+                <div class="ux-label" style="color:#d8b4fe;"><i class="fas fa-circle"></i>{% trans "Automation" %}</div>
+                <h2 class="ux-h" style="color:#fff;">{% trans "UX Design for Successful Automation" %}</h2>
+                <p class="ux-sub" style="color:rgba(255,255,255,.6);">{% trans "Our UX design enables intelligent automation across your product experience." %}</p>
+                <div class="row g-3 mt-3">
+                    <div class="col-12"><div class="ux-glass-dark"><ul class="ux-check"><li style="color:rgba(255,255,255,.7);"><i class="fas fa-check"></i><strong>{% trans "Automating Repetitive Tasks" %}</strong></li><li style="color:rgba(255,255,255,.7);"><i class="fas fa-check"></i><strong>{% trans "Workflow Automation" %}</strong></li><li style="color:rgba(255,255,255,.7);"><i class="fas fa-check"></i><strong>{% trans "Automating Customer Journey" %}</strong></li></ul></div></div>
+                </div>
+            </div>
+            <div class="col-lg-6 ux-fade">
+                <div class="ux-label" style="color:#d8b4fe;"><i class="fas fa-circle"></i>{% trans "SEO" %}</div>
+                <h2 class="ux-h" style="color:#fff;">{% trans "UX Design for SEO" %}</h2>
+                <p class="ux-sub" style="color:rgba(255,255,255,.6);">{% trans "Great UX directly impacts your search engine performance." %}</p>
+                <div class="row g-3 mt-3">
+                    <div class="col-sm-4 text-center">
+                        <div style="background:rgba(147,51,234,.15);border:1px solid rgba(147,51,234,.3);border-radius:12px;padding:1.5rem;">
+                            <div style="font-size:1.8rem;font-weight:800;color:#d8b4fe;"></div>
+                            <h6 style="color:#fff;font-weight:700;font-size:.85rem;">{% trans "Increased Engagement" %}</h6>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 text-center">
+                        <div style="background:rgba(236,72,153,.15);border:1px solid rgba(236,72,153,.3);border-radius:12px;padding:1.5rem;">
+                            <div style="font-size:1.8rem;font-weight:800;color:#f9a8d4;"></div>
+                            <h6 style="color:#fff;font-weight:700;font-size:.85rem;">{% trans "Lower Bounce Rates" %}</h6>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 text-center">
+                        <div style="background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.3);border-radius:12px;padding:1.5rem;">
+                            <div style="font-size:1.8rem;font-weight:800;color:#e9d5ff;"></div>
+                            <h6 style="color:#fff;font-weight:700;font-size:.85rem;">{% trans "Higher Conversion Rates" %}</h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- OnWebApp's Role in UX -->
+<section class="ux-s" id="sec-role">
+    <div class="ux-container">
+        <div class="ux-split">
+            <div class="ux-fade">
+                <div class="ux-label"><i class="fas fa-circle"></i>{% trans "Our Role" %}</div>
+                <h2 class="ux-h">{% trans "We Turn Business Requirements Into User Experiences" %}</h2>
+                <p class="ux-sub mb-3">{% trans "Your business knows what it needs to achieve. Your users know what they need to accomplish. Our role is to connect the two." %}</p>
+                <p class="ux-sub mb-3">{% trans "OnWebApp works between business strategy, user needs, design, and technology to create experiences that are useful, intuitive, and technically realistic." %}</p>
+                <div class="alert border-0 rounded-4 p-4 mb-0" style="background:#faf5ff;border-left:4px solid #9333ea !important;">
+                    <strong style="color:#9333ea;">{% trans "Our Role:" %}</strong> <span style="color:#475569;">{% trans "Business Goals  UX Strategy  User Experience  UI Design  Development" %}</span>
+                </div>
+            </div>
+            <div class="ux-fade">
+                <div class="row g-3">
+                    <div class="col-sm-6"><div class="ux-c" style="border-left:3px solid #9333ea;"><div class="ux-c-icon teal" style="width:36px;height:36px;font-size:.85rem;"><i class="fas fa-eye"></i></div><h6 style="font-weight:700;">{% trans "Understand" %}</h6><p style="font-size:.82rem;margin:0;">{% trans "Identify your users, their needs, goals, behaviors, and pain points." %}</p></div></div>
+                    <div class="col-sm-6"><div class="ux-c" style="border-left:3px solid #ec4899;"><div class="ux-c-icon purple" style="width:36px;height:36px;font-size:.85rem;"><i class="fas fa-sitemap"></i></div><h6 style="font-weight:700;">{% trans "Structure" %}</h6><p style="font-size:.82rem;margin:0;">{% trans "Organize your content, features, workflows, and navigation." %}</p></div></div>
+                    <div class="col-sm-6"><div class="ux-c" style="border-left:3px solid #3b82f6;"><div class="ux-c-icon blue" style="width:36px;height:36px;font-size:.85rem;"><i class="fas fa-minimize"></i></div><h6 style="font-weight:700;">{% trans "Simplify" %}</h6><p style="font-size:.82rem;margin:0;">{% trans "Remove unnecessary steps and make complex processes easier." %}</p></div></div>
+                    <div class="col-sm-6"><div class="ux-c" style="border-left:3px solid #a855f7;"><div class="ux-c-icon amber" style="width:36px;height:36px;font-size:.85rem;"><i class="fas fa-pen-ruler"></i></div><h6 style="font-weight:700;">{% trans "Visualize" %}</h6><p style="font-size:.82rem;margin:0;">{% trans "Transform ideas and requirements into wireframes and prototypes." %}</p></div></div>
+                    <div class="col-sm-6"><div class="ux-c" style="border-left:3px solid #9333ea;"><div class="ux-c-icon teal" style="width:36px;height:36px;font-size:.85rem;"><i class="fas fa-check-double"></i></div><h6 style="font-weight:700;">{% trans "Validate" %}</h6><p style="font-size:.82rem;margin:0;">{% trans "Test important journeys and identify usability problems before development." %}</p></div></div>
+                    <div class="col-sm-6"><div class="ux-c" style="border-left:3px solid #ec4899;"><div class="ux-c-icon purple" style="width:36px;height:36px;font-size:.85rem;"><i class="fas fa-flag"></i></div><h6 style="font-weight:700;">{% trans "Prepare" %}</h6><p style="font-size:.82rem;margin:0;">{% trans "Create a clear UX foundation for UI design and development." %}</p></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- UX That Solves Real Problems -->
+<section class="ux-s ux-s-alt" id="sec-why">
+    <div class="ux-container">
+        <div class="ux-split">
+            <div class="ux-fade">
+                <div class="ux-label"><i class="fas fa-circle"></i>{% trans "Why UX" %}</div>
+                <h2 class="ux-h">{% trans "Don't Design for Assumptions. Design for People." %}</h2>
+                <p class="ux-sub mb-3">{% trans "A beautiful interface cannot fix a confusing experience. At OnWebApp, we look beyond individual screens to understand the complete user journey." %}</p>
+                <p class="ux-sub mb-3">{% trans "We identify where users get confused, lose context, take unnecessary steps, encounter friction, abandon a task, or need clearer guidance." %}</p>
+                <p class="ux-sub">{% trans "Then we redesign the experience around their actual goals." %}</p>
+            </div>
+            <div class="ux-fade">
+                <div class="row g-3">
+                    <div class="col-12"><div class="ux-c"><p style="font-size:.85rem;font-weight:700;color:#9333ea;margin-bottom:.75rem;">{% trans "Our UX Focus:" %}</p><ul class="ux-check"><li><i class="fas fa-check"></i><strong>{% trans "User Needs" %}</strong> — {% trans "What does the user actually need?" %}</li><li><i class="fas fa-check"></i><strong>{% trans "Business Goals" %}</strong> — {% trans "What does the organization need to achieve?" %}</li><li><i class="fas fa-check"></i><strong>{% trans "Product Requirements" %}</strong> — {% trans "What does the product need to do?" %}</li><li><i class="fas fa-check"></i><strong>{% trans "Technical Reality" %}</strong> — {% trans "What can realistically be built?" %}</li><li><i class="fas fa-check"></i><strong>{% trans "User Experience" %}</strong> — {% trans "How can all of these work together?" %}</li></ul></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Our UX Approach -->
+<section class="ux-s" id="sec-process">
+    <div class="ux-container">
+        <div class="text-center mb-5 ux-fade">
+            <div class="ux-label justify-content-center"><i class="fas fa-circle"></i>{% trans "03 — Process" %}</div>
+            <h2 class="ux-h">{% trans "Understand. Structure. Design. Validate. Improve." %}</h2>
+            <p class="ux-sub mx-auto">{% trans "OnWebApp doesn't start with colors, buttons, or polished screens. We start by understanding the problem." %}</p>
+        </div>
+
+        <!-- Process Diagram -->
+        <div class="ux-fade" style="position:relative;padding:2rem 0;">
+            <!-- Row 1: Steps 01  02  03 -->
+            <div style="display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:0;margin-bottom:0;">
+                <!-- Step 01 -->
+                <div style="text-align:center;">
+                    <div style="background:#fff;border:2px solid #9333ea;border-radius:16px;padding:1.5rem;transition:all .3s;cursor:pointer;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 32px rgba(147,51,234,.15)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+                        <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#9333ea,#a855f7);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:1rem;margin-bottom:.6rem;">01</div>
+                        <h6 style="font-weight:800;color:#9333ea;margin-bottom:.3rem;font-size:.9rem;">{% trans "Discover" %}</h6>
+                        <p style="font-size:.72rem;color:#64748b;margin:0;">{% trans "Audit your current product, interview users, and map business goals to measurable UX outcomes." %}</p>
+                        <div style="margin-top:.6rem;padding-top:.6rem;border-top:1px solid #f1f5f9;font-size:.65rem;font-weight:700;color:#9333ea;">{% trans "Result: A clear problem statement aligned with business goals." %}</div>
+                    </div>
+                </div>
+                <!-- Arrow 0102 -->
+                <div style="text-align:center;padding:0 .25rem;">
+                    <svg width="48" height="24" viewBox="0 0 48 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M0 12 H40 M34 6 L42 12 L34 18" stroke="#9333ea" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <!-- Step 02 -->
+                <div style="text-align:center;">
+                    <div style="background:#fff;border:2px solid #ec4899;border-radius:16px;padding:1.5rem;transition:all .3s;cursor:pointer;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 32px rgba(236,72,153,.15)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+                        <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#ec4899,#f472b6);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:1rem;margin-bottom:.6rem;">02</div>
+                        <h6 style="font-weight:800;color:#ec4899;margin-bottom:.3rem;font-size:.9rem;">{% trans "Define" %}</h6>
+                        <p style="font-size:.72rem;color:#64748b;margin:0;">{% trans "Transform insights into personas, user goals, and a prioritized set of use cases." %}</p>
+                        <div style="margin-top:.6rem;padding-top:.6rem;border-top:1px solid #f1f5f9;font-size:.65rem;font-weight:700;color:#ec4899;">{% trans "Result: A shared direction between your business, users, and product team." %}</div>
+                    </div>
+                </div>
+                <!-- Arrow 0203 -->
+                <div style="text-align:center;padding:0 .25rem;">
+                    <svg width="48" height="24" viewBox="0 0 48 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M0 12 H40 M34 6 L42 12 L34 18" stroke="#ec4899" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <!-- Step 03 -->
+                <div style="text-align:center;">
+                    <div style="background:#fff;border:2px solid #a855f7;border-radius:16px;padding:1.5rem;transition:all .3s;cursor:pointer;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 32px rgba(168,85,247,.15)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+                        <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#a855f7,#c084fc);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:1rem;margin-bottom:.6rem;">03</div>
+                        <h6 style="font-weight:800;color:#a855f7;margin-bottom:.3rem;font-size:.9rem;">{% trans "Structure" %}</h6>
+                        <p style="font-size:.72rem;color:#64748b;margin:0;">{% trans "Organize information, navigation, and user journeys into a logical architecture." %}</p>
+                        <div style="margin-top:.6rem;padding-top:.6rem;border-top:1px solid #f1f5f9;font-size:.65rem;font-weight:700;color:#a855f7;">{% trans "Result: A structure users can understand without thinking." %}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Connector Down: 03  06 -->
+            <div style="display:flex;justify-content:flex-end;padding-right:calc(50% - 24px);margin:0;">
+                <svg width="24" height="48" viewBox="0 0 24 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 0 V40 M6 34 L12 42 L18 34" stroke="#a855f7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+
+            <!-- Row 2: Steps 06  05  04 (reversed flow) -->
+            <div style="display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:0;direction:rtl;">
+                <!-- Step 06 (right) -->
+                <div style="text-align:center;direction:ltr;">
+                    <div style="background:#fff;border:2px solid #4f46e5;border-radius:16px;padding:1.5rem;transition:all .3s;cursor:pointer;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 32px rgba(79,70,229,.15)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+                        <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#4f46e5,#6366f1);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:1rem;margin-bottom:.6rem;">06</div>
+                        <h6 style="font-weight:800;color:#4f46e5;margin-bottom:.3rem;font-size:.9rem;">{% trans "Improve" %}</h6>
+                        <p style="font-size:.72rem;color:#64748b;margin:0;">{% trans "Refine based on findings and hand off a validated, developer-ready foundation." %}</p>
+                        <div style="margin-top:.6rem;padding-top:.6rem;border-top:1px solid #f1f5f9;font-size:.65rem;font-weight:700;color:#4f46e5;">{% trans "Result: A polished UX foundation your team can build with confidence." %}</div>
+                    </div>
+                </div>
+                <!-- Arrow 0506 -->
+                <div style="text-align:center;padding:0 .25rem;direction:ltr;">
+                    <svg width="48" height="24" viewBox="0 0 48 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M48 12 H8 M14 6 L6 12 L14 18" stroke="#6366f1" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <!-- Step 05 (middle) -->
+                <div style="text-align:center;direction:ltr;">
+                    <div style="background:#fff;border:2px solid #6366f1;border-radius:16px;padding:1.5rem;transition:all .3s;cursor:pointer;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 32px rgba(99,102,241,.15)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+                        <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#818cf8);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:1rem;margin-bottom:.6rem;">05</div>
+                        <h6 style="font-weight:800;color:#6366f1;margin-bottom:.3rem;font-size:.9rem;">{% trans "Validate" %}</h6>
+                        <p style="font-size:.72rem;color:#64748b;margin:0;">{% trans "Test usability, task completion, and interaction clarity against real user goals." %}</p>
+                        <div style="margin-top:.6rem;padding-top:.6rem;border-top:1px solid #f1f5f9;font-size:.65rem;font-weight:700;color:#6366f1;">{% trans "Result: Problems identified before they become expensive development changes." %}</div>
+                    </div>
+                </div>
+                <!-- Arrow 0405 -->
+                <div style="text-align:center;padding:0 .25rem;direction:ltr;">
+                    <svg width="48" height="24" viewBox="0 0 48 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M48 12 H8 M14 6 L6 12 L14 18" stroke="#7c3aed" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <!-- Step 04 (left) -->
+                <div style="text-align:center;direction:ltr;">
+                    <div style="background:#fff;border:2px solid #7c3aed;border-radius:16px;padding:1.5rem;transition:all .3s;cursor:pointer;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 32px rgba(124,58,237,.15)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+                        <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#8b5cf6);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:1rem;margin-bottom:.6rem;">04</div>
+                        <h6 style="font-weight:800;color:#7c3aed;margin-bottom:.3rem;font-size:.9rem;">{% trans "Design" %}</h6>
+                        <p style="font-size:.72rem;color:#64748b;margin:0;">{% trans "Translate structure into wireframes, interactions, and clickable prototypes." %}</p>
+                        <div style="margin-top:.6rem;padding-top:.6rem;border-top:1px solid #f1f5f9;font-size:.65rem;font-weight:700;color:#7c3aed;">{% trans "Result: A tangible experience your team can see and test before development." %}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Our Role Banner -->
+            <div class="ux-fade" style="margin-top:2rem;background:linear-gradient(135deg,#faf5ff,#f3e8ff);border:1px solid rgba(147,51,234,.2);border-radius:16px;padding:1.25rem 2rem;text-align:center;">
+                <div style="display:inline-flex;align-items:center;gap:.75rem;flex-wrap:wrap;justify-content:center;">
+                    <span style="font-size:.8rem;font-weight:800;color:#9333ea;text-transform:uppercase;letter-spacing:.05em;">{% trans "OnWebApp's Role:" %}</span>
+                    <span style="color:#475569;font-size:.9rem;">{% trans "OnWebApp turns scattered requirements into a clear, validated UX foundation — so your team builds the right product, not just any product." %}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- User Research -->
+<section class="ux-s ux-s-alt" id="sec-research">
+    <div class="ux-container">
+        <div class="ux-split">
+            <div class="ux-fade">
+                <div class="ux-label"><i class="fas fa-circle"></i>{% trans "04 — Research" %}</div>
+                <h2 class="ux-h">{% trans "Understand Before You Design" %}</h2>
+                <p class="ux-sub mb-3">{% trans "The first responsibility of OnWebApp's UX process is to understand who you're building for. We study the context surrounding your product to identify what users need and where the current experience can improve." %}</p>
+                <div class="alert border-0 rounded-4 p-3 mb-0" style="background:#faf5ff;border-left:4px solid #9333ea !important;">
+                    <strong style="color:#9333ea;">{% trans "OnWebApp's Role:" %}</strong> <span style="color:#475569;">{% trans "We transform research and requirements into actionable UX insights that guide the rest of the product design." %}</span>
+                </div>
+            </div>
+            <div class="ux-fade">
+                <div class="row g-3">
+                    <div class="col-12"><div class="ux-c"><p style="font-size:.85rem;font-weight:700;color:#9333ea;margin-bottom:.75rem;">{% trans "We Explore:" %}</p><ul class="ux-check"><li><i class="fas fa-check"></i><strong>{% trans "Who are your users?" %}</strong> — {% trans "Understand the different audiences interacting with your product." %}</li><li><i class="fas fa-check"></i><strong>{% trans "What are they trying to achieve?" %}</strong> — {% trans "Identify their primary goals and tasks." %}</li><li><i class="fas fa-check"></i><strong>{% trans "What frustrates them?" %}</strong> — {% trans "Discover pain points and unnecessary complexity." %}</li><li><i class="fas fa-check"></i><strong>{% trans "What influences their decisions?" %}</strong> — {% trans "Understand expectations, motivations, and behaviors." %}</li><li><i class="fas fa-check"></i><strong>{% trans "What does the business need?" %}</strong> — {% trans "Connect user needs with measurable business objectives." %}</li></ul></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- User Personas -->
+<section class="ux-s" id="sec-personas">
+    <div class="ux-container">
+        <div class="ux-split">
+            <div class="ux-fade">
+                <div class="row g-3">
+                    <div class="col-12"><div class="ux-c"><p style="font-size:.85rem;font-weight:700;color:#9333ea;margin-bottom:.75rem;">{% trans "OnWebApp creates user profiles around:" %}</p><ul class="ux-check"><li><i class="fas fa-check"></i><strong>{% trans "Goals" %}</strong> — {% trans "What users want to accomplish." %}</li><li><i class="fas fa-check"></i><strong>{% trans "Needs" %}</strong> — {% trans "What they require from the product." %}</li><li><i class="fas fa-check"></i><strong>{% trans "Behaviors" %}</strong> — {% trans "How they interact with products and systems." %}</li><li><i class="fas fa-check"></i><strong>{% trans "Pain Points" %}</strong> — {% trans "Where they experience difficulties." %}</li><li><i class="fas fa-check"></i><strong>{% trans "Motivations" %}</strong> — {% trans "Why they use the product." %}</li></ul><div class="alert border-0 rounded-4 p-3 mb-0 mt-3" style="background:#faf5ff;border-left:4px solid #9333ea !important;"><strong style="color:#9333ea;">{% trans "Our Role:" %}</strong> <span style="color:#475569;">{% trans "We use personas as a reference throughout the UX process so design decisions remain connected to real user needs." %}</span></div></div></div>
+                </div>
+            </div>
+            <div class="ux-fade">
+                <div class="ux-label"><i class="fas fa-circle"></i>{% trans "05 — Personas" %}</div>
+                <h2 class="ux-h">{% trans "Give Your Users a Clear Voice" %}</h2>
+                <p class="ux-sub">{% trans "Personas help your team make decisions based on user needs rather than assumptions." %}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- User Journeys -->
+<section class="ux-s ux-s-alt" id="sec-journeys">
+    <div class="ux-container">
+        <div class="text-center mb-5 ux-fade">
+            <div class="ux-label justify-content-center"><i class="fas fa-circle"></i>{% trans "06 — Journeys" %}</div>
+            <h2 class="ux-h">{% trans "See Your Product Through the User's Eyes" %}</h2>
+            <p class="ux-sub mx-auto">{% trans "A user journey shows what happens before, during, and after a user's interaction with your product. OnWebApp maps the experience to identify opportunities at every stage." %}</p>
+        </div>
+        <div class="row g-4 text-center">
+            <div class="col-md-4 col-lg ux-fade"><div class="ux-c" style="text-align:center;padding:2rem;"><div class="ux-c-icon teal mx-auto"><i class="fas fa-compass"></i></div><h6 style="font-weight:700;">{% trans "Discover" %}</h6><p style="font-size:.82rem;margin:0;">{% trans "How does the user find your product?" %}</p></div></div>
+            <div class="col-md-4 col-lg ux-fade"><div class="ux-c" style="text-align:center;padding:2rem;"><div class="ux-c-icon purple mx-auto"><i class="fas fa-eye"></i></div><h6 style="font-weight:700;">{% trans "Explore" %}</h6><p style="font-size:.82rem;margin:0;">{% trans "How do they understand it?" %}</p></div></div>
+            <div class="col-md-4 col-lg ux-fade"><div class="ux-c" style="text-align:center;padding:2rem;"><div class="ux-c-icon blue mx-auto"><i class="fas fa-scale-balanced"></i></div><h6 style="font-weight:700;">{% trans "Decide" %}</h6><p style="font-size:.82rem;margin:0;">{% trans "What influences their decision?" %}</p></div></div>
+            <div class="col-md-4 col-lg ux-fade"><div class="ux-c" style="text-align:center;padding:2rem;"><div class="ux-c-icon amber mx-auto"><i class="fas fa-hand-pointer"></i></div><h6 style="font-weight:700;">{% trans "Act" %}</h6><p style="font-size:.82rem;margin:0;">{% trans "How do they accomplish their goal?" %}</p></div></div>
+            <div class="col-md-4 col-lg ux-fade"><div class="ux-c" style="text-align:center;padding:2rem;"><div class="ux-c-icon teal mx-auto"><i class="fas fa-rotate"></i></div><h6 style="font-weight:700;">{% trans "Continue" %}</h6><p style="font-size:.82rem;margin:0;">{% trans "What makes the experience useful enough to return?" %}</p></div></div>
+        </div>
+        <div class="alert border-0 rounded-4 p-4 mb-0 mt-4" style="background:#faf5ff;border-left:4px solid #9333ea !important;text-align:center;">
+            <strong style="color:#9333ea;">{% trans "OnWebApp's Role:" %}</strong> <span style="color:#475569;">{% trans "We identify moments of friction, opportunities for improvement, and gaps in the overall experience." %}</span>
+        </div>
+    </div>
+</section>
+
+<!-- User Flows -->
+<section class="ux-s" id="sec-flows">
+    <div class="ux-container">
+        <div class="ux-split">
+            <div class="ux-fade">
+                <div class="ux-label"><i class="fas fa-circle"></i>{% trans "07 — Flows" %}</div>
+                <h2 class="ux-h">{% trans "Design the Path From Intent to Action" %}</h2>
+                <p class="ux-sub mb-3">{% trans "Every important task should have a clear path. OnWebApp maps user flows to understand how users move through your product." %}</p>
+                <div style="background:#faf5ff;border:1px solid rgba(147,51,234,.2);border-radius:12px;padding:1rem;font-size:.85rem;font-weight:600;color:#9333ea;text-align:center;margin-bottom:1rem;">
+                    {% trans "Entry Point  Decision  Action  Feedback  Next Step  Goal" %}
+                </div>
+                <div class="alert border-0 rounded-4 p-3 mb-0" style="background:#faf5ff;border-left:4px solid #9333ea !important;">
+                    <strong style="color:#9333ea;">{% trans "OnWebApp's Role:" %}</strong> <span style="color:#475569;">{% trans "We create efficient journeys that help users reach their goals with less effort." %}</span>
+                </div>
+            </div>
+            <div class="ux-fade">
+                <div class="ux-c">
+                    <p style="font-size:.85rem;font-weight:700;color:#9333ea;margin-bottom:.75rem;">{% trans "We look for:" %}</p>
+                    <ul class="ux-check">
+                        <li><i class="fas fa-check"></i>{% trans "Unnecessary steps" %}</li>
+                        <li><i class="fas fa-check"></i>{% trans "Confusing decisions" %}</li>
+                        <li><i class="fas fa-check"></i>{% trans "Dead ends" %}</li>
+                        <li><i class="fas fa-check"></i>{% trans "Repetitive actions" %}</li>
+                        <li><i class="fas fa-check"></i>{% trans "Missing feedback" %}</li>
+                        <li><i class="fas fa-check"></i>{% trans "Navigation problems" %}</li>
+                        <li><i class="fas fa-check"></i>{% trans "Opportunities to simplify" %}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Information Architecture -->
+<section class="ux-s ux-s-alt" id="sec-architecture">
+    <div class="ux-container">
+        <div class="ux-split">
+            <div class="ux-fade">
+                <div class="row g-3">
+                    <div class="col-12"><div class="ux-c"><p style="font-size:.85rem;font-weight:700;color:#9333ea;margin-bottom:.75rem;">{% trans "We Organize:" %}</p><ul class="ux-check"><li><i class="fas fa-check"></i>{% trans "Content" %}</li><li><i class="fas fa-check"></i>{% trans "Features" %}</li><li><i class="fas fa-check"></i>{% trans "Navigation" %}</li><li><i class="fas fa-check"></i>{% trans "Categories" %}</li><li><i class="fas fa-check"></i>{% trans "Pages" %}</li><li><i class="fas fa-check"></i>{% trans "Relationships" %}</li><li><i class="fas fa-check"></i>{% trans "Search" %}</li><li><i class="fas fa-check"></i>{% trans "Information hierarchy" %}</li></ul><div class="alert border-0 rounded-4 p-3 mb-0 mt-3" style="background:#faf5ff;border-left:4px solid #9333ea !important;"><strong style="color:#9333ea;">{% trans "OnWebApp's Role:" %}</strong> <span style="color:#475569;">{% trans "We transform complexity into a logical structure that users can understand and navigate." %}</span></div></div></div>
+                </div>
+            </div>
+            <div class="ux-fade">
+                <div class="ux-label"><i class="fas fa-circle"></i>{% trans "08 — Architecture" %}</div>
+                <h2 class="ux-h">{% trans "Make Complex Products Easy to Understand" %}</h2>
+                <p class="ux-sub">{% trans "As your product grows, features and information can become difficult to navigate. OnWebApp creates the structure behind the experience." %}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Wireframes -->
+<section class="ux-s" id="sec-wireframes">
+    <div class="ux-container">
+        <div class="ux-split">
+            <div class="ux-fade">
+                <div class="ux-label"><i class="fas fa-circle"></i>{% trans "09 — Wireframes" %}</div>
+                <h2 class="ux-h">{% trans "Solve the Experience Before Styling It" %}</h2>
+                <p class="ux-sub mb-3">{% trans "Wireframes allow OnWebApp to focus on structure and functionality before visual design." %}</p>
+                <a href="{% url 'home:build_website' %}" class="btn rounded-pill px-4 fw-800 text-white" style="background:#9333ea;">{% trans "Explore UI Design" %} <i class="fas fa-arrow-right ms-1"></i></a>
+            </div>
+            <div class="ux-fade">
+                <div class="ux-c">
+                    <p style="font-size:.85rem;font-weight:700;color:#9333ea;margin-bottom:.75rem;">{% trans "We explore:" %}</p>
+                    <ul class="ux-check">
+                        <li><i class="fas fa-check"></i><strong>{% trans "Layout" %}</strong> — {% trans "Where information belongs." %}</li>
+                        <li><i class="fas fa-check"></i><strong>{% trans "Hierarchy" %}</strong> — {% trans "What users should see first." %}</li>
+                        <li><i class="fas fa-check"></i><strong>{% trans "Navigation" %}</strong> — {% trans "How users move through the product." %}</li>
+                        <li><i class="fas fa-check"></i><strong>{% trans "Functionality" %}</strong> — {% trans "What each screen needs to accomplish." %}</li>
+                        <li><i class="fas fa-check"></i><strong>{% trans "Interactions" %}</strong> — {% trans "What happens when users take action." %}</li>
+                    </ul>
+                    <div class="alert border-0 rounded-4 p-3 mb-0 mt-3" style="background:#faf5ff;border-left:4px solid #9333ea !important;">
+                        <strong style="color:#9333ea;">{% trans "OnWebApp's Role:" %}</strong> <span style="color:#475569;">{% trans "We use wireframes to identify UX problems early, communicate ideas clearly, and create a strong foundation for UI design." %}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Prototyping -->
+<section class="ux-s ux-s-alt" id="sec-prototyping">
+    <div class="ux-container">
+        <div class="ux-split">
+            <div class="ux-fade">
+                <div class="row g-3">
+                    <div class="col-12"><div class="ux-c"><p style="font-size:.85rem;font-weight:700;color:#9333ea;margin-bottom:.75rem;">{% trans "OnWebApp creates prototypes to help stakeholders:" %}</p><ul class="ux-check"><li><i class="fas fa-check"></i>{% trans "Experience user journeys" %}</li><li><i class="fas fa-check"></i>{% trans "Test navigation" %}</li><li><i class="fas fa-check"></i>{% trans "Validate interactions" %}</li><li><i class="fas fa-check"></i>{% trans "Understand functionality" %}</li><li><i class="fas fa-check"></i>{% trans "Identify problems" %}</li><li><i class="fas fa-check"></i>{% trans "Align on product direction" %}</li></ul><div class="alert border-0 rounded-4 p-3 mb-0 mt-3" style="background:#faf5ff;border-left:4px solid #9333ea !important;"><strong style="color:#9333ea;">{% trans "OnWebApp's Role:" %}</strong> <span style="color:#475569;">{% trans "We use prototyping as a communication and validation tool between your business, users, designers, and developers." %}</span></div></div></div>
+                </div>
+            </div>
+            <div class="ux-fade">
+                <div class="ux-label"><i class="fas fa-circle"></i>{% trans "10 — Prototyping" %}</div>
+                <h2 class="ux-h">{% trans "Experience the Product Before It's Built" %}</h2>
+                <p class="ux-sub">{% trans "A prototype makes the UX tangible. Instead of discussing static screens, your team can experience the product flow before development begins." %}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Usability Testing -->
+<section class="ux-s" id="sec-testing">
+    <div class="ux-container">
+        <div class="ux-split">
+            <div class="ux-fade">
+                <div class="ux-label"><i class="fas fa-circle"></i>{% trans "11 — Testing" %}</div>
+                <h2 class="ux-h">{% trans "Find Friction Before Your Users Do" %}</h2>
+                <p class="ux-sub mb-3">{% trans "We don't assume that a workflow is intuitive simply because it makes sense to the product team." %}</p>
+                <div class="alert border-0 rounded-4 p-3 mb-0" style="background:#faf5ff;border-left:4px solid #9333ea !important;">
+                    <strong style="color:#9333ea;">{% trans "Observe  Learn  Improve" %}</strong> <span style="color:#475569;">— {% trans "We turn usability findings into concrete recommendations that improve the product before development." %}</span>
+                </div>
+            </div>
+            <div class="ux-fade">
+                <div class="ux-c">
+                    <p style="font-size:.85rem;font-weight:700;color:#9333ea;margin-bottom:.75rem;">{% trans "OnWebApp evaluates whether users can:" %}</p>
+                    <ul class="ux-check">
+                        <li><i class="fas fa-check"></i>{% trans "Find what they need" %}</li>
+                        <li><i class="fas fa-check"></i>{% trans "Understand the interface" %}</li>
+                        <li><i class="fas fa-check"></i>{% trans "Complete important tasks" %}</li>
+                        <li><i class="fas fa-check"></i>{% trans "Navigate confidently" %}</li>
+                        <li><i class="fas fa-check"></i>{% trans "Recover from mistakes" %}</li>
+                        <li><i class="fas fa-check"></i>{% trans "Reach their intended outcome" %}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- UX for Complex Products -->
+<section class="ux-s ux-s-alt" id="sec-complex">
+    <div class="ux-container">
+        <div class="text-center mb-5 ux-fade">
+            <div class="ux-label justify-content-center"><i class="fas fa-circle"></i>{% trans "12 — Complex Products" %}</div>
+            <h2 class="ux-h">{% trans "Make Complex Systems Feel Simple" %}</h2>
+            <p class="ux-sub mx-auto">{% trans "Enterprise platforms, SaaS products, dashboards, and business applications can contain hundreds of features and workflows. OnWebApp helps simplify these experiences." %}</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4 ux-fade"><div class="ux-c"><div class="ux-c-icon teal"><i class="fas fa-sitemap"></i></div><h5>{% trans "Clear Information Architecture" %}</h5><p>{% trans "Organize large amounts of information into logical structures." %}</p></div></div>
+            <div class="col-md-6 col-lg-4 ux-fade"><div class="ux-c"><div class="ux-c-icon purple"><i class="fas fa-route"></i></div><h5>{% trans "Focused User Flows" %}</h5><p>{% trans "Remove unnecessary steps from important workflows." %}</p></div></div>
+            <div class="col-md-6 col-lg-4 ux-fade"><div class="ux-c"><div class="ux-c-icon blue"><i class="fas fa-layer-group"></i></div><h5>{% trans "Progressive Disclosure" %}</h5><p>{% trans "Present information when users actually need it." %}</p></div></div>
+            <div class="col-md-6 col-lg-4 ux-fade"><div class="ux-c"><div class="ux-c-icon amber"><i class="fas fa-puzzle-piece"></i></div><h5>{% trans "Consistent Patterns" %}</h5><p>{% trans "Make interactions predictable across the product." %}</p></div></div>
+            <div class="col-md-6 col-lg-4 ux-fade"><div class="ux-c"><div class="ux-c-icon teal"><i class="fas fa-chart-line"></i></div><h5>{% trans "Actionable Information" %}</h5><p>{% trans "Help users understand data and make decisions." %}</p></div></div>
+        </div>
+        <div class="alert border-0 rounded-4 p-4 mb-0 mt-4" style="background:#faf5ff;border-left:4px solid #9333ea !important;text-align:center;">
+            <strong style="color:#9333ea;">{% trans "OnWebApp's Role:" %}</strong> <span style="color:#475569;">{% trans "We translate complex business logic into experiences that feel simple to the people using them." %}</span>
+        </div>
+    </div>
+</section>
+
+<!-- UX + UI + Development -->
+<section class="ux-s" id="sec-connected">
+    <div class="ux-container">
+        <div class="text-center mb-5 ux-fade">
+            <div class="ux-label justify-content-center"><i class="fas fa-circle"></i>{% trans "13 — Connected" %}</div>
+            <h2 class="ux-h">{% trans "One Connected Product Process" %}</h2>
+            <p class="ux-sub mx-auto">{% trans "UX should not be disconnected from visual design or development. At OnWebApp, we connect the entire product experience." %}</p>
+        </div>
+        <div class="row g-4 text-center">
+            <div class="col-md-4 ux-fade"><div class="ux-c" style="border-top:3px solid #9333ea;padding:2rem;"><div style="font-size:.65rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#9333ea;margin-bottom:.4rem;">{% trans "Step 01" %}</div><h5>{% trans "UX" %}</h5><p style="font-size:.85rem;font-weight:700;color:#9333ea;">{% trans "How should the product work?" %}</p><p style="font-size:.82rem;">{% trans "User Research · User Journeys · User Flows · Information Architecture · Wireframes" %}</p></div></div>
+            <div class="col-md-4 ux-fade"><div class="ux-c" style="border-top:3px solid #ec4899;padding:2rem;"><div style="font-size:.65rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#ec4899;margin-bottom:.4rem;">{% trans "Step 02" %}</div><h5>{% trans "UI" %}</h5><p style="font-size:.85rem;font-weight:700;color:#ec4899;">{% trans "How should the experience look and feel?" %}</p><p style="font-size:.82rem;">{% trans "Visual Direction · Design System · High-Fidelity Screens · Responsive Design" %}</p></div></div>
+            <div class="col-md-4 ux-fade"><div class="ux-c" style="border-top:3px solid #a855f7;padding:2rem;"><div style="font-size:.65rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#a855f7;margin-bottom:.4rem;">{% trans "Step 03" %}</div><h5>{% trans "Development" %}</h5><p style="font-size:.85rem;font-weight:700;color:#a855f7;">{% trans "How should the experience become reality?" %}</p><p style="font-size:.82rem;">{% trans "Frontend · Backend · Applications · APIs · Integrations · Testing · Deployment" %}</p></div></div>
+        </div>
+        <div class="alert border-0 rounded-4 p-4 mb-0 mt-4" style="background:#faf5ff;border-left:4px solid #9333ea !important;text-align:center;">
+            <strong style="color:#9333ea;">{% trans "OnWebApp's Advantage:" %}</strong> <span style="color:#475569;">{% trans "Because UX, UI, and development are connected, we can design experiences that are not only user-friendly but also practical to build and scale." %}</span>
+        </div>
+    </div>
+</section>
+
+<!-- From Business Idea to User Experience -->
+<section class="ux-s ux-s-dark" id="sec-idea">
+    <div class="ux-container">
+        <div class="text-center mb-5 ux-fade">
+            <div class="ux-label justify-content-center" style="color:#d8b4fe;"><i class="fas fa-circle"></i>{% trans "14 — Idea to Experience" %}</div>
+            <h2 class="ux-h" style="color:#fff;">{% trans "We Connect the Dots" %}</h2>
+            <p class="ux-sub" style="color:rgba(255,255,255,.6);">{% trans "Your project may start with an idea. OnWebApp helps transform it into a structured product experience." %}</p>
+        </div>
+
+        <!-- Pipeline Diagram -->
+        <div class="ux-fade" style="max-width:700px;margin:0 auto;">
+            <!-- Step: An Idea -->
+            <div style="display:flex;align-items:center;gap:1.25rem;">
+                <div style="flex-shrink:0;width:52px;height:52px;border-radius:50%;background:rgba(147,51,234,.2);border:2px solid rgba(147,51,234,.4);display:flex;align-items:center;justify-content:center;">
+                    <i class="fas fa-lightbulb" style="color:#d8b4fe;font-size:1.1rem;"></i>
+                </div>
+                <div style="flex:1;background:rgba(147,51,234,.1);border:1px solid rgba(147,51,234,.25);border-radius:12px;padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;">
+                    <div>
+                        <div style="font-size:.65rem;font-weight:700;color:#d8b4fe;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.15rem;">{% trans "Step 01" %}</div>
+                        <div style="color:#fff;font-weight:700;">{% trans "An Idea" %}</div>
+                    </div>
+                    <span style="font-size:.75rem;color:rgba(255,255,255,.4);font-style:italic;">{% trans "Where it all begins" %}</span>
+                </div>
+            </div>
+            <!-- Connector -->
+            <div style="display:flex;align-items:center;gap:1.25rem;padding:.25rem 0;">
+                <div style="flex-shrink:0;width:52px;display:flex;justify-content:center;"><div style="width:2px;height:28px;background:linear-gradient(180deg,rgba(147,51,234,.5),rgba(168,85,247,.5));"></div></div>
+            </div>
+
+            <!-- Step: Business Requirements -->
+            <div style="display:flex;align-items:center;gap:1.25rem;">
+                <div style="flex-shrink:0;width:52px;height:52px;border-radius:50%;background:rgba(147,51,234,.2);border:2px solid rgba(147,51,234,.4);display:flex;align-items:center;justify-content:center;">
+                    <i class="fas fa-briefcase" style="color:#d8b4fe;font-size:1.1rem;"></i>
+                </div>
+                <div style="flex:1;background:rgba(147,51,234,.1);border:1px solid rgba(147,51,234,.25);border-radius:12px;padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;">
+                    <div>
+                        <div style="font-size:.65rem;font-weight:700;color:#d8b4fe;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.15rem;">{% trans "Step 02" %}</div>
+                        <div style="color:#fff;font-weight:700;">{% trans "Business Requirements" %}</div>
+                    </div>
+                    <span style="font-size:.75rem;color:rgba(255,255,255,.4);font-style:italic;">{% trans "Goals, constraints, stakeholders" %}</span>
+                </div>
+            </div>
+            <!-- Connector -->
+            <div style="display:flex;align-items:center;gap:1.25rem;padding:.25rem 0;">
+                <div style="flex-shrink:0;width:52px;display:flex;justify-content:center;"><div style="width:2px;height:28px;background:linear-gradient(180deg,rgba(147,51,234,.5),rgba(168,85,247,.5));"></div></div>
+            </div>
+
+            <!-- Step: User Problems -->
+            <div style="display:flex;align-items:center;gap:1.25rem;">
+                <div style="flex-shrink:0;width:52px;height:52px;border-radius:50%;background:rgba(168,85,247,.2);border:2px solid rgba(168,85,247,.4);display:flex;align-items:center;justify-content:center;">
+                    <i class="fas fa-users" style="color:#e9d5ff;font-size:1.1rem;"></i>
+                </div>
+                <div style="flex:1;background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.25);border-radius:12px;padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;">
+                    <div>
+                        <div style="font-size:.65rem;font-weight:700;color:#e9d5ff;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.15rem;">{% trans "Step 03" %}</div>
+                        <div style="color:#fff;font-weight:700;">{% trans "User Problems" %}</div>
+                    </div>
+                    <span style="font-size:.75rem;color:rgba(255,255,255,.4);font-style:italic;">{% trans "Pain points, unmet needs" %}</span>
+                </div>
+            </div>
+            <!-- Connector -->
+            <div style="display:flex;align-items:center;gap:1.25rem;padding:.25rem 0;">
+                <div style="flex-shrink:0;width:52px;display:flex;justify-content:center;"><div style="width:2px;height:28px;background:linear-gradient(180deg,rgba(168,85,247,.5),rgba(192,132,252,.5));"></div></div>
+            </div>
+
+            <!-- Step: Product Features -->
+            <div style="display:flex;align-items:center;gap:1.25rem;">
+                <div style="flex-shrink:0;width:52px;height:52px;border-radius:50%;background:rgba(192,132,252,.2);border:2px solid rgba(192,132,252,.4);display:flex;align-items:center;justify-content:center;">
+                    <i class="fas fa-puzzle-piece" style="color:#f3e8ff;font-size:1.1rem;"></i>
+                </div>
+                <div style="flex:1;background:rgba(192,132,252,.1);border:1px solid rgba(192,132,252,.25);border-radius:12px;padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;">
+                    <div>
+                        <div style="font-size:.65rem;font-weight:700;color:#f3e8ff;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.15rem;">{% trans "Step 04" %}</div>
+                        <div style="color:#fff;font-weight:700;">{% trans "Product Features" %}</div>
+                    </div>
+                    <span style="font-size:.75rem;color:rgba(255,255,255,.4);font-style:italic;">{% trans "What the product must do" %}</span>
+                </div>
+            </div>
+            <!-- Connector -->
+            <div style="display:flex;align-items:center;gap:1.25rem;padding:.25rem 0;">
+                <div style="flex-shrink:0;width:52px;display:flex;justify-content:center;"><div style="width:2px;height:28px;background:linear-gradient(180deg,rgba(192,132,252,.5),rgba(236,72,153,.5));"></div></div>
+            </div>
+
+            <!-- Step: UX Structure -->
+            <div style="display:flex;align-items:center;gap:1.25rem;">
+                <div style="flex-shrink:0;width:52px;height:52px;border-radius:50%;background:rgba(236,72,153,.2);border:2px solid rgba(236,72,153,.4);display:flex;align-items:center;justify-content:center;">
+                    <i class="fas fa-sitemap" style="color:#f9a8d4;font-size:1.1rem;"></i>
+                </div>
+                <div style="flex:1;background:rgba(236,72,153,.1);border:1px solid rgba(236,72,153,.25);border-radius:12px;padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;">
+                    <div>
+                        <div style="font-size:.65rem;font-weight:700;color:#f9a8d4;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.15rem;">{% trans "Step 05" %}</div>
+                        <div style="color:#fff;font-weight:700;">{% trans "UX Structure" %}</div>
+                    </div>
+                    <span style="font-size:.75rem;color:rgba(255,255,255,.4);font-style:italic;">{% trans "Flows, architecture, hierarchy" %}</span>
+                </div>
+            </div>
+            <!-- Connector -->
+            <div style="display:flex;align-items:center;gap:1.25rem;padding:.25rem 0;">
+                <div style="flex-shrink:0;width:52px;display:flex;justify-content:center;"><div style="width:2px;height:28px;background:linear-gradient(180deg,rgba(236,72,153,.5),rgba(147,51,234,.5));"></div></div>
+            </div>
+
+            <!-- Step: UI Design -->
+            <div style="display:flex;align-items:center;gap:1.25rem;">
+                <div style="flex-shrink:0;width:52px;height:52px;border-radius:50%;background:rgba(147,51,234,.2);border:2px solid rgba(147,51,234,.4);display:flex;align-items:center;justify-content:center;">
+                    <i class="fas fa-palette" style="color:#d8b4fe;font-size:1.1rem;"></i>
+                </div>
+                <div style="flex:1;background:rgba(147,51,234,.1);border:1px solid rgba(147,51,234,.25);border-radius:12px;padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;">
+                    <div>
+                        <div style="font-size:.65rem;font-weight:700;color:#d8b4fe;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.15rem;">{% trans "Step 06" %}</div>
+                        <div style="color:#fff;font-weight:700;">{% trans "UI Design" %}</div>
+                    </div>
+                    <span style="font-size:.75rem;color:rgba(255,255,255,.4);font-style:italic;">{% trans "Visual, interactions, prototype" %}</span>
+                </div>
+            </div>
+            <!-- Connector -->
+            <div style="display:flex;align-items:center;gap:1.25rem;padding:.25rem 0;">
+                <div style="flex-shrink:0;width:52px;display:flex;justify-content:center;"><div style="width:2px;height:28px;background:linear-gradient(180deg,rgba(147,51,234,.6),rgba(236,72,153,.8));"></div></div>
+            </div>
+
+            <!-- Step: Working Product -->
+            <div style="display:flex;align-items:center;gap:1.25rem;">
+                <div style="flex-shrink:0;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#9333ea,#ec4899);border:none;display:flex;align-items:center;justify-content:center;">
+                    <i class="fas fa-rocket" style="color:#fff;font-size:1.1rem;"></i>
+                </div>
+                <div style="flex:1;background:linear-gradient(135deg,rgba(147,51,234,.25),rgba(236,72,153,.25));border:1px solid rgba(236,72,153,.4);border-radius:12px;padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;">
+                    <div>
+                        <div style="font-size:.65rem;font-weight:700;color:#f9a8d4;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.15rem;">{% trans "Final" %}</div>
+                        <div style="color:#fff;font-weight:800;">{% trans "Working Product" %}</div>
+                    </div>
+                    <span style="font-size:.75rem;color:#f9a8d4;font-weight:700;">{% trans "Launched & validated" %}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="alert border-0 rounded-4 p-4 mb-0 mt-4" style="background:rgba(147,51,234,.1);border-left:4px solid #a855f7 !important;text-align:center;">
+            <strong style="color:#a855f7;">{% trans "OnWebApp's Role:" %}</strong> <span style="color:rgba(255,255,255,.7);">{% trans "We help transform the initial idea into a structured product experience that your users can understand and your development team can build." %}</span>
+        </div>
+    </div>
+</section>
+
+<!-- UX Deliverables -->
+<section class="ux-s" id="sec-deliverables">
+    <div class="ux-container">
+        <div class="text-center mb-5 ux-fade">
+            <div class="ux-label justify-content-center"><i class="fas fa-circle"></i>{% trans "15 — Deliverables" %}</div>
+            <h2 class="ux-h">{% trans "From Research to Development-Ready Experience" %}</h2>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4 col-lg ux-fade"><div class="ux-deliver"><h6>{% trans "Research" %}</h6><ul><li><i class="fas fa-check"></i>{% trans "User Profiles" %}</li><li><i class="fas fa-check"></i>{% trans "Personas" %}</li><li><i class="fas fa-check"></i>{% trans "User Needs" %}</li><li><i class="fas fa-check"></i>{% trans "Pain Points" %}</li><li><i class="fas fa-check"></i>{% trans "Competitor Insights" %}</li><li><i class="fas fa-check"></i>{% trans "Business Goals" %}</li></ul></div></div>
+            <div class="col-md-4 col-lg ux-fade"><div class="ux-deliver"><h6>{% trans "UX Strategy" %}</h6><ul><li><i class="fas fa-check"></i>{% trans "UX Strategy" %}</li><li><i class="fas fa-check"></i>{% trans "Product Requirements" %}</li><li><i class="fas fa-check"></i>{% trans "Use Cases" %}</li><li><i class="fas fa-check"></i>{% trans "User Goals" %}</li><li><i class="fas fa-check"></i>{% trans "Experience Principles" %}</li></ul></div></div>
+            <div class="col-md-4 col-lg ux-fade"><div class="ux-deliver"><h6>{% trans "Structure" %}</h6><ul><li><i class="fas fa-check"></i>{% trans "Information Architecture" %}</li><li><i class="fas fa-check"></i>{% trans "Sitemap" %}</li><li><i class="fas fa-check"></i>{% trans "User Journeys" %}</li><li><i class="fas fa-check"></i>{% trans "User Flows" %}</li><li><i class="fas fa-check"></i>{% trans "Task Flows" %}</li><li><i class="fas fa-check"></i>{% trans "Content Hierarchy" %}</li></ul></div></div>
+            <div class="col-md-4 col-lg ux-fade"><div class="ux-deliver"><h6>{% trans "Experience Design" %}</h6><ul><li><i class="fas fa-check"></i>{% trans "Wireframes" %}</li><li><i class="fas fa-check"></i>{% trans "Interaction Concepts" %}</li><li><i class="fas fa-check"></i>{% trans "Prototypes" %}</li><li><i class="fas fa-check"></i>{% trans "Responsive UX" %}</li><li><i class="fas fa-check"></i>{% trans "Navigation Systems" %}</li></ul></div></div>
+            <div class="col-md-4 col-lg ux-fade"><div class="ux-deliver"><h6>{% trans "Validation" %}</h6><ul><li><i class="fas fa-check"></i>{% trans "Usability Reviews" %}</li><li><i class="fas fa-check"></i>{% trans "UX Testing" %}</li><li><i class="fas fa-check"></i>{% trans "Feedback Analysis" %}</li><li><i class="fas fa-check"></i>{% trans "Friction Identification" %}</li><li><i class="fas fa-check"></i>{% trans "UX Recommendations" %}</li><li><i class="fas fa-check"></i>{% trans "Iterations" %}</li></ul></div></div>
+        </div>
+    </div>
+</section>
+
+<!-- Why OnWebApp -->
+<section class="ux-s ux-s-alt" id="sec-whyus">
+    <div class="ux-container">
+        <div class="text-center mb-5 ux-fade">
+            <div class="ux-label justify-content-center"><i class="fas fa-circle"></i>{% trans "15 — Why Us" %}</div>
+            <h2 class="ux-h">{% trans "More Than Design. A Product-Focused UX Partner." %}</h2>
+            <p class="ux-sub mx-auto">{% trans "Most agencies hand you wireframes and leave. OnWebApp stays — connecting UX to UI, development, and your business goals." %}</p>
+        </div>
+
+        <!-- Comparison Table -->
+        <div class="ux-fade" style="max-width:800px;margin:0 auto 3rem;">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-radius:16px;overflow:hidden;border:1px solid #e2e8f0;">
+                <!-- Header -->
+                <div style="background:#f8fafc;padding:1rem;text-align:center;border-bottom:1px solid #e2e8f0;"></div>
+                <div style="background:#f8fafc;padding:1rem;text-align:center;border-bottom:1px solid #e2e8f0;border-left:1px solid #e2e8f0;">
+                    <div style="font-size:.7rem;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.1em;">{% trans "Typical Agency" %}</div>
+                </div>
+                <div style="background:linear-gradient(135deg,#9333ea,#ec4899);padding:1rem;text-align:center;border-bottom:none;">
+                    <div style="font-size:.7rem;font-weight:800;color:#fff;text-transform:uppercase;letter-spacing:.1em;">{% trans "OnWebApp" %}</div>
+                </div>
+                <!-- Row 1 -->
+                <div style="padding:.85rem 1rem;font-size:.82rem;font-weight:700;color:#475569;border-bottom:1px solid #f1f5f9;">{% trans "UX Scope" %}</div>
+                <div style="padding:.85rem 1rem;font-size:.82rem;color:#94a3b8;text-align:center;border-bottom:1px solid #f1f5f9;border-left:1px solid #f1f5f9;">{% trans "Screens only" %}</div>
+                <div style="padding:.85rem 1rem;font-size:.82rem;color:#9333ea;font-weight:700;text-align:center;border-bottom:1px solid #f1f5f9;background:rgba(147,51,234,.04);">{% trans "Full product experience" %}</div>
+                <!-- Row 2 -->
+                <div style="padding:.85rem 1rem;font-size:.82rem;font-weight:700;color:#475569;border-bottom:1px solid #f1f5f9;">{% trans "Handoff" %}</div>
+                <div style="padding:.85rem 1rem;font-size:.82rem;color:#94a3b8;text-align:center;border-bottom:1px solid #f1f5f9;border-left:1px solid #f1f5f9;">{% trans "Design files" %}</div>
+                <div style="padding:.85rem 1rem;font-size:.82rem;color:#9333ea;font-weight:700;text-align:center;border-bottom:1px solid #f1f5f9;background:rgba(147,51,234,.04);">{% trans "Design  UI  Code" %}</div>
+                <!-- Row 3 -->
+                <div style="padding:.85rem 1rem;font-size:.82rem;font-weight:700;color:#475569;border-bottom:1px solid #f1f5f9;">{% trans "Business Fit" %}</div>
+                <div style="padding:.85rem 1rem;font-size:.82rem;color:#94a3b8;text-align:center;border-bottom:1px solid #f1f5f9;border-left:1px solid #f1f5f9;">{% trans "Assumed" %}</div>
+                <div style="padding:.85rem 1rem;font-size:.82rem;color:#9333ea;font-weight:700;text-align:center;border-bottom:1px solid #f1f5f9;background:rgba(147,51,234,.04);">{% trans "Mapped to goals" %}</div>
+                <!-- Row 4 -->
+                <div style="padding:.85rem 1rem;font-size:.82rem;font-weight:700;color:#475569;border-bottom:1px solid #f1f5f9;">{% trans "Tech Awareness" %}</div>
+                <div style="padding:.85rem 1rem;font-size:.82rem;color:#94a3b8;text-align:center;border-bottom:1px solid #f1f5f9;border-left:1px solid #f1f5f9;">{% trans "None" %}</div>
+                <div style="padding:.85rem 1rem;font-size:.82rem;color:#9333ea;font-weight:700;text-align:center;border-bottom:1px solid #f1f5f9;background:rgba(147,51,234,.04);">{% trans "Built-in awareness" %}</div>
+                <!-- Row 5 -->
+                <div style="padding:.85rem 1rem;font-size:.82rem;font-weight:700;color:#475569;">{% trans "Scalability" %}</div>
+                <div style="padding:.85rem 1rem;font-size:.82rem;color:#94a3b8;text-align:center;border-left:1px solid #f1f5f9;">{% trans "Limited" %}</div>
+                <div style="padding:.85rem 1rem;font-size:.82rem;color:#9333ea;font-weight:700;text-align:center;background:rgba(147,51,234,.04);">{% trans "Foundation for growth" %}</div>
+            </div>
+        </div>
+
+        <!-- Strength Cards -->
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4 ux-fade">
+                <div class="ux-c" style="border-top:3px solid #14b8a6;">
+                    <div class="ux-c-icon teal"><i class="fas fa-users"></i></div>
+                    <h5>{% trans "User-Centered" %}</h5>
+                    <p>{% trans "We keep the people using your product at the center of every UX decision — not assumptions." %}</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4 ux-fade">
+                <div class="ux-c" style="border-top:3px solid #9333ea;">
+                    <div class="ux-c-icon purple"><i class="fas fa-chart-line"></i></div>
+                    <h5>{% trans "Business-Aware" %}</h5>
+                    <p>{% trans "We balance user needs with your business objectives — UX that drives results, not just pretty screens." %}</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4 ux-fade">
+                <div class="ux-c" style="border-top:3px solid #3b82f6;">
+                    <div class="ux-c-icon blue"><i class="fas fa-microchip"></i></div>
+                    <h5>{% trans "Technology-Aware" %}</h5>
+                    <p>{% trans "Our UX decisions consider technical constraints and development realities from day one." %}</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4 ux-fade">
+                <div class="ux-c" style="border-top:3px solid #f59e0b;">
+                    <div class="ux-c-icon amber"><i class="fas fa-arrows-up-down-left-right"></i></div>
+                    <h5>{% trans "End-to-End" %}</h5>
+                    <p>{% trans "UX connects naturally with our UI design and development — one team, one vision." %}</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4 ux-fade">
+                <div class="ux-c" style="border-top:3px solid #14b8a6;">
+                    <div class="ux-c-icon teal"><i class="fas fa-handshake"></i></div>
+                    <h5>{% trans "Collaborative" %}</h5>
+                    <p>{% trans "We work with your stakeholders, designers, developers, and product teams — not in a silo." %}</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4 ux-fade">
+                <div class="ux-c" style="border-top:3px solid #9333ea;">
+                    <div class="ux-c-icon purple"><i class="fas fa-layer-group"></i></div>
+                    <h5>{% trans "Scalable" %}</h5>
+                    <p>{% trans "We create UX foundations that evolve as your product grows — not just solutions for today." %}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- The Outcome -->
+<section class="ux-s" id="sec-outcome">
+    <div class="ux-container">
+        <div class="text-center mb-5 ux-fade">
+            <div class="ux-label justify-content-center"><i class="fas fa-circle"></i>{% trans "17 — Outcome" %}</div>
+            <h2 class="ux-h">{% trans "A Better Experience Creates a Better Product" %}</h2>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4 ux-fade"><div class="ux-c"><div class="ux-c-icon teal"><i class="fas fa-filter-circle-xmark"></i></div><h5>{% trans "Reduce Friction" %}</h5><p>{% trans "Make important tasks easier to complete." %}</p></div></div>
+            <div class="col-md-6 col-lg-4 ux-fade"><div class="ux-c"><div class="ux-c-icon purple"><i class="fas fa-rocket"></i></div><h5>{% trans "Improve Adoption" %}</h5><p>{% trans "Help users understand your product faster." %}</p></div></div>
+            <div class="col-md-6 col-lg-4 ux-fade"><div class="ux-c"><div class="ux-c-icon blue"><i class="fas fa-arrow-trend-up"></i></div><h5>{% trans "Increase Engagement" %}</h5><p>{% trans "Create experiences that encourage continued interaction." %}</p></div></div>
+            <div class="col-md-6 col-lg-4 ux-fade"><div class="ux-c"><div class="ux-c-icon amber"><i class="fas fa-piggy-bank"></i></div><h5>{% trans "Reduce Rework" %}</h5><p>{% trans "Identify UX problems before development." %}</p></div></div>
+            <div class="col-md-6 col-lg-4 ux-fade"><div class="ux-c"><div class="ux-c-icon teal"><i class="fas fa-comments"></i></div><h5>{% trans "Improve Collaboration" %}</h5><p>{% trans "Give everyone a shared understanding of how the product should work." %}</p></div></div>
+            <div class="col-md-6 col-lg-4 ux-fade"><div class="ux-c"><div class="ux-c-icon purple"><i class="fas fa-shield-halved"></i></div><h5>{% trans "Build With Confidence" %}</h5><p>{% trans "Move into UI and development with a clearer product direction." %}</p></div></div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section style="padding:0;">
+    <div class="ux-cta-box">
+        <h2 class="fw-800 mb-3 position-relative" style="color:#fff;max-width:700px;margin:0 auto 1rem;">{% trans "Your Users Shouldn't Have to Figure Out Your Product." %}</h2>
+        <p class="position-relative mb-2" style="color:rgba(255,255,255,.6);font-size:1rem;max-width:540px;margin:0 auto .5rem;">{% trans "Let OnWebApp turn complexity into clarity." %}</p>
+        <p class="position-relative mb-4" style="color:rgba(255,255,255,.5);font-size:.9rem;">
+            {% trans "Understand the problem." %}<br>
+            {% trans "Map the journey." %}<br>
+            {% trans "Simplify the experience." %}<br>
+            {% trans "Validate the solution." %}<br>
+            {% trans "Build with confidence." %}
+        </p>
+        <h3 class="fw-800 mb-4 position-relative" style="color:#fff;">{% trans "Ready to create a better user experience?" %}</h3>
+        <div class="d-flex gap-3 justify-content-center position-relative flex-wrap">
+            <a href="{% url 'home:build_website' %}" class="btn btn-light btn-lg rounded-pill px-5 fw-800">{% trans "Start Your UX Project" %} <i class="fas fa-arrow-right ms-1"></i></a>
+            <a href="{% url 'home:build_website' %}" class="btn btn-outline-light btn-lg rounded-pill px-4 fw-700">{% trans "Talk to OnWebApp" %}</a>
+        </div>
+    </div>
+</section>
+
+<!-- Section Nav Dots -->
+<nav class="ux-nav" id="uxNav">
+    <div class="ux-nav-dot active" data-section="hero"><span class="ux-nav-tooltip">Hero</span></div>
+    <div class="ux-nav-dot" data-section="sec-overview"><span class="ux-nav-tooltip">Overview</span></div>
+    <div class="ux-nav-dot" data-section="sec-automation"><span class="ux-nav-tooltip">Automation & SEO</span></div>
+    <div class="ux-nav-dot" data-section="sec-role"><span class="ux-nav-tooltip">Our Role</span></div>
+    <div class="ux-nav-dot" data-section="sec-why"><span class="ux-nav-tooltip">Why UX</span></div>
+    <div class="ux-nav-dot" data-section="sec-process"><span class="ux-nav-tooltip">Process</span></div>
+    <div class="ux-nav-dot" data-section="sec-research"><span class="ux-nav-tooltip">Research</span></div>
+    <div class="ux-nav-dot" data-section="sec-personas"><span class="ux-nav-tooltip">Personas</span></div>
+    <div class="ux-nav-dot" data-section="sec-journeys"><span class="ux-nav-tooltip">Journeys</span></div>
+    <div class="ux-nav-dot" data-section="sec-flows"><span class="ux-nav-tooltip">Flows</span></div>
+    <div class="ux-nav-dot" data-section="sec-architecture"><span class="ux-nav-tooltip">Architecture</span></div>
+    <div class="ux-nav-dot" data-section="sec-wireframes"><span class="ux-nav-tooltip">Wireframes</span></div>
+    <div class="ux-nav-dot" data-section="sec-prototyping"><span class="ux-nav-tooltip">Prototyping</span></div>
+    <div class="ux-nav-dot" data-section="sec-testing"><span class="ux-nav-tooltip">Testing</span></div>
+    <div class="ux-nav-dot" data-section="sec-complex"><span class="ux-nav-tooltip">Complex</span></div>
+    <div class="ux-nav-dot" data-section="sec-connected"><span class="ux-nav-tooltip">Connected</span></div>
+    <div class="ux-nav-dot" data-section="sec-idea"><span class="ux-nav-tooltip">Idea</span></div>
+    <div class="ux-nav-dot" data-section="sec-deliverables"><span class="ux-nav-tooltip">Deliverables</span></div>
+    <div class="ux-nav-dot" data-section="sec-whyus"><span class="ux-nav-tooltip">Why Us</span></div>
+    <div class="ux-nav-dot" data-section="sec-outcome"><span class="ux-nav-tooltip">Outcome</span></div>
+</nav>
+
+<script>
+(function(){
+    var obs=new IntersectionObserver(function(entries){
+        entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);}});
+    },{threshold:0.1});
+    document.querySelectorAll('.ux-fade').forEach(function(el){obs.observe(el);});
+
+    var sections=document.querySelectorAll('[id^="sec-"],[id="hero"]');
+    var dots=document.querySelectorAll('.ux-nav-dot');
+    var secObs=new IntersectionObserver(function(entries){
+        entries.forEach(function(e){
+            if(e.isIntersecting){
+                dots.forEach(function(d){d.classList.remove('active');});
+                var dot=document.querySelector('.ux-nav-dot[data-section="'+e.target.id+'"]');
+                if(dot)dot.classList.add('active');
+            }
+        });
+    },{threshold:0.3});
+    sections.forEach(function(s){secObs.observe(s);});
+    dots.forEach(function(d){
+        d.addEventListener('click',function(){
+            var t=document.getElementById(d.dataset.section);
+            if(t)t.scrollIntoView({behavior:'smooth'});
+        });
+    });
+})();
+</script>
+{% endblock %}

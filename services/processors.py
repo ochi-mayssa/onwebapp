@@ -2079,7 +2079,7 @@ def _calculate_posting_frequency(recent_posts, days_horizon=30):
 
 
 def _classify_content_activity(posts_per_week):
-    """Deterministic thresholds: >=3 posts/week → High; >=1 → Medium; <1 → Low."""
+    """Deterministic thresholds: >=3 posts/week  High; >=1  Medium; <1  Low."""
     if posts_per_week is None:
         return None
     if posts_per_week >= 3.0:
@@ -2200,7 +2200,7 @@ def _profile_to_kpi(profile):
     """Runs all deterministic KPI calculations against normalized profile.
 
     Returns a dict suitable for the dashboard. All formulas are documented in code
-    and tests. Missing data → None / Not Available explicitly.
+    and tests. Missing data  None / Not Available explicitly.
     """
     kpi = {}
     recent = profile.get('recent_posts') or []
@@ -2242,7 +2242,7 @@ def _profile_to_kpi(profile):
 
 
 def _run_crawl_pipeline(handle_input, normalized_handle, detected_platform, selected_platforms, days, user):
-    """Run the public profile crawler → normalizer → KPI engine. Returns (profile, kpi, snapshot) OR None on skip."""
+    """Run the public profile crawler  normalizer  KPI engine. Returns (profile, kpi, snapshot) OR None on skip."""
     if not detected_platform or not normalized_handle:
         return None
     raw_profile_url = None

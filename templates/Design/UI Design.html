@@ -1,0 +1,799 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans "UI Design Services" %} | OnWebApp{% endblock %}
+{% block meta_description %}{% trans "UI design that makes every interaction feel effortless: strategy, wireframes, visual systems, interactive prototypes, and developer-ready deliverables." %}{% endblock %}
+
+{% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/*  Reset for this page  */
+.ui-page *{box-sizing:border-box}
+.ui-page{font-family:'Inter',system-ui,sans-serif;color:#1e293b}
+
+/*  Hero  */
+.ui-hero{position:relative;min-height:92vh;display:flex;align-items:center;overflow:hidden;background:#042f2e}
+.ui-hero-bg{position:absolute;inset:0;background:url('{% static "img/backg.png" %}') center/cover no-repeat;opacity:.45}
+.ui-hero-overlay{position:absolute;inset:0;background:linear-gradient(160deg,rgba(4,47,46,.95) 0%,rgba(13,148,136,.7) 50%,rgba(20,184,166,.4) 100%)}
+.ui-hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:60px 60px}
+.ui-hero-glow{position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(94,234,212,.2),transparent 70%);top:-120px;right:-100px;pointer-events:none}
+.ui-hero-glow-2{position:absolute;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(20,184,166,.15),transparent 70%);bottom:-100px;left:-80px;pointer-events:none}
+.ui-hero .container{position:relative;z-index:3}
+.ui-hero-badge{display:inline-flex;align-items:center;gap:.5rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);backdrop-filter:blur(10px);border-radius:999px;padding:.45rem 1.1rem;font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#5eead4;margin-bottom:1.5rem}
+.ui-hero-badge i{font-size:.65rem}
+.ui-hero h1{font-family:'Space Grotesk','Inter',sans-serif;font-weight:900;font-size:clamp(2.6rem,5.5vw,4.5rem);line-height:1.05;color:#fff;margin-bottom:1.5rem;max-width:850px}
+.ui-hero h1 .hero-accent{background:linear-gradient(135deg,#5eead4,#2dd4bf);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.ui-hero-sub{font-size:clamp(1rem,1.5vw,1.25rem);color:rgba(255,255,255,.7);line-height:1.7;max-width:600px;margin-bottom:2.5rem}
+.ui-hero-actions{display:flex;gap:1rem;flex-wrap:wrap}
+.ui-hero-visual{position:relative;display:flex;justify-content:center;align-items:center;min-height:380px}
+.hero-phone{width:220px;height:440px;background:#fff;border-radius:32px;box-shadow:0 40px 80px rgba(0,0,0,.3);padding:12px;position:relative;z-index:2;transform:rotate(3deg);transition:transform .5s}
+.hero-phone:hover{transform:rotate(0deg) scale(1.02)}
+.hero-phone-screen{width:100%;height:100%;border-radius:22px;background:linear-gradient(180deg,#f0fdfa,#ccfbf1);overflow:hidden;padding:16px 14px}
+.hero-phone-notch{width:80px;height:22px;background:#0d9488;border-radius:0 0 14px 14px;margin:0 auto 16px}
+.hero-phone-bar{height:10px;border-radius:5px;background:#99f6e4;margin-bottom:10px}
+.hero-phone-bar.w60{width:60%}.hero-phone-bar.w80{width:80%}.hero-phone-bar.w40{width:40%}
+.hero-phone-card{background:#fff;border-radius:12px;padding:10px;margin-top:12px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.hero-phone-card-row{display:flex;gap:6px;margin-top:6px}
+.hero-phone-dot{width:24px;height:24px;border-radius:8px}
+.hero-card-float{position:absolute;background:#fff;border-radius:16px;padding:14px 18px;box-shadow:0 12px 40px rgba(0,0,0,.15);z-index:3;animation:heroFloat 4s ease-in-out infinite}
+.hero-card-float.c1{top:30px;right:-20px;animation-delay:0s}
+.hero-card-float.c2{bottom:40px;left:-10px;animation-delay:1.5s}
+.hero-card-float .hcf-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.85rem;color:#fff;margin-bottom:6px}
+.hero-card-float .hcf-text{font-size:.75rem;font-weight:700;color:#1e293b}
+.hero-card-float .hcf-sub{font-size:.65rem;color:#94a3b8}
+@keyframes heroFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.hero-stats{display:flex;gap:2.5rem;margin-top:3rem;padding-top:2rem;border-top:1px solid rgba(255,255,255,.12)}
+.hero-stat-num{font-family:'Space Grotesk',sans-serif;font-size:2rem;font-weight:900;color:#fff}
+.hero-stat-label{font-size:.75rem;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-top:.2rem}
+
+/*  Sections  */
+.ui-s{padding:6rem 0}
+.ui-s-dark{background:#0f172a;color:#f8fafc}
+.ui-s-teal{background:linear-gradient(135deg,#042f2e,#0d3d38);color:#f8fafc}
+.ui-s-alt{background:#f8fafc}
+.ui-container{max-width:1140px;margin:0 auto;padding:0 1.5rem}
+.ui-label{display:inline-flex;align-items:center;gap:.4rem;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#0d9488;margin-bottom:.75rem}
+.ui-label i{font-size:.6rem}
+.ui-s-dark .ui-label{color:#5eead4}
+.ui-h{font-family:'Space Grotesk','Inter',sans-serif;font-weight:800;font-size:clamp(1.8rem,3vw,2.6rem);line-height:1.15;margin-bottom:.75rem}
+.ui-sub{font-size:1.05rem;line-height:1.7;color:#64748b;max-width:640px}
+.ui-s-dark .ui-sub{color:rgba(255,255,255,.6)}
+
+/*  Cards  */
+.ui-c{background:#fff;border:1px solid #e2e8f0;border-radius:20px;padding:2rem;height:100%;transition:all .4s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden}
+.ui-c::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#0d9488,#14b8a6);opacity:0;transition:opacity .4s}
+.ui-c:hover{transform:translateY(-6px);box-shadow:0 20px 50px rgba(13,148,136,.12);border-color:#0d9488}
+.ui-c:hover::before{opacity:1}
+.ui-c-icon{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin-bottom:1.25rem;transition:transform .3s}
+.ui-c:hover .ui-c-icon{transform:scale(1.08)}
+.ui-c-icon.teal{background:rgba(13,148,136,.1);color:#0d9488}
+.ui-c-icon.purple{background:rgba(124,58,237,.1);color:#7c3aed}
+.ui-c-icon.blue{background:rgba(37,99,235,.1);color:#2563eb}
+.ui-c-icon.amber{background:rgba(245,158,11,.1);color:#d97706}
+.ui-c h5{font-weight:700;font-size:1.05rem;margin-bottom:.5rem}
+.ui-c p{color:#64748b;font-size:.88rem;line-height:1.65;margin-bottom:0}
+
+/*  Feature split  */
+.ui-split{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
+.ui-split.reverse{direction:rtl}.ui-split.reverse>*{direction:ltr}
+.ui-split-visual{background:linear-gradient(135deg,rgba(13,148,136,.06),rgba(13,148,136,.02));border:1px solid #e2e8f0;border-radius:24px;padding:2.5rem;display:flex;flex-direction:column;gap:1rem}
+
+/*  Steps  */
+.ui-step{position:relative;padding-left:3rem}
+.ui-step::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:linear-gradient(180deg,#0d9488,#14b8a6);border-radius:2px}
+.ui-step-num{position:absolute;left:-14px;top:0;width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#0d9488,#14b8a6);color:#fff;font-size:.7rem;font-weight:800;display:flex;align-items:center;justify-content:center;border:3px solid #f0fdfa}
+
+/*  Process ribbon  */
+.ui-ribbon{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem}
+.ui-ribbon-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:2rem;transition:all .3s;backdrop-filter:blur(10px)}
+.ui-ribbon-card:hover{background:rgba(255,255,255,.08);border-color:rgba(94,234,212,.3);transform:translateY(-4px)}
+.ui-ribbon-num{font-family:'Space Grotesk',sans-serif;font-size:2.5rem;font-weight:900;background:linear-gradient(135deg,#5eead4,#2dd4bf);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.5rem;line-height:1}
+.ui-ribbon-card h5{font-weight:700;font-size:1rem;color:#fff;margin-bottom:.5rem}
+.ui-ribbon-card p{color:rgba(255,255,255,.55);font-size:.85rem;line-height:1.6;margin-bottom:0}
+.ui-ribbon-card ul{list-style:none;padding:0;margin:.75rem 0 0}
+.ui-ribbon-card ul li{padding:.25rem 0;font-size:.82rem;color:rgba(255,255,255,.6);display:flex;align-items:center;gap:.5rem}
+.ui-ribbon-card ul li i{color:#5eead4;font-size:.6rem}
+
+/*  Flow chain  */
+.ui-flow{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;margin-top:1rem}
+.ui-flow span{background:rgba(13,148,136,.08);border:1px solid rgba(13,148,136,.2);color:#0d9488;font-weight:700;font-size:.82rem;padding:.45rem 1rem;border-radius:999px;transition:all .3s}
+.ui-flow span:hover{background:#0d9488;color:#fff}
+.ui-flow i{color:#0d9488;font-size:.65rem}
+
+/*  Deliverable columns  */
+.ui-del-col{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:2rem;height:100%;backdrop-filter:blur(10px)}
+.ui-del-col h6{font-weight:800;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:#5eead4;margin-bottom:1rem}
+.ui-del-col ul{list-style:none;padding:0;margin:0}
+.ui-del-col ul li{padding:.4rem 0;font-size:.88rem;color:rgba(255,255,255,.7);display:flex;align-items:center;gap:.6rem;border-bottom:1px solid rgba(255,255,255,.06)}
+.ui-del-col ul li:last-child{border-bottom:none}
+.ui-del-col ul li i{color:#5eead4;font-size:.7rem;flex-shrink:0}
+
+/*  Check list  */
+.ui-check{list-style:none;padding:0;margin:0}
+.ui-check li{padding:.5rem 0;font-size:.9rem;color:#475569;display:flex;align-items:flex-start;gap:.7rem;line-height:1.5}
+.ui-check li i{color:#0d9488;margin-top:.25rem;font-size:.75rem;flex-shrink:0}
+.ui-s-dark .ui-check li{color:rgba(255,255,255,.65)}
+
+/*  Case study cards  */
+.ui-case{border-radius:24px;padding:2.5rem;position:relative;overflow:hidden;transition:all .4s;min-height:280px;display:flex;flex-direction:column;justify-content:flex-end}
+.ui-case::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .4s}
+.ui-case.c1{background:linear-gradient(135deg,#0f766e,#14b8a6)}
+.ui-case.c2{background:linear-gradient(135deg,#1e3a5f,#3b82f6)}
+.ui-case::after{content:'';position:absolute;top:-50px;right:-50px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.08)}
+.ui-case:hover{transform:translateY(-6px);box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.ui-case .uc-tag{font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:.5rem}
+.ui-case h5{font-weight:800;font-size:1.2rem;color:#fff;margin-bottom:.5rem;position:relative}
+.ui-case p{color:rgba(255,255,255,.7);font-size:.88rem;margin-bottom:1rem;position:relative}
+.ui-case a{color:#fff;font-weight:700;font-size:.88rem;text-decoration:none;position:relative;display:inline-flex;align-items:center;gap:.3rem;transition:gap .3s}
+.ui-case a:hover{gap:.6rem}
+
+/*  FAQ  */
+.ui-faq .accordion-button{font-weight:700;font-size:.95rem;color:#1e293b;background:#fff;border:1px solid #e2e8f0;border-radius:14px !important;padding:1.1rem 1.4rem;margin-bottom:.5rem;transition:all .3s}
+.ui-faq .accordion-button:not(.collapsed){background:#f0fdfa;border-color:#0d9488;color:#0d9488;box-shadow:0 0 0 3px rgba(13,148,136,.1)}
+.ui-faq .accordion-button:focus{box-shadow:0 0 0 3px rgba(13,148,136,.15)}
+.ui-faq .accordion-button::after{width:1.2rem;height:1.2rem;background-size:1rem}
+.ui-faq .accordion-body{padding:1rem 1.4rem 1.2rem;font-size:.9rem;color:#64748b;line-height:1.7}
+
+/*  CTA  */
+.ui-cta-box{background:linear-gradient(135deg,#042f2e,#0d3d38);border-radius:32px;padding:5rem 3rem;text-align:center;position:relative;overflow:hidden}
+.ui-cta-box::before{content:'';position:absolute;top:-100px;right:-100px;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(94,234,212,.12),transparent 70%)}
+.ui-cta-box::after{content:'';position:absolute;bottom:-80px;left:-80px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(20,184,166,.1),transparent 70%)}
+.ui-cta-box .container{position:relative;z-index:2}
+
+/*  Scroll animation  */
+.ui-fade{opacity:0;transform:translateY(30px);transition:opacity .7s,transform .7s}
+.ui-fade.visible{opacity:1;transform:none}
+
+/*  Responsive  */
+@media(max-width:991px){
+    .ui-hero-visual{display:none}
+    .ui-split{grid-template-columns:1fr;gap:2rem}
+    .ui-ribbon{grid-template-columns:1fr 1fr}
+    .hero-stats{gap:1.5rem}
+}
+@media(max-width:575px){
+    .ui-ribbon{grid-template-columns:1fr}
+    .ui-hero h1{font-size:2rem}
+    .hero-stats{flex-direction:column;gap:1rem}
+    .ui-s{padding:4rem 0}
+    .ui-cta-box{padding:3rem 1.5rem}
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ui-page">
+
+<!--  01 — HERO  -->
+<section class="ui-hero">
+    <div class="ui-hero-bg"></div>
+    <div class="ui-hero-overlay"></div>
+    <div class="ui-hero-grid"></div>
+    <div class="ui-hero-glow"></div>
+    <div class="ui-hero-glow-2"></div>
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-7">
+                <div class="ui-hero-badge"><i class="fas fa-pen-nib"></i>{% trans "OnWebApp — UI Design" %}</div>
+                <h1>{% trans "UI Design That Makes Every Interaction " %}<span class="hero-accent">{% trans "Feel Effortless" %}</span></h1>
+                <p class="ui-hero-sub">{% trans "From the first wireframe to the final interactive prototype, we turn complex ideas into simple, engaging, and scalable interfaces your users will love." %}</p>
+                <div class="ui-hero-actions">
+                    <a href="{% url 'home:build_website' %}" class="btn btn-light btn-lg rounded-pill px-5 fw-800" style="font-size:.95rem;">{% trans "Start Your UI Project" %} <i class="fas fa-arrow-right ms-1"></i></a>
+                    <a href="#process" class="btn btn-lg rounded-pill px-5 fw-700" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:.95rem;">{% trans "Explore Our Process" %}</a>
+                </div>
+                <div class="hero-stats">
+                    <div><div class="hero-stat-num">200+</div><div class="hero-stat-label">{% trans "Interfaces Designed" %}</div></div>
+                    <div><div class="hero-stat-num">98%</div><div class="hero-stat-label">{% trans "Client Satisfaction" %}</div></div>
+                    <div><div class="hero-stat-num">40+</div><div class="hero-stat-label">{% trans "Industries Served" %}</div></div>
+                </div>
+            </div>
+            <div class="col-lg-5 d-none d-lg-block">
+                <div class="ui-hero-visual">
+                    <div class="hero-phone">
+                        <div class="hero-phone-screen">
+                            <div class="hero-phone-notch"></div>
+                            <div class="hero-phone-bar w80"></div>
+                            <div class="hero-phone-bar w60"></div>
+                            <div class="hero-phone-bar w40"></div>
+                            <div class="hero-phone-card">
+                                <div style="height:6px;border-radius:3px;background:#0d9488;width:50%;"></div>
+                                <div class="hero-phone-card-row">
+                                    <div class="hero-phone-dot" style="background:#5eead4;"></div>
+                                    <div class="hero-phone-dot" style="background:#99f6e4;"></div>
+                                    <div class="hero-phone-dot" style="background:#ccfbf1;"></div>
+                                </div>
+                            </div>
+                            <div class="hero-phone-card">
+                                <div style="height:6px;border-radius:3px;background:#e2e8f0;width:70%;"></div>
+                                <div style="height:4px;border-radius:2px;background:#f1f5f9;margin-top:6px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hero-card-float c1">
+                        <div class="hcf-icon" style="background:linear-gradient(135deg,#0d9488,#14b8a6);"><i class="fas fa-check"></i></div>
+                        <div class="hcf-text">{% trans "Design Validated" %}</div>
+                        <div class="hcf-sub">{% trans "98% usability score" %}</div>
+                    </div>
+                    <div class="hero-card-float c2">
+                        <div class="hcf-icon" style="background:linear-gradient(135deg,#7c3aed,#a78bfa);"><i class="fas fa-layer-group"></i></div>
+                        <div class="hcf-text">{% trans "Design System" %}</div>
+                        <div class="hcf-sub">{% trans "48 components" %}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--  02 — TRUST  -->
+<section class="ui-s" style="background:#fff;">
+    <div class="ui-container">
+        <div class="ui-split">
+            <div class="ui-fade">
+                <div class="ui-label"><i class="fas fa-circle"></i>{% trans "02 — Why OnWebApp" %}</div>
+                <h2 class="ui-h">{% trans "Your Interface Is Your Brand in Action" %}</h2>
+                <p class="ui-sub mb-3">{% trans "Your users experience your brand through every click, screen, button, and interaction." %}</p>
+                <p class="ui-sub mb-3">{% trans "A successful UI is more than attractive visuals. It creates a clear path for users, reduces friction, builds trust, and makes your product easier to understand." %}</p>
+                <p class="ui-sub mb-4">{% trans "At OnWebApp, we combine user research, UX strategy, visual design, and interactive prototyping to create interfaces that are both beautiful and functional." %}</p>
+                <h6 class="fw-800 mb-2">{% trans "Our Approach" %}</h6>
+                <div class="ui-flow">
+                    <span>{% trans "Research" %}</span><i class="fas fa-chevron-right"></i>
+                    <span>{% trans "Structure" %}</span><i class="fas fa-chevron-right"></i>
+                    <span>{% trans "Visual Design" %}</span><i class="fas fa-chevron-right"></i>
+                    <span>{% trans "Prototype" %}</span><i class="fas fa-chevron-right"></i>
+                    <span>{% trans "Validate" %}</span><i class="fas fa-chevron-right"></i>
+                    <span>{% trans "Develop" %}</span>
+                </div>
+            </div>
+            <div class="ui-fade">
+                <img src="{% static 'img/app.png' %}" alt="UI Design Process" style="width:115%;height:auto;display:block;margin-left:-5%;">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--  03 — WHY UI MATTERS  -->
+<section class="ui-s">
+    <div class="ui-container">
+        <div class="ui-split">
+            <div class="ui-fade">
+                <div class="ui-label"><i class="fas fa-circle"></i>{% trans "03 — Impact" %}</div>
+                <h2 class="ui-h" style="font-size:1.8rem;">{% trans "Good Design Is More Than Looking Good" %}</h2>
+                <p class="ui-sub mb-4">{% trans "A thoughtful interface can help your product:" %}</p>
+                <div style="display:flex;flex-direction:column;gap:1.25rem;">
+                    <div style="display:flex;align-items:flex-start;gap:1rem;">
+                        <span style="flex-shrink:0;width:32px;height:32px;border-radius:50%;background:#0d9488;color:#fff;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;">1</span>
+                        <div><h6 style="font-size:.95rem;margin:0;">{% trans "Increase Engagement" %}</h6><p style="font-size:.85rem;margin:0;color:#64748b;">{% trans "Create interfaces that encourage users to explore, interact, and return." %}</p></div>
+                    </div>
+                    <div style="display:flex;align-items:flex-start;gap:1rem;">
+                        <span style="flex-shrink:0;width:32px;height:32px;border-radius:50%;background:#7c3aed;color:#fff;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;">2</span>
+                        <div><h6 style="font-size:.95rem;margin:0;">{% trans "Improve Usability" %}</h6><p style="font-size:.85rem;margin:0;color:#64748b;">{% trans "Make complex features easier to understand and navigate." %}</p></div>
+                    </div>
+                    <div style="display:flex;align-items:flex-start;gap:1rem;">
+                        <span style="flex-shrink:0;width:32px;height:32px;border-radius:50%;background:#2563eb;color:#fff;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;">3</span>
+                        <div><h6 style="font-size:.95rem;margin:0;">{% trans "Build Trust" %}</h6><p style="font-size:.85rem;margin:0;color:#64748b;">{% trans "A consistent and professional interface strengthens your brand credibility." %}</p></div>
+                    </div>
+                    <div style="display:flex;align-items:flex-start;gap:1rem;">
+                        <span style="flex-shrink:0;width:32px;height:32px;border-radius:50%;background:#d97706;color:#fff;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;">4</span>
+                        <div><h6 style="font-size:.95rem;margin:0;">{% trans "Reduce Friction" %}</h6><p style="font-size:.85rem;margin:0;color:#64748b;">{% trans "Remove unnecessary steps and make important actions easier to discover." %}</p></div>
+                    </div>
+                    <div style="display:flex;align-items:flex-start;gap:1rem;">
+                        <span style="flex-shrink:0;width:32px;height:32px;border-radius:50%;background:#0d9488;color:#fff;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;">5</span>
+                        <div><h6 style="font-size:.95rem;margin:0;">{% trans "Create Better Experiences" %}</h6><p style="font-size:.85rem;margin:0;color:#64748b;">{% trans "Balance aesthetics, functionality, accessibility, and user expectations." %}</p></div>
+                    </div>
+                </div>
+            </div>
+            <div class="ui-fade" style="display:flex;align-items:center;justify-content:center;">
+                <img src="{% static 'img/impact.jpeg' %}" alt="UI Design Impact" style="width:110%;height:auto;border-radius:20px;display:block;opacity:.7;mix-blend-mode:multiply;margin-left:10%;">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--  04 — CORE PROCESS  -->
+<section class="ui-s ui-s-dark" id="process">
+    <div class="ui-container">
+        <div class="text-center mb-5 ui-fade">
+            <div class="ui-label justify-content-center" style="color:#5eead4;"><i class="fas fa-circle"></i>{% trans "04 — Process" %}</div>
+            <h2 class="ui-h" style="color:#fff;">{% trans "OnWebApp's Core UI/UX Process" %}</h2>
+            <p class="ui-sub" style="color:rgba(255,255,255,.6);">{% trans "OnWebApp follows a four-phase process: Discover, Design, Develop, and Dominate." %}</p>
+        </div>
+
+        <!-- Phase 1: Discover -->
+        <div class="mb-5 ui-fade">
+            <div class="d-flex align-items-center mb-3">
+                <span style="background:#0d9488;color:#fff;padding:.3rem .9rem;border-radius:20px;font-size:.8rem;font-weight:700;letter-spacing:.05em;margin-right:.75rem;">{% trans "Phase 1" %}</span>
+                <h3 style="color:#fff;margin:0;font-size:1.3rem;">{% trans "Discover" %}</h3>
+            </div>
+            <p style="color:rgba(255,255,255,.65);margin-bottom:1.5rem;">{% trans "Conduct comprehensive research into user needs and competitor analysis to market your brand." %}</p>
+            <div class="row g-3">
+                <div class="col-md-6 col-lg-3"><div class="ui-c" style="background:#1e293b;border-color:rgba(255,255,255,.08);padding:1.2rem;"><div style="font-size:.65rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#0d9488;margin-bottom:.4rem;">{% trans "Step 1" %}</div><h6 style="color:#fff;font-size:.9rem;">{% trans "Requirement Gathering" %}</h6><p style="font-size:.82rem;">{% trans "Conduct thorough research into the user's goals, behaviors, needs, and challenges." %}</p></div></div>
+                <div class="col-md-6 col-lg-3"><div class="ui-c" style="background:#1e293b;border-color:rgba(255,255,255,.08);padding:1.2rem;"><div style="font-size:.65rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#0d9488;margin-bottom:.4rem;">{% trans "Step 2" %}</div><h6 style="color:#fff;font-size:.9rem;">{% trans "Solution Research" %}</h6><p style="font-size:.82rem;">{% trans "Prepare an initial proposal by integrating research findings and analyzing the client's project infrastructure." %}</p></div></div>
+                <div class="col-md-6 col-lg-3"><div class="ui-c" style="background:#1e293b;border-color:rgba(255,255,255,.08);padding:1.2rem;"><div style="font-size:.65rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#0d9488;margin-bottom:.4rem;">{% trans "Step 3" %}</div><h6 style="color:#fff;font-size:.9rem;">{% trans "Technical Planning" %}</h6><p style="font-size:.82rem;">{% trans "Identify the set of technologies, design the system architecture, and plan the interaction of different technical components." %}</p></div></div>
+                <div class="col-md-6 col-lg-3"><div class="ui-c" style="background:#1e293b;border-color:rgba(255,255,255,.08);padding:1.2rem;"><div style="font-size:.65rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#0d9488;margin-bottom:.4rem;">{% trans "Step 4" %}</div><h6 style="color:#fff;font-size:.9rem;">{% trans "Client Approval" %}</h6><p style="font-size:.82rem;">{% trans "Set a timeline, prepare contingency plans, and obtain client approval before starting." %}</p></div></div>
+            </div>
+        </div>
+
+        <!-- Phase 2: Design -->
+        <div class="mb-5 ui-fade">
+            <div class="d-flex align-items-center mb-3">
+                <span style="background:#2563eb;color:#fff;padding:.3rem .9rem;border-radius:20px;font-size:.8rem;font-weight:700;letter-spacing:.05em;margin-right:.75rem;">{% trans "Phase 2" %}</span>
+                <h3 style="color:#fff;margin:0;font-size:1.3rem;">{% trans "Design" %}</h3>
+            </div>
+            <p style="color:rgba(255,255,255,.65);margin-bottom:1.5rem;">{% trans "Drawing on user insights, craft a design that ensures an intuitive user experience, balancing aesthetics with efficiency." %}</p>
+            <div class="row g-3">
+                <div class="col-md-6 ui-fade">
+                    <div class="ui-c" style="background:#1e293b;border-color:rgba(255,255,255,.08);padding:1.2rem;">
+                        <div style="font-size:.65rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#2563eb;margin-bottom:.4rem;">{% trans "Step 1" %}</div>
+                        <h6 style="color:#fff;font-size:.9rem;">{% trans "User Experience (UX) Design" %}</h6>
+                        <p style="font-size:.82rem;color:rgba(255,255,255,.5);margin-bottom:.75rem;">{% trans "Customized UX design that addresses user needs." %}</p>
+                        <ul style="list-style:none;padding:0;margin:0;font-size:.82rem;">
+                            <li style="padding:.25rem 0;color:rgba(255,255,255,.7);"><i class="fas fa-check" style="color:#2563eb;margin-right:.4rem;"></i>{% trans "User Profiles: Demographics, behaviors, needs, and goals." %}</li>
+                            <li style="padding:.25rem 0;color:rgba(255,255,255,.7);"><i class="fas fa-check" style="color:#2563eb;margin-right:.4rem;"></i>{% trans "User Flows: Steps users take to achieve specific goals." %}</li>
+                            <li style="padding:.25rem 0;color:rgba(255,255,255,.7);"><i class="fas fa-check" style="color:#2563eb;margin-right:.4rem;"></i>{% trans "Feature Map: A high-level view of the application's features." %}</li>
+                            <li style="padding:.25rem 0;color:rgba(255,255,255,.7);"><i class="fas fa-check" style="color:#2563eb;margin-right:.4rem;"></i>{% trans "Wireframes: General layout of the screen for rapid prototyping and understanding functionality." %}</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-6 ui-fade">
+                    <div class="ui-c" style="background:#1e293b;border-color:rgba(255,255,255,.08);padding:1.2rem;">
+                        <div style="font-size:.65rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#2563eb;margin-bottom:.4rem;">{% trans "Step 2" %}</div>
+                        <h6 style="color:#fff;font-size:.9rem;">{% trans "User Interface (UI) Design" %}</h6>
+                        <p style="font-size:.82rem;color:rgba(255,255,255,.5);margin-bottom:.75rem;">{% trans "Move on to visual design and create high-fidelity mockups." %}</p>
+                        <ul style="list-style:none;padding:0;margin:0;font-size:.82rem;">
+                            <li style="padding:.25rem 0;color:rgba(255,255,255,.7);"><i class="fas fa-check" style="color:#2563eb;margin-right:.4rem;"></i>{% trans "Visual Boards: Collages reflecting the intended aesthetic and style." %}</li>
+                            <li style="padding:.25rem 0;color:rgba(255,255,255,.7);"><i class="fas fa-check" style="color:#2563eb;margin-right:.4rem;"></i>{% trans "Style Concepts: Demonstrate different options (e.g., Light Mode, Dark Mode)." %}</li>
+                            <li style="padding:.25rem 0;color:rgba(255,255,255,.7);"><i class="fas fa-check" style="color:#2563eb;margin-right:.4rem;"></i>{% trans "Design System: A style guide setting standards for colors, fonts, buttons, etc." %}</li>
+                            <li style="padding:.25rem 0;color:rgba(255,255,255,.7);"><i class="fas fa-check" style="color:#2563eb;margin-right:.4rem;"></i>{% trans "High-Fidelity Mockups: Accurate visual representations of the final app." %}</li>
+                            <li style="padding:.25rem 0;color:rgba(255,255,255,.7);"><i class="fas fa-check" style="color:#2563eb;margin-right:.4rem;"></i>{% trans "Interactive Prototyping: Clickable prototypes to test functionality and gather feedback." %}</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-6 ui-fade">
+                    <div class="ui-c" style="background:#1e293b;border-color:rgba(255,255,255,.08);padding:1.2rem;">
+                        <div style="font-size:.65rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#2563eb;margin-bottom:.4rem;">{% trans "Step 3" %}</div>
+                        <h6 style="color:#fff;font-size:.9rem;">{% trans "Design Validation" %}</h6>
+                        <p style="font-size:.82rem;color:rgba(255,255,255,.5);margin-bottom:.75rem;">{% trans "Collaborate with engineers to ensure feasibility." %}</p>
+                        <ul style="list-style:none;padding:0;margin:0;font-size:.82rem;">
+                            <li style="padding:.25rem 0;color:rgba(255,255,255,.7);"><i class="fas fa-check" style="color:#2563eb;margin-right:.4rem;"></i>{% trans "Prototype Testing: Evaluate interactive prototypes to pinpoint issues and collect feedback." %}</li>
+                            <li style="padding:.25rem 0;color:rgba(255,255,255,.7);"><i class="fas fa-check" style="color:#2563eb;margin-right:.4rem;"></i>{% trans "Feasibility Analysis: Confirm the design aligns with technical frameworks and constraints." %}</li>
+                            <li style="padding:.25rem 0;color:rgba(255,255,255,.7);"><i class="fas fa-check" style="color:#2563eb;margin-right:.4rem;"></i>{% trans "Design Adjustments: Make necessary changes based on feedback." %}</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-6 ui-fade">
+                    <div class="ui-c" style="background:#1e293b;border-color:rgba(255,255,255,.08);padding:1.2rem;">
+                        <div style="font-size:.65rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#2563eb;margin-bottom:.4rem;">{% trans "Step 4" %}</div>
+                        <h6 style="color:#fff;font-size:.9rem;">{% trans "Development Estimation" %}</h6>
+                        <p style="font-size:.82rem;">{% trans "Assess technical implications, generate estimates, identify risks, and present a comprehensive proposal." %}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Phase 3: Develop -->
+        <div class="mb-5 ui-fade">
+            <div class="d-flex align-items-center mb-3">
+                <span style="background:#d97706;color:#fff;padding:.3rem .9rem;border-radius:20px;font-size:.8rem;font-weight:700;letter-spacing:.05em;margin-right:.75rem;">{% trans "Phase 3" %}</span>
+                <h3 style="color:#fff;margin:0;font-size:1.3rem;">{% trans "Develop" %}</h3>
+            </div>
+            <p style="color:rgba(255,255,255,.65);margin-bottom:1.5rem;">{% trans "From planning to execution, this phase is rooted in efficiency and clarity through iterative sprints and robust testing." %}</p>
+            <div class="row g-3">
+                <div class="col-md-6 col-lg-3"><div class="ui-c" style="background:#1e293b;border-color:rgba(255,255,255,.08);padding:1.2rem;"><div style="font-size:.65rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#d97706;margin-bottom:.4rem;">{% trans "Step 1" %}</div><h6 style="color:#fff;font-size:.9rem;">{% trans "Pre-Development Planning" %}</h6><p style="font-size:.82rem;">{% trans "Assemble the team with skills aligned to project needs. Ensure all members understand their roles and project goals." %}</p></div></div>
+                <div class="col-md-6 col-lg-3"><div class="ui-c" style="background:#1e293b;border-color:rgba(255,255,255,.08);padding:1.2rem;"><div style="font-size:.65rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#d97706;margin-bottom:.4rem;">{% trans "Step 2" %}</div><h6 style="color:#fff;font-size:.9rem;">{% trans "Review and Update Requirements" %}</h6><p style="font-size:.82rem;">{% trans "Re-evaluate initial requirements and integrate new ones as needed." %}</p></div></div>
+                <div class="col-md-6 col-lg-3"><div class="ui-c" style="background:#1e293b;border-color:rgba(255,255,255,.08);padding:1.2rem;"><div style="font-size:.65rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#d97706;margin-bottom:.4rem;">{% trans "Step 3" %}</div><h6 style="color:#fff;font-size:.9rem;">{% trans "Retrospective & Feedback" %}</h6><p style="font-size:.82rem;">{% trans "Actively seek client input to make adjustments. Refine the approach based on feedback to enhance efficiency." %}</p></div></div>
+                <div class="col-md-6 col-lg-3"><div class="ui-c" style="background:#1e293b;border-color:rgba(255,255,255,.08);padding:1.2rem;"><div style="font-size:.65rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#d97706;margin-bottom:.4rem;">{% trans "Step 4" %}</div><h6 style="color:#fff;font-size:.9rem;">{% trans "Deployment & Launch" %}</h6><p style="font-size:.82rem;">{% trans "Final pre-launch testing in staging environment. Prepare backup & rollback plans. Finalize launch date and deploy to production." %}</p></div></div>
+            </div>
+        </div>
+
+        <!-- Phase 4: Dominate -->
+        <div class="ui-fade">
+            <div class="d-flex align-items-center mb-3">
+                <span style="background:#dc2626;color:#fff;padding:.3rem .9rem;border-radius:20px;font-size:.8rem;font-weight:700;letter-spacing:.05em;margin-right:.75rem;">{% trans "Phase 4" %}</span>
+                <h3 style="color:#fff;margin:0;font-size:1.3rem;">{% trans "Dominate" %}</h3>
+            </div>
+            <p style="color:rgba(255,255,255,.65);margin-bottom:1.5rem;">{% trans "Conduct regular improvements based on user feedback and market analysis." %}</p>
+            <div class="row g-3">
+                <div class="col-md-6 col-lg-3"><div class="ui-c" style="background:#1e293b;border-color:rgba(255,255,255,.08);padding:1.2rem;"><div style="font-size:.65rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#dc2626;margin-bottom:.4rem;">{% trans "Step 1" %}</div><h6 style="color:#fff;font-size:.9rem;">{% trans "User Insights Analyze" %}</h6><p style="font-size:.82rem;">{% trans "Bi-monthly market research. Leverage AI-powered analytics to analyze user behavior. Set timelines for product enhancements and optimization sprints." %}</p></div></div>
+                <div class="col-md-6 col-lg-3"><div class="ui-c" style="background:#1e293b;border-color:rgba(255,255,255,.08);padding:1.2rem;"><div style="font-size:.65rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#dc2626;margin-bottom:.4rem;">{% trans "Step 2" %}</div><h6 style="color:#fff;font-size:.9rem;">{% trans "Pre-Launch Testing" %}</h6><p style="font-size:.82rem;">{% trans "Validate improvements before releasing to production." %}</p></div></div>
+                <div class="col-md-6 col-lg-3"><div class="ui-c" style="background:#1e293b;border-color:rgba(255,255,255,.08);padding:1.2rem;"><div style="font-size:.65rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#dc2626;margin-bottom:.4rem;">{% trans "Step 3" %}</div><h6 style="color:#fff;font-size:.9rem;">{% trans "Grow Beyond" %}</h6><p style="font-size:.82rem;">{% trans "Identify opportunities to reach new demographics. Integrate third-party services to enhance features. Prepare the software to handle increased users and traffic." %}</p></div></div>
+                <div class="col-md-6 col-lg-3"><div class="ui-c" style="background:#1e293b;border-color:rgba(255,255,255,.08);padding:1.2rem;"><div style="font-size:.65rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#dc2626;margin-bottom:.4rem;">{% trans "Step 4" %}</div><h6 style="color:#fff;font-size:.9rem;">{% trans "Lead, Don't Follow" %}</h6><p style="font-size:.82rem;">{% trans "Regular audits to ensure adherence to industry standards. Innovation workshops for next-generation features. A transparent deployment calendar of planned updates." %}</p></div></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--  05 — TYPICAL PROJECTS  -->
+<section class="ui-s ui-s-alt">
+    <div class="ui-container">
+        <div class="text-center mb-5 ui-fade">
+            <div class="ui-label justify-content-center"><i class="fas fa-circle"></i>{% trans "05 — Projects" %}</div>
+            <h2 class="ui-h">{% trans "Typical Projects Embracing UI Design" %}</h2>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3 ui-fade">
+                <div class="ui-c" style="padding:0;overflow:hidden;">
+                    <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop" alt="Landing Pages" style="width:100%;height:180px;object-fit:cover;display:block;">
+                    <div style="padding:1.5rem;">
+                        <h5>{% trans "Landing Pages" %}</h5>
+                        <p style="margin:0;">{% trans "High-converting pages designed with a balance of aesthetics and functionality." %}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3 ui-fade">
+                <div class="ui-c" style="padding:0;overflow:hidden;">
+                    <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&h=400&fit=crop" alt="eCommerce Platforms" style="width:100%;height:180px;object-fit:cover;display:block;">
+                    <div style="padding:1.5rem;">
+                        <h5>{% trans "eCommerce Platforms" %}</h5>
+                        <p style="margin:0;">{% trans "Crafting user-centric platforms that simplify purchases and boost sales." %}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3 ui-fade">
+                <div class="ui-c" style="padding:0;overflow:hidden;">
+                    <img src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=600&h=400&fit=crop" alt="Mobile App Design" style="width:100%;height:180px;object-fit:cover;display:block;">
+                    <div style="padding:1.5rem;">
+                        <h5>{% trans "Mobile App Design" %}</h5>
+                        <p style="margin:0;">{% trans "Seamless mobile UI ensuring fluid navigation across iOS and Android devices." %}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3 ui-fade">
+                <div class="ui-c" style="padding:0;overflow:hidden;">
+                    <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop" alt="Dashboards" style="width:100%;height:180px;object-fit:cover;display:block;">
+                    <div style="padding:1.5rem;">
+                        <h5>{% trans "Dashboards" %}</h5>
+                        <p style="margin:0;">{% trans "User-friendly interfaces displaying complex data in digestible visual formats." %}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--  07 — UX COMES FIRST  -->
+<section class="ui-s">
+    <div class="ui-container">
+        <div class="ui-split">
+            <div class="ui-fade">
+                <div class="ui-label"><i class="fas fa-circle"></i>{% trans "07 — UX First" %}</div>
+                <h2 class="ui-h">{% trans "Design Around Real Users" %}</h2>
+                <p class="ui-sub mb-4">{% trans "Before choosing colors or creating polished screens, we first understand who will use the product and what they need to accomplish." %}</p>
+                <div class="alert border-0 rounded-4 p-4 mb-0" style="background:#f0fdfa;border-left:4px solid #0d9488 !important;">
+                    <strong style="color:#0d9488;">{% trans "Result:" %}</strong> <span style="color:#475569;">{% trans "A clear foundation for an interface that works — not just one that looks good." %}</span>
+                </div>
+            </div>
+            <div class="ui-fade">
+                <div class="row g-3">
+                    <div class="col-6"><div class="ui-c" style="text-align:center;padding:1.5rem;"><div class="ui-c-icon teal mx-auto"><i class="fas fa-users"></i></div><h6 class="fw-700 mb-0">{% trans "User Profiles" %}</h6></div></div>
+                    <div class="col-6"><div class="ui-c" style="text-align:center;padding:1.5rem;"><div class="ui-c-icon purple mx-auto"><i class="fas fa-route"></i></div><h6 class="fw-700 mb-0">{% trans "User Flows" %}</h6></div></div>
+                    <div class="col-6"><div class="ui-c" style="text-align:center;padding:1.5rem;"><div class="ui-c-icon blue mx-auto"><i class="fas fa-puzzle-piece"></i></div><h6 class="fw-700 mb-0">{% trans "Feature Mapping" %}</h6></div></div>
+                    <div class="col-6"><div class="ui-c" style="text-align:center;padding:1.5rem;"><div class="ui-c-icon amber mx-auto"><i class="fas fa-pen-ruler"></i></div><h6 class="fw-700 mb-0">{% trans "Wireframes" %}</h6></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--  08 — WIREFRAMES  -->
+<section class="ui-s ui-s-alt" id="wireframes">
+    <div class="ui-container">
+        <div class="ui-split">
+            <div class="ui-fade">
+                <div class="ui-label"><i class="fas fa-circle"></i>{% trans "08 — Wireframes" %}</div>
+                <h2 class="ui-h">{% trans "Start With Structure. Build With Purpose." %}</h2>
+                <p class="ui-sub mb-3">{% trans "Wireframes give your product a clear visual structure before detailed design begins." %}</p>
+                <p class="ui-sub mb-2">{% trans "They help us:" %}</p>
+                <ul class="ui-check mb-4">
+                    <li><i class="fas fa-check-circle"></i>{% trans "Explore different layouts quickly" %}</li>
+                    <li><i class="fas fa-check-circle"></i>{% trans "Understand functionality" %}</li>
+                    <li><i class="fas fa-check-circle"></i>{% trans "Demonstrate user flows" %}</li>
+                    <li><i class="fas fa-check-circle"></i>{% trans "Identify usability issues early" %}</li>
+                    <li><i class="fas fa-check-circle"></i>{% trans "Create a solid foundation for development" %}</li>
+                </ul>
+                <a href="{% url 'home:build_website' %}" class="btn rounded-pill px-4 fw-800 text-white" style="background:#0d9488;">{% trans "See How We Wireframe" %} <i class="fas fa-arrow-right ms-1"></i></a>
+            </div>
+            <div class="ui-fade">
+                <div style="background:#fff;border:1px solid #e2e8f0;border-radius:20px;padding:2rem;max-width:400px;margin:0 auto;">
+                    <div style="display:flex;gap:6px;margin-bottom:16px;"><div style="width:10px;height:10px;border-radius:50%;background:#ef4444;"></div><div style="width:10px;height:10px;border-radius:50%;background:#f59e0b;"></div><div style="width:10px;height:10px;border-radius:50%;background:#22c55e;"></div></div>
+                    <div style="height:14px;border-radius:7px;background:#f1f5f9;width:45%;margin-bottom:12px;"></div>
+                    <div style="height:8px;border-radius:4px;background:#f1f5f9;width:80%;margin-bottom:20px;"></div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+                        <div style="height:80px;border-radius:10px;border:2px dashed #ccfbf1;background:#f0fdfa;"></div>
+                        <div style="height:80px;border-radius:10px;border:2px dashed #ccfbf1;background:#f0fdfa;"></div>
+                    </div>
+                    <div style="height:32px;border-radius:16px;background:#0d9488;width:40%;margin-bottom:12px;"></div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+                        <div style="height:40px;border-radius:8px;border:1px solid #e2e8f0;"></div>
+                        <div style="height:40px;border-radius:8px;border:1px solid #e2e8f0;"></div>
+                        <div style="height:40px;border-radius:8px;border:1px solid #e2e8f0;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--  09 — VISUAL DESIGN  -->
+<section class="ui-s">
+    <div class="ui-container">
+        <div class="text-center mb-5 ui-fade">
+            <div class="ui-label justify-content-center"><i class="fas fa-circle"></i>{% trans "09 — Visual Design" %}</div>
+            <h2 class="ui-h">{% trans "Where Function Meets Visual Identity" %}</h2>
+            <p class="ui-sub mx-auto">{% trans "Once the experience is structured, we transform it into a distinctive visual system." %}</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4 ui-fade"><div class="ui-c"><div class="ui-c-icon teal"><i class="fas fa-compass"></i></div><h5>{% trans "Visual Direction" %}</h5><p>{% trans "Define the mood, personality, and visual language of the product." %}</p></div></div>
+            <div class="col-md-4 ui-fade"><div class="ui-c"><div class="ui-c-icon purple"><i class="fas fa-swatchbook"></i></div><h5>{% trans "Style Concepts" %}</h5><p>{% trans "Explore different combinations of typography, colors, components, imagery, and visual treatments." %}</p></div></div>
+            <div class="col-md-4 ui-fade">
+                <div class="ui-c"><div class="ui-c-icon blue"><i class="fas fa-layer-group"></i></div><h5>{% trans "Design System" %}</h5><p class="mb-2">{% trans "Reusable standards for:" %}</p>
+                    <ul class="ui-check">
+                        <li><i class="fas fa-check"></i>{% trans "Colors · Typography · Buttons" %}</li>
+                        <li><i class="fas fa-check"></i>{% trans "Forms · Navigation · Cards" %}</li>
+                        <li><i class="fas fa-check"></i>{% trans "Icons · Spacing · Components" %}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <p class="ui-sub text-center mx-auto mt-4">{% trans "A strong design system keeps your product consistent as it grows." %}</p>
+    </div>
+</section>
+
+<!--  10-12 — MOCKUPS + PROTOTYPES + INSPIRATION  -->
+<section class="ui-s ui-s-dark">
+    <div class="ui-container">
+        <div class="row g-5 align-items-center">
+            <div class="col-lg-6 ui-fade">
+                <div class="ui-label" style="color:#5eead4;"><i class="fas fa-circle"></i>{% trans "10 — Mockups" %}</div>
+                <h2 class="ui-h" style="color:#fff;">{% trans "See Your Product Before It's Built" %}</h2>
+                <p class="ui-sub" style="color:rgba(255,255,255,.6);">{% trans "High-fidelity mockups transform wireframes into realistic representations of the final product." %}</p>
+                <p class="ui-sub" style="color:rgba(255,255,255,.6);">{% trans "They combine:" %}</p>
+                <div class="ui-flow" style="margin-bottom:1.5rem;">
+                    <span style="background:rgba(94,234,212,.1);border-color:rgba(94,234,212,.3);color:#5eead4;">{% trans "Structure" %}</span>
+                    <span style="background:rgba(94,234,212,.1);border-color:rgba(94,234,212,.3);color:#5eead4;">{% trans "Brand" %}</span>
+                    <span style="background:rgba(94,234,212,.1);border-color:rgba(94,234,212,.3);color:#5eead4;">{% trans "Typography" %}</span>
+                    <span style="background:rgba(94,234,212,.1);border-color:rgba(94,234,212,.3);color:#5eead4;">{% trans "Colors" %}</span>
+                    <span style="background:rgba(94,234,212,.1);border-color:rgba(94,234,212,.3);color:#5eead4;">{% trans "Components" %}</span>
+                </div>
+                <a href="#deliverables" class="btn rounded-pill px-4 fw-800" style="background:#5eead4;color:#042f2e;">{% trans "View Our Deliverables" %} <i class="fas fa-arrow-down ms-1"></i></a>
+            </div>
+            <div class="col-lg-6 ui-fade">
+                <div style="position:relative;">
+                    <div style="background:#1e293b;border-radius:20px;padding:1.5rem;border:1px solid rgba(255,255,255,.08);">
+                        <div style="display:flex;gap:6px;margin-bottom:12px;"><div style="width:10px;height:10px;border-radius:50%;background:#ef4444;"></div><div style="width:10px;height:10px;border-radius:50%;background:#f59e0b;"></div><div style="width:10px;height:10px;border-radius:50%;background:#22c55e;"></div></div>
+                        <div style="display:grid;grid-template-columns:2fr 1fr;gap:12px;">
+                            <div style="background:#0d9488;border-radius:12px;padding:20px;min-height:140px;"><div style="height:10px;border-radius:5px;background:rgba(255,255,255,.3);width:60%;margin-bottom:8px;"></div><div style="height:6px;border-radius:3px;background:rgba(255,255,255,.2);width:80%;margin-bottom:16px;"></div><div style="display:flex;gap:8px;"><div style="height:28px;border-radius:14px;background:rgba(255,255,255,.25);width:80px;"></div><div style="height:28px;border-radius:14px;background:rgba(255,255,255,.15);width:80px;"></div></div></div>
+                            <div style="display:flex;flex-direction:column;gap:10px;">
+                                <div style="background:rgba(94,234,212,.1);border:1px solid rgba(94,234,212,.2);border-radius:10px;padding:12px;flex:1;"><div style="height:6px;border-radius:3px;background:#5eead4;width:50%;margin-bottom:6px;"></div><div style="height:4px;border-radius:2px;background:rgba(255,255,255,.15);width:70%;"></div></div>
+                                <div style="background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.2);border-radius:10px;padding:12px;flex:1;"><div style="height:6px;border-radius:3px;background:#a78bfa;width:50%;margin-bottom:6px;"></div><div style="height:4px;border-radius:2px;background:rgba(255,255,255,.15);width:70%;"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="ui-s" id="prototyping">
+    <div class="ui-container">
+        <div class="ui-split">
+            <div class="ui-fade">
+                <div class="ui-label"><i class="fas fa-circle"></i>{% trans "11 — Prototyping" %}</div>
+                <h2 class="ui-h">{% trans "Click It. Test It. Improve It." %}</h2>
+                <p class="ui-sub mb-3">{% trans "Interactive prototypes allow you to experience the product before a single line of production code is written." %}</p>
+                <p class="ui-sub mb-1">{% trans "Test:" %}</p>
+                <div class="row g-3 mt-1 mb-3">
+                    <div class="col-6"><div class="ui-c" style="padding:1rem;text-align:center;"><h6 class="fw-700 mb-0" style="font-size:.85rem;">{% trans "Navigation" %}</h6></div></div>
+                    <div class="col-6"><div class="ui-c" style="padding:1rem;text-align:center;"><h6 class="fw-700 mb-0" style="font-size:.85rem;">{% trans "User Flows" %}</h6></div></div>
+                    <div class="col-6"><div class="ui-c" style="padding:1rem;text-align:center;"><h6 class="fw-700 mb-0" style="font-size:.85rem;">{% trans "Interactions" %}</h6></div></div>
+                    <div class="col-6"><div class="ui-c" style="padding:1rem;text-align:center;"><h6 class="fw-700 mb-0" style="font-size:.85rem;">{% trans "Responsive" %}</h6></div></div>
+                </div>
+                <p class="ui-sub">{% trans "Prototyping helps uncover usability issues early, align stakeholders, improve development estimates, and create a clearer vision of the final product." %}</p>
+            </div>
+            <div class="ui-fade">
+                <div style="display:flex;gap:1rem;justify-content:center;align-items:flex-end;">
+                    <div style="background:#fff;border:2px solid #e2e8f0;border-radius:16px;padding:12px;width:180px;box-shadow:0 8px 24px rgba(0,0,0,.08);">
+                        <div style="height:8px;border-radius:4px;background:#f1f5f9;width:50%;margin-bottom:8px;"></div>
+                        <div style="height:60px;border-radius:8px;border:2px dashed #ccfbf1;background:#f0fdfa;margin-bottom:8px;"></div>
+                        <div style="height:6px;border-radius:3px;background:#f1f5f9;width:70%;"></div>
+                        <div style="font-size:.6rem;text-align:center;color:#94a3b8;margin-top:6px;font-weight:700;">Desktop</div>
+                    </div>
+                    <div style="background:#fff;border:2px solid #e2e8f0;border-radius:12px;padding:10px;width:130px;box-shadow:0 8px 24px rgba(0,0,0,.08);">
+                        <div style="height:6px;border-radius:3px;background:#f1f5f9;width:50%;margin-bottom:6px;"></div>
+                        <div style="height:50px;border-radius:6px;border:2px dashed #ccfbf1;background:#f0fdfa;margin-bottom:6px;"></div>
+                        <div style="height:5px;border-radius:3px;background:#f1f5f9;width:60%;"></div>
+                        <div style="font-size:.55rem;text-align:center;color:#94a3b8;margin-top:5px;font-weight:700;">Tablet</div>
+                    </div>
+                    <div style="background:#fff;border:2px solid #e2e8f0;border-radius:10px;padding:8px;width:80px;box-shadow:0 8px 24px rgba(0,0,0,.08);">
+                        <div style="height:5px;border-radius:3px;background:#f1f5f9;width:50%;margin-bottom:5px;"></div>
+                        <div style="height:40px;border-radius:5px;border:2px dashed #ccfbf1;background:#f0fdfa;margin-bottom:5px;"></div>
+                        <div style="height:4px;border-radius:2px;background:#f1f5f9;width:60%;"></div>
+                        <div style="font-size:.5rem;text-align:center;color:#94a3b8;margin-top:4px;font-weight:700;">Mobile</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="ui-s ui-s-alt">
+    <div class="ui-container text-center">
+        <div class="ui-label justify-content-center ui-fade"><i class="fas fa-circle"></i>{% trans "12 — Inspiration" %}</div>
+        <h2 class="ui-h ui-fade">{% trans "Inspired by Something You Saw?" %}</h2>
+        <p class="ui-sub mx-auto ui-fade">{% trans "Have a design reference you love? Our design workflow can use screenshots and references as starting points to explore a new interface direction while adapting the experience to your product, users, and brand." %}</p>
+        <a href="{% url 'home:build_website' %}" class="btn rounded-pill px-5 fw-800 text-white mt-4 ui-fade" style="background:#0d9488;">{% trans "Bring Your Inspiration" %} <i class="fas fa-image ms-1"></i></a>
+    </div>
+</section>
+
+<!--  13 — DELIVERABLES  -->
+<section class="ui-s ui-s-dark" id="deliverables">
+    <div class="ui-container">
+        <div class="text-center mb-5 ui-fade">
+            <div class="ui-label justify-content-center" style="color:#5eead4;"><i class="fas fa-circle"></i>{% trans "13 — Deliverables" %}</div>
+            <h2 class="ui-h" style="color:#fff;">{% trans "Everything You Need to Move From Idea to Development" %}</h2>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4 ui-fade"><div class="ui-del-col"><h6>{% trans "UX Deliverables" %}</h6><ul><li><i class="fas fa-check"></i>{% trans "User Profiles" %}</li><li><i class="fas fa-check"></i>{% trans "User Journeys" %}</li><li><i class="fas fa-check"></i>{% trans "User Flows" %}</li><li><i class="fas fa-check"></i>{% trans "Feature Maps" %}</li><li><i class="fas fa-check"></i>{% trans "Information Architecture" %}</li><li><i class="fas fa-check"></i>{% trans "Wireframes" %}</li></ul></div></div>
+            <div class="col-md-4 ui-fade"><div class="ui-del-col"><h6>{% trans "UI Deliverables" %}</h6><ul><li><i class="fas fa-check"></i>{% trans "Visual Direction" %}</li><li><i class="fas fa-check"></i>{% trans "Style Concepts" %}</li><li><i class="fas fa-check"></i>{% trans "Design System" %}</li><li><i class="fas fa-check"></i>{% trans "High-Fidelity Mockups" %}</li><li><i class="fas fa-check"></i>{% trans "Responsive Screens" %}</li></ul></div></div>
+            <div class="col-md-4 ui-fade"><div class="ui-del-col"><h6>{% trans "Prototype Deliverables" %}</h6><ul><li><i class="fas fa-check"></i>{% trans "Interactive Prototype" %}</li><li><i class="fas fa-check"></i>{% trans "Clickable User Flows" %}</li><li><i class="fas fa-check"></i>{% trans "Responsive Prototype" %}</li><li><i class="fas fa-check"></i>{% trans "Developer-Ready Designs" %}</li></ul></div></div>
+        </div>
+    </div>
+</section>
+
+<!--  14 — WORKFLOW  -->
+<section class="ui-s" id="workflow">
+    <div class="ui-container">
+        <div class="text-center mb-5 ui-fade">
+            <div class="ui-label justify-content-center"><i class="fas fa-circle"></i>{% trans "14 — Workflow" %}</div>
+            <h2 class="ui-h">{% trans "One Unified Workflow From Idea to Interface" %}</h2>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3 ui-fade"><div class="ui-c" style="border-top:3px solid #0d9488;"><div style="font-size:.65rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#0d9488;margin-bottom:.4rem;">{% trans "Phase 01" %}</div><h5>{% trans "Discover" %}</h5><p style="font-size:.82rem;">{% trans "Requirement Gathering, Solution Research, Technical Planning, Competitor Analysis" %}</p></div></div>
+            <div class="col-md-6 col-lg-3 ui-fade"><div class="ui-c" style="border-top:3px solid #7c3aed;"><div style="font-size:.65rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#7c3aed;margin-bottom:.4rem;">{% trans "Phase 02" %}</div><h5>{% trans "Design" %}</h5><p style="font-size:.82rem;">{% trans "UX Strategy, User Flows, Wireframes, Visual Direction, UI Design" %}</p></div></div>
+            <div class="col-md-6 col-lg-3 ui-fade"><div class="ui-c" style="border-top:3px solid #2563eb;"><div style="font-size:.65rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#2563eb;margin-bottom:.4rem;">{% trans "Phase 03" %}</div><h5>{% trans "Validate" %}</h5><p style="font-size:.82rem;">{% trans "Interactive Prototypes, Usability Review, Design Validation, Feedback & Refinement" %}</p></div></div>
+            <div class="col-md-6 col-lg-3 ui-fade"><div class="ui-c" style="border-top:3px solid #d97706;"><div style="font-size:.65rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#d97706;margin-bottom:.4rem;">{% trans "Phase 04" %}</div><h5>{% trans "Develop" %}</h5><p style="font-size:.82rem;">{% trans "Development Handoff, Technical Collaboration, Responsive Implementation, Quality Assurance" %}</p></div></div>
+        </div>
+    </div>
+</section>
+
+<!--  15 — VALIDATION  -->
+<section class="ui-s ui-s-alt">
+    <div class="ui-container">
+        <div class="ui-split">
+            <div class="ui-fade">
+                <div class="ui-label"><i class="fas fa-circle"></i>{% trans "15 — Validation" %}</div>
+                <h2 class="ui-h">{% trans "Don't Just Design. Validate." %}</h2>
+                <p class="ui-sub mb-3">{% trans "A polished interface still needs to work for real users." %}</p>
+                <p class="ui-sub mb-2">{% trans "We review the experience to identify:" %}</p>
+                <ul class="ui-check">
+                    <li><i class="fas fa-check-circle"></i>{% trans "Confusing navigation" %}</li>
+                    <li><i class="fas fa-check-circle"></i>{% trans "Unclear actions" %}</li>
+                    <li><i class="fas fa-check-circle"></i>{% trans "Inconsistent components" %}</li>
+                    <li><i class="fas fa-check-circle"></i>{% trans "Usability friction" %}</li>
+                    <li><i class="fas fa-check-circle"></i>{% trans "Responsive issues" %}</li>
+                    <li><i class="fas fa-check-circle"></i>{% trans "Missing states and edge cases" %}</li>
+                </ul>
+                <p class="ui-sub mt-3">{% trans "Then we refine the design before development." %}</p>
+            </div>
+            <div class="ui-fade">
+                <img src="{% static 'img/VALIDATION.png' %}" alt="Validation Process" style="width:100%;height:auto;border-radius:16px;display:block;">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--  16 — RESPONSIVE  -->
+<section class="ui-s ui-s-teal">
+    <div class="ui-container">
+        <div class="text-center mb-5 ui-fade">
+            <div class="ui-label justify-content-center" style="color:#5eead4;"><i class="fas fa-circle"></i>{% trans "16 — Responsive" %}</div>
+            <h2 class="ui-h" style="color:#fff;">{% trans "One Experience. Every Screen." %}</h2>
+        </div>
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-4 ui-fade"><div class="ui-c" style="background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.1);text-align:center;"><div class="ui-c-icon teal mx-auto"><i class="fas fa-desktop"></i></div><h5 style="color:#fff;">{% trans "Desktop" %}</h5><p style="color:rgba(255,255,255,.6);">{% trans "Large-screen layouts with efficient information density." %}</p></div></div>
+            <div class="col-md-4 ui-fade"><div class="ui-c" style="background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.1);text-align:center;"><div class="ui-c-icon purple mx-auto"><i class="fas fa-tablet-screen-button"></i></div><h5 style="color:#fff;">{% trans "Tablet" %}</h5><p style="color:rgba(255,255,255,.6);">{% trans "Flexible layouts optimized for touch and medium-sized screens." %}</p></div></div>
+            <div class="col-md-4 ui-fade"><div class="ui-c" style="background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.1);text-align:center;"><div class="ui-c-icon blue mx-auto"><i class="fas fa-mobile-screen-button"></i></div><h5 style="color:#fff;">{% trans "Mobile" %}</h5><p style="color:rgba(255,255,255,.6);">{% trans "Focused experiences designed around essential actions and simple navigation." %}</p></div></div>
+        </div>
+    </div>
+</section>
+
+<!--  17 — CASE STUDIES  -->
+<section class="ui-s ui-s-alt">
+    <div class="ui-container">
+        <div class="text-center mb-5 ui-fade">
+            <div class="ui-label justify-content-center"><i class="fas fa-circle"></i>{% trans "17 — Case Studies" %}</div>
+            <h2 class="ui-h">{% trans "UI Design That Solves Real Problems" %}</h2>
+            <p class="ui-sub mx-auto">{% trans "Explore how strategy, UX, technology, and visual design come together to create better digital experiences." %}</p>
+        </div>
+
+        <!-- Case Study 01 -->
+        <div class="ui-split mb-5 ui-fade">
+            <div>
+                <img src="{% static 'img/case1.png' %}" alt="Unified Platform" style="width:100%;height:auto;border-radius:20px;display:block;">
+            </div>
+            <div style="display:flex;flex-direction:column;justify-content:center;">
+                <div class="uc-tag" style="align-self:flex-start;margin-bottom:1rem;">{% trans "Case Study 01" %}</div>
+                <h3 style="font-size:1.5rem;font-weight:800;margin-bottom:.75rem;">{% trans "From Fragmented Systems to One Unified Experience" %}</h3>
+                <p style="color:#64748b;margin-bottom:1.5rem;">{% trans "Transform complex workflows and disconnected systems into a scalable, intuitive digital platform." %}</p>
+                <div style="display:flex;gap:2rem;margin-bottom:1.5rem;">
+                    <div><div style="font-size:1.8rem;font-weight:800;color:#0d9488;">3x</div><div style="font-size:.8rem;color:#64748b;">{% trans "Faster Workflows" %}</div></div>
+                    <div><div style="font-size:1.8rem;font-weight:800;color:#7c3aed;">40%</div><div style="font-size:.8rem;color:#64748b;">{% trans "Less Support Tickets" %}</div></div>
+                    <div><div style="font-size:1.8rem;font-weight:800;color:#2563eb;">95%</div><div style="font-size:.8rem;color:#64748b;">{% trans "User Satisfaction" %}</div></div>
+                </div>
+                <a href="{% url 'home:build_website' %}" class="btn rounded-pill px-4 fw-800 text-white" style="background:#0d9488;align-self:flex-start;">{% trans "View Case Study" %} <i class="fas fa-arrow-right ms-1"></i></a>
+            </div>
+        </div>
+
+        <!-- Case Study 02 -->
+        <div class="ui-split ui-fade">
+            <div style="display:flex;flex-direction:column;justify-content:center;">
+                <div class="uc-tag" style="align-self:flex-start;margin-bottom:1rem;">{% trans "Case Study 02" %}</div>
+                <h3 style="font-size:1.5rem;font-weight:800;margin-bottom:.75rem;">{% trans "Building a Better Digital Experience" %}</h3>
+                <p style="color:#64748b;margin-bottom:1.5rem;">{% trans "Discover how user-centered design can transform the way customers interact with a product." %}</p>
+                <div style="display:flex;gap:2rem;margin-bottom:1.5rem;">
+                    <div><div style="font-size:1.8rem;font-weight:800;color:#d97706;">60%</div><div style="font-size:.8rem;color:#64748b;">{% trans "More Engagement" %}</div></div>
+                    <div><div style="font-size:1.8rem;font-weight:800;color:#0d9488;">2x</div><div style="font-size:.8rem;color:#64748b;">{% trans "Faster Onboarding" %}</div></div>
+                    <div><div style="font-size:1.8rem;font-weight:800;color:#dc2626;">50%</div><div style="font-size:.8rem;color:#64748b;">{% trans "Reduced Churn" %}</div></div>
+                </div>
+                <a href="{% url 'home:build_website' %}" class="btn rounded-pill px-4 fw-800 text-white" style="background:#0d9488;align-self:flex-start;">{% trans "View Case Study" %} <i class="fas fa-arrow-right ms-1"></i></a>
+            </div>
+            <div>
+                <img src="{% static 'img/case2.png' %}" alt="Digital Experience" style="width:100%;height:auto;border-radius:20px;display:block;">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--  18 — FAQ  -->
+<section class="ui-s ui-s-alt">
+    <div class="ui-container" style="max-width:800px;">
+        <div class="text-center mb-5 ui-fade">
+            <div class="ui-label justify-content-center"><i class="fas fa-circle"></i>{% trans "18 — FAQ" %}</div>
+            <h2 class="ui-h">{% trans "Frequently Asked Questions" %}</h2>
+        </div>
+        <div class="ui-faq ui-fade">
+            <div class="accordion" id="uiFaq">
+                <div class="accordion-item" style="background:transparent;border:none;margin-bottom:.5rem;">
+                    <h2 class="accordion-header"><button class="accordion-button" data-bs-toggle="collapse" data-bs-target="#f1">{% trans "What is UI design?" %}</button></h2>
+                    <div id="f1" class="accordion-collapse collapse show" data-bs-parent="#uiFaq"><div class="accordion-body">{% trans "UI design focuses on the visual and interactive elements users interact with, including layouts, typography, colors, buttons, navigation, icons, and components." %}</div></div>
+                </div>
+                <div class="accordion-item" style="background:transparent;border:none;margin-bottom:.5rem;">
+                    <h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#f2">{% trans "Why is UI design important?" %}</button></h2>
+                    <div id="f2" class="accordion-collapse collapse" data-bs-parent="#uiFaq"><div class="accordion-body">{% trans "A well-designed interface improves usability, engagement, satisfaction, and the overall perception of your digital product." %}</div></div>
+                </div>
+                <div class="accordion-item" style="background:transparent;border:none;margin-bottom:.5rem;">
+                    <h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#f3">{% trans "What is the difference between UX and UI?" %}</button></h2>
+                    <div id="f3" class="accordion-collapse collapse" data-bs-parent="#uiFaq"><div class="accordion-body">{% trans "UX focuses on how the experience works and how users accomplish their goals. UI focuses on how that experience looks and how users interact with its visual interface." %}</div></div>
+                </div>
+                <div class="accordion-item" style="background:transparent;border:none;margin-bottom:.5rem;">
+                    <h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#f4">{% trans "Do you design mobile and web interfaces?" %}</button></h2>
+                    <div id="f4" class="accordion-collapse collapse" data-bs-parent="#uiFaq"><div class="accordion-body">{% trans "Yes. We design responsive experiences for web applications, SaaS platforms, dashboards, eCommerce stores, and mobile apps across iOS and Android." %}</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--  CTA  -->
+<section style="padding:0;">
+    <div class="ui-cta-box ui-fade" style="border-radius:0;max-width:none;">
+        <h2 class="ui-h" style="color:#fff;max-width:700px;margin:0 auto 1rem;">{% trans "Ready to Build an Interface Your Users Will Love?" %}</h2>
+        <p style="color:rgba(255,255,255,.6);font-size:1.1rem;max-width:540px;margin:0 auto 2rem;">{% trans "Start your UI project today — free consultation included." %}</p>
+        <a href="{% url 'home:build_website' %}" class="btn btn-light btn-lg rounded-pill px-6 fw-800" style="font-size:1rem;padding:1rem 2.5rem;">{% trans "Start Your UI Project" %} <i class="fas fa-arrow-right ms-1"></i></a>
+    </div>
+</section>
+
+</div>
+
+<script>
+(function(){
+    var obs=new IntersectionObserver(function(entries){
+        entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);}});
+    },{threshold:0.1});
+    document.querySelectorAll('.ui-fade').forEach(function(el){obs.observe(el);});
+})();
+</script>
+{% endblock %}
