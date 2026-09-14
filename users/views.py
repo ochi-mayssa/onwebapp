@@ -266,11 +266,22 @@ def signup(request):
         if form.is_valid():
             user = form.save()
             
-            # Start ERPNext Provisioning in background
+            # Start ERPNext Provisioning in background (non-blocking)
             try:
+                import threading
+
+                def _fire_task(func, *args):
+                    def _run():
+                        try:
+                            func.delay(*args)
+                        except Exception:
+                            pass
+                    t = threading.Thread(target=_run, daemon=True)
+                    t.start()
+
                 from .tasks import provision_erpnext_instance, send_verification_email
-                provision_erpnext_instance.delay(user.id)
-                
+                _fire_task(provision_erpnext_instance, user.id)
+
                 # Async verification email
                 from django.utils.http import urlsafe_base64_encode
                 from django.utils.encoding import force_bytes
@@ -278,7 +289,7 @@ def signup(request):
                 uid = urlsafe_base64_encode(force_bytes(user.pk))
                 token = default_token_generator.make_token(user)
                 verify_url = request.build_absolute_uri(reverse('users:verify_email', args=[uid, token]))
-                send_verification_email.delay(user.id, verify_url)
+                _fire_task(send_verification_email, user.id, verify_url)
             except Exception:
                 pass
 
@@ -421,7 +432,7 @@ def onboarding(request):
                 return _get_community_redirect(profile)
             
             messages.success(request, 'Welcome to the Full Platform!')
-            return redirect('users:dashboard')
+            return redirect('home:home')
     else:
         form = OnboardingForm(instance=profile)
     
