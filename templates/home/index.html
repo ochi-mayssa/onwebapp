@@ -14,11 +14,34 @@
 .oh-scroll-progress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,#3b82f6,#8b5cf6,#ec4899);z-index:10000;width:0;transition:width .1s}
 
 /* ===== HERO ===== */
-.oh-hero{padding:11rem 0 7rem;background:linear-gradient(160deg,#0a0f1e 0%,#111827 35%,#0f172a 65%,#0a0f1e 100%);position:relative;overflow:hidden}
-.oh-hero::before{content:'';position:absolute;top:-400px;right:-300px;width:900px;height:900px;border-radius:50%;background:radial-gradient(circle,rgba(59,130,246,.1) 0%,transparent 65%);pointer-events:none;animation:heroPulse 8s ease-in-out infinite}
-.oh-hero::after{content:'';position:absolute;bottom:-300px;left:-200px;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.07) 0%,transparent 65%);pointer-events:none;animation:heroPulse 10s ease-in-out infinite reverse}
-@keyframes heroPulse{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.15);opacity:1}}
-.oh-hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:60px 60px;pointer-events:none}
+.oh-hero{
+    padding:11rem 0 7rem;
+    position:relative;
+    overflow:hidden;
+    background:url("{% static 'img/hero-bg.png' %}") center/cover no-repeat;
+}
+.oh-hero::before{
+    content:'';
+    position:absolute;
+    inset:0;
+    background:linear-gradient(160deg,rgba(10,15,30,.85) 0%,rgba(17,24,39,.75) 35%,rgba(15,23,42,.85) 65%,rgba(10,15,30,.9) 100%);
+    z-index:1;
+}
+.oh-hero::after{
+    content:'';
+    position:absolute;
+    bottom:-300px;
+    left:-200px;
+    width:700px;
+    height:700px;
+    border-radius:50%;
+    background:radial-gradient(circle,rgba(139,92,246,.07) 0%,transparent 65%);
+    pointer-events:none;
+    animation:heroPulse 10s ease-in-out infinite reverse;
+    z-index:1;
+}
+.oh-hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:1}
+.oh-hero-content{position:relative;z-index:2}
 .oh-hero-title{font-size:clamp(2.6rem,6.5vw,4.2rem);font-weight:800;line-height:1.05;letter-spacing:-.045em;color:#fff;margin-bottom:1.5rem}
 .oh-hero-title .grad{background:linear-gradient(135deg,#60a5fa,#a78bfa,#f472b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;background-size:200% 200%;animation:gradShift 6s ease infinite}
 @keyframes gradShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
@@ -36,7 +59,7 @@
 .oh-hero-stats{display:flex;gap:3rem;margin-top:3.5rem;padding-top:2.5rem;border-top:1px solid rgba(255,255,255,.06)}
 .oh-hero-stat-num{font-size:1.8rem;font-weight:800;color:#fff;line-height:1;background:linear-gradient(135deg,#fff,#94a3b8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .oh-hero-stat-label{font-size:.7rem;color:#64748b;text-transform:uppercase;letter-spacing:.07em;margin-top:.35rem}
-.oh-hero-scroll{position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.5rem;color:rgba(255,255,255,.3);font-size:.65rem;text-transform:uppercase;letter-spacing:.15em;animation:scrollBounce 2s ease-in-out infinite}
+.oh-hero-scroll{position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.5rem;color:rgba(255,255,255,.3);font-size:.65rem;text-transform:uppercase;letter-spacing:.15em;animation:scrollBounce 2s ease-in-out infinite;z-index:2}
 .oh-hero-scroll i{font-size:.75rem}
 @keyframes scrollBounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(6px)}}
 
@@ -97,1029 +120,325 @@
 .oh-erp-list li:hover .icon{background:#2563eb;color:#fff}
 .oh-erp-list li strong{display:block;font-size:.88rem;margin-bottom:.15rem;color:#0f172a}
 .oh-erp-list li small{font-size:.82rem;color:#64748b;line-height:1.55}
-
-/* ===== AUTOMATION CARDS ===== */
-.oh-auto-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem}
-.oh-auto-card{background:#fff;border:1px solid #e2e8f0;border-radius:18px;overflow:hidden;transition:all .4s cubic-bezier(.22,1,.36,1)}
-.oh-auto-card:hover{transform:translateY(-6px);box-shadow:0 16px 40px rgba(37,99,235,.1);border-color:rgba(59,130,246,.2)}
-.oh-auto-card-img{height:160px;position:relative;overflow:hidden}
-.oh-auto-card-img img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
-.oh-auto-card:hover .oh-auto-card-img img{transform:scale(1.05)}
-.oh-auto-card-img::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(15,23,42,.85) 0%,rgba(15,23,42,.2) 40%,transparent 70%)}
-.oh-auto-card-overlay{position:absolute;bottom:.85rem;left:1.1rem;right:1.1rem;color:#fff;z-index:1}
-.oh-auto-card-overlay small{font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;opacity:.6;display:block;margin-bottom:.2rem}
-.oh-auto-card-overlay span{font-weight:700;font-size:.88rem}
-.oh-auto-card-body{padding:1.1rem 1.25rem}
-.oh-auto-card-body ul{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.45rem}
-.oh-auto-card-body li{display:flex;align-items:flex-start;gap:.45rem;font-size:.75rem;color:#475569;line-height:1.55}
-.oh-auto-card-body li i{color:#2563eb;font-size:.6rem;margin-top:.22rem;flex-shrink:0}
-
-/* ===== PYRAMID ===== */
-.oh-pyramid{max-width:580px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:0}
-.oh-pyr-top{background:linear-gradient(135deg,#2563eb,#3b82f6);color:#fff;padding:1.1rem 3rem;border-radius:14px;width:280px;text-align:center;position:relative;z-index:3;box-shadow:0 8px 30px rgba(37,99,235,.2)}
-.oh-pyr-top span{font-weight:800;font-size:.92rem;display:block}
-.oh-pyr-top small{display:block;font-size:.58rem;text-transform:uppercase;letter-spacing:.15em;opacity:.6;margin-top:.2rem}
-.oh-pyr-label{font-size:.55rem;text-transform:uppercase;letter-spacing:.2em;color:#3b82f6;font-weight:700;margin:1rem 0 .5rem;display:inline-flex;align-items:center;gap:.5rem}
-.oh-pyr-label::before,.oh-pyr-label::after{content:'';height:1px;width:24px;background:linear-gradient(90deg,transparent,rgba(37,99,235,.25))}
-.oh-pyr-arrow i{color:#3b82f6;font-size:.5rem}
-.oh-pyr-mid{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;width:440px}
-.oh-pyr-box{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:1.1rem .8rem;text-align:center;transition:all .35s}
-.oh-pyr-box:hover{border-color:#3b82f6;box-shadow:0 10px 30px rgba(37,99,235,.08);transform:translateY(-3px)}
-.oh-pyr-box-icon{width:36px;height:36px;border-radius:10px;background:rgba(37,99,235,.06);color:#2563eb;display:flex;align-items:center;justify-content:center;margin:0 auto .5rem;font-size:.75rem;transition:all .3s}
-.oh-pyr-box:hover .oh-pyr-box-icon{background:#2563eb;color:#fff;transform:scale(1.1)}
-.oh-pyr-box h6{font-weight:700;font-size:.78rem;margin:0 0 .15rem;color:#0f172a}
-.oh-pyr-box p{color:#64748b;font-size:.64rem;line-height:1.55;margin:0}
-.oh-pyr-base{background:linear-gradient(135deg,#0f172a,#1e293b);color:#fff;padding:1.1rem 2.5rem;border-radius:14px;width:500px;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,.15)}
-.oh-pyr-base h6{font-weight:800;font-size:.92rem;margin:0 0 .1rem}
-.oh-pyr-base small{opacity:.4;font-size:.58rem;display:block;letter-spacing:.15em;text-transform:uppercase}
-
-/* ===== AI SECTION ===== */
-.oh-ai{background:linear-gradient(160deg,rgba(10,15,30,.9),rgba(30,41,59,.85)),url("{% static 'img/build.png' %}") center/cover no-repeat;color:#fff;padding:8rem 0;position:relative;overflow:hidden}
-.oh-ai::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent,rgba(0,0,0,.3));pointer-events:none}
-.oh-ai-grid{display:grid;grid-template-columns:1fr;gap:3rem;align-items:center;max-width:700px;position:relative;z-index:1}
-.oh-ai h2{color:#fff;font-size:2.3rem;font-weight:800;letter-spacing:-.035em}
-.oh-ai p{color:rgba(255,255,255,.55);font-size:1rem;line-height:1.8}
-.oh-ai-features{list-style:none;padding:0;margin:1.5rem 0 0;display:flex;flex-direction:column;gap:1.1rem}
-.oh-ai-features li{display:flex;gap:.8rem;align-items:flex-start;transition:transform .3s}
-.oh-ai-features li:hover{transform:translateX(4px)}
-.oh-ai-features li i{color:#60a5fa;margin-top:.2rem;font-size:.85rem;flex-shrink:0}
-.oh-ai-features li strong{display:block;font-size:.88rem;color:#fff}
-.oh-ai-features li small{font-size:.82rem;color:rgba(255,255,255,.45);line-height:1.55}
-
-/* ===== VALIDATION ===== */
-.oh-val-grid{display:grid;grid-template-columns:1fr 1fr;gap:3.5rem;align-items:center;max-width:1050px;margin:0 auto}
-.oh-val-dashboard{background:#0f172a;border-radius:18px;padding:1.5rem;box-shadow:0 24px 70px rgba(0,0,0,.15);position:relative;overflow:hidden}
-.oh-val-dashboard::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#10b981,#059669,#10b981)}
-.oh-val-bar{display:flex;align-items:center;gap:.45rem;margin-bottom:1rem}
-.oh-val-bar-dot{width:8px;height:8px;border-radius:50%}
-.oh-val-bar-dot:nth-child(1){background:#ef4444}
-.oh-val-bar-dot:nth-child(2){background:#f59e0b}
-.oh-val-bar-dot:nth-child(3){background:#10b981}
-.oh-val-bar-title{margin-left:.5rem;font-size:.6rem;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.1em}
-.oh-val-status{display:grid;grid-template-columns:repeat(3,1fr);gap:.65rem;margin-bottom:.85rem}
-.oh-val-status-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:.8rem .65rem;text-align:center;transition:all .3s}
-.oh-val-status-card:hover{background:rgba(255,255,255,.06);transform:translateY(-2px)}
-.oh-val-status-dot{width:6px;height:6px;border-radius:50%;background:#10b981;margin:0 auto .35rem;box-shadow:0 0 8px rgba(16,185,129,.5);animation:pulse 2s ease-in-out infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
-.oh-val-status-label{font-size:.5rem;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.3);margin-bottom:.15rem}
-.oh-val-status-value{font-size:1rem;font-weight:800;color:#fff}
-.oh-val-gauges{display:grid;grid-template-columns:repeat(3,1fr);gap:.65rem;margin-bottom:.85rem}
-.oh-val-gauge{text-align:center}
-.oh-val-gauge-ring{width:54px;height:54px;border-radius:50%;border:3px solid rgba(255,255,255,.06);margin:0 auto .35rem;position:relative;display:flex;align-items:center;justify-content:center}
-.oh-val-gauge-ring svg{position:absolute;inset:0;transform:rotate(-90deg)}
-.oh-val-gauge-ring circle{fill:none;stroke-width:3;stroke-linecap:round}
-.oh-val-gauge-pct{font-size:.72rem;font-weight:800;color:#fff}
-.oh-val-gauge-label{font-size:.48rem;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.3)}
-.oh-val-feed{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);border-radius:10px;padding:.7rem}
-.oh-val-feed-title{font-size:.48rem;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.3);margin-bottom:.45rem}
-.oh-val-feed-item{display:flex;align-items:center;gap:.45rem;padding:.3rem 0;border-bottom:1px solid rgba(255,255,255,.04)}
-.oh-val-feed-item:last-child{border:none}
-.oh-val-feed-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
-.oh-val-feed-dot--ok{background:#10b981;box-shadow:0 0 6px rgba(16,185,129,.4)}
-.oh-val-feed-dot--warn{background:#f59e0b}
-.oh-val-feed-text{font-size:.62rem;color:rgba(255,255,255,.45);flex:1}
-.oh-val-feed-time{font-size:.5rem;color:rgba(255,255,255,.2)}
-.oh-val-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem;margin-top:3rem;max-width:1050px;margin-left:auto;margin-right:auto;border-top:1px solid rgba(0,0,0,.06);padding-top:2.5rem}
-.oh-val-stat{text-align:center}
-.oh-val-stat-num{font-size:1.6rem;font-weight:900;color:#0f172a;letter-spacing:-.03em;line-height:1}
-.oh-val-stat-label{font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;color:#64748b;margin-top:.35rem}
-
-/* ===== SERVICES ===== */
-.oh-svc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
-.oh-svc-card{background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:2rem;transition:all .4s cubic-bezier(.22,1,.36,1);position:relative;overflow:hidden}
-.oh-svc-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--svc-color,#2563eb);opacity:0;transition:opacity .35s}
-.oh-svc-card::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,var(--svc-bg,rgba(37,99,235,.03)),transparent 70%);opacity:0;transition:opacity .35s}
-.oh-svc-card:hover{transform:translateY(-6px);box-shadow:0 16px 40px rgba(0,0,0,.06);border-color:transparent}
-.oh-svc-card:hover::before{opacity:1}
-.oh-svc-card:hover::after{opacity:1}
-.oh-svc-card-icon{width:48px;height:48px;border-radius:14px;display:inline-flex;align-items:center;justify-content:center;font-size:1.1rem;margin-bottom:1.25rem;background:var(--svc-bg);color:var(--svc-color);transition:all .35s;position:relative;z-index:1}
-.oh-svc-card:hover .oh-svc-card-icon{background:var(--svc-color);color:#fff;transform:scale(1.08);box-shadow:0 6px 20px rgba(0,0,0,.1)}
-.oh-svc-card h5{font-weight:700;font-size:1rem;margin-bottom:.5rem;color:#0f172a;position:relative;z-index:1}
-.oh-svc-card p{color:#64748b;font-size:.82rem;line-height:1.65;margin:0;position:relative;z-index:1}
-.oh-svc-card-link{display:inline-flex;align-items:center;gap:.35rem;font-size:.78rem;font-weight:700;color:#2563eb;margin-top:1rem;text-decoration:none;transition:all .25s;position:relative;z-index:1}
-.oh-svc-card-link i{transition:transform .25s}
-.oh-svc-card-link:hover{gap:.6rem}
-.oh-svc-card-link:hover i{transform:translateX(2px)}
-
-/* ===== CERTIFICATIONS ===== */
-.oh-cert-grid{display:flex;justify-content:center;gap:1.5rem;flex-wrap:wrap}
-.oh-cert{display:flex;flex-direction:column;align-items:center;text-decoration:none;padding:1.4rem 1.6rem;border-radius:16px;border:1px solid transparent;transition:all .35s;min-width:135px;position:relative;overflow:hidden}
-.oh-cert::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(59,130,246,.03),rgba(139,92,246,.03));opacity:0;transition:opacity .35s}
-.oh-cert:hover{border-color:#e2e8f0;background:#f8fafc;transform:translateY(-4px)}
-.oh-cert:hover::before{opacity:1}
-.oh-cert-icon{width:52px;height:52px;border-radius:50%;border:1.5px solid #e2e8f0;background:#fff;display:flex;align-items:center;justify-content:center;margin-bottom:.7rem;transition:all .35s;position:relative;z-index:1}
-.oh-cert:hover .oh-cert-icon{border-color:#3b82f6;background:linear-gradient(135deg,#eff6ff,#f0f9ff)}
-.oh-cert-icon i{font-size:1.15rem;color:#2563eb;transition:transform .35s}
-.oh-cert:hover .oh-cert-icon i{transform:scale(1.1)}
-.oh-cert-name{font-size:.78rem;font-weight:700;color:#0f172a;margin-bottom:.1rem;position:relative;z-index:1}
-.oh-cert-desc{font-size:.63rem;color:#94a3b8;position:relative;z-index:1}
-
-/* ===== EVENTS ===== */
-.oh-events-grid{display:grid;grid-template-columns:1.3fr 1fr 1fr;grid-template-rows:1fr 1fr;gap:1.25rem}
-.oh-event{background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:1.85rem;display:flex;flex-direction:column;justify-content:space-between;transition:all .4s cubic-bezier(.22,1,.36,1);cursor:pointer}
-.oh-event:hover{transform:translateY(-5px);border-color:rgba(59,130,246,.15);box-shadow:0 14px 36px rgba(37,99,235,.06)}
-.oh-event-featured{grid-row:1/3;background:linear-gradient(160deg,#0f172a,#1e293b);border-color:transparent}
-.oh-event-featured:hover{box-shadow:0 20px 50px rgba(0,0,0,.15)}
-.oh-event-featured .oh-event-date{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.1)}
-.oh-event-featured .oh-event-date-month{color:#60a5fa}
-.oh-event-featured .oh-event-date-year{color:#fff}
-.oh-event-featured .oh-event-title{color:#fff}
-.oh-event-featured .oh-event-desc{color:rgba(255,255,255,.5)}
-.oh-event-featured .oh-event-cta{color:#60a5fa}
-.oh-event-top{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:1rem}
-.oh-event-date{display:flex;flex-direction:column;align-items:center;min-width:50px;padding:.5rem;border-radius:10px;background:#f1f5f9;border:1px solid #e2e8f0;transition:all .3s}
-.oh-event-date-month{font-size:.55rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#2563eb;line-height:1}
-.oh-event-date-year{font-size:.68rem;font-weight:800;color:#0f172a;line-height:1.2;margin-top:.1rem}
-.oh-event-cat{display:inline-block;padding:.2rem .6rem;border-radius:2rem;font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
-.oh-event-cat--webinar{background:rgba(20,184,166,.08);color:#0d9488}
-.oh-event-cat--exhibition{background:rgba(37,99,235,.08);color:#2563eb}
-.oh-event-cat--seminar{background:rgba(139,92,246,.08);color:#8b5cf6}
-.oh-event-title{font-size:1rem;font-weight:700;color:#0f172a;line-height:1.3;margin-bottom:.4rem}
-.oh-event-desc{font-size:.8rem;color:#64748b;line-height:1.6;flex:1}
-.oh-event-cta{display:inline-flex;align-items:center;gap:.3rem;font-size:.78rem;font-weight:700;color:#2563eb;margin-top:.75rem;text-decoration:none;transition:gap .25s}
-.oh-event-cta i{transition:transform .25s}
-.oh-event-cta:hover{gap:.5rem}
-.oh-event-cta:hover i{transform:translateX(2px)}
-.oh-event-featured .oh-event-title{font-size:1.25rem}
-
-/* ===== NEWS ===== */
-.oh-news-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
-.oh-news-featured{grid-column:1;grid-row:1/3;background:#fff;border:1px solid #e2e8f0;border-radius:22px;padding:2.25rem;display:flex;flex-direction:column;justify-content:space-between;transition:all .4s cubic-bezier(.22,1,.36,1);overflow:hidden;position:relative}
-.oh-news-featured::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#3b82f6,#8b5cf6);opacity:0;transition:opacity .35s}
-.oh-news-featured:hover{transform:translateY(-5px);border-color:rgba(59,130,246,.15);box-shadow:0 16px 48px rgba(37,99,235,.06)}
-.oh-news-featured:hover::before{opacity:1}
-.oh-news-badge{display:inline-block;padding:.25rem .65rem;border-radius:2rem;font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
-.oh-news-badge--ai{background:rgba(20,184,166,.08);color:#0d9488}
-.oh-news-badge--product{background:rgba(37,99,235,.08);color:#2563eb}
-.oh-news-badge--expansion{background:rgba(139,92,246,.08);color:#8b5cf6}
-.oh-news-badge--savings{background:rgba(245,158,11,.08);color:#d97706}
-.oh-news-card{background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:1.6rem;display:flex;flex-direction:column;justify-content:space-between;transition:all .4s cubic-bezier(.22,1,.36,1);min-height:165px}
-.oh-news-card:hover{transform:translateY(-5px);border-color:rgba(59,130,246,.15);box-shadow:0 12px 32px rgba(37,99,235,.06)}
-.oh-news-card-title{font-size:.95rem;font-weight:700;color:#0f172a;line-height:1.3;margin-bottom:.35rem}
-.oh-news-card-desc{font-size:.8rem;color:#64748b;line-height:1.6;flex:1}
-.oh-news-cta{display:inline-flex;align-items:center;gap:.3rem;font-size:.82rem;font-weight:700;color:#2563eb;text-decoration:none;transition:gap .25s}
-.oh-news-cta i{transition:transform .25s}
-.oh-news-cta:hover{gap:.5rem}
-.oh-news-cta:hover i{transform:translateX(2px)}
-
-/* ===== PARTNERS ===== */
-.oh-partners{padding:4.5rem 0;background:var(--bg-body);border-top:1px solid var(--border-color);border-bottom:1px solid var(--border-color)}
-.oh-partner-grid{display:flex;justify-content:center;gap:1.5rem;flex-wrap:wrap;align-items:center}
-.oh-partner{display:flex;align-items:center;gap:.5rem;padding:.75rem 1.3rem;border-radius:12px;border:1px solid var(--border-color);background:var(--bg-surface);font-size:.8rem;font-weight:700;color:var(--text-muted);transition:all .35s}
-.oh-partner:hover{transform:translateY(-3px);box-shadow:0 6px 16px rgba(0,0,0,.05);border-color:rgba(59,130,246,.15)}
-.oh-partner i{font-size:1rem;color:#2563eb}
-
-/* ===== GLOBAL OFFICES ===== */
-.oh-global{padding:6rem 0;background:var(--bg-surface)}
-.oh-global-grid{display:grid;grid-template-columns:1fr 1fr;gap:3.5rem;align-items:start}
-.oh-global-text p{color:var(--text-muted);font-size:.88rem;line-height:1.75;margin-bottom:1.25rem}
-.oh-office{display:flex;gap:1.1rem;align-items:flex-start;padding:1.1rem 0;border-bottom:1px solid var(--border-color);transition:all .3s}
-.oh-office:last-child{border-bottom:none}
-.oh-office:hover{padding-left:.5rem}
-.oh-office-icon{width:44px;height:44px;border-radius:12px;background:rgba(37,99,235,.07);color:#2563eb;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0;transition:all .3s}
-.oh-office:hover .oh-office-icon{background:#2563eb;color:#fff}
-.oh-office strong{display:block;font-size:.88rem;margin-bottom:.15rem;color:#0f172a}
-.oh-office small{font-size:.78rem;color:var(--text-muted);line-height:1.55}
-
-/* ===== FINAL CTA ===== */
-.oh-final-cta{padding:7rem 0;background:linear-gradient(160deg,#0a0f1e,#111827,#0f172a);text-align:center;color:#fff;position:relative;overflow:hidden}
-.oh-final-cta::before{content:'';position:absolute;top:-200px;right:-200px;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(59,130,246,.08) 0%,transparent 70%);pointer-events:none}
-.oh-final-cta::after{content:'';position:absolute;bottom:-200px;left:-200px;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.06) 0%,transparent 70%);pointer-events:none}
-.oh-final-cta h2{font-weight:800;font-size:2.4rem;margin-bottom:.85rem;color:#fff;letter-spacing:-.04em;position:relative;z-index:1}
-.oh-final-cta p{color:rgba(255,255,255,.5);font-size:1.05rem;margin-bottom:2.5rem;max-width:520px;margin-left:auto;margin-right:auto;position:relative;z-index:1;line-height:1.75}
-
-/* ===== FOOTER ===== */
-.oh-footer{padding:4rem 0 1.5rem;background:#080d1a;color:rgba(255,255,255,.6);border-top:1px solid rgba(255,255,255,.05);position:relative}
-.oh-footer::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(59,130,246,.15),transparent)}
-.oh-footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:2rem;margin-bottom:2.5rem}
-.oh-footer-brand h5{font-weight:800;color:#fff;margin-bottom:.6rem;font-size:1.1rem}
-.oh-footer-brand p{font-size:.82rem;line-height:1.7}
-.oh-footer-col h6{font-weight:700;color:#fff;font-size:.78rem;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.85rem}
-.oh-footer-col a{display:block;font-size:.78rem;color:rgba(255,255,255,.45);text-decoration:none;padding:.3rem 0;transition:all .25s}
-.oh-footer-col a:hover{color:#fff;transform:translateX(3px)}
-.oh-footer-bottom{border-top:1px solid rgba(255,255,255,.05);padding-top:1.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;font-size:.72rem}
-.oh-footer-legal a{color:rgba(255,255,255,.35);text-decoration:none;margin-left:1.25rem;transition:color .25s}
-.oh-footer-legal a:hover{color:#fff}
-
-/* ===== RESPONSIVE ===== */
-@media(max-width:1199px){.oh-pillars-grid{grid-template-columns:repeat(3,1fr)}.oh-auto-grid{grid-template-columns:repeat(2,1fr)}.oh-svc-grid{grid-template-columns:repeat(2,1fr)}.oh-events-grid{grid-template-columns:1fr 1fr}.oh-event-featured{grid-row:auto}}
-@media(max-width:991px){.oh-hero{padding:8rem 0 5rem}.oh-erp-grid,.oh-ai-grid,.oh-global-grid,.oh-val-grid{grid-template-columns:1fr}.oh-auto-grid{grid-template-columns:repeat(2,1fr)}.oh-svc-grid{grid-template-columns:1fr}.oh-events-grid{grid-template-columns:1fr}.oh-news-grid{grid-template-columns:1fr}.oh-news-featured{grid-column:1;grid-row:auto}.oh-footer-grid{grid-template-columns:1fr 1fr}.oh-pyr-mid{width:100%}.oh-pyr-base{width:100%}}
-@media(max-width:767px){.oh-pillars-grid{grid-template-columns:1fr 1fr}.oh-auto-grid{grid-template-columns:1fr}.oh-cert-grid{gap:.75rem}.oh-cert{min-width:0;flex:1 1 calc(50% - .75rem)}.oh-hero-scroll{display:none}}
-@media(max-width:575px){.oh-hero{padding:7rem 0 4rem}.oh-hero-title{font-size:2rem}.oh-pillars-grid{grid-template-columns:1fr}.oh-pyr-mid{grid-template-columns:1fr;width:260px}.oh-pyr-base{width:260px}.oh-val-stats{grid-template-columns:repeat(2,1fr)}.oh-footer-grid{grid-template-columns:1fr}.oh-hero-stats{flex-wrap:wrap;gap:1.5rem}.oh-hero-badges{gap:.4rem}}
-@media(prefers-reduced-motion:reduce){.oh-trust-track{animation:none}.oh-hero-scroll{animation:none}.oh-val-status-dot{animation:none}.oh-reveal{opacity:1;transform:none;transition:none}.oh-pillar,.oh-auto-card,.oh-svc-card,.oh-event,.oh-news-featured,.oh-news-card,.oh-partner{transition:none !important;transform:none !important}}
 </style>
 {% endblock %}
 
 {% block content %}
+<!-- Scroll Progress -->
+<div class="oh-scroll-progress" id="scrollProgress"></div>
 
-<!-- Scroll Progress Bar -->
-<div class="oh-scroll-progress"></div>
-
-<!-- ==================== HERO ==================== -->
-<section class="oh-hero">
-  <div class="oh-hero-grid"></div>
-  <div class="container" style="position:relative;z-index:1;">
-    <div class="row align-items-center">
-      <div class="col-lg-8">
-        <div class="oh-hero-badges">
-          <span class="oh-badge"><i class="fas fa-shield-halved"></i> GDPR</span>
-          <span class="oh-badge"><i class="fas fa-certificate"></i> ISO 27001</span>
-          <span class="oh-badge"><i class="fas fa-universal-access"></i> WCAG</span>
-          <span class="oh-badge"><i class="fas fa-lock"></i> AES-256</span>
-          <span class="oh-badge"><i class="fas fa-server"></i> 99.9% Uptime</span>
+<!-- HERO -->
+<section class="oh-hero" id="hero">
+    <div class="oh-hero-grid"></div>
+    <div class="container oh-hero-content">
+        <div class="oh-hero-badges oh-reveal">
+            <span class="oh-badge"><i class="fas fa-shield-halved"></i> GDPR Compliant</span>
+            <span class="oh-badge"><i class="fas fa-certificate"></i> ISO 27001</span>
+            <span class="oh-badge"><i class="fas fa-universal-access"></i> WCAG 2.1 AA</span>
+            <span class="oh-badge"><i class="fas fa-bolt"></i> 99.9% Uptime</span>
         </div>
-        <h1 class="oh-hero-title">
-          {% trans "Build." %} <span class="grad">{% trans "Automate." %}</span> {% trans "Scale." %}
+        <h1 class="oh-hero-title oh-reveal">
+            Build.<br>
+            <span class="grad">Automate.</span><br>
+            Scale.
         </h1>
-        <p class="oh-hero-sub">
-          {% trans "All-in-one platform for web development, AI automation, ERP integration, and digital transformation. More than just a website builder." %}
-        </p>
-        <div class="d-flex flex-wrap gap-3">
-          <a href="{% url 'contact:contact' %}" class="oh-cta-primary">
-            {% trans "Book a Consultation" %} <i class="fas fa-arrow-right"></i>
-          </a>
-          <a href="{% url 'chatbot:chatbot' %}" class="oh-cta-secondary">
-            <i class="fas fa-play-circle"></i> {% trans "View Demo" %}
-          </a>
+        <p class="oh-hero-sub oh-reveal oh-reveal-delay-1">{% trans "All-in-one platform for web development, AI automation, ERP integration, and digital transformation. From idea to enterprise-grade solution." %}</p>
+        <div style="display:flex;flex-wrap:wrap;gap:1rem;margin-bottom:2.5rem" class="oh-reveal oh-reveal-delay-2">
+            <a href="{% url 'community:home' %}" class="oh-cta-primary">Get Started Free <i class="fas fa-arrow-right"></i></a>
+            <a href="{% url 'home:software_home' %}" class="oh-cta-secondary">Explore Solutions <i class="fas fa-chevron-right"></i></a>
         </div>
-        <div class="oh-hero-stats">
-          <div>
-            <div class="oh-hero-stat-num" data-count="200">0</div>
-            <div class="oh-hero-stat-label">{% trans "Projects Delivered" %}</div>
-          </div>
-          <div>
-            <div class="oh-hero-stat-num" data-count="50">0</div>
-            <div class="oh-hero-stat-label">{% trans "Active Clients" %}</div>
-          </div>
-          <div>
-            <div class="oh-hero-stat-num" data-count="99" data-suffix=".9%">0</div>
-            <div class="oh-hero-stat-label">{% trans "Uptime SLA" %}</div>
-          </div>
-          <div>
-            <div class="oh-hero-stat-num">{% trans "24/7" %}</div>
-            <div class="oh-hero-stat-label">{% trans "Monitoring" %}</div>
-          </div>
+        <div class="oh-hero-stats oh-reveal oh-reveal-delay-3">
+            <div>
+                <div class="oh-hero-stat-num" data-count="500">0</div>
+                <div class="oh-hero-stat-label">Projects Delivered</div>
+            </div>
+            <div>
+                <div class="oh-hero-stat-num" data-count="150">0</div>
+                <div class="oh-hero-stat-label">Enterprise Clients</div>
+            </div>
+            <div>
+                <div class="oh-hero-stat-num" data-count="99">0</div>
+                <div class="oh-hero-stat-label">% Client Satisfaction</div>
+            </div>
+            <div>
+                <div class="oh-hero-stat-num" data-count="24">0</div>
+                <div class="oh-hero-stat-label">/7 Support</div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
-  <div class="oh-hero-scroll">
-    <span>{% trans "Scroll" %}</span>
-    <i class="fas fa-chevron-down"></i>
-  </div>
+    <div class="oh-hero-scroll"><i class="fas fa-chevron-down"></i> Scroll</div>
 </section>
 
-<!-- ==================== TRUST BAR ==================== -->
-<section class="oh-trust">
-  <div class="container">
+<!-- TRUST BAR -->
+<div class="oh-trust">
     <div class="oh-trust-track">
-      <div class="oh-trust-item"><i class="fas fa-shield-halved"></i> GDPR Compliant</div>
-      <div class="oh-trust-item"><i class="fas fa-certificate"></i> ISO 27001</div>
-      <div class="oh-trust-item"><i class="fas fa-universal-access"></i> WCAG Guidelines</div>
-      <div class="oh-trust-item"><i class="fas fa-lock"></i> AES-256 Encryption</div>
-      <div class="oh-trust-item"><i class="fas fa-server"></i> 99.9% Uptime</div>
-      <div class="oh-trust-item"><i class="fas fa-shield-halved"></i> GDPR Compliant</div>
-      <div class="oh-trust-item"><i class="fas fa-certificate"></i> ISO 27001</div>
-      <div class="oh-trust-item"><i class="fas fa-universal-access"></i> WCAG Guidelines</div>
-      <div class="oh-trust-item"><i class="fas fa-lock"></i> AES-256 Encryption</div>
-      <div class="oh-trust-item"><i class="fas fa-server"></i> 99.9% Uptime</div>
+        <span class="oh-trust-item"><i class="fas fa-check-circle"></i> GDPR Compliant</span>
+        <span class="oh-trust-item"><i class="fas fa-check-circle"></i> ISO 27001 Certified</span>
+        <span class="oh-trust-item"><i class="fas fa-check-circle"></i> WCAG 2.1 AA</span>
+        <span class="oh-trust-item"><i class="fas fa-check-circle"></i> SOC 2 Type II</span>
+        <span class="oh-trust-item"><i class="fas fa-check-circle"></i> PCI DSS</span>
+        <span class="oh-trust-item"><i class="fas fa-check-circle"></i> HIPAA Ready</span>
+        <span class="oh-trust-item"><i class="fas fa-check-circle"></i> 99.9% Uptime SLA</span>
+        <span class="oh-trust-item"><i class="fas fa-check-circle"></i> 24/7 Monitoring</span>
+        <!-- Duplicate for seamless loop -->
+        <span class="oh-trust-item"><i class="fas fa-check-circle"></i> GDPR Compliant</span>
+        <span class="oh-trust-item"><i class="fas fa-check-circle"></i> ISO 27001 Certified</span>
+        <span class="oh-trust-item"><i class="fas fa-check-circle"></i> WCAG 2.1 AA</span>
+        <span class="oh-trust-item"><i class="fas fa-check-circle"></i> SOC 2 Type II</span>
+        <span class="oh-trust-item"><i class="fas fa-check-circle"></i> PCI DSS</span>
+        <span class="oh-trust-item"><i class="fas fa-check-circle"></i> HIPAA Ready</span>
+        <span class="oh-trust-item"><i class="fas fa-check-circle"></i> 99.9% Uptime SLA</span>
+        <span class="oh-trust-item"><i class="fas fa-check-circle"></i> 24/7 Monitoring</span>
     </div>
-  </div>
-</section>
+</div>
 
-<!-- ==================== FIVE PILLARS ==================== -->
+<!-- FIVE PILLARS -->
 <section class="oh-section">
-  <div class="container">
-    <div class="text-center mb-5">
-      <div class="oh-section-label">{% trans "Our Approach" %}</div>
-      <h2 class="oh-section-title">{% trans "Five Pillars of Excellence" %}</h2>
-      <p class="oh-section-sub mx-auto">{% trans "A unified approach that powers every website and application we build." %}</p>
+    <div class="container">
+        <div style="text-align:center;margin-bottom:3.5rem">
+            <div class="oh-section-label oh-reveal">Our Pillars</div>
+            <h2 class="oh-section-title oh-reveal oh-reveal-delay-1">Everything You Need to <span class="grad">Dominate Digital</span></h2>
+            <p class="oh-section-sub oh-reveal oh-reveal-delay-2" style="margin:0 auto">Five core competencies powering your digital transformation from strategy to execution.</p>
+        </div>
+        <div class="oh-pillars-grid oh-reveal oh-reveal-delay-3">
+            <div class="oh-pillar" style="--pillar-color:#2563eb;--pillar-color-end:#3b82f6;--pillar-bg:rgba(37,99,235,.08)">
+                <div class="oh-pillar-icon"><i class="fas fa-code"></i></div>
+                <div class="oh-pillar-title">Web Development</div>
+                <p class="oh-pillar-desc">Custom websites, SaaS platforms, and enterprise web applications built with modern stacks.</p>
+            </div>
+            <div class="oh-pillar" style="--pillar-color:#8b5cf6;--pillar-color-end:#a78bfa;--pillar-bg:rgba(139,92,246,.08)">
+                <div class="oh-pillar-icon"><i class="fas fa-brain"></i></div>
+                <div class="oh-pillar-title">AI & Automation</div>
+                <p class="oh-pillar-desc">Intelligent workflows, chatbots, predictive analytics, and RPA solutions.</p>
+            </div>
+            <div class="oh-pillar" style="--pillar-color:#ec4899;--pillar-color-end:#f472b6;--pillar-bg:rgba(236,72,153,.08)">
+                <div class="oh-pillar-icon"><i class="fas fa-link"></i></div>
+                <div class="oh-pillar-title">ERP Integration</div>
+                <p class="oh-pillar-desc">Seamless ERPNext, SAP, and custom ERP integrations with real-time sync.</p>
+            </div>
+            <div class="oh-pillar" style="--pillar-color:#f59e0b;--pillar-color-end:#fbbf24;--pillar-bg:rgba(245,158,11,.08)">
+                <div class="oh-pillar-icon"><i class="fas fa-mobile-screen-button"></i></div>
+                <div class="oh-pillar-title">Mobile Apps</div>
+                <p class="oh-pillar-desc">Native iOS, Android, and cross-platform Flutter applications.</p>
+            </div>
+            <div class="oh-pillar" style="--pillar-color:#10b981;--pillar-color-end:#34d399;--pillar-bg:rgba(16,185,129,.08)">
+                <div class="oh-pillar-icon"><i class="fas fa-shield-halved"></i></div>
+                <div class="oh-pillar-title">Security & Compliance</div>
+                <p class="oh-pillar-desc">GDPR, ISO 27001, WCAG compliance with continuous monitoring.</p>
+            </div>
+        </div>
     </div>
-    <div class="oh-pillars-grid">
-      <div class="oh-pillar oh-reveal" style="--pillar-color:#2563eb;--pillar-color-end:#3b82f6;--pillar-bg:rgba(37,99,235,.07)">
-        <div class="oh-pillar-icon"><i class="fas fa-link"></i></div>
-        <div class="oh-pillar-title">{% trans "Integration" %}</div>
-        <p class="oh-pillar-desc">{% trans "ERP, API, B2B & B2C — seamless connectivity across all systems." %}</p>
-      </div>
-      <div class="oh-pillar oh-reveal oh-reveal-delay-1" style="--pillar-color:#8b5cf6;--pillar-color-end:#a78bfa;--pillar-bg:rgba(139,92,246,.07)">
-        <div class="oh-pillar-icon"><i class="fas fa-gear"></i></div>
-        <div class="oh-pillar-title">{% trans "Automation" %}</div>
-        <p class="oh-pillar-desc">{% trans "Workflows, chatbots, IoT — orchestrated for peak efficiency." %}</p>
-      </div>
-      <div class="oh-pillar oh-reveal oh-reveal-delay-2" style="--pillar-color:#f59e0b;--pillar-color-end:#fbbf24;--pillar-bg:rgba(245,158,11,.07)">
-        <div class="oh-pillar-icon"><i class="fas fa-chart-line"></i></div>
-        <div class="oh-pillar-title">{% trans "Digital Marketing" %}</div>
-        <p class="oh-pillar-desc">{% trans "SEO, social media, analytics — 200+ ranking factors optimized." %}</p>
-      </div>
-      <div class="oh-pillar oh-reveal oh-reveal-delay-3" style="--pillar-color:#0f172a;--pillar-color-end:#1e293b;--pillar-bg:rgba(15,23,42,.06)">
-        <div class="oh-pillar-icon"><i class="fas fa-brain"></i></div>
-        <div class="oh-pillar-title">{% trans "AI" %}</div>
-        <p class="oh-pillar-desc">{% trans "Machine learning, predictive analytics, generative automation." %}</p>
-      </div>
-      <div class="oh-pillar oh-reveal oh-reveal-delay-4" style="--pillar-color:#10b981;--pillar-color-end:#34d399;--pillar-bg:rgba(16,185,129,.07)">
-        <div class="oh-pillar-icon"><i class="fas fa-shield-halved"></i></div>
-        <div class="oh-pillar-title">{% trans "Validation" %}</div>
-        <p class="oh-pillar-desc">{% trans "Monitoring, quality, compliance — from chaos to control." %}</p>
-      </div>
-    </div>
-  </div>
 </section>
 
 <div class="oh-section-divider"></div>
 
-<!-- ==================== ERP INTEGRATION ==================== -->
-<section class="oh-section oh-section-alt">
-  <div class="container">
-    <div class="oh-erp-grid">
-      <div class="oh-reveal">
-        <div class="oh-section-label">{% trans "Built-in Integration" %}</div>
-        <h2 class="oh-section-title">{% trans "Website ERP Integration" %}</h2>
-        <p class="oh-section-sub mb-3">{% trans "Improve your operations and save time and money with website integration with an ERP system that best meets your business needs." %}</p>
-        <ul class="oh-erp-list">
-          <li>
-            <div class="icon"><i class="fas fa-building"></i></div>
-            <div>
-              <strong>{% trans "B2B & B2C Integration" %}</strong>
-              <small>{% trans "Connect your website to ERP for real-time inventory, orders, invoicing, and customer data synchronization." %}</small>
+<!-- ERP SECTION -->
+<section class="oh-section">
+    <div class="container">
+        <div class="oh-erp-grid">
+            <div class="oh-reveal">
+                <div class="oh-section-label">ERP Integration</div>
+                <h2 class="oh-section-title">Connect Everything.<br><span class="grad">Automate Anything.</span></h2>
+                <p class="oh-section-sub">Deep integration with ERPNext, SAP, Odoo, and custom systems. Real-time data sync, automated workflows, and unified dashboards.</p>
+                <ul class="oh-erp-list">
+                    <li>
+                        <span class="icon"><i class="fas fa-sync"></i></span>
+                        <div><strong>Real-Time Sync</strong><small>Bidirectional data flow between your ERP and all connected systems with sub-second latency.</small></div>
+                    </li>
+                    <li>
+                        <span class="icon"><i class="fas fa-plug"></i></span>
+                        <div><strong>Plug & Play Connectors</strong><small>Pre-built integrations for 50+ platforms including Shopify, Stripe, Salesforce, and more.</small></div>
+                    </li>
+                    <li>
+                        <span class="icon"><i class="fas fa-chart-line"></i></span>
+                        <div><strong>Unified Analytics</strong><small>Single source of truth with consolidated reporting across all business systems.</small></div>
+                    </li>
+                    <li>
+                        <span class="icon"><i class="fas fa-robot"></i></span>
+                        <div><strong>Workflow Automation</strong><small>Trigger actions across systems based on events. No-code automation builder included.</small></div>
+                    </li>
+                </ul>
             </div>
-          </li>
-          <li>
-            <div class="icon"><i class="fas fa-database"></i></div>
-            <div>
-              <strong>{% trans "ERP Systems" %}</strong>
-              <small>{% trans "ERPNext, SAP, Oracle, and custom ERP systems — unified through intelligent API connectors." %}</small>
+            <div class="oh-erp-img oh-reveal oh-reveal-delay-2">
+                <img src="{% static 'img/integration.jpeg' %}" alt="ERP Integration">
             </div>
-          </li>
-          <li>
-            <div class="icon"><i class="fas fa-link"></i></div>
-            <div>
-              <strong>{% trans "API Architecture" %}</strong>
-              <small>{% trans "RESTful APIs, webhooks, and event-driven architecture for seamless data exchange." %}</small>
-            </div>
-          </li>
-        </ul>
-      </div>
-      <div class="oh-erp-img oh-reveal oh-reveal-delay-2">
-        <img src="{% static 'img/unified-data-flow.jpg' %}" alt="Unified Data Flow" loading="lazy">
-      </div>
+        </div>
     </div>
-  </div>
 </section>
 
-<!-- ==================== AUTOMATION ==================== -->
+<!-- AUTOMATION SECTION -->
+<section class="oh-section oh-section-alt">
+    <div class="container">
+        <div class="oh-erp-grid" style="direction:rtl">
+            <div class="oh-erp-img oh-reveal" style="direction:ltr">
+                <img src="{% static 'img/ai.png' %}" alt="AI Automation">
+            </div>
+            <div class="oh-reveal oh-reveal-delay-1" style="direction:ltr">
+                <div class="oh-section-label">AI & Automation</div>
+                <h2 class="oh-section-title">Let AI Handle<br><span class="grad">The Heavy Lifting</span></h2>
+                <p class="oh-section-sub">From intelligent chatbots to predictive analytics, our AI solutions automate repetitive tasks and unlock insights hidden in your data.</p>
+                <ul class="oh-erp-list">
+                    <li>
+                        <span class="icon"><i class="fas fa-comments"></i></span>
+                        <div><strong>AI Chatbots</strong><small>Customer support and internal helpdesk bots trained on your knowledge base.</small></div>
+                    </li>
+                    <li>
+                        <span class="icon"><i class="fas fa-chart-bar"></i></span>
+                        <div><strong>Predictive Analytics</strong><small>Forecast trends, detect anomalies, and make data-driven decisions with ML models.</small></div>
+                    </li>
+                    <li>
+                        <span class="icon"><i class="fas fa-arrows-spin"></i></span>
+                        <div><strong>Process Automation</strong><small>Automate invoicing, onboarding, reporting, and more with visual workflow builder.</small></div>
+                    </li>
+                    <li>
+                        <span class="icon"><i class="fas fa-brain"></i></span>
+                        <div><strong>Custom AI Models</strong><small>Tailored machine learning solutions for your specific business challenges.</small></div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- DIGITAL MARKETING -->
 <section class="oh-section">
-  <div class="container">
-    <div class="text-center mb-5">
-      <div class="oh-section-label">{% trans "Built-in Automation" %}</div>
-      <h2 class="oh-section-title">{% trans "Enhance Customer Journey" %}</h2>
-      <p class="oh-section-sub mx-auto">{% trans "Design innovative recipes to automate workflows, workloads, and repetitive tasks across your entire business." %}</p>
+    <div class="container">
+        <div class="oh-erp-grid">
+            <div class="oh-reveal">
+                <div class="oh-section-label">Digital Marketing</div>
+                <h2 class="oh-section-title">Data-Driven<br><span class="grad">Marketing That Converts</span></h2>
+                <p class="oh-section-sub">SEO, social media, content strategy, and paid campaigns managed by experts and optimized by AI.</p>
+                <ul class="oh-erp-list">
+                    <li>
+                        <span class="icon"><i class="fas fa-magnifying-glass-chart"></i></span>
+                        <div><strong>SEO Optimization</strong><small>Technical SEO, content strategy, and link building to rank higher on search engines.</small></div>
+                    </li>
+                    <li>
+                        <span class="icon"><i class="fas fa-bullseye"></i></span>
+                        <div><strong>PPC Campaigns</strong><small>Google Ads, Meta Ads, and LinkedIn campaigns with real-time ROI tracking.</small></div>
+                    </li>
+                    <li>
+                        <span class="icon"><i class="fas fa-share-nodes"></i></span>
+                        <div><strong>Social Media</strong><small>Content creation, scheduling, and community management across all platforms.</small></div>
+                    </li>
+                    <li>
+                        <span class="icon"><i class="fas fa-envelope"></i></span>
+                        <div><strong>Email Marketing</strong><small>Automated drip campaigns, newsletters, and behavioral triggers.</small></div>
+                    </li>
+                </ul>
+            </div>
+            <div class="oh-erp-img oh-reveal oh-reveal-delay-2">
+                <img src="{% static 'img/digital.png' %}" alt="Digital Marketing">
+            </div>
+        </div>
     </div>
-    <div class="oh-auto-grid">
-      <div class="oh-auto-card oh-reveal">
-        <div class="oh-auto-card-img">
-          <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=500&h=300&fit=crop" alt="Customer Journey" loading="lazy">
-          <div class="oh-auto-card-overlay"><small>WF-001</small><span>{% trans "Automated Customer Journey" %}</span></div>
-        </div>
-        <div class="oh-auto-card-body">
-          <ul>
-            <li><i class="fas fa-check-circle"></i> {% trans "Personalized user flows based on behavior" %}</li>
-            <li><i class="fas fa-check-circle"></i> {% trans "Dynamic content delivery and A/B testing" %}</li>
-            <li><i class="fas fa-check-circle"></i> {% trans "Lead scoring and qualification automation" %}</li>
-          </ul>
-        </div>
-      </div>
-      <div class="oh-auto-card oh-reveal oh-reveal-delay-1">
-        <div class="oh-auto-card-img">
-          <img src="https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=500&h=300&fit=crop" alt="Workflow" loading="lazy">
-          <div class="oh-auto-card-overlay"><small>WF-002</small><span>{% trans "Workflow Automation" %}</span></div>
-        </div>
-        <div class="oh-auto-card-body">
-          <ul>
-            <li><i class="fas fa-check-circle"></i> {% trans "Visual workflow builder with drag-and-drop" %}</li>
-            <li><i class="fas fa-check-circle"></i> {% trans "Conditional logic and trigger-based actions" %}</li>
-            <li><i class="fas fa-check-circle"></i> {% trans "Repetitive tasks automated end-to-end" %}</li>
-          </ul>
-        </div>
-      </div>
-      <div class="oh-auto-card oh-reveal oh-reveal-delay-2">
-        <div class="oh-auto-card-img">
-          <img src="https://images.unsplash.com/photo-1677442136019-21780ecad995?w=500&h=300&fit=crop" alt="Chatbot" loading="lazy">
-          <div class="oh-auto-card-overlay"><small>WF-003</small><span>{% trans "Chatbots & AI Assistants" %}</span></div>
-        </div>
-        <div class="oh-auto-card-body">
-          <ul>
-            <li><i class="fas fa-check-circle"></i> {% trans "24/7 AI-powered customer support" %}</li>
-            <li><i class="fas fa-check-circle"></i> {% trans "Natural language processing for inquiries" %}</li>
-            <li><i class="fas fa-check-circle"></i> {% trans "Seamless handoff to human agents" %}</li>
-          </ul>
-        </div>
-      </div>
-      <div class="oh-auto-card oh-reveal oh-reveal-delay-3">
-        <div class="oh-auto-card-img">
-          <img src="https://images.unsplash.com/photo-1576444356170-66073fbf8511?w=500&h=300&fit=crop" alt="Testing" loading="lazy">
-          <div class="oh-auto-card-overlay"><small>WF-004</small><span>{% trans "Test Automation" %}</span></div>
-        </div>
-        <div class="oh-auto-card-body">
-          <ul>
-            <li><i class="fas fa-check-circle"></i> {% trans "Automated regression and performance testing" %}</li>
-            <li><i class="fas fa-check-circle"></i> {% trans "Continuous integration and deployment" %}</li>
-            <li><i class="fas fa-check-circle"></i> {% trans "Quality assurance at every release" %}</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
 </section>
 
 <div class="oh-section-divider"></div>
 
-<!-- ==================== DIGITAL MARKETING ==================== -->
-<section class="oh-section oh-section-alt">
-  <div class="container">
-    <div class="text-center mb-5">
-      <div class="oh-section-label">{% trans "Built-in Digital Marketing" %}</div>
-      <h2 class="oh-section-title">{% trans "Rank High. Stand Out." %}</h2>
-      <p class="oh-section-sub mx-auto">{% trans "Website structuring strategies that take into account more than 200 factors that Google considers for ranking." %}</p>
+<!-- SERVICES -->
+<section class="oh-section oh-section-dark">
+    <div class="container">
+        <div style="text-align:center;margin-bottom:3.5rem">
+            <div class="oh-section-label oh-reveal" style="color:#60a5fa">Our Services</div>
+            <h2 class="oh-section-title oh-reveal oh-reveal-delay-1">End-to-End Digital Solutions</h2>
+            <p class="oh-section-sub oh-reveal oh-reveal-delay-2" style="margin:0 auto;color:rgba(255,255,255,.5)">From strategy to execution, we deliver complete digital transformation.</p>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem" class="oh-reveal oh-reveal-delay-3">
+            <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:2rem;transition:all .35s">
+                <div style="width:48px;height:48px;border-radius:12px;background:rgba(37,99,235,.12);color:#60a5fa;display:flex;align-items:center;justify-content:center;font-size:1.1rem;margin-bottom:1.25rem"><i class="fas fa-laptop-code"></i></div>
+                <h3 style="color:#fff;font-size:1rem;font-weight:700;margin-bottom:.5rem">Web Development</h3>
+                <p style="color:rgba(255,255,255,.45);font-size:.82rem;line-height:1.65;margin:0">Custom websites, web apps, and SaaS platforms. React, Django, Node.js, and more.</p>
+            </div>
+            <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:2rem;transition:all .35s">
+                <div style="width:48px;height:48px;border-radius:12px;background:rgba(139,92,246,.12);color:#a78bfa;display:flex;align-items:center;justify-content:center;font-size:1.1rem;margin-bottom:1.25rem"><i class="fas fa-mobile-screen-button"></i></div>
+                <h3 style="color:#fff;font-size:1rem;font-weight:700;margin-bottom:.5rem">Mobile Apps</h3>
+                <p style="color:rgba(255,255,255,.45);font-size:.82rem;line-height:1.65;margin:0">Native and cross-platform mobile applications for iOS and Android.</p>
+            </div>
+            <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:2rem;transition:all .35s">
+                <div style="width:48px;height:48px;border-radius:12px;background:rgba(236,72,153,.12);color:#f472b6;display:flex;align-items:center;justify-content:center;font-size:1.1rem;margin-bottom:1.25rem"><i class="fas fa-brain"></i></div>
+                <h3 style="color:#fff;font-size:1rem;font-weight:700;margin-bottom:.5rem">AI Solutions</h3>
+                <p style="color:rgba(255,255,255,.45);font-size:.82rem;line-height:1.65;margin:0">Custom AI models, chatbots, predictive analytics, and process automation.</p>
+            </div>
+            <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:2rem;transition:all .35s">
+                <div style="width:48px;height:48px;border-radius:12px;background:rgba(16,185,129,.12);color:#34d399;display:flex;align-items:center;justify-content:center;font-size:1.1rem;margin-bottom:1.25rem"><i class="fas fa-link"></i></div>
+                <h3 style="color:#fff;font-size:1rem;font-weight:700;margin-bottom:.5rem">ERP Integration</h3>
+                <p style="color:rgba(255,255,255,.45);font-size:.82rem;line-height:1.65;margin:0">ERPNext, SAP, Odoo integrations with real-time sync and custom workflows.</p>
+            </div>
+            <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:2rem;transition:all .35s">
+                <div style="width:48px;height:48px;border-radius:12px;background:rgba(245,158,11,.12);color:#fbbf24;display:flex;align-items:center;justify-content:center;font-size:1.1rem;margin-bottom:1.25rem"><i class="fas fa-bullhorn"></i></div>
+                <h3 style="color:#fff;font-size:1rem;font-weight:700;margin-bottom:.5rem">Digital Marketing</h3>
+                <p style="color:rgba(255,255,255,.45);font-size:.82rem;line-height:1.65;margin:0">SEO, PPC, social media, and content marketing with AI-powered optimization.</p>
+            </div>
+            <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:2rem;transition:all .35s">
+                <div style="width:48px;height:48px;border-radius:12px;background:rgba(59,130,246,.12);color:#60a5fa;display:flex;align-items:center;justify-content:center;font-size:1.1rem;margin-bottom:1.25rem"><i class="fas fa-cloud"></i></div>
+                <h3 style="color:#fff;font-size:1rem;font-weight:700;margin-bottom:.5rem">Cloud & DevOps</h3>
+                <p style="color:rgba(255,255,255,.45);font-size:.82rem;line-height:1.65;margin:0">AWS, Azure, GCP infrastructure, CI/CD pipelines, and container orchestration.</p>
+            </div>
+        </div>
     </div>
-    <div class="oh-pyramid oh-reveal">
-      <div class="oh-pyr-top">
-        <span>{% trans "Rank High. Stand Out." %}</span>
-        <small>{% trans "The Goal" %}</small>
-      </div>
-      <div class="oh-pyr-label"><span>{% trans "Powered By" %}</span></div>
-      <div class="oh-pyr-arrow"><i class="fas fa-chevron-down"></i></div>
-      <div class="oh-pyr-mid">
-        <div class="oh-pyr-box">
-          <div class="oh-pyr-box-icon"><i class="fas fa-search"></i></div>
-          <h6>{% trans "SEO Optimization" %}</h6>
-          <p>{% trans "On-page SEO, technical audits, keyword research, and content optimization." %}</p>
-        </div>
-        <div class="oh-pyr-box">
-          <div class="oh-pyr-box-icon"><i class="fas fa-share-nodes"></i></div>
-          <h6>{% trans "Social Media" %}</h6>
-          <p>{% trans "Open Graph, cross-platform distribution, and social integration." %}</p>
-        </div>
-        <div class="oh-pyr-box">
-          <div class="oh-pyr-box-icon"><i class="fas fa-chart-bar"></i></div>
-          <h6>{% trans "Analytics & KPIs" %}</h6>
-          <p>{% trans "Real-time traffic, conversion tracking, and actionable dashboards." %}</p>
-        </div>
-      </div>
-      <div class="oh-pyr-arrow"><i class="fas fa-chevron-down"></i></div>
-      <div class="oh-pyr-label"><span>{% trans "Built On" %}</span></div>
-      <div class="oh-pyr-base">
-        <h6>{% trans "200+ Google Ranking Factors" %}</h6>
-        <small>{% trans "The Foundation" %}</small>
-      </div>
-    </div>
-  </div>
 </section>
 
-<!-- ==================== BUILT-IN AI ==================== -->
-<section class="oh-ai">
-  <div class="container">
-    <div class="oh-ai-grid oh-reveal">
-      <div>
-        <div class="oh-section-label" style="color:#60a5fa;">{% trans "Built-in AI" %}</div>
-        <h2>{% trans "Stand-out Productivity" %}</h2>
-        <p>{% trans "Let AI and machine learning predict the future and generate automation. Intelligent systems that learn, adapt, and optimize your operations." %}</p>
-        <ul class="oh-ai-features">
-          <li>
-            <i class="fas fa-brain"></i>
-            <div>
-              <strong>{% trans "Predictive Analytics" %}</strong>
-              <small>{% trans "ML-powered forecasting for demand, revenue, and customer behavior." %}</small>
+<!-- FINAL CTA -->
+<section class="oh-section" style="padding:6rem 0">
+    <div class="container" style="text-align:center">
+        <div class="oh-reveal">
+            <h2 class="oh-section-title" style="margin-bottom:1rem">Ready to Transform Your Business?</h2>
+            <p class="oh-section-sub" style="margin:0 auto 2.5rem">Join 150+ enterprises that trust OnWebApp for their digital transformation. Start free, scale as you grow.</p>
+            <div style="display:flex;justify-content:center;flex-wrap:wrap;gap:1rem">
+                <a href="{% url 'community:home' %}" class="oh-cta-primary">Start Free Trial <i class="fas fa-arrow-right"></i></a>
+                <a href="{% url 'contact:contact' %}" class="oh-cta-secondary">Talk to Sales <i class="fas fa-phone"></i></a>
             </div>
-          </li>
-          <li>
-            <i class="fas fa-wand-magic-sparkles"></i>
-            <div>
-              <strong>{% trans "Generative AI" %}</strong>
-              <small>{% trans "Automated content creation, code generation, and design optimization." %}</small>
-            </div>
-          </li>
-          <li>
-            <i class="fas fa-robot"></i>
-            <div>
-              <strong>{% trans "Intelligent Automation" %}</strong>
-              <small>{% trans "Self-learning workflows that improve efficiency over time." %}</small>
-            </div>
-          </li>
-          <li>
-            <i class="fas fa-eye"></i>
-            <div>
-              <strong>{% trans "Computer Vision" %}</strong>
-              <small>{% trans "Image recognition, quality inspection, and visual data analysis." %}</small>
-            </div>
-          </li>
-        </ul>
-      </div>
+        </div>
     </div>
-  </div>
 </section>
 
-<!-- ==================== BUILT-IN VALIDATION ==================== -->
-<section class="oh-section">
-  <div class="container">
-    <div class="oh-val-grid">
-      <div class="oh-reveal">
-        <div class="oh-section-label" style="color:#059669;">{% trans "Built-in Validation" %}</div>
-        <h2 class="oh-section-title">{% trans "From Chaos to Control" %}</h2>
-        <p class="oh-section-sub">{% trans "Website monitoring, platform dashboards, API design, and comprehensive validation." %}</p>
-        <ul style="list-style:none;padding:0;margin:1.5rem 0 0;display:flex;flex-direction:column;gap:.8rem;">
-          <li style="display:flex;align-items:center;gap:.6rem;font-size:.88rem;color:#334155;"><i class="fas fa-check-circle" style="color:#10b981;"></i> {% trans "24/7 uptime monitoring & instant alerts" %}</li>
-          <li style="display:flex;align-items:center;gap:.6rem;font-size:.88rem;color:#334155;"><i class="fas fa-check-circle" style="color:#10b981;"></i> {% trans "Custom KPI dashboards with real-time data" %}</li>
-          <li style="display:flex;align-items:center;gap:.6rem;font-size:.88rem;color:#334155;"><i class="fas fa-check-circle" style="color:#10b981;"></i> {% trans "API architecture, testing & continuous validation" %}</li>
-          <li style="display:flex;align-items:center;gap:.6rem;font-size:.88rem;color:#334155;"><i class="fas fa-check-circle" style="color:#10b981;"></i> {% trans "Performance, SEO & accessibility scoring" %}</li>
-        </ul>
-      </div>
-      <div class="oh-val-dashboard oh-reveal oh-reveal-delay-2">
-        <div class="oh-val-bar">
-          <div class="oh-val-bar-dot"></div>
-          <div class="oh-val-bar-dot"></div>
-          <div class="oh-val-bar-dot"></div>
-          <span class="oh-val-bar-title">{% trans "Validation Dashboard" %}</span>
-        </div>
-        <div class="oh-val-status">
-          <div class="oh-val-status-card">
-            <div class="oh-val-status-dot"></div>
-            <div class="oh-val-status-label">{% trans "Uptime" %}</div>
-            <div class="oh-val-status-value">99.9%</div>
-          </div>
-          <div class="oh-val-status-card">
-            <div class="oh-val-status-dot"></div>
-            <div class="oh-val-status-label">{% trans "Response" %}</div>
-            <div class="oh-val-status-value">48ms</div>
-          </div>
-          <div class="oh-val-status-card">
-            <div class="oh-val-status-dot"></div>
-            <div class="oh-val-status-label">{% trans "SSL" %}</div>
-            <div class="oh-val-status-value">{% trans "Valid" %}</div>
-          </div>
-        </div>
-        <div class="oh-val-gauges">
-          <div class="oh-val-gauge">
-            <div class="oh-val-gauge-ring">
-              <svg viewBox="0 0 50 50"><circle cx="25" cy="25" r="22" stroke="#10b981" stroke-dasharray="138" stroke-dashoffset="7"/></svg>
-              <span class="oh-val-gauge-pct">95%</span>
-            </div>
-            <div class="oh-val-gauge-label">{% trans "Performance" %}</div>
-          </div>
-          <div class="oh-val-gauge">
-            <div class="oh-val-gauge-ring">
-              <svg viewBox="0 0 50 50"><circle cx="25" cy="25" r="22" stroke="#3b82f6" stroke-dasharray="138" stroke-dashoffset="14"/></svg>
-              <span class="oh-val-gauge-pct">90%</span>
-            </div>
-            <div class="oh-val-gauge-label">{% trans "SEO" %}</div>
-          </div>
-          <div class="oh-val-gauge">
-            <div class="oh-val-gauge-ring">
-              <svg viewBox="0 0 50 50"><circle cx="25" cy="25" r="22" stroke="#8b5cf6" stroke-dasharray="138" stroke-dashoffset="21"/></svg>
-              <span class="oh-val-gauge-pct">85%</span>
-            </div>
-            <div class="oh-val-gauge-label">{% trans "A11y" %}</div>
-          </div>
-        </div>
-        <div class="oh-val-feed">
-          <div class="oh-val-feed-title">{% trans "Live Feed" %}</div>
-          <div class="oh-val-feed-item">
-            <div class="oh-val-feed-dot oh-val-feed-dot--ok"></div>
-            <span class="oh-val-feed-text">{% trans "All systems operational" %}</span>
-            <span class="oh-val-feed-time">2s</span>
-          </div>
-          <div class="oh-val-feed-item">
-            <div class="oh-val-feed-dot oh-val-feed-dot--ok"></div>
-            <span class="oh-val-feed-text">{% trans "SSL renewed" %}</span>
-            <span class="oh-val-feed-time">14m</span>
-          </div>
-          <div class="oh-val-feed-item">
-            <div class="oh-val-feed-dot oh-val-feed-dot--warn"></div>
-            <span class="oh-val-feed-text">{% trans "Warning resolved" %}</span>
-            <span class="oh-val-feed-time">1h</span>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="oh-val-stats">
-      <div class="oh-val-stat oh-reveal">
-        <div class="oh-val-stat-num" data-count="99" data-suffix=".9%">0</div>
-        <div class="oh-val-stat-label">{% trans "Uptime SLA" %}</div>
-      </div>
-      <div class="oh-val-stat oh-reveal oh-reveal-delay-1">
-        <div class="oh-val-stat-num">&lt;100ms</div>
-        <div class="oh-val-stat-label">{% trans "Response Time" %}</div>
-      </div>
-      <div class="oh-val-stat oh-reveal oh-reveal-delay-2">
-        <div class="oh-val-stat-num">{% trans "24/7" %}</div>
-        <div class="oh-val-stat-label">{% trans "Monitoring" %}</div>
-      </div>
-      <div class="oh-val-stat oh-reveal oh-reveal-delay-3">
-        <div class="oh-val-stat-num" data-count="50" data-suffix="+">0</div>
-        <div class="oh-val-stat-label">{% trans "Check Points" %}</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<div class="oh-section-divider"></div>
-
-<!-- ==================== SERVICES ==================== -->
-<section class="oh-section oh-section-alt">
-  <div class="container">
-    <div class="text-center mb-5">
-      <div class="oh-section-label">{% trans "Our Services" %}</div>
-      <h2 class="oh-section-title">{% trans "End-to-End Development" %}</h2>
-      <p class="oh-section-sub mx-auto">{% trans "From concept to launch, we deliver complete digital solutions for modern enterprises." %}</p>
-    </div>
-    <div class="oh-svc-grid">
-      <div class="oh-svc-card oh-reveal" style="--svc-color:#2563eb;--svc-bg:rgba(37,99,235,.07)">
-        <div class="oh-svc-card-icon"><i class="fas fa-robot"></i></div>
-        <h5>{% trans "AI Development" %}</h5>
-        <p>{% trans "Custom AI solutions, machine learning models, and intelligent automation that transform how your business operates." %}</p>
-        <a href="#" class="oh-svc-card-link">{% trans "Learn more" %} <i class="fas fa-arrow-right"></i></a>
-      </div>
-      <div class="oh-svc-card oh-reveal oh-reveal-delay-1" style="--svc-color:#8b5cf6;--svc-bg:rgba(139,92,246,.07)">
-        <div class="oh-svc-card-icon"><i class="fas fa-palette"></i></div>
-        <h5>{% trans "UI/UX Design" %}</h5>
-        <p>{% trans "User-centered design that engages, converts, and delights your users across every touchpoint." %}</p>
-        <a href="#" class="oh-svc-card-link">{% trans "Learn more" %} <i class="fas fa-arrow-right"></i></a>
-      </div>
-      <div class="oh-svc-card oh-reveal oh-reveal-delay-2" style="--svc-color:#10b981;--svc-bg:rgba(16,185,129,.07)">
-        <div class="oh-svc-card-icon"><i class="fas fa-code"></i></div>
-        <h5>{% trans "Web Development" %}</h5>
-        <p>{% trans "Scalable, high-performance web applications built with modern tech stacks for your business." %}</p>
-        <a href="#" class="oh-svc-card-link">{% trans "Learn more" %} <i class="fas fa-arrow-right"></i></a>
-      </div>
-      <div class="oh-svc-card oh-reveal oh-reveal-delay-3" style="--svc-color:#f59e0b;--svc-bg:rgba(245,158,11,.07)">
-        <div class="oh-svc-card-icon"><i class="fas fa-arrows-spin"></i></div>
-        <h5>{% trans "Digital Transformation" %}</h5>
-        <p>{% trans "Modernize legacy systems and digitize business processes for the future." %}</p>
-        <a href="#" class="oh-svc-card-link">{% trans "Learn more" %} <i class="fas fa-arrow-right"></i></a>
-      </div>
-      <div class="oh-svc-card oh-reveal oh-reveal-delay-4" style="--svc-color:#f43f5e;--svc-bg:rgba(244,63,94,.07)">
-        <div class="oh-svc-card-icon"><i class="fas fa-gem"></i></div>
-        <h5>{% trans "Product Engineering" %}</h5>
-        <p>{% trans "From concept to launch — end-to-end product development with agile methodology." %}</p>
-        <a href="#" class="oh-svc-card-link">{% trans "Learn more" %} <i class="fas fa-arrow-right"></i></a>
-      </div>
-      <div class="oh-svc-card oh-reveal oh-reveal-delay-5" style="--svc-color:#0ea5e9;--svc-bg:rgba(14,165,233,.07)">
-        <div class="oh-svc-card-icon"><i class="fas fa-mobile-screen"></i></div>
-        <h5>{% trans "Mobile Apps" %}</h5>
-        <p>{% trans "Native and cross-platform mobile applications for iOS and Android with exceptional UX." %}</p>
-        <a href="#" class="oh-svc-card-link">{% trans "Learn more" %} <i class="fas fa-arrow-right"></i></a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ==================== CERTIFICATIONS ==================== -->
-<section class="oh-section">
-  <div class="container">
-    <div class="text-center mb-5">
-      <div class="oh-section-label">{% trans "Certifications" %}</div>
-      <h2 class="oh-section-title">{% trans "Certified & Trusted" %}</h2>
-      <p class="oh-section-sub mx-auto">{% trans "Built around recognized standards for security, accessibility, privacy, and trust." %}</p>
-    </div>
-    <div class="oh-cert-grid">
-      <div class="oh-cert oh-reveal">
-        <div class="oh-cert-icon"><i class="fas fa-shield-halved"></i></div>
-        <div class="oh-cert-name">GDPR</div>
-        <div class="oh-cert-desc">{% trans "Privacy" %}</div>
-      </div>
-      <div class="oh-cert oh-reveal oh-reveal-delay-1">
-        <div class="oh-cert-icon"><i class="fas fa-certificate"></i></div>
-        <div class="oh-cert-name">ISO 27001</div>
-        <div class="oh-cert-desc">{% trans "Information Security" %}</div>
-      </div>
-      <div class="oh-cert oh-reveal oh-reveal-delay-2">
-        <div class="oh-cert-icon"><i class="fas fa-universal-access"></i></div>
-        <div class="oh-cert-name">WCAG</div>
-        <div class="oh-cert-desc">{% trans "Accessibility" %}</div>
-      </div>
-      <div class="oh-cert oh-reveal oh-reveal-delay-3">
-        <div class="oh-cert-icon"><i class="fas fa-lock"></i></div>
-        <div class="oh-cert-name">SOC 2</div>
-        <div class="oh-cert-desc">{% trans "Security Controls" %}</div>
-      </div>
-      <div class="oh-cert oh-reveal oh-reveal-delay-4">
-        <div class="oh-cert-icon"><i class="fas fa-heartbeat"></i></div>
-        <div class="oh-cert-name">HIPAA</div>
-        <div class="oh-cert-desc">{% trans "Healthcare Privacy" %}</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<div class="oh-section-divider"></div>
-
-<!-- ==================== EVENTS ==================== -->
-<section class="oh-section oh-section-alt">
-  <div class="container">
-    <div class="text-center mb-5">
-      <div class="oh-section-label">{% trans "Events" %}</div>
-      <h2 class="oh-section-title">{% trans "Learn at International Exhibitions" %}</h2>
-      <p class="oh-section-sub mx-auto">{% trans "Discover new ideas, technologies, and practical insights through our exhibitions, webinars, and seminars." %}</p>
-    </div>
-    <div class="oh-events-grid">
-      <div class="oh-event oh-event-featured oh-reveal">
-        <div>
-          <div class="oh-event-top">
-            <div class="oh-event-date">
-              <span class="oh-event-date-month">SEP</span>
-              <span class="oh-event-date-year">2026</span>
-            </div>
-            <span class="oh-event-cat oh-event-cat--webinar">{% trans "Webinar" %}</span>
-          </div>
-          <h3 class="oh-event-title">{% trans "Webinars: UX and Product Development" %}</h3>
-          <p class="oh-event-desc">{% trans "Insider advice from top companies. All based on real case studies and data-driven insights." %}</p>
-        </div>
-        <a href="#" class="oh-event-cta">{% trans "Explore" %} <i class="fas fa-arrow-right"></i></a>
-      </div>
-      <div class="oh-event oh-reveal oh-reveal-delay-1">
-        <div>
-          <div class="oh-event-top">
-            <div class="oh-event-date">
-              <span class="oh-event-date-month">OCT</span>
-              <span class="oh-event-date-year">2026</span>
-            </div>
-            <span class="oh-event-cat oh-event-cat--exhibition">{% trans "Exhibition" %}</span>
-          </div>
-          <h3 class="oh-event-title">{% trans "International Tech Exhibition" %}</h3>
-          <p class="oh-event-desc">{% trans "Live demonstrations of our AI-powered automation and integration platform." %}</p>
-        </div>
-        <a href="#" class="oh-event-cta">{% trans "Explore" %} <i class="fas fa-arrow-right"></i></a>
-      </div>
-      <div class="oh-event oh-reveal oh-reveal-delay-2">
-        <div>
-          <div class="oh-event-top">
-            <div class="oh-event-date">
-              <span class="oh-event-date-month">NOV</span>
-              <span class="oh-event-date-year">2026</span>
-            </div>
-            <span class="oh-event-cat oh-event-cat--seminar">{% trans "Seminar" %}</span>
-          </div>
-          <h3 class="oh-event-title">{% trans "Digital Transformation Seminar" %}</h3>
-          <p class="oh-event-desc">{% trans "Workshop on enterprise automation, IoT integration, and modern web platforms." %}</p>
-        </div>
-        <a href="#" class="oh-event-cta">{% trans "Explore" %} <i class="fas fa-arrow-right"></i></a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ==================== NEWS ==================== -->
-<section class="oh-section">
-  <div class="container">
-    <div class="text-center mb-5">
-      <div class="oh-section-label">{% trans "OnWebApp Updates" %}</div>
-      <h2 class="oh-section-title">{% trans "Built. Improved. Evolving." %}</h2>
-      <p class="oh-section-sub mx-auto">{% trans "The latest products, capabilities, and ideas from OnWebApp." %}</p>
-    </div>
-    <div class="oh-news-grid">
-      <div class="oh-news-featured oh-reveal">
-        <div>
-          <div class="d-flex align-items-center gap-2 mb-3">
-            <span class="oh-news-badge oh-news-badge--ai">{% trans "AI" %}</span>
-            <span class="small fw-600" style="color:#94a3b8;">{% trans "AUG 2026" %}</span>
-          </div>
-          <h3 style="font-size:1.4rem;font-weight:800;color:#0f172a;letter-spacing:-.02em;margin-bottom:.5rem;">{% trans "Data Robot for Analysis" %}</h3>
-          <p style="color:#64748b;font-size:.9rem;line-height:1.65;">{% trans "New AI-powered data analysis robot for market, customer, and operational insights." %}</p>
-        </div>
-        <a href="#" class="oh-news-cta">{% trans "Explore update" %} <i class="fas fa-arrow-right"></i></a>
-      </div>
-      <div class="oh-news-card oh-reveal oh-reveal-delay-1">
-        <div>
-          <div class="d-flex align-items-center gap-2 mb-2">
-            <span class="oh-news-badge oh-news-badge--product">{% trans "Product" %}</span>
-            <span class="small fw-600" style="color:#94a3b8;">{% trans "AUG 2026" %}</span>
-          </div>
-          <h4 class="oh-news-card-title">{% trans "Your Website in Android" %}</h4>
-          <p class="oh-news-card-desc">{% trans "Turn your website into a native Android app with our new conversion engine." %}</p>
-        </div>
-        <a href="#" class="oh-news-cta">{% trans "Explore" %} <i class="fas fa-arrow-right"></i></a>
-      </div>
-      <div class="oh-news-card oh-reveal oh-reveal-delay-2">
-        <div>
-          <div class="d-flex align-items-center gap-2 mb-2">
-            <span class="oh-news-badge oh-news-badge--expansion">{% trans "Expansion" %}</span>
-            <span class="small fw-600" style="color:#94a3b8;">{% trans "JUL 2026" %}</span>
-          </div>
-          <h4 class="oh-news-card-title">{% trans "New Branches: Riyadh, Al Khobar" %}</h4>
-          <p class="oh-news-card-desc">{% trans "Expanding our presence in Saudi Arabia to better serve the Gulf region." %}</p>
-        </div>
-        <a href="#" class="oh-news-cta">{% trans "Explore" %} <i class="fas fa-arrow-right"></i></a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ==================== PARTNERSHIPS ==================== -->
-<section class="oh-partners">
-  <div class="container">
-    <div class="text-center mb-4">
-      <div class="oh-section-label">{% trans "Partnerships" %}</div>
-      <h2 class="oh-section-title">{% trans "Valuable Partnerships" %}</h2>
-    </div>
-    <div class="oh-partner-grid">
-      <div class="oh-partner oh-reveal"><i class="fas fa-shield-halved"></i> RSD Security Solutions</div>
-      <div class="oh-partner oh-reveal oh-reveal-delay-1"><i class="fas fa-cloud"></i> Cloud Partners</div>
-      <div class="oh-partner oh-reveal oh-reveal-delay-2"><i class="fas fa-handshake"></i> Technology Alliances</div>
-      <div class="oh-partner oh-reveal oh-reveal-delay-3"><i class="fas fa-building"></i> Enterprise Partners</div>
-    </div>
-  </div>
-</section>
-
-<!-- ==================== GLOBAL OFFICES ==================== -->
-<section class="oh-global">
-  <div class="container">
-    <div class="oh-global-grid">
-      <div class="oh-reveal">
-        <div class="oh-section-label">{% trans "Global Presence" %}</div>
-        <h2 class="oh-section-title">{% trans "OnWebApp Around the World" %}</h2>
-        <p>{% trans "Day after day, our offices are expanding all over the world wherever you are." %}</p>
-        <p>{% trans "Thanks to our main office in the Kingdom of Saudi Arabia to cover the Gulf Cooperation Council countries. In addition to our branch in the Hashemite Kingdom of Jordan — Amman — to cover Asia and Africa." %}</p>
-        <p>{% trans "Our global offices enable us to provide the highest level of support and cooperation to our customers." %}</p>
-      </div>
-      <div class="oh-reveal oh-reveal-delay-2">
-        <div class="oh-office">
-          <div class="oh-office-icon"><i class="fas fa-building"></i></div>
-          <div>
-            <strong>{% trans "K.S.A — Main Office" %}</strong>
-            <small>{% trans "Kingdom of Saudi Arabia — Covering Gulf Cooperation Council countries." %}</small>
-          </div>
-        </div>
-        <div class="oh-office">
-          <div class="oh-office-icon"><i class="fas fa-building"></i></div>
-          <div>
-            <strong>{% trans "Jordan — Amman Branch" %}</strong>
-            <small>{% trans "Hashemite Kingdom of Jordan — Covering Asia and Africa." %}</small>
-          </div>
-        </div>
-        <div style="text-align:center;margin-top:1.5rem;">
-          <a href="{% url 'contact:contact' %}" class="oh-cta-primary" style="font-size:.85rem;padding:.7rem 1.5rem;">
-            <i class="fas fa-map-marker-alt"></i> {% trans "Visit Us" %}
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ==================== FINAL CTA ==================== -->
-<section class="oh-final-cta">
-  <div class="container">
-    <div class="oh-reveal">
-      <h2>{% trans "Ready to Build Something Extraordinary?" %}</h2>
-      <p>{% trans "Book a consultation for a comprehensive overview of our approach to building integrated websites and applications." %}</p>
-      <div class="d-flex flex-wrap gap-3 justify-content-center">
-        <a href="{% url 'contact:contact' %}" class="oh-cta-primary">
-          {% trans "Book a Consultation" %} <i class="fas fa-arrow-right"></i>
-        </a>
-        <a href="{% url 'users:signup' %}" class="oh-cta-secondary" style="border-color:rgba(255,255,255,.2);color:#fff;">
-          {% trans "Get Started Free" %}
-        </a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ==================== FOOTER ==================== -->
-<footer class="oh-footer">
-  <div class="container">
-    <div class="oh-footer-grid">
-      <div class="oh-footer-brand">
-        <h5>OnWebApp</h5>
-        <p>{% trans "More than just a website builder. Built-in AI, automation, integration, and validation for modern enterprises." %}</p>
-      </div>
-      <div class="oh-footer-col">
-        <h6>{% trans "Discover" %}</h6>
-        <a href="#">{% trans "Sitemap" %}</a>
-        <a href="#">{% trans "Case Studies" %}</a>
-        <a href="#">{% trans "Research" %}</a>
-        <a href="{% url 'blog:index' %}">{% trans "Blogs" %}</a>
-        <a href="{% url 'blog:articles' %}">{% trans "Articles" %}</a>
-      </div>
-      <div class="oh-footer-col">
-        <h6>{% trans "Connect" %}</h6>
-        <a href="#">{% trans "Documentation" %}</a>
-        <a href="{% url 'home:webinars' %}">{% trans "Events" %}</a>
-        <a href="#">{% trans "Newsletters" %}</a>
-        <a href="#">{% trans "Support" %}</a>
-        <a href="#">{% trans "Community" %}</a>
-      </div>
-      <div class="oh-footer-col">
-        <h6>{% trans "About" %}</h6>
-        <a href="{% url 'home:about' %}">{% trans "Overview" %}</a>
-        <a href="#">{% trans "Careers" %}</a>
-        <a href="#">{% trans "Leadership" %}</a>
-        <a href="#">{% trans "Newsroom" %}</a>
-        <a href="{% url 'home:security' %}">{% trans "Security & Privacy" %}</a>
-      </div>
-    </div>
-    <div class="oh-footer-bottom">
-      <span>&copy; 2027 OnWebApp. {% trans "All rights reserved." %}</span>
-      <div class="oh-footer-legal">
-        <a href="{% url 'home:privacy' %}">{% trans "Privacy Policy" %}</a>
-        <a href="{% url 'home:terms' %}">{% trans "Terms" %}</a>
-        <a href="#">{% trans "Cookie Preferences" %}</a>
-      </div>
-    </div>
-  </div>
-</footer>
-
-{% endblock %}
-
-{% block footer %}{% endblock %}
-
-{% block extra_js %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+// Scroll progress
+window.addEventListener('scroll', function() {
+    var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+    var scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    var progress = (scrollTop / scrollHeight) * 100;
+    document.getElementById('scrollProgress').style.width = progress + '%';
+});
 
-    /* Scroll Progress */
-    var progressBar = document.querySelector('.oh-scroll-progress');
-    if (progressBar) {
-        window.addEventListener('scroll', function() {
-            var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-            var scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-            progressBar.style.width = (scrollTop / scrollHeight) * 100 + '%';
-        }, { passive: true });
-    }
+// Scroll reveal
+var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+        }
+    });
+}, { threshold: 0.1 });
 
-    /* Smooth scroll */
-    if (!prefersReducedMotion) {
-        document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
-            anchor.addEventListener('click', function(e) {
-                var target = document.querySelector(this.getAttribute('href'));
-                if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
-            });
-        });
-    }
+document.querySelectorAll('.oh-reveal').forEach(function(el) {
+    observer.observe(el);
+});
 
-    /* Scroll Reveal */
-    var revealEls = document.querySelectorAll('.oh-reveal');
-    var revealObs = new IntersectionObserver(function(entries) {
-        entries.forEach(function(entry) {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('is-visible');
-                revealObs.unobserve(entry.target);
-            }
-        });
-    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-    revealEls.forEach(function(el) { revealObs.observe(el); });
-
-    /* Animated Counters */
-    var counterEls = document.querySelectorAll('[data-count]');
-    var counterObs = new IntersectionObserver(function(entries) {
-        entries.forEach(function(entry) {
-            if (entry.isIntersecting) {
-                var el = entry.target;
-                var target = parseInt(el.getAttribute('data-count'), 10);
-                var suffix = el.getAttribute('data-suffix') || '';
-                var prefix = el.getAttribute('data-prefix') || '';
-                var duration = 1800;
-                var start = 0;
-                var startTime = null;
-
-                function step(timestamp) {
-                    if (!startTime) startTime = timestamp;
-                    var progress = Math.min((timestamp - startTime) / duration, 1);
-                    var eased = 1 - Math.pow(1 - progress, 3);
-                    var current = Math.floor(eased * target);
-                    el.textContent = prefix + current + suffix;
-                    if (progress < 1) {
-                        requestAnimationFrame(step);
-                    } else {
-                        el.textContent = prefix + target + suffix;
-                    }
-                }
-
-                if (prefersReducedMotion) {
-                    el.textContent = prefix + target + suffix;
+// Animated counters
+var counterObserver = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+            var el = entry.target;
+            var target = parseInt(el.getAttribute('data-count'));
+            var current = 0;
+            var increment = target / 60;
+            var timer = setInterval(function() {
+                current += increment;
+                if (current >= target) {
+                    el.textContent = target;
+                    clearInterval(timer);
                 } else {
-                    requestAnimationFrame(step);
+                    el.textContent = Math.floor(current);
                 }
-                counterObs.unobserve(el);
-            }
-        });
-    }, { threshold: 0.5 });
-    counterEls.forEach(function(el) { counterObs.observe(el); });
+            }, 30);
+            counterObserver.unobserve(el);
+        }
+    });
+}, { threshold: 0.5 });
 
-    /* Magnetic CTA */
-    if (!prefersReducedMotion) {
-        document.querySelectorAll('.oh-cta-primary').forEach(function(btn) {
-            btn.addEventListener('mousemove', function(e) {
-                var rect = btn.getBoundingClientRect();
-                var x = e.clientX - rect.left - rect.width / 2;
-                var y = e.clientY - rect.top - rect.height / 2;
-                btn.style.transform = 'translate(' + (x * 0.12) + 'px, ' + (y * 0.12) + 'px)';
-            });
-            btn.addEventListener('mouseleave', function() {
-                btn.style.transform = 'translate(0, 0)';
-                btn.style.transition = 'transform .4s cubic-bezier(.22,1,.36,1)';
-            });
-        });
-    }
+document.querySelectorAll('[data-count]').forEach(function(el) {
+    counterObserver.observe(el);
 });
 </script>
 {% endblock %}
