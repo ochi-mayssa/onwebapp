@@ -145,12 +145,18 @@ def ecommerce_development(request):
     return render(request, 'software/ecommerce_development.html')
 
 
+def erp_service(request):
+    """ERP integration and implementation services page."""
+    return render(request, 'services/erp-service.html')
+
+
 def api_status(request):
     """Simple API status endpoint to respond to health checks."""
     from django.http import JsonResponse
+    from django.utils import timezone
     return JsonResponse({
         'status': 'ok',
         'service': 'OnWebApp API',
         'version': '1.0',
-        'timestamp': '2026-04-12T18:00:00Z'  # Current date
+        'timestamp': timezone.now().isoformat(),
     })

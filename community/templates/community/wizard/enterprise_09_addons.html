@@ -1,0 +1,51 @@
+{% extends "community/wizard/base_wizard.html" %}
+{% load static i18n %}
+
+{% block wizard_content %}
+<div class="wizard-card">
+    <div class="text-center mb-4">
+        <div class="wizard-section-label">STEP 9 OF 10</div>
+        <h2 class="mb-2">Optional Add-ons</h2>
+        <p class="lead">Enhance your Enterprise package with premium services.</p>
+    </div>
+
+    <div class="text-center mb-4">
+        <span class="badge rounded-pill px-4 py-2 fw-700" style="background:linear-gradient(135deg,#059669,#10b981);color:#fff;font-size:.75rem;">
+            <i class="fas fa-crown me-1"></i> Enterprise Package
+        </span>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="row g-3">
+            {% for addon in addons %}
+            <div class="col-sm-6">
+                <input type="checkbox" name="addons" value="{{ addon.slug }}" id="addon_{{ addon.slug }}" class="wizard-check-input" {% if addon.slug in selected_addons %}checked{% endif %}>
+                <label for="addon_{{ addon.slug }}" class="wizard-check-label h-100">
+                    <span class="check-icon"><i class="fas fa-check" style="font-size:0.7rem;"></i></span>
+                    <div class="flex-grow-1">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <strong class="small">{{ addon.name }}</strong>
+                            <span class="badge bg-light text-dark small fw-700">${{ addon.price|floatformat:0 }}</span>
+                        </div>
+                        <p class="text-secondary small mb-0 mt-1">{{ addon.description|truncatechars:80 }}</p>
+                    </div>
+                </label>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-4">
+                <i class="fas fa-puzzle-piece text-secondary mb-2" style="font-size:2rem;opacity:0.3;"></i>
+                <p class="text-secondary small mb-0">No add-ons available right now.</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="mt-5 text-center">
+            <button type="submit" class="btn-wizard-next px-5 py-3">
+                Continue <i class="fas fa-arrow-right ms-2"></i>
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -8,6 +8,7 @@ app_name = 'branding'
 urlpatterns = [
     # Public
     path('', views.landing, name='landing'),
+    path('collections/<slug:slug>/', views.collection_detail, name='collection_detail'),
     path('my-requests/', views.my_requests, name='my_requests'),
     path('project/<int:pk>/progress/', views.client_project_progress, name='client_project_progress'),
     path('project/<int:pk>/messages/', views.client_messages, name='client_messages'),

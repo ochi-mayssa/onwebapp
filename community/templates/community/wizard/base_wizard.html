@@ -20,7 +20,7 @@
                 <div class="d-flex align-items-center gap-2">
                     <span class="autosave-dot" title="Autosave active"></span>
                     <span class="badge rounded-pill px-3 py-2 fw-700 wizard-step-badge">
-                        Step {{ session.current_step }} of 13
+                        Step {{ session.current_step }} of {{ session.get_total_steps }}
                     </span>
                 </div>
                 {% endif %}
@@ -50,7 +50,19 @@
     {% if session and session.current_step > 1 %}
     <div class="wizard-bottombar sticky-bottom z-2">
         <div class="container-xl d-flex align-items-center justify-content-between py-3">
-            {% if session.current_step > 2 %}
+            {% if session.package_type == 'essential' and session.current_step == 3 %}
+            <a href="{% url 'community:wizard_start' %}" class="btn btn-outline-secondary rounded-pill px-4 fw-700">
+                <i class="fas fa-arrow-left me-2"></i>{% trans "Back" %}
+            </a>
+            {% elif session.package_type == 'essential' and session.current_step > 3 %}
+            <a href="{% url 'community:wizard_essential_step' step=session.current_step|add:'-1' %}" class="btn btn-outline-secondary rounded-pill px-4 fw-700">
+                <i class="fas fa-arrow-left me-2"></i>{% trans "Back" %}
+            </a>
+            {% elif session.package_type == 'enterprise' and session.current_step > 2 %}
+            <a href="{% url 'community:wizard_enterprise_step' step=session.current_step|add:'-1' %}" class="btn btn-outline-secondary rounded-pill px-4 fw-700">
+                <i class="fas fa-arrow-left me-2"></i>{% trans "Back" %}
+            </a>
+            {% elif session.current_step > 2 %}
             <a href="{% url 'community:wizard_step' step=session.current_step|add:'-1' %}" class="btn btn-outline-secondary rounded-pill px-4 fw-700">
                 <i class="fas fa-arrow-left me-2"></i>{% trans "Back" %}
             </a>

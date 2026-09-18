@@ -39,18 +39,19 @@ class OnboardingSession(models.Model):
     ]
     STEP_CHOICES = [
         (1, 'Welcome'),
-        (2, 'Choose Service'),
-        (3, 'Business Discovery'),
-        (4, 'Project Details'),
-        (5, 'Design Preferences'),
-        (6, 'Features & Integrations'),
-        (7, 'AI Cost Estimation'),
-        (8, 'Package Recommendation'),
-        (9, 'Optional Add-ons'),
-        (10, 'Project Summary'),
-        (11, 'Proposal Preview'),
-        (12, 'Payment'),
-        (13, 'Workspace Generated'),
+        (2, 'Choose Package'),
+        (3, 'Business & Project'),
+        (4, 'Design Preferences'),
+        (5, 'Features & Integrations'),
+        (6, 'Estimate & Summary'),
+        (7, 'Add-ons'),
+        (8, 'Payment & Workspace'),
+    ]
+
+    PROJECT_TYPE_CHOICES = [
+        ('startup', 'Startup Package'),
+        ('essential', 'Basic Package'),
+        ('enterprise', 'Enterprise Package'),
     ]
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='onboarding_sessions')
@@ -58,6 +59,7 @@ class OnboardingSession(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft')
     current_step = models.PositiveIntegerField(default=1)
     completed_steps = models.JSONField(default=list, help_text='List of completed step numbers')
+    package_type = models.CharField(max_length=20, choices=PROJECT_TYPE_CHOICES, blank=True, help_text='Startup Package or Basic Package')
 
     # Step 2: Service
     selected_services = models.ManyToManyField('ServiceType', blank=True, related_name='sessions')
@@ -144,9 +146,21 @@ class OnboardingSession(models.Model):
             self.completed_steps = self.completed_steps + [step_num]
             self.save(update_fields=['completed_steps', 'updated_at'])
 
+    def get_total_steps(self):
+        if self.package_type == 'essential':
+            return 6
+        if self.package_type == 'enterprise':
+            return 10
+        return 8
+
     def get_progress_pct(self):
-        total = 13
-        done = len(self.completed_steps)
+        total = self.get_total_steps()
+        if self.package_type == 'essential':
+            done = len([s for s in self.completed_steps if s in (2, 3, 4, 5, 6)])
+        elif self.package_type == 'enterprise':
+            done = len([s for s in self.completed_steps if s in (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)])
+        else:
+            done = len([s for s in self.completed_steps if s in (1, 2, 3, 4, 5, 6, 7, 8)])
         return round((done / total) * 100)
 
     def get_step_name(self):
@@ -156,7 +170,14 @@ class OnboardingSession(models.Model):
         return 'Unknown'
 
     def get_estimated_time_left(self):
-        remaining = 13 - len(self.completed_steps)
+        total = self.get_total_steps()
+        if self.package_type == 'essential':
+            done = len([s for s in self.completed_steps if s in (2, 3, 4, 5, 6)])
+        elif self.package_type == 'enterprise':
+            done = len([s for s in self.completed_steps if s in (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)])
+        else:
+            done = len([s for s in self.completed_steps if s in (1, 2, 3, 4, 5, 6, 7, 8)])
+        remaining = total - done
         return f"~{remaining * 2} min"
 
     def get_selected_services_list(self):

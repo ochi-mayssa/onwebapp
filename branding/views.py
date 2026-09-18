@@ -795,9 +795,25 @@ def landing(request):
         if dashboard_url:
             return redirect(dashboard_url)
     featured = BrandCollection.objects.filter(is_active=True)[:6]
+    total_collections = BrandCollection.objects.filter(is_active=True).count()
+    total_industries = BrandCollection.objects.filter(is_active=True).values('industry').distinct().count()
     return render(request, 'branding/landing.html', {
         'featured_collections': featured,
         'categories': COLLECTION_CATEGORIES,
+        'total_collections': total_collections or 24,
+        'total_industries': total_industries or 8,
+    })
+
+
+def collection_detail(request, slug):
+    """Public collection detail page."""
+    collection = get_object_or_404(BrandCollection, slug=slug, is_active=True)
+    related = BrandCollection.objects.filter(
+        is_active=True, category=collection.category
+    ).exclude(pk=collection.pk)[:3]
+    return render(request, 'branding/collection_detail.html', {
+        'collection': collection,
+        'related': related,
     })
 
 

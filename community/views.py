@@ -20,7 +20,7 @@ from .models import WebsiteIntake, OnboardingSession, ServiceType, OnboardingAdd
 from .forms import (
     WebsiteIntakeForm, Step2ServiceForm, Step3BusinessForm,
     Step4ProjectForm, Step5DesignForm, Step6FeaturesForm,
-    Step9AddonsForm, Step12PaymentForm, BrandAssistForm,
+    BrandAssistForm,
 )
 from .services import calculate, get_package_comparison
 
@@ -48,6 +48,9 @@ def is_community_user(user):
 # Branding services clients pay for (add-ons total to unlock download).
 # Slugs must match OnboardingAddon entries seeded in _ensure_addons_exist().
 BRANDING_ADDON_SLUGS = ['logo-addon', 'brand-addon', 'social-kit']
+STARTUP_PACKAGE_PRICE = 1499
+ESSENTIAL_PACKAGE_PRICE = 499
+ENTERPRISE_PACKAGE_PRICE = 2499
 
 
 DESIGN_STYLES = [
@@ -300,7 +303,7 @@ def dashboard(request):
 
 
 # ---------------------------------------------------------------------------
-# Onboarding Wizard
+# Onboarding Wizard (Startup: 8 steps, Essential: 6 steps, Enterprise: 10 steps)
 # ---------------------------------------------------------------------------
 
 @login_required
@@ -312,8 +315,13 @@ def wizard_start(request):
     ).order_by('-updated_at').first()
 
     force_new = request.GET.get('new') == '1' or request.POST.get('new') == '1'
+    preselected_package = request.GET.get('package', '').strip()
 
     if existing and existing.current_step > 1 and not force_new:
+        if existing.package_type == 'essential':
+            return redirect('community:wizard_essential_step', step=existing.current_step)
+        if existing.package_type == 'enterprise':
+            return redirect('community:wizard_enterprise_step', step=existing.current_step)
         return redirect('community:wizard_step', step=existing.current_step)
 
     if request.method == 'POST':
@@ -335,6 +343,23 @@ def wizard_start(request):
             ActivityLog.objects.create(
                 user=request.user, action="Started onboarding wizard.",
             )
+
+        if preselected_package in ('startup', 'essential', 'enterprise'):
+            session.package_type = preselected_package
+            session.mark_step_complete(2)
+            if preselected_package == 'essential':
+                session.current_step = 3
+                session.save(update_fields=['package_type', 'current_step', 'completed_steps', 'updated_at'])
+                return redirect('community:wizard_essential_step', step=3)
+            elif preselected_package == 'enterprise':
+                session.current_step = 3
+                session.save(update_fields=['package_type', 'current_step', 'completed_steps', 'updated_at'])
+                return redirect('community:wizard_enterprise_step', step=3)
+            else:
+                session.current_step = 3
+                session.save(update_fields=['package_type', 'current_step', 'completed_steps', 'updated_at'])
+                return redirect('community:wizard_step', step=3)
+
         return redirect('community:wizard_step', step=2)
 
     return render(request, 'community/wizard/step_01_welcome.html', {
@@ -346,7 +371,7 @@ def wizard_start(request):
 @login_required
 def wizard_step(request, step):
     step = int(step)
-    if step < 1 or step > 13:
+    if step < 1 or step > 8:
         return redirect('community:wizard_start')
 
     session = OnboardingSession.objects.filter(
@@ -356,22 +381,23 @@ def wizard_step(request, step):
     if not session:
         return redirect('community:wizard_start')
 
+    if session.package_type == 'essential' and step not in (1, 2, 3, 4, 5, 6):
+        return redirect('community:wizard_essential_step', step=min(session.current_step, 6))
+
+    if session.package_type == 'enterprise' and step not in (1, 2, 3, 4, 5, 6, 7, 8, 9, 10):
+        return redirect('community:wizard_enterprise_step', step=min(session.current_step, 10))
+
     if step > session.current_step + 1:
         return redirect('community:wizard_step', step=session.current_step)
 
     step_handlers = {
-        2: _handle_step2,
-        3: _handle_step3,
-        4: _handle_step4,
-        5: _handle_step5,
-        6: _handle_step6,
-        7: _handle_step7,
-        8: _handle_step8,
-        9: _handle_step9,
-        10: _handle_step10,
-        11: _handle_step11,
-        12: _handle_step12,
-        13: _handle_step13,
+        2: _handle_step2_package,
+        3: _handle_step3_business_project,
+        4: _handle_step4_design,
+        5: _handle_step5_features,
+        6: _handle_step6_estimate_summary,
+        7: _handle_step7_addons,
+        8: _handle_step8_payment_workspace,
     }
 
     handler = step_handlers.get(step)
@@ -381,44 +407,49 @@ def wizard_step(request, step):
     return redirect('community:wizard_start')
 
 
-def _handle_step2(request, session):
-    services = ServiceType.objects.filter(is_active=True)
-
+def _handle_step2_package(request, session):
     if request.method == 'POST':
-        selected_slugs = request.POST.getlist('services')
-        if not selected_slugs:
-            messages.error(request, 'Please select at least one service.')
-            return render(request, 'community/wizard/step_02_service.html', {
-                'session': session, 'services': services, 'selected_slugs': [],
-            })
-        valid_slugs = set(services.values_list('slug', flat=True))
-        selected_slugs = [s for s in selected_slugs if s in valid_slugs]
-        session.selected_services.set(ServiceType.objects.filter(slug__in=selected_slugs))
+        package_type = request.POST.get('package_type', '').strip()
+        if package_type not in ('startup', 'essential', 'enterprise'):
+            messages.error(request, 'Please select a package to continue.')
+            return render(request, 'community/wizard/step_02_package.html', {'session': session})
+        session.package_type = package_type
         session.mark_step_complete(2)
-        session.current_step = 3
-        session.save(update_fields=['current_step', 'updated_at'])
-        return redirect('community:wizard_step', step=3)
 
-    selected_slugs = [s.slug for s in session.selected_services.all()]
+        if package_type == 'essential':
+            session.current_step = 3
+            session.save(update_fields=['package_type', 'current_step', 'completed_steps', 'updated_at'])
+            return redirect('community:wizard_essential_step', step=3)
+        elif package_type == 'enterprise':
+            session.current_step = 3
+            session.save(update_fields=['package_type', 'current_step', 'completed_steps', 'updated_at'])
+            return redirect('community:wizard_enterprise_step', step=3)
+        else:
+            session.current_step = 3
+            session.save(update_fields=['package_type', 'current_step', 'completed_steps', 'updated_at'])
+            return redirect('community:wizard_step', step=3)
 
-    return render(request, 'community/wizard/step_02_service.html', {
-        'session': session, 'services': services, 'selected_slugs': selected_slugs,
-    })
+    return render(request, 'community/wizard/step_02_package.html', {'session': session})
 
 
-def _handle_step3(request, session):
+def _handle_step3_business_project(request, session):
     if request.method == 'POST':
         business_name = request.POST.get('business_name', '').strip()
         industry = request.POST.get('industry', '').strip()
         business_description = request.POST.get('business_description', '').strip()
         target_audience = request.POST.get('target_audience', '').strip()
+        project_name = request.POST.get('project_name', '').strip()
+        project_goals = request.POST.get('project_goals', '').strip()
 
         if not business_name:
             messages.error(request, 'Business name is required.')
-            return render(request, 'community/wizard/step_03_business.html', {'session': session})
+            return render(request, 'community/wizard/step_03_business_project.html', {'session': session})
         if not industry:
             messages.error(request, 'Industry is required.')
-            return render(request, 'community/wizard/step_03_business.html', {'session': session})
+            return render(request, 'community/wizard/step_03_business_project.html', {'session': session})
+        if not project_name:
+            messages.error(request, 'Project name is required.')
+            return render(request, 'community/wizard/step_03_business_project.html', {'session': session})
 
         session.business_name = business_name
         session.industry = industry
@@ -426,25 +457,6 @@ def _handle_step3(request, session):
         session.target_audience = target_audience
         session.existing_website = request.POST.get('existing_website', '').strip()
         session.competitors = request.POST.get('competitors', '').strip()
-        session.mark_step_complete(3)
-        session.current_step = 4
-        session.save()
-        return redirect('community:wizard_step', step=4)
-
-    return render(request, 'community/wizard/step_03_business.html', {
-        'session': session,
-    })
-
-
-def _handle_step4(request, session):
-    if request.method == 'POST':
-        project_name = request.POST.get('project_name', '').strip()
-        project_goals = request.POST.get('project_goals', '').strip()
-
-        if not project_name:
-            messages.error(request, 'Project name is required.')
-            return render(request, 'community/wizard/step_04_project.html', {'session': session})
-
         session.project_name = project_name
         session.project_goals = project_goals
         session.budget_range = request.POST.get('budget_range', '').strip()
@@ -454,23 +466,132 @@ def _handle_step4(request, session):
                 session.target_launch_date = launch
             except Exception:
                 pass
-        session.additional_notes = request.POST.get('additional_notes', '').strip()
-        session.mark_step_complete(4)
-        session.current_step = 5
-        session.save()
-        return redirect('community:wizard_step', step=5)
 
-    return render(request, 'community/wizard/step_04_project.html', {
+        session.mark_step_complete(3)
+        if session.package_type == 'enterprise':
+            session.current_step = 4
+            session.save()
+            return redirect('community:wizard_enterprise_step', step=4)
+        else:
+            session.current_step = 4
+            session.save()
+            return redirect('community:wizard_step', step=4)
+
+    return render(request, 'community/wizard/step_03_business_project.html', {'session': session})
+
+@login_required
+def wizard_enterprise_step(request, step):
+    step = int(step)
+    if step < 1 or step > 10:
+        return redirect('community:wizard_start')
+
+    session = OnboardingSession.objects.filter(
+        user=request.user, status__in=['draft', 'in_progress']
+    ).order_by('-updated_at').first()
+
+    if not session:
+        return redirect('community:wizard_start')
+
+    if session.package_type == 'essential':
+        return redirect('community:wizard_essential_step', step=min(session.current_step, 6))
+
+    if step > session.current_step + 1:
+        return redirect('community:wizard_enterprise_step', step=session.current_step)
+
+    # Steps 1-5 reuse startup handlers
+    shared_handlers = {
+        1: lambda r, s: render(r, 'community/wizard/step_01_welcome.html', {'session': s}),
+        2: _handle_step2_package,
+    }
+    if step in shared_handlers:
+        return shared_handlers[step](request, session)
+
+    if step == 3:
+        return _enterprise_step3_business_project(request, session)
+
+    if step == 4:
+        return _enterprise_step4_design(request, session)
+
+    if step == 5:
+        return _enterprise_step5_features(request, session)
+
+    # Steps 6-10 are enterprise-specific
+    enterprise_handlers = {
+        6: _enterprise_step6_seo,
+        7: _enterprise_step7_content,
+        8: _enterprise_step8_estimate,
+        9: _enterprise_step9_addons,
+        10: _enterprise_step10_payment_workspace,
+    }
+    handler = enterprise_handlers.get(step)
+    if handler:
+        return handler(request, session)
+
+    return redirect('community:wizard_start')
+
+
+def _enterprise_step3_business_project(request, session):
+    """Enterprise step 3 — business & project with SEO presence fields."""
+    if request.method == 'POST':
+        business_name = request.POST.get('business_name', '').strip()
+        industry = request.POST.get('industry', '').strip()
+        business_description = request.POST.get('business_description', '').strip()
+        target_audience = request.POST.get('target_audience', '').strip()
+        project_name = request.POST.get('project_name', '').strip()
+        project_goals = request.POST.get('project_goals', '').strip()
+
+        if not business_name:
+            messages.error(request, 'Business name is required.')
+            return render(request, 'community/wizard/enterprise_03_business_project.html', {'session': session})
+        if not industry:
+            messages.error(request, 'Industry is required.')
+            return render(request, 'community/wizard/enterprise_03_business_project.html', {'session': session})
+        if not project_name:
+            messages.error(request, 'Project name is required.')
+            return render(request, 'community/wizard/enterprise_03_business_project.html', {'session': session})
+
+        session.business_name = business_name
+        session.industry = industry
+        session.business_description = business_description
+        session.target_audience = target_audience
+        session.existing_website = request.POST.get('existing_website', '').strip()
+        session.competitors = request.POST.get('competitors', '').strip()
+        session.project_name = project_name
+        session.project_goals = project_goals
+        session.budget_range = request.POST.get('budget_range', '').strip()
+        launch = request.POST.get('target_launch_date', '').strip()
+        if launch:
+            try:
+                session.target_launch_date = launch
+            except Exception:
+                pass
+
+        # Store enterprise-specific fields in estimation_data
+        session.estimation_data = {
+            **(session.estimation_data or {}),
+            'existing_seo_tools': request.POST.get('existing_seo_tools', '').strip(),
+            'existing_content': request.POST.get('existing_content', '').strip(),
+        }
+
+        session.mark_step_complete(3)
+        session.current_step = 4
+        session.save()
+        return redirect('community:wizard_enterprise_step', step=4)
+
+    return render(request, 'community/wizard/enterprise_03_business_project.html', {
         'session': session,
+        'existing_seo_tools': (session.estimation_data or {}).get('existing_seo_tools', ''),
+        'existing_content': (session.estimation_data or {}).get('existing_content', ''),
     })
 
 
-def _handle_step5(request, session):
+def _enterprise_step4_design(request, session):
+    """Enterprise step 4 — design preferences with enterprise branding."""
     if request.method == 'POST':
         design_style = request.POST.get('design_style', '').strip()
         if not design_style:
             messages.error(request, 'Please select a design style.')
-            return render(request, 'community/wizard/step_05_design.html', {
+            return render(request, 'community/wizard/enterprise_04_design.html', {
                 'session': session,
                 'design_styles': DESIGN_STYLES,
                 'typography_styles': TYPOGRAPHY_STYLES,
@@ -481,71 +602,215 @@ def _handle_step5(request, session):
         session.accent_color = request.POST.get('accent_color', '#8b5cf6').strip()
         session.typography_style = request.POST.get('typography_style', '').strip()
         session.inspiration_sites = request.POST.get('inspiration_sites', '').strip()
-        session.mark_step_complete(5)
-        session.current_step = 6
+        session.mark_step_complete(4)
+        session.current_step = 5
         session.save()
-        return redirect('community:wizard_step', step=6)
+        return redirect('community:wizard_enterprise_step', step=5)
 
-    return render(request, 'community/wizard/step_05_design.html', {
+    return render(request, 'community/wizard/enterprise_04_design.html', {
         'session': session,
         'design_styles': DESIGN_STYLES,
         'typography_styles': TYPOGRAPHY_STYLES,
     })
 
 
-def _handle_step6(request, session):
+def _enterprise_step5_features(request, session):
+    """Enterprise step 5 — features & integrations with enterprise branding."""
     if request.method == 'POST':
         session.selected_features = request.POST.getlist('features')
         session.integrations = request.POST.get('integrations', '')
-        session.mark_step_complete(6)
-        session.current_step = 7
+        session.mark_step_complete(5)
+        session.current_step = 6
         session.save()
-        return redirect('community:wizard_step', step=7)
+        return redirect('community:wizard_enterprise_step', step=6)
 
     selected_features = session.selected_features or []
 
-    return render(request, 'community/wizard/step_06_features.html', {
+    return render(request, 'community/wizard/enterprise_05_features.html', {
         'session': session,
         'features': FEATURES,
         'selected_features': selected_features,
     })
 
 
-def _handle_step7(request, session):
-    estimation = calculate(session)
-    session.estimation_data = estimation.to_dict()
-    session.save(update_fields=['estimation_data', 'updated_at'])
+def _enterprise_step6_seo(request, session):
+    """SEO Setup — keywords, meta, sitemap, analytics goals."""
+    SEO_GOALS = [
+        ('local_seo', 'Local SEO', 'Google Business Profile, local citations'),
+        ('ecommerce_seo', 'E-Commerce SEO', 'Product pages, schema markup, feeds'),
+        ('content_seo', 'Content / Blog SEO', 'Blog strategy, pillar pages, internal linking'),
+        ('technical_seo', 'Technical SEO', 'Site speed, Core Web Vitals, crawlability'),
+        ('link_building', 'Link Building', 'Backlink strategy, outreach plan'),
+        ('analytics', 'Analytics & Tracking', 'GA4, Tag Manager, conversion tracking'),
+    ]
+    INDUSTRY_KEYWORDS = {
+        'saas': ['cloud software', 'SaaS platform', 'B2B tool', 'subscription software'],
+        'ecommerce': ['online store', 'shop online', 'buy online', 'product deals'],
+        'healthcare': ['medical clinic', 'health services', 'doctor near me', 'telehealth'],
+        'restaurant': ['restaurant near me', 'food delivery', 'best menu', 'dining'],
+        'realestate': ['homes for sale', 'real estate agent', 'property listings'],
+        'education': ['online courses', 'training programs', 'e-learning', 'certifications'],
+        'finance': ['financial advisor', 'accounting services', 'investment planning'],
+        'technology': ['IT solutions', 'tech consulting', 'software development', 'cloud services'],
+    }
 
     if request.method == 'POST':
+        seo_goals = request.POST.getlist('seo_goals')
+        target_keywords = request.POST.get('target_keywords', '').strip()
+        meta_title = request.POST.get('meta_title', '').strip()
+        meta_description = request.POST.get('meta_description', '').strip()
+        analytics_goals = request.POST.get('analytics_goals', '').strip()
+        competitor_urls = request.POST.get('competitor_urls', '').strip()
+        existing_seo = request.POST.get('existing_seo', '').strip()
+
+        session.selected_features = list(set(
+            session.selected_features or [] + ['seo_setup']
+        ))
+        session.estimation_data = {
+            **(session.estimation_data or {}),
+            'seo_goals': seo_goals,
+            'target_keywords': target_keywords,
+            'meta_title': meta_title,
+            'meta_description': meta_description,
+            'analytics_goals': analytics_goals,
+            'competitor_urls': competitor_urls,
+            'existing_seo': existing_seo,
+        }
+        session.mark_step_complete(6)
+        session.current_step = 7
+        session.save()
+        return redirect('community:wizard_enterprise_step', step=7)
+
+    suggested_keywords = INDUSTRY_KEYWORDS.get(
+        (session.industry or '').strip().lower(), []
+    )
+    return render(request, 'community/wizard/enterprise_06_seo.html', {
+        'session': session,
+        'seo_goals': SEO_GOALS,
+        'selected_goals': (session.estimation_data or {}).get('seo_goals', []),
+        'suggested_keywords': suggested_keywords,
+        'meta_title': (session.estimation_data or {}).get('meta_title', ''),
+        'meta_description': (session.estimation_data or {}).get('meta_description', ''),
+        'target_keywords': (session.estimation_data or {}).get('target_keywords', ''),
+        'analytics_goals': (session.estimation_data or {}).get('analytics_goals', ''),
+        'competitor_urls': (session.estimation_data or {}).get('competitor_urls', ''),
+        'existing_seo': (session.estimation_data or {}).get('existing_seo', ''),
+    })
+
+
+def _enterprise_step7_content(request, session):
+    """Content Creator — blog pages, landing pages, content calendar."""
+    CONTENT_TYPES = [
+        ('blog_posts', 'Blog Posts / Articles'),
+        ('landing_pages', 'Landing Pages'),
+        ('product_descriptions', 'Product Descriptions'),
+        ('case_studies', 'Case Studies'),
+        ('faq_pages', 'FAQ / Knowledge Base'),
+        ('email_templates', 'Email Templates'),
+        ('social_copy', 'Social Media Copy'),
+        ('video_scripts', 'Video Scripts'),
+    ]
+    CONTENT_PYLES = [
+        ('professional', 'Professional & Authoritative'),
+        ('friendly', 'Friendly & Conversational'),
+        ('technical', 'Technical & Detailed'),
+        ('creative', 'Creative & Storytelling'),
+        ('minimal', 'Minimal & Direct'),
+    ]
+
+    if request.method == 'POST':
+        content_types = request.POST.getlist('content_types')
+        tone = request.POST.get('tone', '').strip()
+        monthly_posts = request.POST.get('monthly_posts', '4').strip()
+        content_pages = request.POST.get('content_pages', '').strip()
+        brand_voice = request.POST.get('brand_voice', '').strip()
+        content_goals = request.POST.get('content_goals', '').strip()
+
+        session.selected_features = list(set(
+            session.selected_features or [] + ['content_creator']
+        ))
+        session.estimation_data = {
+            **(session.estimation_data or {}),
+            'content_types': content_types,
+            'content_tone': tone,
+            'monthly_posts': int(monthly_posts) if monthly_posts.isdigit() else 4,
+            'content_pages': content_pages,
+            'brand_voice': brand_voice,
+            'content_goals': content_goals,
+        }
         session.mark_step_complete(7)
         session.current_step = 8
         session.save()
-        return redirect('community:wizard_step', step=8)
+        return redirect('community:wizard_enterprise_step', step=8)
 
-    return render(request, 'community/wizard/step_07_estimate.html', {
-        'session': session, 'estimation': estimation,
+    return render(request, 'community/wizard/enterprise_07_content.html', {
+        'session': session,
+        'content_types': CONTENT_TYPES,
+        'content_styles': CONTENT_PYLES,
+        'selected_types': (session.estimation_data or {}).get('content_types', []),
+        'selected_tone': (session.estimation_data or {}).get('content_tone', ''),
+        'monthly_posts': (session.estimation_data or {}).get('monthly_posts', 4),
+        'content_pages': (session.estimation_data or {}).get('content_pages', ''),
+        'brand_voice': (session.estimation_data or {}).get('brand_voice', ''),
+        'content_goals': (session.estimation_data or {}).get('content_goals', ''),
     })
 
 
-def _handle_step8(request, session):
-    comparison = get_package_comparison(session)
+def _enterprise_step8_estimate(request, session):
+    """Estimate & Summary — same as startup step 6 logic."""
+    base_price = ENTERPRISE_PACKAGE_PRICE
+    addons_cost = session.addons_total or Decimal('0')
+    total = Decimal(str(base_price)) + addons_cost
+    seo_cost = Decimal('0')
+    content_cost = Decimal('0')
+
+    seo_goals = (session.estimation_data or {}).get('seo_goals', [])
+    if 'local_seo' in seo_goals:
+        seo_cost += Decimal('300')
+    if 'ecommerce_seo' in seo_goals:
+        seo_cost += Decimal('500')
+    if 'content_seo' in seo_goals:
+        seo_cost += Decimal('400')
+    if 'technical_seo' in seo_goals:
+        seo_cost += Decimal('600')
+    if 'link_building' in seo_goals:
+        seo_cost += Decimal('350')
+    if 'analytics' in seo_goals:
+        seo_cost += Decimal('250')
+
+    content_types = (session.estimation_data or {}).get('content_types', [])
+    monthly_posts = (session.estimation_data or {}).get('monthly_posts', 4)
+    content_cost = Decimal(str(len(content_types) * 150)) + Decimal(str(monthly_posts * 50))
+
+    total += seo_cost + content_cost
 
     if request.method == 'POST':
-        selected = request.POST.get('package', '')
-        if selected:
-            session.selected_package = selected
-            session.recommended_package = comparison.get('recommended', '')
-            session.mark_step_complete(8)
-            session.current_step = 9
-            session.save()
-            return redirect('community:wizard_step', step=9)
+        session.estimation_data = {
+            **(session.estimation_data or {}),
+            'seo_cost': str(seo_cost),
+            'content_cost': str(content_cost),
+            'total_estimated': str(total),
+        }
+        session.total_amount = total
+        session.mark_step_complete(8)
+        session.current_step = 9
+        session.save()
+        return redirect('community:wizard_enterprise_step', step=9)
 
-    return render(request, 'community/wizard/step_08_package.html', {
-        'session': session, 'packages': PACKAGES,
+    return render(request, 'community/wizard/enterprise_08_estimate.html', {
+        'session': session,
+        'base_price': str(int(base_price)),
+        'seo_cost': str(int(seo_cost)),
+        'content_cost': str(int(content_cost)),
+        'addons_cost': str(int(addons_cost)),
+        'total_estimated': str(int(total)),
+        'payment_schedule': '50% upfront, remaining in monthly installments',
     })
 
 
-def _handle_step9(request, session):
+def _enterprise_step9_addons(request, session):
+    """Add-ons — same as startup step 7 logic."""
+    from .models import OnboardingAddon
     addons = OnboardingAddon.objects.filter(is_active=True)
 
     if request.method == 'POST':
@@ -561,83 +826,314 @@ def _handle_step9(request, session):
         session.mark_step_complete(9)
         session.current_step = 10
         session.save()
-        return redirect('community:wizard_step', step=10)
+        return redirect('community:wizard_enterprise_step', step=10)
 
     selected_addons = [a['slug'] for a in session.selected_addons] if session.selected_addons else []
-
-    return render(request, 'community/wizard/step_09_addons.html', {
+    return render(request, 'community/wizard/enterprise_09_addons.html', {
         'session': session, 'addons': addons, 'selected_addons': selected_addons,
     })
 
 
-def _handle_step10(request, session):
-    estimation = calculate(session)
-
-    if request.method == 'POST':
-        if not session.estimation_data:
-            session.estimation_data = estimation.to_dict()
-        session.mark_step_complete(10)
-        session.current_step = 11
-        session.save()
-        return redirect('community:wizard_step', step=11)
-
-    return render(request, 'community/wizard/step_10_summary.html', {
-        'session': session, 'estimation': estimation,
-    })
-
-
-def _handle_step11(request, session):
-    estimation = calculate(session)
-    if not session.estimation_data:
-        session.estimation_data = estimation.to_dict()
-        session.save(update_fields=['estimation_data', 'updated_at'])
-
-    if request.method == 'POST':
-        session.selected_package = estimation.recommended_package
-        session.mark_step_complete(11)
-        session.current_step = 12
-        session.save()
-        return redirect('community:wizard_step', step=12)
-
-    return render(request, 'community/wizard/step_11_proposal.html', {
-        'session': session, 'estimation': estimation,
-    })
-
-
-def _handle_step12(request, session):
-    package_prices = {'basic_pkg': 499, 'standard_pkg': 999, 'advanced_pkg': 1999, 'enterprise_pkg': 4999}
-    package_price = package_prices.get(session.selected_package, 999)
+def _enterprise_step10_payment_workspace(request, session):
+    """Payment & Workspace — enterprise pricing with 50% upfront."""
+    package_price = ENTERPRISE_PACKAGE_PRICE
     addons_cost = session.addons_total or Decimal('0')
     total = Decimal(str(package_price)) + addons_cost
+    seo_cost = Decimal((session.estimation_data or {}).get('seo_cost', '0'))
+    content_cost = Decimal((session.estimation_data or {}).get('content_cost', '0'))
+    total += seo_cost + content_cost
+    upfront = total / 2
+    monthly = total / 2
 
     if request.method == 'POST':
         session.payment_method = 'stripe'
-        session.deposit_amount = total / 2
+        session.deposit_amount = upfront
         session.total_amount = total
-        session.mark_step_complete(12)
-        session.current_step = 13
+        session.mark_step_complete(10)
+        session.current_step = 10
         session.payment_completed = True
         session.save()
-        _generate_workspace(session)
-        return redirect('community:wizard_step', step=13)
+        _generate_enterprise_workspace(session)
+        return redirect('community:wizard_enterprise_step', step=10)
 
-    return render(request, 'community/wizard/step_12_payment.html', {
+    project = session.linked_project
+    return render(request, 'community/wizard/enterprise_10_workspace.html', {
         'session': session,
-        'services_cost': str(int(package_price)),
+        'project': project,
+        'package_price': str(int(package_price)),
+        'seo_cost': str(int(seo_cost)),
+        'content_cost': str(int(content_cost)),
         'addon_cost': str(int(addons_cost)),
-        'total_due': str(int(total)),
-        'payment_schedule': '50% upfront, 50% on completion',
+        'total_due': str(int(upfront)),
+        'total_project': str(int(total)),
+        'monthly_payment': str(int(monthly)),
+        'payment_schedule': '50% upfront, remaining in monthly installments',
+        'payment_completed': session.payment_completed,
     })
 
 
-def _handle_step13(request, session):
+def _generate_enterprise_workspace(session):
+    """Create project workspace for enterprise package."""
+    services_text = ', '.join([s.name for s in session.selected_services.all()]) or 'Enterprise Web Project'
+    project = Project.objects.create(
+        client=session.user,
+        title=f"{session.business_name or 'Project'} - {services_text}",
+        description=(
+            f"Industry: {session.industry}\n"
+            f"Description: {session.business_description}\n"
+            f"Target: {session.target_audience}\n"
+            f"Style: {session.design_style}\n"
+            f"Package: Enterprise (SEO + Content Creator)"
+        ),
+        project_type='WEBSITE',
+        current_status='PLANNING',
+        current_phase='PLANNING',
+        brand_color=session.primary_color or '#000000',
+    )
+    session.linked_project = project
+    session.save(update_fields=['linked_project'])
+
+    phases_data = [
+        ('PLANNING', 'Planning & Requirements'),
+        ('SEO_SETUP', 'SEO Setup & Audit'),
+        ('CONTENT', 'Content Strategy & Creation'),
+        ('DESIGN', 'Design Drafts'),
+        ('DEVELOPMENT', 'Development'),
+        ('TESTING', 'Testing & QA'),
+        ('LAUNCH', 'Launch'),
+    ]
+    for ptype, _ in phases_data:
+        ProjectPhase.objects.create(
+            project=project, phase_type=ptype, status='NOT_STARTED',
+            is_locked=True, client_visible_notes=f'{ptype} phase'
+        )
+
+    planning_phase = project.phases.filter(phase_type='PLANNING').first()
+    if planning_phase:
+        tasks = [
+            'Review project requirements',
+            'Finalize page structure',
+            'Set up development environment',
+            'Keyword research & SEO audit',
+            'Content calendar planning',
+        ]
+        for task_name in tasks:
+            PhaseTask.objects.create(
+                phase=planning_phase, name=task_name,
+                priority='HIGH', status='TODO'
+            )
+
+    seo_phase = project.phases.filter(phase_type='SEO_SETUP').first()
+    if seo_phase:
+        seo_tasks = [
+            'Technical SEO audit',
+            'Keyword mapping',
+            'Meta tag optimization',
+            'Schema markup setup',
+            'Analytics configuration',
+        ]
+        for task_name in seo_tasks:
+            PhaseTask.objects.create(
+                phase=seo_phase, name=task_name,
+                priority='HIGH', status='TODO'
+            )
+
+    content_phase = project.phases.filter(phase_type='CONTENT').first()
+    if content_phase:
+        content_tasks = [
+            'Content strategy document',
+            'Blog post outlines',
+            'Landing page copy',
+            'Brand voice guidelines',
+            'Content calendar',
+        ]
+        for task_name in content_tasks:
+            PhaseTask.objects.create(
+                phase=content_phase, name=task_name,
+                priority='HIGH', status='TODO'
+            )
+
+    if session.user.email:
+        Customer.objects.get_or_create(
+            email=session.user.email,
+            defaults={
+                'user': session.user,
+                'name': session.user.get_full_name() or session.user.username,
+                'lifecycle_stage': 'LEAD',
+                'company_name': session.business_name or '',
+                'industry': session.industry or '',
+                'source': 'Enterprise Package Onboarding',
+            }
+        )
+
+    ActivityLog.objects.create(
+        user=session.user,
+        action=f"Enterprise Package onboarding completed. Project '{project.title}' created.",
+    )
+
+    _send_enterprise_completion_email(session, project)
+
+
+def _send_enterprise_completion_email(session, project):
+    if not session.user.email:
+        return
+
+    subject = f"Enterprise Package Project Created: {project.title}"
+    plain = (
+        f"Hi {session.user.get_full_name() or session.user.username},\n\n"
+        f"Your Enterprise Package project has been created!\n\n"
+        f"Project: {project.title}\n"
+        f"Package: Enterprise (Website + SEO + Content Creator)\n"
+        f"Total: ${session.total_amount}\n\n"
+        f"Your project team will reach out within 24 hours.\n\n"
+        f"- The OnWebApp Team"
+    )
+    html = (
+        f"<h2>Your Enterprise Package project is ready!</h2>"
+        f"<p>Hi <strong>{session.user.get_full_name() or session.user.username}</strong>,</p>"
+        f"<p>Your Enterprise Package project has been created.</p>"
+        f"<table style='border-collapse:collapse;width:100%;max-width:480px;'>"
+        f"<tr><td style='padding:8px 12px;font-weight:600;'>Project</td><td style='padding:8px 12px;'>{project.title}</td></tr>"
+        f"<tr><td style='padding:8px 12px;font-weight:600;'>Package</td><td style='padding:8px 12px;'>Enterprise (Website + SEO + Content Creator)</td></tr>"
+        f"<tr><td style='padding:8px 12px;font-weight:600;'>Total</td><td style='padding:8px 12px;'>${session.total_amount}</td></tr>"
+        f"</table>"
+        f"<p style='margin-top:20px;'>Your project team will reach out within <strong>24 hours</strong>.</p>"
+        f"<p>- The OnWebApp Team</p>"
+    )
+    try:
+        send_mail(
+            subject, plain, django_settings.DEFAULT_FROM_EMAIL,
+            [session.user.email], html_message=html, fail_silently=True,
+        )
+    except Exception:
+        pass
+        session.additional_notes = request.POST.get('additional_notes', '').strip()
+        session.mark_step_complete(3)
+        session.current_step = 4
+        session.save()
+        return redirect('community:wizard_step', step=4)
+
+    return render(request, 'community/wizard/step_03_business_project.html', {
+        'session': session,
+    })
+
+
+def _handle_step4_design(request, session):
     if request.method == 'POST':
-        session.complete()
-        return redirect('community:dashboard')
+        design_style = request.POST.get('design_style', '').strip()
+        if not design_style:
+            messages.error(request, 'Please select a design style.')
+            return render(request, 'community/wizard/step_04_design.html', {
+                'session': session,
+                'design_styles': DESIGN_STYLES,
+                'typography_styles': TYPOGRAPHY_STYLES,
+            })
+
+        session.design_style = design_style
+        session.primary_color = request.POST.get('primary_color', '#6366f1').strip()
+        session.accent_color = request.POST.get('accent_color', '#8b5cf6').strip()
+        session.typography_style = request.POST.get('typography_style', '').strip()
+        session.inspiration_sites = request.POST.get('inspiration_sites', '').strip()
+        session.mark_step_complete(4)
+        session.current_step = 5
+        session.save()
+        return redirect('community:wizard_step', step=5)
+
+    return render(request, 'community/wizard/step_04_design.html', {
+        'session': session,
+        'design_styles': DESIGN_STYLES,
+        'typography_styles': TYPOGRAPHY_STYLES,
+    })
+
+
+def _handle_step5_features(request, session):
+    if request.method == 'POST':
+        session.selected_features = request.POST.getlist('features')
+        session.integrations = request.POST.get('integrations', '')
+        session.mark_step_complete(5)
+        session.current_step = 6
+        session.save()
+        return redirect('community:wizard_step', step=6)
+
+    selected_features = session.selected_features or []
+
+    return render(request, 'community/wizard/step_05_features.html', {
+        'session': session,
+        'features': FEATURES,
+        'selected_features': selected_features,
+    })
+
+
+def _handle_step6_estimate_summary(request, session):
+    estimation = calculate(session)
+    session.estimation_data = estimation.to_dict()
+    session.save(update_fields=['estimation_data', 'updated_at'])
+
+    if request.method == 'POST':
+        session.mark_step_complete(6)
+        session.current_step = 7
+        session.save()
+        return redirect('community:wizard_step', step=7)
+
+    return render(request, 'community/wizard/step_06_estimate_summary.html', {
+        'session': session, 'estimation': estimation,
+    })
+
+
+def _handle_step7_addons(request, session):
+    addons = OnboardingAddon.objects.filter(is_active=True)
+
+    if request.method == 'POST':
+        selected_slugs = request.POST.getlist('addons')
+        addon_list = []
+        total = Decimal('0')
+        for addon in addons:
+            if addon.slug in selected_slugs:
+                addon_list.append({'slug': addon.slug, 'name': addon.name, 'price': float(addon.price)})
+                total += addon.price
+        session.selected_addons = addon_list
+        session.addons_total = total
+        session.mark_step_complete(7)
+        session.current_step = 8
+        session.save()
+        return redirect('community:wizard_step', step=8)
+
+    selected_addons = [a['slug'] for a in session.selected_addons] if session.selected_addons else []
+
+    return render(request, 'community/wizard/step_07_addons.html', {
+        'session': session, 'addons': addons, 'selected_addons': selected_addons,
+    })
+
+
+def _handle_step8_payment_workspace(request, session):
+    package_price = STARTUP_PACKAGE_PRICE
+    addons_cost = session.addons_total or Decimal('0')
+    total = Decimal(str(package_price)) + addons_cost
+    upfront = total / 2
+    monthly = total / 2
+
+    if request.method == 'POST':
+        session.payment_method = 'stripe'
+        session.deposit_amount = upfront
+        session.total_amount = total
+        session.mark_step_complete(8)
+        session.current_step = 8
+        session.payment_completed = True
+        session.save()
+        _generate_workspace(session)
+        return redirect('community:wizard_step', step=8)
 
     project = session.linked_project
-    return render(request, 'community/wizard/step_13_workspace.html', {
-        'session': session, 'project': project,
+    return render(request, 'community/wizard/step_08_workspace.html', {
+        'session': session,
+        'project': project,
+        'package_price': str(int(package_price)),
+        'addon_cost': str(int(addons_cost)),
+        'total_due': str(int(upfront)),
+        'total_project': str(int(total)),
+        'monthly_payment': str(int(monthly)),
+        'payment_schedule': '50% upfront, remaining in monthly installments',
+        'payment_completed': session.payment_completed,
     })
 
 
@@ -787,10 +1283,9 @@ def wizard_autosave(request):
     field_updates = data.get('data', {})
 
     field_map = {
-        3: ['business_name', 'industry', 'business_description', 'target_audience', 'existing_website', 'competitors'],
-        4: ['project_name', 'project_goals', 'budget_range', 'additional_notes'],
-        5: ['design_style', 'primary_color', 'accent_color', 'typography_style', 'inspiration_sites'],
-        6: ['selected_features', 'integrations'],
+        3: ['business_name', 'industry', 'business_description', 'target_audience', 'existing_website', 'competitors', 'project_name', 'project_goals', 'budget_range', 'additional_notes'],
+        4: ['design_style', 'primary_color', 'accent_color', 'typography_style', 'inspiration_sites'],
+        5: ['selected_features', 'integrations'],
     }
 
     allowed = field_map.get(step, [])
@@ -1228,3 +1723,242 @@ def brand_download(request, profile_id):
     response = HttpResponse(buffer.getvalue(), content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="brand-kit-{profile.name.lower().replace(" ", "-")}-{profile.id}.pdf"'
     return response
+
+
+# ---------------------------------------------------------------------------
+# Basic Package Wizard (Simplified 6-step flow)
+# Step 2: Package Selection (shared)
+# Step 3: Business Info
+# Step 4: Project Details
+# Step 5: Payment
+# Step 6: Workspace Generated
+# ---------------------------------------------------------------------------
+
+@login_required
+def wizard_essential_step(request, step):
+    step = int(step)
+    if step < 3 or step > 6:
+        return redirect('community:wizard_start')
+
+    session = OnboardingSession.objects.filter(
+        user=request.user, status__in=['draft', 'in_progress']
+    ).order_by('-updated_at').first()
+
+    if not session:
+        return redirect('community:wizard_start')
+
+    if session.package_type != 'essential':
+        return redirect('community:wizard_step', step=session.current_step)
+
+    if step > session.current_step + 1:
+        return redirect('community:wizard_essential_step', step=session.current_step)
+
+    step_handlers = {
+        3: _essential_step3_business,
+        4: _essential_step4_project,
+        5: _essential_step5_payment,
+        6: _essential_step6_workspace,
+    }
+
+    handler = step_handlers.get(step)
+    if handler:
+        return handler(request, session)
+
+    return redirect('community:wizard_start')
+
+
+def _essential_step3_business(request, session):
+    if request.method == 'POST':
+        business_name = request.POST.get('business_name', '').strip()
+        industry = request.POST.get('industry', '').strip()
+        business_description = request.POST.get('business_description', '').strip()
+        target_audience = request.POST.get('target_audience', '').strip()
+
+        if not business_name:
+            messages.error(request, 'Business name is required.')
+            return render(request, 'community/wizard/essential_03_business.html', {'session': session})
+        if not industry:
+            messages.error(request, 'Industry is required.')
+            return render(request, 'community/wizard/essential_03_business.html', {'session': session})
+
+        session.business_name = business_name
+        session.industry = industry
+        session.business_description = business_description
+        session.target_audience = target_audience
+        session.mark_step_complete(3)
+        session.current_step = 4
+        session.save()
+        return redirect('community:wizard_essential_step', step=4)
+
+    return render(request, 'community/wizard/essential_03_business.html', {'session': session})
+
+
+def _essential_step4_project(request, session):
+    if request.method == 'POST':
+        project_name = request.POST.get('project_name', '').strip()
+        project_goals = request.POST.get('project_goals', '').strip()
+        pages_needed = request.POST.get('pages_needed', '').strip()
+        reference_sites = request.POST.get('reference_sites', '').strip()
+
+        if not project_name:
+            messages.error(request, 'Project name is required.')
+            return render(request, 'community/wizard/essential_04_project.html', {'session': session})
+
+        session.project_name = project_name
+        session.project_goals = project_goals
+        session.additional_notes = f"Pages needed: {pages_needed}\nReference sites: {reference_sites}"
+        session.selected_package = 'basic_pkg'
+        session.mark_step_complete(4)
+        session.current_step = 5
+        session.save()
+        return redirect('community:wizard_essential_step', step=5)
+
+    pages_needed = '3'
+    reference_sites = ''
+    if session.additional_notes:
+        for line in session.additional_notes.split('\n'):
+            if line.startswith('Pages needed:'):
+                pages_needed = line.split(':', 1)[1].strip()
+            elif line.startswith('Reference sites:'):
+                reference_sites = line.split(':', 1)[1].strip()
+
+    return render(request, 'community/wizard/essential_04_project.html', {
+        'session': session,
+        'pages_needed': pages_needed,
+        'reference_sites': reference_sites,
+    })
+
+
+def _essential_step5_payment(request, session):
+    package_price = ESSENTIAL_PACKAGE_PRICE
+    total = Decimal(str(package_price))
+
+    if request.method == 'POST':
+        session.payment_method = 'stripe'
+        session.deposit_amount = total
+        session.total_amount = total
+        session.mark_step_complete(5)
+        session.current_step = 6
+        session.payment_completed = True
+        session.save()
+        _generate_essential_workspace(session)
+        return redirect('community:wizard_essential_step', step=6)
+
+    session.total_amount = total
+    session.save(update_fields=['total_amount', 'updated_at'])
+
+    return render(request, 'community/wizard/essential_05_payment.html', {
+        'session': session,
+        'total_due': str(int(total)),
+        'payment_schedule': 'Full payment upfront',
+    })
+
+
+def _essential_step6_workspace(request, session):
+    if request.method == 'POST':
+        session.complete()
+        messages.success(request, 'Your Basic Package project has been created!')
+        return redirect('community:dashboard')
+
+    project = session.linked_project
+    return render(request, 'community/wizard/essential_06_workspace.html', {
+        'session': session, 'project': project,
+    })
+
+
+def _generate_essential_workspace(session):
+    project = Project.objects.create(
+        client=session.user,
+        title=f"{session.business_name or 'Project'} - Basic Package",
+        description=(
+            f"Industry: {session.industry}\n"
+            f"Description: {session.business_description}\n"
+            f"Target: {session.target_audience}\n"
+            f"Package: Basic Package"
+        ),
+        project_type='WEBSITE',
+        current_status='PLANNING',
+        current_phase='PLANNING',
+    )
+    session.linked_project = project
+    session.save(update_fields=['linked_project'])
+
+    phases_data = [
+        ('PLANNING', 'Planning & Requirements'),
+        ('DESIGN', 'Design'),
+        ('DEVELOPMENT', 'Development'),
+        ('LAUNCH', 'Launch'),
+    ]
+    for ptype, _ in phases_data:
+        ProjectPhase.objects.create(
+            project=project, phase_type=ptype, status='NOT_STARTED',
+            is_locked=True, client_visible_notes=f'{ptype} phase'
+        )
+
+    planning_phase = project.phases.filter(phase_type='PLANNING').first()
+    if planning_phase:
+        tasks = [
+            'Review project requirements',
+            'Finalize page structure',
+            'Set up development environment',
+        ]
+        for task_name in tasks:
+            PhaseTask.objects.create(
+                phase=planning_phase, name=task_name,
+                priority='HIGH', status='TODO'
+            )
+
+    if session.user.email:
+        Customer.objects.get_or_create(
+            email=session.user.email,
+            defaults={
+                'user': session.user,
+                'name': session.user.get_full_name() or session.user.username,
+                'lifecycle_stage': 'LEAD',
+                'company_name': session.business_name or '',
+                'industry': session.industry or '',
+                'source': 'Basic Package Onboarding',
+            }
+        )
+
+    ActivityLog.objects.create(
+        user=session.user,
+        action=f"Basic Package onboarding completed. Project '{project.title}' created.",
+    )
+
+    _send_essential_completion_email(session, project)
+
+
+def _send_essential_completion_email(session, project):
+    if not session.user.email:
+        return
+
+    subject = f"Basic Package Project Created: {project.title}"
+    plain = (
+        f"Hi {session.user.get_full_name() or session.user.username},\n\n"
+        f"Your Basic Package project has been created!\n\n"
+        f"Project: {project.title}\n"
+        f"Package: Basic Package\n"
+        f"Total: ${session.total_amount}\n\n"
+        f"Your project team will reach out within 24 hours.\n\n"
+        f"- The OnWebApp Team"
+    )
+    html = (
+        f"<h2>Your Basic Package project is ready!</h2>"
+        f"<p>Hi <strong>{session.user.get_full_name() or session.user.username}</strong>,</p>"
+        f"<p>Your Basic Package project has been created.</p>"
+        f"<table style='border-collapse:collapse;width:100%;max-width:480px;'>"
+        f"<tr><td style='padding:8px 12px;font-weight:600;'>Project</td><td style='padding:8px 12px;'>{project.title}</td></tr>"
+        f"<tr><td style='padding:8px 12px;font-weight:600;'>Package</td><td style='padding:8px 12px;'>Basic Package</td></tr>"
+        f"<tr><td style='padding:8px 12px;font-weight:600;'>Total</td><td style='padding:8px 12px;'>${session.total_amount}</td></tr>"
+        f"</table>"
+        f"<p style='margin-top:20px;'>Your project team will reach out within <strong>24 hours</strong>.</p>"
+        f"<p>- The OnWebApp Team</p>"
+    )
+    try:
+        send_mail(
+            subject, plain, django_settings.DEFAULT_FROM_EMAIL,
+            [session.user.email], html_message=html, fail_silently=True,
+        )
+    except Exception:
+        pass

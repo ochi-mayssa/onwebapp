@@ -1,0 +1,119 @@
+{% extends "community/wizard/base_wizard.html" %}
+{% load static i18n %}
+
+{% block wizard_content %}
+<div class="wizard-card">
+    <div class="text-center mb-4">
+        <div class="wizard-section-label">ENTERPRISE PACKAGE - STEP 3 OF 10</div>
+        <h2 class="mb-2">Business & Project</h2>
+        <p class="lead">Tell us about your business, your goals, and your online presence.</p>
+    </div>
+
+    <div class="text-center mb-4">
+        <span class="badge rounded-pill px-4 py-2 fw-700" style="background:linear-gradient(135deg,#059669,#10b981);color:#fff;font-size:.75rem;">
+            <i class="fas fa-crown me-1"></i> Enterprise Package
+        </span>
+    </div>
+
+    <form method="post" id="businessProjectForm">
+        {% csrf_token %}
+
+        <!-- Business Section -->
+        <h6 class="fw-700 mb-3" style="color:#059669;"><i class="fas fa-building me-2"></i>About Your Business</h6>
+        <div class="row g-3 mb-4">
+            <div class="col-md-6">
+                <label class="form-label fw-600 small">Business Name <span class="text-danger">*</span></label>
+                <input type="text" name="business_name" class="wizard-input" placeholder="e.g. Acme Corp" required
+                       value="{% if session.business_name %}{{ session.business_name }}{% endif %}">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-600 small">Industry <span class="text-danger">*</span></label>
+                <input type="text" name="industry" class="wizard-input" placeholder="e.g. Technology, Healthcare, Retail" required
+                       value="{% if session.industry %}{{ session.industry }}{% endif %}">
+            </div>
+            <div class="col-12">
+                <label class="form-label fw-600 small">Business Description</label>
+                <textarea name="business_description" class="wizard-input" rows="2" placeholder="What does your business do?">{% if session.business_description %}{{ session.business_description }}{% endif %}</textarea>
+            </div>
+            <div class="col-12">
+                <label class="form-label fw-600 small">Target Audience</label>
+                <input type="text" name="target_audience" class="wizard-input" placeholder="e.g. Small business owners, Tech startups"
+                       value="{% if session.target_audience %}{{ session.target_audience }}{% endif %}">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-600 small">Existing Website</label>
+                <input type="url" name="existing_website" class="wizard-input" placeholder="https://..."
+                       value="{% if session.existing_website %}{{ session.existing_website }}{% endif %}">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-600 small">Competitors</label>
+                <input type="text" name="competitors" class="wizard-input" placeholder="e.g. competitor1.com, competitor2.com"
+                       value="{% if session.competitors %}{{ session.competitors }}{% endif %}">
+            </div>
+        </div>
+
+        <!-- Project Section -->
+        <h6 class="fw-700 mb-3" style="color:#059669;"><i class="fas fa-folder-open me-2"></i>About Your Project</h6>
+        <div class="row g-3 mb-4">
+            <div class="col-md-6">
+                <label class="form-label fw-600 small">Project Name <span class="text-danger">*</span></label>
+                <input type="text" name="project_name" class="wizard-input" placeholder="e.g. Company Website Redesign" required
+                       value="{% if session.project_name %}{{ session.project_name }}{% endif %}">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-600 small">Budget Range</label>
+                <select name="budget_range" class="wizard-input">
+                    <option value="">Select budget</option>
+                    <option value="under_1k" {% if session.budget_range == 'under_1k' %}selected{% endif %}>Under $1,000</option>
+                    <option value="1k_3k" {% if session.budget_range == '1k_3k' %}selected{% endif %}>$1,000 - $3,000</option>
+                    <option value="3k_5k" {% if session.budget_range == '3k_5k' %}selected{% endif %}>$3,000 - $5,000</option>
+                    <option value="5k_10k" {% if session.budget_range == '5k_10k' %}selected{% endif %}>$5,000 - $10,000</option>
+                    <option value="10k_plus" {% if session.budget_range == '10k_plus' %}selected{% endif %}>$10,000+</option>
+                </select>
+            </div>
+            <div class="col-12">
+                <label class="form-label fw-600 small">Project Goals</label>
+                <textarea name="project_goals" class="wizard-input" rows="2" placeholder="What do you want to achieve?">{% if session.project_goals %}{{ session.project_goals }}{% endif %}</textarea>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-600 small">Target Launch Date</label>
+                <input type="date" name="target_launch_date" class="wizard-input"
+                       value="{% if session.target_launch_date %}{{ session.target_launch_date|date:'Y-m-d' }}{% endif %}">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-600 small">Additional Notes</label>
+                <input type="text" name="additional_notes" class="wizard-input" placeholder="Any special requirements"
+                       value="{% if session.additional_notes %}{{ session.additional_notes }}{% endif %}">
+            </div>
+        </div>
+
+        <!-- Online Presence (Enterprise-specific) -->
+        <h6 class="fw-700 mb-3" style="color:#059669;"><i class="fas fa-globe me-2"></i>Current Online Presence</h6>
+        <div class="row g-3 mb-4">
+            <div class="col-12">
+                <label class="form-label fw-600 small">Do you currently use any SEO tools or services?</label>
+                <input type="text" name="existing_seo_tools" class="wizard-input" placeholder="e.g. Ahrefs, SEMrush, Yoast, None"
+                       value="{{ existing_seo_tools }}">
+            </div>
+            <div class="col-12">
+                <label class="form-label fw-600 small">Do you have an existing content strategy or blog?</label>
+                <textarea name="existing_content" class="wizard-input" rows="2" placeholder="Describe any existing blog, social media, or content efforts...">{{ existing_content }}</textarea>
+            </div>
+        </div>
+
+        {% if messages %}
+        <div class="mb-3">
+            {% for message in messages %}
+            <div class="alert alert-danger py-2" style="font-size:.85rem;">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </form>
+</div>
+{% endblock %}
+
+{% block wizard_next %}
+<button type="submit" form="businessProjectForm" class="btn-wizard-next">
+    Continue <i class="fas fa-arrow-right ms-2"></i>
+</button>
+{% endblock %}

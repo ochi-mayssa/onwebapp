@@ -1,0 +1,194 @@
+{% extends "community/wizard/base_wizard.html" %}
+{% load static i18n %}
+
+{% block wizard_content %}
+{% if payment_completed %}
+<!-- Workspace Ready -->
+<div class="wizard-card text-center">
+    <div class="mb-4">
+        <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3 wizard-success-icon" style="width:100px;height:100px;background:linear-gradient(135deg,#10b981,#059669);color:white;font-size:2.5rem;">
+            <i class="fas fa-check"></i>
+        </div>
+    </div>
+
+    <h2 class="mb-3">Payment Received!</h2>
+    <p class="lead mb-5">Your project is now active. Here's what happens next.</p>
+
+    <div class="row g-4 mb-5" style="text-align:left;">
+        <div class="col-md-4">
+            <div class="card rounded-3 border-0 h-100" style="background:var(--bg-surface-secondary,#f8fafc);">
+                <div class="card-body p-4 text-center">
+                    <i class="fas fa-clipboard-check text-primary fs-2 mb-2"></i>
+                    <h6 class="fw-700">Project Created</h6>
+                    <p class="text-secondary small mb-0">Your project has 5 phases: Planning, Design, Development, Testing, and Launch.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card rounded-3 border-0 h-100" style="background:var(--bg-surface-secondary,#f8fafc);">
+                <div class="card-body p-4 text-center">
+                    <i class="fas fa-headset text-primary fs-2 mb-2"></i>
+                    <h6 class="fw-700">Team Outreach</h6>
+                    <p class="text-secondary small mb-0">Our project team will contact you within 24 hours to kick things off.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card rounded-3 border-0 h-100" style="background:var(--bg-surface-secondary,#f8fafc);">
+                <div class="card-body p-4 text-center">
+                    <i class="fas fa-tasks text-primary fs-2 mb-2"></i>
+                    <h6 class="fw-700">Track Progress</h6>
+                    <p class="text-secondary small mb-0">Monitor your project phases and milestones from your Dashboard.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
+        <a href="{% url 'community:dashboard' %}" class="btn-wizard-next px-5 py-3 text-decoration-none text-center">
+            <i class="fas fa-th-large me-2"></i>Go to Dashboard
+        </a>
+    </div>
+
+    <div class="mt-5 pt-4 border-top">
+        <p class="text-secondary small mb-1">
+            <i class="fas fa-envelope me-2"></i>A confirmation email has been sent to <strong>{{ user.email }}</strong>
+        </p>
+        <p class="text-secondary small mb-0">
+            Your project team will reach out within 24 hours.
+        </p>
+    </div>
+</div>
+
+<style>
+.wizard-success-icon {
+    animation: wizardSuccessPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes wizardSuccessPop {
+    0% { transform: scale(0); opacity: 0; }
+    60% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+}
+</style>
+
+{% else %}
+<!-- Payment Form -->
+<div class="wizard-card">
+    <div class="text-center mb-4">
+        <div class="wizard-section-label">STEP 8 OF 8</div>
+        <h2 class="mb-2">Secure Payment</h2>
+        <p class="lead">Complete your payment to start the project.</p>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="card rounded-3 border-0" style="background:var(--bg-surface-secondary,#f8fafc);">
+                <div class="card-body p-4">
+                    <h6 class="fw-700 mb-3"><i class="fas fa-credit-card me-2 text-primary"></i>Payment Method</h6>
+
+                    <form method="post" id="paymentForm">
+                        {% csrf_token %}
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-12">
+                                <label class="form-label fw-600 small">Cardholder Name</label>
+                                <input type="text" name="card_name" class="wizard-input" placeholder="John Doe" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-600 small">Card Number</label>
+                                <input type="text" name="card_number" class="wizard-input" placeholder="4242 4242 4242 4242" maxlength="19" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-600 small">Expiry</label>
+                                <input type="text" name="card_expiry" class="wizard-input" placeholder="MM/YY" maxlength="5" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-600 small">CVC</label>
+                                <input type="text" name="card_cvc" class="wizard-input" placeholder="123" maxlength="4" required>
+                            </div>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="savePayment" name="save_payment" checked>
+                            <label class="form-check-label small" for="savePayment">Save payment method for future invoices</label>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card rounded-3 border-0" style="background:var(--bg-surface-secondary,#f8fafc);">
+                <div class="card-body p-4">
+                    <h6 class="fw-700 mb-3"><i class="fas fa-receipt me-2 text-primary"></i>Order Summary</h6>
+
+                    <!-- Package -->
+                    <div class="d-flex align-items-center gap-3 mb-3 p-3 rounded" style="background:var(--bg-surface,#fff);border:1px solid var(--border-color,#e2e8f0);">
+                        <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0;">
+                            <i class="fas fa-rocket"></i>
+                        </div>
+                        <div>
+                            <div class="fw-700 small">Startup Package</div>
+                            <div class="text-secondary" style="font-size:.72rem;">Growth-ready digital foundation</div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between small mb-1">
+                            <span class="text-secondary">Startup Package</span>
+                            <span class="fw-600">${{ package_price }}</span>
+                        </div>
+                        {% if addon_cost != "0" %}
+                        <div class="d-flex justify-content-between small mb-1">
+                            <span class="text-secondary">Add-ons</span>
+                            <span class="fw-600">${{ addon_cost }}</span>
+                        </div>
+                        {% endif %}
+                        <hr>
+                        <div class="d-flex justify-content-between small mb-1">
+                            <span class="text-secondary">Due Today (50%)</span>
+                            <span class="fw-700 text-primary" style="font-size:1.1rem;">${{ total_due }}</span>
+                        </div>
+                        <div class="text-secondary small mt-1">
+                            Remaining ${{ monthly_payment }} in monthly installments after launch
+                        </div>
+                    </div>
+
+                    {% if session.get_addons_list %}
+                    <div class="mb-3">
+                        <span class="small fw-700 text-secondary">Add-ons:</span>
+                        {% for a in session.get_addons_list %}
+                        <span class="badge bg-warning bg-opacity-10 text-warning small fw-600 me-1 mb-1">{{ a }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="d-flex align-items-center gap-2 text-success small mb-3">
+                        <i class="fas fa-shield-halved"></i>
+                        <span>256-bit SSL encrypted. Powered by Stripe.</span>
+                    </div>
+
+                    <button type="submit" form="paymentForm" class="btn-wizard-next w-100 py-3">
+                        <i class="fas fa-lock me-2"></i>Pay ${{ total_due }} Now
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block wizard_js %}
+<script>
+document.querySelector('[name="card_number"]')?.addEventListener('input', function(e) {
+    let v = e.target.value.replace(/\D/g, '').substring(0, 16);
+    e.target.value = v.replace(/(.{4})/g, '$1 ').trim();
+});
+document.querySelector('[name="card_expiry"]')?.addEventListener('input', function(e) {
+    let v = e.target.value.replace(/\D/g, '').substring(0, 4);
+    if(v.length > 2) v = v.substring(0,2) + '/' + v.substring(2);
+    e.target.value = v;
+});
+</script>
+{% endblock %}

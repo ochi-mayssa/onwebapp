@@ -25,6 +25,7 @@ urlpatterns = [
     path('software/web-development/', views.web_development, name='web_development'),
     path('software/mobile-development/', views.mobile_development, name='mobile_development'),
     path('software/ecommerce-development/', views.ecommerce_development, name='ecommerce_development'),
+    path('services/erp/', views.erp_service, name='erp_service'),
     path('design-system/', views.design_system, name='design_system'),
     path('overview/', views.video_explainer, name='video_explainer'),
 ]

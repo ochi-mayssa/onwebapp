@@ -1,0 +1,125 @@
+{% extends "community/wizard/base_wizard.html" %}
+{% load static i18n %}
+
+{% block wizard_content %}
+<div class="wizard-card">
+    <div class="text-center mb-4">
+        <div class="wizard-section-label">STEP 6 OF 10</div>
+        <h2 class="mb-2">SEO Setup</h2>
+        <p class="lead">Configure your search engine optimization strategy to get found online.</p>
+    </div>
+
+    <!-- Enterprise badge -->
+    <div class="text-center mb-4">
+        <span class="badge rounded-pill px-4 py-2 fw-700" style="background:linear-gradient(135deg,#059669,#10b981);color:#fff;font-size:.75rem;">
+            <i class="fas fa-crown me-1"></i> Enterprise Package — SEO + Content Creator
+        </span>
+    </div>
+
+    <form method="post" id="seoForm">
+        {% csrf_token %}
+
+        <!-- SEO Goals -->
+        <div class="mb-4">
+            <h6 class="fw-700 mb-3"><i class="fas fa-bullseye me-2 text-primary"></i>SEO Goals</h6>
+            <p class="text-secondary small mb-3">Select the SEO areas you want to focus on.</p>
+            <div class="row g-2">
+                {% for value, label, desc in seo_goals %}
+                <div class="col-md-6">
+                    <input type="checkbox" name="seo_goals" value="{{ value }}" id="seo_{{ value }}" class="wizard-check-input" {% if value in selected_goals %}checked{% endif %}>
+                    <label for="seo_{{ value }}" class="wizard-check-label h-100">
+                        <span class="check-icon"><i class="fas fa-check" style="font-size:0.7rem;"></i></span>
+                        <div>
+                            <strong class="small">{{ label }}</strong>
+                            <div class="text-secondary" style="font-size:.75rem;">{{ desc }}</div>
+                        </div>
+                    </label>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Target Keywords -->
+        <div class="mb-4">
+            <h6 class="fw-700 mb-3"><i class="fas fa-key me-2 text-primary"></i>Target Keywords</h6>
+            {% if suggested_keywords %}
+            <div class="mb-3">
+                <span class="small fw-600 text-secondary me-2">Suggested for your industry:</span>
+                {% for kw in suggested_keywords %}
+                <span class="badge rounded-pill px-3 py-1 fw-600 industry-kw" style="background:rgba(99,102,241,0.08);color:#6366f1;font-size:.75rem;cursor:pointer;" onclick="addKeyword('{{ kw }}')">
+                    + {{ kw }}
+                </span>
+                {% endfor %}
+            </div>
+            {% endif %}
+            <label class="form-label fw-600 small">Keywords (comma separated)</label>
+            <textarea name="target_keywords" class="wizard-input" rows="3" placeholder="e.g. web design agency, custom software, ERP solutions">{{ target_keywords }}</textarea>
+        </div>
+
+        <!-- Meta Tags -->
+        <div class="row g-3 mb-4">
+            <div class="col-12">
+                <h6 class="fw-700 mb-3"><i class="fas fa-tags me-2 text-primary"></i>Meta Tags</h6>
+            </div>
+            <div class="col-12">
+                <label class="form-label fw-600 small">Meta Title</label>
+                <input type="text" name="meta_title" class="wizard-input" placeholder="e.g. My Business | Web Design & Development" value="{{ meta_title }}">
+                <div class="form-text small">Recommended: 50-60 characters</div>
+            </div>
+            <div class="col-12">
+                <label class="form-label fw-600 small">Meta Description</label>
+                <textarea name="meta_description" class="wizard-input" rows="2" placeholder="Brief description of your business for search results...">{{ meta_description }}</textarea>
+                <div class="form-text small">Recommended: 150-160 characters</div>
+            </div>
+        </div>
+
+        <!-- Analytics & Competitors -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-6">
+                <h6 class="fw-700 mb-3"><i class="fas fa-chart-line me-2 text-primary"></i>Analytics Goals</h6>
+                <textarea name="analytics_goals" class="wizard-input" rows="3" placeholder="e.g. Track conversions, monitor bounce rate, measure page views...">{{ analytics_goals }}</textarea>
+            </div>
+            <div class="col-md-6">
+                <h6 class="fw-700 mb-3"><i class="fas fa-eye me-2 text-primary"></i>Competitor URLs</h6>
+                <textarea name="competitor_urls" class="wizard-input" rows="3" placeholder="e.g. competitor1.com, competitor2.com...">{{ competitor_urls }}</textarea>
+            </div>
+        </div>
+
+        <!-- Existing SEO -->
+        <div class="mb-4">
+            <h6 class="fw-700 mb-3"><i class="fas fa-history me-2 text-primary"></i>Existing SEO</h6>
+            <textarea name="existing_seo" class="wizard-input" rows="2" placeholder="Describe any existing SEO work, tools used, or previous rankings...">{{ existing_seo }}</textarea>
+        </div>
+
+        <div id="seoError" class="alert alert-danger d-none mb-3" style="font-size:.85rem;">
+            Please select at least one SEO goal to continue.
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block wizard_next %}
+<button type="submit" form="seoForm" class="btn-wizard-next" id="nextBtn">
+    Continue <i class="fas fa-arrow-right ms-2"></i>
+</button>
+{% endblock %}
+
+{% block wizard_js %}
+<script>
+function addKeyword(kw) {
+    var ta = document.querySelector('[name="target_keywords"]');
+    var current = ta.value.trim();
+    if (current && !current.endsWith(',')) current += ', ';
+    ta.value = current + kw;
+    ta.focus();
+}
+
+document.getElementById('seoForm').addEventListener('submit', function(e) {
+    var checked = document.querySelectorAll('input[name="seo_goals"]:checked');
+    if (checked.length === 0) {
+        e.preventDefault();
+        document.getElementById('seoError').classList.remove('d-none');
+    }
+});
+</script>
+{% endblock %}

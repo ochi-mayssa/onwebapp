@@ -143,20 +143,6 @@ class Step6FeaturesForm(forms.Form):
     )
 
 
-class Step9AddonsForm(forms.Form):
-    pass  # Dynamically built from OnboardingAddon model
-
-
-class Step12PaymentForm(forms.Form):
-    PAYMENT_CHOICES = [
-        ('deposit', 'Pay 50% Deposit'),
-        ('full', 'Pay Full Amount'),
-    ]
-    payment_method = forms.ChoiceField(choices=PAYMENT_CHOICES, widget=forms.RadioSelect)
-    promo_code = forms.CharField(max_length=50, required=False, widget=forms.TextInput(
-        attrs={'class': 'wizard-input', 'placeholder': 'Promo code (optional)'}
-    ))
-
 
 class WebsiteIntakeForm(forms.ModelForm):
     WEBSITE_GOALS_CHOICES = [

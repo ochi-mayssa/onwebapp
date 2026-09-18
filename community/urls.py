@@ -7,10 +7,16 @@ urlpatterns = [
     path('', views.home, name='home'),
     path('dashboard/', views.dashboard, name='dashboard'),
 
-    # Onboarding Wizard
+    # Onboarding Wizard (Startup Package - 8 steps)
     path('onboarding/', views.wizard_start, name='wizard_start'),
     path('onboarding/step/<int:step>/', views.wizard_step, name='wizard_step'),
     path('onboarding/autosave/', views.wizard_autosave, name='wizard_autosave'),
+
+    # Basic Package Wizard (Simplified 6-step flow)
+    path('onboarding/essential/<int:step>/', views.wizard_essential_step, name='wizard_essential_step'),
+
+    # Enterprise Package Wizard (10-step flow)
+    path('onboarding/enterprise/<int:step>/', views.wizard_enterprise_step, name='wizard_enterprise_step'),
 
     # Legacy (kept for backward compat)
     path('website-building/', views.website_building, name='website_building'),

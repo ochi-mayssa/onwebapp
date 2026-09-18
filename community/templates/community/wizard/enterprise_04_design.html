@@ -3,9 +3,17 @@
 
 {% block wizard_content %}
 <div class="wizard-card">
-    <div class="wizard-section-label mb-1">Step 5 of 13</div>
-    <h2 class="mb-2">Design Preferences</h2>
-    <p class="lead mb-4">Help our designers understand your visual direction.</p>
+    <div class="text-center mb-4">
+        <div class="wizard-section-label">ENTERPRISE PACKAGE - STEP 4 OF 10</div>
+        <h2 class="mb-2">Design Preferences</h2>
+        <p class="lead">Help our designers understand your visual direction.</p>
+    </div>
+
+    <div class="text-center mb-4">
+        <span class="badge rounded-pill px-4 py-2 fw-700" style="background:linear-gradient(135deg,#059669,#10b981);color:#fff;font-size:.75rem;">
+            <i class="fas fa-crown me-1"></i> Enterprise Package
+        </span>
+    </div>
 
     <form method="post">
         {% csrf_token %}
@@ -65,10 +73,10 @@
 
             <div class="col-12">
                 <label class="form-label fw-700 small">Logo Upload</label>
-                <div class="border rounded-3 p-4 text-center" style="border-style:dashed !important; border-color: #6366f1 !important;">
+                <div class="border rounded-3 p-4 text-center" style="border-style:dashed !important; border-color: #059669 !important;">
                     <input type="file" name="logo_file" accept="image/*" class="d-none" id="logoUpload">
                     <label for="logoUpload" class="cursor-pointer mb-0">
-                        <i class="fas fa-cloud-upload-alt text-primary fs-1 mb-2"></i>
+                        <i class="fas fa-cloud-upload-alt fs-1 mb-2" style="color:#059669;"></i>
                         <p class="text-secondary small mb-0">Click to upload or drag & drop</p>
                         <p class="text-muted small mb-0">PNG, SVG, or JPG (max 5MB)</p>
                     </label>
@@ -89,7 +97,6 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('input[type="color"]').forEach(function(picker) {
-        var suffix = picker.name === 'primary_color' ? '_hex' : '_hex';
         var group = picker.closest('.d-flex');
         if (!group) return;
         var textInput = group.querySelector('input[type="text"]');

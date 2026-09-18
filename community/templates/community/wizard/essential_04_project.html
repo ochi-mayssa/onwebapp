@@ -1,0 +1,58 @@
+{% extends "community/wizard/base_wizard.html" %}
+{% load static i18n %}
+
+{% block wizard_content %}
+<div class="wizard-card">
+    <div class="text-center mb-4">
+        <div class="wizard-section-label">BASIC PACKAGE - STEP 4 OF 6</div>
+        <h2 class="mb-2">Project Details</h2>
+        <p class="lead">Tell us about your website project.</p>
+    </div>
+
+    <form method="post" id="projectForm">
+        {% csrf_token %}
+
+        <div class="mb-4">
+            <label class="form-label fw-700 small">Project Name <span class="text-danger">*</span></label>
+            <input type="text" name="project_name" class="wizard-input" placeholder="e.g. My Business Website" required
+                   value="{% if session.project_name %}{{ session.project_name }}{% endif %}">
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label fw-700 small">What is the main goal of your website?</label>
+            <textarea name="project_goals" class="wizard-input" rows="3" placeholder="e.g. Showcase our services, Generate leads, Provide information">{% if session.project_goals %}{{ session.project_goals }}{% endif %}</textarea>
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label fw-700 small">How many pages do you need?</label>
+            <select name="pages_needed" class="wizard-input">
+                <option value="1" {% if pages_needed == "1" %}selected{% endif %}>1 page (Landing page)</option>
+                <option value="3" {% if pages_needed == "3" or not pages_needed %}selected{% endif %}>2-3 pages</option>
+                <option value="5" {% if pages_needed == "5" %}selected{% endif %}>4-5 pages</option>
+                <option value="7" {% if pages_needed == "7" %}selected{% endif %}>6-7 pages</option>
+            </select>
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label fw-700 small">Reference websites (optional)</label>
+            <input type="text" name="reference_sites" class="wizard-input" placeholder="e.g. example.com, another-site.com"
+                   value="{{ reference_sites }}">
+            <div class="form-text small text-muted">List websites you like for inspiration (comma separated)</div>
+        </div>
+
+        {% if messages %}
+        <div class="mb-3">
+            {% for message in messages %}
+            <div class="alert alert-danger py-2" style="font-size:.85rem;">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </form>
+</div>
+{% endblock %}
+
+{% block wizard_next %}
+<button type="submit" form="projectForm" class="btn-wizard-next">
+    Continue <i class="fas fa-arrow-right ms-2"></i>
+</button>
+{% endblock %}

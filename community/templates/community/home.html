@@ -13,35 +13,14 @@
         --c-border: #e2e8f0;
         --c-bg: #ffffff;
         --c-bg-alt: #f8fafc;
-        --c-warm: #fef3c7;
-        --c-warm-dark: #d97706;
     }
 
-    /*  Animations  */
     .c-reveal {
         opacity: 0;
         transform: translateY(30px);
         transition: opacity .7s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1);
     }
     .c-reveal.visible { opacity: 1; transform: translateY(0); }
-    .c-reveal-left {
-        opacity: 0;
-        transform: translateX(-40px);
-        transition: opacity .7s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1);
-    }
-    .c-reveal-left.visible { opacity: 1; transform: translateX(0); }
-    .c-reveal-right {
-        opacity: 0;
-        transform: translateX(40px);
-        transition: opacity .7s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1);
-    }
-    .c-reveal-right.visible { opacity: 1; transform: translateX(0); }
-    .c-reveal-scale {
-        opacity: 0;
-        transform: scale(.95);
-        transition: opacity .6s cubic-bezier(.22,1,.36,1), transform .6s cubic-bezier(.22,1,.36,1);
-    }
-    .c-reveal-scale.visible { opacity: 1; transform: scale(1); }
     .c-stagger-1 { transition-delay: .05s; }
     .c-stagger-2 { transition-delay: .12s; }
     .c-stagger-3 { transition-delay: .19s; }
@@ -49,7 +28,6 @@
     .c-stagger-5 { transition-delay: .33s; }
     .c-stagger-6 { transition-delay: .40s; }
 
-    /*  Buttons  */
     .c-btn-primary {
         display: inline-flex; align-items: center; gap: .5rem;
         padding: .85rem 2rem; background: var(--c-primary); color: #fff;
@@ -64,13 +42,6 @@
         border: 2px solid var(--c-border); text-decoration: none; transition: all .2s;
     }
     .c-btn-outline:hover { border-color: var(--c-primary); color: var(--c-primary); transform: translateY(-1px); }
-    .c-btn-secondary {
-        display: inline-flex; align-items: center; gap: .5rem;
-        padding: .85rem 2rem; background: transparent; color: var(--c-body);
-        font-size: .9rem; font-weight: 700; border-radius: 10px;
-        border: 1.5px solid var(--c-border); text-decoration: none; transition: all .2s;
-    }
-    .c-btn-secondary:hover { border-color: var(--c-primary); color: var(--c-primary); }
     .c-btn-white {
         display: inline-flex; align-items: center; gap: .5rem;
         padding: .85rem 2rem; background: #fff; color: var(--c-dark);
@@ -79,9 +50,9 @@
     }
     .c-btn-white:hover { background: var(--c-primary-light); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(255,255,255,.2); }
 
-    /*  Section system  */
     .c-sec { padding: 5.5rem 0; }
     .c-sec-alt { background: var(--c-bg-alt); }
+    .c-sec-dark { background: var(--c-dark); color: #fff; }
     .c-sec-label {
         display: inline-flex; align-items: center; gap: .5rem;
         font-size: .68rem; font-weight: 700; letter-spacing: .12em;
@@ -90,13 +61,14 @@
     .c-sec-label::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--c-primary); }
     .c-sec-title { font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 800; color: var(--c-dark); letter-spacing: -.01em; margin-bottom: .4rem; }
     .c-sec-sub { font-size: .95rem; color: var(--c-muted); max-width: 520px; line-height: 1.6; }
-    .c-sep { width: 100%; height: 1px; background: var(--c-border); }
+    .c-sec-dark .c-sec-title { color: #fff; }
+    .c-sec-dark .c-sec-sub { color: rgba(255,255,255,.5); }
 
-    /*  Hero  */
+    /* Hero */
     .c-hero {
-        padding: 6rem 0 5rem;
-        position: relative; overflow: hidden;
+        padding: 6.5rem 0 5rem;
         background: linear-gradient(160deg, #fafbff 0%, #f1f0ff 40%, #eef2ff 100%);
+        position: relative; overflow: hidden;
     }
     .c-hero::before {
         content: ''; position: absolute; top: -30%; right: -10%;
@@ -121,126 +93,273 @@
         font-size: 1.05rem; line-height: 1.7;
         color: var(--c-muted); max-width: 540px; margin-bottom: 2.5rem;
     }
-    .c-hero-sub em { font-style: normal; color: var(--c-body); font-weight: 600; }
     .c-hero-actions { display: flex; gap: .75rem; flex-wrap: wrap; align-items: center; margin-bottom: .75rem; }
     .c-hero-trust {
         font-size: .78rem; color: var(--c-faint); display: flex; align-items: center; gap: .5rem;
     }
     .c-hero-trust i { color: var(--c-primary); }
 
-    /*  Why Choose  */
-    .c-why {
-        padding: 2rem 1.5rem; border-radius: 14px;
-        border: 1px solid var(--c-border); background: var(--c-bg);
-        transition: all .25s; height: 100%;
+    /* Growth Journey */
+    .c-journey {
+        display: flex; align-items: center; justify-content: center; gap: 0;
+        padding: 2rem 0; flex-wrap: wrap;
     }
-    .c-why:hover { border-color: var(--c-primary); box-shadow: 0 8px 30px rgba(79,70,229,.06); transform: translateY(-3px); }
-    .c-why-ic { font-size: 1.5rem; margin-bottom: .75rem; }
-    .c-why h5 { font-size: .95rem; font-weight: 700; color: var(--c-dark); margin-bottom: .35rem; }
-    .c-why p { font-size: .85rem; color: var(--c-muted); line-height: 1.6; margin: 0; }
-
-    /*  Problem  */
-    .c-problem-item {
-        display: flex; gap: 1rem; padding: 1rem 0;
-        border-bottom: 1px solid var(--c-bg-alt);
+    .c-journey-step {
+        display: flex; align-items: center; gap: .6rem;
+        padding: .7rem 1.2rem; border-radius: 10px;
+        background: var(--c-bg); border: 1px solid var(--c-border);
+        font-size: .82rem; font-weight: 700; color: var(--c-dark);
+        transition: all .3s; white-space: nowrap;
     }
-    .c-problem-item:last-child { border-bottom: none; }
-    .c-problem-item i { color: var(--c-muted); font-size: .85rem; margin-top: .15rem; flex-shrink: 0; }
-    .c-problem-item p { font-size: .9rem; color: var(--c-body); margin: 0; line-height: 1.6; }
-    .c-problem-item strong { color: var(--c-dark); }
-
-    /*  Services  */
-    .c-svc {
-        border-radius: 16px; overflow: hidden;
-        border: 1px solid var(--c-border); background: var(--c-bg);
-        transition: all .3s; height: 100%;
+    .c-journey-step.active {
+        background: var(--c-primary); color: #fff;
+        border-color: var(--c-primary); box-shadow: 0 4px 16px rgba(79,70,229,.2);
     }
-    .c-svc:hover { border-color: var(--c-primary); box-shadow: 0 12px 40px rgba(79,70,229,.08); transform: translateY(-4px); }
-    .c-svc-top {
-        padding: 2rem 1.75rem 1.5rem;
-        background: linear-gradient(135deg, var(--c-primary-light) 0%, #e0e7ff 100%);
-        border-bottom: 1px solid var(--c-border);
-    }
-    .c-svc-top .ic { font-size: 2rem; margin-bottom: .75rem; }
-    .c-svc-top h4 { font-size: 1.15rem; font-weight: 800; color: var(--c-dark); margin-bottom: .25rem; }
-    .c-svc-top p { font-size: .85rem; color: var(--c-muted); margin: 0; }
-    .c-svc-body { padding: 1.5rem 1.75rem; }
-    .c-svc-body h6 { font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--c-faint); margin-bottom: .75rem; }
-    .c-svc-list { list-style: none; padding: 0; margin: 0 0 1.25rem; }
-    .c-svc-list li {
-        font-size: .85rem; color: var(--c-body); padding: .35rem 0;
-        display: flex; align-items: center; gap: .5rem;
-    }
-    .c-svc-list li::before {
-        content: ''; width: 5px; height: 5px; border-radius: 50%;
-        background: var(--c-primary); flex-shrink: 0;
-    }
-    .c-svc-tag {
-        font-size: .72rem; font-weight: 600; color: var(--c-primary);
-        background: var(--c-primary-light); padding: .35rem .75rem;
-        border-radius: 6px; display: inline-block;
+    .c-journey-step i { font-size: .75rem; }
+    .c-journey-arrow {
+        color: var(--c-faint); font-size: .7rem; padding: 0 .3rem;
+        flex-shrink: 0;
     }
 
-    /*  Steps  */
-    .c-step {
+    /* Packages */
+    .c-pkg {
+        border-radius: 16px; border: 1px solid var(--c-border);
+        background: var(--c-bg); overflow: hidden;
+        transition: all .35s cubic-bezier(.22,1,.36,1); height: 100%;
+        display: flex; flex-direction: column;
+        position: relative;
+        box-shadow: 0 1px 3px rgba(0,0,0,.04), 0 4px 12px rgba(0,0,0,.02);
+    }
+    .c-pkg:hover {
+        box-shadow: 0 8px 32px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.04);
+        transform: translateY(-3px); border-color: #c7d2fe;
+    }
+
+    /* Basic — clean neutral */
+    .c-pkg .c-pkg-head { background: #fafbfc; border-bottom: 1px solid var(--c-border); }
+    .c-pkg .c-pkg-list li i { color: #94a3b8; }
+    .c-pkg .c-pkg-section h6 { color: #94a3b8; }
+
+    /* Featured (Startup) — elevated purple */
+    .c-pkg-featured {
+        border-color: rgba(79,70,229,.2);
+        box-shadow: 0 1px 3px rgba(79,70,229,.06), 0 8px 24px rgba(79,70,229,.08);
+    }
+    .c-pkg-featured:hover {
+        border-color: rgba(79,70,229,.35);
+        box-shadow: 0 12px 40px rgba(79,70,229,.12), 0 4px 12px rgba(79,70,229,.06);
+    }
+    .c-pkg-featured::before {
+        content: ''; position: absolute; top: 0; left: 0; right: 0;
+        height: 3px; background: linear-gradient(90deg, var(--c-primary), #818cf8);
+        border-radius: 16px 16px 0 0;
+    }
+    .c-pkg-featured .c-pkg-head { background: linear-gradient(180deg, #f5f3ff 0%, #fafbff 100%); border-bottom-color: rgba(79,70,229,.1); }
+    .c-pkg-featured .c-pkg-list li i { color: var(--c-primary); }
+    .c-pkg-featured .c-pkg-section h6 { color: var(--c-primary); }
+    .c-pkg-badge-featured {
+        position: absolute; top: .85rem; right: .85rem;
+        background: linear-gradient(135deg, var(--c-primary), #818cf8); color: #fff;
+        font-size: .6rem; font-weight: 700; letter-spacing: .08em;
+        text-transform: uppercase; padding: .25rem .6rem; border-radius: 5px;
+        z-index: 2; box-shadow: 0 2px 8px rgba(79,70,229,.25);
+    }
+
+    /* Enterprise — dark premium */
+    .c-pkg-enterprise::before {
+        content: ''; position: absolute; top: 0; left: 0; right: 0;
+        height: 3px; background: linear-gradient(90deg, #334155, #64748b);
+        border-radius: 16px 16px 0 0;
+    }
+    .c-pkg-enterprise .c-pkg-head { background: linear-gradient(180deg, #f8fafc 0%, #fafbfc 100%); }
+    .c-pkg-enterprise .c-pkg-list li i { color: #475569; }
+    .c-pkg-enterprise .c-pkg-section h6 { color: #475569; }
+    .c-pkg-enterprise .c-pkg-badge-enterprise {
+        position: absolute; top: .85rem; right: .85rem;
+        background: linear-gradient(135deg, #1e293b, #334155); color: #fff;
+        font-size: .6rem; font-weight: 700; letter-spacing: .08em;
+        text-transform: uppercase; padding: .25rem .6rem; border-radius: 5px;
+        z-index: 2; box-shadow: 0 2px 8px rgba(15,23,42,.2);
+    }
+
+    .c-pkg-head {
+        padding: 1.75rem 1.75rem 1.4rem;
+    }
+    .c-pkg-name {
+        font-size: .64rem; font-weight: 700; letter-spacing: .1em;
+        text-transform: uppercase; color: var(--c-faint); margin-bottom: .35rem;
+    }
+    .c-pkg-price { margin-bottom: .5rem; display: flex; align-items: baseline; gap: .5rem; }
+    .c-pkg-price-val {
+        font-size: 1.5rem; font-weight: 800; color: var(--c-dark); letter-spacing: -.02em;
+    }
+    .c-pkg-featured .c-pkg-price-val { color: var(--c-primary); }
+    .c-pkg-price-label {
+        font-size: .68rem; color: var(--c-faint); font-weight: 500;
+    }
+    .c-pkg-head h3 {
+        font-size: 1.05rem; font-weight: 800; color: var(--c-dark);
+        margin-bottom: .3rem; line-height: 1.3;
+    }
+    .c-pkg-head p {
+        font-size: .82rem; color: var(--c-muted); margin: 0; line-height: 1.55;
+    }
+
+    .c-pkg-body {
+        padding: 1.4rem 1.75rem; flex: 1;
+    }
+    .c-pkg-section { margin-bottom: 1.1rem; }
+    .c-pkg-section:last-child { margin-bottom: 0; }
+    .c-pkg-section h6 {
+        font-size: .62rem; font-weight: 700; letter-spacing: .12em;
+        text-transform: uppercase; margin-bottom: .5rem;
+        padding-bottom: .35rem; border-bottom: 1px solid var(--c-border);
+    }
+    .c-pkg-list {
+        list-style: none; padding: 0; margin: 0;
+    }
+    .c-pkg-list li {
+        font-size: .82rem; color: var(--c-body); padding: .22rem 0;
+        display: flex; align-items: flex-start; gap: .5rem; line-height: 1.5;
+    }
+    .c-pkg-list li i {
+        font-size: .6rem; margin-top: .28rem; flex-shrink: 0;
+    }
+    .c-pkg-list-muted li { color: var(--c-muted); }
+    .c-pkg-list-muted li i { color: var(--c-faint) !important; }
+    .c-pkg-list-expandable li { color: var(--c-muted); }
+    .c-pkg-list-expandable li i { color: var(--c-primary) !important; font-size: .5rem; }
+
+    /* Growth Path Visual */
+    .c-pkg-growth {
+        margin-bottom: .9rem; padding: .65rem .75rem;
+        background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+        border-radius: 10px; border: 1px solid rgba(79,70,229,.1);
+    }
+    .c-pkg-growth-track {
+        display: flex; align-items: center; justify-content: center;
+        gap: 0; flex-wrap: nowrap;
+    }
+    .c-pkg-growth-step {
+        display: flex; flex-direction: column; align-items: center;
+        gap: .15rem; padding: .2rem .2rem; border-radius: 6px;
+        transition: all .3s; min-width: 0;
+    }
+    .c-pkg-growth-step i {
+        font-size: .55rem; color: var(--c-primary); transition: all .3s; opacity: .4;
+    }
+    .c-pkg-growth-step span {
+        font-size: .48rem; font-weight: 600; color: var(--c-primary);
+        white-space: nowrap; transition: all .3s; opacity: .4;
+    }
+    .c-pkg-growth-step.active {
+        background: var(--c-primary); border-radius: 6px;
+        box-shadow: 0 2px 8px rgba(79,70,229,.2);
+    }
+    .c-pkg-growth-step.active i,
+    .c-pkg-growth-step.active span { color: #fff; opacity: 1; }
+    .c-pkg-growth-arrow {
+        color: var(--c-primary); font-size: .35rem; padding: 0 .05rem;
+        flex-shrink: 0; opacity: .25;
+    }
+
+    .c-pkg-foot {
+        padding: 1.1rem 1.75rem; border-top: 1px solid var(--c-border);
+        background: #fafbfc;
+    }
+    .c-pkg-featured .c-pkg-foot { background: linear-gradient(180deg, #f5f3ff 0%, #ede9fe 100%); border-top-color: rgba(79,70,229,.1); }
+    .c-pkg-enterprise .c-pkg-foot { background: #f8fafc; }
+
+    /* CTA variants */
+    .c-pkg-cta {
+        display: flex; align-items: center; justify-content: center; gap: .45rem;
+        width: 100%; padding: .65rem 1.25rem; font-size: .8rem; font-weight: 700;
+        border-radius: 8px; text-decoration: none; transition: all .25s;
+        border: none; cursor: pointer;
+    }
+    .c-pkg-cta i { font-size: .65rem; transition: transform .2s; }
+    .c-pkg-cta:hover i { transform: translateX(2px); }
+    .c-pkg-cta-primary {
+        background: linear-gradient(135deg, var(--c-primary), #6366f1); color: #fff;
+        box-shadow: 0 2px 8px rgba(79,70,229,.2);
+    }
+    .c-pkg-cta-primary:hover {
+        background: linear-gradient(135deg, #4338ca, #4f46e5); color: #fff;
+        box-shadow: 0 4px 16px rgba(79,70,229,.3); transform: translateY(-1px);
+    }
+    .c-pkg-cta-outline {
+        background: transparent; color: var(--c-dark);
+        border: 1.5px solid var(--c-border);
+    }
+    .c-pkg-cta-outline:hover {
+        border-color: var(--c-primary); color: var(--c-primary);
+        background: rgba(79,70,229,.03); transform: translateY(-1px);
+    }
+    .c-pkg-cta-enterprise {
+        background: linear-gradient(135deg, #1e293b, #334155); color: #fff;
+        box-shadow: 0 2px 8px rgba(15,23,42,.15);
+    }
+    .c-pkg-cta-enterprise:hover {
+        background: linear-gradient(135deg, #0f172a, #1e293b); color: #fff;
+        box-shadow: 0 4px 16px rgba(15,23,42,.25); transform: translateY(-1px);
+    }
+
+    /* Responsive growth path */
+    @media (max-width: 576px) {
+        .c-pkg-growth-track { flex-wrap: wrap; gap: .2rem; }
+        .c-pkg-growth-arrow { display: none; }
+        .c-pkg-growth-step { min-width: auto; }
+    }
+
+    /* Growth Steps */
+    .c-growth-step {
         display: flex; gap: 1.25rem; padding: 1.5rem;
         border-radius: 14px; border: 1px solid var(--c-border);
         background: var(--c-bg); transition: all .25s; align-items: flex-start;
     }
-    .c-step:hover { border-color: var(--c-primary); box-shadow: 0 4px 20px rgba(79,70,229,.06); }
-    .c-step-num {
-        width: 48px; height: 48px; border-radius: 12px;
+    .c-growth-step:hover { border-color: var(--c-primary); box-shadow: 0 4px 20px rgba(79,70,229,.06); }
+    .c-growth-num {
+        width: 44px; height: 44px; border-radius: 10px;
         display: flex; align-items: center; justify-content: center;
-        font-size: .85rem; font-weight: 800; color: var(--c-primary);
+        font-size: .8rem; font-weight: 800; color: var(--c-primary);
         background: var(--c-primary-light); flex-shrink: 0;
     }
-    .c-step h5 { font-size: .95rem; font-weight: 700; color: var(--c-dark); margin: 0 0 .25rem; }
-    .c-step p { font-size: .85rem; color: var(--c-muted); margin: 0; line-height: 1.5; }
+    .c-growth-step h5 { font-size: .92rem; font-weight: 700; color: var(--c-dark); margin: 0 0 .25rem; }
+    .c-growth-step p { font-size: .82rem; color: var(--c-muted); margin: 0; line-height: 1.55; }
 
-    /*  Testimonials  */
-    .c-test {
-        padding: 2rem; border-radius: 14px;
-        border: 1px solid var(--c-border); background: var(--c-bg);
-        transition: all .25s; height: 100%;
-        display: flex; flex-direction: column;
+    /* Comparison Table */
+    .c-compare {
+        border-radius: 14px; border: 1px solid var(--c-border);
+        background: var(--c-bg); overflow: hidden;
     }
-    .c-test:hover { border-color: var(--c-primary); box-shadow: 0 4px 20px rgba(79,70,229,.06); }
-    .c-test-quote {
-        font-size: .92rem; color: var(--c-body); line-height: 1.7;
-        font-style: italic; margin-bottom: 1.25rem; flex: 1;
+    .c-compare-head {
+        display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr;
+        border-bottom: 1px solid var(--c-border);
     }
-    .c-test-quote::before { content: '\201C'; color: var(--c-primary); font-size: 1.5rem; font-weight: 800; margin-right: .25rem; }
-    .c-test-author { display: flex; align-items: center; gap: .75rem; }
-    .c-test-av {
-        width: 40px; height: 40px; border-radius: 50%;
-        background: var(--c-primary-light); display: flex; align-items: center; justify-content: center;
-        font-weight: 700; font-size: .8rem; color: var(--c-primary); flex-shrink: 0;
+    .c-compare-head > div {
+        padding: 1.1rem 1.25rem; font-size: .75rem; font-weight: 700;
+        text-transform: uppercase; letter-spacing: .06em; color: var(--c-muted);
+        text-align: center;
     }
-    .c-test-name { font-size: .82rem; font-weight: 700; color: var(--c-dark); }
-    .c-test-role { font-size: .72rem; color: var(--c-faint); }
+    .c-compare-head > div:first-child { text-align: left; }
+    .c-compare-head > div.c-compare-highlight { color: var(--c-primary); background: var(--c-primary-light); }
+    .c-compare-row {
+        display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr;
+        border-bottom: 1px solid var(--c-border);
+    }
+    .c-compare-row:last-child { border-bottom: none; }
+    .c-compare-row > div {
+        padding: .75rem 1.25rem; font-size: .82rem; color: var(--c-body);
+        display: flex; align-items: center; justify-content: center;
+    }
+    .c-compare-row > div:first-child {
+        justify-content: flex-start; font-weight: 600; color: var(--c-dark);
+    }
+    .c-compare-row > div.c-compare-highlight { background: rgba(79,70,229,.02); }
+    .c-compare-check { color: var(--c-primary); font-size: .85rem; }
+    .c-compare-dash { color: var(--c-faint); font-size: .75rem; }
 
-    /*  FAQ  */
-    .c-faq {
-        border-bottom: 1px solid var(--c-border); padding: 1.25rem 0;
-    }
-    .c-faq:last-child { border-bottom: none; }
-    .c-faq-q {
-        font-size: .92rem; font-weight: 700; color: var(--c-dark);
-        cursor: pointer; display: flex; justify-content: space-between; align-items: center;
-        transition: color .2s;
-    }
-    .c-faq-q:hover { color: var(--c-primary); }
-    .c-faq-q i { font-size: .75rem; color: var(--c-faint); transition: transform .3s; }
-    .c-faq.open .c-faq-q i { transform: rotate(180deg); }
-    .c-faq-a {
-        font-size: .88rem; color: var(--c-muted); line-height: 1.7;
-        max-height: 0; overflow: hidden; transition: max-height .3s, padding .3s;
-    }
-    .c-faq.open .c-faq-a { max-height: 200px; padding-top: .75rem; }
-    .c-faq-a a { color: var(--c-primary); text-decoration: none; font-weight: 600; }
-    .c-faq-a a:hover { text-decoration: underline; }
-
-    /*  Stats  */
+    /* Stats */
     .c-stat-row {
         display: flex; justify-content: center; gap: 3rem; flex-wrap: wrap;
         padding: 3rem 0; border-top: 1px solid var(--c-border); border-bottom: 1px solid var(--c-border);
@@ -249,7 +368,7 @@
     .c-stat-num { font-size: clamp(1.8rem, 3vw, 2.4rem); font-weight: 800; color: var(--c-dark); line-height: 1; margin-bottom: .3rem; letter-spacing: -.02em; }
     .c-stat-label { font-size: .78rem; color: var(--c-muted); }
 
-    /*  CTA  */
+    /* CTA */
     .c-final {
         background: var(--c-dark); padding: 5rem 0; text-align: center;
         position: relative; overflow: hidden;
@@ -267,7 +386,23 @@
     .c-final-sub a { color: var(--c-primary); text-decoration: none; font-weight: 600; }
     .c-final-sub a:hover { text-decoration: underline; }
 
-    /*  Footer  */
+    /* FAQ */
+    .c-faq { border-bottom: 1px solid var(--c-border); padding: 1.25rem 0; }
+    .c-faq:last-child { border-bottom: none; }
+    .c-faq-q {
+        font-size: .92rem; font-weight: 700; color: var(--c-dark);
+        cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+    }
+    .c-faq-q:hover { color: var(--c-primary); }
+    .c-faq-q i { font-size: .75rem; color: var(--c-faint); transition: transform .3s; }
+    .c-faq.open .c-faq-q i { transform: rotate(180deg); }
+    .c-faq-a {
+        font-size: .88rem; color: var(--c-muted); line-height: 1.7;
+        max-height: 0; overflow: hidden; transition: max-height .3s, padding .3s;
+    }
+    .c-faq.open .c-faq-a { max-height: 200px; padding-top: .75rem; }
+
+    /* Footer */
     .c-foot {
         background: var(--c-dark); border-top: 1px solid rgba(255,255,255,.08);
         padding: 1.5rem 0; text-align: center;
@@ -283,11 +418,9 @@
             <i class="fas fa-users text-success me-2 fa-lg"></i>
             <span class="fw-bold text-heading">OnWebApp <span class="text-success fw-normal">Community</span></span>
         </a>
-
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#communityNav">
             <span class="navbar-toggler-icon"></span>
         </button>
-
         <div class="collapse navbar-collapse" id="communityNav">
             <ul class="navbar-nav ms-auto align-items-center">
                 <li class="nav-item">
@@ -314,19 +447,18 @@
 
 {% block community_content %}
 
-<!--  HERO  -->
+<!-- HERO -->
 <section class="c-hero">
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-7">
-                <div class="c-reveal-left">
-                    <div class="c-hero-eyebrow">ONWEBAPP COMMUNITY SERVICES</div>
-                    <h1>Your Mission Deserves a <em>Digital Presence</em> That Matches It</h1>
-                    <p class="c-hero-sub">Premium websites and branding — built exclusively for <em>community initiatives</em>.</p>
-                    <p class="c-hero-sub">You didn't start your project to wrestle with hosting, plugins, and design tools. You started it to change something. So let us handle the tech — you go make the impact.</p>
+                <div class="c-reveal">
+                    <div class="c-hero-eyebrow">START YOUR PROJECT</div>
+                    <h1>Start Small. Grow Over Time. <em>Your Infrastructure Is Ready.</em></h1>
+                    <p class="c-hero-sub">You do not need to build everything today. Start with what your business needs now. As your business grows, your digital infrastructure can grow with it.</p>
                     <div class="c-hero-actions">
-                        <a href="{% url 'community:wizard_start' %}?new=1" class="c-btn-primary">Start Your Project <i class="fas fa-arrow-right"></i></a>
-                        <a href="{% url 'forum:home' %}" class="c-btn-outline"><i class="fas fa-comments me-1"></i> Community Forum</a>
+                        <a href="#packages" class="c-btn-primary">Start Your Growth Journey <i class="fas fa-arrow-right"></i></a>
+                        <a href="#essential" class="c-btn-outline">Build My Website</a>
                     </div>
                     <div class="c-hero-trust">
                         <i class="fas fa-check-circle"></i> Trusted by 200+ community projects worldwide
@@ -337,286 +469,355 @@
     </div>
 </section>
 
-<!--  WHY CHOOSE  -->
+<!-- GROWTH JOURNEY VISUAL -->
+<section class="c-sec c-sec-alt">
+    <div class="container">
+        <div class="c-sec-head text-center c-reveal">
+            <div class="c-sec-label justify-content-center">YOUR GROWTH PATH</div>
+            <h2 class="c-sec-title">Start Today. Grow Tomorrow. Never Start Over.</h2>
+            <p class="c-sec-sub mx-auto">Your digital foundation is designed to evolve with your business. Add new capabilities whenever you are ready.</p>
+        </div>
+        <div class="c-reveal">
+            <div class="c-journey">
+                <div class="c-journey-step active"><i class="fas fa-laptop-code"></i> Website</div>
+                <span class="c-journey-arrow"><i class="fas fa-chevron-right"></i></span>
+                <div class="c-journey-step"><i class="fas fa-arrows-spin"></i> Automation</div>
+                <span class="c-journey-arrow"><i class="fas fa-chevron-right"></i></span>
+                <div class="c-journey-step"><i class="fas fa-brain"></i> AI Chatbot</div>
+                <span class="c-journey-arrow"><i class="fas fa-chevron-right"></i></span>
+                <div class="c-journey-step"><i class="fas fa-chart-line"></i> Business Systems</div>
+                <span class="c-journey-arrow"><i class="fas fa-chevron-right"></i></span>
+                <div class="c-journey-step"><i class="fas fa-plug"></i> Integrations</div>
+                <span class="c-journey-arrow"><i class="fas fa-chevron-right"></i></span>
+                <div class="c-journey-step"><i class="fas fa-rocket"></i> Growth</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- PACKAGES -->
+<section class="c-sec" id="packages">
+    <div class="container">
+        <div class="c-sec-head text-center c-reveal">
+            <div class="c-sec-label justify-content-center">CHOOSE WHERE YOU START</div>
+            <h2 class="c-sec-title">Start with what you need today.<br>Build what your business needs tomorrow.</h2>
+            <p class="c-sec-sub mx-auto">Every project starts with a clear foundation. As your needs evolve, OnWebApp evolves with you.</p>
+        </div>
+        <div class="row g-4 justify-content-center align-items-stretch">
+
+            <!-- Basic Package -->
+            <div class="col-lg-4 c-reveal c-stagger-1" id="essential">
+                <div class="c-pkg">
+                    <div class="c-pkg-head">
+                        <div class="c-pkg-name">Basic Package</div>
+                        <div class="c-pkg-price">
+                            <span class="c-pkg-price-val">Starting at $499</span>
+                            <span class="c-pkg-price-label">One-time</span>
+                        </div>
+                        <h3>Simple Website. Professional Start.</h3>
+                        <p>A clean, responsive website built around the essential needs of your business.</p>
+                    </div>
+                    <div class="c-pkg-body">
+                        <div class="c-pkg-section">
+                            <h6>What's Included</h6>
+                            <ul class="c-pkg-list">
+                                <li><i class="fas fa-check"></i> Professional responsive website</li>
+                                <li><i class="fas fa-check"></i> Essential pages and sections</li>
+                                <li><i class="fas fa-check"></i> Mobile-friendly design</li>
+                                <li><i class="fas fa-check"></i> Contact form</li>
+                                <li><i class="fas fa-check"></i> Basic website functionality</li>
+                                <li><i class="fas fa-check"></i> Deployment-ready setup</li>
+                            </ul>
+                        </div>
+                        <div class="c-pkg-section">
+                            <h6>Ideal For</h6>
+                            <ul class="c-pkg-list c-pkg-list-muted">
+                                <li><i class="fas fa-check"></i> Landing pages</li>
+                                <li><i class="fas fa-check"></i> Portfolio websites</li>
+                                <li><i class="fas fa-check"></i> Small businesses</li>
+                                <li><i class="fas fa-check"></i> Simple company websites</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="c-pkg-foot">
+                        <a href="{% url 'community:wizard_start' %}?new=1&package=essential" class="c-pkg-cta c-pkg-cta-outline">Start My Website <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Startup Package -->
+            <div class="col-lg-4 c-reveal c-stagger-2">
+                <div class="c-pkg c-pkg-featured">
+                    <div class="c-pkg-badge-featured">Most Popular</div>
+                    <div class="c-pkg-head">
+                        <div class="c-pkg-name">Startup Package</div>
+                        <div class="c-pkg-price">
+                            <span class="c-pkg-price-val">Starting at $1,499</span>
+                            <span class="c-pkg-price-label">Starting project price</span>
+                        </div>
+                        <h3>Start Small. Grow Without Starting Over.</h3>
+                        <p>Launch with what you need today and add automation, AI, integrations, and business systems as your business grows.</p>
+                    </div>
+                    <div class="c-pkg-body">
+                        <div class="c-pkg-section">
+                            <h6>Start With</h6>
+                            <ul class="c-pkg-list">
+                                <li><i class="fas fa-check"></i> Professional custom website</li>
+                                <li><i class="fas fa-check"></i> Growth-ready architecture</li>
+                                <li><i class="fas fa-check"></i> Scalable infrastructure</li>
+                            </ul>
+                        </div>
+                        <div class="c-pkg-section">
+                            <h6>Add When You're Ready</h6>
+                            <ul class="c-pkg-list c-pkg-list-expandable">
+                                <li><i class="fas fa-plus"></i> Automation</li>
+                                <li><i class="fas fa-plus"></i> AI & Chatbots</li>
+                                <li><i class="fas fa-plus"></i> CRM & Business Systems</li>
+                                <li><i class="fas fa-plus"></i> Integrations</li>
+                                <li><i class="fas fa-plus"></i> Advanced functionality</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="c-pkg-foot">
+                        <a href="{% url 'community:wizard_start' %}?new=1&package=startup" class="c-pkg-cta c-pkg-cta-primary">Start My Growth Journey <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enterprise Package -->
+            <div class="col-lg-4 c-reveal c-stagger-3">
+                <div class="c-pkg c-pkg-enterprise">
+                    <div class="c-pkg-badge-enterprise">Premium</div>
+                    <div class="c-pkg-head">
+                        <div class="c-pkg-name">Enterprise Package</div>
+                        <div class="c-pkg-price">
+                            <span class="c-pkg-price-val">Starting at $2,499</span>
+                            <span class="c-pkg-price-label">Starting project price</span>
+                        </div>
+                        <h3>Build the Foundation. Scale the System.</h3>
+                        <p>Everything in Startup, plus advanced SEO, content infrastructure, analytics, integrations, and capabilities designed for growing businesses.</p>
+                    </div>
+                    <div class="c-pkg-body">
+                        <div class="c-pkg-section">
+                            <h6>Everything in Startup, Plus</h6>
+                            <ul class="c-pkg-list">
+                                <li><i class="fas fa-check"></i> Advanced SEO foundation</li>
+                                <li><i class="fas fa-check"></i> Technical SEO audit</li>
+                                <li><i class="fas fa-check"></i> Keyword & search strategy</li>
+                                <li><i class="fas fa-check"></i> Content creation infrastructure</li>
+                                <li><i class="fas fa-check"></i> Analytics & conversion tracking</li>
+                                <li><i class="fas fa-check"></i> Advanced integrations</li>
+                                <li><i class="fas fa-check"></i> Scalable business architecture</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="c-pkg-foot">
+                        <a href="{% url 'community:wizard_start' %}?new=1&package=enterprise" class="c-pkg-cta c-pkg-cta-enterprise">Build My Growth System <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- GROWTH JOURNEY STEPS -->
+<section class="c-sec c-sec-alt">
+    <div class="container">
+        <div class="c-sec-head text-center c-reveal">
+            <div class="c-sec-label justify-content-center">HOW IT GROWS</div>
+            <h2 class="c-sec-title">Your Growth Journey</h2>
+            <p class="c-sec-sub mx-auto">Start with a website. Add capabilities as your business evolves. No rebuilding required.</p>
+        </div>
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-6 col-lg-4 c-reveal c-stagger-1">
+                <div class="c-growth-step">
+                    <div class="c-growth-num">01</div>
+                    <div>
+                        <h5>Website</h5>
+                        <p>A professional website with the essential pages and functionality needed to launch your business.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4 c-reveal c-stagger-2">
+                <div class="c-growth-step">
+                    <div class="c-growth-num">02</div>
+                    <div>
+                        <h5>Automation</h5>
+                        <p>Automate repetitive business processes and workflows as your operations grow.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4 c-reveal c-stagger-3">
+                <div class="c-growth-step">
+                    <div class="c-growth-num">03</div>
+                    <div>
+                        <h5>AI Chatbot</h5>
+                        <p>Add an AI-powered chatbot to assist customers and answer questions automatically.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4 c-reveal c-stagger-4">
+                <div class="c-growth-step">
+                    <div class="c-growth-num">04</div>
+                    <div>
+                        <h5>Business Systems</h5>
+                        <p>Add CRM, booking, customer management, dashboards, or other business functionality when needed.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4 c-reveal c-stagger-5">
+                <div class="c-growth-step">
+                    <div class="c-growth-num">05</div>
+                    <div>
+                        <h5>Integrations</h5>
+                        <p>Connect your business with external platforms, APIs, and other systems as you scale.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- PACKAGE COMPARISON -->
 <section class="c-sec">
     <div class="container">
         <div class="c-sec-head text-center c-reveal">
-            <div class="c-sec-label justify-content-center">WHY TEAMS CHOOSE ONWEBAPP</div>
-            <h2 class="c-sec-title">Built for Purpose, Not Profit</h2>
+            <div class="c-sec-label justify-content-center">SIDE BY SIDE</div>
+            <h2 class="c-sec-title">Package Comparison</h2>
+        </div>
+        <div class="c-reveal">
+            <div class="c-compare">
+                <div class="c-compare-head">
+                    <div>Feature</div>
+                    <div>Basic &mdash; $499</div>
+                    <div class="c-compare-highlight">Startup &mdash; $1,499</div>
+                    <div>Enterprise &mdash; $2,499</div>
+                </div>
+                <div class="c-compare-row">
+                    <div>Professional website</div>
+                    <div><i class="fas fa-check c-compare-check"></i></div>
+                    <div class="c-compare-highlight"><i class="fas fa-check c-compare-check"></i></div>
+                    <div><i class="fas fa-check c-compare-check"></i></div>
+                </div>
+                <div class="c-compare-row">
+                    <div>Growth-ready infrastructure</div>
+                    <div><i class="fas fa-minus c-compare-dash"></i></div>
+                    <div class="c-compare-highlight"><i class="fas fa-check c-compare-check"></i></div>
+                    <div><i class="fas fa-check c-compare-check"></i></div>
+                </div>
+                <div class="c-compare-row">
+                    <div>Scalable architecture</div>
+                    <div><i class="fas fa-minus c-compare-dash"></i></div>
+                    <div class="c-compare-highlight"><i class="fas fa-check c-compare-check"></i></div>
+                    <div><i class="fas fa-check c-compare-check"></i></div>
+                </div>
+                <div class="c-compare-row">
+                    <div>Add automation when needed</div>
+                    <div><i class="fas fa-minus c-compare-dash"></i></div>
+                    <div class="c-compare-highlight"><i class="fas fa-check c-compare-check"></i></div>
+                    <div><i class="fas fa-check c-compare-check"></i></div>
+                </div>
+                <div class="c-compare-row">
+                    <div>Add AI features when needed</div>
+                    <div><i class="fas fa-minus c-compare-dash"></i></div>
+                    <div class="c-compare-highlight"><i class="fas fa-check c-compare-check"></i></div>
+                    <div><i class="fas fa-check c-compare-check"></i></div>
+                </div>
+                <div class="c-compare-row">
+                    <div>Add CRM and business systems</div>
+                    <div><i class="fas fa-minus c-compare-dash"></i></div>
+                    <div class="c-compare-highlight"><i class="fas fa-check c-compare-check"></i></div>
+                    <div><i class="fas fa-check c-compare-check"></i></div>
+                </div>
+                <div class="c-compare-row">
+                    <div>Advanced SEO foundation</div>
+                    <div><i class="fas fa-minus c-compare-dash"></i></div>
+                    <div class="c-compare-highlight"><i class="fas fa-minus c-compare-dash"></i></div>
+                    <div><i class="fas fa-check c-compare-check"></i></div>
+                </div>
+                <div class="c-compare-row">
+                    <div>Content creation infrastructure</div>
+                    <div><i class="fas fa-minus c-compare-dash"></i></div>
+                    <div class="c-compare-highlight"><i class="fas fa-minus c-compare-dash"></i></div>
+                    <div><i class="fas fa-check c-compare-check"></i></div>
+                </div>
+                <div class="c-compare-row">
+                    <div>Analytics & conversion tracking</div>
+                    <div><i class="fas fa-minus c-compare-dash"></i></div>
+                    <div class="c-compare-highlight"><i class="fas fa-minus c-compare-dash"></i></div>
+                    <div><i class="fas fa-check c-compare-check"></i></div>
+                </div>
+                <div class="c-compare-row">
+                    <div>50% upfront payment</div>
+                    <div><i class="fas fa-minus c-compare-dash"></i></div>
+                    <div class="c-compare-highlight"><i class="fas fa-check c-compare-check"></i></div>
+                    <div><i class="fas fa-check c-compare-check"></i></div>
+                </div>
+                <div class="c-compare-row">
+                    <div>Flexible payment plan</div>
+                    <div><i class="fas fa-minus c-compare-dash"></i></div>
+                    <div class="c-compare-highlight"><i class="fas fa-check c-compare-check"></i></div>
+                    <div><i class="fas fa-check c-compare-check"></i></div>
+                </div>
+                <div class="c-compare-row">
+                    <div>Responsive design</div>
+                    <div><i class="fas fa-check c-compare-check"></i></div>
+                    <div class="c-compare-highlight"><i class="fas fa-check c-compare-check"></i></div>
+                    <div><i class="fas fa-check c-compare-check"></i></div>
+                </div>
+                <div class="c-compare-row">
+                    <div>Quick launch</div>
+                    <div><i class="fas fa-check c-compare-check"></i></div>
+                    <div class="c-compare-highlight"><i class="fas fa-check c-compare-check"></i></div>
+                    <div><i class="fas fa-check c-compare-check"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- WHY ONWEBAPP -->
+<section class="c-sec c-sec-alt">
+    <div class="container">
+        <div class="c-sec-head text-center c-reveal">
+            <div class="c-sec-label justify-content-center">WHY ONWEBAPP</div>
+            <h2 class="c-sec-title">Not Just a Website. A Growth Foundation.</h2>
         </div>
         <div class="row g-4">
             <div class="col-md-6 col-lg-3 c-reveal c-stagger-1">
-                <div class="c-why">
-                    <div class="c-why-ic"></div>
-                    <h5>Live in Days, Not Months</h5>
-                    <p>Our streamlined process gets your project online fast — without cutting corners.</p>
+                <div class="c-growth-step" style="flex-direction:column;text-align:center;align-items:center;">
+                    <div style="width:48px;height:48px;border-radius:12px;background:var(--c-primary-light);display:flex;align-items:center;justify-content:center;margin-bottom:.75rem;"><i class="fas fa-seedling" style="color:var(--c-primary);font-size:1.1rem;"></i></div>
+                    <h5>Start Small</h5>
+                    <p>Begin with what your business needs today. No overselling, no unnecessary complexity.</p>
                 </div>
             </div>
             <div class="col-md-6 col-lg-3 c-reveal c-stagger-2">
-                <div class="c-why">
-                    <div class="c-why-ic"></div>
-                    <h5>Quality That Earns Trust</h5>
-                    <p>Industry-standard design and development, so your community sees you as the real deal.</p>
+                <div class="c-growth-step" style="flex-direction:column;text-align:center;align-items:center;">
+                    <div style="width:48px;height:48px;border-radius:12px;background:var(--c-primary-light);display:flex;align-items:center;justify-content:center;margin-bottom:.75rem;"><i class="fas fa-expand" style="color:var(--c-primary);font-size:1.1rem;"></i></div>
+                    <h5>Grow Without Starting Over</h5>
+                    <p>Your digital foundation is built to evolve. Add new capabilities without rebuilding from scratch.</p>
                 </div>
             </div>
             <div class="col-md-6 col-lg-3 c-reveal c-stagger-3">
-                <div class="c-why">
-                    <div class="c-why-ic"></div>
-                    <h5>A Real Human, Always Available</h5>
-                    <p>Skip the ticket queues. Talk directly to our team whenever you need us.</p>
+                <div class="c-growth-step" style="flex-direction:column;text-align:center;align-items:center;">
+                    <div style="width:48px;height:48px;border-radius:12px;background:var(--c-primary-light);display:flex;align-items:center;justify-content:center;margin-bottom:.75rem;"><i class="fas fa-hand-holding-dollar" style="color:var(--c-primary);font-size:1.1rem;"></i></div>
+                    <h5>Control Your Investment</h5>
+                    <p>Pay for what you use. Expand when you are ready. Your budget stays in your control.</p>
                 </div>
             </div>
             <div class="col-md-6 col-lg-3 c-reveal c-stagger-4">
-                <div class="c-why">
-                    <div class="c-why-ic"></div>
-                    <h5>Built for Community, Not Corporations</h5>
-                    <p>We work exclusively with community initiatives — so we understand your constraints, your budget, and your mission.</p>
+                <div class="c-growth-step" style="flex-direction:column;text-align:center;align-items:center;">
+                    <div style="width:48px;height:48px;border-radius:12px;background:var(--c-primary-light);display:flex;align-items:center;justify-content:center;margin-bottom:.75rem;"><i class="fas fa-handshake" style="color:var(--c-primary);font-size:1.1rem;"></i></div>
+                    <h5>Long-Term Partnership</h5>
+                    <p>We are not just a vendor. OnWebApp is your technology partner for the long run.</p>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!--  THE PROBLEM  -->
-<section class="c-sec c-sec-alt">
-    <div class="container">
-        <div class="row align-items-start g-5">
-            <div class="col-lg-5 c-reveal-left">
-                <div class="c-sec-label">THE PROBLEM WE SOLVE</div>
-                <h2 class="c-sec-title" style="font-size:clamp(1.4rem,2.5vw,1.8rem);">Most community projects start with passion and a shoestring budget. Then reality hits.</h2>
-            </div>
-            <div class="col-lg-7 c-reveal-right">
-                <div class="c-problem-item">
-                    <i class="fas fa-circle-xmark"></i>
-                    <p><strong>Website builders feel overwhelming</strong> — endless templates, hidden fees, and tech jargon.</p>
-                </div>
-                <div class="c-problem-item">
-                    <i class="fas fa-circle-xmark"></i>
-                    <p><strong>Agencies are too expensive</strong> — quotes in the thousands before you've even launched.</p>
-                </div>
-                <div class="c-problem-item">
-                    <i class="fas fa-circle-xmark"></i>
-                    <p><strong>DIY eats your time</strong> — hours spent fiddling with design instead of serving your community.</p>
-                </div>
-                <div class="c-problem-item">
-                    <i class="fas fa-circle-xmark"></i>
-                    <p><strong>Generic tools don't fit</strong> — enterprise software built for profit, not purpose.</p>
-                </div>
-                <div style="margin-top:1.5rem;padding:1.25rem;border-radius:12px;background:var(--c-primary-light);border:1px solid rgba(79,70,229,.1);">
-                    <p style="font-size:.9rem;color:var(--c-body);margin:0;line-height:1.7;">We built OnWebApp to fix all of that. <strong style="color:var(--c-primary);">Premium digital services, priced and designed for the people doing the most important work.</strong></p>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!--  SERVICES  -->
-<section class="c-sec">
-    <div class="container">
-        <div class="c-sec-head text-center c-reveal">
-            <div class="c-sec-label justify-content-center">EVERYTHING YOU NEED</div>
-            <h2 class="c-sec-title">To Show Up Strong Online</h2>
-            <p class="c-sec-sub mx-auto">Three core services. One goal: a digital presence your community is proud of.</p>
-        </div>
-        <div class="row g-4">
-            <div class="col-lg-4 c-reveal c-stagger-1">
-                <div class="c-svc">
-                    <div class="c-svc-top">
-                        <div class="ic"></div>
-                        <h4>Website Building</h4>
-                        <p>A custom website that looks incredible on every device — and works as hard as you do.</p>
-                    </div>
-                    <div class="c-svc-body">
-                        <h6>What's Included</h6>
-                        <ul class="c-svc-list">
-                            <li>Responsive mobile-first design</li>
-                            <li>SEO optimization built in</li>
-                            <li>Easy-to-use content management</li>
-                            <li>Secure, reliable hosting setup</li>
-                            <li>Accessibility best practices (WCAG-friendly)</li>
-                            <li>Analytics & performance tracking</li>
-                        </ul>
-                        <div class="c-svc-tag">Perfect for: nonprofits, local clubs, grassroots movements, faith groups, and mutual aid networks.</div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4 c-reveal c-stagger-2">
-                <div class="c-svc">
-                    <div class="c-svc-top">
-                        <div class="ic"></div>
-                        <h4>Brand Assist</h4>
-                        <p>An identity people remember — and rally behind.</p>
-                    </div>
-                    <div class="c-svc-body">
-                        <h6>What's Included</h6>
-                        <ul class="c-svc-list">
-                            <li>Logo design & refinement</li>
-                            <li>Color palette selection</li>
-                            <li>Typography guidelines</li>
-                            <li>Social media asset kit</li>
-                            <li>Brand voice & messaging guide</li>
-                            <li>Print-ready templates (flyers, posters, business cards)</li>
-                        </ul>
-                        <div class="c-svc-tag">Perfect for: new initiatives finding their feet, or established projects ready for a refresh.</div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4 c-reveal c-stagger-3">
-                <div class="c-svc">
-                    <div class="c-svc-top">
-                        <div class="ic"></div>
-                        <h4>Community Forum</h4>
-                        <p>Where your people connect, learn, and grow together.</p>
-                    </div>
-                    <div class="c-svc-body">
-                        <h6>What's Included</h6>
-                        <ul class="c-svc-list">
-                            <li>Discussions & Q&A</li>
-                            <li>Project showcase</li>
-                            <li>Trending topics</li>
-                            <li>Community events</li>
-                            <li>Private groups & member profiles</li>
-                            <li>Moderation tools & spam protection</li>
-                        </ul>
-                        <div class="c-svc-tag">Perfect for: member organizations, alumni networks, volunteer teams, and learning communities.</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!--  STEPS  -->
-<section class="c-sec c-sec-alt">
-    <div class="container">
-        <div class="c-sec-head text-center c-reveal">
-            <div class="c-sec-label justify-content-center">HOW IT WORKS</div>
-            <h2 class="c-sec-title">From Idea to Impact in Three Steps</h2>
-        </div>
-        <div class="row g-4 justify-content-center">
-            <div class="col-md-4 c-reveal c-stagger-1">
-                <div class="c-step" style="flex-direction:column;text-align:center;align-items:center;">
-                    <div class="c-step-num">01</div>
-                    <div>
-                        <h5>Tell Us What You Need</h5>
-                        <p>Choose a service, fill out a quick brief. That's it — no lengthy onboarding, no sales calls.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 c-reveal c-stagger-2">
-                <div class="c-step" style="flex-direction:column;text-align:center;align-items:center;">
-                    <div class="c-step-num">02</div>
-                    <div>
-                        <h5>We Build It Together</h5>
-                        <p>Our team gets to work, sharing updates and folding in your feedback at every stage.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 c-reveal c-stagger-3">
-                <div class="c-step" style="flex-direction:column;text-align:center;align-items:center;">
-                    <div class="c-step-num">03</div>
-                    <div>
-                        <h5>Launch, Grow, Repeat</h5>
-                        <p>Get your finished website or brand assets — and start reaching more people.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!--  TESTIMONIALS  -->
-<section class="c-sec">
-    <div class="container">
-        <div class="c-sec-head text-center c-reveal">
-            <div class="c-sec-label justify-content-center">TESTIMONIALS</div>
-            <h2 class="c-sec-title">What Community Leaders Are Saying</h2>
-        </div>
-        <div class="row g-4">
-            <div class="col-md-4 c-reveal c-stagger-1">
-                <div class="c-test">
-                    <div class="c-test-quote">We went from a blank page to a fully live website in under two weeks. The team just got our mission — no explaining required.</div>
-                    <div class="c-test-author">
-                        <div class="c-test-av">AO</div>
-                        <div>
-                            <div class="c-test-name">Amara O.</div>
-                            <div class="c-test-role">Community Garden Collective</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 c-reveal c-stagger-2">
-                <div class="c-test">
-                    <div class="c-test-quote">The branding package made us look like a national organization. Our donations doubled within three months.</div>
-                    <div class="c-test-author">
-                        <div class="c-test-av">DR</div>
-                        <div>
-                            <div class="c-test-name">Daniel R.</div>
-                            <div class="c-test-role">Youth Mentorship Network</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 c-reveal c-stagger-3">
-                <div class="c-test">
-                    <div class="c-test-quote">Finally, a service that speaks our language and respects our budget. We felt like partners, not clients.</div>
-                    <div class="c-test-author">
-                        <div class="c-test-av">PS</div>
-                        <div>
-                            <div class="c-test-name">Priya S.</div>
-                            <div class="c-test-role">Neighborhood Food Bank</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!--  FAQ  -->
-<section class="c-sec c-sec-alt">
-    <div class="container">
-        <div class="row g-5">
-            <div class="col-lg-5 c-reveal-left">
-                <div class="c-sec-label">FAQ</div>
-                <h2 class="c-sec-title" style="font-size:clamp(1.4rem,2.5vw,1.8rem);">Common Questions, Answered</h2>
-                <p class="c-sec-sub" style="margin-top:.75rem;">Everything you need to know before getting started.</p>
-            </div>
-            <div class="col-lg-7 c-reveal-right">
-                <div class="c-faq open">
-                    <div class="c-faq-q" onclick="this.parentElement.classList.toggle('open')">Do I need any technical skills? <i class="fas fa-chevron-down"></i></div>
-                    <div class="c-faq-a">None at all. We handle everything from setup to launch — and give you a simple dashboard to manage things afterward.</div>
-                </div>
-                <div class="c-faq">
-                    <div class="c-faq-q" onclick="this.parentElement.classList.toggle('open')">How long does a typical project take? <i class="fas fa-chevron-down"></i></div>
-                    <div class="c-faq-a">Most websites go live within 2–3 weeks. Branding packages typically take 1–2 weeks. Need it faster? Ask about our priority track.</div>
-                </div>
-                <div class="c-faq">
-                    <div class="c-faq-q" onclick="this.parentElement.classList.toggle('open')">What does it cost? <i class="fas fa-chevron-down"></i></div>
-                    <div class="c-faq-a">Pricing is scaled for community budgets — far below typical agency rates. <a href="{% url 'community:wizard_start' %}?new=1">View pricing </a></div>
-                </div>
-                <div class="c-faq">
-                    <div class="c-faq-q" onclick="this.parentElement.classList.toggle('open')">Can I make changes after launch? <i class="fas fa-chevron-down"></i></div>
-                    <div class="c-faq-a">Absolutely. Every site comes with an easy-to-use CMS, plus ongoing support if you'd rather have us handle updates.</div>
-                </div>
-                <div class="c-faq">
-                    <div class="c-faq-q" onclick="this.parentElement.classList.toggle('open')">What if I already have a website or logo? <i class="fas fa-chevron-down"></i></div>
-                    <div class="c-faq-a">Great — we can redesign, refine, or build alongside what you already have. Just tell us what's working and what isn't.</div>
-                </div>
-                <div class="c-faq">
-                    <div class="c-faq-q" onclick="this.parentElement.classList.toggle('open')">Do you offer ongoing support? <i class="fas fa-chevron-down"></i></div>
-                    <div class="c-faq-a">Yes. Every project includes dedicated post-launch support, with optional maintenance plans for long-term peace of mind.</div>
-                </div>
-                <div class="c-faq">
-                    <div class="c-faq-q" onclick="this.parentElement.classList.toggle('open')">Is my data safe? <i class="fas fa-chevron-down"></i></div>
-                    <div class="c-faq-a">Always. We use secure hosting, encrypted connections, and industry-standard data practices. Your community's information stays protected.</div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!--  STATS  -->
+<!-- STATS -->
 <section class="c-sec">
     <div class="container">
         <div class="c-sec-head text-center c-reveal">
@@ -645,23 +846,71 @@
     </div>
 </section>
 
-<!--  FINAL CTA  -->
-<section class="c-final c-reveal-scale">
+<!-- FAQ -->
+<section class="c-sec c-sec-alt">
     <div class="container">
-        <h2>Ready to Make a Bigger Impact?</h2>
-        <p>Join the community projects already trusting OnWebApp to power their digital presence.</p>
-        <div class="c-final-actions">
-            <a href="{% url 'community:wizard_start' %}?new=1" class="c-btn-white">Get Started Free <i class="fas fa-arrow-right"></i></a>
-            <a href="{% url 'forum:home' %}" class="c-btn-outline" style="border-color:rgba(255,255,255,.25);color:#fff;"><i class="fas fa-comments me-1"></i> Community Forum</a>
-        </div>
-        <div class="c-final-sub">
-            No commitment. Just momentum.<br>
-            Still have questions? <a href="{% url 'community:dashboard' %}">Talk to our team </a> — we usually reply within a few hours.
+        <div class="row g-5">
+            <div class="col-lg-5 c-reveal">
+                <div class="c-sec-label">FAQ</div>
+                <h2 class="c-sec-title" style="font-size:clamp(1.4rem,2.5vw,1.8rem);">Common Questions, Answered</h2>
+                <p class="c-sec-sub" style="margin-top:.75rem;">Everything you need to know before getting started.</p>
+            </div>
+            <div class="col-lg-7 c-reveal">
+                <div class="c-faq open">
+                    <div class="c-faq-q" onclick="this.parentElement.classList.toggle('open')">What is the difference between the three packages? <i class="fas fa-chevron-down"></i></div>
+                    <div class="c-faq-a">The <strong>Enterprise Package</strong> ($2,499) includes everything in the Startup Package plus SEO setup and a built-in content creator for blog posts and landing pages. The <strong>Startup Package</strong> ($1,499) gives you a professional website with growth-ready architecture. The <strong>Basic Package</strong> ($499) is for clients who only need a simple, straightforward website.</div>
+                </div>
+                <div class="c-faq">
+                    <div class="c-faq-q" onclick="this.parentElement.classList.toggle('open')">How does the pay-as-you-grow model work? <i class="fas fa-chevron-down"></i></div>
+                    <div class="c-faq-a">For the Startup and Enterprise packages, you pay 50% upfront for your website. The remaining balance can be paid through a flexible monthly plan. After launch, you can request additional features like automation, AI chatbots, or CRM systems. Each capability is developed and paid for separately.</div>
+                </div>
+                <div class="c-faq">
+                    <div class="c-faq-q" onclick="this.parentElement.classList.toggle('open')">What is included in the Enterprise SEO setup? <i class="fas fa-chevron-down"></i></div>
+                    <div class="c-faq-a">The Enterprise Package includes a full SEO audit, keyword research for your industry, meta tag optimization, Google Analytics setup, and a content strategy. You also get a content creator for blog posts, landing pages, product descriptions, and more.</div>
+                </div>
+                <div class="c-faq">
+                    <div class="c-faq-q" onclick="this.parentElement.classList.toggle('open')">Do I need to buy everything from day one? <i class="fas fa-chevron-down"></i></div>
+                    <div class="c-faq-a">No. The core principle is that you start with what you need today. Your website is built on a growth-ready foundation, so when you are ready to add automation, AI, or other capabilities, they integrate seamlessly without rebuilding.</div>
+                </div>
+                <div class="c-faq">
+                    <div class="c-faq-q" onclick="this.parentElement.classList.toggle('open')">How long does a typical project take? <i class="fas fa-chevron-down"></i></div>
+                    <div class="c-faq-a">Most websites go live within 2 to 3 weeks. The Basic Package is typically faster due to its simpler scope. Need it faster? Ask about our priority track.</div>
+                </div>
+                <div class="c-faq">
+                    <div class="c-faq-q" onclick="this.parentElement.classList.toggle('open')">Can I upgrade from Basic to Startup or Enterprise later? <i class="fas fa-chevron-down"></i></div>
+                    <div class="c-faq-a">Yes. If you start with the Basic Package and later decide you want growth capabilities, we can migrate you to the Startup or Enterprise Package foundation. Your existing website is preserved and enhanced, not rebuilt.</div>
+                </div>
+                <div class="c-faq">
+                    <div class="c-faq-q" onclick="this.parentElement.classList.toggle('open')">Do I need any technical skills? <i class="fas fa-chevron-down"></i></div>
+                    <div class="c-faq-a">None at all. We handle everything from setup to launch and give you a simple dashboard to manage things afterward.</div>
+                </div>
+                <div class="c-faq">
+                    <div class="c-faq-q" onclick="this.parentElement.classList.toggle('open')">Do you offer ongoing support? <i class="fas fa-chevron-down"></i></div>
+                    <div class="c-faq-a">Yes. Every project includes dedicated post-launch support, with optional maintenance plans for long-term peace of mind.</div>
+                </div>
+            </div>
         </div>
     </div>
 </section>
 
-<!--  FOOTER  -->
+<!-- FINAL CTA -->
+<section class="c-final c-reveal">
+    <div class="container">
+        <h2>Start Your Growth Journey Today</h2>
+        <p>Join the community projects already trusting OnWebApp to power their digital presence.</p>
+        <div class="c-final-actions">
+            <a href="{% url 'community:wizard_start' %}?new=1&package=startup" class="c-btn-white">Start Your Growth Journey <i class="fas fa-arrow-right"></i></a>
+            <a href="{% url 'community:wizard_start' %}?new=1&package=enterprise" class="c-btn-white" style="background:#059669;"><i class="fas fa-crown me-1"></i> Enterprise Package</a>
+            <a href="{% url 'forum:home' %}" class="c-btn-outline" style="border-color:rgba(255,255,255,.25);color:#fff;"><i class="fas fa-comments me-1"></i> Community Forum</a>
+        </div>
+        <div class="c-final-sub">
+            No commitment. Just momentum.<br>
+            Still have questions? <a href="{% url 'community:dashboard' %}">Talk to our team</a> — we usually reply within a few hours.
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
 <div class="c-foot">
     <div class="container">
         <p>&copy; 2026 OnWebApp Community Services. Simplified for your focus.</p>
@@ -675,15 +924,15 @@
 {% block extra_js %}
 <script>
 (function(){
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
+    var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
             if (entry.isIntersecting) {
                 entry.target.classList.add('visible');
             }
         });
     }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
 
-    document.querySelectorAll('.c-reveal, .c-reveal-left, .c-reveal-right, .c-reveal-scale').forEach(el => {
+    document.querySelectorAll('.c-reveal').forEach(function(el) {
         observer.observe(el);
     });
 })();

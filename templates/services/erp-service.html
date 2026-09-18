@@ -1,0 +1,393 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans "ERP Integration & Implementation" %} | OnWebApp{% endblock %}
+
+{% block meta_description %}{% trans "Enterprise Resource Planning integration, implementation, and consulting. ERPNext, SAP, Oracle, and custom ERP solutions for businesses of all sizes." %}{% endblock %}
+
+{% block extra_css %}
+<style>
+.er-hero{background:linear-gradient(135deg,#0f172a 0%,#1e293b 40%,#0f172a 100%);padding:10rem 0 9rem;position:relative;overflow:hidden}
+.er-hero::before{content:'';position:absolute;inset:0;background:url('{% static "img/dev.jpg" %}') center/cover no-repeat;opacity:.3}
+.er-hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:200px;background:linear-gradient(to top,var(--bg-body),transparent)}
+.er-hero .container{position:relative;z-index:2}
+.er-label{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#10b981;margin-bottom:.5rem;display:flex;align-items:center;gap:.4rem}
+.er-label i{font-size:.35rem}
+.er-h{font-weight:800;font-size:2rem;margin-bottom:.6rem}
+.er-sub{color:#94a3b8;font-size:.95rem;line-height:1.7;max-width:640px}
+.er-s{padding:5rem 0}
+.er-s-alt{background:#f8fafc;padding:5rem 0}
+.er-s-dark{background:#0f172a;padding:5rem 0}
+.er-s-green{background:linear-gradient(135deg,#065f46,#10b981);padding:5rem 0}
+.er-c{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:1.75rem;height:100%;transition:all .3s}
+.er-c:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(16,185,129,.12);border-color:#10b981}
+.er-c-dark{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:1.75rem;height:100%;transition:all .3s}
+.er-c-dark:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(16,185,129,.15);border-color:rgba(16,185,129,.3)}
+.er-c-icon{width:48px;height:48px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;font-size:1.1rem;margin-bottom:1rem}
+.er-c-icon.green{background:rgba(16,185,129,.1);color:#10b981}
+.er-c-icon.blue{background:rgba(37,99,235,.1);color:#2563eb}
+.er-c-icon.purple{background:rgba(147,51,234,.1);color:#9333ea}
+.er-c-icon.amber{background:rgba(245,158,11,.1);color:#f59e0b}
+.er-c-icon.rose{background:rgba(244,63,94,.1);color:#f43f5e}
+.er-container{max-width:1140px;margin:0 auto;padding:0 1.5rem}
+.er-cta-box{background:linear-gradient(135deg,#065f46,#10b981);border-radius:20px;padding:4rem 2rem;text-align:center;margin:0}
+.er-step{display:flex;align-items:flex-start;gap:1.5rem;padding:2rem 0;border-bottom:1px solid #e2e8f0}
+.er-step:last-child{border-bottom:none}
+.er-step-num{flex-shrink:0;width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#059669,#10b981);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:1rem}
+.er-list{list-style:none;padding:0;margin:0}
+.er-list li{padding:.5rem 0;font-size:.9rem;color:#475569;display:flex;align-items:flex-start;gap:.6rem}
+.er-list li i{color:#10b981;margin-top:.2rem;flex-shrink:0}
+.er-metric{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:2rem;text-align:center;height:100%}
+.er-metric-val{font-size:2rem;font-weight:800;color:#059669}
+.er-metric-label{font-size:.82rem;color:#64748b;margin-top:.3rem}
+.er-pill{display:inline-block;padding:.35rem .85rem;border-radius:20px;font-size:.72rem;font-weight:600;transition:all .2s}
+.er-pill:hover{transform:translateY(-1px)}
+.er-platform{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:2rem;text-align:center;height:100%;transition:all .3s}
+.er-platform:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,.08);border-color:#10b981}
+.er-platform-icon{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.4rem;margin:0 auto 1rem}
+.er-tab-row{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:2rem}
+.er-tab{padding:.6rem 1.25rem;border-radius:50rem;font-size:.82rem;font-weight:600;border:1.5px solid #e2e8f0;background:#fff;color:#64748b;cursor:pointer;transition:all .2s}
+.er-tab:hover,.er-tab.active{background:#10b981;color:#fff;border-color:#10b981}
+.er-case{background:#fff;border:1px solid #e2e8f0;border-radius:16px;overflow:hidden;height:100%;transition:all .3s}
+.er-case:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,.08)}
+.er-case-head{padding:1.5rem 1.75rem 1rem}
+.er-case-body{padding:0 1.75rem 1.75rem}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero -->
+<section class="er-hero">
+    <div class="container">
+        <div class="er-label"><i class="fas fa-circle"></i> ERP INTEGRATION</div>
+        <h1 class="er-h text-white" style="font-size:2.75rem;max-width:700px;">Connect Your Business Systems Into One Unified Platform</h1>
+        <p class="er-sub mb-4">Enterprise Resource Planning integration, implementation, and consulting. We connect your finance, operations, HR, and supply chain into a single source of truth.</p>
+        <div class="d-flex gap-3 flex-wrap">
+            <a href="{% url 'community:home' %}" class="btn btn-success btn-lg px-5 rounded-pill fw-700">Start Your ERP Project <i class="fas fa-arrow-right ms-2"></i></a>
+            <a href="#erp-features" class="btn btn-outline-light btn-lg px-5 rounded-pill fw-700">Learn More</a>
+        </div>
+    </div>
+</section>
+
+<!-- Trust Bar -->
+<section class="er-s-alt">
+    <div class="er-container">
+        <div class="row g-4 text-center">
+            <div class="col-md-3 col-6"><div class="er-metric"><div class="er-metric-val">50+</div><div class="er-metric-label">ERP Implementations</div></div></div>
+            <div class="col-md-3 col-6"><div class="er-metric"><div class="er-metric-val">99.9%</div><div class="er-metric-label">System Uptime</div></div></div>
+            <div class="col-md-3 col-6"><div class="er-metric"><div class="er-metric-val">40%</div><div class="er-metric-label">Cost Reduction</div></div></div>
+            <div class="col-md-3 col-6"><div class="er-metric"><div class="er-metric-val">3x</div><div class="er-metric-label">Faster Reporting</div></div></div>
+        </div>
+    </div>
+</section>
+
+<!-- What We Do -->
+<section class="er-s" id="erp-features">
+    <div class="er-container">
+        <div class="text-center mb-5">
+            <div class="er-label justify-content-center"><i class="fas fa-circle"></i> OUR ERP SERVICES</div>
+            <h2 class="er-h">End-to-End Enterprise Resource Planning</h2>
+            <p class="er-sub mx-auto">From strategy and selection to implementation and ongoing support, we handle every aspect of your ERP journey.</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="er-c">
+                    <div class="er-c-icon green"><i class="fas fa-search"></i></div>
+                    <h5 class="fw-700 mb-2">ERP Assessment</h5>
+                    <p class="text-secondary small mb-3">We evaluate your current systems, processes, and pain points to recommend the right ERP solution for your business.</p>
+                    <ul class="er-list">
+                        <li><i class="fas fa-check-circle"></i> Process audit & gap analysis</li>
+                        <li><i class="fas fa-check-circle"></i> Technology stack review</li>
+                        <li><i class="fas fa-check-circle"></i> ROI projection</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="er-c">
+                    <div class="er-c-icon blue"><i class="fas fa-cogs"></i></div>
+                    <h5 class="fw-700 mb-2">Implementation</h5>
+                    <p class="text-secondary small mb-3">Full-cycle ERP deployment with data migration, workflow configuration, and user training included.</p>
+                    <ul class="er-list">
+                        <li><i class="fas fa-check-circle"></i> System configuration</li>
+                        <li><i class="fas fa-check-circle"></i> Data migration & validation</li>
+                        <li><i class="fas fa-check-circle"></i> User training & documentation</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="er-c">
+                    <div class="er-c-icon purple"><i class="fas fa-plug"></i></div>
+                    <h5 class="fw-700 mb-2">Integration</h5>
+                    <p class="text-secondary small mb-3">Connect your ERP with existing tools: CRM, eCommerce, payment gateways, shipping, and more.</p>
+                    <ul class="er-list">
+                        <li><i class="fas fa-check-circle"></i> API-based integrations</li>
+                        <li><i class="fas fa-check-circle"></i> Real-time sync</li>
+                        <li><i class="fas fa-check-circle"></i> Custom connectors</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="er-c">
+                    <div class="er-c-icon amber"><i class="fas fa-chart-line"></i></div>
+                    <h5 class="fw-700 mb-2">Analytics & Reporting</h5>
+                    <p class="text-secondary small mb-3">Custom dashboards, automated reports, and real-time KPIs so you always know where your business stands.</p>
+                    <ul class="er-list">
+                        <li><i class="fas fa-check-circle"></i> Executive dashboards</li>
+                        <li><i class="fas fa-check-circle"></i> Financial reporting</li>
+                        <li><i class="fas fa-check-circle"></i> Operational metrics</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="er-c">
+                    <div class="er-c-icon rose"><i class="fas fa-headset"></i></div>
+                    <h5 class="fw-700 mb-2">Ongoing Support</h5>
+                    <p class="text-secondary small mb-3">Post-launch support, system updates, performance optimization, and continuous improvement.</p>
+                    <ul class="er-list">
+                        <li><i class="fas fa-check-circle"></i> 24/7 monitoring</li>
+                        <li><i class="fas fa-check-circle"></i> Version upgrades</li>
+                        <li><i class="fas fa-check-circle"></i> Performance tuning</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="er-c">
+                    <div class="er-c-icon green"><i class="fas fa-users-cog"></i></div>
+                    <h5 class="fw-700 mb-2">Custom Development</h5>
+                    <p class="text-secondary small mb-3">Tailored modules, workflows, and features built specifically for your unique business requirements.</p>
+                    <ul class="er-list">
+                        <li><i class="fas fa-check-circle"></i> Custom modules</li>
+                        <li><i class="fas fa-check-circle"></i> Workflow automation</li>
+                        <li><i class="fas fa-check-circle"></i> Mobile extensions</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ERP Platforms -->
+<section class="er-s-alt">
+    <div class="er-container">
+        <div class="text-center mb-5">
+            <div class="er-label justify-content-center"><i class="fas fa-circle"></i> PLATFORMS WE WORK WITH</div>
+            <h2 class="er-h">Choose the Right ERP for Your Business</h2>
+            <p class="er-sub mx-auto">We implement and customize the leading ERP platforms to match your exact needs.</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-3 col-6">
+                <div class="er-platform">
+                    <div class="er-platform-icon" style="background:linear-gradient(135deg,#1e40af,#3b82f6);"><i class="fas fa-cube"></i></div>
+                    <h6 class="fw-700 mb-1">ERPNext</h6>
+                    <p class="text-secondary small mb-0">Open-source, modular, and highly customizable</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="er-platform">
+                    <div class="er-platform-icon" style="background:linear-gradient(135deg,#0369a1,#0ea5e9);"><i class="fas fa-building"></i></div>
+                    <h6 class="fw-700 mb-1">SAP Business One</h6>
+                    <p class="text-secondary small mb-0">Enterprise-grade for mid-to-large businesses</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="er-platform">
+                    <div class="er-platform-icon" style="background:linear-gradient(135deg,#c2410c,#f97316);"><i class="fas fa-database"></i></div>
+                    <h6 class="fw-700 mb-1">Oracle NetSuite</h6>
+                    <p class="text-secondary small mb-0">Cloud-native for growing companies</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="er-platform">
+                    <div class="er-platform-icon" style="background:linear-gradient(135deg,#7c3aed,#a78bfa);"><i class="fas fa-code"></i></div>
+                    <h6 class="fw-700 mb-1">Custom ERP</h6>
+                    <p class="text-secondary small mb-0">Built from scratch for unique requirements</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works -->
+<section class="er-s">
+    <div class="er-container">
+        <div class="row align-items-center">
+            <div class="col-lg-5 mb-4 mb-lg-0">
+                <div class="er-label"><i class="fas fa-circle"></i> HOW IT WORKS</div>
+                <h2 class="er-h">From Assessment to Go-Live in 4 Phases</h2>
+                <p class="er-sub mb-4">Our proven methodology ensures your ERP implementation is on time, on budget, and delivers real results.</p>
+                <div class="d-flex gap-3 flex-wrap">
+                    <span class="er-pill" style="background:rgba(16,185,129,.1);color:#059669;"><i class="fas fa-clock me-1"></i> 8-16 weeks typical</span>
+                    <span class="er-pill" style="background:rgba(16,185,129,.1);color:#059669;"><i class="fas fa-users me-1"></i> Dedicated team</span>
+                </div>
+            </div>
+            <div class="col-lg-7">
+                <div class="er-step">
+                    <div class="er-step-num">1</div>
+                    <div>
+                        <h6 class="fw-700 mb-1">Discovery & Assessment</h6>
+                        <p class="text-secondary small mb-0">We audit your current systems, map your processes, and identify the best ERP solution and integration approach.</p>
+                    </div>
+                </div>
+                <div class="er-step">
+                    <div class="er-step-num">2</div>
+                    <div>
+                        <h6 class="fw-700 mb-1">Design & Configuration</h6>
+                        <p class="text-secondary small mb-0">System architecture, module configuration, data mapping, and custom workflow design.</p>
+                    </div>
+                </div>
+                <div class="er-step">
+                    <div class="er-step-num">3</div>
+                    <div>
+                        <h6 class="fw-700 mb-1">Data Migration & Testing</h6>
+                        <p class="text-secondary small mb-0">Cleanse, transform, and migrate your data. Rigorous testing at every stage.</p>
+                    </div>
+                </div>
+                <div class="er-step">
+                    <div class="er-step-num">4</div>
+                    <div>
+                        <h6 class="fw-700 mb-1">Go-Live & Support</h6>
+                        <p class="text-secondary small mb-0">Training, parallel run, go-live support, and ongoing optimization.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Industries -->
+<section class="er-s-alt">
+    <div class="er-container">
+        <div class="text-center mb-5">
+            <div class="er-label justify-content-center"><i class="fas fa-circle"></i> INDUSTRIES WE SERVE</div>
+            <h2 class="er-h">ERP Solutions for Every Sector</h2>
+        </div>
+        <div class="row g-3">
+            <div class="col-md-3 col-6">
+                <div class="er-c text-center py-4">
+                    <i class="fas fa-industry text-primary fs-2 mb-2"></i>
+                    <h6 class="fw-700 mb-1">Manufacturing</h6>
+                    <p class="text-secondary small mb-0">Production planning, inventory, quality</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="er-c text-center py-4">
+                    <i class="fas fa-truck text-success fs-2 mb-2"></i>
+                    <h6 class="fw-700 mb-1">Supply Chain</h6>
+                    <p class="text-secondary small mb-0">Logistics, procurement, warehouse</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="er-c text-center py-4">
+                    <i class="fas fa-heartbeat text-danger fs-2 mb-2"></i>
+                    <h6 class="fw-700 mb-1">Healthcare</h6>
+                    <p class="text-secondary small mb-0">Patient records, billing, compliance</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="er-c text-center py-4">
+                    <i class="fas fa-store text-warning fs-2 mb-2"></i>
+                    <h6 class="fw-700 mb-1">Retail</h6>
+                    <p class="text-secondary small mb-0">POS, inventory, multi-channel</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="er-c text-center py-4">
+                    <i class="fas fa-building text-info fs-2 mb-2"></i>
+                    <h6 class="fw-700 mb-1">Real Estate</h6>
+                    <p class="text-secondary small mb-0">Property management, leasing, facilities</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="er-c text-center py-4">
+                    <i class="fas fa-graduation-cap text-purple fs-2 mb-2" style="color:#9333ea;"></i>
+                    <h6 class="fw-700 mb-1">Education</h6>
+                    <p class="text-secondary small mb-0">Student records, finance, HR</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="er-c text-center py-4">
+                    <i class="fas fa-utensils text-warning fs-2 mb-2"></i>
+                    <h6 class="fw-700 mb-1">Hospitality</h6>
+                    <p class="text-secondary small mb-0">Reservations, inventory, staff</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="er-c text-center py-4">
+                    <i class="fas fa-hand-holding-usd text-success fs-2 mb-2"></i>
+                    <h6 class="fw-700 mb-1">Financial Services</h6>
+                    <p class="text-secondary small mb-0">Accounting, compliance, reporting</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Case Studies -->
+<section class="er-s">
+    <div class="er-container">
+        <div class="text-center mb-5">
+            <div class="er-label justify-content-center"><i class="fas fa-circle"></i> SUCCESS STORIES</div>
+            <h2 class="er-h">Real Results From Real Implementations</h2>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="er-case">
+                    <div class="er-case-head">
+                        <span class="er-pill" style="background:rgba(16,185,129,.1);color:#059669;">Manufacturing</span>
+                        <h5 class="fw-700 mt-2 mb-0">Global Parts Corp</h5>
+                    </div>
+                    <div class="er-case-body">
+                        <p class="text-secondary small mb-3">Migrated from legacy system to ERPNext. Integrated production planning, inventory, and financials.</p>
+                        <div class="row g-2">
+                            <div class="col-6"><div class="text-center p-2 rounded" style="background:#f0fdf4;"><div class="fw-800 text-success">35%</div><div class="text-secondary" style="font-size:.7rem;">Cost Reduction</div></div></div>
+                            <div class="col-6"><div class="text-center p-2 rounded" style="background:#f0fdf4;"><div class="fw-800 text-success">50%</div><div class="text-secondary" style="font-size:.7rem;">Faster Reporting</div></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="er-case">
+                    <div class="er-case-head">
+                        <span class="er-pill" style="background:rgba(37,99,235,.1);color:#2563eb;">Retail</span>
+                        <h5 class="fw-700 mt-2 mb-0">Urban Outfitters Group</h5>
+                    </div>
+                    <div class="er-case-body">
+                        <p class="text-secondary small mb-3">Unified 12 retail locations with a single ERP. Real-time inventory sync across all channels.</p>
+                        <div class="row g-2">
+                            <div class="col-6"><div class="text-center p-2 rounded" style="background:#eff6ff;"><div class="fw-800 text-primary">12</div><div class="text-secondary" style="font-size:.7rem;">Locations Unified</div></div></div>
+                            <div class="col-6"><div class="text-center p-2 rounded" style="background:#eff6ff;"><div class="fw-800 text-primary">99.9%</div><div class="text-secondary" style="font-size:.7rem;">Inventory Accuracy</div></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="er-case">
+                    <div class="er-case-head">
+                        <span class="er-pill" style="background:rgba(147,51,234,.1);color:#9333ea;">Healthcare</span>
+                        <h5 class="fw-700 mt-2 mb-0">MedCare Hospital Network</h5>
+                    </div>
+                    <div class="er-case-body">
+                        <p class="text-secondary small mb-3">Implemented custom ERP for patient management, billing, and compliance across 5 facilities.</p>
+                        <div class="row g-2">
+                            <div class="col-6"><div class="text-center p-2 rounded" style="background:#faf5ff;"><div class="fw-800" style="color:#9333ea;">60%</div><div class="text-secondary" style="font-size:.7rem;">Faster Billing</div></div></div>
+                            <div class="col-6"><div class="text-center p-2 rounded" style="background:#faf5ff;"><div class="fw-800" style="color:#9333ea;">100%</div><div class="text-secondary" style="font-size:.7rem;">Compliance</div></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="er-s-green">
+    <div class="er-container text-center">
+        <h2 class="text-white fw-800 mb-3" style="font-size:2rem;">Ready to Unify Your Business Systems?</h2>
+        <p class="text-white mb-4" style="max-width:600px;margin:0 auto;opacity:.9;">Let us assess your current setup and recommend the perfect ERP solution for your business. Free consultation, no commitment.</p>
+        <div class="d-flex gap-3 justify-content-center flex-wrap">
+            <a href="{% url 'community:home' %}" class="btn btn-light btn-lg px-5 rounded-pill fw-700">Get Free Assessment <i class="fas fa-arrow-right ms-2"></i></a>
+            <a href="#erp-features" class="btn btn-outline-light btn-lg px-5 rounded-pill fw-700">Explore Services</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

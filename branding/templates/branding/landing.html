@@ -1,217 +1,485 @@
 {% extends 'branding/base.html' %}
+{% load static %}
 
-{% block title %}Enterprise Branding Studio{% endblock %}
+{% block title %}Branding Studio — Premium Brand Identity Design{% endblock %}
 
 {% block branding_content %}
-<div class="landing-page">
-    <!-- Hero -->
-    <section class="landing-hero position-relative overflow-hidden">
-        <div class="hero-glow hero-glow-1"></div>
-        <div class="hero-glow hero-glow-2"></div>
-        <div class="container position-relative py-5 py-lg-6 text-center">
-            <span class="hero-badge"><i class="fa-solid fa-sparkles me-2"></i>Premium Brand Design Service</span>
-            <h1 class="display-4 fw-800 mt-4 mb-3">A brand your customers<br class="d-none d-lg-block"> will <span class="text-gradient">never forget</span></h1>
-            <p class="lead text-muted mx-auto mb-4" style="max-width: 620px;">
-                From logo to full identity system — our studio crafts premium brands for ambitious
-                companies. Answer a few questions and get a curated collection in minutes.
-            </p>
-            <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
-                <a href="{% url 'branding:wizard' %}" class="btn btn-brand-primary btn-lg px-5">
-                    Start Your Project <i class="fa-solid fa-arrow-right ms-2"></i>
-                </a>
-                <a href="#library" class="btn btn-glass btn-lg px-5">Browse Brand Library</a>
-            </div>
-            <div class="hero-stats d-flex justify-content-center gap-4 gap-lg-5 mt-5 flex-wrap">
-                <div class="hero-stat"><div class="hero-stat-value">240+</div><div class="hero-stat-label">Brands launched</div></div>
-                <div class="hero-stat"><div class="hero-stat-value">8</div><div class="hero-stat-label">Industries covered</div></div>
-                <div class="hero-stat"><div class="hero-stat-value">24</div><div class="hero-stat-label">Curated collections</div></div>
-                <div class="hero-stat"><div class="hero-stat-value">4.9</div><div class="hero-stat-label">Client rating</div></div>
+<div class="bl-landing">
+
+    <!-- ═══════════════════════ HERO ═══════════════════════ -->
+    <section class="bl-hero">
+        <div class="bl-hero-grid-bg"></div>
+        <div class="bl-hero-glow bl-hero-glow-1"></div>
+        <div class="bl-hero-glow bl-hero-glow-2"></div>
+        <div class="bl-hero-glow bl-hero-glow-3"></div>
+        <div class="container position-relative py-5 py-lg-7">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6" data-reveal="left">
+                    <div class="bl-hero-badge">
+                        <span class="bl-hero-badge-dot"></span>
+                        Enterprise Branding Studio
+                    </div>
+                    <h1 class="bl-hero-title">
+                        Build a brand<br>
+                        <span class="bl-hero-gradient">that never gets forgotten</span>
+                    </h1>
+                    <p class="bl-hero-subtitle">
+                        From logo to full identity system — our studio crafts premium brands for ambitious companies. Answer a few questions and get a curated collection in minutes.
+                    </p>
+                    <div class="bl-hero-actions">
+                        <a href="{% url 'branding:wizard' %}" class="bl-btn bl-btn-primary bl-btn-lg">
+                            <span>Start Your Project</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                        <a href="#library" class="bl-btn bl-btn-ghost bl-btn-lg">
+                            <i class="fa-solid fa-grid-2"></i>
+                            <span>Browse Collections</span>
+                        </a>
+                    </div>
+                    <div class="bl-hero-trust">
+                        <div class="bl-hero-stat">
+                            <span class="bl-hero-stat-value" data-count="{{ total_collections }}">0</span><span class="bl-hero-stat-suffix">+</span>
+                            <span class="bl-hero-stat-label">Brands Launched</span>
+                        </div>
+                        <div class="bl-hero-stat-divider"></div>
+                        <div class="bl-hero-stat">
+                            <span class="bl-hero-stat-value" data-count="{{ total_industries }}">0</span>
+                            <span class="bl-hero-stat-label">Industries</span>
+                        </div>
+                        <div class="bl-hero-stat-divider"></div>
+                        <div class="bl-hero-stat">
+                            <span class="bl-hero-stat-value">4.9<span class="bl-hero-stat-star"><i class="fa-solid fa-star"></i></span></span>
+                            <span class="bl-hero-stat-label">Client Rating</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 d-none d-lg-block" data-reveal="right">
+                    <div class="bl-hero-visual">
+                        <!-- Floating feature cards -->
+                        <div class="bl-hero-float bl-hero-float-1">
+                            <div class="bl-hero-float-icon" style="background:rgba(99,102,241,0.15);color:#818cf8;"><i class="fa-solid fa-palette"></i></div>
+                            <div>
+                                <div class="bl-hero-float-title">Brand Identity</div>
+                                <div class="bl-hero-float-desc">Logo, colors, typography</div>
+                            </div>
+                        </div>
+                        <div class="bl-hero-float bl-hero-float-2">
+                            <div class="bl-hero-float-icon" style="background:rgba(245,158,11,0.15);color:#fbbf24;"><i class="fa-solid fa-swatchbook"></i></div>
+                            <div>
+                                <div class="bl-hero-float-title">Style Guide</div>
+                                <div class="bl-hero-float-desc">Complete design system</div>
+                            </div>
+                        </div>
+                        <div class="bl-hero-float bl-hero-float-3">
+                            <div class="bl-hero-float-icon" style="background:rgba(16,185,129,0.15);color:#34d399;"><i class="fa-solid fa-check-circle"></i></div>
+                            <div>
+                                <div class="bl-hero-float-title">Delivery Ready</div>
+                                <div class="bl-hero-float-desc">Files in 48 hours</div>
+                            </div>
+                        </div>
+
+                        <!-- Central mockup -->
+                        <div class="bl-hero-mockup">
+                            <div class="bl-hero-mockup-chrome">
+                                <span class="bl-hero-mockup-dot" style="background:#ef4444;"></span>
+                                <span class="bl-hero-mockup-dot" style="background:#f59e0b;"></span>
+                                <span class="bl-hero-mockup-dot" style="background:#22c55e;"></span>
+                            </div>
+                            <div class="bl-hero-mockup-content">
+                                <div class="bl-hero-mockup-sidebar">
+                                    <div class="bl-hero-mockup-nav-item active"></div>
+                                    <div class="bl-hero-mockup-nav-item"></div>
+                                    <div class="bl-hero-mockup-nav-item"></div>
+                                    <div class="bl-hero-mockup-nav-item"></div>
+                                </div>
+                                <div class="bl-hero-mockup-main">
+                                    <div class="bl-hero-mockup-header-bar"></div>
+                                    <div class="bl-hero-mockup-colors">
+                                        <span style="background:linear-gradient(135deg,#6366f1,#818cf8);"></span>
+                                        <span style="background:linear-gradient(135deg,#f59e0b,#fbbf24);"></span>
+                                        <span style="background:linear-gradient(135deg,#10b981,#34d399);"></span>
+                                        <span style="background:linear-gradient(135deg,#ec4899,#f472b6);"></span>
+                                        <span style="background:linear-gradient(135deg,#3b82f6,#60a5fa);"></span>
+                                    </div>
+                                    <div class="bl-hero-mockup-card-row">
+                                        <div class="bl-hero-mockup-sm-card"></div>
+                                        <div class="bl-hero-mockup-sm-card"></div>
+                                    </div>
+                                    <div class="bl-hero-mockup-typography">
+                                        <div class="bl-hero-mockup-font-a">Aa</div>
+                                        <div>
+                                            <div class="bl-hero-mockup-font-line"></div>
+                                            <div class="bl-hero-mockup-font-line short"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- How it works -->
-    <section class="py-5 py-lg-6">
+    <!-- ═══════════════════════ TRUST BAR ═══════════════════════ -->
+    <section class="bl-trust-bar">
         <div class="container">
-            <div class="text-center mb-5">
-                <span class="section-kicker">How it works</span>
-                <h2 class="fw-800">From brief to brand in four steps</h2>
+            <p class="bl-trust-label">Trusted by ambitious brands across industries</p>
+            <div class="bl-trust-logos">
+                <div class="bl-trust-logo"><i class="fa-solid fa-building"></i><span>TechStart</span></div>
+                <div class="bl-trust-logo"><i class="fa-solid fa-leaf"></i><span>GreenLife</span></div>
+                <div class="bl-trust-logo"><i class="fa-solid fa-chart-line"></i><span>FinEdge</span></div>
+                <div class="bl-trust-logo"><i class="fa-solid fa-heart"></i><span>HealthFirst</span></div>
+                <div class="bl-trust-logo"><i class="fa-solid fa-graduation-cap"></i><span>EduPath</span></div>
+                <div class="bl-trust-logo"><i class="fa-solid fa-shopping-bag"></i><span>ShopVibe</span></div>
             </div>
-            <div class="row g-4">
-                <div class="col-md-6 col-lg-3">
-                    <div class="how-card">
-                        <div class="how-num">01</div>
-                        <i class="fa-solid fa-building how-icon"></i>
-                        <h5 class="fw-800 mt-3">Company Info</h5>
-                        <p class="text-muted small mb-0">Tell us who you are, your industry and what makes you unique.</p>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════ HOW IT WORKS ═══════════════════════ -->
+    <section class="bl-section bl-how">
+        <div class="container">
+            <div class="bl-section-header" data-reveal="up">
+                <span class="bl-kicker"><i class="fa-solid fa-wand-magic-sparkles"></i> How It Works</span>
+                <h2 class="bl-section-title">From brief to brand in four steps</h2>
+                <p class="bl-section-subtitle">No design skills needed — just tell us about your company and we handle the rest.</p>
+            </div>
+            <div class="bl-how-grid">
+                <div class="bl-how-card" data-reveal="up" data-delay="0">
+                    <div class="bl-how-connector"></div>
+                    <div class="bl-how-num">01</div>
+                    <div class="bl-how-icon" style="background:linear-gradient(135deg,#eef2ff,#e0e7ff);color:#6366f1;">
+                        <i class="fa-solid fa-building"></i>
                     </div>
+                    <h3 class="bl-how-title">Company Info</h3>
+                    <p class="bl-how-desc">Tell us who you are, your industry, and what makes you unique in the market.</p>
                 </div>
-                <div class="col-md-6 col-lg-3">
-                    <div class="how-card">
-                        <div class="how-num">02</div>
-                        <i class="fa-solid fa-brush how-icon"></i>
-                        <h5 class="fw-800 mt-3">Brand Identity</h5>
-                        <p class="text-muted small mb-0">Define your audience, values, colors and current branding.</p>
+                <div class="bl-how-card" data-reveal="up" data-delay="100">
+                    <div class="bl-how-connector"></div>
+                    <div class="bl-how-num">02</div>
+                    <div class="bl-how-icon" style="background:linear-gradient(135deg,#fef3c7,#fde68a);color:#d97706;">
+                        <i class="fa-solid fa-brush"></i>
                     </div>
+                    <h3 class="bl-how-title">Brand Identity</h3>
+                    <p class="bl-how-desc">Define your audience, values, colors, and current branding preferences.</p>
                 </div>
-                <div class="col-md-6 col-lg-3">
-                    <div class="how-card">
-                        <div class="how-num">03</div>
-                        <i class="fa-solid fa-cloud-arrow-up how-icon"></i>
-                        <h5 class="fw-800 mt-3">Upload Assets</h5>
-                        <p class="text-muted small mb-0">Share existing logos, guidelines and inspiration images.</p>
+                <div class="bl-how-card" data-reveal="up" data-delay="200">
+                    <div class="bl-how-connector"></div>
+                    <div class="bl-how-num">03</div>
+                    <div class="bl-how-icon" style="background:linear-gradient(135deg,#dcfce7,#bbf7d0);color:#16a34a;">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
                     </div>
+                    <h3 class="bl-how-title">Upload Assets</h3>
+                    <p class="bl-how-desc">Share existing logos, guidelines, and inspiration images for reference.</p>
                 </div>
-                <div class="col-md-6 col-lg-3">
-                    <div class="how-card">
-                        <div class="how-num">04</div>
-                        <i class="fa-solid fa-folder-open how-icon"></i>
-                        <h5 class="fw-800 mt-3">Choose Collection</h5>
-                        <p class="text-muted small mb-0">Pick the collection that fits your vision and submit.</p>
+                <div class="bl-how-card" data-reveal="up" data-delay="300">
+                    <div class="bl-how-num">04</div>
+                    <div class="bl-how-icon" style="background:linear-gradient(135deg,#fce7f3,#fbcfe8);color:#db2777;">
+                        <i class="fa-solid fa-folder-open"></i>
                     </div>
+                    <h3 class="bl-how-title">Choose Collection</h3>
+                    <p class="bl-how-desc">Pick the curated collection that fits your vision and submit your project.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Brand library preview -->
-    <section id="library" class="py-5 py-lg-6 bg-surface-soft">
+    <!-- ═══════════════════════ FEATURES ═══════════════════════ -->
+    <section class="bl-section bl-features">
         <div class="container">
-            <div class="d-flex align-items-end justify-content-between flex-wrap gap-3 mb-4">
-                <div>
-                    <span class="section-kicker">Brand Library</span>
-                    <h2 class="fw-800 mb-0">Curated collections</h2>
-                    <p class="text-muted mb-0">Explore identity systems designed for every industry.</p>
-                </div>
-                <a href="{% url 'branding:wizard' %}" class="btn btn-outline-brand">Start a Project <i class="fa-solid fa-arrow-right ms-2"></i></a>
+            <div class="bl-section-header" data-reveal="up">
+                <span class="bl-kicker"><i class="fa-solid fa-bolt"></i> Why Choose Us</span>
+                <h2 class="bl-section-title">Built for brands that mean business</h2>
+                <p class="bl-section-subtitle">We combine enterprise-grade tools with a human-first design process.</p>
             </div>
-            <div class="row g-4">
+            <div class="bl-features-grid">
+                <div class="bl-feature-card" data-reveal="up" data-delay="0">
+                    <div class="bl-feature-icon"><i class="fa-solid fa-bolt"></i></div>
+                    <h3 class="bl-feature-title">48-Hour Delivery</h3>
+                    <p class="bl-feature-desc">Get your first brand concepts within 48 hours. No weeks of waiting.</p>
+                </div>
+                <div class="bl-feature-card bl-feature-card-highlight" data-reveal="up" data-delay="100">
+                    <div class="bl-feature-icon"><i class="fa-solid fa-infinity"></i></div>
+                    <h3 class="bl-feature-title">Unlimited Revisions</h3>
+                    <p class="bl-feature-desc">We refine until you love it. Every package includes unlimited revision cycles.</p>
+                </div>
+                <div class="bl-feature-card" data-reveal="up" data-delay="200">
+                    <div class="bl-feature-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                    <h3 class="bl-feature-title">Full Ownership</h3>
+                    <p class="bl-feature-desc">All final files are yours. Complete copyright transfer with every project.</p>
+                </div>
+                <div class="bl-feature-card" data-reveal="up" data-delay="300">
+                    <div class="bl-feature-icon"><i class="fa-solid fa-file-export"></i></div>
+                    <h3 class="bl-feature-title">Export-Ready Files</h3>
+                    <p class="bl-feature-desc">SVG, PNG, PDF — all formats. Print-ready and web-optimized from day one.</p>
+                </div>
+                <div class="bl-feature-card" data-reveal="up" data-delay="400">
+                    <div class="bl-feature-icon"><i class="fa-solid fa-users"></i></div>
+                    <h3 class="bl-feature-title">Dedicated Designer</h3>
+                    <p class="bl-feature-desc">One expert designer handles your project end-to-end. No hand-offs.</p>
+                </div>
+                <div class="bl-feature-card" data-reveal="up" data-delay="500">
+                    <div class="bl-feature-icon"><i class="fa-solid fa-comments"></i></div>
+                    <h3 class="bl-feature-title">Real-Time Chat</h3>
+                    <p class="bl-feature-desc">Communicate directly with your designer through our built-in messaging system.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════ BRAND LIBRARY ═══════════════════════ -->
+    <section id="library" class="bl-section bl-library">
+        <div class="container">
+            <div class="bl-section-header" data-reveal="up">
+                <span class="bl-kicker"><i class="fa-solid fa-grid-2"></i> Brand Library</span>
+                <h2 class="bl-section-title">Curated collections</h2>
+                <p class="bl-section-subtitle">Explore identity systems designed for every industry.</p>
+            </div>
+            <div class="bl-library-grid">
                 {% for c in featured_collections %}
-                <div class="col-md-6 col-lg-4">
-                    <div class="landing-collection" style="--lc-accent:{{ c.accent_color }};">
-                        <div class="landing-collection-cover"
-                             data-hero="{% if c.hero_image %}{{ c.hero_image.url }}{% endif %}"
-                             data-logo="{% if c.logo_image %}{{ c.logo_image.url }}{% endif %}"
-                             data-business-card="{% if c.business_card_image %}{{ c.business_card_image.url }}{% endif %}"
-                             data-presentation="{% if c.presentation_image %}{{ c.presentation_image.url }}{% endif %}"
-                             data-letterhead="{% if c.letterhead_image %}{{ c.letterhead_image.url }}{% endif %}"
-                             data-email-signature="{% if c.email_signature_image %}{{ c.email_signature_image.url }}{% endif %}"
-                             data-social-media="{% if c.social_media_image %}{{ c.social_media_image.url }}{% endif %}"
-                             data-brand-guidelines="{% if c.brand_guidelines_image %}{{ c.brand_guidelines_image.url }}{% endif %}"
-                             data-typography="{% if c.typography_image %}{{ c.typography_image.url }}{% endif %}"
-                             data-name="{{ c.name }}"
-                             data-accent="{{ c.accent_color }}">
-                            {% if c.preview_image %}<img src="{{ c.preview_image.url }}" alt="{{ c.name }}" loading="lazy">
-                            {% else %}
-                            <div class="collection-cover-fallback" style="background:{{ c.accent_color }};">
-                                <div style="position:absolute;top:0;left:0;right:0;bottom:0;overflow:hidden;">
-                                    <div style="position:absolute;top:15%;left:50%;transform:translateX(-50%);width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.2);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;">
-                                        <span style="font-size:1.4rem;font-weight:800;color:#fff;letter-spacing:-0.02em;">{{ c.name|slice:":1"|upper }}</span>
-                                    </div>
-                                    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;width:80%;">
-                                        <div style="font-size:0.65rem;font-weight:700;color:rgba(255,255,255,0.7);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.25rem;">{{ c.industry|default:"Brand" }}</div>
-                                        <div style="font-size:1.1rem;font-weight:800;color:#fff;line-height:1.2;">{{ c.name }}</div>
-                                    </div>
-                                    <div style="position:absolute;bottom:12%;left:50%;transform:translateX(-50%);display:flex;gap:6px;">
-                                        {% for color in c.color_palette|slice:":5" %}
-                                        <div style="width:16px;height:16px;border-radius:50%;background:{{ color }};border:2px solid rgba(255,255,255,0.4);"></div>
-                                        {% endfor %}
-                                        {% if not c.color_palette %}
-                                        <div style="width:16px;height:16px;border-radius:50%;background:rgba(255,255,255,0.3);border:2px solid rgba(255,255,255,0.4);"></div>
-                                        <div style="width:16px;height:16px;border-radius:50%;background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.4);"></div>
-                                        <div style="width:16px;height:16px;border-radius:50%;background:rgba(0,0,0,0.2);border:2px solid rgba(255,255,255,0.4);"></div>
-                                        {% endif %}
-                                    </div>
-                                    <div style="position:absolute;top:10%;right:-10%;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,0.06);"></div>
-                                    <div style="position:absolute;bottom:5%;left:-8%;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,0.04);"></div>
+                <div class="bl-collection-card" data-reveal="up" data-delay="{{ forloop.counter0|add:1|floatformat:0 }}">
+                    <div class="bl-collection-cover"
+                         style="--lc-accent:{{ c.accent_color }};"
+                         data-hero="{% if c.hero_image %}{{ c.hero_image.url }}{% endif %}"
+                         data-logo="{% if c.logo_image %}{{ c.logo_image.url }}{% endif %}"
+                         data-business-card="{% if c.business_card_image %}{{ c.business_card_image.url }}{% endif %}"
+                         data-presentation="{% if c.presentation_image %}{{ c.presentation_image.url }}{% endif %}"
+                         data-letterhead="{% if c.letterhead_image %}{{ c.letterhead_image.url }}{% endif %}"
+                         data-email-signature="{% if c.email_signature_image %}{{ c.email_signature_image.url }}{% endif %}"
+                         data-social-media="{% if c.social_media_image %}{{ c.social_media_image.url }}{% endif %}"
+                         data-brand-guidelines="{% if c.brand_guidelines_image %}{{ c.brand_guidelines_image.url }}{% endif %}"
+                         data-typography="{% if c.typography_image %}{{ c.typography_image.url }}{% endif %}"
+                         data-name="{{ c.name }}"
+                         data-accent="{{ c.accent_color }}">
+                        {% if c.preview_image %}
+                            <img src="{{ c.preview_image.url }}" alt="{{ c.name }}" loading="lazy">
+                        {% else %}
+                            <div class="bl-collection-fallback" style="background:{{ c.accent_color }};">
+                                <div class="bl-fallback-shape bl-fallback-shape-1"></div>
+                                <div class="bl-fallback-shape bl-fallback-shape-2"></div>
+                                <div class="bl-fallback-initial">{{ c.name|slice:":1"|upper }}</div>
+                                <div class="bl-fallback-info">
+                                    <span class="bl-fallback-industry">{{ c.industry|default:"Brand" }}</span>
+                                    <span class="bl-fallback-name">{{ c.name }}</span>
+                                </div>
+                                <div class="bl-fallback-dots">
+                                    {% for color in c.color_palette|slice:":5" %}
+                                    <span class="bl-fallback-dot" style="background:{{ color }};"></span>
+                                    {% endfor %}
+                                    {% if not c.color_palette %}
+                                    <span class="bl-fallback-dot" style="background:rgba(255,255,255,0.3);"></span>
+                                    <span class="bl-fallback-dot" style="background:rgba(255,255,255,0.15);"></span>
+                                    <span class="bl-fallback-dot" style="background:rgba(0,0,0,0.2);"></span>
+                                    {% endif %}
                                 </div>
                             </div>
-                            {% endif %}
-                            <span class="collection-cat">{{ c.get_category_display }}</span>
-                            <button type="button" class="lc-gallery-btn lc-gallery-next" title="View all images"><i class="fa-solid fa-chevron-right"></i></button>
-                        </div>
-                        <div class="landing-collection-body">
-                            <div class="lc-header">
-                                {% if c.logo_image %}
-                                <img src="{{ c.logo_image.url }}" alt="{{ c.name }} logo" class="lc-logo">
-                                {% else %}
-                                <div class="lc-logo lc-logo-fallback" style="background:{{ c.accent_color }};">
-                                    <span>{{ c.name|slice:":1"|upper }}</span>
-                                </div>
-                                {% endif %}
-                                <div>
-                                    <h5 class="lc-name">{{ c.name }}</h5>
-                                    <span class="lc-industry">{{ c.industry }}</span>
-                                </div>
-                            </div>
-                            {% if c.description %}
-                            <p class="lc-desc">{{ c.description|truncatechars:80 }}</p>
-                            {% endif %}
-                            {% if c.color_palette %}
-                            <div class="lc-palette">
-                                {% for color in c.color_palette|slice:":6" %}
-                                <div class="lc-swatch" style="background:{{ color }};" title="{{ color }}"></div>
-                                {% endfor %}
-                            </div>
-                            {% endif %}
-                            {% if c.fonts %}
-                            <div class="lc-fonts">
-                                {% for font in c.fonts|slice:":2" %}
-                                <span class="lc-font">{{ font }}</span>
-                                {% endfor %}
-                            </div>
-                            {% endif %}
-                            <div class="lc-tags">
-                                {% for tag in c.style_tags|slice:":3" %}<span class="style-tag">{{ tag }}</span>{% endfor %}
-                            </div>
-                            <a href="{% url 'branding:wizard' %}" class="lc-cta">
-                                View Collection <i class="fa-solid fa-arrow-right"></i>
-                            </a>
-                        </div>
+                        {% endif %}
+                        <span class="bl-collection-cat">{{ c.get_category_display }}</span>
+                        <button type="button" class="bl-gallery-btn" title="View gallery">
+                            <i class="fa-solid fa-expand"></i>
+                        </button>
                     </div>
+                    <div class="bl-collection-body">
+                        <div class="bl-collection-header">
+                            {% if c.logo_image %}
+                                <img src="{{ c.logo_image.url }}" alt="{{ c.name }} logo" class="bl-collection-logo">
+                            {% else %}
+                                <div class="bl-collection-logo bl-collection-logo-fallback" style="background:{{ c.accent_color }};">
+                                    {{ c.name|slice:":1"|upper }}
+                                </div>
+                            {% endif %}
+                            <div>
+                                <h3 class="bl-collection-name">{{ c.name }}</h3>
+                                <span class="bl-collection-industry">{{ c.industry }}</span>
+                            </div>
+                        </div>
+                        {% if c.description %}
+                            <p class="bl-collection-desc">{{ c.description|truncatechars:100 }}</p>
+                        {% endif %}
+                        {% if c.color_palette %}
+                            <div class="bl-collection-palette">
+                                {% for color in c.color_palette|slice:":6" %}
+                                <span class="bl-collection-swatch" style="background:{{ color }};" title="{{ color }}"></span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        {% if c.fonts %}
+                            <div class="bl-collection-fonts">
+                                {% for font in c.fonts|slice:":2" %}
+                                <span class="bl-collection-font">{{ font }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        {% if c.style_tags %}
+                            <div class="bl-collection-tags">
+                                {% for tag in c.style_tags|slice:":3" %}
+                                <span class="bl-tag">{{ tag }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <a href="{% url 'branding:collection_detail' c.slug %}" class="bl-collection-cta">
+                            View Collection <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="bl-empty-state">
+                    <div class="bl-empty-icon"><i class="fa-solid fa-palette"></i></div>
+                    <h3>Collections Coming Soon</h3>
+                    <p>We're curating premium brand collections. Start your project now and be first to access them.</p>
+                    <a href="{% url 'branding:wizard' %}" class="bl-btn bl-btn-primary">Start a Project</a>
                 </div>
                 {% endfor %}
             </div>
         </div>
     </section>
 
-    <!-- CTA -->
-    <section class="py-5 py-lg-6">
+    <!-- ═══════════════════════ TESTIMONIALS ═══════════════════════ -->
+    <section class="bl-section bl-testimonials">
         <div class="container">
-            <div class="cta-banner rounded-5 p-4 p-lg-5 text-center position-relative overflow-hidden">
-                <div class="hero-glow hero-glow-1"></div>
-                <h2 class="fw-800 mb-2">Ready to build a brand that stands out?</h2>
-                <p class="mb-4 opacity-75">Free consultation · Dedicated designer · Fast turnaround</p>
-                <a href="{% url 'branding:wizard' %}" class="btn btn-light btn-lg px-5 fw-800">
-                    Start Your Brand <i class="fa-solid fa-arrow-right ms-2"></i>
-                </a>
+            <div class="bl-section-header" data-reveal="up">
+                <span class="bl-kicker"><i class="fa-solid fa-quote-left"></i> Testimonials</span>
+                <h2 class="bl-section-title">Loved by founders & teams</h2>
+                <p class="bl-section-subtitle">Hear from brands we've helped launch and grow.</p>
+            </div>
+            <div class="bl-testimonials-grid">
+                <div class="bl-testimonial-card" data-reveal="up" data-delay="0">
+                    <div class="bl-testimonial-stars">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                    </div>
+                    <p class="bl-testimonial-text">"The entire process took less than a week. We went from zero brand assets to a complete identity system that our customers instantly recognize."</p>
+                    <div class="bl-testimonial-author">
+                        <div class="bl-testimonial-avatar" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);">S</div>
+                        <div>
+                            <div class="bl-testimonial-name">Sarah Chen</div>
+                            <div class="bl-testimonial-role">CEO, TechStart</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bl-testimonial-card" data-reveal="up" data-delay="100">
+                    <div class="bl-testimonial-stars">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                    </div>
+                    <p class="bl-testimonial-text">"We needed a rebrand that felt modern but professional. The team nailed it on the first round. Our investors were impressed."</p>
+                    <div class="bl-testimonial-author">
+                        <div class="bl-testimonial-avatar" style="background:linear-gradient(135deg,#f59e0b,#f97316);">M</div>
+                        <div>
+                            <div class="bl-testimonial-name">Marcus Rivera</div>
+                            <div class="bl-testimonial-role">Founder, FinEdge</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bl-testimonial-card" data-reveal="up" data-delay="200">
+                    <div class="bl-testimonial-stars">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                    </div>
+                    <p class="bl-testimonial-text">"The brand kit we received was incredibly thorough. Logo, colors, typography, guidelines — everything we needed to launch with confidence."</p>
+                    <div class="bl-testimonial-author">
+                        <div class="bl-testimonial-avatar" style="background:linear-gradient(135deg,#10b981,#06b6d4);">A</div>
+                        <div>
+                            <div class="bl-testimonial-name">Amira Osei</div>
+                            <div class="bl-testimonial-role">Marketing Dir, GreenLife</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
+
+    <!-- ═══════════════════════ CTA ═══════════════════════ -->
+    <section class="bl-section bl-cta-section">
+        <div class="container">
+            <div class="bl-cta-banner" data-reveal="up">
+                <div class="bl-cta-glow"></div>
+                <div class="bl-cta-glow bl-cta-glow-2"></div>
+                <div class="bl-cta-content">
+                    <h2 class="bl-cta-title">Ready to build a brand that stands out?</h2>
+                    <p class="bl-cta-subtitle">Free consultation, dedicated designer, fast turnaround.</p>
+                    <div class="bl-cta-actions">
+                        <a href="{% url 'branding:wizard' %}" class="bl-btn bl-btn-white bl-btn-lg">
+                            <span>Start Your Brand</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                        <div class="bl-cta-trust-inline">
+                            <div class="bl-cta-avatars">
+                                <span class="bl-cta-avatar" style="background:#6366f1;">S</span>
+                                <span class="bl-cta-avatar" style="background:#f59e0b;">M</span>
+                                <span class="bl-cta-avatar" style="background:#10b981;">A</span>
+                            </div>
+                            <span class="bl-cta-trust-text">240+ brands delivered</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
 </div>
 
 <!-- Gallery Modal -->
-<div class="lc-modal-overlay" id="lcGalleryModal" style="display:none;">
-    <div class="lc-modal">
-        <button class="lc-modal-close" id="lcModalClose"><i class="fa-solid fa-xmark"></i></button>
-        <div class="lc-modal-header">
-            <div class="lc-modal-title" id="lcModalTitle"></div>
-            <span class="lc-modal-counter" id="lcModalCounter"></span>
+<div class="bl-modal-overlay" id="blGalleryModal" style="display:none;">
+    <div class="bl-modal">
+        <button class="bl-modal-close" id="blModalClose"><i class="fa-solid fa-xmark"></i></button>
+        <div class="bl-modal-header">
+            <div class="bl-modal-title" id="blModalTitle"></div>
+            <span class="bl-modal-counter" id="blModalCounter"></span>
         </div>
-        <div class="lc-modal-body">
-            <button class="lc-modal-arrow lc-modal-prev" id="lcModalPrev"><i class="fa-solid fa-chevron-left"></i></button>
-            <div class="lc-modal-slide" id="lcModalSlide">
-                <img id="lcModalImg" src="" alt="">
-                <div class="lc-modal-label" id="lcModalLabel"></div>
+        <div class="bl-modal-body">
+            <button class="bl-modal-arrow bl-modal-prev" id="blModalPrev"><i class="fa-solid fa-chevron-left"></i></button>
+            <div class="bl-modal-slide" id="blModalSlide">
+                <img id="blModalImg" src="" alt="">
+                <div class="bl-modal-label" id="blModalLabel"></div>
             </div>
-            <button class="lc-modal-arrow lc-modal-next" id="lcModalNext"><i class="fa-solid fa-chevron-right"></i></button>
+            <button class="bl-modal-arrow bl-modal-next" id="blModalNext"><i class="fa-solid fa-chevron-right"></i></button>
         </div>
-        <div class="lc-modal-dots" id="lcModalDots"></div>
+        <div class="bl-modal-dots" id="blModalDots"></div>
     </div>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+
+    /* ── Scroll Reveal ── */
+    var reveals = document.querySelectorAll('[data-reveal]');
+    var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+                var delay = parseInt(entry.target.dataset.delay || '0', 10);
+                setTimeout(function() {
+                    entry.target.classList.add('is-visible');
+                }, delay);
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.12 });
+    reveals.forEach(function(el) { observer.observe(el); });
+
+    /* ── Counter Animation ── */
+    var counters = document.querySelectorAll('[data-count]');
+    var counterObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+                var el = entry.target;
+                var target = parseInt(el.dataset.count, 10);
+                var duration = 1200;
+                var start = 0;
+                var startTime = null;
+                function step(timestamp) {
+                    if (!startTime) startTime = timestamp;
+                    var progress = Math.min((timestamp - startTime) / duration, 1);
+                    var eased = 1 - Math.pow(1 - progress, 3);
+                    el.textContent = Math.floor(eased * target);
+                    if (progress < 1) requestAnimationFrame(step);
+                    else el.textContent = target;
+                }
+                requestAnimationFrame(step);
+                counterObserver.unobserve(el);
+            }
+        });
+    }, { threshold: 0.5 });
+    counters.forEach(function(el) { counterObserver.observe(el); });
+
+    /* ── Gallery Modal ── */
     var labels = {
         hero: 'Hero Image', logo: 'Logo', typography: 'Typography',
         business_card: 'Business Card', presentation: 'Presentation',
@@ -220,11 +488,11 @@ document.addEventListener('DOMContentLoaded', function() {
     };
     var keys = ['hero','logo','typography','business_card','presentation','letterhead','email_signature','social_media','brand_guidelines'];
 
-    document.querySelectorAll('.lc-gallery-next').forEach(function(btn) {
+    document.querySelectorAll('.bl-gallery-btn').forEach(function(btn) {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            var cover = btn.closest('.landing-collection-cover');
+            var cover = btn.closest('.bl-collection-cover');
             if (!cover) return;
             var name = cover.dataset.name || '';
             var accent = cover.dataset.accent || '#6366f1';
@@ -238,12 +506,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    var modal = document.getElementById('lcGalleryModal');
-    var modalImg = document.getElementById('lcModalImg');
-    var modalLabel = document.getElementById('lcModalLabel');
-    var modalTitle = document.getElementById('lcModalTitle');
-    var modalCounter = document.getElementById('lcModalCounter');
-    var modalDots = document.getElementById('lcModalDots');
+    var modal = document.getElementById('blGalleryModal');
+    var modalImg = document.getElementById('blModalImg');
+    var modalLabel = document.getElementById('blModalLabel');
+    var modalTitle = document.getElementById('blModalTitle');
+    var modalCounter = document.getElementById('blModalCounter');
+    var modalDots = document.getElementById('blModalDots');
     var current = 0;
     var galleryItems = [];
 
@@ -265,21 +533,21 @@ document.addEventListener('DOMContentLoaded', function() {
         modalDots.innerHTML = '';
         galleryItems.forEach(function(it, i) {
             var dot = document.createElement('span');
-            dot.className = 'lc-dot' + (i === current ? ' active' : '');
+            dot.className = 'bl-dot' + (i === current ? ' active' : '');
             dot.addEventListener('click', function() { current = i; renderSlide(); });
             modalDots.appendChild(dot);
         });
     }
 
-    document.getElementById('lcModalPrev').addEventListener('click', function() {
+    document.getElementById('blModalPrev').addEventListener('click', function() {
         current = (current - 1 + galleryItems.length) % galleryItems.length;
         renderSlide();
     });
-    document.getElementById('lcModalNext').addEventListener('click', function() {
+    document.getElementById('blModalNext').addEventListener('click', function() {
         current = (current + 1) % galleryItems.length;
         renderSlide();
     });
-    document.getElementById('lcModalClose').addEventListener('click', function() {
+    document.getElementById('blModalClose').addEventListener('click', function() {
         modal.style.display = 'none';
         document.body.style.overflow = '';
     });

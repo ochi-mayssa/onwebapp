@@ -9,10 +9,17 @@
         </div>
     </div>
 
+    {% if session %}
+    <h2 class="mb-3">Welcome back, {{ user.get_full_name|default:user.username }}</h2>
+    <p class="lead mb-4">
+        Pick up where you left off. Your progress is saved automatically.
+    </p>
+    {% else %}
     <h2 class="mb-3">Welcome to OnWebApp Community</h2>
     <p class="lead mb-4">
         Let's build something extraordinary together. Our guided onboarding collects everything we need to start your project &mdash; no back-and-forth emails required.
     </p>
+    {% endif %}
 
     <div class="row g-3 mb-5 text-start">
         <div class="col-md-4">
@@ -49,7 +56,7 @@
             {% csrf_token %}
             {% if force_new %}<input type="hidden" name="new" value="1">{% endif %}
             <button type="submit" class="btn-wizard-next px-5 py-3">
-                {% if session %}Continue Previous{% else %}Start Project{% endif %}
+                {% if session %}Continue Project{% else %}Start Project{% endif %}
                 <i class="fas fa-arrow-right ms-2"></i>
             </button>
         </form>
@@ -64,7 +71,8 @@
     <p class="text-secondary small mt-4">
         <i class="fas fa-clock me-1"></i>
         Last saved {{ session.updated_at|timesince }} ago &bull;
-        Step {{ session.current_step }} of 13
+        Step {{ session.current_step }} of {{ session.get_total_steps }} &bull;
+        {{ session.get_step_name }}
     </p>
     {% endif %}
 </div>

@@ -1,0 +1,53 @@
+{% extends "community/wizard/base_wizard.html" %}
+{% load static i18n %}
+
+{% block wizard_content %}
+<div class="wizard-card">
+    <div class="text-center mb-4">
+        <div class="wizard-section-label">BASIC PACKAGE - STEP 3 OF 6</div>
+        <h2 class="mb-2">Tell Us About Your Business</h2>
+        <p class="lead">We need some basic information to get started on your website.</p>
+    </div>
+
+    <form method="post" id="businessForm">
+        {% csrf_token %}
+
+        <div class="mb-4">
+            <label class="form-label fw-700 small">Business Name <span class="text-danger">*</span></label>
+            <input type="text" name="business_name" class="wizard-input" placeholder="e.g. My Business" required
+                   value="{% if session.business_name %}{{ session.business_name }}{% endif %}">
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label fw-700 small">Industry <span class="text-danger">*</span></label>
+            <input type="text" name="industry" class="wizard-input" placeholder="e.g. Restaurant, Consulting, Retail" required
+                   value="{% if session.industry %}{{ session.industry }}{% endif %}">
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label fw-700 small">Business Description</label>
+            <textarea name="business_description" class="wizard-input" rows="3" placeholder="Brief description of your business">{% if session.business_description %}{{ session.business_description }}{% endif %}</textarea>
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label fw-700 small">Target Audience</label>
+            <input type="text" name="target_audience" class="wizard-input" placeholder="e.g. Local customers, Young professionals"
+                   value="{% if session.target_audience %}{{ session.target_audience }}{% endif %}">
+        </div>
+
+        {% if messages %}
+        <div class="mb-3">
+            {% for message in messages %}
+            <div class="alert alert-danger py-2" style="font-size:.85rem;">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </form>
+</div>
+{% endblock %}
+
+{% block wizard_next %}
+<button type="submit" form="businessForm" class="btn-wizard-next">
+    Continue <i class="fas fa-arrow-right ms-2"></i>
+</button>
+{% endblock %}
