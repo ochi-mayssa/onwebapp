@@ -1,4 +1,4 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 {% load i18n static %}
 
 {% block title %}{% trans "OnWebApp — More Than Just a Website Builder" %}{% endblock %}
@@ -99,8 +99,8 @@
     var(--panel);
   border-radius:var(--radius-m,14px);
   border:1px solid var(--line);
-  padding:40px 48px 44px;
-  max-width:1120px;
+  padding:56px 64px 60px;
+  max-width:1280px;
   margin:0 auto}
 .oh-sh-tabs{display:flex;gap:2px;background:var(--panel-alt);border-radius:10px;padding:5px;margin-bottom:36px}
 .oh-sh-tab{flex:1;text-align:center;background:none;border:none;border-radius:8px;color:var(--muted-dim);padding:12px 8px;font-size:.92rem;font-weight:600;cursor:pointer;transition:color .2s,background .2s,border-color .2s;border:2px solid transparent}
@@ -139,11 +139,10 @@
 .oh-sh-body .oh-sh-cta i{transition:transform .3s}
 .oh-sh-body .oh-sh-cta:hover i{transform:translateX(3px)}
 .oh-svc-wrap{position:relative;height:400vh}
-.oh-svc-pin{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;justify-content:center;overflow:hidden}
-.oh-svc-slide{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:28px;padding:0 60px;opacity:0;transform:translateY(30px) scale(.98);transition:opacity .6s cubic-bezier(.22,1,.36,1),transform .6s cubic-bezier(.22,1,.36,1);pointer-events:none}
+.oh-svc-pin{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;justify-content:flex-start;padding-top:60px;overflow:hidden}
+.oh-svc-slide{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:0 80px;opacity:0;transform:translateY(30px) scale(.98);transition:opacity .6s cubic-bezier(.22,1,.36,1),transform .6s cubic-bezier(.22,1,.36,1);pointer-events:none}
 .oh-svc-slide.active{opacity:1;transform:none;pointer-events:auto}
-.oh-svc-slide:nth-child(even){flex-direction:row-reverse}
-.oh-svc-img{position:relative;border-radius:14px;overflow:hidden;aspect-ratio:3/2;background:#F4F6FB;border:1px solid rgba(15,23,42,.08);width:420px;flex-shrink:0}
+.oh-svc-body{text-align:center;max-width:640px}
 .oh-svc-img img{width:100%;height:100%;object-fit:cover;display:block}
 .oh-svc-img-tint{position:absolute;inset:0;background:linear-gradient(135deg,rgba(217,164,65,.12),transparent 60%,rgba(14,148,136,.08));mix-blend-mode:multiply;pointer-events:none}
 .oh-svc-body{padding:8px 0}
@@ -298,8 +297,8 @@
     <div class="wrap">
         <div class="section-head reveal" data-period="700">
             <span class="kicker">Beyond the ordinary approach</span>
-            <h2>Seven things every OnWebApp site is born with.</h2>
-            <p>Everyone else builds websites. We build websites with the web and app infrastructure so advanced, they don't just run for people — they run for machines too.</p>
+            <h2>Seven pillars every OnWebApp site is born with.</h2>
+            <p>Seven core pillars built-in for building web and application, aligned with Web 4.0 — the autonomous web.</p>
         </div>
         <div class="builtin reveal">
             <div class="tab-list" id="tabList" role="tablist" aria-label="Built-in stack">
@@ -474,10 +473,10 @@
 <!-- WHERE WE SHINE -->
 <section class="oh-section" id="shine">
     <div class="container">
-        <div style="text-align:center;margin-bottom:2.5rem">
-            <div class="oh-section-label oh-reveal">Where We Shine</div>
-            <h2 class="oh-section-title oh-reveal oh-reveal-delay-1">Three Things We're<br><span class="grad">Known For.</span></h2>
-            <p class="oh-section-sub oh-reveal oh-reveal-delay-2" style="margin:0 auto">Website monitoring, dashboard design, and API design — built into every project, never bolted on later.</p>
+        <div style="text-align:center;margin-bottom:3rem">
+            <span class="oh-section-label oh-reveal" style="font-family:'Fraunces',Georgia,serif;font-style:italic;color:#A5760D;font-size:1.1rem;font-weight:500;text-transform:none;letter-spacing:0">Where We Shine</span>
+            <h2 class="oh-section-title oh-reveal oh-reveal-delay-1" style="font-size:clamp(1.5rem,2.5vw,2rem);font-family:'Fraunces',Georgia,serif;font-weight:500">Three Software Products<br>Address All Your Needs.</h2>
+            <p class="oh-section-sub oh-reveal oh-reveal-delay-2" style="margin:0 auto;max-width:640px;color:#5B6478">Website monitoring, dashboard design, project tracking system and API development - integrated into every project from the start, not added as an afterthought.</p>
         </div>
         <div class="oh-shine" id="shineBlock">
             <div class="oh-sh-tabs" id="shineTabList" role="tablist" aria-label="Where we shine">
@@ -589,19 +588,16 @@
 <div class="oh-section-divider"></div>
 
 <!-- SERVICES -->
-<section class="oh-section" style="background:#fff;padding-bottom:0">
-    <div class="container">
-        <div style="text-align:center;margin-bottom:1rem">
-            <div class="oh-section-label oh-reveal" style="color:#A5760D">Our Services</div>
-            <h2 class="oh-section-title oh-reveal oh-reveal-delay-1">End-to-End Web & Mobile App Development</h2>
-            <p class="oh-section-sub oh-reveal oh-reveal-delay-2" style="margin:0 auto">From strategy to execution, we deliver complete digital transformation.</p>
-        </div>
-    </div>
+<section class="oh-section" style="background:#fff;padding:0">
     <div class="oh-svc-wrap" id="svcWrap">
         <div class="oh-svc-pin" id="svcPin">
+            <div style="text-align:center;padding:0 0 20px">
+                <div class="oh-section-label" style="color:#A5760D">Our Services</div>
+                <h2 class="oh-section-title">End-to-End Web & Mobile App Development</h2>
+                <p class="oh-section-sub" style="margin:0 auto">From strategy to execution, we deliver complete digital transformation.</p>
+            </div>
             <div class="oh-svc-progress"><span class="oh-svc-counter"><strong id="svcNum">01</strong> / 04</span><div class="oh-svc-progress-line"><div class="oh-svc-progress-fill" id="svcFill" style="height:0%"></div></div></div>
             <div class="oh-svc-slide active" data-svc="0">
-                <div class="oh-svc-img"><img src="{% static 'img/webb.png' %}" alt="Web Development"><span class="oh-svc-img-tint"></span></div>
                 <div class="oh-svc-body">
                     <span class="oh-svc-num">01</span>
                     <h3>Web Development</h3>
@@ -615,7 +611,6 @@
                 </div>
             </div>
             <div class="oh-svc-slide" data-svc="1">
-                <div class="oh-svc-img"><img src="{% static 'img/erp.png' %}" alt="ERP"><span class="oh-svc-img-tint"></span></div>
                 <div class="oh-svc-body">
                     <span class="oh-svc-num">02</span>
                     <h3>ERP</h3>
@@ -629,7 +624,6 @@
                 </div>
             </div>
             <div class="oh-svc-slide" data-svc="2">
-                <div class="oh-svc-img"><img src="{% static 'img/brand.png' %}" alt="Branding"><span class="oh-svc-img-tint"></span></div>
                 <div class="oh-svc-body">
                     <span class="oh-svc-num">03</span>
                     <h3>Branding</h3>
@@ -643,7 +637,6 @@
                 </div>
             </div>
             <div class="oh-svc-slide" data-svc="3">
-                <div class="oh-svc-img"><img src="{% static 'img/automation.jpg' %}" alt="Automation"><span class="oh-svc-img-tint"></span></div>
                 <div class="oh-svc-body">
                     <span class="oh-svc-num">04</span>
                     <h3>Automation</h3>

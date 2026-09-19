@@ -776,10 +776,7 @@
                         </li>
 
                         {% elif request.resolver_match and request.resolver_match.url_name == 'home' %}
-                        <!-- Minimal nav on homepage: Home · Pricing · Community ONLY -->
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'home:home' %}">{% trans 'Home' %}</a>
-                        </li>
+                        <!-- Minimal nav on homepage: Pricing + Community ONLY -->
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="servicesMenuHome" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 {% trans 'Services' %}
@@ -787,16 +784,20 @@
                             {% include "./_services_dropdown.html" with menu_id="servicesMenuHome" %}
                         </li>
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="designMenuHome" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                {% trans 'Design' %}
+                            <a class="nav-link dropdown-toggle" href="#" id="technologyMenuHome" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                {% trans 'Technology' %}
                             </a>
-                            {% include "./_design_dropdown.html" with menu_id="designMenuHome" %}
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="softwareMenuHome" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                {% trans 'Software' %}
-                            </a>
-                            {% include "./_software_dropdown.html" with menu_id="softwareMenuHome" %}
+                            <ul class="dropdown-menu shadow-xl border-0 rounded-24 p-3" aria-labelledby="technologyMenuHome" style="min-width:220px;">
+                                <li><span class="dropdown-header px-3 py-1" style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b;">{% trans 'Design' %}</span></li>
+                                <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'home:ux_design' %}"><i class="fas fa-compass-drafting me-2" style="color:#7c3aed;font-size:.8rem;"></i>{% trans 'UX Design' %}</a></li>
+                                <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'home:ui_design' %}"><i class="fas fa-pen-nib me-2" style="color:#0d9488;font-size:.8rem;"></i>{% trans 'UI Design' %}</a></li>
+                                <li><hr class="dropdown-divider border-0" style="border-top:1px solid rgba(15,23,42,.08);margin:4px 0"></li>
+                                <li><span class="dropdown-header px-3 py-1" style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b;">{% trans 'Software' %}</span></li>
+                                <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'home:software_home' %}"><i class="fas fa-laptop-code me-2" style="color:#2563eb;font-size:.8rem;"></i>{% trans 'Software Home' %}</a></li>
+                                <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'home:web_development' %}"><i class="fas fa-globe me-2" style="color:#2563eb;font-size:.8rem;"></i>{% trans 'Web Development' %}</a></li>
+                                <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'home:mobile_development' %}"><i class="fas fa-mobile-alt me-2" style="color:#14b8a6;font-size:.8rem;"></i>{% trans 'Mobile App Development' %}</a></li>
+                                <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'home:ecommerce_development' %}"><i class="fas fa-shopping-cart me-2" style="color:#9333ea;font-size:.8rem;"></i>{% trans 'eCommerce Development' %}</a></li>
+                            </ul>
                         </li>
                         <!--
                         <li class="nav-item dropdown">
