@@ -62,6 +62,9 @@
         body {
             font-family: var(--font-body);
             -webkit-font-smoothing: antialiased;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
         }
 
         h1, h2, h3, h4, .navbar-brand, .fw-800 {
@@ -446,8 +449,9 @@
             .oh-topbar { display: none; }
         }
         /*  Homepage Footer  */
-        .oh-footer{padding:4rem 0 1.5rem;background:#080d1a;color:rgba(255,255,255,.6);border-top:1px solid rgba(255,255,255,.05);position:relative}
+        .oh-footer{padding:4rem 0 1.5rem;background:#080d1a;color:rgba(255,255,255,.6);border-top:1px solid rgba(255,255,255,.05);position:relative;width:100vw;margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw)}
         .oh-footer::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(59,130,246,.15),transparent)}
+        .oh-footer-inner{max-width:1200px;margin:0 auto;padding:0 32px;width:100%}
         .oh-footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:2rem;margin-bottom:2.5rem}
         .oh-footer-brand h5{font-weight:800;color:#fff;margin-bottom:.6rem;font-size:1.1rem}
         .oh-footer-brand p{font-size:.82rem;line-height:1.7}
@@ -929,7 +933,7 @@
     <!-- Footer -->
     {% block footer %}
     <footer class="oh-footer">
-      <div class="container">
+      <div class="oh-footer-inner">
         <div class="oh-footer-grid">
           <div class="oh-footer-brand">
             <h5>OnWebApp</h5>
