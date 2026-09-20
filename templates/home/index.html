@@ -56,7 +56,7 @@
 .oh-hero-scroll i{font-size:.75rem}
 @keyframes scrollBounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(6px)}}
 @media(max-width:991px){.oh-hero{padding:8rem 0 7rem;min-height:auto}}
-@media(max-width:575px){.oh-hero{padding:7rem 0 6rem}.oh-hero-actions{gap:.75rem}}
+@media(max-width:575px){.oh-hero{padding:7rem 0 6rem}.oh-hero-actions{gap:.75rem}.oh-hero-badges{gap:.4rem!important}.oh-hero-badges .oh-badge{font-size:.65rem!important;padding:.25rem .6rem!important}.oh-hero-title{font-size:1.8rem!important}.oh-hero-sub{font-size:.92rem!important}}
 .oh-trust{padding:2.75rem 0;border-top:1px solid #eef2f7;border-bottom:1px solid #eef2f7;background:var(--bg-body,#fdfdfd);position:relative;overflow:hidden}
 .oh-trust::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(59,130,246,.15),transparent)}
 .oh-trust::after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,var(--bg-body,#fdfdfd),transparent 12%,transparent 88%,var(--bg-body,#fdfdfd));z-index:1}
@@ -223,8 +223,10 @@
 .reveal{opacity:0;transform:translateY(30px);transition:opacity .7s cubic-bezier(.22,1,.36,1),transform .7s cubic-bezier(.22,1,.36,1)}
 .reveal.is-visible{opacity:1;transform:translateY(0)}
 @media(max-width:991px){.oh-stack .builtin{grid-template-columns:1fr}}
-@media(max-width:880px){.oh-stack .tab-list{position:static;flex-direction:row;flex-wrap:wrap;gap:8px}.oh-stack .tab-btn{border-left:none;border-bottom:2px solid var(--line);padding:10px 4px}.oh-stack .tab-btn[aria-selected="true"]{border-bottom-color:var(--gold);background:none}.oh-shine{padding:28px 20px 32px}.oh-sh-grid{grid-template-columns:1fr}}
-@media(max-width:575px){.oh-shine{padding:24px 16px 28px}.oh-sh-tab{font-size:.82rem;padding:10px 4px}.oh-stack .tab-panel{padding:26px}.oh-stack .tab-cols{grid-template-columns:1fr}}
+@media(max-width:880px){.oh-stack .tab-list{position:static;flex-direction:row;flex-wrap:wrap;gap:8px}.oh-stack .tab-btn{border-left:none;border-bottom:2px solid var(--line);padding:10px 4px;font-size:.82rem}.oh-stack .tab-btn[aria-selected="true"]{border-bottom-color:var(--gold);background:none}.oh-shine{padding:28px 20px 32px}.oh-sh-grid{grid-template-columns:1fr}.oh-process-grid{grid-template-columns:1fr 1fr!important}.oh-stats-grid{grid-template-columns:1fr 1fr!important;gap:1rem!important}}
+@media(max-width:575px){.oh-shine{padding:24px 16px 28px}.oh-sh-tab{font-size:.82rem;padding:10px 4px}.oh-stack .tab-panel{padding:26px}.oh-stack .tab-cols{grid-template-columns:1fr}.oh-process-grid{grid-template-columns:1fr!important}.oh-stats-grid{grid-template-columns:1fr 1fr!important}.oh-hero-badges{flex-wrap:wrap!important}.oh-hero-badges .oh-badge{font-size:.7rem!important;padding:.3rem .7rem!important}.oh-cta-buttons{flex-direction:column!important;align-items:center!important}.oh-cta-buttons a{width:100%!important;justify-content:center!important}.oh-seo-cards{grid-template-columns:1fr!important}.oh-sh-photo-mini strong{font-size:.85rem!important}.oh-sh-photo-mini span{font-size:.7rem!important}}
+@media(max-width:768px){.oh-process-grid{grid-template-columns:1fr 1fr!important}.oh-process-line{display:none!important}.oh-stats-grid{grid-template-columns:1fr 1fr!important;gap:1rem!important}.oh-seo-grid{grid-template-columns:1fr!important;gap:2rem!important}.oh-seo-cards{grid-template-columns:1fr!important}.oh-seo-pills{justify-content:center!important}.oh-cta-section{padding:4rem 0!important}.oh-cta-buttons{flex-direction:column!important;align-items:center!important}.oh-cta-buttons a{width:100%!important;justify-content:center!important}.oh-sh-photo-mini strong{font-size:.9rem!important}}
+@media(max-width:575px){.oh-process-grid{grid-template-columns:1fr!important}.oh-stats-grid{grid-template-columns:1fr 1fr!important}.oh-hero-badges{flex-wrap:wrap!important}.oh-hero-badges .oh-badge{font-size:.7rem!important;padding:.3rem .7rem!important}.oh-cta-buttons{flex-direction:column!important;align-items:center!important}.oh-cta-buttons a{width:100%!important;justify-content:center!important}}
 </style>
 {% endblock %}
 
@@ -306,7 +308,7 @@
             <p>OnWebApp brings together Web, ERP, APIs, AI, IoT, Data, and Automation to create connected digital systems built around real business needs.</p>
             <p style="font-weight:700;color:#0F172A;margin-top:1rem;font-size:1.1rem">Connect. Integrate. Transform.</p>
         </div>
-        <div class="reveal" style="display:grid;grid-template-columns:repeat(4,1fr);gap:2rem;margin-top:2.5rem;padding:2.5rem 0;border-top:1px solid rgba(15,23,42,.06)">
+        <div class="reveal oh-stats-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:2rem;margin-top:2.5rem;padding:2.5rem 0;border-top:1px solid rgba(15,23,42,.06)">
             <div style="text-align:center">
                 <div style="font-family:'Fraunces',Georgia,serif;font-size:2.5rem;font-weight:500;color:#D9A441;line-height:1">150+</div>
                 <div style="font-size:.85rem;color:#5B6478;margin-top:.5rem;font-weight:500">Projects Delivered</div>
@@ -337,8 +339,8 @@
             <h2 style="font-family:'Fraunces',Georgia,serif;font-size:clamp(1.8rem,3.5vw,2.5rem);font-weight:500;color:#0F172A;line-height:1.15;letter-spacing:-.01em;margin-bottom:.75rem">We don't just build and leave.</h2>
             <p style="color:#5B6478;font-size:1rem;max-width:52ch;margin:0 auto;line-height:1.75">Strategy, design, development, deployment, and ongoing support under one roof.</p>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;position:relative">
-            <div style="position:absolute;top:44px;left:0;right:0;height:2px;background:linear-gradient(90deg,rgba(37,99,235,.2),rgba(14,148,136,.2),rgba(217,164,65,.2),rgba(124,58,237,.2));z-index:0;border-radius:1px"></div>
+        <div class="oh-process-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;position:relative">
+            <div class="oh-process-line" style="position:absolute;top:44px;left:0;right:0;height:2px;background:linear-gradient(90deg,rgba(37,99,235,.2),rgba(14,148,136,.2),rgba(217,164,65,.2),rgba(124,58,237,.2));z-index:0;border-radius:1px"></div>
             <div style="position:relative;z-index:1;text-align:center">
                 <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,rgba(37,99,235,.12),rgba(37,99,235,.04));display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;border:2px solid #fff;box-shadow:0 2px 12px rgba(37,99,235,.12)"><i class="fas fa-compass" style="color:#2563eb;font-size:1.1rem"></i></div>
                 <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#2563eb;margin-bottom:.5rem">Step 1</div>
@@ -510,12 +512,12 @@
 <!-- SEO -->
 <section class="oh-section" style="background:#F4F6FB">
     <div class="wrap">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center">
+        <div class="oh-seo-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center">
             <div>
                 <span style="display:inline-block;font-family:'Fraunces',Georgia,serif;font-style:italic;color:#D9A441;font-size:1.05rem;font-weight:500;margin-bottom:12px">Built-in SEO</span>
                 <h2 style="font-family:'Fraunces',Georgia,serif;font-size:clamp(1.8rem,3.5vw,2.5rem);font-weight:500;color:#0F172A;line-height:1.15;letter-spacing:-.01em;margin-bottom:1.25rem">Rank higher from day one. Not after.</h2>
                 <p style="color:#5B6478;font-size:1.05rem;line-height:1.75;max-width:48ch;margin-bottom:1.5rem">Every OnWebApp site ships with SEO baked in. Clean code, structured data, fast load times, and intelligent content optimization built into the platform.</p>
-                <div style="display:flex;flex-wrap:wrap;gap:.75rem;margin-bottom:2rem">
+                <div class="oh-seo-pills" style="display:flex;flex-wrap:wrap;gap:.75rem;margin-bottom:2rem">
                     <a href="{% url 'seo_analyzer:seo_home_marketing' %}" style="display:inline-flex;align-items:center;gap:.45rem;padding:.55rem 1.1rem;border-radius:50px;background:#fff;border:1px solid rgba(15,23,42,.08);color:#0F172A;font-size:.82rem;font-weight:600;text-decoration:none;transition:all .3s" onmouseover="this.style.borderColor='rgba(37,99,235,.3)';this.style.color='#2563eb'" onmouseout="this.style.borderColor='rgba(15,23,42,.08)';this.style.color='#0F172A'"><i class="fas fa-home" style="font-size:.7rem;color:#2563eb"></i> SEO Home</a>
                     <a href="{% url 'seo_analyzer:seo_keyword_marketing' %}" style="display:inline-flex;align-items:center;gap:.45rem;padding:.55rem 1.1rem;border-radius:50px;background:#fff;border:1px solid rgba(15,23,42,.08);color:#0F172A;font-size:.82rem;font-weight:600;text-decoration:none;transition:all .3s" onmouseover="this.style.borderColor='rgba(37,99,235,.3)';this.style.color='#2563eb'" onmouseout="this.style.borderColor='rgba(15,23,42,.08)';this.style.color='#0F172A'"><i class="fas fa-key" style="font-size:.7rem;color:#2563eb"></i> Keywords</a>
                     <a href="{% url 'seo_analyzer:seo_content_marketing' %}" style="display:inline-flex;align-items:center;gap:.45rem;padding:.55rem 1.1rem;border-radius:50px;background:#fff;border:1px solid rgba(15,23,42,.08);color:#0F172A;font-size:.82rem;font-weight:600;text-decoration:none;transition:all .3s" onmouseover="this.style.borderColor='rgba(37,99,235,.3)';this.style.color='#2563eb'" onmouseout="this.style.borderColor='rgba(15,23,42,.08)';this.style.color='#0F172A'"><i class="fas fa-file-alt" style="font-size:.7rem;color:#2563eb"></i> Content</a>
@@ -524,7 +526,7 @@
                 </div>
                 <a href="{% url 'seo_analyzer:seo_home_marketing' %}" style="display:inline-flex;align-items:center;gap:.55rem;padding:.85rem 2rem;border-radius:50px;background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;font-weight:700;font-size:.9rem;text-decoration:none;transition:all .35s;box-shadow:0 6px 28px rgba(37,99,235,.3)" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 10px 36px rgba(37,99,235,.4)'" onmouseout="this.style.transform='';this.style.boxShadow='0 6px 28px rgba(37,99,235,.3)'">Explore SEO Tools <i class="fas fa-arrow-right" style="font-size:.8rem"></i></a>
             </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+            <div class="oh-seo-cards" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
                 <div style="background:#fff;border-radius:14px;padding:1.5rem;border:1px solid rgba(15,23,42,.06);box-shadow:0 2px 12px rgba(15,23,42,.04)">
                     <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,rgba(37,99,235,.1),rgba(37,99,235,.05));display:flex;align-items:center;justify-content:center;margin-bottom:.85rem"><i class="fas fa-search" style="color:#2563eb;font-size:1rem"></i></div>
                     <div style="font-weight:700;color:#0F172A;margin-bottom:.3rem;font-size:.95rem">Keyword Research</div>
@@ -753,7 +755,7 @@
             </div>
             <h2 style="font-family:'Fraunces',Georgia,serif;font-size:clamp(2rem,4.5vw,3.2rem);font-weight:500;line-height:1.1;letter-spacing:-.02em;color:#0F172A;margin-bottom:1.5rem">Build. Connect. Automate.</h2>
             <p style="color:#5B6478;font-size:1.1rem;max-width:540px;margin:0 auto 2.5rem;line-height:1.75">Your next digital system shouldn't be a collection of disconnected tools. Let's design, develop, integrate, and automate a solution built around your business.</p>
-            <div style="display:flex;justify-content:center;flex-wrap:wrap;gap:1rem">
+            <div class="oh-cta-buttons" style="display:flex;justify-content:center;flex-wrap:wrap;gap:1rem">
                 <a href="{% url 'contact:contact' %}" style="display:inline-flex;align-items:center;gap:.55rem;padding:.95rem 2.3rem;border-radius:50px;background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;font-weight:700;font-size:.95rem;text-decoration:none;transition:all .35s;box-shadow:0 6px 28px rgba(37,99,235,.3)" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 10px 36px rgba(37,99,235,.4)'" onmouseout="this.style.transform='';this.style.boxShadow='0 6px 28px rgba(37,99,235,.3)'">Book a Consultation <i class="fas fa-arrow-right" style="font-size:.85rem"></i></a>
                 <a href="{% url 'home:testimonials' %}" style="display:inline-flex;align-items:center;gap:.55rem;padding:.95rem 2.3rem;border-radius:50px;background:#fff;border:1px solid rgba(15,23,42,.1);color:#0F172A;font-weight:700;font-size:.95rem;text-decoration:none;transition:all .35s" onmouseover="this.style.borderColor='rgba(37,99,235,.3)';this.style.color='#2563eb'" onmouseout="this.style.borderColor='rgba(15,23,42,.1)';this.style.color='#0F172A'">Explore Our Work <i class="fas fa-arrow-right" style="font-size:.85rem"></i></a>
             </div>
