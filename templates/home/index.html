@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 {% load i18n static %}
 
-{% block title %}{% trans "OnWebApp — More Than Just a Website Builder" %}{% endblock %}
-{% block meta_description %}{% trans "OnWebApp: Five built-in pillars powering Web 4.0 — the autonomous web. AI, Automation, Integration, and Validation for websites and applications." %}{% endblock %}
-{% block og_title %}{% trans "OnWebApp — More Than Just a Website Builder" %}{% endblock %}
-{% block og_description %}{% trans "Five built-in pillars powering Web 4.0 — the autonomous web. AI, Automation, Integration, and Validation." %}{% endblock %}
-{% block twitter_title %}{% trans "OnWebApp — More Than Just a Website Builder" %}{% endblock %}
-{% block twitter_description %}{% trans "Five built-in pillars powering Web 4.0 — the autonomous web. AI, Automation, Integration, and Validation." %}{% endblock %}
+{% block title %}{% trans "OnWebApp  More Than Just a Website Builder" %}{% endblock %}
+{% block meta_description %}{% trans "OnWebApp: Five built-in pillars powering Web 4.0  the autonomous web. AI, Automation, Integration, and Validation for websites and applications." %}{% endblock %}
+{% block og_title %}{% trans "OnWebApp  More Than Just a Website Builder" %}{% endblock %}
+{% block og_description %}{% trans "Five built-in pillars powering Web 4.0  the autonomous web. AI, Automation, Integration, and Validation." %}{% endblock %}
+{% block twitter_title %}{% trans "OnWebApp  More Than Just a Website Builder" %}{% endblock %}
+{% block twitter_description %}{% trans "Five built-in pillars powering Web 4.0  the autonomous web. AI, Automation, Integration, and Validation." %}{% endblock %}
 
 {% block extra_css %}
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -203,6 +203,7 @@
 .oh-stack .tab-panel{display:none;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-m);padding:40px;grid-template-columns:none;gap:0;align-items:stretch;animation:none}
 .oh-stack .tab-panel.active{display:block;animation:ohPanelIn .35s ease}
 @keyframes ohPanelIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}}
 .oh-stack .tab-photo{position:relative;border-radius:10px;overflow:hidden;margin-bottom:26px;border:1px solid var(--line);background:var(--panel-alt);min-height:0;box-shadow:none}
 .oh-stack .tab-photo img{position:static;width:100%;height:auto;display:block}
 .oh-stack .tab-photo-tint{position:absolute;inset:0;background:linear-gradient(135deg,rgba(217,164,65,0.28),transparent 55%,rgba(14,148,136,0.18));mix-blend-mode:multiply;pointer-events:none}
@@ -245,7 +246,7 @@
                     More Than Just<br>
                     a <span class="grad"><span id="ohTypeText">Website Builder.</span></span><span class="oh-caret"></span>
                 </h1>
-                <p class="oh-hero-sub oh-reveal oh-reveal-delay-1">{% trans "OnWebApp heralds the dawn of Web 4.0 — the autonomous, AI-web. Web 4.0 is not a distant future; it is a reality we are living today." %}</p>
+                <p class="oh-hero-sub oh-reveal oh-reveal-delay-1">{% trans "OnWebApp heralds the dawn of Web 4.0  the autonomous, AI-web. Web 4.0 is not a distant future; it is a reality we are living today." %}</p>
                 <div class="oh-hero-actions oh-reveal oh-reveal-delay-2">
                     <a href="{% url 'contact:contact' %}" class="oh-cta-primary">{% trans "Book a Consultation" %} <i class="fas fa-arrow-right"></i></a>
                     <a href="{% url 'home:video_explainer' %}" class="oh-cta-play"><span class="oh-play-icon"><i class="fas fa-play"></i></span> {% trans "Watch Overview" %}</a>
@@ -301,7 +302,6 @@
 <section class="oh-section" style="background:#fff">
     <div class="wrap">
         <div class="section-head reveal" data-period="700">
-            <span class="kicker">Who we are</span>
             <h2>Technology that connects. Solutions that move businesses forward.</h2>
             <p>OnWebApp brings together Web, ERP, APIs, AI, IoT, Data, and Automation to create connected digital systems built around real business needs.</p>
             <p style="font-weight:700;color:#0F172A;margin-top:1rem;font-size:1.1rem">Connect. Integrate. Transform.</p>
@@ -327,318 +327,234 @@
     </div>
 </section>
 
-<!-- WHAT IS ONWEBAPP -->
-<section class="oh-section" style="background:linear-gradient(180deg,#F4F6FB 0%,#fff 100%)">
-    <div class="wrap">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center">
-            <div class="reveal">
-                <span style="display:inline-block;font-family:'Fraunces',Georgia,serif;font-style:italic;color:#A5760D;font-size:1.05rem;font-weight:500;margin-bottom:12px">What is OnWebApp?</span>
-                <h2 style="font-family:'Fraunces',Georgia,serif;font-size:clamp(2rem,4vw,2.8rem);font-weight:500;color:#0F172A;line-height:1.15;letter-spacing:-.01em;margin-bottom:1.25rem">A digital technology platform that connects the systems, data, and technologies businesses rely on.</h2>
-                <p style="color:#5B6478;font-size:1.05rem;line-height:1.75;max-width:48ch">We bring together Web, ERP, APIs, AI, IoT, Data, and Automation to build integrated digital solutions.</p>
-                <p style="font-weight:700;color:#0F172A;margin-top:1.25rem;font-size:1.1rem">One platform. Connected solutions.</p>
-            </div>
-            <div class="reveal" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
-                <div style="background:#fff;border-radius:14px;padding:1.5rem;border:1px solid rgba(15,23,42,.06);box-shadow:0 2px 12px rgba(15,23,42,.04);transition:transform .3s,box-shadow .3s" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 24px rgba(15,23,42,.08)'" onmouseout="this.style.transform='';this.style.boxShadow='0 2px 12px rgba(15,23,42,.04)'">
-                    <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,rgba(37,99,235,.1),rgba(124,58,237,.1));display:flex;align-items:center;justify-content:center;margin-bottom:1rem"><i class="fas fa-cube" style="color:#2563eb;font-size:1rem"></i></div>
-                    <div style="font-weight:700;color:#0F172A;margin-bottom:.35rem;font-size:.95rem">All-in-One</div>
-                    <p style="font-size:.85rem;color:#5B6478;margin:0;line-height:1.6">Design, develop, and deploy from a single dashboard.</p>
-                </div>
-                <div style="background:#fff;border-radius:14px;padding:1.5rem;border:1px solid rgba(15,23,42,.06);box-shadow:0 2px 12px rgba(15,23,42,.04);transition:transform .3s,box-shadow .3s" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 24px rgba(15,23,42,.08)'" onmouseout="this.style.transform='';this.style.boxShadow='0 2px 12px rgba(15,23,42,.04)'">
-                    <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,rgba(14,148,136,.1),rgba(14,148,136,.05));display:flex;align-items:center;justify-content:center;margin-bottom:1rem"><i class="fas fa-bolt" style="color:#0E9488;font-size:1rem"></i></div>
-                    <div style="font-weight:700;color:#0F172A;margin-bottom:.35rem;font-size:.95rem">Built-In AI</div>
-                    <p style="font-size:.85rem;color:#5B6478;margin:0;line-height:1.6">Intelligent automation baked into every feature.</p>
-                </div>
-                <div style="background:#fff;border-radius:14px;padding:1.5rem;border:1px solid rgba(15,23,42,.06);box-shadow:0 2px 12px rgba(15,23,42,.04);transition:transform .3s,box-shadow .3s" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 24px rgba(15,23,42,.08)'" onmouseout="this.style.transform='';this.style.boxShadow='0 2px 12px rgba(15,23,42,.04)'">
-                    <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,rgba(217,164,65,.12),rgba(217,164,65,.05));display:flex;align-items:center;justify-content:center;margin-bottom:1rem"><i class="fas fa-layer-group" style="color:#D9A441;font-size:1rem"></i></div>
-                    <div style="font-weight:700;color:#0F172A;margin-bottom:.35rem;font-size:.95rem">Scalable</div>
-                    <p style="font-size:.85rem;color:#5B6478;margin:0;line-height:1.6">Grows with your business from day one to scale.</p>
-                </div>
-                <div style="background:#fff;border-radius:14px;padding:1.5rem;border:1px solid rgba(15,23,42,.06);box-shadow:0 2px 12px rgba(15,23,42,.04);transition:transform .3s,box-shadow .3s" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 24px rgba(15,23,42,.08)'" onmouseout="this.style.transform='';this.style.boxShadow='0 2px 12px rgba(15,23,42,.04)'">
-                    <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,rgba(124,58,237,.1),rgba(124,58,237,.05));display:flex;align-items:center;justify-content:center;margin-bottom:1rem"><i class="fas fa-shield-halved" style="color:#7c3aed;font-size:1rem"></i></div>
-                    <div style="font-weight:700;color:#0F172A;margin-bottom:.35rem;font-size:.95rem">Secure</div>
-                    <p style="font-size:.85rem;color:#5B6478;margin:0;line-height:1.6">Enterprise-grade security, zero configuration.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
 
-<!-- WHAT CAN IT DO -->
-<section class="oh-section" style="background:#F4F6FB">
-    <div class="wrap">
-        <div class="reveal" style="text-align:center;max-width:640px;margin:0 auto 3rem">
-            <span style="display:inline-block;font-family:Fraunces,Georgia,serif;font-style:italic;color:#0E9488;font-size:1.05rem;font-weight:500;margin-bottom:12px">What can it do?</span>
-            <h2 style="font-family:Fraunces,Georgia,serif;font-size:clamp(1.8rem,3.5vw,2.5rem);font-weight:500;color:#0F172A;line-height:1.15;letter-spacing:-.01em;margin-bottom:.75rem">OnWebApp connects technology to real business needs.</h2>
-        </div>
-        <div style="max-width:860px;margin:0 auto">
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem">
-                <div style="display:flex;gap:1rem;align-items:flex-start;padding:1.5rem;border-radius:14px;background:#fff;border:1px solid rgba(15,23,42,.06);transition:all .3s" onmouseover="this.style.boxShadow='0 8px 24px rgba(15,23,42,.06)'" onmouseout="this.style.boxShadow=''">
-                    <div style="width:44px;height:44px;border-radius:11px;background:linear-gradient(135deg,rgba(37,99,235,.12),rgba(37,99,235,.04));display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-code" style="color:#2563eb;font-size:1rem"></i></div>
-                    <div><div style="font-weight:700;color:#0F172A;margin-bottom:.3rem;font-size:1rem">Build</div><p style="font-size:.88rem;color:#5B6478;margin:0;line-height:1.6">Websites, digital experiences, dashboards, and custom applications.</p></div>
-                </div>
-                <div style="display:flex;gap:1rem;align-items:flex-start;padding:1.5rem;border-radius:14px;background:#fff;border:1px solid rgba(15,23,42,.06);transition:all .3s" onmouseover="this.style.boxShadow='0 8px 24px rgba(15,23,42,.06)'" onmouseout="this.style.boxShadow=''">
-                    <div style="width:44px;height:44px;border-radius:11px;background:linear-gradient(135deg,rgba(14,148,136,.12),rgba(14,148,136,.04));display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-plug" style="color:#0E9488;font-size:1rem"></i></div>
-                    <div><div style="font-weight:700;color:#0F172A;margin-bottom:.3rem;font-size:1rem">Connect</div><p style="font-size:.88rem;color:#5B6478;margin:0;line-height:1.6">APIs, ERP, databases, IoT devices, and business systems.</p></div>
-                </div>
-                <div style="display:flex;gap:1rem;align-items:flex-start;padding:1.5rem;border-radius:14px;background:#fff;border:1px solid rgba(15,23,42,.06);transition:all .3s" onmouseover="this.style.boxShadow='0 8px 24px rgba(15,23,42,.06)'" onmouseout="this.style.boxShadow=''">
-                    <div style="width:44px;height:44px;border-radius:11px;background:linear-gradient(135deg,rgba(124,58,237,.12),rgba(124,58,237,.04));display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-robot" style="color:#7c3aed;font-size:1rem"></i></div>
-                    <div><div style="font-weight:700;color:#0F172A;margin-bottom:.3rem;font-size:1rem">Automate</div><p style="font-size:.88rem;color:#5B6478;margin:0;line-height:1.6">Workflows, repetitive tasks, monitoring, and business processes.</p></div>
-                </div>
-                <div style="display:flex;gap:1rem;align-items:flex-start;padding:1.5rem;border-radius:14px;background:#fff;border:1px solid rgba(15,23,42,.06);transition:all .3s" onmouseover="this.style.boxShadow='0 8px 24px rgba(15,23,42,.06)'" onmouseout="this.style.boxShadow=''">
-                    <div style="width:44px;height:44px;border-radius:11px;background:linear-gradient(135deg,rgba(217,164,65,.12),rgba(217,164,65,.04));display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-chart-bar" style="color:#D9A441;font-size:1rem"></i></div>
-                    <div><div style="font-weight:700;color:#0F172A;margin-bottom:.3rem;font-size:1rem">Analyze</div><p style="font-size:.88rem;color:#5B6478;margin:0;line-height:1.6">Data, SEO, social media, performance, and business insights.</p></div>
-                </div>
-                <div style="display:flex;gap:1rem;align-items:flex-start;padding:1.5rem;border-radius:14px;background:#fff;border:1px solid rgba(15,23,42,.06);transition:all .3s" onmouseover="this.style.boxShadow='0 8px 24px rgba(15,23,42,.06)'" onmouseout="this.style.boxShadow=''">
-                    <div style="width:44px;height:44px;border-radius:11px;background:linear-gradient(135deg,rgba(14,148,136,.12),rgba(14,148,136,.04));display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-gauge-high" style="color:#0E9488;font-size:1rem"></i></div>
-                    <div><div style="font-weight:700;color:#0F172A;margin-bottom:.3rem;font-size:1rem">Optimize</div><p style="font-size:.88rem;color:#5B6478;margin:0;line-height:1.6">Websites, operations, user experience, and digital performance.</p></div>
-                </div>
-                <div style="display:flex;gap:1rem;align-items:flex-start;padding:1.5rem;border-radius:14px;background:#fff;border:1px solid rgba(15,23,42,.06);transition:all .3s" onmouseover="this.style.boxShadow='0 8px 24px rgba(15,23,42,.06)'" onmouseout="this.style.boxShadow=''">
-                    <div style="width:44px;height:44px;border-radius:11px;background:linear-gradient(135deg,rgba(37,99,235,.12),rgba(37,99,235,.04));display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-brain" style="color:#2563eb;font-size:1rem"></i></div>
-                    <div><div style="font-weight:700;color:#0F172A;margin-bottom:.3rem;font-size:1rem">Intelligence</div><p style="font-size:.88rem;color:#5B6478;margin:0;line-height:1.6">AI-powered recommendations, anomaly detection, and predictive solutions.</p></div>
-                </div>
-            </div>
-            <div style="text-align:center;margin-top:2rem">
-                <p style="font-weight:700;color:#0F172A;font-size:1.1rem;margin:0">One ecosystem. Multiple possibilities.</p>
-            </div>
-        </div>
-    </div>
-</section>
 
-<!-- WHAT DO YOU OFFER -->
+<!-- END TO END PROJECT PROCESS -->
 <section class="oh-section" style="background:#fff">
     <div class="wrap">
-        <div class="reveal" style="text-align:center;max-width:640px;margin:0 auto 3.5rem">
-            <span style="display:inline-block;font-family:Fraunces,Georgia,serif;font-style:italic;color:#A5760D;font-size:1.05rem;font-weight:500;margin-bottom:12px">What do you offer?</span>
-            <h2 style="font-family:Fraunces,Georgia,serif;font-size:clamp(1.8rem,3.5vw,2.5rem);font-weight:500;color:#0F172A;line-height:1.15;letter-spacing:-.01em;margin-bottom:.75rem">End-to-end digital services.</h2>
-            <p style="color:#5B6478;font-size:1rem;max-width:52ch;margin:0 auto;line-height:1.75">We don&#x27;t just build and leave. Strategy, design, development, deployment, and ongoing support under one roof.</p>
+        <div style="text-align:center;max-width:640px;margin:0 auto 3.5rem">
+            <span style="display:inline-block;font-family:'Fraunces',Georgia,serif;font-style:italic;color:#0E9488;font-size:1.05rem;font-weight:500;margin-bottom:12px">End to end project process</span>
+            <h2 style="font-family:'Fraunces',Georgia,serif;font-size:clamp(1.8rem,3.5vw,2.5rem);font-weight:500;color:#0F172A;line-height:1.15;letter-spacing:-.01em;margin-bottom:.75rem">We don't just build and leave.</h2>
+            <p style="color:#5B6478;font-size:1rem;max-width:52ch;margin:0 auto;line-height:1.75">Strategy, design, development, deployment, and ongoing support under one roof.</p>
         </div>
-        <div class="reveal" style="display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem">
-            <div style="padding:2rem 1.5rem;border-radius:16px;background:#F4F6FB;border:1px solid rgba(15,23,42,.04);transition:all .3s;cursor:default" onmouseover="this.style.transform='translateY(-6px)';this.style.boxShadow='0 12px 32px rgba(15,23,42,.08)';this.style.background='#fff';this.style.borderColor='rgba(217,164,65,.15)'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.background='#F4F6FB';this.style.borderColor='rgba(15,23,42,.04)'">
-                <div style="width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,rgba(217,164,65,.15),rgba(217,164,65,.05));display:flex;align-items:center;justify-content:center;margin-bottom:1.25rem"><i class="fas fa-compass" style="color:#D9A441;font-size:1.1rem"></i></div>
-                <div style="font-weight:700;color:#0F172A;margin-bottom:.5rem;font-size:1rem">Strategy &amp; Consulting</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;position:relative">
+            <div style="position:absolute;top:44px;left:0;right:0;height:2px;background:linear-gradient(90deg,rgba(37,99,235,.2),rgba(14,148,136,.2),rgba(217,164,65,.2),rgba(124,58,237,.2));z-index:0;border-radius:1px"></div>
+            <div style="position:relative;z-index:1;text-align:center">
+                <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,rgba(37,99,235,.12),rgba(37,99,235,.04));display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;border:2px solid #fff;box-shadow:0 2px 12px rgba(37,99,235,.12)"><i class="fas fa-compass" style="color:#2563eb;font-size:1.1rem"></i></div>
+                <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#2563eb;margin-bottom:.5rem">Step 1</div>
+                <div style="font-weight:700;color:#0F172A;margin-bottom:.5rem;font-size:1.05rem">Strategy &amp; Consulting</div>
                 <p style="font-size:.88rem;color:#5B6478;margin:0;line-height:1.65">Roadmaps, audits, and technical guidance.</p>
             </div>
-            <div style="padding:2rem 1.5rem;border-radius:16px;background:#F4F6FB;border:1px solid rgba(15,23,42,.04);transition:all .3s;cursor:default" onmouseover="this.style.transform='translateY(-6px)';this.style.boxShadow='0 12px 32px rgba(15,23,42,.08)';this.style.background='#fff';this.style.borderColor='rgba(14,148,136,.15)'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.background='#F4F6FB';this.style.borderColor='rgba(15,23,42,.04)'">
-                <div style="width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,rgba(14,148,136,.15),rgba(14,148,136,.05));display:flex;align-items:center;justify-content:center;margin-bottom:1.25rem"><i class="fas fa-palette" style="color:#0E9488;font-size:1.1rem"></i></div>
-                <div style="font-weight:700;color:#0F172A;margin-bottom:.5rem;font-size:1rem">UI/UX Design</div>
+            <div style="position:relative;z-index:1;text-align:center">
+                <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,rgba(14,148,136,.12),rgba(14,148,136,.04));display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;border:2px solid #fff;box-shadow:0 2px 12px rgba(14,148,136,.12)"><i class="fas fa-palette" style="color:#0E9488;font-size:1.1rem"></i></div>
+                <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#0E9488;margin-bottom:.5rem">Step 2</div>
+                <div style="font-weight:700;color:#0F172A;margin-bottom:.5rem;font-size:1.05rem">UI/UX Design</div>
                 <p style="font-size:.88rem;color:#5B6478;margin:0;line-height:1.65">User research, wireframes, pixel-perfect UI.</p>
             </div>
-            <div style="padding:2rem 1.5rem;border-radius:16px;background:#F4F6FB;border:1px solid rgba(15,23,42,.04);transition:all .3s;cursor:default" onmouseover="this.style.transform='translateY(-6px)';this.style.boxShadow='0 12px 32px rgba(15,23,42,.08)';this.style.background='#fff';this.style.borderColor='rgba(37,99,235,.15)'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.background='#F4F6FB';this.style.borderColor='rgba(15,23,42,.04)'">
-                <div style="width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,rgba(37,99,235,.15),rgba(37,99,235,.05));display:flex;align-items:center;justify-content:center;margin-bottom:1.25rem"><i class="fas fa-server" style="color:#2563eb;font-size:1.1rem"></i></div>
-                <div style="font-weight:700;color:#0F172A;margin-bottom:.5rem;font-size:1rem">Full-Stack Development</div>
+            <div style="position:relative;z-index:1;text-align:center">
+                <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,rgba(217,164,65,.12),rgba(217,164,65,.04));display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;border:2px solid #fff;box-shadow:0 2px 12px rgba(217,164,65,.12)"><i class="fas fa-code" style="color:#D9A441;font-size:1.1rem"></i></div>
+                <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#D9A441;margin-bottom:.5rem">Step 3</div>
+                <div style="font-weight:700;color:#0F172A;margin-bottom:.5rem;font-size:1.05rem">Full-Stack Development</div>
                 <p style="font-size:.88rem;color:#5B6478;margin:0;line-height:1.65">Frontend, backend, APIs, databases managed.</p>
             </div>
-            <div style="padding:2rem 1.5rem;border-radius:16px;background:#F4F6FB;border:1px solid rgba(15,23,42,.04);transition:all .3s;cursor:default" onmouseover="this.style.transform='translateY(-6px)';this.style.boxShadow='0 12px 32px rgba(15,23,42,.08)';this.style.background='#fff';this.style.borderColor='rgba(124,58,237,.15)'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.background='#F4F6FB';this.style.borderColor='rgba(15,23,42,.04)'">
-                <div style="width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,rgba(124,58,237,.15),rgba(124,58,237,.05));display:flex;align-items:center;justify-content:center;margin-bottom:1.25rem"><i class="fas fa-rocket" style="color:#7c3aed;font-size:1.1rem"></i></div>
-                <div style="font-weight:700;color:#0F172A;margin-bottom:.5rem;font-size:1rem">Launch &amp; Support</div>
+            <div style="position:relative;z-index:1;text-align:center">
+                <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,rgba(124,58,237,.12),rgba(124,58,237,.04));display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;border:2px solid #fff;box-shadow:0 2px 12px rgba(124,58,237,.12)"><i class="fas fa-rocket" style="color:#7c3aed;font-size:1.1rem"></i></div>
+                <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#7c3aed;margin-bottom:.5rem">Step 4</div>
+                <div style="font-weight:700;color:#0F172A;margin-bottom:.5rem;font-size:1.05rem">Launch &amp; Support</div>
                 <p style="font-size:.88rem;color:#5B6478;margin:0;line-height:1.65">Deployment, monitoring, and continuous updates.</p>
             </div>
-            <div style="padding:2rem 1.5rem;border-radius:16px;background:#F4F6FB;border:1px solid rgba(15,23,42,.04);transition:all .3s;cursor:default" onmouseover="this.style.transform='translateY(-6px)';this.style.boxShadow='0 12px 32px rgba(15,23,42,.08)';this.style.background='#fff';this.style.borderColor='rgba(59,130,246,.15)'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.background='#F4F6FB';this.style.borderColor='rgba(15,23,42,.04)'">
-                <div style="width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,rgba(59,130,246,.15),rgba(59,130,246,.05));display:flex;align-items:center;justify-content:center;margin-bottom:1.25rem"><i class="fas fa-cogs" style="color:#3b82f6;font-size:1.1rem"></i></div>
-                <div style="font-weight:700;color:#0F172A;margin-bottom:.5rem;font-size:1rem">ERP Integration</div>
-                <p style="font-size:.88rem;color:#5B6478;margin:0;line-height:1.65">Connect your business systems seamlessly.</p>
-            </div>
-            <div style="padding:2rem 1.5rem;border-radius:16px;background:#F4F6FB;border:1px solid rgba(15,23,42,.04);transition:all .3s;cursor:default" onmouseover="this.style.transform='translateY(-6px)';this.style.boxShadow='0 12px 32px rgba(15,23,42,.08)';this.style.background='#fff';this.style.borderColor='rgba(244,114,182,.15)'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.background='#F4F6FB';this.style.borderColor='rgba(15,23,42,.04)'">
-                <div style="width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,rgba(244,114,182,.15),rgba(244,114,182,.05));display:flex;align-items:center;justify-content:center;margin-bottom:1.25rem"><i class="fas fa-wand-magic-sparkles" style="color:#f472b6;font-size:1.1rem"></i></div>
-                <div style="font-weight:700;color:#0F172A;margin-bottom:.5rem;font-size:1rem">Branding</div>
-                <p style="font-size:.88rem;color:#5B6478;margin:0;line-height:1.65">Identity, guidelines, and brand strategy.</p>
-            </div>
-            <div style="padding:2rem 1.5rem;border-radius:16px;background:#F4F6FB;border:1px solid rgba(15,23,42,.04);transition:all .3s;cursor:default" onmouseover="this.style.transform='translateY(-6px)';this.style.boxShadow='0 12px 32px rgba(15,23,42,.08)';this.style.background='#fff';this.style.borderColor='rgba(20,184,166,.15)'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.background='#F4F6FB';this.style.borderColor='rgba(15,23,42,.04)'">
-                <div style="width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,rgba(20,184,166,.15),rgba(20,184,166,.05));display:flex;align-items:center;justify-content:center;margin-bottom:1.25rem"><i class="fas fa-plug" style="color:#14b8a6;font-size:1.1rem"></i></div>
-                <div style="font-weight:700;color:#0F172A;margin-bottom:.5rem;font-size:1rem">API Design</div>
-                <p style="font-size:.88rem;color:#5B6478;margin:0;line-height:1.65">RESTful and GraphQL APIs built to scale.</p>
-            </div>
-            <div style="padding:2rem 1.5rem;border-radius:16px;background:#F4F6FB;border:1px solid rgba(15,23,42,.04);transition:all .3s;cursor:default" onmouseover="this.style.transform='translateY(-6px)';this.style.boxShadow='0 12px 32px rgba(15,23,42,.08)';this.style.background='#fff';this.style.borderColor='rgba(251,191,36,.15)'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.background='#F4F6FB';this.style.borderColor='rgba(15,23,42,.04)'">
-                <div style="width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,rgba(251,191,36,.15),rgba(251,191,36,.05));display:flex;align-items:center;justify-content:center;margin-bottom:1.25rem"><i class="fas fa-gauge-high" style="color:#fbbf24;font-size:1.1rem"></i></div>
-                <div style="font-weight:700;color:#0F172A;margin-bottom:.5rem;font-size:1rem">Dashboards</div>
-                <p style="font-size:.88rem;color:#5B6478;margin:0;line-height:1.65">Real-time analytics and reporting panels.</p>
-            </div>
         </div>
+    </div>
+</section>
 
 <!-- BUILT-IN STACK -->
 <section class="oh-section oh-stack">
     <div class="wrap">
         <div class="section-head reveal" data-period="700">
             <span class="kicker">Beyond the ordinary approach</span>
-            <h2>Seven pillars every OnWebApp site is born with.</h2>
-            <p>Seven core pillars built-in for building web and application, aligned with Web 4.0 — the autonomous web.</p>
+            <h2>Four pillars every OnWebApp site is born with.</h2>
+            <p>Four core pillars built-in for building web and application, aligned with Web 4.0  the autonomous web.</p>
         </div>
         <div class="builtin reveal">
             <div class="tab-list" id="tabList" role="tablist" aria-label="Built-in stack">
-                <button type="button" class="tab-btn" id="tab-ia" role="tab" aria-selected="true" aria-controls="panel-ia" data-target="panel-ia">Information architecture</button>
-                <button type="button" class="tab-btn" id="tab-search" role="tab" aria-selected="false" aria-controls="panel-search" data-target="panel-search">AI search &amp; content</button>
+                <button type="button" class="tab-btn" id="tab-search" role="tab" aria-selected="true" aria-controls="panel-search" data-target="panel-search">Content</button>
                 <button type="button" class="tab-btn" id="tab-integration" role="tab" aria-selected="false" aria-controls="panel-integration" data-target="panel-integration">Integration</button>
                 <button type="button" class="tab-btn" id="tab-automation" role="tab" aria-selected="false" aria-controls="panel-automation" data-target="panel-automation">Automation</button>
-                <button type="button" class="tab-btn" id="tab-seo" role="tab" aria-selected="false" aria-controls="panel-seo" data-target="panel-seo">SEO</button>
-                <button type="button" class="tab-btn" id="tab-ai" role="tab" aria-selected="false" aria-controls="panel-ai" data-target="panel-ai">AI &amp; machine learning</button>
-                <button type="button" class="tab-btn" id="tab-validation" role="tab" aria-selected="false" aria-controls="panel-validation" data-target="panel-validation">Validation</button>
+                <button type="button" class="tab-btn" id="tab-ai" role="tab" aria-selected="false" aria-controls="panel-ai" data-target="panel-ai">AI</button>
             </div>
-            <div class="tab-panel active" id="panel-ia" role="tabpanel" aria-labelledby="tab-ia">
-                <div class="tab-photo"><img src="{% static 'img/archit.jpg' %}" alt="Information architecture"><span class="tab-photo-tint"></span></div>
-                <h3>Information architecture</h3>
-                <p class="desc">A structure that flows. From menu to checkout, every path is mapped for speed, comprehension, and intuition — then translated into SEO-ready markup.</p>
+            <div class="tab-panel active" id="panel-search" role="tabpanel" aria-labelledby="tab-search">
+                <div class="tab-photo"><img src="{% static 'img/se.png' %}" alt="Content"><span class="tab-photo-tint"></span></div>
+                <h3>Content</h3>
+                <p class="desc">Search that understands. Content that gets discovered.</p>
+                <p style="color:#5B6478;font-size:.92rem;line-height:1.7;margin-bottom:1.5rem">OnWebApp combines intelligent search with AI-ready content systems to help websites deliver better answers to users and improve how content is discovered across traditional search engines and generative AI platforms.</p>
                 <div class="tab-cols">
                     <div class="tab-col">
-                        <h4>Built for people</h4>
+                        <h4>AI-Powered Search</h4>
                         <ul>
-                            <li><strong>Zero-friction journeys</strong> — navigation and conversion on every device</li>
-                            <li><strong>Clear hierarchy</strong> — classification and taxonomy that guide users</li>
+                            <li><strong>Instant Answers</strong> &#x2014; transform search into an experience that responds like a knowledgeable support agent</li>
+                            <li><strong>Conversational Search</strong> &#x2014; let users search naturally using complete questions and everyday language</li>
+                            <li><strong>Context-Aware Results</strong> &#x2014; go beyond keyword matching using page content, metadata, and user intent</li>
+                            <li><strong>Intelligent Product Discovery</strong> &#x2014; help users find products using natural descriptions and attributes</li>
                         </ul>
                     </div>
                     <div class="tab-col">
-                        <h4>Built for machines</h4>
+                        <h4>Content Built for Search and AI</h4>
                         <ul>
-                            <li><strong>SEO-ready structure</strong> — semantic markup search engines understand</li>
-                            <li><strong>Entity-based taxonomy</strong> — content that answer engines can cite</li>
+                            <li><strong>GEO-Optimized Content</strong> &#x2014; improve visibility across generative search and AI answer engines</li>
+                            <li><strong>AI-Ready Content Architecture</strong> &#x2014; organize content into clear entities, topics, and structured information</li>
+                            <li><strong>Automated Content Generation</strong> &#x2014; generate pages, FAQs, and descriptions at scale with consistent brand guidelines</li>
+                            <li><strong>Structured Data &amp; Schema</strong> &#x2014; help search engines understand pages, products, and organizations</li>
                         </ul>
                     </div>
                 </div>
-                <a href="{% url 'home:ui_design' %}" style="display:inline-flex;align-items:center;gap:.45rem;margin-top:20px;font-size:.88rem;font-weight:700;color:#A5760D;text-decoration:none">Explore UI Design <i class="fas fa-arrow-right"></i></a>
-            </div>
-
-            <div class="tab-panel" id="panel-search" role="tabpanel" aria-labelledby="tab-search">
-                <div class="tab-photo"><img src="{% static 'img/se.png' %}" alt="AI search and content"><span class="tab-photo-tint"></span></div>
-                <h3>AI search &amp; content</h3>
-                <p class="desc">Search that answers like a human and content tuned for both classic search and AI answer engines.</p>
-                <div class="tab-cols">
-                    <div class="tab-col">
-                        <h4>AI that finds</h4>
-                        <ul>
-                            <li><strong>Instant answers</strong> — site and e-commerce search responds like a support agent</li>
-                            <li><strong>Conversational</strong> — natural-language queries handled in context</li>
-                        </ul>
-                    </div>
-                    <div class="tab-col">
-                        <h4>Content for AI</h4>
-                        <ul>
-                            <li><strong>GEO-optimized</strong> — writing tuned for generative engine results</li>
-                            <li><strong>Auto-generated</strong> — pages, FAQs, and schema created at scale</li>
-                        </ul>
-                    </div>
+                <div style="margin-top:1.5rem;padding:1.25rem 1.5rem;border-radius:12px;background:#F4F6FB;border:1px solid rgba(15,23,42,.04)">
+                    <div style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#A5760D;margin-bottom:.5rem">From Search to Answer</div>
+                    <p style="font-size:.88rem;color:#5B6478;margin:0;line-height:1.65"><strong style="color:#0F172A">Understand &#x2192; Retrieve &#x2192; Generate &#x2192; Optimize</strong> &#x2014; connects intelligent search and content generation into one workflow, helping businesses create digital experiences that are easier for people &#x2014; and AI systems &#x2014; to understand.</p>
                 </div>
             </div>
-
             <div class="tab-panel" id="panel-integration" role="tabpanel" aria-labelledby="tab-integration">
                 <div class="tab-photo"><img src="{% static 'img/back.jpeg' %}" alt="Integration"><span class="tab-photo-tint"></span></div>
                 <h3>Integration</h3>
-                <p class="desc">Ecosystems wired together — ERPs, APIs, IoT — one source of truth for every operation.</p>
+                <p class="desc">Connect every system. Orchestrate every operation.</p>
+                <p style="color:#5B6478;font-size:.92rem;line-height:1.7;margin-bottom:1.5rem">Bring your business applications, APIs, data sources, IoT devices, and external platforms together through a connected integration layer. OnWebApp helps businesses move data between systems, automate processes, and maintain a consistent source of truth across their operations.</p>
                 <div class="tab-cols">
                     <div class="tab-col">
-                        <h4>Plug &amp; play</h4>
+                        <h4>Plug &amp; Play Integration</h4>
                         <ul>
-                            <li><strong>50+ connectors</strong> — Shopify, Stripe, Salesforce, and more</li>
-                            <li><strong>API-first</strong> — custom endpoints built for your stack</li>
+                            <li><strong>50+ Connectors</strong> &#x2014; connect Shopify, Stripe, Salesforce, and other services without rebuilding infrastructure</li>
+                            <li><strong>API-First Architecture</strong> &#x2014; build custom integrations with REST APIs, webhooks, and secure data exchange</li>
+                            <li><strong>Flexible Integration</strong> &#x2014; connect cloud apps, internal systems, databases, and business tools</li>
                         </ul>
                     </div>
                     <div class="tab-col">
-                        <h4>Unified operations</h4>
+                        <h4>Unified Business Operations</h4>
                         <ul>
-                            <li><strong>ERP sync</strong> — ERPNext, SAP, Odoo in real time</li>
-                            <li><strong>IoT &amp; B2B</strong> — commerce, sensors, and kiosks on one platform</li>
+                            <li><strong>ERP &amp; CRM Synchronization</strong> &#x2014; keep customer, product, inventory, and financial data synchronized</li>
+                            <li><strong>Data Integration</strong> &#x2014; move data between applications while reducing duplicates and manual entry</li>
+                            <li><strong>IoT &amp; Device Integration</strong> &#x2014; connect sensors, kiosks, and equipment to business applications</li>
+                            <li><strong>B2B Integration</strong> &#x2014; connect suppliers, partners, and marketplaces through structured APIs</li>
                         </ul>
                     </div>
+                </div>
+                <div style="margin-top:1.5rem;padding:1.25rem 1.5rem;border-radius:12px;background:#F4F6FB;border:1px solid rgba(15,23,42,.04)">
+                    <div style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#A5760D;margin-bottom:.5rem">Integration That Works With Your Stack</div>
+                    <p style="font-size:.88rem;color:#5B6478;margin:0;line-height:1.65"><strong style="color:#0F172A">Connect &#x2192; Synchronize &#x2192; Automate &#x2192; Monitor</strong> &#x2014; whether you are connecting an ERP, synchronizing e-commerce data, integrating an API, or bringing IoT devices into your workflow, OnWebApp provides the integration layer that keeps systems connected.</p>
                 </div>
                 <a href="{% url 'integration:integration_homepage' %}" style="display:inline-flex;align-items:center;gap:.45rem;margin-top:20px;font-size:.88rem;font-weight:700;color:#A5760D;text-decoration:none">Explore Integration <i class="fas fa-arrow-right"></i></a>
             </div>
-
             <div class="tab-panel" id="panel-automation" role="tabpanel" aria-labelledby="tab-automation">
                 <div class="tab-photo"><img src="{% static 'img/auto.png' %}" alt="Automation"><span class="tab-photo-tint"></span></div>
                 <h3>Automation</h3>
-                <p class="desc">Recipes that run your website and enterprise on autopilot — from the simplest task to complex cross-system workflows.</p>
+                <p class="desc">Turn processes into systems that run themselves.</p>
+                <p style="color:#5B6478;font-size:.92rem;line-height:1.7;margin-bottom:1.5rem">Automate repetitive work, coordinate complex business processes, and connect actions across websites, applications, enterprise systems, and connected devices. OnWebApp turns business rules into workflows that execute consistently with less manual intervention.</p>
                 <div class="tab-cols">
                     <div class="tab-col">
-                        <h4>Website automation</h4>
+                        <h4>Website &amp; Business Automation</h4>
                         <ul>
-                            <li><strong>Workflows</strong> — business rules that trigger actions automatically</li>
-                            <li><strong>Customer journeys</strong> — personalized paths without manual intervention</li>
+                            <li><strong>Workflow Automation</strong> &#x2014; create workflows that respond to events, conditions, and business rules automatically</li>
+                            <li><strong>Customer Journeys</strong> &#x2014; build automated journeys connecting interactions, data, and actions across the lifecycle</li>
+                            <li><strong>Scheduled Operations</strong> &#x2014; run recurring tasks automatically based on schedules or predefined conditions</li>
+                            <li><strong>Intelligent Actions</strong> &#x2014; combine rules, APIs, data, and AI-powered decisions that adapt to business situations</li>
                         </ul>
                     </div>
                     <div class="tab-col">
-                        <h4>Enterprise automation</h4>
+                        <h4>Enterprise Automation</h4>
                         <ul>
-                            <li><strong>Workload automation</strong> — across multiple computing systems</li>
-                            <li><strong>Robots &amp; kiosks</strong> — industrial and infrastructure automation</li>
+                            <li><strong>Cross-System Workflows</strong> &#x2014; orchestrate processes across websites, CRM, ERP, APIs, and databases</li>
+                            <li><strong>RPA &amp; Browser Automation</strong> &#x2014; automate repetitive browser and computer-based tasks</li>
+                            <li><strong>Robots &amp; Kiosks</strong> &#x2014; bridge digital workflows with physical environments through connected devices</li>
+                            <li><strong>Industrial Automation</strong> &#x2014; connect operational data and automation across industrial environments</li>
                         </ul>
                     </div>
                 </div>
-            </div>
-
-            <div class="tab-panel" id="panel-seo" role="tabpanel" aria-labelledby="tab-seo">
-                <div class="tab-photo"><img src="{% static 'img/sseo.jpeg' %}" alt="SEO"><span class="tab-photo-tint"></span></div>
-                <h3>SEO</h3>
-                <p class="desc">200+ factors engineered so you rank — and get found by both search engines and AI answer engines.</p>
-                <div class="tab-cols">
-                    <div class="tab-col">
-                        <h4>Engineered to rank</h4>
-                        <ul>
-                            <li><strong>200+ factors</strong> — technical SEO, content strategy, and structure</li>
-                            <li><strong>On-page precision</strong> — titles, schema, and internal linking tuned</li>
-                        </ul>
-                    </div>
-                    <div class="tab-col">
-                        <h4>Found by AI</h4>
-                        <ul>
-                            <li><strong>GEO &amp; AEO</strong> — optimized for generative and answer engines</li>
-                            <li><strong>Featured answers</strong> — content designed to win citations</li>
-                        </ul>
-                    </div>
+                <div style="margin-top:1.5rem;padding:1.25rem 1.5rem;border-radius:12px;background:#F4F6FB;border:1px solid rgba(15,23,42,.04)">
+                    <div style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#A5760D;margin-bottom:.5rem">From Trigger to Action</div>
+                    <p style="font-size:.88rem;color:#5B6478;margin:0;line-height:1.65"><strong style="color:#0F172A">Detect &#x2192; Decide &#x2192; Execute &#x2192; Monitor</strong> &#x2014; a workflow can start from a user action, API request, scheduled event, system change, or sensor signal &#x2014; then execute actions across connected systems.</p>
                 </div>
-                <a href="{% url 'seo_analyzer:seo_home_marketing' %}" style="display:inline-flex;align-items:center;gap:.45rem;margin-top:20px;font-size:.88rem;font-weight:700;color:#A5760D;text-decoration:none">Explore SEO <i class="fas fa-arrow-right"></i></a>
             </div>
-
             <div class="tab-panel" id="panel-ai" role="tabpanel" aria-labelledby="tab-ai">
-                <div class="tab-photo"><img src="{% static 'img/ma.jpg' %}" alt="AI and machine learning"><span class="tab-photo-tint"></span></div>
-                <h3>AI &amp; machine learning</h3>
-                <p class="desc">Predict the future and generate automation — built in, not bolted on.</p>
+                <div class="tab-photo"><img src="{% static 'img/ma.jpg' %}" alt="AI"><span class="tab-photo-tint"></span></div>
+                <h3>AI</h3>
+                <p class="desc">Intelligence that understands, predicts, and acts.</p>
+                <p style="color:#5B6478;font-size:.92rem;line-height:1.7;margin-bottom:1.5rem">AI is built into OnWebApp to help businesses understand data, anticipate patterns, generate useful content, and turn insights into automated actions. From customer behavior to operational workflows, AI works alongside your existing systems rather than sitting apart from them.</p>
                 <div class="tab-cols">
                     <div class="tab-col">
-                        <h4>Predictive</h4>
+                        <h4>Predictive Intelligence</h4>
                         <ul>
-                            <li><strong>Behavior prediction</strong> — AI anticipates user needs before they happen</li>
-                            <li><strong>Smart segmentation</strong> — audiences grouped by predicted intent</li>
+                            <li><strong>Behavior Prediction</strong> &#x2014; analyze behavioral patterns to identify potential customer needs and opportunities</li>
+                            <li><strong>Intelligent Segmentation</strong> &#x2014; group customers, products, or data based on behavior and predicted intent</li>
+                            <li><strong>Anomaly Detection</strong> &#x2014; identify unusual activity, unexpected changes, and patterns requiring attention</li>
+                            <li><strong>Predictive Insights</strong> &#x2014; turn historical and real-time data into insights that identify trends earlier</li>
                         </ul>
                     </div>
                     <div class="tab-col">
-                        <h4>Generative</h4>
+                        <h4>Generative AI</h4>
                         <ul>
-                            <li><strong>Automation recipes</strong> — models turn insight into action</li>
-                            <li><strong>Content generation</strong> — pages and copy created from data</li>
+                            <li><strong>AI-Powered Workflows</strong> &#x2014; use AI to interpret information, make decisions, and support business processes</li>
+                            <li><strong>Content Generation</strong> &#x2014; generate pages, descriptions, summaries, FAQs, and reports at scale</li>
+                            <li><strong>AI Recommendations</strong> &#x2014; transform data into actionable recommendations for content and operations</li>
+                            <li><strong>AI-Generated Reports</strong> &#x2014; turn large amounts of data into structured summaries and insights</li>
                         </ul>
                     </div>
                 </div>
-            </div>
-
-            <div class="tab-panel" id="panel-validation" role="tabpanel" aria-labelledby="tab-validation">
-                <div class="tab-photo"><img src="{% static 'img/VALIDATION.png' %}" alt="Validation"><span class="tab-photo-tint"></span></div>
-                <h3>Validation</h3>
-                <p class="desc">Continuous checks across every layer — code, accessibility, performance, and compliance — so your platform stays reliable.</p>
-                <div class="tab-cols">
-                    <div class="tab-col">
-                        <h4>Every layer</h4>
-                        <ul>
-                            <li><strong>Code quality</strong> — automated testing and validation at deploy</li>
-                            <li><strong>Performance</strong> — Core Web Vitals monitored continuously</li>
-                        </ul>
-                    </div>
-                    <div class="tab-col">
-                        <h4>Always compliant</h4>
-                        <ul>
-                            <li><strong>GDPR &amp; ISO 27001</strong> — data protection by design</li>
-                            <li><strong>WCAG 2.1 AA</strong> — accessibility baked into every component</li>
-                        </ul>
-                    </div>
+                <div style="margin-top:1.5rem;padding:1.25rem 1.5rem;border-radius:12px;background:#F4F6FB;border:1px solid rgba(15,23,42,.04)">
+                    <div style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#A5760D;margin-bottom:.5rem">From Intelligence to Action</div>
+                    <p style="font-size:.88rem;color:#5B6478;margin:0;line-height:1.65"><strong style="color:#0F172A">Understand &#x2192; Predict &#x2192; Generate &#x2192; Automate</strong> &#x2014; OnWebApp connects AI with your websites, business systems, data, and workflows so intelligence can move beyond analysis and become part of everyday operations.</p>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
+
+<!-- SEO -->
+<section class="oh-section" style="background:#F4F6FB">
+    <div class="wrap">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center">
+            <div>
+                <span style="display:inline-block;font-family:'Fraunces',Georgia,serif;font-style:italic;color:#D9A441;font-size:1.05rem;font-weight:500;margin-bottom:12px">Built-in SEO</span>
+                <h2 style="font-family:'Fraunces',Georgia,serif;font-size:clamp(1.8rem,3.5vw,2.5rem);font-weight:500;color:#0F172A;line-height:1.15;letter-spacing:-.01em;margin-bottom:1.25rem">Rank higher from day one. Not after.</h2>
+                <p style="color:#5B6478;font-size:1.05rem;line-height:1.75;max-width:48ch;margin-bottom:1.5rem">Every OnWebApp site ships with SEO baked in. Clean code, structured data, fast load times, and intelligent content optimization built into the platform.</p>
+                <div style="display:flex;flex-wrap:wrap;gap:.75rem;margin-bottom:2rem">
+                    <a href="{% url 'seo_analyzer:seo_home_marketing' %}" style="display:inline-flex;align-items:center;gap:.45rem;padding:.55rem 1.1rem;border-radius:50px;background:#fff;border:1px solid rgba(15,23,42,.08);color:#0F172A;font-size:.82rem;font-weight:600;text-decoration:none;transition:all .3s" onmouseover="this.style.borderColor='rgba(37,99,235,.3)';this.style.color='#2563eb'" onmouseout="this.style.borderColor='rgba(15,23,42,.08)';this.style.color='#0F172A'"><i class="fas fa-home" style="font-size:.7rem;color:#2563eb"></i> SEO Home</a>
+                    <a href="{% url 'seo_analyzer:seo_keyword_marketing' %}" style="display:inline-flex;align-items:center;gap:.45rem;padding:.55rem 1.1rem;border-radius:50px;background:#fff;border:1px solid rgba(15,23,42,.08);color:#0F172A;font-size:.82rem;font-weight:600;text-decoration:none;transition:all .3s" onmouseover="this.style.borderColor='rgba(37,99,235,.3)';this.style.color='#2563eb'" onmouseout="this.style.borderColor='rgba(15,23,42,.08)';this.style.color='#0F172A'"><i class="fas fa-key" style="font-size:.7rem;color:#2563eb"></i> Keywords</a>
+                    <a href="{% url 'seo_analyzer:seo_content_marketing' %}" style="display:inline-flex;align-items:center;gap:.45rem;padding:.55rem 1.1rem;border-radius:50px;background:#fff;border:1px solid rgba(15,23,42,.08);color:#0F172A;font-size:.82rem;font-weight:600;text-decoration:none;transition:all .3s" onmouseover="this.style.borderColor='rgba(37,99,235,.3)';this.style.color='#2563eb'" onmouseout="this.style.borderColor='rgba(15,23,42,.08)';this.style.color='#0F172A'"><i class="fas fa-file-alt" style="font-size:.7rem;color:#2563eb"></i> Content</a>
+                    <a href="{% url 'seo_analyzer:seo_url_marketing' %}" style="display:inline-flex;align-items:center;gap:.45rem;padding:.55rem 1.1rem;border-radius:50px;background:#fff;border:1px solid rgba(15,23,42,.08);color:#0F172A;font-size:.82rem;font-weight:600;text-decoration:none;transition:all .3s" onmouseover="this.style.borderColor='rgba(37,99,235,.3)';this.style.color='#2563eb'" onmouseout="this.style.borderColor='rgba(15,23,42,.08)';this.style.color='#0F172A'"><i class="fas fa-link" style="font-size:.7rem;color:#2563eb"></i> URL Analysis</a>
+                    <a href="{% url 'seo_analyzer:seo_links_marketing' %}" style="display:inline-flex;align-items:center;gap:.45rem;padding:.55rem 1.1rem;border-radius:50px;background:#fff;border:1px solid rgba(15,23,42,.08);color:#0F172A;font-size:.82rem;font-weight:600;text-decoration:none;transition:all .3s" onmouseover="this.style.borderColor='rgba(37,99,235,.3)';this.style.color='#2563eb'" onmouseout="this.style.borderColor='rgba(15,23,42,.08)';this.style.color='#0F172A'"><i class="fas fa-project-diagram" style="font-size:.7rem;color:#2563eb"></i> Backlinks</a>
+                </div>
+                <a href="{% url 'seo_analyzer:seo_home_marketing' %}" style="display:inline-flex;align-items:center;gap:.55rem;padding:.85rem 2rem;border-radius:50px;background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;font-weight:700;font-size:.9rem;text-decoration:none;transition:all .35s;box-shadow:0 6px 28px rgba(37,99,235,.3)" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 10px 36px rgba(37,99,235,.4)'" onmouseout="this.style.transform='';this.style.boxShadow='0 6px 28px rgba(37,99,235,.3)'">Explore SEO Tools <i class="fas fa-arrow-right" style="font-size:.8rem"></i></a>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+                <div style="background:#fff;border-radius:14px;padding:1.5rem;border:1px solid rgba(15,23,42,.06);box-shadow:0 2px 12px rgba(15,23,42,.04)">
+                    <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,rgba(37,99,235,.1),rgba(37,99,235,.05));display:flex;align-items:center;justify-content:center;margin-bottom:.85rem"><i class="fas fa-search" style="color:#2563eb;font-size:1rem"></i></div>
+                    <div style="font-weight:700;color:#0F172A;margin-bottom:.3rem;font-size:.95rem">Keyword Research</div>
+                    <p style="font-size:.82rem;color:#5B6478;margin:0;line-height:1.55">Find high-impact keywords your audience is searching for.</p>
+                </div>
+                <div style="background:#fff;border-radius:14px;padding:1.5rem;border:1px solid rgba(15,23,42,.06);box-shadow:0 2px 12px rgba(15,23,42,.04)">
+                    <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,rgba(14,148,136,.1),rgba(14,148,136,.05));display:flex;align-items:center;justify-content:center;margin-bottom:.85rem"><i class="fas fa-file-alt" style="color:#0E9488;font-size:1rem"></i></div>
+                    <div style="font-weight:700;color:#0F172A;margin-bottom:.3rem;font-size:.95rem">Content Analysis</div>
+                    <p style="font-size:.82rem;color:#5B6478;margin:0;line-height:1.55">Optimize your pages for search intent and readability.</p>
+                </div>
+                <div style="background:#fff;border-radius:14px;padding:1.5rem;border:1px solid rgba(15,23,42,.06);box-shadow:0 2px 12px rgba(15,23,42,.04)">
+                    <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,rgba(217,164,65,.1),rgba(217,164,65,.05));display:flex;align-items:center;justify-content:center;margin-bottom:.85rem"><i class="fas fa-gauge-high" style="color:#D9A441;font-size:1rem"></i></div>
+                    <div style="font-weight:700;color:#0F172A;margin-bottom:.3rem;font-size:.95rem">Performance</div>
+                    <p style="font-size:.82rem;color:#5B6478;margin:0;line-height:1.55">Core Web Vitals and speed scores baked in.</p>
+                </div>
+                <div style="background:#fff;border-radius:14px;padding:1.5rem;border:1px solid rgba(15,23,42,.06);box-shadow:0 2px 12px rgba(15,23,42,.04)">
+                    <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,rgba(124,58,237,.1),rgba(124,58,237,.05));display:flex;align-items:center;justify-content:center;margin-bottom:.85rem"><i class="fas fa-project-diagram" style="color:#7c3aed;font-size:1rem"></i></div>
+                    <div style="font-weight:700;color:#0F172A;margin-bottom:.3rem;font-size:.95rem">Backlink Monitoring</div>
+                    <p style="font-size:.82rem;color:#5B6478;margin:0;line-height:1.55">Track your link profile and domain authority.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 <!-- WHERE WE SHINE -->
 <section class="oh-section" id="shine">
     <div class="container">
         <div style="text-align:center;margin-bottom:3rem">
             <span class="oh-section-label oh-reveal" style="font-family:'Fraunces',Georgia,serif;font-style:italic;color:#A5760D;font-size:1.1rem;font-weight:500;text-transform:none;letter-spacing:0">Where We Shine</span>
-            <h2 class="oh-section-title oh-reveal oh-reveal-delay-1" style="font-size:clamp(1.5rem,2.5vw,2rem);font-family:'Fraunces',Georgia,serif;font-weight:500">Three Software Products<br>Address All Your Needs.</h2>
+            <h2 class="oh-section-title oh-reveal oh-reveal-delay-1" style="font-size:clamp(1.5rem,2.5vw,2rem);font-family:'Fraunces',Georgia,serif;font-weight:500">Three Core Capabilities<br>Built Into Every Project.</h2>
             <p class="oh-section-sub oh-reveal oh-reveal-delay-2" style="margin:0 auto;max-width:640px;color:#5B6478">Website monitoring, dashboard design, project tracking system and API development - integrated into every project from the start, not added as an afterthought.</p>
         </div>
         <div class="oh-shine" id="shineBlock">
@@ -665,13 +581,13 @@
                             <span class="oh-sh-photo-tint"></span>
                         </div>
                         <div class="oh-sh-body">
-                            <span class="oh-sh-kicker">Oversight · Platform</span>
+                            <span class="oh-sh-kicker">Oversight  Platform</span>
                             <h3>Website Monitoring Platform</h3>
-                            <p>A dedicated monitoring platform that keeps watch over your uptime, performance, and health — 24/7.</p>
+                            <p>A dedicated monitoring platform that keeps watch over your uptime, performance, and health  24/7.</p>
                             <ul>
-                                <li><strong>Uptime, performance &amp; health checks</strong> — every page, every endpoint, every minute</li>
-                                <li><strong>Instant alerts before users notice</strong> — Slack, email, or SMS in under 30 seconds</li>
-                                <li><strong>SLA-backed reliability</strong> — 99.97% uptime guaranteed or credits back</li>
+                                <li><strong>Uptime, performance &amp; health checks</strong>  every page, every endpoint, every minute</li>
+                                <li><strong>Instant alerts before users notice</strong>  Slack, email, or SMS in under 30 seconds</li>
+                                <li><strong>SLA-backed reliability</strong>  99.97% uptime guaranteed or credits back</li>
                             </ul>
                             <a href="{% url 'contact:contact' %}" class="oh-sh-cta">Explore the monitor <i class="fas fa-arrow-right"></i></a>
                         </div>
@@ -696,13 +612,13 @@
                             <span class="oh-sh-photo-tint"></span>
                         </div>
                         <div class="oh-sh-body">
-                            <span class="oh-sh-kicker">Design · Interface</span>
+                            <span class="oh-sh-kicker">Design  Interface</span>
                             <h3>Dashboard Design</h3>
                             <p>Data-rich, intuitive dashboards that turn complex metrics into clear, actionable insight.</p>
                             <ul>
-                                <li><strong>Conversion-focused interface design</strong> — every pixel serves a business goal</li>
-                                <li><strong>Clear, glanceable data visualisation</strong> — patterns spotted in seconds, not minutes</li>
-                                <li><strong>Designed to be understood in seconds</strong> — zero training required</li>
+                                <li><strong>Conversion-focused interface design</strong>  every pixel serves a business goal</li>
+                                <li><strong>Clear, glanceable data visualisation</strong>  patterns spotted in seconds, not minutes</li>
+                                <li><strong>Designed to be understood in seconds</strong>  zero training required</li>
                             </ul>
                             <a href="{% url 'contact:contact' %}" class="oh-sh-cta">See our dashboards <i class="fas fa-arrow-right"></i></a>
                         </div>
@@ -731,13 +647,13 @@
                             <span class="oh-sh-photo-tint"></span>
                         </div>
                         <div class="oh-sh-body">
-                            <span class="oh-sh-kicker">Engineering · API</span>
+                            <span class="oh-sh-kicker">Engineering  API</span>
                             <h3>API Design</h3>
                             <p>Well-documented, secure, and scalable APIs designed for developers and the systems you integrate with.</p>
                             <ul>
-                                <li><strong>Secure, versioned &amp; documented endpoints</strong> — OAuth 2.0, rate limits, and OpenAPI specs</li>
-                                <li><strong>Built to scale with your users</strong> — from 100 to 100M requests</li>
-                                <li><strong>Developer-friendly &amp; easy to integrate</strong> — SDKs, webhooks, and sandbox environments</li>
+                                <li><strong>Secure, versioned &amp; documented endpoints</strong>  OAuth 2.0, rate limits, and OpenAPI specs</li>
+                                <li><strong>Built to scale with your users</strong>  from 100 to 100M requests</li>
+                                <li><strong>Developer-friendly &amp; easy to integrate</strong>  SDKs, webhooks, and sandbox environments</li>
                             </ul>
                             <a href="{% url 'contact:contact' %}" class="oh-sh-cta">Explore the API <i class="fas fa-arrow-right"></i></a>
                         </div>
@@ -823,14 +739,23 @@
 </section>
 
 <!-- FINAL CTA -->
-<section class="oh-section" style="padding:6rem 0">
-    <div class="container" style="text-align:center">
+<section style="padding:7rem 0;background:#fff;position:relative;overflow:hidden">
+    <div style="position:absolute;inset:0;pointer-events:none">
+        <div style="position:absolute;top:-120px;right:-80px;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(37,99,235,.06),transparent 70%)"></div>
+        <div style="position:absolute;bottom:-100px;left:-60px;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(217,164,65,.05),transparent 70%)"></div>
+        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(14,148,136,.04),transparent 70%)"></div>
+    </div>
+    <div class="container" style="text-align:center;position:relative;z-index:1">
         <div class="oh-reveal">
-            <h2 class="oh-section-title" style="margin-bottom:1rem">Ready to Go Beyond the Ordinary?</h2>
-            <p class="oh-section-sub" style="margin:0 auto 2.5rem">Book a consultation for a comprehensive overview of our approach to building integrated websites.</p>
+            <div style="display:inline-flex;align-items:center;gap:.5rem;padding:.5rem 1.2rem;border-radius:50px;background:rgba(15,23,42,.03);border:1px solid rgba(15,23,42,.06);margin-bottom:2rem">
+                <div style="width:8px;height:8px;border-radius:50%;background:#0E9488;animation:pulse-dot 2s infinite"></div>
+                <span style="font-size:.8rem;color:#5B6478;font-weight:500">Let's build something great</span>
+            </div>
+            <h2 style="font-family:'Fraunces',Georgia,serif;font-size:clamp(2rem,4.5vw,3.2rem);font-weight:500;line-height:1.1;letter-spacing:-.02em;color:#0F172A;margin-bottom:1.5rem">Build. Connect. Automate.</h2>
+            <p style="color:#5B6478;font-size:1.1rem;max-width:540px;margin:0 auto 2.5rem;line-height:1.75">Your next digital system shouldn't be a collection of disconnected tools. Let's design, develop, integrate, and automate a solution built around your business.</p>
             <div style="display:flex;justify-content:center;flex-wrap:wrap;gap:1rem">
-                <a href="{% url 'contact:contact' %}" class="oh-cta-primary">Book a Consultation <i class="fas fa-arrow-right"></i></a>
-                <a href="{% url 'home:testimonials' %}" class="oh-cta-secondary">See Case Studies <i class="fas fa-book-open"></i></a>
+                <a href="{% url 'contact:contact' %}" style="display:inline-flex;align-items:center;gap:.55rem;padding:.95rem 2.3rem;border-radius:50px;background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;font-weight:700;font-size:.95rem;text-decoration:none;transition:all .35s;box-shadow:0 6px 28px rgba(37,99,235,.3)" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 10px 36px rgba(37,99,235,.4)'" onmouseout="this.style.transform='';this.style.boxShadow='0 6px 28px rgba(37,99,235,.3)'">Book a Consultation <i class="fas fa-arrow-right" style="font-size:.85rem"></i></a>
+                <a href="{% url 'home:testimonials' %}" style="display:inline-flex;align-items:center;gap:.55rem;padding:.95rem 2.3rem;border-radius:50px;background:#fff;border:1px solid rgba(15,23,42,.1);color:#0F172A;font-weight:700;font-size:.95rem;text-decoration:none;transition:all .35s" onmouseover="this.style.borderColor='rgba(37,99,235,.3)';this.style.color='#2563eb'" onmouseout="this.style.borderColor='rgba(15,23,42,.1)';this.style.color='#0F172A'">Explore Our Work <i class="fas fa-arrow-right" style="font-size:.85rem"></i></a>
             </div>
         </div>
     </div>

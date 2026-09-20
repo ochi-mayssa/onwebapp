@@ -667,232 +667,58 @@
         <div class="collapse navbar-collapse order-lg-1" id="navbarNav">
             <ul class="navbar-nav ms-auto">
                 
-                    {% if '/projects/admin/' not in request.path %}
-                        {% if request.resolver_match.url_name == 'login_view' or request.resolver_match.url_name == 'signup' or '/login/' in request.path or '/signup/' in request.path %}
-                            <!-- Minimal nav for Auth pages: Home + Pricing + Community -->
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'home:home' %}">{% trans 'Home' %}</a>
-                            </li>
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="servicesMenuAuth" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    {% trans 'Services' %}
-                                </a>
-                                {% include "./_services_dropdown.html" with menu_id="servicesMenuAuth" %}
-                            </li>
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="designMenuAuth" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    {% trans 'Design' %}
-                                </a>
-                                {% include "./_design_dropdown.html" with menu_id="designMenuAuth" %}
-                            </li>
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="softwareMenuAuth" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    {% trans 'Software' %}
-                                </a>
-                                {% include "./_software_dropdown.html" with menu_id="softwareMenuAuth" %}
-                            </li>
-                            <!--
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="solutionsMenuAuth" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    {% trans 'Solutions' %}
-                                </a>
-                                {% include "./_solutions_dropdown.html" with menu_id="solutionsMenuAuth" %}
-                            </li>
-                            -->
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="integrationMenuAuth" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    {% trans 'Integration' %}
-                                </a>
-                                {% include "./_integration_dropdown.html" with menu_id="integrationMenuAuth" %}
-                            </li>
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="insightsMenuAuth" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    {% trans 'Insights' %}
-                                </a>
-                                {% include "./_insights_dropdown.html" with menu_id="insightsMenuAuth" %}
-                            </li>
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="seoMenuAuth" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    {% trans 'SEO' %}
-                                </a>
-                                <ul class="dropdown-menu shadow-xl border-0 rounded-24 p-3" aria-labelledby="seoMenuAuth" style="min-width:220px;">
-                                    <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'seo_analyzer:seo_home_marketing' %}"><i class="fas fa-search me-2" style="color:#1e40af;font-size:.8rem;"></i>{% trans 'SEO Home' %}</a></li>
-                                    <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'seo_analyzer:seo_keyword_marketing' %}"><i class="fas fa-key me-2" style="color:#1e40af;font-size:.8rem;"></i>{% trans 'SEO Keywords' %}</a></li>
-                                    <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'seo_analyzer:seo_content_marketing' %}"><i class="fas fa-file-alt me-2" style="color:#1e40af;font-size:.8rem;"></i>{% trans 'SEO Content' %}</a></li>
-                                    <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'seo_analyzer:seo_url_marketing' %}"><i class="fas fa-link me-2" style="color:#1e40af;font-size:.8rem;"></i>{% trans 'URL for SEO' %}</a></li>
-                                    <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'seo_analyzer:seo_links_marketing' %}"><i class="fas fa-project-diagram me-2" style="color:#1e40af;font-size:.8rem;"></i>{% trans 'SEO Links' %}</a></li>
-                                </ul>
-                            </li>
-                        {% elif request.resolver_match and request.resolver_match.url_name == 'platform_monitoring' %}
-                        <!-- Legacy services:platform_monitoring page (kept for URL compat)  minimal top nav: Home / Pricing / Community -->
+                    <!-- Unified nav (same as homepage on all pages) -->
+                    {% if request.user.is_authenticated %}
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'home:home' %}">{% trans 'Home' %}</a>
                         </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="servicesMenuLegacyPM" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                {% trans 'Services' %}
-                            </a>
-                            {% include "./_services_dropdown.html" with menu_id="servicesMenuLegacyPM" %}
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="designMenuLegacyPM" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                {% trans 'Design' %}
-                            </a>
-                            {% include "./_design_dropdown.html" with menu_id="designMenuLegacyPM" %}
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="softwareMenuLegacyPM" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                {% trans 'Software' %}
-                            </a>
-                            {% include "./_software_dropdown.html" with menu_id="softwareMenuLegacyPM" %}
-                        </li>
-                        <!--
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="solutionsMenuLegacyPM" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                {% trans 'Solutions' %}
-                            </a>
-                            {% include "./_solutions_dropdown.html" with menu_id="solutionsMenuLegacyPM" %}
-                        </li>
-                        -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="integrationMenuLegacyPM" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                {% trans 'Integration' %}
-                            </a>
-                            {% include "./_integration_dropdown.html" with menu_id="integrationMenuLegacyPM" %}
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="insightsMenuLegacyPM" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                {% trans 'Insights' %}
-                            </a>
-                            {% include "./_insights_dropdown.html" with menu_id="insightsMenuLegacyPM" %}
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="seoMenuLegacyPM" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                {% trans 'SEO' %}
-                            </a>
-                            <ul class="dropdown-menu shadow-xl border-0 rounded-24 p-3" aria-labelledby="seoMenuLegacyPM" style="min-width:220px;">
-                                <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'seo_analyzer:seo_home_marketing' %}"><i class="fas fa-search me-2" style="color:#1e40af;font-size:.8rem;"></i>{% trans 'SEO Home' %}</a></li>
-                                <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'seo_analyzer:seo_keyword_marketing' %}"><i class="fas fa-key me-2" style="color:#1e40af;font-size:.8rem;"></i>{% trans 'SEO Keywords' %}</a></li>
-                                <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'seo_analyzer:seo_content_marketing' %}"><i class="fas fa-file-alt me-2" style="color:#1e40af;font-size:.8rem;"></i>{% trans 'SEO Content' %}</a></li>
-                                <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'seo_analyzer:seo_url_marketing' %}"><i class="fas fa-link me-2" style="color:#1e40af;font-size:.8rem;"></i>{% trans 'URL for SEO' %}</a></li>
-                                <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'seo_analyzer:seo_links_marketing' %}"><i class="fas fa-project-diagram me-2" style="color:#1e40af;font-size:.8rem;"></i>{% trans 'SEO Links' %}</a></li>
-                            </ul>
-                        </li>
-
-                        {% elif request.resolver_match and request.resolver_match.url_name == 'home' %}
-                        <!-- Minimal nav on homepage: Pricing + Community ONLY -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="servicesMenuHome" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                {% trans 'Services' %}
-                            </a>
-                            {% include "./_services_dropdown.html" with menu_id="servicesMenuHome" %}
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="technologyMenuHome" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                {% trans 'Technology' %}
-                            </a>
-                            <ul class="dropdown-menu shadow-xl border-0 rounded-24 p-3" aria-labelledby="technologyMenuHome" style="min-width:220px;">
-                                <li><span class="dropdown-header px-3 py-1" style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b;">{% trans 'Design' %}</span></li>
-                                <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'home:ux_design' %}"><i class="fas fa-compass-drafting me-2" style="color:#7c3aed;font-size:.8rem;"></i>{% trans 'UX Design' %}</a></li>
-                                <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'home:ui_design' %}"><i class="fas fa-pen-nib me-2" style="color:#0d9488;font-size:.8rem;"></i>{% trans 'UI Design' %}</a></li>
-                                <li><hr class="dropdown-divider border-0" style="border-top:1px solid rgba(15,23,42,.08);margin:4px 0"></li>
-                                <li><span class="dropdown-header px-3 py-1" style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b;">{% trans 'Software' %}</span></li>
-                                <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'home:software_home' %}"><i class="fas fa-laptop-code me-2" style="color:#2563eb;font-size:.8rem;"></i>{% trans 'Software Home' %}</a></li>
-                                <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'home:web_development' %}"><i class="fas fa-globe me-2" style="color:#2563eb;font-size:.8rem;"></i>{% trans 'Web Development' %}</a></li>
-                                <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'home:mobile_development' %}"><i class="fas fa-mobile-alt me-2" style="color:#14b8a6;font-size:.8rem;"></i>{% trans 'Mobile App Development' %}</a></li>
-                                <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'home:ecommerce_development' %}"><i class="fas fa-shopping-cart me-2" style="color:#9333ea;font-size:.8rem;"></i>{% trans 'eCommerce Development' %}</a></li>
-                            </ul>
-                        </li>
-                        <!--
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="solutionsMenuHome" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                {% trans 'Solutions' %}
-                            </a>
-                            {% include "./_solutions_dropdown.html" with menu_id="solutionsMenuHome" %}
-                        </li>
-                        -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="integrationMenuHome" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                {% trans 'Integration' %}
-                            </a>
-                            {% include "./_integration_dropdown.html" with menu_id="integrationMenuHome" %}
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="insightsMenuHome" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                {% trans 'Insights' %}
-                            </a>
-                            {% include "./_insights_dropdown.html" with menu_id="insightsMenuHome" %}
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="seoMenuHome" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                {% trans 'SEO' %}
-                            </a>
-                            <ul class="dropdown-menu shadow-xl border-0 rounded-24 p-3" aria-labelledby="seoMenuHome" style="min-width:220px;">
-                                <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'seo_analyzer:seo_home_marketing' %}"><i class="fas fa-search me-2" style="color:#1e40af;font-size:.8rem;"></i>{% trans 'SEO Home' %}</a></li>
-                                <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'seo_analyzer:seo_keyword_marketing' %}"><i class="fas fa-key me-2" style="color:#1e40af;font-size:.8rem;"></i>{% trans 'SEO Keywords' %}</a></li>
-                                <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'seo_analyzer:seo_content_marketing' %}"><i class="fas fa-file-alt me-2" style="color:#1e40af;font-size:.8rem;"></i>{% trans 'SEO Content' %}</a></li>
-                                <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'seo_analyzer:seo_url_marketing' %}"><i class="fas fa-link me-2" style="color:#1e40af;font-size:.8rem;"></i>{% trans 'URL for SEO' %}</a></li>
-                                <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'seo_analyzer:seo_links_marketing' %}"><i class="fas fa-project-diagram me-2" style="color:#1e40af;font-size:.8rem;"></i>{% trans 'SEO Links' %}</a></li>
-                            </ul>
-                        </li>
-                    {% else %}
-                        <!-- Full nav elsewhere: Home · Pricing · Community ONLY -->
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'home:home' %}">{% trans 'Home' %}</a>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="servicesMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                {% trans 'Services' %}
-                            </a>
-                            {% include "./_services_dropdown.html" with menu_id="servicesMenu" %}
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="designMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                {% trans 'Design' %}
-                            </a>
-                            {% include "./_design_dropdown.html" with menu_id="designMenu" %}
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="softwareMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                {% trans 'Software' %}
-                            </a>
-                            {% include "./_software_dropdown.html" with menu_id="softwareMenu" %}
-                        </li>
-                        <!--
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="solutionsMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                {% trans 'Solutions' %}
-                            </a>
-                            {% include "./_solutions_dropdown.html" with menu_id="solutionsMenu" %}
-                        </li>
-                        -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="integrationMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                {% trans 'Integration' %}
-                            </a>
-                            {% include "./_integration_dropdown.html" with menu_id="integrationMenu" %}
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="insightsMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                {% trans 'Insights' %}
-                            </a>
-                            {% include "./_insights_dropdown.html" with menu_id="insightsMenu" %}
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="seoMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                {% trans 'SEO' %}
-                            </a>
-                            <ul class="dropdown-menu shadow-xl border-0 rounded-24 p-3" aria-labelledby="seoMenu" style="min-width:220px;">
-                                <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'seo_analyzer:seo_home_marketing' %}"><i class="fas fa-search me-2" style="color:#1e40af;font-size:.8rem;"></i>{% trans 'SEO Home' %}</a></li>
-                                <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'seo_analyzer:seo_keyword_marketing' %}"><i class="fas fa-key me-2" style="color:#1e40af;font-size:.8rem;"></i>{% trans 'SEO Keywords' %}</a></li>
-                                <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'seo_analyzer:seo_content_marketing' %}"><i class="fas fa-file-alt me-2" style="color:#1e40af;font-size:.8rem;"></i>{% trans 'SEO Content' %}</a></li>
-                                <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'seo_analyzer:seo_url_marketing' %}"><i class="fas fa-link me-2" style="color:#1e40af;font-size:.8rem;"></i>{% trans 'URL for SEO' %}</a></li>
-                                <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'seo_analyzer:seo_links_marketing' %}"><i class="fas fa-project-diagram me-2" style="color:#1e40af;font-size:.8rem;"></i>{% trans 'SEO Links' %}</a></li>
-                            </ul>
-                        </li>
-                        
                     {% endif %}
-                {% endif %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="servicesMenuUnified" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            {% trans 'Services' %}
+                        </a>
+                        {% include "./_services_dropdown.html" with menu_id="servicesMenuUnified" %}
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="technologyMenuUnified" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            {% trans 'Technology' %}
+                        </a>
+                        <ul class="dropdown-menu shadow-xl border-0 rounded-24 p-3" aria-labelledby="technologyMenuUnified" style="min-width:220px;">
+                            <li><span class="dropdown-header px-3 py-1" style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b;">{% trans 'Design' %}</span></li>
+                            <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'home:ux_design' %}"><i class="fas fa-compass-drafting me-2" style="color:#7c3aed;font-size:.8rem;"></i>{% trans 'UX Design' %}</a></li>
+                            <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'home:ui_design' %}"><i class="fas fa-pen-nib me-2" style="color:#0d9488;font-size:.8rem;"></i>{% trans 'UI Design' %}</a></li>
+                            <li><hr class="dropdown-divider border-0" style="border-top:1px solid rgba(15,23,42,.08);margin:4px 0"></li>
+                            <li><span class="dropdown-header px-3 py-1" style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b;">{% trans 'Software' %}</span></li>
+                            <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'home:software_home' %}"><i class="fas fa-laptop-code me-2" style="color:#2563eb;font-size:.8rem;"></i>{% trans 'Software Home' %}</a></li>
+                            <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'home:web_development' %}"><i class="fas fa-globe me-2" style="color:#2563eb;font-size:.8rem;"></i>{% trans 'Web Development' %}</a></li>
+                            <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'home:mobile_development' %}"><i class="fas fa-mobile-alt me-2" style="color:#14b8a6;font-size:.8rem;"></i>{% trans 'Mobile App Development' %}</a></li>
+                            <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'home:ecommerce_development' %}"><i class="fas fa-shopping-cart me-2" style="color:#9333ea;font-size:.8rem;"></i>{% trans 'eCommerce Development' %}</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="integrationMenuUnified" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            {% trans 'Integration' %}
+                        </a>
+                        {% include "./_integration_dropdown.html" with menu_id="integrationMenuUnified" %}
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="insightsMenuUnified" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            {% trans 'Insights' %}
+                        </a>
+                        {% include "./_insights_dropdown.html" with menu_id="insightsMenuUnified" %}
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="seoMenuUnified" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            {% trans 'SEO' %}
+                        </a>
+                        <ul class="dropdown-menu shadow-xl border-0 rounded-24 p-3" aria-labelledby="seoMenuUnified" style="min-width:220px;">
+                            <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'seo_analyzer:seo_home_marketing' %}"><i class="fas fa-search me-2" style="color:#1e40af;font-size:.8rem;"></i>{% trans 'SEO Home' %}</a></li>
+                            <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'seo_analyzer:seo_keyword_marketing' %}"><i class="fas fa-key me-2" style="color:#1e40af;font-size:.8rem;"></i>{% trans 'SEO Keywords' %}</a></li>
+                            <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'seo_analyzer:seo_content_marketing' %}"><i class="fas fa-file-alt me-2" style="color:#1e40af;font-size:.8rem;"></i>{% trans 'SEO Content' %}</a></li>
+                            <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'seo_analyzer:seo_url_marketing' %}"><i class="fas fa-link me-2" style="color:#1e40af;font-size:.8rem;"></i>{% trans 'URL for SEO' %}</a></li>
+                            <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'seo_analyzer:seo_links_marketing' %}"><i class="fas fa-project-diagram me-2" style="color:#1e40af;font-size:.8rem;"></i>{% trans 'SEO Links' %}</a></li>
+                        </ul>
+                    </li>
             </ul>
             
             <!-- Mobile Auth is now handled by the user-dropdown in order-lg-2 -->
