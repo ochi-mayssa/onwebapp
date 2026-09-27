@@ -1,244 +1,292 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block title %}AI Chatbot - OnWebApp{% endblock %}
+{% block title %}{% trans "Smart Guide" %} | OnWebApp{% endblock %}
 
 {% block extra_css %}
 <style>
-    body {
-        background-color: var(--bg-body);
-        color: var(--text-primary);
-    }
-    .chat-container {
-        max-height: 400px;
+    .guide-container {
+        max-height: 62vh;
+        min-height: 380px;
         overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 20px;
     }
-    .message {
-        margin-bottom: 1rem;
-        padding: 0.75rem;
-        border-radius: 0.5rem;
+    .guide-msg {
+        max-width: 90%;
+        padding: 12px 16px;
+        border-radius: 16px;
+        font-size: .92rem;
+        line-height: 1.55;
+        word-wrap: break-word;
+        overflow-wrap: anywhere;
     }
-    .user-message {
-        background-color: var(--primary-color);
-        color: white;
-        margin-left: 2rem;
+    .guide-msg.bot {
+        background: var(--bg-surface-secondary, #F4F6FB);
+        color: var(--text-primary, #0F172A);
+        border: 1px solid var(--border-color, rgba(15,23,42,.06));
+        align-self: flex-start;
+        border-bottom-left-radius: 4px;
     }
-    .bot-message {
-        background-color: var(--bg-surface-secondary);
-        color: var(--text-primary);
-        margin-right: 2rem;
-        border: 1px solid var(--border-color);
+    .guide-msg.bot strong { color: #7c3aed; }
+    .guide-msg.user {
+        background: #7c3aed;
+        color: #fff;
+        align-self: flex-end;
+        border-bottom-right-radius: 4px;
+    }
+    .guide-msg.user strong { color: #fff; }
+    .guide-typing {
+        align-self: flex-start;
+        padding: 10px 16px;
+        border-radius: 16px;
+        background: var(--bg-surface-secondary, #F4F6FB);
+        border: 1px solid var(--border-color, rgba(15,23,42,.06));
+        font-size: .85rem;
+        color: var(--text-secondary, #5B6478);
+    }
+    .guide-typing span {
+        display: inline-block;
+        width: 6px; height: 6px;
+        border-radius: 50%;
+        background: #5B6478;
+        margin: 0 2px;
+        animation: gDot 1.2s infinite;
+    }
+    .guide-typing span:nth-child(2) { animation-delay: .2s; }
+    .guide-typing span:nth-child(3) { animation-delay: .4s; }
+    @keyframes gDot { 0%,60%,100%{opacity:.3;transform:translateY(0)} 30%{opacity:1;transform:translateY(-3px)} }
+    .guide-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 4px;
+        align-self: flex-start;
+    }
+    .guide-chip {
+        background: var(--bg-surface-secondary, #F4F6FB);
+        border: 1px solid var(--border-color, rgba(15,23,42,.06));
+        border-radius: 20px;
+        padding: 6px 14px;
+        font-size: .82rem;
+        font-weight: 600;
+        color: #7c3aed;
+        cursor: pointer;
+        transition: all .25s;
+        text-decoration: none;
+    }
+    .guide-chip:hover {
+        background: rgba(124,58,237,.08);
+        border-color: #7c3aed;
+        transform: translateY(-1px);
+    }
+    .guide-chip i {
+        font-size: .62rem;
+        margin-right: 5px;
+        opacity: .7;
+    }
+    .guide-ref {
+        align-self: flex-start;
+        max-width: 90%;
+        font-size: .84rem;
+        line-height: 1.6;
+        color: var(--text-secondary, #5B6478);
+        overflow-wrap: anywhere;
+    }
+    .guide-ref a {
+        color: #7c3aed;
+        font-weight: 600;
+        text-decoration: underline;
+        text-underline-offset: 2px;
+        text-decoration-thickness: 1px;
+        transition: opacity .2s;
+    }
+    .guide-ref a:hover { opacity: .7; }
+    .guide-input-area {
+        border-top: 1px solid var(--border-color, rgba(15,23,42,.06));
+        padding: 16px 20px;
+        display: flex;
+        gap: 10px;
+        background: var(--bg-surface, #fff);
+    }
+    .guide-input-area input {
+        flex: 1;
+        border-radius: 12px;
+        font-size: .92rem;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="text-center mb-5">
-        <h1 class="display-5 fw-bold text-heading mb-3">AI Chat Assistant</h1>
-        <p class="lead text-muted">Get instant answers to your questions about our services</p>
-    </div>
+<section style="background:var(--bg-body,#fff);min-height:80vh;padding:4rem 0">
+    <div class="wrap">
+        <div style="text-align:center;max-width:500px;margin:0 auto 2rem">
+            <span style="display:inline-block;font-family:'Fraunces',Georgia,serif;font-style:italic;color:#7c3aed;font-size:1rem;font-weight:500;margin-bottom:8px">{% trans 'Smart Guide' %}</span>
+            <h1 style="font-family:'Fraunces',Georgia,serif;font-size:clamp(1.6rem,3vw,2.2rem);font-weight:600;color:var(--text-primary,#0F172A);line-height:1.15;margin-bottom:.5rem">{% trans 'How Can I Help You?' %}</h1>
+            <p style="color:var(--text-secondary,#5B6478);font-size:.95rem;margin:0">Ask me about services, pricing, navigation, or anything on the site.</p>
+        </div>
 
-    <div class="card shadow-lg border-0" style="background-color: var(--bg-surface); border: 1px solid var(--border-color) !important;">
-        <div class="card-body p-4">
-            <!-- Chat Interface -->
-            <div class="chat-container mb-4 p-3 rounded" style="background-color: var(--bg-surface-secondary); border: 1px solid var(--border-color);">
-                <div class="message bot-message">
-                    <strong>OnWebApp Bot:</strong> Hello! I'm here to help you with information about our web development services. What would you like to know?
+        <div style="max-width:600px;margin:0 auto">
+            <div class="card border-0 shadow-lg" style="border-radius:16px;overflow:hidden;background:var(--bg-surface,#fff)">
+                <div style="padding:14px 20px;background:linear-gradient(135deg,#7c3aed,#a78bfa);color:#fff;font-weight:600;display:flex;align-items:center;gap:8px">
+                    <i class="fas fa-robot"></i> {% trans 'OnWebApp Guide' %}
                 </div>
-                
-                <!-- Example conversation -->
-                <div class="message user-message">
-                    <strong>You:</strong> What services do you offer?
-                </div>
-                <div class="message bot-message">
-                    <strong>OnWebApp Bot:</strong> We offer industrial automation monitoring, competitor tracking, and custom web development solutions. Would you like details about any specific service?
-                </div>
-            </div>
-
-            <!-- Input Form -->
-            <form id="chatbot-form" class="d-flex gap-2">
-                <input 
-                    id="chatbot-message-input"
-                    type="text" 
-                    placeholder="Type your message here..."
-                    class="form-control"
-                    style="background-color: var(--bg-surface); color: var(--text-primary); border-color: var(--border-color);"
-                >
-                <button 
-                    type="submit"
-                    class="btn btn-primary px-4"
-                >
-                    <i class="fas fa-paper-plane me-2"></i> Send
-                </button>
-            </form>
-
-            <!-- Quick Actions -->
-            <div class="mt-4 quick-actions">
-                <h3 class="h5 fw-semibold text-heading mb-3">Quick Questions</h3>
-                <div class="row g-2">
-                    <div class="col-6 col-md-3">
-                        <button class="btn btn-outline-secondary w-100 text-start text-truncate" style="border-color: var(--border-color); color: var(--text-secondary);">
-                            What is industrial automation?
-                        </button>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <button class="btn btn-outline-secondary w-100 text-start text-truncate" style="border-color: var(--border-color); color: var(--text-secondary);">
-                            How does competitor tracking work?
-                        </button>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <button class="btn btn-outline-secondary w-100 text-start text-truncate" style="border-color: var(--border-color); color: var(--text-secondary);">
-                            Pricing information
-                        </button>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <button class="btn btn-outline-secondary w-100 text-start text-truncate" style="border-color: var(--border-color); color: var(--text-secondary);">
-                            Contact support
-                        </button>
-                    </div>
+                <div class="guide-container" id="guideBody"></div>
+                <div class="guide-input-area">
+                    <input id="guideInput" type="text" class="form-control" placeholder="{% trans 'Type your question...' %}" aria-label="{% trans 'Chat input' %}">
+                    <button id="guideSend" class="btn btn-primary px-4" style="border-radius:12px"><i class="fas fa-paper-plane me-1"></i> {% trans 'Send' %}</button>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</section>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-    // Enhanced chat functionality with context-aware suggestions
-    document.addEventListener('DOMContentLoaded', function() {
-        const form = document.getElementById('chatbot-form');
-        const input = document.getElementById('chatbot-message-input');
-        const chatContainer = document.querySelector('.chat-container');
-        const quickActions = document.querySelector('.quick-actions');
-        
-        // Function to get context-aware suggestions
-        async function getBotResponse(message) {
-            try {
-                const response = await fetch('/chatbot/suggestions/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': getCookie('csrftoken')
-                    },
-                    body: JSON.stringify({ message: message })
+(function(){
+    const body = document.getElementById('guideBody');
+    const input = document.getElementById('guideInput');
+    const send = document.getElementById('guideSend');
+    let chatSessionId = localStorage.getItem('chatbot_session_id') || null;
+
+    function escapeHtml(str){
+        const d = document.createElement('div');
+        d.appendChild(document.createTextNode(str));
+        return d.innerHTML;
+    }
+
+    function getCookie(name){
+        let v = null;
+        document.cookie.split(';').forEach(c => {
+            c = c.trim();
+            if(c.startsWith(name + '=')) v = decodeURIComponent(c.substring(name.length+1));
+        });
+        return v;
+    }
+
+    function addBotMessage(text){
+        const el = document.createElement('div');
+        el.className = 'guide-msg bot';
+        el.innerHTML = text;
+        body.appendChild(el);
+        body.scrollTop = body.scrollHeight;
+    }
+
+    function addUserMessage(text){
+        const el = document.createElement('div');
+        el.className = 'guide-msg user';
+        el.innerHTML = '<strong>You:</strong> ' + escapeHtml(text);
+        body.appendChild(el);
+        body.scrollTop = body.scrollHeight;
+    }
+
+    function addTyping(){
+        const el = document.createElement('div');
+        el.className = 'guide-typing';
+        el.id = 'guide-typing';
+        el.innerHTML = '<span></span><span></span><span></span>';
+        body.appendChild(el);
+        body.scrollTop = body.scrollHeight;
+    }
+
+    function removeTyping(){
+        const el = document.getElementById('guide-typing');
+        if(el) el.remove();
+    }
+
+    function addSuggestions(suggestions){
+        if(!suggestions || !suggestions.length) return;
+        const container = document.createElement('div');
+        container.className = 'guide-chips';
+        suggestions.forEach(s => {
+            const chip = document.createElement('div');
+            chip.className = 'guide-chip';
+            chip.textContent = s.title;
+            chip.title = s.content || '';
+            if(s.url){
+                chip.classList.add('has-link');
+                chip.insertBefore(Object.assign(document.createElement('i'),{className:'fas fa-arrow-up-right-from-square'}), chip.firstChild);
+                chip.addEventListener('click', function(){ window.location.href = s.url; });
+            } else {
+                chip.addEventListener('click', function(){
+                    input.value = s.title;
+                    sendMessage();
                 });
-                
-                if (response.ok) {
-                    return await response.json();
-                }
-            } catch (error) {
-                console.error('Error fetching bot response:', error);
             }
-            return { reply: 'Sorry, something went wrong.', suggestions: [] };
-        }
-        
-        // Function to display suggestions
-        function displaySuggestions(suggestions) {
-            if (suggestions && suggestions.length > 0) {
-                // Clear existing quick actions
-                quickActions.innerHTML = '<h3 class="h5 fw-semibold text-heading mb-3">Suggested Actions</h3>';
-                
-                const row = document.createElement('div');
-                row.className = 'row g-2';
-                
-                suggestions.forEach(suggestion => {
-                    const col = document.createElement('div');
-                    col.className = 'col-6 col-md-3';
+            container.appendChild(chip);
+        });
+        body.appendChild(container);
+        body.scrollTop = body.scrollHeight;
+    }
 
-                    const button = document.createElement('button');
-                    button.className = 'btn btn-outline-primary w-100 text-start text-truncate btn-sm';
-                    button.innerHTML = suggestion.title;
-                    button.onclick = () => {
-                        handleUserAction(suggestion.title, suggestion.content);
-                    };
-                    col.appendChild(button);
-                    row.appendChild(col);
-                });
-                
-                quickActions.appendChild(row);
-            }
-        }
-        
-        // Helper to handle user action
-        async function handleUserAction(messageText, directResponseContent = null) {
-            // Add user message
-            const userMessage = document.createElement('div');
-            userMessage.className = 'message user-message';
-            userMessage.innerHTML = `<strong>You:</strong> ${messageText}`;
-            chatContainer.appendChild(userMessage);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-
-            if (directResponseContent) {
-                 // If we already have the content (from suggestion), display it immediately
-                 const botMessage = document.createElement('div');
-                 botMessage.className = 'message bot-message';
-                 botMessage.innerHTML = `<strong>OnWebApp Bot:</strong> ${directResponseContent}`;
-                 chatContainer.appendChild(botMessage);
-                 chatContainer.scrollTop = chatContainer.scrollHeight;
-                 return;
-            }
-
-            // Show typing indicator
-            const typingIndicator = document.createElement('div');
-            typingIndicator.className = 'message bot-message text-muted fst-italic';
-            typingIndicator.id = 'typing-indicator';
-            typingIndicator.innerHTML = '<small>Typing...</small>';
-            chatContainer.appendChild(typingIndicator);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-            
-            // Get bot response from server
-            const data = await getBotResponse(messageText);
-            
-            // Remove typing indicator
-            const typingEl = document.getElementById('typing-indicator');
-            if (typingEl) typingEl.remove();
-            
-            // Display Bot Reply
-            const botMessage = document.createElement('div');
-            botMessage.className = 'message bot-message';
-            botMessage.innerHTML = `<strong>OnWebApp Bot:</strong> ${data.reply || 'I am not sure how to help with that.'}`;
-            chatContainer.appendChild(botMessage);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-
-            // Display Suggestions
-            displaySuggestions(data.suggestions);
-        }
-        
-        // CSRF token helper function
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
-        
-        form.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const message = input.value.trim();
-            if (message) {
-                input.value = '';
-                await handleUserAction(message);
+    function addPageReference(links){
+        if(!links || !links.length) return;
+        const total = links.length;
+        const el = document.createElement('div');
+        el.className = 'guide-ref';
+        el.appendChild(document.createTextNode('{% trans "For more information, visit the" %} '));
+        links.forEach(function(l, i){
+            const a = document.createElement('a');
+            a.href = l.url;
+            a.target = '_blank';
+            a.rel = 'noopener';
+            a.textContent = '"' + l.title + '"';
+            el.appendChild(a);
+            if(i < total - 1){
+                el.appendChild(document.createTextNode(
+                    (total === 2 || i === total - 2) ? ' or ' : ', '
+                ));
             }
         });
-        
-        // Initialize static quick action buttons
-        if (quickActions) {
-            const staticButtons = quickActions.querySelectorAll('button');
-            staticButtons.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    handleUserAction(btn.innerText.trim());
-                });
+        el.appendChild(document.createTextNode(total > 1 ? ' {% trans "pages." %}' : ' {% trans "page." %}'));
+        body.appendChild(el);
+        body.scrollTop = body.scrollHeight;
+    }
+
+    async function sendMessage(){
+        const text = input.value && input.value.trim();
+        if(!text) return;
+        addUserMessage(text);
+        input.value = '';
+        addTyping();
+
+        try{
+            const res = await fetch('/chatbot/suggestions/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken') || ''
+                },
+                body: JSON.stringify({ message: text, session_id: chatSessionId })
             });
+            removeTyping();
+            if(!res.ok){
+                addBotMessage('Sorry, something went wrong. Please try again.');
+                return;
+            }
+            const data = await res.json();
+            if(data.session_id){
+                chatSessionId = data.session_id;
+                localStorage.setItem('chatbot_session_id', chatSessionId);
+            }
+            addBotMessage(escapeHtml(data.reply || 'I\'m not sure how to help with that.'));
+            addPageReference(data.links);
+            addSuggestions(data.suggestions);
+        }catch(e){
+            removeTyping();
+            addBotMessage('Network error. Please check your connection and try again.');
         }
+    }
+
+    send.addEventListener('click', sendMessage);
+    input.addEventListener('keydown', function(e){
+        if(e.key === 'Enter'){ e.preventDefault(); sendMessage(); }
     });
-    </script>
+
+    addBotMessage('Hi! I\'m your OnWebApp guide. I can help you find services, check pricing, navigate the site, or answer questions. What are you looking for?');
+})();
+</script>
 {% endblock %}

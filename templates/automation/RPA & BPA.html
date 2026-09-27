@@ -1,0 +1,334 @@
+{% extends 'base.html' %}
+{% load i18n static %}
+
+{% block title %}{% trans "RPA & BPA" %} | OnWebApp{% endblock %}
+
+{% block content %}
+<!-- HERO -->
+<section style="color:#fff;padding:7rem 0 5rem;min-height:70vh;display:flex;align-items:center;position:relative;overflow:hidden;background:url('{% static "img/RPA.png" %}') center/cover no-repeat">
+    <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(15,23,42,.85) 40%,rgba(15,23,42,.5) 100%);pointer-events:none"></div>
+    <div style="position:absolute;bottom:0;left:0;right:0;height:120px;background:linear-gradient(to top,#fff,transparent);pointer-events:none;z-index:2"></div>
+    <div class="wrap" style="text-align:left;position:relative;z-index:1;max-width:580px;margin-left:0;margin-right:auto;padding-left:32px">
+        <span style="display:inline-block;font-family:'Fraunces',Georgia,serif;font-style:italic;color:#a78bfa;font-size:1.05rem;font-weight:500;margin-bottom:16px;letter-spacing:.03em">Automation</span>
+        <h1 style="font-family:'Fraunces',Georgia,serif;font-size:clamp(2.8rem,5.5vw,3.8rem);font-weight:600;color:#fff;line-height:1.1;letter-spacing:-.02em;margin-bottom:1.5rem">Automate Work. Orchestrate Processes. Scale Without Friction.</h1>
+        <p style="color:rgba(255,255,255,.65);font-size:1.1rem;max-width:480px;margin:0 0 2.5rem;line-height:1.75">Transform repetitive tasks and complex business processes into intelligent, automated workflows.</p>
+        <div style="display:flex;justify-content:flex-start;flex-wrap:nowrap;gap:1rem;margin-top:.5rem">
+            <a href="{% url 'contact:contact' %}" style="display:inline-flex;align-items:center;gap:.5rem;padding:.8rem 2rem;border-radius:50px;background:linear-gradient(135deg,#7c3aed,#a78bfa);color:#fff;font-weight:700;font-size:.88rem;text-decoration:none;transition:all .35s;box-shadow:0 6px 28px rgba(124,58,237,.35)" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 10px 36px rgba(124,58,237,.45)'" onmouseout="this.style.transform='';this.style.boxShadow='0 6px 28px rgba(124,58,237,.35)'">Build Smarter Processes <i class="fas fa-arrow-right" style="font-size:.8rem"></i></a>
+            <a href="#automation-overview" style="display:inline-flex;align-items:center;gap:.5rem;padding:.8rem 2rem;border-radius:50px;background:transparent;border:1.5px solid rgba(255,255,255,.25);color:#fff;font-weight:700;font-size:.88rem;text-decoration:none;transition:all .35s" onmouseover="this.style.background='rgba(255,255,255,.08)';this.style.borderColor='rgba(255,255,255,.4)'" onmouseout="this.style.background='transparent';this.style.borderColor='rgba(255,255,255,.25)'">Explore Automation <i class="fas fa-arrow-right" style="font-size:.8rem"></i></a>
+        </div>
+    </div>
+</section>
+
+<!-- AUTOMATION BEYOND REPETITIVE TASKS -->
+<section id="automation-overview" style="background:#fff;padding:5rem 0">
+    <div class="wrap">
+        <div style="text-align:center;max-width:640px;margin:0 auto 1.5rem">
+            <span style="display:inline-block;font-family:'Fraunces',Georgia,serif;font-style:italic;color:#7c3aed;font-size:1.05rem;font-weight:500;margin-bottom:12px">Automation Beyond Repetitive Tasks</span>
+            <h2 style="font-family:'Fraunces',Georgia,serif;font-size:clamp(1.8rem,3.5vw,2.5rem);font-weight:500;color:#0F172A;line-height:1.15;letter-spacing:-.01em;margin-bottom:.75rem">From Manual Workflows to Intelligent Operations</h2>
+            <p style="color:#5B6478;font-size:1rem;line-height:1.75;margin:0">OnWebApp combines Business Process Automation (BPA) and Robotic Process Automation (RPA) to automate both the process itself and the tasks within it.</p>
+        </div>
+        <div style="max-width:900px;margin:0 auto">
+            <img src="{% static 'img/bb.png' %}" alt="BPA, RPA, Workflow Automation, AI Automation" style="width:100%;height:auto;display:block;mix-blend-mode:multiply">
+        </div>
+    </div>
+</section>
+
+<!-- BPA SECTION -->
+<section style="background:#F4F6FB;padding:7rem 0">
+    <div class="wrap">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start" class="rpa-split-grid">
+            <div>
+                <span style="display:inline-block;font-family:'Fraunces',Georgia,serif;font-style:italic;color:#7c3aed;font-size:1.05rem;font-weight:500;margin-bottom:12px">BPA</span>
+                <h2 style="font-family:'Fraunces',Georgia,serif;font-size:clamp(1.8rem,3.5vw,2.2rem);font-weight:500;color:#0F172A;line-height:1.15;letter-spacing:-.01em;margin-bottom:.75rem">Business Process Automation</h2>
+                <h3 style="font-family:'Fraunces',Georgia,serif;font-size:1.2rem;font-weight:500;color:#0F172A;margin-bottom:1rem">Design Better Processes. Then Automate Them.</h3>
+                <p style="color:#5B6478;font-size:1rem;line-height:1.75;margin-bottom:1.5rem">BPA focuses on the bigger picture: how work moves through your organization. OnWebApp helps map business processes, identify manual bottlenecks, connect systems, and automate workflows from initiation to completion.</p>
+                <p style="color:#5B6478;font-size:.95rem;line-height:1.75;font-style:italic">From a customer request to a completed service, every step can become part of a connected process.</p>
+            </div>
+            <div>
+                <h4 style="font-weight:700;color:#0F172A;margin-bottom:1rem;font-size:1rem">Process Capabilities</h4>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem">
+                    <div style="display:flex;align-items:center;gap:.5rem;padding:.6rem 1rem;border-radius:8px;background:#fff;border:1px solid rgba(15,23,42,.06)"><i class="fas fa-check" style="color:#0E9488;font-size:.75rem"></i><span style="font-size:.88rem;color:#0F172A">Process mapping</span></div>
+                    <div style="display:flex;align-items:center;gap:.5rem;padding:.6rem 1rem;border-radius:8px;background:#fff;border:1px solid rgba(15,23,42,.06)"><i class="fas fa-check" style="color:#0E9488;font-size:.75rem"></i><span style="font-size:.88rem;color:#0F172A">Workflow orchestration</span></div>
+                    <div style="display:flex;align-items:center;gap:.5rem;padding:.6rem 1rem;border-radius:8px;background:#fff;border:1px solid rgba(15,23,42,.06)"><i class="fas fa-check" style="color:#0E9488;font-size:.75rem"></i><span style="font-size:.88rem;color:#0F172A">Approval workflows</span></div>
+                    <div style="display:flex;align-items:center;gap:.5rem;padding:.6rem 1rem;border-radius:8px;background:#fff;border:1px solid rgba(15,23,42,.06)"><i class="fas fa-check" style="color:#0E9488;font-size:.75rem"></i><span style="font-size:.88rem;color:#0F172A">Business rules</span></div>
+                    <div style="display:flex;align-items:center;gap:.5rem;padding:.6rem 1rem;border-radius:8px;background:#fff;border:1px solid rgba(15,23,42,.06)"><i class="fas fa-check" style="color:#0E9488;font-size:.75rem"></i><span style="font-size:.88rem;color:#0F172A">Task routing</span></div>
+                    <div style="display:flex;align-items:center;gap:.5rem;padding:.6rem 1rem;border-radius:8px;background:#fff;border:1px solid rgba(15,23,42,.06)"><i class="fas fa-check" style="color:#0E9488;font-size:.75rem"></i><span style="font-size:.88rem;color:#0F172A">Notifications &amp; triggers</span></div>
+                    <div style="display:flex;align-items:center;gap:.5rem;padding:.6rem 1rem;border-radius:8px;background:#fff;border:1px solid rgba(15,23,42,.06)"><i class="fas fa-check" style="color:#0E9488;font-size:.75rem"></i><span style="font-size:.88rem;color:#0F172A">Data synchronization</span></div>
+                    <div style="display:flex;align-items:center;gap:.5rem;padding:.6rem 1rem;border-radius:8px;background:#fff;border:1px solid rgba(15,23,42,.06)"><i class="fas fa-check" style="color:#0E9488;font-size:.75rem"></i><span style="font-size:.88rem;color:#0F172A">Exception handling</span></div>
+                    <div style="display:flex;align-items:center;gap:.5rem;padding:.6rem 1rem;border-radius:8px;background:#fff;border:1px solid rgba(15,23,42,.06)"><i class="fas fa-check" style="color:#0E9488;font-size:.75rem"></i><span style="font-size:.88rem;color:#0F172A">Process monitoring</span></div>
+                    <div style="display:flex;align-items:center;gap:.5rem;padding:.6rem 1rem;border-radius:8px;background:#fff;border:1px solid rgba(15,23,42,.06)"><i class="fas fa-check" style="color:#0E9488;font-size:.75rem"></i><span style="font-size:.88rem;color:#0F172A">Automated reporting</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- RPA SECTION -->
+<section style="background:#fff;padding:7rem 0">
+    <div class="wrap">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start" class="rpa-split-grid">
+            <div>
+                <span style="display:inline-block;font-family:'Fraunces',Georgia,serif;font-style:italic;color:#0E9488;font-size:1.05rem;font-weight:500;margin-bottom:12px">RPA</span>
+                <h2 style="font-family:'Fraunces',Georgia,serif;font-size:clamp(1.8rem,3.5vw,2.2rem);font-weight:500;color:#0F172A;line-height:1.15;letter-spacing:-.01em;margin-bottom:.75rem">Robotic Process Automation</h2>
+                <h3 style="font-family:'Fraunces',Georgia,serif;font-size:1.2rem;font-weight:500;color:#0F172A;margin-bottom:1rem">Let Software Handle Repetitive Work.</h3>
+                <p style="color:#5B6478;font-size:1rem;line-height:1.75;margin-bottom:1.5rem">RPA uses software agents to perform structured, repetitive tasks across websites, desktop applications, business systems, and internal tools.</p>
+                <p style="color:#5B6478;font-size:.95rem;line-height:1.75;font-style:italic">Your employees focus on decisions. Automation handles the repetition.</p>
+            </div>
+            <div>
+                <h4 style="font-weight:700;color:#0F172A;margin-bottom:1rem;font-size:1rem">Automate Tasks Such As</h4>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem">
+                    <div style="display:flex;align-items:center;gap:.5rem;padding:.6rem 1rem;border-radius:8px;background:#F4F6FB;border:1px solid rgba(15,23,42,.04)"><i class="fas fa-check" style="color:#7c3aed;font-size:.75rem"></i><span style="font-size:.88rem;color:#0F172A">Data entry</span></div>
+                    <div style="display:flex;align-items:center;gap:.5rem;padding:.6rem 1rem;border-radius:8px;background:#F4F6FB;border:1px solid rgba(15,23,42,.04)"><i class="fas fa-check" style="color:#7c3aed;font-size:.75rem"></i><span style="font-size:.88rem;color:#0F172A">Data extraction</span></div>
+                    <div style="display:flex;align-items:center;gap:.5rem;padding:.6rem 1rem;border-radius:8px;background:#F4F6FB;border:1px solid rgba(15,23,42,.04)"><i class="fas fa-check" style="color:#7c3aed;font-size:.75rem"></i><span style="font-size:.88rem;color:#0F172A">Form processing</span></div>
+                    <div style="display:flex;align-items:center;gap:.5rem;padding:.6rem 1rem;border-radius:8px;background:#F4F6FB;border:1px solid rgba(15,23,42,.04)"><i class="fas fa-check" style="color:#7c3aed;font-size:.75rem"></i><span style="font-size:.88rem;color:#0F172A">File management</span></div>
+                    <div style="display:flex;align-items:center;gap:.5rem;padding:.6rem 1rem;border-radius:8px;background:#F4F6FB;border:1px solid rgba(15,23,42,.04)"><i class="fas fa-check" style="color:#7c3aed;font-size:.75rem"></i><span style="font-size:.88rem;color:#0F172A">System transfers</span></div>
+                    <div style="display:flex;align-items:center;gap:.5rem;padding:.6rem 1rem;border-radius:8px;background:#F4F6FB;border:1px solid rgba(15,23,42,.04)"><i class="fas fa-check" style="color:#7c3aed;font-size:.75rem"></i><span style="font-size:.88rem;color:#0F172A">Report generation</span></div>
+                    <div style="display:flex;align-items:center;gap:.5rem;padding:.6rem 1rem;border-radius:8px;background:#F4F6FB;border:1px solid rgba(15,23,42,.04)"><i class="fas fa-check" style="color:#7c3aed;font-size:.75rem"></i><span style="font-size:.88rem;color:#0F172A">Record updates</span></div>
+                    <div style="display:flex;align-items:center;gap:.5rem;padding:.6rem 1rem;border-radius:8px;background:#F4F6FB;border:1px solid rgba(15,23,42,.04)"><i class="fas fa-check" style="color:#7c3aed;font-size:.75rem"></i><span style="font-size:.88rem;color:#0F172A">Invoice processing</span></div>
+                    <div style="display:flex;align-items:center;gap:.5rem;padding:.6rem 1rem;border-radius:8px;background:#F4F6FB;border:1px solid rgba(15,23,42,.04)"><i class="fas fa-check" style="color:#7c3aed;font-size:.75rem"></i><span style="font-size:.88rem;color:#0F172A">Document handling</span></div>
+                    <div style="display:flex;align-items:center;gap:.5rem;padding:.6rem 1rem;border-radius:8px;background:#F4F6FB;border:1px solid rgba(15,23,42,.04)"><i class="fas fa-check" style="color:#7c3aed;font-size:.75rem"></i><span style="font-size:.88rem;color:#0F172A">Browser operations</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- RPA + BPA COMBINED -->
+<section style="background:#F4F6FB;padding:5rem 0">
+    <div class="wrap">
+        <div style="text-align:center;max-width:640px;margin:0 auto 2rem">
+            <span style="display:inline-block;font-family:'Fraunces',Georgia,serif;font-style:italic;color:#D9A441;font-size:1.05rem;font-weight:500;margin-bottom:12px">RPA + BPA</span>
+            <h2 style="font-family:'Fraunces',Georgia,serif;font-size:clamp(1.8rem,3.5vw,2.5rem);font-weight:500;color:#0F172A;line-height:1.15;letter-spacing:-.01em;margin-bottom:.75rem">Where RPA Meets Process Automation</h2>
+            <p style="color:#5B6478;font-size:1rem;line-height:1.75;margin:0">RPA is powerful when a specific task needs automation. BPA becomes more powerful when multiple tasks, people, systems, and decisions need to work together. OnWebApp combines both.</p>
+        </div>
+        <div style="max-width:800px;margin:0 auto">
+            <img src="{% static 'img/ex.png' %}" alt="Example Workflow" style="width:100%;height:auto;display:block;margin:0 auto;border-radius:16px;box-shadow:0 4px 24px rgba(15,23,42,.06)">
+        </div>
+    </div>
+</section>
+
+<!-- INTELLIGENT AUTOMATION -->
+<section style="background:#F4F6FB;padding:7rem 0">
+    <div class="wrap">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start" class="rpa-split-grid">
+            <div>
+                <span style="display:inline-block;font-family:'Fraunces',Georgia,serif;font-style:italic;color:#7c3aed;font-size:1.05rem;font-weight:500;margin-bottom:12px">Intelligent Automation</span>
+                <h2 style="font-family:'Fraunces',Georgia,serif;font-size:clamp(1.8rem,3.5vw,2.2rem);font-weight:500;color:#0F172A;line-height:1.15;letter-spacing:-.01em;margin-bottom:.75rem">Automation That Can Understand</h2>
+                <p style="color:#5B6478;font-size:1rem;line-height:1.75;margin-bottom:1.5rem">Not every process follows a simple rule. OnWebApp can combine automation workflows with AI capabilities to handle processes involving unstructured information and more complex decisions.</p>
+                <p style="color:#5B6478;font-size:.95rem;line-height:1.75;font-style:italic">Automate what is predictable. Assist with what requires intelligence.</p>
+            </div>
+            <div>
+                <h4 style="font-weight:700;color:#0F172A;margin-bottom:1rem;font-size:1rem">AI-Powered Automation Can Support</h4>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem">
+                    <div style="display:flex;align-items:center;gap:.5rem;padding:.6rem 1rem;border-radius:8px;background:#fff;border:1px solid rgba(15,23,42,.06)"><i class="fas fa-check" style="color:#7c3aed;font-size:.75rem"></i><span style="font-size:.88rem;color:#0F172A">Document classification</span></div>
+                    <div style="display:flex;align-items:center;gap:.5rem;padding:.6rem 1rem;border-radius:8px;background:#fff;border:1px solid rgba(15,23,42,.06)"><i class="fas fa-check" style="color:#7c3aed;font-size:.75rem"></i><span style="font-size:.88rem;color:#0F172A">Information extraction</span></div>
+                    <div style="display:flex;align-items:center;gap:.5rem;padding:.6rem 1rem;border-radius:8px;background:#fff;border:1px solid rgba(15,23,42,.06)"><i class="fas fa-check" style="color:#7c3aed;font-size:.75rem"></i><span style="font-size:.88rem;color:#0F172A">Text analysis</span></div>
+                    <div style="display:flex;align-items:center;gap:.5rem;padding:.6rem 1rem;border-radius:8px;background:#fff;border:1px solid rgba(15,23,42,.06)"><i class="fas fa-check" style="color:#7c3aed;font-size:.75rem"></i><span style="font-size:.88rem;color:#0F172A">Data categorization</span></div>
+                    <div style="display:flex;align-items:center;gap:.5rem;padding:.6rem 1rem;border-radius:8px;background:#fff;border:1px solid rgba(15,23,42,.06)"><i class="fas fa-check" style="color:#7c3aed;font-size:.75rem"></i><span style="font-size:.88rem;color:#0F172A">Anomaly identification</span></div>
+                    <div style="display:flex;align-items:center;gap:.5rem;padding:.6rem 1rem;border-radius:8px;background:#fff;border:1px solid rgba(15,23,42,.06)"><i class="fas fa-check" style="color:#7c3aed;font-size:.75rem"></i><span style="font-size:.88rem;color:#0F172A">Intelligent routing</span></div>
+                    <div style="display:flex;align-items:center;gap:.5rem;padding:.6rem 1rem;border-radius:8px;background:#fff;border:1px solid rgba(15,23,42,.06)"><i class="fas fa-check" style="color:#7c3aed;font-size:.75rem"></i><span style="font-size:.88rem;color:#0F172A">Recommendation generation</span></div>
+                    <div style="display:flex;align-items:center;gap:.5rem;padding:.6rem 1rem;border-radius:8px;background:#fff;border:1px solid rgba(15,23,42,.06)"><i class="fas fa-check" style="color:#7c3aed;font-size:.75rem"></i><span style="font-size:.88rem;color:#0F172A">Predictive process insights</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- HUMAN-IN-THE-LOOP -->
+<section style="background:#fff;padding:7rem 0">
+    <div class="wrap">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center" class="rpa-split-grid">
+            <div>
+                <span style="display:inline-block;font-family:'Fraunces',Georgia,serif;font-style:italic;color:#D9A441;font-size:1.05rem;font-weight:500;margin-bottom:12px">Human-in-the-Loop</span>
+                <h2 style="font-family:'Fraunces',Georgia,serif;font-size:clamp(1.8rem,3.5vw,2.2rem);font-weight:500;color:#0F172A;line-height:1.15;letter-spacing:-.01em;margin-bottom:.75rem">Automation Doesn't Have to Remove People</h2>
+                <p style="color:#5B6478;font-size:1rem;line-height:1.75">Some processes should remain human-controlled. OnWebApp can introduce checkpoints where a person reviews information, approves an action, resolves an exception, or makes a business decision.</p>
+            </div>
+            <div style="padding:2rem;border-radius:16px;background:#F4F6FB;border:1px solid rgba(15,23,42,.04)">
+                <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap">
+                    <div style="padding:.5rem 1rem;border-radius:8px;background:#7c3aed;color:#fff;font-size:.85rem;font-weight:600">Automated</div>
+                    <i class="fas fa-arrow-right" style="color:#5B6478;font-size:.8rem"></i>
+                    <div style="padding:.5rem 1rem;border-radius:8px;background:#D9A441;color:#fff;font-size:.85rem;font-weight:600">Reviewed</div>
+                    <i class="fas fa-arrow-right" style="color:#5B6478;font-size:.8rem"></i>
+                    <div style="padding:.5rem 1rem;border-radius:8px;background:#0E9488;color:#fff;font-size:.85rem;font-weight:600">Approved</div>
+                    <i class="fas fa-arrow-right" style="color:#5B6478;font-size:.8rem"></i>
+                    <div style="padding:.5rem 1rem;border-radius:8px;background:#2563eb;color:#fff;font-size:.85rem;font-weight:600">Executed</div>
+                </div>
+                <p style="color:#5B6478;font-size:.9rem;margin:1.25rem 0 0;line-height:1.65">This creates processes that combine the speed of automation with human oversight.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- PROCESS MONITORING -->
+<section style="background:#F4F6FB;padding:7rem 0">
+    <div class="wrap">
+        <div style="text-align:center;max-width:640px;margin:0 auto 3.5rem">
+            <span style="display:inline-block;font-family:'Fraunces',Georgia,serif;font-style:italic;color:#0E9488;font-size:1.05rem;font-weight:500;margin-bottom:12px">Process Monitoring</span>
+            <h2 style="font-family:'Fraunces',Georgia,serif;font-size:clamp(1.8rem,3.5vw,2.5rem);font-weight:500;color:#0F172A;line-height:1.15;letter-spacing:-.01em;margin-bottom:.75rem">See How Your Processes Perform</h2>
+            <p style="color:#5B6478;font-size:1rem;max-width:52ch;margin:0 auto;line-height:1.75">Automation should not become a black box. Monitor automated processes and understand what is happening across your workflows.</p>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;max-width:800px;margin:0 auto" class="rpa-monitor-grid">
+            <div style="display:flex;align-items:center;gap:.6rem;padding:.75rem 1.25rem;border-radius:10px;background:#fff;border:1px solid rgba(15,23,42,.06)"><i class="fas fa-play-circle" style="color:#7c3aed;font-size:.85rem"></i><span style="font-size:.88rem;color:#0F172A;font-weight:500">Process executions</span></div>
+            <div style="display:flex;align-items:center;gap:.6rem;padding:.75rem 1.25rem;border-radius:10px;background:#fff;border:1px solid rgba(15,23,42,.06)"><i class="fas fa-check-circle" style="color:#0E9488;font-size:.85rem"></i><span style="font-size:.88rem;color:#0F172A;font-weight:500">Task completion</span></div>
+            <div style="display:flex;align-items:center;gap:.6rem;padding:.75rem 1.25rem;border-radius:10px;background:#fff;border:1px solid rgba(15,23,42,.06)"><i class="fas fa-clock" style="color:#D9A441;font-size:.85rem"></i><span style="font-size:.88rem;color:#0F172A;font-weight:500">Processing time</span></div>
+            <div style="display:flex;align-items:center;gap:.6rem;padding:.75rem 1.25rem;border-radius:10px;background:#fff;border:1px solid rgba(15,23,42,.06)"><i class="fas fa-times-circle" style="color:#ef4444;font-size:.85rem"></i><span style="font-size:.88rem;color:#0F172A;font-weight:500">Failed actions</span></div>
+            <div style="display:flex;align-items:center;gap:.6rem;padding:.75rem 1.25rem;border-radius:10px;background:#fff;border:1px solid rgba(15,23,42,.06)"><i class="fas fa-exclamation-triangle" style="color:#f97316;font-size:.85rem"></i><span style="font-size:.88rem;color:#0F172A;font-weight:500">Exceptions</span></div>
+            <div style="display:flex;align-items:center;gap:.6rem;padding:.75rem 1.25rem;border-radius:10px;background:#fff;border:1px solid rgba(15,23,42,.06)"><i class="fas fa-tachometer-alt" style="color:#2563eb;font-size:.85rem"></i><span style="font-size:.88rem;color:#0F172A;font-weight:500">Bottlenecks</span></div>
+            <div style="display:flex;align-items:center;gap:.6rem;padding:.75rem 1.25rem;border-radius:10px;background:#fff;border:1px solid rgba(15,23,42,.06)"><i class="fas fa-robot" style="color:#7c3aed;font-size:.85rem"></i><span style="font-size:.88rem;color:#0F172A;font-weight:500">Automation activity</span></div>
+            <div style="display:flex;align-items:center;gap:.6rem;padding:.75rem 1.25rem;border-radius:10px;background:#fff;border:1px solid rgba(15,23,42,.06)"><i class="fas fa-history" style="color:#0E9488;font-size:.85rem"></i><span style="font-size:.88rem;color:#0F172A;font-weight:500">Workflow history</span></div>
+            <div style="display:flex;align-items:center;gap:.6rem;padding:.75rem 1.25rem;border-radius:10px;background:#fff;border:1px solid rgba(15,23,42,.06)"><i class="fas fa-chart-bar" style="color:#D9A441;font-size:.85rem"></i><span style="font-size:.88rem;color:#0F172A;font-weight:500">Operational metrics</span></div>
+        </div>
+        <p style="color:#5B6478;font-size:.95rem;line-height:1.75;text-align:center;margin-top:2rem;max-width:500px;margin-left:auto;margin-right:auto">Use process data to identify where automation can be improved.</p>
+    </div>
+</section>
+
+<!-- USE CASES -->
+<section style="background:#fff;padding:7rem 0">
+    <div class="wrap">
+        <div style="text-align:center;max-width:640px;margin:0 auto 3.5rem">
+            <span style="display:inline-block;font-family:'Fraunces',Georgia,serif;font-style:italic;color:#D9A441;font-size:1.05rem;font-weight:500;margin-bottom:12px">Use Cases</span>
+            <h2 style="font-family:'Fraunces',Georgia,serif;font-size:clamp(1.8rem,3.5vw,2.5rem);font-weight:500;color:#0F172A;line-height:1.15;letter-spacing:-.01em;margin-bottom:.75rem">Automation Across the Business</h2>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem" class="rpa-usecases-grid">
+            <div style="padding:2rem;border-radius:16px;background:#F4F6FB;border:1px solid rgba(15,23,42,.04)">
+                <div style="width:44px;height:44px;border-radius:11px;background:linear-gradient(135deg,rgba(37,99,235,.12),rgba(37,99,235,.04));display:flex;align-items:center;justify-content:center;margin-bottom:1rem"><i class="fas fa-dollar-sign" style="color:#2563eb;font-size:1rem"></i></div>
+                <div style="font-weight:700;color:#0F172A;margin-bottom:.4rem;font-size:1rem">Finance</div>
+                <p style="font-size:.88rem;color:#5B6478;margin:0;line-height:1.65">Automate repetitive financial operations, document processing, approvals, and reporting.</p>
+            </div>
+            <div style="padding:2rem;border-radius:16px;background:#F4F6FB;border:1px solid rgba(15,23,42,.04)">
+                <div style="width:44px;height:44px;border-radius:11px;background:linear-gradient(135deg,rgba(14,148,136,.12),rgba(14,148,136,.04));display:flex;align-items:center;justify-content:center;margin-bottom:1rem"><i class="fas fa-cogs" style="color:#0E9488;font-size:1rem"></i></div>
+                <div style="font-weight:700;color:#0F172A;margin-bottom:.4rem;font-size:1rem">Operations</div>
+                <p style="font-size:.88rem;color:#5B6478;margin:0;line-height:1.65">Connect operational tasks, systems, approvals, and recurring workflows.</p>
+            </div>
+            <div style="padding:2rem;border-radius:16px;background:#F4F6FB;border:1px solid rgba(15,23,42,.04)">
+                <div style="width:44px;height:44px;border-radius:11px;background:linear-gradient(135deg,rgba(217,164,65,.12),rgba(217,164,65,.04));display:flex;align-items:center;justify-content:center;margin-bottom:1rem"><i class="fas fa-handshake" style="color:#D9A441;font-size:1rem"></i></div>
+                <div style="font-weight:700;color:#0F172A;margin-bottom:.4rem;font-size:1rem">Sales &amp; CRM</div>
+                <p style="font-size:.88rem;color:#5B6478;margin:0;line-height:1.65">Automate lead processing, data synchronization, customer updates, and follow-up workflows.</p>
+            </div>
+            <div style="padding:2rem;border-radius:16px;background:#F4F6FB;border:1px solid rgba(15,23,42,.04)">
+                <div style="width:44px;height:44px;border-radius:11px;background:linear-gradient(135deg,rgba(124,58,237,.12),rgba(124,58,237,.04));display:flex;align-items:center;justify-content:center;margin-bottom:1rem"><i class="fas fa-users" style="color:#7c3aed;font-size:1rem"></i></div>
+                <div style="font-weight:700;color:#0F172A;margin-bottom:.4rem;font-size:1rem">Human Resources</div>
+                <p style="font-size:.88rem;color:#5B6478;margin:0;line-height:1.65">Streamline onboarding, employee workflows, document handling, and internal requests.</p>
+            </div>
+            <div style="padding:2rem;border-radius:16px;background:#F4F6FB;border:1px solid rgba(15,23,42,.04)">
+                <div style="width:44px;height:44px;border-radius:11px;background:linear-gradient(135deg,rgba(244,114,182,.12),rgba(244,114,182,.04));display:flex;align-items:center;justify-content:center;margin-bottom:1rem"><i class="fas fa-headset" style="color:#f472b6;font-size:1rem"></i></div>
+                <div style="font-weight:700;color:#0F172A;margin-bottom:.4rem;font-size:1rem">Customer Service</div>
+                <p style="font-size:.88rem;color:#5B6478;margin:0;line-height:1.65">Route requests, update systems, trigger actions, and keep customers informed.</p>
+            </div>
+            <div style="padding:2rem;border-radius:16px;background:#F4F6FB;border:1px solid rgba(15,23,42,.04)">
+                <div style="width:44px;height:44px;border-radius:11px;background:linear-gradient(135deg,rgba(249,115,22,.12),rgba(249,115,22,.04));display:flex;align-items:center;justify-content:center;margin-bottom:1rem"><i class="fas fa-server" style="color:#f97316;font-size:1rem"></i></div>
+                <div style="font-weight:700;color:#0F172A;margin-bottom:.4rem;font-size:1rem">IT &amp; Administration</div>
+                <p style="font-size:.88rem;color:#5B6478;margin:0;line-height:1.65">Automate repetitive system operations, data transfers, reports, and administrative tasks.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- WORKFLOW BUILDER -->
+<section style="background:#F4F6FB;padding:7rem 0">
+    <div class="wrap">
+        <div style="text-align:center;max-width:640px;margin:0 auto 3.5rem">
+            <span style="display:inline-block;font-family:'Fraunces',Georgia,serif;font-style:italic;color:#7c3aed;font-size:1.05rem;font-weight:500;margin-bottom:12px">Workflow Builder</span>
+            <h2 style="font-family:'Fraunces',Georgia,serif;font-size:clamp(1.8rem,3.5vw,2.5rem);font-weight:500;color:#0F172A;line-height:1.15;letter-spacing:-.01em;margin-bottom:.75rem">Build Automation Around Your Business</h2>
+            <p style="color:#5B6478;font-size:1rem;max-width:52ch;margin:0 auto;line-height:1.75">Create workflows around your actual business processes instead of forcing your operations into rigid automation templates.</p>
+        </div>
+        <div style="max-width:700px;margin:0 auto">
+            <div style="display:flex;align-items:center;justify-content:center;gap:.5rem;flex-wrap:wrap;margin-bottom:1.5rem">
+                <div style="padding:.6rem 1.2rem;border-radius:10px;background:#7c3aed;color:#fff;font-size:.85rem;font-weight:600">Trigger</div>
+                <i class="fas fa-arrow-right" style="color:#5B6478;font-size:.8rem"></i>
+                <div style="padding:.6rem 1.2rem;border-radius:10px;background:#0E9488;color:#fff;font-size:.85rem;font-weight:600">Condition</div>
+                <i class="fas fa-arrow-right" style="color:#5B6478;font-size:.8rem"></i>
+                <div style="padding:.6rem 1.2rem;border-radius:10px;background:#D9A441;color:#fff;font-size:.85rem;font-weight:600">Action</div>
+                <i class="fas fa-arrow-right" style="color:#5B6478;font-size:.8rem"></i>
+                <div style="padding:.6rem 1.2rem;border-radius:10px;background:#2563eb;color:#fff;font-size:.85rem;font-weight:600">Decision</div>
+                <i class="fas fa-arrow-right" style="color:#5B6478;font-size:.8rem"></i>
+                <div style="padding:.6rem 1.2rem;border-radius:10px;background:#f472b6;color:#fff;font-size:.85rem;font-weight:600">Integration</div>
+                <i class="fas fa-arrow-right" style="color:#5B6478;font-size:.8rem"></i>
+                <div style="padding:.6rem 1.2rem;border-radius:10px;background:#0F172A;color:#fff;font-size:.85rem;font-weight:600">Result</div>
+            </div>
+            <p style="color:#5B6478;font-size:.95rem;line-height:1.75;text-align:center">Connect multiple steps into a single process and define what happens when the workflow succeeds, fails, or requires human intervention.</p>
+        </div>
+    </div>
+</section>
+
+<!-- RESULTS -->
+<section style="background:#fff;padding:7rem 0">
+    <div class="wrap">
+        <div style="text-align:center;max-width:640px;margin:0 auto 3.5rem">
+            <span style="display:inline-block;font-family:'Fraunces',Georgia,serif;font-style:italic;color:#0E9488;font-size:1.05rem;font-weight:500;margin-bottom:12px">Results</span>
+            <h2 style="font-family:'Fraunces',Georgia,serif;font-size:clamp(1.8rem,3.5vw,2.5rem);font-weight:500;color:#0F172A;line-height:1.15;letter-spacing:-.01em;margin-bottom:.75rem">Less Manual Work. More Connected Operations.</h2>
+            <p style="color:#5B6478;font-size:1rem;max-width:52ch;margin:0 auto;line-height:1.75">Automation can help organizations:</p>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;max-width:900px;margin:0 auto" class="rpa-results-grid">
+            <div style="text-align:center;padding:1.5rem">
+                <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,rgba(124,58,237,.12),rgba(124,58,237,.04));display:flex;align-items:center;justify-content:center;margin:0 auto 1rem"><i class="fas fa-minus-circle" style="color:#7c3aed;font-size:1.1rem"></i></div>
+                <div style="font-weight:700;color:#0F172A;margin-bottom:.4rem;font-size:1rem">Reduce repetitive work</div>
+                <p style="font-size:.88rem;color:#5B6478;margin:0;line-height:1.65">Spend less time performing predictable manual tasks.</p>
+            </div>
+            <div style="text-align:center;padding:1.5rem">
+                <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,rgba(14,148,136,.12),rgba(14,148,136,.04));display:flex;align-items:center;justify-content:center;margin:0 auto 1rem"><i class="fas fa-check-double" style="color:#0E9488;font-size:1.1rem"></i></div>
+                <div style="font-weight:700;color:#0F172A;margin-bottom:.4rem;font-size:1rem">Improve consistency</div>
+                <p style="font-size:.88rem;color:#5B6478;margin:0;line-height:1.65">Execute standardized processes with fewer manual variations.</p>
+            </div>
+            <div style="text-align:center;padding:1.5rem">
+                <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,rgba(37,99,235,.12),rgba(37,99,235,.04));display:flex;align-items:center;justify-content:center;margin:0 auto 1rem"><i class="fas fa-link" style="color:#2563eb;font-size:1.1rem"></i></div>
+                <div style="font-weight:700;color:#0F172A;margin-bottom:.4rem;font-size:1rem">Connect systems</div>
+                <p style="font-size:.88rem;color:#5B6478;margin:0;line-height:1.65">Move information between applications without unnecessary manual transfers.</p>
+            </div>
+            <div style="text-align:center;padding:1.5rem">
+                <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,rgba(217,164,65,.12),rgba(217,164,65,.04));display:flex;align-items:center;justify-content:center;margin:0 auto 1rem"><i class="fas fa-eye" style="color:#D9A441;font-size:1.1rem"></i></div>
+                <div style="font-weight:700;color:#0F172A;margin-bottom:.4rem;font-size:1rem">Increase visibility</div>
+                <p style="font-size:.88rem;color:#5B6478;margin:0;line-height:1.65">Track processes and identify bottlenecks through automation data.</p>
+            </div>
+            <div style="text-align:center;padding:1.5rem;grid-column:span 2" class="rpa-results-scale">
+                <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,rgba(244,114,182,.12),rgba(244,114,182,.04));display:flex;align-items:center;justify-content:center;margin:0 auto 1rem"><i class="fas fa-expand-arrows-alt" style="color:#f472b6;font-size:1.1rem"></i></div>
+                <div style="font-weight:700;color:#0F172A;margin-bottom:.4rem;font-size:1rem">Scale operations</div>
+                <p style="font-size:.88rem;color:#5B6478;margin:0;line-height:1.65">Handle growing workloads without increasing every manual step proportionally.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section style="background:#0F172A;color:#fff;text-align:center;padding:7rem 0;position:relative;overflow:hidden">
+    <div style="position:absolute;inset:0;pointer-events:none">
+        <div style="position:absolute;top:-100px;left:20%;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(124,58,237,.1),transparent 70%)"></div>
+    </div>
+    <div class="wrap" style="position:relative;z-index:1">
+        <h2 style="font-family:'Fraunces',Georgia,serif;font-size:clamp(1.8rem,3.5vw,2.5rem);font-weight:500;color:#fff;line-height:1.15;letter-spacing:-.01em;margin-bottom:1rem">Ready to Automate the Way Your Business Works?</h2>
+        <p style="color:rgba(255,255,255,.5);font-size:1rem;max-width:52ch;margin:0 auto 2rem;line-height:1.75">Turn repetitive tasks and disconnected processes into structured, automated workflows with OnWebApp.</p>
+        <div style="display:flex;justify-content:center;flex-wrap:wrap;gap:1rem">
+            <a href="{% url 'contact:contact' %}" style="display:inline-flex;align-items:center;gap:.55rem;padding:.95rem 2.3rem;border-radius:50px;background:linear-gradient(135deg,#7c3aed,#a78bfa);color:#fff;font-weight:700;font-size:.95rem;text-decoration:none;transition:all .35s;box-shadow:0 6px 28px rgba(124,58,237,.3)" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 10px 36px rgba(124,58,237,.4)'" onmouseout="this.style.transform='';this.style.boxShadow='0 6px 28px rgba(124,58,237,.3)'">Start Building Automation <i class="fas fa-arrow-right" style="font-size:.85rem"></i></a>
+            <a href="{% url 'contact:contact' %}" style="display:inline-flex;align-items:center;gap:.55rem;padding:.95rem 2.3rem;border-radius:50px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:#fff;font-weight:700;font-size:.95rem;text-decoration:none;transition:all .35s" onmouseover="this.style.background='rgba(255,255,255,.1)'" onmouseout="this.style.background='rgba(255,255,255,.06)'">Talk to Our Team <i class="fas fa-arrow-right" style="font-size:.85rem"></i></a>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .rpa-split-grid{gap:4rem}
+    .rpa-overview-grid{grid-template-columns:repeat(2,1fr)}
+    .rpa-arch-grid{grid-template-columns:repeat(3,1fr)}
+    .rpa-arch-ai{grid-column:span 2}
+    .rpa-usecases-grid{grid-template-columns:repeat(3,1fr)}
+    .rpa-results-grid{grid-template-columns:repeat(3,1fr)}
+    .rpa-results-scale{grid-column:span 2}
+    @media(max-width:991px){
+        .rpa-split-grid{grid-template-columns:1fr!important;gap:2rem!important}
+        .rpa-arch-grid{grid-template-columns:1fr 1fr!important}
+        .rpa-arch-ai{grid-column:span 2!important}
+        .rpa-usecases-grid{grid-template-columns:1fr 1fr!important}
+        .rpa-results-grid{grid-template-columns:1fr 1fr!important}
+        .rpa-results-scale{grid-column:span 2!important}
+    }
+    @media(max-width:575px){
+        .rpa-overview-grid{grid-template-columns:1fr!important}
+        .rpa-arch-grid{grid-template-columns:1fr!important}
+        .rpa-arch-ai{grid-column:span 1!important}
+        .rpa-usecases-grid{grid-template-columns:1fr!important}
+        .rpa-results-grid{grid-template-columns:1fr!important}
+        .rpa-results-scale{grid-column:span 1!important}
+    }
+</style>
+{% endblock %}

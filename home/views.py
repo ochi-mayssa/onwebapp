@@ -50,6 +50,12 @@ def api_docs(request):
 def about(request):
     return render(request, 'home/about.html')
 
+def rpa_bpa(request):
+    return render(request, 'automation/RPA & BPA.html')
+
+def automation_home(request):
+    return render(request, 'automation/automationhome.html')
+
 def help_center(request):
     return render(request, 'home/help_center.html')
 

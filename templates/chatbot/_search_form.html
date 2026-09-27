@@ -1,0 +1,20 @@
+{% load i18n %}
+<form class="navsearch-form" role="search" method="get" action="{% url 'chatbot:search' %}" autocomplete="off">
+    <i class="fas fa-search navsearch-icon" aria-hidden="true"></i>
+    <input
+        type="search"
+        name="q"
+        id="{{ search_id }}"
+        class="navsearch-input"
+        placeholder="{% trans 'Search' %}"
+        aria-label="{% trans 'Search the site' %}"
+        role="combobox"
+        aria-expanded="false"
+        aria-autocomplete="list"
+        aria-haspopup="listbox"
+        aria-controls="{{ search_id }}Menu">
+    <button type="button" class="navsearch-clear" id="{{ search_id }}Clear" aria-label="{% trans 'Clear search' %}">
+        <i class="fas fa-times"></i>
+    </button>
+    <div class="navsearch-menu" id="{{ search_id }}Menu" role="listbox" aria-label="{% trans 'Search results' %}" hidden></div>
+</form>

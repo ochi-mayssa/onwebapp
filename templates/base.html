@@ -67,6 +67,17 @@
             overflow-x: hidden;
         }
 
+        .wrap {
+            max-width: 1140px;
+            margin: 0 auto;
+            padding: 0 32px;
+            width: 100%;
+        }
+
+        .oh-section {
+            padding: 7rem 0;
+        }
+
         h1, h2, h3, h4, .navbar-brand, .fw-800 {
             font-family: var(--font-display);
         }
@@ -503,7 +514,7 @@
                 <a href="{% url 'branding:landing' %}">{% trans 'Branding' %}</a>
             </div>
             <div class="oh-topbar-right">
-                <a href="{% url 'home:help_center' %}">{% trans 'Support' %}</a>
+                <a href="{% url 'contact:contact' %}">{% trans 'Support' %}</a>
                 <div class="oh-topbar-divider"></div>
                 {% if user.is_authenticated %}
                     <a href="{% url 'crm:client_tracking_portal' %}" class="btn-topbar"><i class="fas fa-tachometer-alt"></i> {% trans 'Dashboard' %}</a>
@@ -534,6 +545,10 @@
             {% endif %}
             
             <div class="d-flex align-items-center order-lg-2 gap-2">
+                <!-- Navbar site search (desktop) -->
+                <div class="navsearch d-none d-lg-block">
+                    {% include "chatbot/_search_form.html" with search_id="navSearch" %}
+                </div>
             <!-- Auth & Utilities -->
             {% if user.is_authenticated %}
                 <div class="dropdown">
@@ -666,8 +681,15 @@
         <!-- Services Navigation Menu -->
         <div class="collapse navbar-collapse order-lg-1" id="navbarNav">
             <ul class="navbar-nav ms-auto">
-                
-                    <!-- Unified nav (same as homepage on all pages) -->
+
+                <!-- Navbar site search (mobile) -->
+                <li class="nav-item d-lg-none px-3 pt-2 pb-1">
+                    <div class="navsearch navsearch-mobile">
+                        {% include "chatbot/_search_form.html" with search_id="navSearchMobile" %}
+                    </div>
+                </li>
+
+                <!-- Unified nav (same as homepage on all pages) -->
                     {% if request.user.is_authenticated %}
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'home:home' %}">{% trans 'Home' %}</a>
@@ -700,6 +722,16 @@
                             {% trans 'Integration' %}
                         </a>
                         {% include "./_integration_dropdown.html" with menu_id="integrationMenuUnified" %}
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="automationMenuUnified" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            {% trans 'Automation' %}
+                        </a>
+                        <ul class="dropdown-menu shadow-xl border-0 rounded-24 p-3" aria-labelledby="automationMenuUnified" style="min-width:220px;">
+                            <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'home:automation_home' %}"><i class="fas fa-house me-2" style="color:#D9A441;font-size:.8rem;"></i>{% trans 'Automation Home' %}</a></li>
+                            <li><hr class="dropdown-divider" style="border-color:rgba(15,23,42,.06);margin:.25rem 0"></li>
+                            <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'home:rpa_bpa' %}"><i class="fas fa-robot me-2" style="color:#7c3aed;font-size:.8rem;"></i>{% trans 'RPA & BPA' %}</a></li>
+                        </ul>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="insightsMenuUnified" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -776,7 +808,7 @@
           <div class="oh-footer-col">
             <h6>{% trans "Connect" %}</h6>
             <a href="#">{% trans "Documentation" %}</a>
-            <a href="{% url 'home:webinars' %}">{% trans "Events" %}</a>
+            <a href="{% url 'forum:events' %}">{% trans "Events" %}</a>
             <a href="#">{% trans "Newsletters" %}</a>
             <a href="#">{% trans "Support" %}</a>
             <a href="#">{% trans "Community" %}</a>
@@ -787,7 +819,7 @@
             <a href="#">{% trans "Careers" %}</a>
             <a href="#">{% trans "Leadership" %}</a>
             <a href="#">{% trans "Newsroom" %}</a>
-            <a href="{% url 'home:security' %}">{% trans "Security & Privacy" %}</a>
+            <a href="{% url 'home:privacy' %}">{% trans "Security & Privacy" %}</a>
           </div>
         </div>
         <div class="oh-footer-bottom">
@@ -969,96 +1001,382 @@
         position: fixed;
         right: 24px;
         bottom: 90px;
-        width: 320px;
-        max-height: 60vh;
+        width: 380px;
+        max-height: min(70vh, 560px);
         background: var(--bg-surface);
         color: var(--text-primary);
         border: 1px solid var(--border-color);
-        border-radius: 12px;
-        box-shadow: var(--card-shadow-hover);
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(0,0,0,.12);
         display: none;
         flex-direction: column;
         z-index: 1100;
+        overflow: hidden;
     }
-    .chatbot-header { padding: 10px 12px; border-bottom: 1px solid var(--border-color); font-weight:600; background: var(--bg-surface); border-radius: 12px 12px 0 0; }
-    .chatbot-body { padding: 12px; overflow:auto; flex:1; background: var(--bg-surface); }
-    .chatbot-footer { padding: 8px; border-top: 1px solid var(--border-color); background: var(--bg-surface); border-radius: 0 0 12px 12px; }
-    .chatbot-message { margin-bottom:8px; line-height: 1.4; font-size: 0.95rem; color: var(--text-primary); }
-    .chatbot-message strong { color: var(--primary-color); }
-    
-    /* Suggestion Chips */
-    .suggestion-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-    .suggestion-chip {
+    .chatbot-header {
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--border-color);
+        font-weight: 600;
+        font-size: .95rem;
+        background: linear-gradient(135deg, #7c3aed, #a78bfa);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-radius: 16px 16px 0 0;
+    }
+    .chatbot-header .chatbot-close {
+        background: rgba(255,255,255,.2);
+        border: none;
+        color: #fff;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: .8rem;
+        transition: background .2s;
+    }
+    .chatbot-header .chatbot-close:hover { background: rgba(255,255,255,.35); }
+    .chatbot-body {
+        padding: 14px;
+        overflow-y: auto;
+        flex: 1;
+        background: var(--bg-surface);
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .chatbot-footer {
+        padding: 10px 12px;
+        border-top: 1px solid var(--border-color);
+        background: var(--bg-surface);
+        display: flex;
+        gap: 8px;
+    }
+    .chatbot-footer input {
+        flex: 1;
+        font-size: .9rem;
+    }
+    .chatbot-msg {
+        max-width: 88%;
+        padding: 10px 14px;
+        border-radius: 14px;
+        font-size: .9rem;
+        line-height: 1.55;
+        word-wrap: break-word;
+        overflow-wrap: anywhere;
+    }
+    .chatbot-msg.bot {
+        background: var(--bg-surface-secondary);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+        align-self: flex-start;
+        border-bottom-left-radius: 4px;
+    }
+    .chatbot-msg.bot strong { color: var(--primary-color); }
+    .chatbot-msg.user {
+        background: var(--primary-color);
+        color: #fff;
+        align-self: flex-end;
+        border-bottom-right-radius: 4px;
+    }
+    .chatbot-msg.user strong { color: #fff; }
+    .chatbot-typing {
+        align-self: flex-start;
+        padding: 8px 14px;
+        border-radius: 14px;
+        background: var(--bg-surface-secondary);
+        border: 1px solid var(--border-color);
+        font-size: .85rem;
+        color: var(--text-secondary);
+    }
+    .chatbot-typing span {
+        display: inline-block;
+        width: 6px; height: 6px;
+        border-radius: 50%;
+        background: var(--text-secondary);
+        margin: 0 2px;
+        animation: chatDot 1.2s infinite;
+    }
+    .chatbot-typing span:nth-child(2) { animation-delay: .2s; }
+    .chatbot-typing span:nth-child(3) { animation-delay: .4s; }
+    @keyframes chatDot { 0%,60%,100%{opacity:.3;transform:translateY(0)} 30%{opacity:1;transform:translateY(-3px)} }
+    .chatbot-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 4px;
+        align-self: flex-start;
+    }
+    .chatbot-chip {
         background: var(--bg-surface-secondary);
         border: 1px solid var(--border-color);
         border-radius: 16px;
-        padding: 4px 10px;
-        font-size: 0.8rem;
+        padding: 5px 12px;
+        font-size: .78rem;
         color: var(--text-secondary);
         cursor: pointer;
-        transition: all 0.2s;
+        transition: all .2s;
+        text-decoration: none;
     }
-    .suggestion-chip:hover {
-        background: var(--primary-light);
+    .chatbot-chip:hover {
+        background: var(--primary-light, rgba(124,58,237,.08));
         color: var(--primary-color);
         border-color: var(--primary-color);
     }
-    
-    .chatbot-fab { position: fixed; right: 24px; bottom: 24px; width: 56px; height: 56px; display:flex; align-items:center; justify-content:center; z-index:1050; color: white; }
-    
-    /* Input field dark mode fix */
+    .chatbot-chip i {
+        font-size: .62rem;
+        margin-right: 5px;
+        opacity: .7;
+    }
+    .chatbot-links-label {
+        font-size: .68rem;
+        text-transform: uppercase;
+        letter-spacing: .07em;
+        color: var(--text-secondary);
+        opacity: .75;
+        margin-top: 10px;
+        align-self: flex-start;
+    }
+    .chatbot-ref {
+        align-self: flex-start;
+        max-width: 88%;
+        font-size: .8rem;
+        line-height: 1.6;
+        color: var(--text-secondary);
+        overflow-wrap: anywhere;
+    }
+    .chatbot-ref a {
+        color: var(--primary-color);
+        font-weight: 600;
+        text-decoration: underline;
+        text-underline-offset: 2px;
+        text-decoration-thickness: 1px;
+        transition: opacity .2s;
+    }
+    .chatbot-ref a:hover { opacity: .7; }
+    .chatbot-fab {
+        position: fixed;
+        right: 24px;
+        bottom: 24px;
+        width: 56px;
+        height: 56px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1050;
+        color: white;
+        border-radius: 50%;
+        border: none;
+        cursor: pointer;
+    }
+    .chatbot-nudge {
+        position: fixed;
+        right: 24px;
+        bottom: 88px;
+        z-index: 1051;
+        background: var(--bg-surface);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        box-shadow: 0 6px 20px rgba(0,0,0,.14);
+        padding: 7px 13px;
+        font-size: .8rem;
+        font-weight: 600;
+        white-space: nowrap;
+        pointer-events: none;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity .25s ease, visibility .25s ease;
+    }
+    .chatbot-nudge.show {
+        opacity: 1;
+        visibility: visible;
+        animation: chatbotNudgeBob 2s ease-in-out infinite;
+    }
+    .chatbot-nudge::after {
+        content: '';
+        position: absolute;
+        right: 24px;
+        bottom: -6px;
+        width: 11px;
+        height: 11px;
+        background: var(--bg-surface);
+        border-right: 1px solid var(--border-color);
+        border-bottom: 1px solid var(--border-color);
+        transform: rotate(45deg);
+    }
+    @keyframes chatbotNudgeBob {
+        0%, 100% { transform: translateY(0); }
+        50%      { transform: translateY(-4px); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .chatbot-nudge.show { animation: none; }
+    }
+    /* Navbar site search */
+    .navsearch { position: relative; }
+    .navsearch-form { position: relative; }
+    .navsearch-input {
+        width: 210px;
+        max-width: 42vw;
+        height: 38px;
+        padding: 0 34px 0 34px;
+        font-size: .82rem;
+        border-radius: 20px;
+        border: 1px solid var(--border-color);
+        background: var(--bg-surface-secondary, #f3f4f6);
+        color: var(--text-primary);
+        transition: width .2s ease, border-color .2s ease, box-shadow .2s ease;
+    }
+    .navsearch-input:focus {
+        width: 280px;
+        max-width: 52vw;
+        outline: none;
+        border-color: #7c3aed;
+        box-shadow: 0 0 0 3px rgba(124, 58, 237, .15);
+    }
+    .navsearch-input::-webkit-search-cancel-button { cursor: pointer; }
+    .navsearch-icon {
+        position: absolute;
+        left: 13px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: .78rem;
+        color: var(--text-secondary);
+        pointer-events: none;
+    }
+    .navsearch-clear {
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        border: none;
+        background: transparent;
+        color: var(--text-secondary);
+        cursor: pointer;
+        font-size: .78rem;
+        line-height: 1;
+        padding: 4px;
+        display: none;
+    }
+    .navsearch-clear.visible { display: block; }
+    .navsearch-menu {
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        width: 380px;
+        max-width: 88vw;
+        /* Must stay scrollable: a tall result list that runs past the viewport
+           with overflow:hidden swallows the wheel and looks like a frozen page. */
+        max-height: min(58vh, 420px);
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        background: var(--bg-surface, #fff);
+        border: 1px solid var(--border-color);
+        border-radius: 14px;
+        box-shadow: 0 12px 34px rgba(0, 0, 0, .14);
+        z-index: 1060;
+    }
+    .navsearch-menu[hidden] { display: none; }
+    .navsearch-item {
+        display: block;
+        padding: 10px 14px;
+        text-decoration: none;
+        border-bottom: 1px solid var(--border-color);
+        transition: background .15s;
+    }
+    .navsearch-item:last-child { border-bottom: none; }
+    .navsearch-item:hover,
+    .navsearch-item.active { background: rgba(124, 58, 237, .08); }
+    .navsearch-item-title {
+        font-size: .84rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .navsearch-item-path {
+        font-size: .7rem;
+        color: #7c3aed;
+        overflow-wrap: anywhere;
+    }
+    .navsearch-item-snippet {
+        font-size: .76rem;
+        color: var(--text-secondary);
+        margin-top: 2px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .navsearch-status {
+        padding: 12px 14px;
+        font-size: .8rem;
+        color: var(--text-secondary);
+        text-align: center;
+    }
+    .navsearch-all {
+        display: block;
+        padding: 10px 14px;
+        font-size: .78rem;
+        font-weight: 600;
+        color: #7c3aed;
+        text-align: center;
+        text-decoration: none;
+        background: var(--bg-surface-secondary, #f3f4f6);
+        border-top: 1px solid var(--border-color);
+        /* Pinned so it stays reachable while the result list scrolls. */
+        position: sticky;
+        bottom: 0;
+    }
+    .navsearch-all:hover { background: rgba(124, 58, 237, .1); }
+    /* Full-width variant inside the mobile collapse menu */
+    .navsearch-mobile .navsearch-input { width: 100%; max-width: none; }
+    .navsearch-mobile .navsearch-input:focus { width: 100%; max-width: none; }
+    .navsearch-mobile .navsearch-menu {
+        position: static;
+        width: 100%;
+        max-width: none;
+        /* Capped so the sticky navbar cannot grow past the viewport and push
+           the rest of the page out of reach. */
+        max-height: 40vh;
+        margin-top: 6px;
+        box-shadow: none;
+    }
+    .navsearch-mobile { position: static; }
+
     [data-theme="dark"] #chatbotInput {
         background-color: var(--bg-surface-secondary);
         border-color: var(--border-color);
         color: var(--text-primary);
     }
-    [data-theme="dark"] #chatbotClose {
-        color: var(--text-primary);
-        background: transparent;
-        border: 1px solid var(--border-color);
-    }
     </style>
-
 
     <!-- Chatbot HTML -->
     <div class="chatbot-panel" id="chatbotPanel" role="dialog" aria-hidden="true">
-        <div class="chatbot-header d-flex align-items-center justify-content-between">
-            <div>OnWebApp Bot</div>
-            <button id="chatbotClose" class="btn btn-sm btn-light"></button>
+        <div class="chatbot-header">
+            <div><i class="fas fa-robot me-2"></i>OnWebApp Guide</div>
+            <button class="chatbot-close" id="chatbotClose" aria-label="Close chat"><i class="fas fa-times"></i></button>
         </div>
-        <div class="chatbot-body" id="chatbotBody">
-            <div class="chatbot-message"><strong>OnWebApp Bot:</strong> {% trans 'Hi — ask me about services, pricing, or diagnostics.' %}</div>
-        </div>
-        <div class="chatbot-footer d-flex">
-            <input id="chatbotInput" class="form-control" placeholder="{% trans 'Type a message...' %}" aria-label="{% trans 'Chat input' %}">
-            <button id="chatbotSend" class="btn btn-primary ms-2">{% trans 'Send' %}</button>
+        <div class="chatbot-body" id="chatbotBody"></div>
+        <div class="chatbot-footer">
+            <input id="chatbotInput" class="form-control" placeholder="Ask me anything..." aria-label="Chat input">
+            <button id="chatbotSend" class="btn btn-primary btn-sm px-3"><i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
 
-    <button class="btn btn-primary rounded-circle chatbot-fab" id="chatbotFab" aria-label="{% trans 'Open chatbot' %}">
+    <button class="btn btn-primary rounded-circle chatbot-fab" id="chatbotFab" aria-label="Open chatbot">
         <i class="fas fa-comment-dots"></i>
     </button>
 
+    <span class="chatbot-nudge" id="chatbotNudge" role="status">Need some help?</span>
+
     <!-- Chatbot JS -->
     <script>
-    // Theme toggle handled by DOMContentLoaded event listener below
-    
-    // Read CSRF token from cookie
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-
     (function(){
         const panel = document.getElementById('chatbotPanel');
         const fab = document.getElementById('chatbotFab');
@@ -1066,101 +1384,191 @@
         const body = document.getElementById('chatbotBody');
         const input = document.getElementById('chatbotInput');
         const send = document.getElementById('chatbotSend');
+        let chatSessionId = localStorage.getItem('chatbot_session_id') || null;
 
-        function openPanel(){ panel.style.display = 'flex'; panel.setAttribute('aria-hidden','false'); input.focus(); }
-        function closePanel(){ panel.style.display = 'none'; panel.setAttribute('aria-hidden','true'); }
+        // "Need some help?" nudge: shows as soon as the page is ready, then
+        // stays put until the visitor opens the chat, and never nags again.
+        const nudge = document.getElementById('chatbotNudge');
+        const NUDGE_KEY = 'chatbot_nudge_seen';
+        const NUDGE_DELAY_MS = 0;
+        let nudgeTimer = null;
+        let nudgeDismissed = false;
+        try {
+            nudgeDismissed = window.sessionStorage.getItem(NUDGE_KEY) === '1';
+        } catch (e) {
+            nudgeDismissed = false;
+        }
+
+        function stopNudge(){
+            if (nudgeTimer) { clearTimeout(nudgeTimer); nudgeTimer = null; }
+            if (nudge) { nudge.classList.remove('show'); }
+        }
+
+        function dismissNudge(){
+            stopNudge();
+            nudgeDismissed = true;
+            try { window.sessionStorage.setItem(NUDGE_KEY, '1'); } catch (e) { /* private mode */ }
+        }
+
+        function startNudge(){
+            if (!nudge || nudgeDismissed) return;
+            nudgeTimer = setTimeout(function(){
+                nudge.classList.add('show');
+            }, NUDGE_DELAY_MS);
+        }
+
+        function openPanel(){
+            dismissNudge();
+            panel.style.display = 'flex';
+            panel.setAttribute('aria-hidden','false');
+            input.focus();
+            if(body.children.length === 0){
+                addBotMessage('Hi! I\'m your OnWebApp guide. Ask me about services, pricing, or how to navigate the site.');
+            }
+        }
+        function closePanel(){
+            panel.style.display = 'none';
+            panel.setAttribute('aria-hidden','true');
+        }
 
         fab.addEventListener('click', openPanel);
         closeBtn.addEventListener('click', closePanel);
 
-        function appendMessage(sender, text, isHtml = false){
+        function escapeHtml(str){
+            const d = document.createElement('div');
+            d.appendChild(document.createTextNode(str));
+            return d.innerHTML;
+        }
+
+        function getCookie(name){
+            let v = null;
+            document.cookie.split(';').forEach(c => {
+                c = c.trim();
+                if(c.startsWith(name + '=')) v = decodeURIComponent(c.substring(name.length+1));
+            });
+            return v;
+        }
+
+        function addBotMessage(text){
             const el = document.createElement('div');
-            el.className = 'chatbot-message';
-            el.innerHTML = '<strong>' + sender + ':</strong> ' + text;
+            el.className = 'chatbot-msg bot';
+            el.innerHTML = text;
             body.appendChild(el);
             body.scrollTop = body.scrollHeight;
         }
-        
-        function appendSuggestions(suggestions) {
-            if (!suggestions || !suggestions.length) return;
-            
-            const chipsContainer = document.createElement('div');
-            chipsContainer.className = 'suggestion-chips';
-            
+
+        function addUserMessage(text){
+            const el = document.createElement('div');
+            el.className = 'chatbot-msg user';
+            el.innerHTML = '<strong>You:</strong> ' + escapeHtml(text);
+            body.appendChild(el);
+            body.scrollTop = body.scrollHeight;
+        }
+
+        function addTyping(){
+            const el = document.createElement('div');
+            el.className = 'chatbot-typing';
+            el.id = 'chatbot-typing';
+            el.innerHTML = '<span></span><span></span><span></span>';
+            body.appendChild(el);
+            body.scrollTop = body.scrollHeight;
+        }
+
+        function removeTyping(){
+            const el = document.getElementById('chatbot-typing');
+            if(el) el.remove();
+        }
+
+        function addSuggestions(suggestions){
+            if(!suggestions || !suggestions.length) return;
+            const container = document.createElement('div');
+            container.className = 'chatbot-chips';
             suggestions.forEach(s => {
                 const chip = document.createElement('div');
-                chip.className = 'suggestion-chip';
+                chip.className = 'chatbot-chip';
                 chip.textContent = s.title;
-                chip.title = s.content;
-                chip.onclick = () => {
-                    input.value = s.title; // Pre-fill or send immediately
-                    sendMessage();
-                };
-                chipsContainer.appendChild(chip);
+                chip.title = s.content || '';
+                if(s.url){
+                    chip.classList.add('has-link');
+                    chip.insertBefore(Object.assign(document.createElement('i'),{className:'fas fa-arrow-up-right-from-square'}), chip.firstChild);
+                    chip.addEventListener('click', function(){ window.location.href = s.url; });
+                } else {
+                    chip.addEventListener('click', function(){
+                        input.value = s.title;
+                        sendMessage();
+                    });
+                }
+                container.appendChild(chip);
             });
-            
-            body.appendChild(chipsContainer);
+            body.appendChild(container);
+            body.scrollTop = body.scrollHeight;
+        }
+
+        function addPageReference(links){
+            if(!links || !links.length) return;
+            const total = links.length;
+            const el = document.createElement('div');
+            el.className = 'chatbot-ref';
+            el.appendChild(document.createTextNode('For more information, visit the '));
+            links.forEach(function(l, i){
+                const a = document.createElement('a');
+                a.href = l.url;
+                a.target = '_blank';
+                a.rel = 'noopener';
+                a.textContent = '"' + l.title + '"';
+                el.appendChild(a);
+                if(i < total - 1){
+                    el.appendChild(document.createTextNode(
+                        (total === 2 || i === total - 2) ? ' or ' : ', '
+                    ));
+                }
+            });
+            el.appendChild(document.createTextNode(total > 1 ? ' pages.' : ' page.'));
+            body.appendChild(el);
             body.scrollTop = body.scrollHeight;
         }
 
         async function sendMessage(){
             const text = input.value && input.value.trim();
             if(!text) return;
-            appendMessage('You', text);
+            addUserMessage(text);
             input.value = '';
-            
-            // Show typing indicator (optional, simple text for now)
-            const loadingId = 'bot-loading-' + Date.now();
-            const loadingEl = document.createElement('div');
-            loadingEl.className = 'chatbot-message text-muted fst-italic';
-            loadingEl.id = loadingId;
-            loadingEl.innerHTML = '<small>Typing...</small>';
-            body.appendChild(loadingEl);
-            body.scrollTop = body.scrollHeight;
+            addTyping();
 
             try{
-                const csrftoken = getCookie('csrftoken');
                 const res = await fetch('/chatbot/suggestions/', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRFToken': csrftoken || ''
+                        'X-CSRFToken': getCookie('csrftoken') || ''
                     },
-                    body: JSON.stringify({ message: text })
+                    body: JSON.stringify({ message: text, session_id: chatSessionId })
                 });
-                
-                // Remove loading indicator
-                const loadingNode = document.getElementById(loadingId);
-                if(loadingNode) loadingNode.remove();
-                
+                removeTyping();
                 if(!res.ok){
-                    appendMessage('OnWebApp Bot', '{% trans 'Sorry, something went wrong.' %}');
+                    addBotMessage('Sorry, something went wrong. Please try again.');
                     return;
                 }
-                
                 const data = await res.json();
-                
-                if(data.reply) {
-                    appendMessage('OnWebApp Bot', data.reply);
-                } else if(data.error){
-                    appendMessage('OnWebApp Bot', data.error);
-                } else {
-                    appendMessage('OnWebApp Bot', '{% trans 'I am not sure how to help with that.' %}');
+                if(data.session_id){
+                    chatSessionId = data.session_id;
+                    localStorage.setItem('chatbot_session_id', chatSessionId);
                 }
-                
-                if(data.suggestions && data.suggestions.length){
-                    appendSuggestions(data.suggestions);
-                }
-                
+                addBotMessage(escapeHtml(data.reply || 'I\'m not sure how to help with that.'));
+                addPageReference(data.links);
+                addSuggestions(data.suggestions);
             }catch(e){
-                const loadingNode = document.getElementById(loadingId);
-                if(loadingNode) loadingNode.remove();
-                appendMessage('OnWebApp Bot', '{% trans 'Network error. Please try again.' %}');
+                removeTyping();
+                addBotMessage('Network error. Please check your connection and try again.');
             }
         }
 
         send.addEventListener('click', sendMessage);
-        input.addEventListener('keydown', function(e){ if(e.key === 'Enter'){ e.preventDefault(); sendMessage(); } });
+        input.addEventListener('keydown', function(e){
+            if(e.key === 'Enter'){ e.preventDefault(); sendMessage(); }
+        });
+
+        startNudge();
     })();
     
     // Global Intersection Observer for scroll animations
@@ -1212,6 +1620,188 @@
                 });
             }
         });
+    </script>
+
+    <!-- Navbar site search -->
+    <script>
+    (function(){
+        const ENDPOINT = '{% url "chatbot:search_api" %}';
+        const RESULTS_URL = '{% url "chatbot:search" %}';
+        const DEBOUNCE_MS = 220;
+        const MIN_CHARS = 2;
+
+        document.querySelectorAll('.navsearch-form').forEach(function(form){
+            const input = form.querySelector('.navsearch-input');
+            const menu = form.querySelector('.navsearch-menu');
+            const clearBtn = form.querySelector('.navsearch-clear');
+            if (!input || !menu) return;
+
+            let timer = null;
+            let seq = 0;          // guards against out-of-order responses
+            let activeIndex = -1;
+            let items = [];
+
+            function closeMenu(){
+                menu.hidden = true;
+                menu.textContent = '';
+                input.setAttribute('aria-expanded', 'false');
+                input.removeAttribute('aria-activedescendant');
+                activeIndex = -1;
+                items = [];
+            }
+
+            function keepItemVisible(el){
+                // Scroll the dropdown only. scrollIntoView() walks up to the
+                // document and yanks the page around once the navbar is sticky.
+                const itemRect = el.getBoundingClientRect();
+                const menuRect = menu.getBoundingClientRect();
+                if (itemRect.top < menuRect.top) {
+                    menu.scrollTop -= (menuRect.top - itemRect.top);
+                } else if (itemRect.bottom > menuRect.bottom) {
+                    menu.scrollTop += (itemRect.bottom - menuRect.bottom);
+                }
+            }
+
+            function setActive(next){
+                if (!items.length) return;
+                activeIndex = (next + items.length) % items.length;
+                items.forEach(function(el, i){
+                    el.classList.toggle('active', i === activeIndex);
+                });
+                const current = items[activeIndex];
+                input.setAttribute('aria-activedescendant', current.id);
+                keepItemVisible(current);
+            }
+
+            function status(text){
+                menu.textContent = '';
+                const p = document.createElement('div');
+                p.className = 'navsearch-status';
+                p.textContent = text;
+                menu.appendChild(p);
+                menu.hidden = false;
+                input.setAttribute('aria-expanded', 'true');
+            }
+
+            function renderResults(results, query){
+                if (!results.length){
+                    status(input.value.trim().length < MIN_CHARS
+                        ? 'Type at least ' + MIN_CHARS + ' characters.'
+                        : 'No results for “' + query + '”.');
+                    return;
+                }
+                menu.textContent = '';
+                items = [];
+                results.forEach(function(result, i){
+                    const link = document.createElement('a');
+                    link.className = 'navsearch-item';
+                    link.href = result.url;
+                    link.id = input.id + 'Result' + i;
+                    link.setAttribute('role', 'option');
+
+                    const title = document.createElement('div');
+                    title.className = 'navsearch-item-title';
+                    // textContent, never innerHTML: titles come from page content.
+                    title.textContent = result.title || result.url;
+                    link.appendChild(title);
+
+                    const path = document.createElement('div');
+                    path.className = 'navsearch-item-path';
+                    path.textContent = result.url;
+                    link.appendChild(path);
+
+                    if (result.snippet){
+                        const snippet = document.createElement('div');
+                        snippet.className = 'navsearch-item-snippet';
+                        snippet.textContent = result.snippet;
+                        link.appendChild(snippet);
+                    }
+                    menu.appendChild(link);
+                    items.push(link);
+                });
+
+                const all = document.createElement('a');
+                all.className = 'navsearch-all';
+                all.href = RESULTS_URL + '?q=' + encodeURIComponent(query);
+                all.textContent = 'View all results';
+                menu.appendChild(all);
+
+                menu.hidden = false;
+                input.setAttribute('aria-expanded', 'true');
+                activeIndex = -1;
+            }
+
+            function run(){
+                const query = input.value.trim();
+                if (query.length < MIN_CHARS){
+                    closeMenu();
+                    return;
+                }
+                const ticket = ++seq;
+                fetch(ENDPOINT + '?q=' + encodeURIComponent(query), {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    credentials: 'same-origin',
+                })
+                    .then(function(r){ return r.json(); })
+                    .then(function(data){
+                        if (ticket !== seq) return;   // a newer keystroke won
+                        renderResults(data.results || [], query);
+                    })
+                    .catch(function(){
+                        if (ticket === seq) closeMenu();
+                    });
+            }
+
+            input.addEventListener('input', function(){
+                if (clearBtn) clearBtn.classList.toggle('visible', input.value.length > 0);
+                clearTimeout(timer);
+                timer = setTimeout(run, DEBOUNCE_MS);
+            });
+
+            input.addEventListener('focus', function(){
+                if (input.value.trim().length >= MIN_CHARS && !menu.children.length) run();
+            });
+
+            input.addEventListener('keydown', function(e){
+                if (e.key === 'ArrowDown'){
+                    e.preventDefault();
+                    if (menu.hidden) { run(); return; }
+                    setActive(activeIndex + 1);
+                } else if (e.key === 'ArrowUp'){
+                    e.preventDefault();
+                    setActive(activeIndex - 1);
+                } else if (e.key === 'Escape'){
+                    if (!menu.hidden){ e.preventDefault(); closeMenu(); }
+                } else if (e.key === 'Enter'){
+                    if (!menu.hidden && activeIndex > -1 && items[activeIndex]){
+                        e.preventDefault();
+                        window.location.href = items[activeIndex].href;
+                    }
+                    // otherwise fall through and submit the form normally
+                }
+            });
+
+            if (clearBtn){
+                clearBtn.addEventListener('click', function(){
+                    input.value = '';
+                    clearBtn.classList.remove('visible');
+                    closeMenu();
+                    input.focus();
+                });
+            }
+
+            form.addEventListener('submit', function(e){
+                if (!menu.hidden && activeIndex > -1 && items[activeIndex]){
+                    e.preventDefault();
+                    window.location.href = items[activeIndex].href;
+                }
+            });
+
+            document.addEventListener('click', function(e){
+                if (!form.contains(e.target)) closeMenu();
+            });
+        });
+    })();
     </script>
 </body>
 </html>

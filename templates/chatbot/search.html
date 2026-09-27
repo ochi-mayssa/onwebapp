@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% if query %}{% blocktrans with term=query %}Search: {{ term }}{% endblocktrans %}{% else %}{% trans "Search" %}{% endif %} | OnWebApp{% endblock %}
+
+{% block extra_css %}
+<style>
+    .search-page-head {
+        max-width: 640px;
+        margin: 0 auto 2rem;
+        text-align: center;
+    }
+    .search-eyebrow {
+        display: inline-block;
+        font-family: 'Fraunces', Georgia, serif;
+        font-style: italic;
+        color: #7c3aed;
+        font-size: 1rem;
+        font-weight: 500;
+        margin-bottom: 8px;
+    }
+    .search-results {
+        max-width: 720px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .search-hit {
+        display: block;
+        padding: 16px 18px;
+        border: 1px solid var(--border-color);
+        border-radius: 14px;
+        background: var(--bg-surface, #fff);
+        text-decoration: none;
+        transition: border-color .2s, transform .2s, box-shadow .2s;
+    }
+    .search-hit:hover {
+        border-color: #7c3aed;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 22px rgba(124, 58, 237, .1);
+    }
+    .search-hit-title {
+        font-weight: 600;
+        color: var(--text-primary, #0F172A);
+        font-size: 1rem;
+        margin-bottom: 2px;
+    }
+    .search-hit-url {
+        font-size: .74rem;
+        color: #7c3aed;
+        margin-bottom: 6px;
+        overflow-wrap: anywhere;
+    }
+    .search-hit-snippet {
+        font-size: .85rem;
+        line-height: 1.6;
+        color: var(--text-secondary, #5B6478);
+    }
+    .search-hit-heading {
+        display: inline-block;
+        font-size: .68rem;
+        text-transform: uppercase;
+        letter-spacing: .06em;
+        color: var(--text-secondary, #5B6478);
+        background: var(--bg-surface-secondary, #f3f4f6);
+        border-radius: 20px;
+        padding: 2px 9px;
+        margin-bottom: 7px;
+    }
+    .search-empty {
+        max-width: 640px;
+        margin: 0 auto;
+        text-align: center;
+        padding: 2.5rem 1rem;
+        border: 1px dashed var(--border-color);
+        border-radius: 16px;
+        color: var(--text-secondary, #5B6478);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section style="background:var(--bg-body,#fff);min-height:70vh;padding:3.5rem 0">
+    <div class="wrap">
+        <div class="search-page-head">
+            <span class="search-eyebrow">{% trans 'Search' %}</span>
+            <h1 style="font-family:'Fraunces',Georgia,serif;font-size:clamp(1.5rem,3vw,2.1rem);font-weight:600;color:var(--text-primary,#0F172A);line-height:1.15;margin-bottom:.5rem">
+                {% if query %}
+                    {% blocktrans count counter=results_length %}1 result for “{{ query }}”{% plural %}{{ counter }} results for “{{ query }}”{% endblocktrans %}
+                {% else %}
+                    {% trans 'What are you looking for?' %}
+                {% endif %}
+            </h1>
+            <form role="search" method="get" action="{% url 'chatbot:search' %}" class="mt-3">
+                <div class="d-flex gap-2">
+                    <input type="search" name="q" value="{{ query }}" class="form-control" placeholder="{% trans 'Search the site...' %}" aria-label="{% trans 'Search the site' %}" autofocus>
+                    <button type="submit" class="btn btn-primary px-4" style="border-radius:12px">{% trans 'Search' %}</button>
+                </div>
+            </form>
+        </div>
+
+        {% if query and results %}
+            <div class="search-results">
+                {% for result in results %}
+                    <a class="search-hit" href="{{ result.url }}">
+                        {% if result.heading %}<span class="search-hit-heading">{{ result.heading }}</span>{% endif %}
+                        <div class="search-hit-title">{{ result.title }}</div>
+                        <div class="search-hit-url">{{ result.url }}</div>
+                        <div class="search-hit-snippet">{{ result.snippet }}</div>
+                    </a>
+                {% endfor %}
+            </div>
+        {% elif query %}
+            <div class="search-empty">
+                <p class="mb-2">{% blocktrans %}Nothing on the site matches “{{ query }}”.{% endblocktrans %}</p>
+                <p class="mb-0" style="font-size:.88rem">{% trans 'Try different words, or ask the guide for help.' %}</p>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
