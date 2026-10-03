@@ -1,0 +1,690 @@
+/* OnWebApp chat: shared by the fixed widget and the /chatbot/ full page.
+   One stylesheet so a fix cannot be applied to one surface and missed on the
+   other. Names are owa-chat-* to stay clear of Bootstrap's component classes.
+
+   The accent is declared once here rather than scattered as literals. The
+   site's own tokens disagree with its templates -- --primary-color resolves to
+   indigo, but #7c3aed violet is what the markup actually uses ~3.5x more often
+   -- so the chat follows the templates and stays put visually. */
+
+.owa-chat {
+    --owa-accent: #7c3aed;
+    --owa-accent-soft: rgba(124, 58, 237, .12);
+    --owa-accent-ring: rgba(124, 58, 237, .30);
+    --owa-accent-deep: #6d28d9;
+    --owa-shadow-sm: 0 1px 2px rgba(15, 23, 42, .05);
+    --owa-shadow-md: 0 2px 8px rgba(15, 23, 42, .07);
+    --owa-shadow-lg: 0 18px 40px -12px rgba(15, 23, 42, .28);
+    color: var(--text-primary, #1e293b);
+    font-family: var(--font-body, 'Inter', sans-serif);
+}
+
+/* ── Launcher ─────────────────────────────────────────────────────────── */
+
+.owa-chat-fab {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1050;
+    color: #fff;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    background: linear-gradient(145deg, #8b5cf6, var(--owa-accent-deep));
+    box-shadow:
+        0 6px 16px -4px rgba(109, 40, 217, .45),
+        0 2px 4px rgba(15, 23, 42, .12),
+        inset 0 1px 0 rgba(255, 255, 255, .22);
+    transition: transform .2s cubic-bezier(.34, 1.4, .64, 1), box-shadow .2s ease;
+}
+.owa-chat-fab:hover {
+    transform: translateY(-2px);
+    box-shadow:
+        0 12px 26px -6px rgba(109, 40, 217, .55),
+        0 3px 6px rgba(15, 23, 42, .14),
+        inset 0 1px 0 rgba(255, 255, 255, .22);
+}
+.owa-chat-fab:active { transform: translateY(0) scale(.96); }
+.owa-chat-fab:focus-visible {
+    outline: 3px solid var(--owa-accent-ring);
+    outline-offset: 3px;
+}
+
+/* ── Panel shell ──────────────────────────────────────────────────────── */
+
+.owa-chat-panel {
+    position: fixed;
+    right: 24px;
+    bottom: 90px;
+    width: 380px;
+    max-width: calc(100vw - 32px);
+    max-height: min(70vh, 560px);
+    background: var(--bg-surface, #fff);
+    color: var(--text-primary, #1e293b);
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: 20px;
+    box-shadow: var(--owa-shadow-lg);
+    display: none;
+    flex-direction: column;
+    z-index: 1100;
+    overflow: hidden;
+}
+.owa-chat-panel.open {
+    display: flex;
+    animation: owaChatIn .22s cubic-bezier(.2, .9, .3, 1);
+}
+.owa-chat-panel:focus { outline: none; }
+@keyframes owaChatIn {
+    from { opacity: 0; transform: translateY(10px) scale(.97); }
+    to { opacity: 1; transform: none; }
+}
+
+.owa-chat-header {
+    padding: 13px 14px 13px 16px;
+    font-weight: 600;
+    font-size: .92rem;
+    background:
+        radial-gradient(120% 140% at 12% 0%, rgba(255, 255, 255, .26), transparent 55%),
+        linear-gradient(135deg, #8b5cf6, var(--owa-accent-deep));
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex: 0 0 auto;
+}
+.owa-chat-header-title {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-width: 0;
+}
+.owa-chat-header-title i { font-size: .95rem; opacity: .95; }
+.owa-chat-header-text { display: flex; flex-direction: column; min-width: 0; }
+.owa-chat-header-name {
+    font-family: var(--font-display, 'Plus Jakarta Sans', sans-serif);
+    font-weight: 700;
+    letter-spacing: -.01em;
+    line-height: 1.2;
+}
+/* A live-status dot reads as "someone is here" without claiming a human is
+   answering; the assistant is a retrieval index, not a rep. */
+.owa-chat-header-status {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: .68rem;
+    font-weight: 500;
+    opacity: .82;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.owa-chat-header-status::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #4ade80;
+    box-shadow: 0 0 0 3px rgba(74, 222, 128, .28);
+    flex: 0 0 auto;
+}
+
+.owa-chat-close {
+    background: rgba(255, 255, 255, .16);
+    border: none;
+    color: #fff;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: .78rem;
+    flex: 0 0 auto;
+    transition: background .2s ease, transform .2s ease;
+}
+.owa-chat-close:hover { background: rgba(255, 255, 255, .3); transform: rotate(90deg); }
+.owa-chat-close:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+}
+
+/* ── Message log ──────────────────────────────────────────────────────── */
+
+.owa-chat-body {
+    padding: 16px 14px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    flex: 1 1 auto;
+    min-height: 0;
+    background:
+        radial-gradient(90% 60% at 50% 0%, var(--owa-accent-soft), transparent 70%),
+        var(--bg-surface, #fff);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-hover, #cbd5e1) transparent;
+}
+.owa-chat-body::-webkit-scrollbar { width: 6px; }
+.owa-chat-body::-webkit-scrollbar-track { background: transparent; }
+.owa-chat-body::-webkit-scrollbar-thumb {
+    background: var(--border-hover, #cbd5e1);
+    border-radius: 99px;
+}
+.owa-chat-body::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary, #94a3b8); }
+.owa-chat-body:focus { outline: none; }
+
+/* ── Bubbles ──────────────────────────────────────────────────────────── */
+
+.owa-chat-msg {
+    max-width: 86%;
+    padding: 10px 14px;
+    border-radius: 16px;
+    font-size: .9rem;
+    line-height: 1.6;
+    word-wrap: break-word;
+    overflow-wrap: anywhere;
+    animation: owaChatMsgIn .18s ease-out;
+}
+@keyframes owaChatMsgIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: none; }
+}
+.owa-chat-msg.bot {
+    background: var(--bg-surface, #fff);
+    color: var(--text-primary, #1e293b);
+    border: 1px solid var(--border-color, #e2e8f0);
+    align-self: flex-start;
+    border-bottom-left-radius: 5px;
+    box-shadow: var(--owa-shadow-sm);
+}
+.owa-chat-msg.bot strong { color: var(--owa-accent); }
+.owa-chat-msg.user {
+    background: linear-gradient(135deg, #8b5cf6, var(--owa-accent));
+    color: #fff;
+    align-self: flex-end;
+    border-bottom-right-radius: 5px;
+    box-shadow: 0 2px 8px -2px rgba(124, 58, 237, .38);
+}
+.owa-chat-msg.user strong { color: #fff; }
+
+.owa-chat-msg.system {
+    align-self: center;
+    max-width: 100%;
+    text-align: center;
+    font-size: .76rem;
+    color: var(--text-tertiary, #94a3b8);
+    background: transparent;
+    border: none;
+    padding: 2px 0;
+    animation: none;
+}
+
+/* Structured answer: one paragraph per piece, or a real list when the answer
+   was written as a list. Keeps a 400-character answer scannable in a narrow
+   column without changing a single word of it. */
+.owa-chat-parts { margin: 0; }
+.owa-chat-parts > *:first-child { margin-top: 0; }
+.owa-chat-parts > *:last-child { margin-bottom: 0; }
+.owa-chat-parts p { margin: 0 0 .55em; }
+.owa-chat-parts ul { margin: .45em 0 0; padding-left: 1.2em; }
+.owa-chat-parts li { margin: 0 0 .32em; }
+.owa-chat-parts li::marker { color: var(--owa-accent); }
+.owa-chat-parts li:last-child { margin-bottom: 0; }
+
+.owa-chat-typing {
+    align-self: flex-start;
+    padding: 11px 15px;
+    border-radius: 16px;
+    border-bottom-left-radius: 5px;
+    background: var(--bg-surface, #fff);
+    border: 1px solid var(--border-color, #e2e8f0);
+    box-shadow: var(--owa-shadow-sm);
+    font-size: .85rem;
+    color: var(--text-tertiary, #94a3b8);
+}
+.owa-chat-typing span {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    margin: 0 2px;
+    animation: owaChatDot 1.2s infinite;
+}
+.owa-chat-typing span:nth-child(2) { animation-delay: .2s; }
+.owa-chat-typing span:nth-child(3) { animation-delay: .4s; }
+@keyframes owaChatDot {
+    0%, 60%, 100% { opacity: .3; transform: translateY(0); }
+    30% { opacity: 1; transform: translateY(-3px); }
+}
+
+/* ── Source footnote ──────────────────────────────────────────────────── */
+
+.owa-chat-ref {
+    align-self: flex-start;
+    max-width: 92%;
+    font-size: .78rem;
+    line-height: 1.55;
+    color: var(--text-secondary, #475569);
+    background: var(--bg-surface-secondary, #f8fafc);
+    border-left: 2px solid var(--owa-accent);
+    border-radius: 0 10px 10px 0;
+    padding: 8px 12px;
+    overflow-wrap: anywhere;
+}
+.owa-chat-ref a {
+    color: var(--owa-accent);
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    text-decoration-thickness: 1px;
+    transition: opacity .2s;
+}
+.owa-chat-ref a:hover { opacity: .72; }
+
+.owa-chat-retry {
+    margin-top: .6em;
+    background: transparent;
+    border: 1px solid var(--owa-accent);
+    color: var(--owa-accent);
+    border-radius: 999px;
+    padding: 4px 14px;
+    font-size: .78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .2s ease, transform .15s ease;
+}
+.owa-chat-retry:hover {
+    background: var(--owa-accent-soft);
+    transform: translateY(-1px);
+}
+.owa-chat-retry:focus-visible {
+    outline: 2px solid var(--owa-accent);
+    outline-offset: 2px;
+}
+
+/* ── Follow-up chips ──────────────────────────────────────────────────── */
+
+.owa-chat-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-top: 2px;
+    align-self: flex-start;
+    max-width: 100%;
+}
+.owa-chat-chip {
+    display: inline-flex;
+    align-items: center;
+    background: var(--bg-surface, #fff);
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: 999px;
+    padding: 6px 14px;
+    min-height: 32px;
+    font-size: .79rem;
+    font-weight: 600;
+    color: var(--owa-accent);
+    cursor: pointer;
+    text-decoration: none;
+    box-shadow: var(--owa-shadow-sm);
+    transition: transform .16s ease, box-shadow .2s ease,
+                border-color .2s ease, background .2s ease;
+}
+.owa-chat-chip:hover {
+    background: var(--owa-accent-soft);
+    border-color: var(--owa-accent);
+    transform: translateY(-1px);
+    box-shadow: var(--owa-shadow-md);
+}
+.owa-chat-chip:focus-visible {
+    outline: 2px solid var(--owa-accent);
+    outline-offset: 2px;
+}
+.owa-chat-chip i { font-size: .62rem; margin-right: 6px; opacity: .75; }
+
+/* ── Composer ─────────────────────────────────────────────────────────── */
+
+/* Column now that the escape-hatch button sits above the input row. */
+.owa-chat-footer {
+    padding: 10px 12px 12px;
+    border-top: 1px solid var(--border-color, #e2e8f0);
+    background: var(--bg-surface, #fff);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 0 0 auto;
+}
+.owa-chat-footer-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* "Talk to a person": the way out of a bot that cannot help. It is hidden until
+   the turn earns it, and it sits in its own row so revealing it cannot resize
+   the input the visitor is typing into. */
+.owa-chat-offer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.owa-chat-offer[hidden] { display: none; }
+.owa-chat-offer.show { animation: owa-offer-in .18s ease-out; }
+
+@keyframes owa-offer-in {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: none; }
+}
+
+.owa-chat-handoff {
+    align-self: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .45rem;
+    background: transparent;
+    border: 1px dashed var(--border-color, #e2e8f0);
+    color: var(--text-secondary, #475569);
+    border-radius: 999px;
+    padding: 7px 14px;
+    font-size: .78rem;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all .2s ease;
+}
+.owa-chat-handoff:hover:not(:disabled) {
+    color: var(--owa-accent);
+    border-color: var(--owa-accent);
+    border-style: solid;
+    background: var(--owa-accent-soft);
+}
+.owa-chat-handoff:focus-visible {
+    outline: 3px solid var(--owa-accent-ring);
+    outline-offset: 2px;
+}
+.owa-chat-handoff:disabled { opacity: .5; cursor: not-allowed; }
+
+/* A human's reply, once the bot has handed over. Green so it can never be
+   mistaken for the bot still talking. */
+.owa-chat-msg.agent {
+    align-self: flex-start;
+    max-width: 92%;
+    padding: 10px 14px;
+    font-size: .88rem;
+    line-height: 1.55;
+    color: #065f46;
+    background: rgba(16, 185, 129, .12);
+    border: 1px solid rgba(16, 185, 129, .35);
+    border-radius: 0 12px 12px 12px;
+    overflow-wrap: anywhere;
+}
+.owa-chat-msg.agent strong { display: block; font-size: .72rem; margin-bottom: 2px; color: #047857; }
+[data-theme="dark"] .owa-chat-msg.agent {
+    color: #6ee7b7;
+    background: rgba(16, 185, 129, .14);
+    border-color: rgba(16, 185, 129, .3);
+}
+[data-theme="dark"] .owa-chat-msg.agent strong { color: #34d399; }
+
+/* Channel buttons rendered under an escalating answer. */
+.owa-chat-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-self: flex-end;
+    max-width: 100%;
+}
+.owa-chat-action {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    padding: 9px 14px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, var(--owa-accent), var(--owa-accent-deep));
+    color: #fff;
+    text-decoration: none;
+    font-size: .8rem;
+    font-weight: 600;
+    line-height: 1.2;
+    box-shadow: 0 6px 18px -6px rgba(124, 58, 237, .55);
+    transition: transform .2s ease, box-shadow .2s ease, opacity .2s ease;
+}
+.owa-chat-action:hover {
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 24px -8px rgba(124, 58, 237, .7);
+}
+.owa-chat-action:focus-visible {
+    outline: 3px solid var(--owa-accent-ring);
+    outline-offset: 2px;
+}
+.owa-chat-action small {
+    display: block;
+    font-size: .66rem;
+    font-weight: 500;
+    opacity: .78;
+}
+.owa-chat-footer input,
+.owa-chat-inputbar input {
+    flex: 1;
+    min-width: 0;
+    border-radius: 999px;
+    font-size: .9rem;
+    padding: 9px 16px;
+    border: 1px solid var(--border-color, #e2e8f0);
+    background: var(--bg-surface-secondary, #f8fafc);
+    color: var(--text-primary, #1e293b);
+    transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+}
+.owa-chat-footer input::placeholder,
+.owa-chat-inputbar input::placeholder { color: var(--text-tertiary, #94a3b8); }
+.owa-chat-footer input:focus,
+.owa-chat-inputbar input:focus {
+    outline: none;
+    background: var(--bg-surface, #fff);
+    border-color: var(--owa-accent);
+    box-shadow: 0 0 0 3px var(--owa-accent-ring);
+}
+.owa-chat-footer input:disabled,
+.owa-chat-inputbar input:disabled { opacity: .6; cursor: not-allowed; }
+
+/* The widget's launcher is icon-only, so it can be a round target; the page
+   variant carries a visible "Send" label and stays a pill. */
+.owa-chat-footer [data-chat-send] {
+    flex: 0 0 auto;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: none;
+    color: #fff;
+    background: linear-gradient(135deg, #8b5cf6, var(--owa-accent));
+    box-shadow: 0 3px 10px -2px rgba(124, 58, 237, .5);
+    transition: transform .16s ease, box-shadow .2s ease, opacity .2s;
+}
+.owa-chat-footer [data-chat-send]:hover:not(:disabled) {
+    transform: scale(1.06);
+    box-shadow: 0 6px 16px -3px rgba(124, 58, 237, .6);
+}
+.owa-chat-footer [data-chat-send]:active:not(:disabled) { transform: scale(.94); }
+.owa-chat-footer [data-chat-send]:focus-visible {
+    outline: 3px solid var(--owa-accent-ring);
+    outline-offset: 2px;
+}
+.owa-chat-footer [data-chat-send]:disabled {
+    opacity: .45;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* ── Nudge ────────────────────────────────────────────────────────────── */
+
+.owa-chat-nudge {
+    position: fixed;
+    right: 24px;
+    bottom: 88px;
+    z-index: 1051;
+    background: var(--bg-surface, #fff);
+    color: var(--text-primary, #1e293b);
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: 14px;
+    box-shadow: 0 8px 24px -6px rgba(15, 23, 42, .25);
+    padding: 8px 14px;
+    font-size: .8rem;
+    font-weight: 600;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .25s ease, visibility .25s ease;
+}
+.owa-chat-nudge.show {
+    opacity: 1;
+    visibility: visible;
+    animation: owaChatNudgeBob 2.4s ease-in-out infinite;
+}
+.owa-chat-nudge::after {
+    content: '';
+    position: absolute;
+    right: 24px;
+    bottom: -6px;
+    width: 11px;
+    height: 11px;
+    background: var(--bg-surface, #fff);
+    border-right: 1px solid var(--border-color, #e2e8f0);
+    border-bottom: 1px solid var(--border-color, #e2e8f0);
+    transform: rotate(45deg);
+}
+@keyframes owaChatNudgeBob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+}
+
+/* ── Full-page surface ────────────────────────────────────────────────── */
+
+.owa-chat-page {
+    max-height: 62vh;
+    min-height: 380px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-hover, #cbd5e1) transparent;
+}
+.owa-chat-page .owa-chat-msg { max-width: 88%; font-size: .92rem; }
+.owa-chat-page::-webkit-scrollbar { width: 6px; }
+.owa-chat-page::-webkit-scrollbar-track { background: transparent; }
+.owa-chat-page::-webkit-scrollbar-thumb {
+    background: var(--border-hover, #cbd5e1);
+    border-radius: 99px;
+}
+.owa-chat-inputbar {
+    border-top: 1px solid var(--border-color, #e2e8f0);
+    padding: 14px 20px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    background: var(--bg-surface, #fff);
+}
+.owa-chat-inputbar input { font-size: .92rem; }
+.owa-chat-inputbar .owa-chat-offer { flex: 0 0 100%; }
+.owa-chat-inputbar [data-chat-send] {
+    flex: 0 0 auto;
+    border-radius: 999px;
+    border: none;
+    padding: 9px 22px;
+    font-weight: 600;
+    color: #fff;
+    background: linear-gradient(135deg, #8b5cf6, var(--owa-accent));
+    box-shadow: 0 3px 10px -2px rgba(124, 58, 237, .5);
+    transition: transform .16s ease, box-shadow .2s ease, opacity .2s;
+}
+.owa-chat-inputbar [data-chat-send]:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px -3px rgba(124, 58, 237, .6);
+}
+.owa-chat-inputbar [data-chat-send]:focus-visible {
+    outline: 3px solid var(--owa-accent-ring);
+    outline-offset: 2px;
+}
+.owa-chat-inputbar [data-chat-send]:disabled { opacity: .45; cursor: not-allowed; }
+
+@media (prefers-reduced-motion: reduce) {
+    .owa-chat-nudge.show { animation: none; }
+    .owa-chat-offer.show { animation: none; }
+    .owa-chat-typing span { animation: none; }
+    .owa-chat-panel.open,
+    .owa-chat-msg { animation: none; }
+    .owa-chat-close:hover { transform: none; }
+    .owa-chat-fab:hover,
+    .owa-chat-chip:hover,
+    .owa-chat-retry:hover,
+    .owa-chat-footer [data-chat-send]:hover:not(:disabled),
+    .owa-chat-inputbar [data-chat-send]:hover:not(:disabled) { transform: none; }
+}
+
+/* Narrow phones: the panel is 380px wide plus a 24px right offset, so it hung
+   off the left edge of any viewport under 404px. Pin both edges instead. */
+@media (max-width: 575.98px) {
+    .owa-chat-panel {
+        right: 12px;
+        left: 12px;
+        width: auto;
+        bottom: 80px;
+        max-height: min(74vh, 560px);
+        border-radius: 18px;
+    }
+    .owa-chat-fab { right: 16px; bottom: 16px; width: 52px; height: 52px; }
+    .owa-chat-nudge { right: 16px; bottom: 76px; }
+    .owa-chat-nudge::after { right: 20px; }
+    .owa-chat-body { padding: 14px 12px; }
+    .owa-chat-msg { max-width: 92%; }
+    .owa-chat-footer { padding: 10px; }
+    .owa-chat-page { min-height: 300px; padding: 16px; }
+    .owa-chat-inputbar { padding: 12px 14px; }
+    .owa-chat-inputbar [data-chat-send] { padding: 9px 18px; }
+}
+
+/* ── Dark theme ───────────────────────────────────────────────────────── */
+
+/* --primary-color is deliberately lightened in dark mode so it works as text
+   on a dark background; as a bubble fill under white text it fails contrast,
+   so the senders and buttons step back down to the 600 shade. */
+[data-theme="dark"] .owa-chat-msg.user,
+[data-theme="dark"] .owa-chat-footer [data-chat-send],
+[data-theme="dark"] .owa-chat-inputbar [data-chat-send] {
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+}
+/* --bg-surface and --bg-surface-secondary are the same value in dark mode, so
+   without this the assistant's bubble would disappear into the panel. */
+[data-theme="dark"] .owa-chat-msg.bot,
+[data-theme="dark"] .owa-chat-typing {
+    background: var(--bg-surface-tertiary, #334155);
+    border-color: var(--border-color, #334155);
+}
+[data-theme="dark"] .owa-chat-msg.bot strong,
+[data-theme="dark"] .owa-chat-chip,
+[data-theme="dark"] .owa-chat-retry,
+[data-theme="dark"] .owa-chat-ref a {
+    color: #a5b4fc;
+}
+[data-theme="dark"] .owa-chat-handoff { color: var(--text-secondary, #cbd5e1); }
+[data-theme="dark"] .owa-chat-msg.user { box-shadow: 0 2px 10px -2px rgba(79, 70, 229, .5); }
+[data-theme="dark"] .owa-chat-header-status::before { box-shadow: 0 0 0 3px rgba(74, 222, 128, .2); }

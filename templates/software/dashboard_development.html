@@ -1,0 +1,1342 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans "Dashboard Development" %} | OnWebApp{% endblock %}
+
+{% block meta_description %}{% trans "Custom dashboard development for executives, operations, sales, marketing and industrial teams. Executive, operations, sales, website and IoT dashboards built around your own data." %}{% endblock %}
+
+{% block og_title %}{% trans "Dashboard Development" %} | OnWebApp{% endblock %}
+{% block og_description %}{% trans "Custom dashboards for businesses that need a clearer view of their operations, performance, and data." %}{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ── Base ─────────────────────────────────────────────────────────── */
+.dd-container{max-width:1180px;margin:0 auto;padding:0 1.5rem}
+.dd-section{padding:5.5rem 0}
+.dd-section--alt{background:var(--bg-surface-secondary)}
+.dd-section--dark{background:var(--slate-900);color:#fff}
+
+/* ── Type ─────────────────────────────────────────────────────────── */
+.dd-eyebrow{display:inline-flex;align-items:center;gap:.5rem;font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.14em;color:var(--primary-color);margin-bottom:.75rem}
+.dd-eyebrow::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor}
+.dd-eyebrow--light{color:#a5b4fc}
+.dd-h2{font-family:var(--font-display);font-weight:800;font-size:clamp(1.7rem,3.2vw,2.4rem);line-height:1.16;margin-bottom:1rem}
+.dd-h3{font-family:var(--font-display);font-weight:800;font-size:1.28rem;margin-bottom:.5rem}
+.dd-lede{color:var(--text-secondary);font-size:1rem;line-height:1.75;max-width:640px}
+.dd-lede--light{color:#94a3b8}
+.dd-section--dark .dd-h2{color:#fff}
+
+/* ── Reveal ───────────────────────────────────────────────────────── */
+.dd-reveal{opacity:0;transform:translateY(26px);transition:opacity .65s cubic-bezier(.22,.8,.3,1),transform .65s cubic-bezier(.22,.8,.3,1)}
+.dd-reveal.is-visible{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){.dd-reveal{opacity:1;transform:none;transition:none}}
+
+/* ── Hero ─────────────────────────────────────────────────────────── */
+.dd-hero{position:relative;overflow:hidden;padding:7rem 0 6rem;background:linear-gradient(160deg,#0a0f1e 0%,#141d36 48%,#0a0f1e 100%)}
+.dd-hero__grid{position:absolute;inset:0;z-index:1;background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,.08) 1px,transparent 0);background-size:28px 28px;-webkit-mask-image:linear-gradient(to bottom,#000 0%,transparent 88%);mask-image:linear-gradient(to bottom,#000 0%,transparent 88%)}
+.dd-hero__glow{position:absolute;z-index:1;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(79,70,229,.38) 0%,transparent 68%);filter:blur(80px);top:-220px;right:-160px;pointer-events:none}
+.dd-hero__glow--2{width:520px;height:520px;background:radial-gradient(circle,rgba(6,182,212,.22) 0%,transparent 68%);top:auto;bottom:-240px;right:auto;left:-180px}
+.dd-hero__inner{position:relative;z-index:2;display:grid;grid-template-columns:minmax(0,1.06fr) minmax(0,.94fr);gap:3.5rem;align-items:center}
+.dd-hero__copy{max-width:none;margin:0;text-align:left}
+.dd-hero__copy p{color:#94a3b8;font-size:1.02rem;line-height:1.75;max-width:540px;margin:0}
+.dd-hero__actions{display:flex;flex-wrap:wrap;gap:.75rem;justify-content:flex-start;margin-top:2rem}
+@media(prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+.dd-section,.dd-anchor{scroll-margin-top:92px}
+.dd-hero h1{font-family:var(--font-display);font-weight:800;font-size:clamp(2.3rem,5.2vw,3.6rem);line-height:1.06;color:#fff;letter-spacing:-.02em}
+.dd-grad{background:linear-gradient(120deg,#818cf8 0%,#a78bfa 55%,#22d3ee 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+.dd-chips{display:flex;flex-wrap:wrap;gap:.5rem}
+.dd-chip{display:inline-flex;align-items:center;gap:.45rem;padding:.42rem .9rem;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:#cbd5e1;font-size:.78rem;font-weight:600;backdrop-filter:blur(10px)}
+.dd-chip i{color:#a5b4fc;font-size:.75rem}
+
+/* ── Real dashboard showcase ──────────────────────────────────────── */
+.dd-shot{position:relative;margin-top:3.5rem;border-radius:20px;overflow:hidden;background:#f1f5f9;border:1px solid rgba(255,255,255,.16);box-shadow:0 70px 130px -45px rgba(2,6,23,.85),0 0 0 1px rgba(255,255,255,.05)}
+.dd-shot__glow{position:absolute;inset:0;z-index:2;pointer-events:none;box-shadow:inset 0 -70px 90px -60px rgba(10,15,30,.55),inset 0 1px 0 rgba(255,255,255,.18)}
+.dd-shot__bar{display:flex;align-items:center;gap:.5rem;padding:.6rem .9rem;background:#fff;border-bottom:1px solid #e2e8f0}
+.dd-shot__dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.dd-shot__url{flex:1;min-width:0;margin-left:.5rem;padding:.24rem .8rem;border-radius:999px;background:#f1f5f9;font-size:.68rem;font-weight:600;color:#64748b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dd-shot__live{display:inline-flex;align-items:center;gap:.35rem;font-size:.62rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#059669;flex-shrink:0}
+.dd-shot__pulse{width:6px;height:6px;border-radius:50%;background:#10b981;box-shadow:0 0 0 0 rgba(16,185,129,.7);animation:ddPulse 2.2s infinite}
+@keyframes ddPulse{70%{box-shadow:0 0 0 7px rgba(16,185,129,0)}100%{box-shadow:0 0 0 0 rgba(16,185,129,0)}}
+
+.dd-hero .dd-shot{margin-top:0;border-radius:16px}
+.dd-hero .dd-shot__bar{padding:.45rem .7rem}
+.dd-hero .dd-shot__dot{width:7px;height:7px}
+.dd-hero .dd-shot__url{font-size:.6rem;padding:.2rem .6rem}
+.dd-hero .dd-mock{grid-template-columns:124px minmax(0,1fr);min-height:0}
+.dd-hero .dd-mock__side{padding:.7rem .5rem}
+.dd-hero .dd-mock__brand{font-size:.62rem}
+.dd-hero .dd-mock__nav{font-size:.63rem;padding:.32rem .45rem;gap:.4rem}
+.dd-hero .dd-mock__nav i{font-size:.58rem;width:12px}
+.dd-hero .dd-mock__main{padding:.7rem .75rem;gap:.5rem}
+.dd-hero .dd-mock__title{font-size:.7rem}
+.dd-hero .dd-mock__range span{font-size:.52rem;padding:.18rem .5rem}
+.dd-hero .dd-mock__tiles{grid-template-columns:repeat(2,1fr);gap:.45rem}
+.dd-hero .dd-mock__tile{padding:.45rem .5rem}
+.dd-hero .dd-mock__label{font-size:.48rem}
+.dd-hero .dd-mock__val{font-size:.92rem}
+.dd-hero .dd-mock__delta{font-size:.52rem}
+.dd-hero .dd-mock__spark{height:13px}
+.dd-hero .dd-mock__grid{gap:.45rem}
+.dd-hero .dd-mock__panel{padding:.5rem .55rem}
+.dd-hero .dd-mock__ptitle{font-size:.53rem;margin-bottom:.4rem}
+.dd-hero .dd-mock__canvas{height:92px}
+.dd-hero .dd-mock__legend span{font-size:.48rem}
+.dd-hero .dd-mock__row{font-size:.54rem;padding:.35rem .55rem;gap:.5rem}
+.dd-hero .dd-mock__row--head{font-size:.46rem}
+.dd-hero .dd-mock__pill{font-size:.46rem;padding:.12rem .4rem}
+
+/* ── Mock dashboard inside the frame ──────────────────────────────── */
+.dd-mock{display:grid;grid-template-columns:186px 1fr;min-height:430px;background:#f8fafc}
+.dd-mock__side{background:#0f172a;padding:1rem .7rem;display:flex;flex-direction:column;gap:.2rem}
+.dd-mock__brand{display:flex;align-items:center;gap:.45rem;padding:.4rem .5rem 1rem;margin-bottom:.35rem;border-bottom:1px solid rgba(255,255,255,.08)}
+.dd-mock__brand span{font-size:.72rem;font-weight:800;color:#fff;letter-spacing:.03em}
+.dd-mock__nav{display:flex;align-items:center;gap:.5rem;padding:.45rem .55rem;border-radius:8px;font-size:.74rem;font-weight:600;color:#94a3b8}
+.dd-mock__nav i{width:14px;font-size:.68rem;text-align:center}
+.dd-mock__nav.is-active{background:linear-gradient(135deg,#4f46e5,#6366f1);color:#fff;box-shadow:0 4px 12px -3px rgba(79,70,229,.6)}
+.dd-mock__main{padding:1rem 1.1rem;display:flex;flex-direction:column;gap:.75rem;min-width:0}
+.dd-mock__top{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap}
+.dd-mock__title{font-size:.84rem;font-weight:800;color:#0f172a;margin:0}
+.dd-mock__range{margin-left:auto;display:inline-flex;gap:.3rem}
+.dd-mock__range span{font-size:.6rem;font-weight:700;color:#64748b;background:#fff;border:1px solid #e2e8f0;border-radius:999px;padding:.24rem .7rem}
+.dd-mock__range .is-on{background:#4f46e5;border-color:#4f46e5;color:#fff}
+.dd-mock__tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem}
+.dd-mock__tile{background:#fff;border:1px solid #e2e8f0;border-radius:11px;padding:.65rem .7rem}
+.dd-mock__label{font-size:.56rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#94a3b8}
+.dd-mock__val{font-family:var(--font-display);font-size:1.2rem;font-weight:800;color:#0f172a;line-height:1.25;letter-spacing:-.01em}
+.dd-mock__delta{font-size:.6rem;font-weight:800;display:inline-flex;align-items:center;gap:.15rem}
+.dd-mock__delta.up{color:#059669}
+.dd-mock__delta.down{color:#dc2626}
+.dd-mock__spark{display:flex;align-items:flex-end;gap:2px;height:18px;margin-top:.35rem}
+.dd-mock__spark i{flex:1;border-radius:1px 1px 0 0;background:linear-gradient(180deg,#818cf8,#4f46e5);opacity:.85}
+.dd-mock__grid{display:grid;grid-template-columns:1.7fr 1fr;gap:.6rem}
+.dd-mock__panel{background:#fff;border:1px solid #e2e8f0;border-radius:11px;padding:.7rem .75rem}
+.dd-mock__ptitle{font-size:.63rem;font-weight:800;color:#334155;margin-bottom:.55rem;display:flex;justify-content:space-between;align-items:center;gap:.5rem}
+.dd-mock__ptitle em{font-style:normal;font-size:.55rem;font-weight:700;color:#94a3b8}
+.dd-mock__canvas{position:relative;height:132px}
+.dd-mock__legend{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:.55rem}
+.dd-mock__legend span{display:inline-flex;align-items:center;gap:.3rem;font-size:.56rem;font-weight:700;color:#64748b}
+.dd-mock__legend i{width:7px;height:7px;border-radius:2px}
+.dd-mock__rows{background:#fff;border:1px solid #e2e8f0;border-radius:11px;overflow:hidden}
+.dd-mock__row{display:grid;grid-template-columns:1.7fr 1fr 1fr auto;gap:.75rem;align-items:center;padding:.5rem .8rem;font-size:.66rem;font-weight:600;color:#475569;border-bottom:1px solid #f1f5f9}
+.dd-mock__row:last-child{border-bottom:none}
+.dd-mock__row--head{background:#f8fafc;font-size:.55rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#94a3b8}
+.dd-mock__pill{display:inline-flex;align-items:center;gap:.3rem;padding:.16rem .55rem;border-radius:999px;font-size:.55rem;font-weight:800;justify-self:start}
+.dd-mock__pill.ok{background:#d1fae5;color:#047857}
+.dd-mock__pill.warn{background:#fef3c7;color:#b45309}
+.dd-mock__pill.info{background:#e0e7ff;color:#4338ca}
+
+/* ── Know more ────────────────────────────────────────────────────── */
+.dd-more{display:flex;justify-content:center;margin-top:2.75rem}
+.dd-more__btn{display:inline-flex;align-items:center;gap:.6rem;padding:.85rem 1.85rem;border-radius:999px;font-size:.95rem;font-weight:800;color:#fff;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);backdrop-filter:blur(10px);transition:transform .3s ease,background .3s ease,border-color .3s ease,box-shadow .3s ease}
+.dd-more__btn:hover,.dd-more__btn:focus-visible{background:var(--grad-primary);border-color:transparent;transform:translateY(-2px);box-shadow:0 14px 30px -12px var(--primary-glow);color:#fff}
+.dd-more__btn i{font-size:.8rem;animation:ddBob 1.9s ease-in-out infinite}
+@keyframes ddBob{0%,100%{transform:translateY(0)}50%{transform:translateY(3px)}}
+.dd-more__hint{display:block;text-align:center;margin-top:.7rem;font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.42)}
+
+/* ── Stat strip ───────────────────────────────────────────────────── */
+.dd-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;text-align:center}
+.dd-stat__num{font-family:var(--font-display);font-size:clamp(1.7rem,3vw,2.35rem);font-weight:800;color:var(--primary-color);line-height:1.1;letter-spacing:-.02em}
+.dd-stat__label{font-size:.74rem;font-weight:700;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.08em;margin-top:.35rem}
+
+/* ── Cards ────────────────────────────────────────────────────────── */
+.dd-card{position:relative;overflow:hidden;height:100%;background:var(--bg-surface);border:1px solid var(--border-color);border-radius:var(--radius-xl);padding:1.7rem;transition:transform .35s ease,box-shadow .35s ease,border-color .35s ease}
+.dd-card::after{content:'';position:absolute;inset:0;background:linear-gradient(115deg,transparent 32%,rgba(255,255,255,.6) 48%,transparent 64%);transform:translateX(-130%);transition:transform .8s ease;pointer-events:none}
+.dd-card:hover{transform:translateY(-6px);box-shadow:var(--card-shadow-lg);border-color:var(--dc,var(--primary-color))}
+.dd-card:hover::after{transform:translateX(130%)}
+.dd-icon{width:52px;height:52px;border-radius:15px;display:inline-flex;align-items:center;justify-content:center;font-size:1.15rem;margin-bottom:1.1rem;background:var(--dc-soft,rgba(79,70,229,.1));color:var(--dc,var(--primary-color))}
+.dd-card p{color:var(--text-secondary);font-size:.9rem;line-height:1.7;margin:0}
+.dd-card--dark{background:rgba(255,255,255,.045);border-color:rgba(255,255,255,.1);color:#fff}
+.dd-card--dark:hover{border-color:rgba(255,255,255,.24);box-shadow:none}
+.dd-card--dark p{color:#94a3b8}
+.dd-card--dark .dd-h3{color:#fff}
+
+/* ── Flow ─────────────────────────────────────────────────────────── */
+.dd-flow{display:grid;grid-template-columns:1fr 54px 1fr 54px 1fr;align-items:stretch;gap:0}
+.dd-flow__stage{background:var(--bg-surface);border:1px solid var(--border-color);border-radius:var(--radius-xl);padding:1.6rem 1.5rem;transition:.35s}
+.dd-flow__stage:hover{border-color:var(--primary-color);box-shadow:var(--card-shadow-md)}
+.dd-flow__num{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:10px;background:var(--primary-color);color:#fff;font-size:.8rem;font-weight:800;margin-bottom:1rem}
+.dd-flow__stage ul{list-style:none;padding:0;margin:1rem 0 0;font-size:.85rem;color:var(--text-secondary)}
+.dd-flow__stage li{display:flex;align-items:flex-start;gap:.45rem;padding:.3rem 0}
+.dd-flow__stage li i{color:var(--success);font-size:.7rem;margin-top:.32rem}
+.dd-flow__arrow{display:flex;align-items:center;justify-content:center;position:relative}
+.dd-flow__arrow::before{content:'';width:100%;height:2px;background-image:linear-gradient(90deg,var(--primary-color) 55%,transparent 0);background-size:9px 2px;animation:ddDash 1.1s linear infinite}
+.dd-flow__arrow i{position:absolute;color:var(--primary-color);font-size:.72rem;background:var(--bg-body);padding:0 3px}
+@keyframes ddDash{to{background-position:9px 0}}
+
+/* ── Process ──────────────────────────────────────────────────────── */
+.dd-tl{position:relative;list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1.35rem}
+.dd-tl::before{content:'';position:absolute;left:0;right:0;top:50%;height:2px;transform:translateY(-50%);border-radius:2px;background:linear-gradient(90deg,var(--primary-500),var(--primary-color) 62%,#22d3ee)}
+.dd-tl::after{content:'';position:absolute;left:0;top:50%;width:12px;height:12px;margin-top:-6px;border-radius:50%;background:#fff;box-shadow:0 0 0 3px rgba(34,211,238,.3),0 0 16px 2px rgba(34,211,238,.55);z-index:2;animation:ddFlow 5.5s cubic-bezier(.65,0,.35,1) infinite}
+@keyframes ddFlow{0%{left:0;opacity:0}10%{opacity:1}90%{opacity:1}100%{left:100%;opacity:0}}
+@media(prefers-reduced-motion:reduce){.dd-tl::after{animation:none;left:0;opacity:1;box-shadow:0 0 0 3px rgba(34,211,238,.3)}}
+.dd-tl__step{position:relative;display:grid;grid-template-rows:1fr auto 1fr;justify-items:center;text-align:center}
+.dd-tl__card{background:var(--bg-surface);border:1px solid var(--border-color);border-radius:var(--radius-xl);padding:1.35rem 1.2rem;width:100%;transition:transform .35s ease,box-shadow .35s ease,border-color .35s ease}
+.dd-tl__step.is-up .dd-tl__card{grid-row:1;align-self:end;margin-bottom:2.1rem}
+.dd-tl__step.is-down .dd-tl__card{grid-row:3;align-self:start;margin-top:2.1rem}
+.dd-tl__card:hover{transform:translateY(-5px);box-shadow:var(--card-shadow-lg);border-color:var(--primary-color)}
+.dd-tl__card--end{border-color:var(--primary-color);background:linear-gradient(180deg,var(--bg-surface),var(--bg-surface-secondary))}
+.dd-tl__phase{display:inline-block;font-size:.66rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--primary-color);margin-bottom:.55rem}
+.dd-tl__card h5{font-weight:700;font-size:1rem;margin-bottom:.45rem}
+.dd-tl__card p{margin:0;color:var(--text-secondary);font-size:.86rem;line-height:1.65}
+.dd-tl__step .dd-tags{justify-content:center}
+.dd-tl__node{grid-row:2;position:relative;width:46px;height:46px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.95rem;color:var(--primary-color);background:var(--bg-surface);border:2px solid var(--primary-color);box-shadow:0 0 0 5px var(--bg-surface),0 10px 22px -12px rgba(79,70,229,.7);z-index:2;transition:transform .35s ease,color .35s ease,background .35s ease}
+.dd-tl__step.is-up .dd-tl__node::after{content:'';position:absolute;top:100%;left:50%;width:2px;height:2.1rem;transform:translateX(-50%);background:linear-gradient(var(--primary-color),transparent)}
+.dd-tl__step.is-down .dd-tl__node::after{content:'';position:absolute;bottom:100%;left:50%;width:2px;height:2.1rem;transform:translateX(-50%);background:linear-gradient(transparent,var(--primary-color))}
+.dd-tl__step:hover .dd-tl__node{transform:scale(1.12)}
+.dd-tl__node--end{color:#fff;background:linear-gradient(135deg,var(--primary-600),#22d3ee);border-color:transparent}
+.dd-tags{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.75rem}
+
+    /* "Scattered sources → one view" pairing in the problem section. The arrow is
+       the argument of the section, so it is given room to breathe. */
+    .dd-frag-arrow{display:flex;flex-direction:column;align-items:center;gap:.35rem;margin:1.5rem 0;color:var(--text-tertiary);font-size:.74rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+    .dd-frag-arrow i{color:var(--primary-color);font-size:.9rem}
+    .dd-frag-result{display:flex;gap:.85rem;align-items:flex-start;background:var(--bg-surface-secondary);border:1px solid var(--border-color);border-radius:var(--radius-lg,14px);padding:1rem 1.1rem}
+    .dd-frag-result i{color:var(--primary-color);font-size:1.1rem;margin-top:.2rem}
+    .dd-frag-result strong{display:block;font-size:.95rem;margin-bottom:.15rem}
+    .dd-frag-result p{margin:0;font-size:.85rem;color:var(--text-secondary);line-height:1.6}
+.dd-tag{display:inline-flex;align-items:center;gap:.4rem;padding:.32rem .75rem;border-radius:999px;background:var(--bg-surface-secondary);border:1px solid var(--border-color);font-size:.76rem;font-weight:600;color:var(--text-secondary)}
+.dd-tag i{font-size:.6rem;color:var(--success)}
+
+/* ── List rows (dark capability section) ──────────────────────────── */
+.dd-list{list-style:none;padding:0;margin:1.1rem 0 0;font-size:.84rem;color:#94a3b8}
+.dd-list li{display:flex;align-items:flex-start;gap:.55rem;padding:.36rem 0}
+.dd-list li i{color:#34d399;font-size:.7rem;margin-top:.34rem}
+
+/* ── Industry chips ───────────────────────────────────────────────── */
+.dd-industries{display:flex;flex-wrap:wrap;gap:.6rem;justify-content:center}
+.dd-ind{display:inline-flex;align-items:center;gap:.5rem;padding:.5rem 1.05rem;border-radius:999px;background:var(--bg-surface);border:1px solid var(--border-color);font-size:.84rem;font-weight:600;color:var(--text-secondary);transition:.25s}
+.dd-ind:hover{border-color:var(--primary-color);color:var(--primary-color);transform:translateY(-2px)}
+.dd-ind i{font-size:.8rem}
+
+/* ── Pricing ──────────────────────────────────────────────────────── */
+.dd-plan{display:flex;flex-direction:column;height:100%;background:var(--bg-surface);border:1px solid var(--border-color);border-radius:var(--radius-xl);padding:2rem 1.75rem;position:relative;transition:.35s}
+.dd-plan:hover{transform:translateY(-5px);box-shadow:var(--card-shadow-lg)}
+.dd-plan--featured{border-color:var(--primary-color);box-shadow:0 18px 44px -18px var(--primary-glow)}
+.dd-plan__flag{position:absolute;top:-.8rem;left:50%;transform:translateX(-50%);background:var(--grad-primary);color:#fff;font-size:.62rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:.3rem .9rem;border-radius:999px;white-space:nowrap}
+.dd-plan__tier{font-size:.7rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--primary-color);margin-bottom:.5rem}
+.dd-plan h4{font-family:var(--font-display);font-weight:800;font-size:1.22rem;margin-bottom:.6rem}
+.dd-plan__desc{color:var(--text-secondary);font-size:.87rem;line-height:1.65;min-height:2.9rem}
+.dd-plan ul{list-style:none;padding:0;margin:1.2rem 0 0;font-size:.86rem;color:var(--text-secondary);flex-grow:1}
+.dd-plan ul li{display:flex;align-items:flex-start;gap:.5rem;padding:.42rem 0;border-bottom:1px solid var(--border-color)}
+.dd-plan ul li:last-child{border-bottom:none}
+.dd-plan ul i{color:var(--success);font-size:.7rem;margin-top:.35rem}
+
+/* ── FAQ ──────────────────────────────────────────────────────────── */
+.dd-faq{border:1px solid var(--border-color);border-radius:var(--radius-xl);overflow:hidden;background:var(--bg-surface)}
+.dd-faq__item + .dd-faq__item{border-top:1px solid var(--border-color)}
+.dd-faq__btn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1.15rem 1.4rem;background:none;border:none;text-align:left;font-weight:700;font-size:.95rem;color:var(--text-primary)}
+.dd-faq__btn:hover{background:var(--bg-surface-secondary)}
+.dd-faq__btn i{transition:transform .3s ease;font-size:.78rem;color:var(--text-tertiary);flex-shrink:0}
+.dd-faq__btn:not(.collapsed) i{transform:rotate(180deg)}
+.dd-faq__body{padding:0 1.4rem 1.25rem;color:var(--text-secondary);font-size:.9rem;line-height:1.75}
+
+/* ── CTA ──────────────────────────────────────────────────────────── */
+.dd-cta{position:relative;overflow:hidden;background:transparent;padding:3rem 2rem;text-align:center;color:var(--text-primary)}
+.dd-cta::after{content:'';position:absolute;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,rgba(99,102,241,.1) 0%,transparent 65%);bottom:-300px;right:-140px;pointer-events:none}
+.dd-cta > *{position:relative;z-index:1}
+.dd-cta h2{font-family:var(--font-display);font-weight:800;font-size:clamp(1.6rem,3.4vw,2.35rem);line-height:1.2;margin-bottom:1rem}
+.dd-cta p{color:var(--text-secondary);width:100%;margin:0 auto 2rem}
+
+.dd-anatomy{position:relative;display:grid;grid-template-columns:minmax(0,1.22fr) minmax(0,1fr);gap:4rem;align-items:center}
+.dd-anatomy__fig{position:relative;border-radius:var(--radius-xl);overflow:hidden;background:#f8fafc;border:1px solid var(--border-color);box-shadow:0 40px 80px -50px rgba(2,6,23,.7)}
+.dd-anatomy__fig .dd-shot__bar{position:relative}
+.dd-board{position:relative;padding:.85rem 3.2rem .85rem .95rem;display:flex;flex-direction:column;gap:.5rem}
+.dd-board::after{content:'';position:absolute;top:.7rem;bottom:.7rem;right:1.75rem;width:1px;background:repeating-linear-gradient(rgba(148,163,184,.5) 0 3px,transparent 3px 8px)}
+.dd-board__strip{position:relative;display:flex;align-items:center;gap:.35rem;flex-wrap:wrap;min-height:26px}
+.dd-board__strip--title strong{font-family:var(--font-display);font-size:.82rem;color:#0f172a}
+.dd-board__strip--title .dd-board__chip{margin-left:auto}
+.dd-board__strip--foot{background:#fff;border:1px solid #e2e8f0;border-radius:9px;padding:.3rem .45rem}
+.dd-board__micro{font-size:.58rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#94a3b8;display:inline-flex;align-items:center;gap:.3rem}
+.dd-board__pulse{width:6px;height:6px;border-radius:50%;background:#10b981;box-shadow:0 0 0 0 rgba(16,185,129,.65);animation:ddPulse 2.2s infinite}
+.dd-board__chip{display:inline-flex;align-items:center;gap:.28rem;font-size:.58rem;font-weight:800;color:#64748b;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:999px;padding:.2rem .55rem;white-space:nowrap}
+.dd-board__chip.is-on{background:#4f46e5;border-color:#4f46e5;color:#fff}
+.dd-board__chip--role{background:#ede9fe;border-color:#ddd6fe;color:#6d28d9}
+.dd-board__tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem}
+.dd-board__tile{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:.5rem .6rem;display:flex;align-items:baseline;gap:.4rem;flex-wrap:wrap}
+.dd-board__tile .dd-board__micro{width:100%}
+.dd-board__tile b{font-family:var(--font-display);font-size:.98rem;color:#0f172a;line-height:1.2}
+.dd-board__tile em{font-style:normal;font-size:.58rem;font-weight:800}
+.dd-board__tile .is-up{color:#059669}
+.dd-board__tile .is-down{color:#dc2626}
+.dd-board__split{display:grid;grid-template-columns:1.65fr 1fr;gap:.5rem}
+.dd-board__panel{position:relative;background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:.5rem .6rem .6rem}
+.dd-board__ptitle{font-size:.6rem;font-weight:800;color:#334155;margin-bottom:.45rem}
+.dd-board__bars{position:relative;display:flex;align-items:flex-end;gap:4px;height:78px}
+.dd-board__bars i{flex:1;border-radius:2px 2px 0 0;background:linear-gradient(180deg,#a5b4fc,#4f46e5)}
+.dd-board__goal{position:absolute;left:0;right:0;top:46%;border-top:1px dashed rgba(225,29,72,.65)}
+.dd-board__ring{width:78px;height:78px;margin:0 auto;border-radius:50%;background:conic-gradient(#4f46e5 0 42%,#06b6d4 42% 68%,#8b5cf6 68% 86%,#e2e8f0 86% 100%);display:flex;align-items:center;justify-content:center}
+.dd-board__ring::before{content:'';position:absolute;width:52px;height:52px;border-radius:50%;background:#fff}
+.dd-board__ring span{position:relative;font-family:var(--font-display);font-size:.9rem;font-weight:800;color:#0f172a}
+.dd-board--dc{color:#94a3b8;font-size:.8rem}
+.dd-pin{position:absolute;right:.45rem;top:50%;transform:translateY(-50%);width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:800;color:#fff;background:var(--pc,var(--primary-color));box-shadow:0 0 0 3px #f8fafc,0 6px 14px -6px var(--pc,var(--primary-color));transition:transform .3s ease,box-shadow .3s ease}
+.dd-pin.is-lit{transform:translateY(-50%) scale(1.18)}
+.dd-anatomy__key{display:flex;flex-direction:column;gap:.8rem}
+.dd-keyrow{display:flex;gap:.85rem;align-items:flex-start;padding:.85rem 1rem;border-radius:var(--radius-lg,14px);border:1px solid transparent;background:var(--bg-surface);transition:border-color .3s ease,background .3s ease,transform .3s ease}
+.dd-keyrow:hover{border-color:var(--dc);transform:translateX(4px)}
+.dd-keyrow__no{flex-shrink:0;width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:800;color:#fff;background:var(--dc)}
+.dd-keyrow h5{font-size:.95rem;margin-bottom:.25rem}
+.dd-keyrow p{color:var(--text-secondary);font-size:.85rem;line-height:1.65;margin:0}
+.dd-wires{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:4;overflow:visible}
+.dd-wire{fill:none;stroke:var(--text-tertiary);stroke-width:1.4;stroke-linecap:round;opacity:.45;stroke-dasharray:1;stroke-dashoffset:1;transition:opacity .3s ease,stroke .3s ease,stroke-width .3s ease}
+.dd-wires.is-ready .dd-wire{animation:ddWire .85s cubic-bezier(.4,0,.2,1) forwards}
+.dd-wires.is-drawn .dd-wire{animation:none;stroke-dashoffset:0}
+.dd-wire.is-lit{opacity:1;stroke:var(--primary-color);stroke-width:2}
+@keyframes ddWire{to{stroke-dashoffset:0}}
+
+/* ── Responsive ───────────────────────────────────────────────────── */
+@media(max-width:1199px){
+    .dd-hero__inner{grid-template-columns:1fr;gap:2.75rem}
+    .dd-hero__copy{max-width:820px;margin:0 auto;text-align:center}
+    .dd-hero__copy p{max-width:620px;margin-left:auto;margin-right:auto}
+    .dd-hero__copy .dd-eyebrow{justify-content:center}
+    .dd-hero__copy .dd-chips{justify-content:center}
+    .dd-hero__actions{justify-content:center}
+    .dd-hero .dd-shot{max-width:720px;margin:0 auto}
+    .dd-tl{grid-template-columns:1fr;gap:0}
+    .dd-tl::before{left:23px;right:auto;top:0;bottom:0;width:2px;height:auto;transform:none}
+    .dd-tl::after{display:none}
+    .dd-tl__step{grid-template-rows:auto;justify-items:start;text-align:left;padding:0 0 1.75rem 3.6rem}
+    .dd-tl__step:last-child{padding-bottom:0}
+    .dd-tl__step.is-up .dd-tl__card,.dd-tl__step.is-down .dd-tl__card{grid-row:auto;align-self:auto;margin:0}
+    .dd-tl__step .dd-tags{justify-content:flex-start}
+    .dd-tl__node{grid-row:auto;position:absolute;left:0;top:0}
+    .dd-tl__step.is-up .dd-tl__node::after,.dd-tl__step.is-down .dd-tl__node::after{left:100%;right:auto;top:50%;bottom:auto;width:3.6rem;height:2px;transform:translateY(-50%);background:linear-gradient(90deg,var(--primary-color),transparent)}
+}
+@media(max-width:991px){
+    .dd-section,.dd-section--alt{padding:3.5rem 0}
+    .dd-hero{padding:6rem 0 4.5rem}
+    .dd-flow{grid-template-columns:1fr}
+    .dd-flow__arrow{height:44px;transform:rotate(90deg)}
+    .dd-stats{grid-template-columns:repeat(2,1fr)}
+    .dd-anatomy{grid-template-columns:1fr;gap:2.25rem}
+    .dd-wires{display:none}
+    .dd-board{padding-right:2.6rem}
+.dd-board__split{grid-template-columns:1fr}
+    .dd-board__ring{display:none}
+    .dd-hero .dd-mock{grid-template-columns:1fr}
+
+    .dd-hero .dd-mock__side{flex-direction:row;overflow-x:auto;padding:.5rem;gap:.3rem}
+    .dd-hero .dd-mock__brand{display:none}
+    .dd-hero .dd-mock__nav{white-space:nowrap}
+    .dd-cta{padding:2rem 1.25rem}
+    .dd-more{margin-top:2rem}
+}
+@media(max-width:575px){
+    .dd-stats{grid-template-columns:1fr}
+    .dd-hero .dd-shot{border-radius:12px}
+    .dd-hero .dd-shot__url{display:none}
+    .dd-hero .dd-mock__tiles{grid-template-columns:1fr}
+    .dd-hero .dd-mock__range{display:none}
+    .dd-hero .dd-mock__row{grid-template-columns:1fr auto;gap:.5rem}
+    .dd-hero .dd-mock__row > :nth-child(2),.dd-hero .dd-mock__row > :nth-child(3){display:none}
+    .dd-hero__actions .btn{width:100%}
+    .dd-more__btn{width:100%;justify-content:center}
+}
+
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- ══ HERO ══════════════════════════════════════════════════════ -->
+<section class="dd-hero">
+    <div class="dd-hero__grid"></div>
+    <div class="dd-hero__glow"></div>
+    <div class="dd-hero__glow dd-hero__glow--2"></div>
+    <div class="dd-container dd-hero__inner">
+        <div class="dd-hero__copy">
+            <div class="dd-eyebrow dd-eyebrow--light">{% trans "Dashboard Development" %}</div>
+            <h1 class="mb-3">{% trans "Custom dashboards that answer" %} <span class="dd-grad">{% trans "every question" %}</span></h1>
+            <p>
+                {% trans "Custom dashboards for businesses that need a clearer view of their operations, performance, and data." %}
+            </p>
+            <div class="dd-hero__actions">
+                <a href="{% url 'home:build_website' %}" class="btn btn-lg rounded-pill px-5 fw-800" style="background:var(--grad-primary);border:none;color:#fff;box-shadow:0 12px 28px -10px var(--primary-glow);">
+                    {% trans "Start Your Project" %} <i class="fas fa-arrow-right ms-1"></i>
+                </a>
+                <a href="#db-types" class="btn btn-lg rounded-pill px-4 fw-700" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);color:#fff;backdrop-filter:blur(10px);">
+                    {% trans "Explore Dashboards" %}
+                </a>
+            </div>
+            <div class="dd-chips mt-4">
+                <span class="dd-chip"><i class="fas fa-bolt"></i>{% trans "Live data" %}</span>
+                <span class="dd-chip"><i class="fas fa-filter"></i>{% trans "Self-service filters" %}</span>
+                <span class="dd-chip"><i class="fas fa-user-lock"></i>{% trans "Role-based access" %}</span>
+                <span class="dd-chip"><i class="fas fa-mobile-screen"></i>{% trans "Responsive" %}</span>
+            </div>
+        </div>
+
+        <!-- The real dashboard, presented as a live product surface -->
+        <div class="dd-shot dd-reveal">
+            <div class="dd-shot__bar">
+                <span class="dd-shot__dot" style="background:#f87171"></span>
+                <span class="dd-shot__dot" style="background:#fbbf24"></span>
+                <span class="dd-shot__dot" style="background:#34d399"></span>
+                <span class="dd-shot__url">app.onwebapp.com/dashboard/executive-overview</span>
+                <span class="dd-shot__live"><span class="dd-shot__pulse"></span>{% trans "Live" %}</span>
+            </div>
+            <div class="dd-mock">
+                <div class="dd-mock__side">
+                    <div class="dd-mock__brand"><i class="fas fa-chart-pie" style="color:#818cf8;font-size:.85rem"></i><span>{% trans "OnWebApp" %}</span></div>
+                    <div class="dd-mock__nav is-active"><i class="fas fa-gauge-high"></i>{% trans "Overview" %}</div>
+                    <div class="dd-mock__nav"><i class="fas fa-gears"></i>{% trans "Operations" %}</div>
+                    <div class="dd-mock__nav"><i class="fas fa-arrow-trend-up"></i>{% trans "Sales" %}</div>
+                    <div class="dd-mock__nav"><i class="fas fa-globe"></i>{% trans "Marketing" %}</div>
+                    <div class="dd-mock__nav"><i class="fas fa-industry"></i>{% trans "Industrial" %}</div>
+                </div>
+                <div class="dd-mock__main">
+                    <div class="dd-mock__top">
+                        <h3 class="dd-mock__title">{% trans "Executive Overview" %}</h3>
+                        <div class="dd-mock__range">
+                            <span>{% trans "7D" %}</span>
+                            <span>{% trans "30D" %}</span>
+                            <span class="is-on">{% trans "12M" %}</span>
+                        </div>
+                    </div>
+
+                    <div class="dd-mock__tiles">
+                        <div class="dd-mock__tile">
+                            <div class="dd-mock__label">{% trans "Revenue" %}</div>
+                            <div class="dd-mock__val">$<span class="dd-count" data-count="2481300">2,481,300</span></div>
+                            <div class="dd-mock__delta up"><i class="fas fa-arrow-up"></i>12.4%</div>
+                            <div class="dd-mock__spark"><i style="height:40%"></i><i style="height:62%"></i><i style="height:48%"></i><i style="height:78%"></i><i style="height:66%"></i><i style="height:92%"></i></div>
+                        </div>
+                        <div class="dd-mock__tile">
+                            <div class="dd-mock__label">{% trans "Orders" %}</div>
+                            <div class="dd-mock__val"><span class="dd-count" data-count="18426">18,426</span></div>
+                            <div class="dd-mock__delta up"><i class="fas fa-arrow-up"></i>8.1%</div>
+                            <div class="dd-mock__spark"><i style="height:55%"></i><i style="height:44%"></i><i style="height:70%"></i><i style="height:58%"></i><i style="height:84%"></i><i style="height:74%"></i></div>
+                        </div>
+                        <div class="dd-mock__tile">
+                            <div class="dd-mock__label">{% trans "Conversion" %}</div>
+                            <div class="dd-mock__val"><span class="dd-count" data-count="3.8" data-decimals="1">3.8</span>%</div>
+                            <div class="dd-mock__delta up"><i class="fas fa-arrow-up"></i>0.6</div>
+                            <div class="dd-mock__spark"><i style="height:38%"></i><i style="height:52%"></i><i style="height:46%"></i><i style="height:66%"></i><i style="height:60%"></i><i style="height:80%"></i></div>
+                        </div>
+                        <div class="dd-mock__tile">
+                            <div class="dd-mock__label">{% trans "Uptime" %}</div>
+                            <div class="dd-mock__val"><span class="dd-count" data-count="99.9" data-decimals="1">99.9</span>%</div>
+                            <div class="dd-mock__delta up"><i class="fas fa-minus"></i>0.0</div>
+                            <div class="dd-mock__spark"><i style="height:88%"></i><i style="height:92%"></i><i style="height:86%"></i><i style="height:94%"></i><i style="height:90%"></i><i style="height:96%"></i></div>
+                        </div>
+                    </div>
+
+                    <div class="dd-mock__grid">
+                        <div class="dd-mock__panel">
+                            <div class="dd-mock__ptitle">{% trans "Revenue vs Target" %}<em>{% trans "Last 12 months" %}</em></div>
+                            <div class="dd-mock__canvas"><canvas id="ddChartTrend" aria-label="{% trans 'Revenue compared with target over twelve months' %}" role="img"></canvas></div>
+                            <div class="dd-mock__legend">
+                                <span><i style="background:#4f46e5"></i>{% trans "Actual" %}</span>
+                                <span><i style="background:#22d3ee"></i>{% trans "Target" %}</span>
+                            </div>
+                        </div>
+                        <div class="dd-mock__panel">
+                            <div class="dd-mock__ptitle">{% trans "Traffic by Channel" %}</div>
+                            <div class="dd-mock__canvas"><canvas id="ddChartChannel" aria-label="{% trans 'Website traffic split by channel' %}" role="img"></canvas></div>
+                            <div class="dd-mock__legend">
+                                <span><i style="background:#4f46e5"></i>{% trans "Organic" %}</span>
+                                <span><i style="background:#06b6d4"></i>{% trans "Paid" %}</span>
+                                <span><i style="background:#8b5cf6"></i>{% trans "Referral" %}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dd-mock__rows">
+                        <div class="dd-mock__row dd-mock__row--head">
+                            <span>{% trans "Data Source" %}</span><span>{% trans "Last Sync" %}</span><span>{% trans "Owner" %}</span><span>{% trans "Status" %}</span>
+                        </div>
+                        <div class="dd-mock__row">
+                            <span>{% trans "Salesforce CRM" %}</span><span>{% trans "2 min ago" %}</span><span>{% trans "Sales Ops" %}</span>
+                            <span class="dd-mock__pill ok"><i class="fas fa-check"></i>{% trans "Healthy" %}</span>
+                        </div>
+                        <div class="dd-mock__row">
+                            <span>{% trans "Shopify Orders" %}</span><span>{% trans "6 min ago" %}</span><span>{% trans "E-commerce" %}</span>
+                            <span class="dd-mock__pill ok"><i class="fas fa-check"></i>{% trans "Healthy" %}</span>
+                        </div>
+                        <div class="dd-mock__row">
+                            <span>{% trans "IoT Sensor Grid" %}</span><span>{% trans "18 min ago" %}</span><span>{% trans "Industrial" %}</span>
+                            <span class="dd-mock__pill warn"><i class="fas fa-triangle-exclamation"></i>{% trans "Delayed" %}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <span class="dd-shot__glow"></span>
+        </div>
+
+        <!-- Know more → content -->
+        <div class="dd-more">
+            <div>
+                <a href="#dd-content" class="dd-more__btn">{% trans "Know More" %} <i class="fas fa-chevron-down"></i></a>
+                <span class="dd-more__hint">{% trans "See how we build it" %}</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══ STAT STRIP ═════════════════════════════════════════════════ -->
+<section class="dd-section" id="dd-content">
+    <div class="dd-container">
+        <div class="dd-stats dd-reveal">
+            <div class="dd-stat">
+                <div class="dd-stat__num"><span class="dd-count" data-count="4">4</span></div>
+                <div class="dd-stat__label">{% trans "Dashboard Types" %}</div>
+            </div>
+            <div class="dd-stat">
+                <div class="dd-stat__num"><span class="dd-count" data-count="40">40</span>+</div>
+                <div class="dd-stat__label">{% trans "Data Sources" %}</div>
+            </div>
+            <div class="dd-stat">
+                <div class="dd-stat__num"><span class="dd-count" data-count="3">3</span></div>
+                <div class="dd-stat__label">{% trans "Delivery Plans" %}</div>
+            </div>
+            <div class="dd-stat">
+                <div class="dd-stat__num"><span class="dd-count" data-count="99">99</span>%</div>
+                <div class="dd-stat__label">{% trans "Refresh SLA" %}</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══ THE PROBLEM ══════════════════════════════════════════════════ -->
+<section class="dd-section" id="dd-problem">
+    <div class="dd-container">
+        <div class="row g-5 align-items-center">
+            <div class="col-lg-6 dd-reveal">
+                <div class="dd-eyebrow">{% trans "Why Dashboards" %}</div>
+                <h2 class="dd-h2">{% trans "Your Data Is Everywhere. Your Decisions Shouldn't Be." %}</h2>
+                <p class="dd-lede">{% trans "Your business already generates the data you need. It lives across your website, CRM, sales systems, marketing platforms, ERP, and other tools." %}</p>
+                <p class="dd-lede mt-3">{% trans "The challenge is seeing it all together." %}</p>
+                <p class="dd-lede mt-3">{% trans "OnWebApp brings your business data into a single, tailored dashboard — giving your team the metrics, trends, and insights they need without searching across multiple systems." %}</p>
+            </div>
+            <div class="col-lg-6 dd-reveal">
+                <div class="dd-card">
+                    <div class="dd-icon" style="--dc:#ea580c;--dc-soft:rgba(234,88,12,.1)"><i class="fas fa-layer-group"></i></div>
+                    <h3 class="dd-h3">{% trans "Turn Your Business Data Into a Clear View" %}</h3>
+                    <div class="dd-tags">
+                        <span class="dd-tag"><i class="fas fa-globe"></i>{% trans "Website" %}</span>
+                        <span class="dd-tag"><i class="fas fa-address-book"></i>{% trans "CRM" %}</span>
+                        <span class="dd-tag"><i class="fas fa-file-invoice-dollar"></i>{% trans "Sales" %}</span>
+                        <span class="dd-tag"><i class="fas fa-bullhorn"></i>{% trans "Marketing" %}</span>
+                        <span class="dd-tag"><i class="fas fa-industry"></i>{% trans "ERP" %}</span>
+                        <span class="dd-tag"><i class="fas fa-ellipsis"></i>{% trans "Other tools" %}</span>
+                    </div>
+
+                    <div class="dd-frag-arrow">
+                        <i class="fas fa-arrow-down"></i>
+                        <span>{% trans "One clear view" %}</span>
+                    </div>
+
+                    <div class="dd-frag-result">
+                        <i class="fas fa-chart-line"></i>
+                        <div>
+                            <strong>{% trans "Your business, on one screen" %}</strong>
+                            <p>{% trans "The metrics, trends and insights your team actually decides on." %}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══ DASHBOARD TYPES ════════════════════════════════════════════ -->
+<section class="dd-section dd-section--alt" id="db-types">
+    <div class="dd-container">
+        <div class="text-center mb-5 dd-reveal">
+            <div class="dd-eyebrow">{% trans "Built Around Your Business" %}</div>
+            <h2 class="dd-h2">{% trans "Dashboards for the decisions that matter" %}</h2>
+            <p class="dd-lede mx-auto">{% trans "There is no one-size-fits-all dashboard. We design each experience around your business, your data, and the decisions your team needs to make." %}</p>
+            <p class="dd-lede mx-auto mt-3"><strong>{% trans "Your dashboard should reflect your business — not force your business into a template." %}</strong></p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3 dd-reveal">
+                <div class="dd-card" style="--dc:#059669;--dc-soft:rgba(5,150,105,.1)">
+                    <div class="dd-icon"><i class="fas fa-arrow-trend-up"></i></div>
+                    <h5 class="dd-h3">{% trans "Sales & Revenue" %}</h5>
+                    <p>{% trans "Leads, customers, pipeline, orders, revenue." %}</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3 dd-reveal">
+                <div class="dd-card" style="--dc:#7c3aed;--dc-soft:rgba(124,58,237,.1)">
+                    <div class="dd-icon"><i class="fas fa-globe"></i></div>
+                    <h5 class="dd-h3">{% trans "Marketing & Digital" %}</h5>
+                    <p>{% trans "Traffic, engagement, conversions, SEO, website performance." %}</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3 dd-reveal">
+                <div class="dd-card" style="--dc:#2563eb;--dc-soft:rgba(37,99,235,.1)">
+                    <div class="dd-icon"><i class="fas fa-gears"></i></div>
+                    <h5 class="dd-h3">{% trans "Operations & Performance" %}</h5>
+                    <p>{% trans "Workflows, KPIs, processes, productivity, operational data." %}</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3 dd-reveal">
+                <div class="dd-card" style="--dc:#e11d48;--dc-soft:rgba(225,29,72,.1)">
+                    <div class="dd-icon"><i class="fas fa-sliders"></i></div>
+                    <h5 class="dd-h3">{% trans "Custom" %}</h5>
+                    <p>{% trans "Any combination of your systems, metrics and business requirements." %}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══ WHY ONWEBAPP ═══════════════════════════════════════════════ -->
+<section class="dd-section">
+    <div class="dd-container">
+        <div class="text-center mb-5 dd-reveal">
+            <div class="dd-eyebrow">{% trans "Why OnWebApp" %}</div>
+            <h2 class="dd-h2">{% trans "Data people actually use" %}</h2>
+            <p class="dd-lede mx-auto">{% trans "A dashboard nobody opens changes nothing. We build reporting that teams trust, open every morning, and act on." %}</p>
+        </div>
+        <div class="dd-anatomy dd-reveal" data-anatomy>
+            <div class="dd-anatomy__fig">
+                <div class="dd-shot__bar">
+                    <span class="dd-shot__dot" style="background:#f87171"></span>
+                    <span class="dd-shot__dot" style="background:#fbbf24"></span>
+                    <span class="dd-shot__dot" style="background:#34d399"></span>
+                    <span class="dd-shot__url">app.onwebapp.com/dashboard</span>
+                    <span class="dd-shot__live"><span class="dd-shot__pulse"></span>{% trans "Live" %}</span>
+                </div>
+                <div class="dd-board">
+                    <div class="dd-board__strip">
+                        <span class="dd-board__micro"><span class="dd-board__pulse"></span>{% trans "All sources synced" %}</span>
+                        <span class="dd-board__micro">{% trans "12s ago · next in 4m" %}</span>
+                        <span class="dd-pin" data-pin="1" style="--pc:#06b6d4">1</span>
+                    </div>
+                    <div class="dd-board__strip">
+                        <span class="dd-board__chip is-on">{% trans "Last 30 days" %}</span>
+                        <span class="dd-board__chip">{% trans "Region: All" %}</span>
+                        <span class="dd-board__chip">{% trans "Team: All" %}</span>
+                        <span class="dd-board__chip">{% trans "Product line" %}</span>
+                        <span class="dd-pin" data-pin="2" style="--pc:#10b981">2</span>
+                    </div>
+                    <div class="dd-board__strip dd-board__strip--title">
+                        <strong>{% trans "Executive Overview" %}</strong>
+                        <span class="dd-board__chip dd-board__chip--role"><i class="fas fa-user-shield"></i>{% trans "Manager view" %}</span>
+                        <span class="dd-pin" data-pin="3" style="--pc:#8b5cf6">3</span>
+                    </div>
+                    <div class="dd-board__tiles">
+                        <div class="dd-board__tile">
+                            <span class="dd-board__micro">{% trans "Revenue" %}</span>
+                            <b>$248,130</b>
+                            <em class="is-up">+12.4%</em>
+                        </div>
+                        <div class="dd-board__tile">
+                            <span class="dd-board__micro">{% trans "Orders" %}</span>
+                            <b>1,842</b>
+                            <em class="is-up">+8.1%</em>
+                        </div>
+                        <div class="dd-board__tile">
+                            <span class="dd-board__micro">{% trans "Margin" %}</span>
+                            <b>31.6%</b>
+                            <em class="is-down">-0.4%</em>
+                        </div>
+                    </div>
+                    <div class="dd-board__strip">
+                        <span class="dd-board__micro">{% trans "Reading from" %}</span>
+                        <span class="dd-board__chip">CRM</span>
+                        <span class="dd-board__chip">ERP</span>
+                        <span class="dd-board__chip">POS</span>
+                        <span class="dd-board__chip">{% trans "Web" %}</span>
+                        <span class="dd-board__chip">{% trans "Ads" %}</span>
+                        <span class="dd-pin" data-pin="4" style="--pc:#4f46e5">4</span>
+                    </div>
+                    <div class="dd-board__split">
+                        <div class="dd-board__panel">
+                            <div class="dd-board__ptitle">{% trans "Revenue vs target" %}</div>
+                            <div class="dd-board__bars">
+                                <i style="height:34%"></i><i style="height:46%"></i><i style="height:40%"></i><i style="height:58%"></i><i style="height:52%"></i><i style="height:70%"></i><i style="height:64%"></i><i style="height:82%"></i><i style="height:74%"></i><i style="height:92%"></i>
+                                <span class="dd-board__goal"></span>
+                            </div>
+                        </div>
+                        <div class="dd-board__panel">
+                            <div class="dd-board__ptitle">{% trans "By channel" %}</div>
+                            <div class="dd-board__ring"><span>5</span></div>
+                        </div>
+                    </div>
+                    <div class="dd-board__strip dd-board__strip--foot">
+                        <span class="dd-board__micro">{% trans "Opens on" %}</span>
+                        <i class="fas fa-display dd-board--dc"></i>
+                        <i class="fas fa-tablet-screen-button dd-board--dc"></i>
+                        <i class="fas fa-mobile-screen dd-board--dc"></i>
+                        <span class="dd-pin" data-pin="5" style="--pc:#0ea5e9">5</span>
+                    </div>
+                    <div class="dd-board__strip dd-board__strip--foot">
+                        <span class="dd-board__chip"><i class="fas fa-file-pdf"></i>{% trans "PDF" %}</span>
+                        <span class="dd-board__chip"><i class="fas fa-file-excel"></i>{% trans "Excel" %}</span>
+                        <span class="dd-board__chip"><i class="fas fa-clock"></i>{% trans "Mondays 08:00" %}</span>
+                        <span class="dd-board__chip is-on"><i class="fas fa-paper-plane"></i>{% trans "Send" %}</span>
+                        <span class="dd-pin" data-pin="6" style="--pc:#f59e0b">6</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dd-anatomy__key">
+                <div class="dd-keyrow" data-key="1" style="--dc:#06b6d4">
+                    <span class="dd-keyrow__no">1</span>
+                    <div>
+                        <h5 class="dd-h3">{% trans "Real-Time Refresh" %}</h5>
+                        <p>{% trans "Continuous and scheduled sync cycles keep KPIs current without anyone exporting a spreadsheet again." %}</p>
+                    </div>
+                </div>
+                <div class="dd-keyrow" data-key="2" style="--dc:#10b981">
+                    <span class="dd-keyrow__no">2</span>
+                    <div>
+                        <h5 class="dd-h3">{% trans "Self-Service Filters" %}</h5>
+                        <p>{% trans "Date range, region, team and product line are one click away, so users answer their own questions." %}</p>
+                    </div>
+                </div>
+                <div class="dd-keyrow" data-key="3" style="--dc:#8b5cf6">
+                    <span class="dd-keyrow__no">3</span>
+                    <div>
+                        <h5 class="dd-h3">{% trans "Role-Based Views" %}</h5>
+                        <p>{% trans "Executives, managers and analysts each see the metrics that matter to them — nothing more, nothing less." %}</p>
+                    </div>
+                </div>
+                <div class="dd-keyrow" data-key="4" style="--dc:#4f46e5">
+                    <span class="dd-keyrow__no">4</span>
+                    <div>
+                        <h5 class="dd-h3">{% trans "Single Source of Truth" %}</h5>
+                        <p>{% trans "Every figure comes from the system that already owns it, so one number never means two different things on two screens." %}</p>
+                    </div>
+                </div>
+                <div class="dd-keyrow" data-key="5" style="--dc:#0ea5e9">
+                    <span class="dd-keyrow__no">5</span>
+                    <div>
+                        <h5 class="dd-h3">{% trans "Responsive by Default" %}</h5>
+                        <p>{% trans "Desktop, tablet and phone all work, so a decision is never blocked by being away from a desk." %}</p>
+                    </div>
+                </div>
+                <div class="dd-keyrow" data-key="6" style="--dc:#f59e0b">
+                    <span class="dd-keyrow__no">6</span>
+                    <div>
+                        <h5 class="dd-h3">{% trans "Export & Scheduling" %}</h5>
+                        <p>{% trans "Automated PDF, Excel and email delivery of the exact reports your stakeholders expect each week." %}</p>
+                    </div>
+                </div>
+            </div>
+
+            <svg class="dd-wires" data-anatomy-wires aria-hidden="true" focusable="false"></svg>
+        </div>
+    </div>
+</section>
+
+<!-- ══ HOW IT WORKS ═══════════════════════════════════════════════ -->
+<section class="dd-section dd-section--alt">
+    <div class="dd-container">
+        <div class="text-center mb-5 dd-reveal">
+            <div class="dd-eyebrow">{% trans "How It Works" %}</div>
+            <h2 class="dd-h2">{% trans "From scattered data to one clear view" %}</h2>
+            <p class="dd-lede mx-auto">{% trans "Nothing in your stack gets replaced. We sit on top of it, model it once, and expose exactly what each team needs." %}</p>
+        </div>
+        <div class="dd-flow dd-reveal">
+            <div class="dd-flow__stage">
+                <div class="dd-flow__num">01</div>
+                <h5 class="dd-h3">{% trans "Connect" %}</h5>
+                <p class="mb-0" style="color:var(--text-secondary);font-size:.9rem;line-height:1.7;">{% trans "We link the systems that already hold your data." %}</p>
+                <ul>
+                    <li><i class="fas fa-check"></i>{% trans "CRM, ERP and accounting" %}</li>
+                    <li><i class="fas fa-check"></i>{% trans "Databases and spreadsheets" %}</li>
+                    <li><i class="fas fa-check"></i>{% trans "Analytics, ads and web" %}</li>
+                    <li><i class="fas fa-check"></i>{% trans "IoT and machine feeds" %}</li>
+                </ul>
+            </div>
+            <div class="dd-flow__arrow"><i class="fas fa-chevron-right"></i></div>
+            <div class="dd-flow__stage">
+                <div class="dd-flow__num">02</div>
+                <h5 class="dd-h3">{% trans "Model" %}</h5>
+                <p class="mb-0" style="color:var(--text-secondary);font-size:.9rem;line-height:1.7;">{% trans "We clean, join and validate it into one reliable layer." %}</p>
+                <ul>
+                    <li><i class="fas fa-check"></i>{% trans "Cleansing and deduplication" %}</li>
+                    <li><i class="fas fa-check"></i>{% trans "Unified KPI definitions" %}</li>
+                    <li><i class="fas fa-check"></i>{% trans "Automated quality checks" %}</li>
+                    <li><i class="fas fa-check"></i>{% trans "Scheduled refresh" %}</li>
+                </ul>
+            </div>
+            <div class="dd-flow__arrow"><i class="fas fa-chevron-right"></i></div>
+            <div class="dd-flow__stage">
+                <div class="dd-flow__num">03</div>
+                <h5 class="dd-h3">{% trans "Visualize" %}</h5>
+                <p class="mb-0" style="color:var(--text-secondary);font-size:.9rem;line-height:1.7;">{% trans "We turn it into dashboards teams use daily." %}</p>
+                <ul>
+                    <li><i class="fas fa-check"></i>{% trans "KPI and trend layouts" %}</li>
+                    <li><i class="fas fa-check"></i>{% trans "Interactive drill-down" %}</li>
+                    <li><i class="fas fa-check"></i>{% trans "Filters and saved views" %}</li>
+                    <li><i class="fas fa-check"></i>{% trans "Scheduled delivery" %}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══ PROCESS ════════════════════════════════════════════════════ -->
+<section class="dd-section" id="db-process">
+    <div class="dd-container">
+        <div class="text-center mb-5 dd-reveal">
+            <div class="dd-eyebrow">{% trans "Our Process" %}</div>
+            <h2 class="dd-h2">{% trans "From raw data to live dashboard" %}</h2>
+            <p class="dd-lede mx-auto">{% trans "A structured engagement that ends with reporting your teams rely on, not a folder of charts." %}</p>
+        </div>
+        <ol class="dd-tl dd-reveal">
+            <li class="dd-tl__step is-up">
+                <div class="dd-tl__card">
+                    <span class="dd-tl__phase">{% trans "Phase 01" %}</span>
+                    <h5>{% trans "Discovery & KPI Definition" %}</h5>
+                    <p>{% trans "We interview the people who will use the dashboard, audit where the data lives, and agree exactly which metrics matter to whom." %}</p>
+                    <div class="dd-tags">
+                        <span class="dd-tag"><i class="fas fa-check"></i>{% trans "Stakeholder Interviews" %}</span>
+                        <span class="dd-tag"><i class="fas fa-check"></i>{% trans "Data Source Audit" %}</span>
+                        <span class="dd-tag"><i class="fas fa-check"></i>{% trans "KPI Definition" %}</span>
+                    </div>
+                </div>
+                <span class="dd-tl__node"><i class="fas fa-compass-drafting"></i></span>
+            </li>
+            <li class="dd-tl__step is-down">
+                <div class="dd-tl__card">
+                    <span class="dd-tl__phase">{% trans "Phase 02" %}</span>
+                    <h5>{% trans "Data Integration" %}</h5>
+                    <p>{% trans "APIs, databases and spreadsheets are connected and modelled into one clean, dependable layer with scheduled syncs." %}</p>
+                    <div class="dd-tags">
+                        <span class="dd-tag"><i class="fas fa-check"></i>{% trans "API & Database Connections" %}</span>
+                        <span class="dd-tag"><i class="fas fa-check"></i>{% trans "Data Cleansing" %}</span>
+                        <span class="dd-tag"><i class="fas fa-check"></i>{% trans "Scheduled Syncs" %}</span>
+                    </div>
+                </div>
+                <span class="dd-tl__node"><i class="fas fa-plug"></i></span>
+            </li>
+            <li class="dd-tl__step is-up">
+                <div class="dd-tl__card">
+                    <span class="dd-tl__phase">{% trans "Phase 03" %}</span>
+                    <h5>{% trans "Dashboard Design" %}</h5>
+                    <p>{% trans "Wireframes and visual design built around information hierarchy, so the number that matters is never hard to find." %}</p>
+                    <div class="dd-tags">
+                        <span class="dd-tag"><i class="fas fa-check"></i>{% trans "Layout & Wireframes" %}</span>
+                        <span class="dd-tag"><i class="fas fa-check"></i>{% trans "Chart Selection" %}</span>
+                        <span class="dd-tag"><i class="fas fa-check"></i>{% trans "User Review" %}</span>
+                    </div>
+                </div>
+                <span class="dd-tl__node"><i class="fas fa-pen-ruler"></i></span>
+            </li>
+            <li class="dd-tl__step is-down">
+                <div class="dd-tl__card">
+                    <span class="dd-tl__phase">{% trans "Phase 04" %}</span>
+                    <h5>{% trans "Build & Integrate" %}</h5>
+                    <p>{% trans "We develop the dashboards, wire in filters, drill-down and permissions, and connect them to your live data." %}</p>
+                    <div class="dd-tags">
+                        <span class="dd-tag"><i class="fas fa-check"></i>{% trans "Dashboard Build" %}</span>
+                        <span class="dd-tag"><i class="fas fa-check"></i>{% trans "Interactive Filters" %}</span>
+                        <span class="dd-tag"><i class="fas fa-check"></i>{% trans "Role-Based Access" %}</span>
+                    </div>
+                </div>
+                <span class="dd-tl__node"><i class="fas fa-code"></i></span>
+            </li>
+            <li class="dd-tl__step is-up is-last">
+                <div class="dd-tl__card dd-tl__card--end">
+                    <span class="dd-tl__phase">{% trans "Phase 05" %}</span>
+                    <h5>{% trans "Launch & Support" %}</h5>
+                    <p>{% trans "Numbers are validated against your existing reports, teams are trained, and improvements follow as your data grows." %}</p>
+                    <div class="dd-tags">
+                        <span class="dd-tag"><i class="fas fa-check"></i>{% trans "Data Validation" %}</span>
+                        <span class="dd-tag"><i class="fas fa-check"></i>{% trans "Team Training" %}</span>
+                        <span class="dd-tag"><i class="fas fa-check"></i>{% trans "Ongoing Updates" %}</span>
+                    </div>
+                </div>
+                <span class="dd-tl__node dd-tl__node--end"><i class="fas fa-rocket"></i></span>
+            </li>
+        </ol>
+    </div>
+</section>
+
+<!-- ══ CAPABILITIES (DARK) ════════════════════════════════════════ -->
+<section class="dd-section dd-section--dark">
+    <div class="dd-container">
+        <div class="text-center mb-5 dd-reveal">
+            <div class="dd-eyebrow dd-eyebrow--light">{% trans "Capabilities" %}</div>
+            <h2 class="dd-h2">{% trans "What every dashboard includes" %}</h2>
+            <p class="dd-lede dd-lede--light mx-auto">{% trans "The same foundation under every tier, so your reporting never has to be rebuilt from scratch as you grow." %}</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-lg-4 dd-reveal">
+                <div class="dd-card dd-card--dark" style="--dc:#818cf8;--dc-soft:rgba(99,102,241,.2)">
+                    <div class="dd-icon"><i class="fas fa-satellite-dish"></i></div>
+                    <h5 class="dd-h3">{% trans "Live Data Feeds" %}</h5>
+                    <p>{% trans "Dashboards update on a schedule or continuously, so what is on screen matches reality right now." %}</p>
+                    <ul class="dd-list">
+                        <li><i class="fas fa-check"></i>{% trans "Real-time and scheduled refresh" %}</li>
+                        <li><i class="fas fa-check"></i>{% trans "Automated ETL pipelines" %}</li>
+                        <li><i class="fas fa-check"></i>{% trans "Staleness and error alerts" %}</li>
+                        <li><i class="fas fa-check"></i>{% trans "Automated data quality checks" %}</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-4 dd-reveal">
+                <div class="dd-card dd-card--dark" style="--dc:#34d399;--dc-soft:rgba(52,211,153,.2)">
+                    <div class="dd-icon"><i class="fas fa-magnifying-glass-chart"></i></div>
+                    <h5 class="dd-h3">{% trans "Interactive Analysis" %}</h5>
+                    <p>{% trans "Users explore the data themselves instead of filing a request for a new report every week." %}</p>
+                    <ul class="dd-list">
+                        <li><i class="fas fa-check"></i>{% trans "Cross-filtering on every chart" %}</li>
+                        <li><i class="fas fa-check"></i>{% trans "Drill-down to detail records" %}</li>
+                        <li><i class="fas fa-check"></i>{% trans "Period-over-period comparison" %}</li>
+                        <li><i class="fas fa-check"></i>{% trans "Saved views and bookmarks" %}</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-4 dd-reveal">
+                <div class="dd-card dd-card--dark" style="--dc:#c084fc;--dc-soft:rgba(192,132,252,.2)">
+                    <div class="dd-icon"><i class="fas fa-user-lock"></i></div>
+                    <h5 class="dd-h3">{% trans "Governance & Delivery" %}</h5>
+                    <p>{% trans "The right people see the right numbers, and stakeholders receive them without having to ask." %}</p>
+                    <ul class="dd-list">
+                        <li><i class="fas fa-check"></i>{% trans "Role-based permissions" %}</li>
+                        <li><i class="fas fa-check"></i>{% trans "White-label branding" %}</li>
+                        <li><i class="fas fa-check"></i>{% trans "Scheduled email reports" %}</li>
+                        <li><i class="fas fa-check"></i>{% trans "PDF and Excel export" %}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══ INDUSTRIES ═════════════════════════════════════════════════ -->
+<section class="dd-section">
+    <div class="dd-container">
+        <div class="text-center mb-5 dd-reveal">
+            <div class="dd-eyebrow">{% trans "Industries We Serve" %}</div>
+            <h2 class="dd-h2">{% trans "Where our dashboards deliver value" %}</h2>
+            <p class="dd-lede mx-auto">{% trans "Reporting needs differ sharply by sector. We adapt the metrics, not just the layout." %}</p>
+        </div>
+        <div class="dd-industries dd-reveal">
+            <span class="dd-ind"><i class="fas fa-industry" style="color:#4f46e5"></i>{% trans "Manufacturing" %}</span>
+            <span class="dd-ind"><i class="fas fa-truck-medical" style="color:#059669"></i>{% trans "Healthcare" %}</span>
+            <span class="dd-ind"><i class="fas fa-store" style="color:#7c3aed"></i>{% trans "Retail & eCommerce" %}</span>
+            <span class="dd-ind"><i class="fas fa-building" style="color:#2563eb"></i>{% trans "Real Estate" %}</span>
+            <span class="dd-ind"><i class="fas fa-graduation-cap" style="color:#ea580c"></i>{% trans "Education" %}</span>
+            <span class="dd-ind"><i class="fas fa-utensils" style="color:#e11d48"></i>{% trans "Hospitality" %}</span>
+            <span class="dd-ind"><i class="fas fa-truck-fast" style="color:#06b6d4"></i>{% trans "Logistics" %}</span>
+            <span class="dd-ind"><i class="fas fa-coins" style="color:#64748b"></i>{% trans "Banking & Finance" %}</span>
+            <span class="dd-ind"><i class="fas fa-wheat-awn" style="color:#16a34a"></i>{% trans "Agriculture" %}</span>
+            <span class="dd-ind"><i class="fas fa-bolt" style="color:#ca8a04"></i>{% trans "Energy & Utilities" %}</span>
+        </div>
+    </div>
+</section>
+
+<!-- ══ PRICING ═══════════════════════════════════════════════════ -->
+<section class="dd-section dd-section--alt">
+    <div class="dd-container">
+        <div class="text-center mb-5 dd-reveal">
+            <div class="dd-eyebrow">{% trans "Pricing" %}</div>
+            <h2 class="dd-h2">{% trans "Choose your dashboard plan" %}</h2>
+            <p class="dd-lede mx-auto">{% trans "Three levels, from a single focused dashboard to a full analytics platform across every system." %}</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-lg-4 dd-reveal">
+                <div class="dd-plan">
+                    <div class="dd-plan__tier">{% trans "Starter" %}</div>
+                    <h4>{% trans "Dashboard Starter" %}</h4>
+                    <p class="dd-plan__desc">{% trans "The fastest way to get a reliable view of one key area of the business." %}</p>
+                    <ul>
+                        <li><i class="fas fa-check"></i>{% trans "One data source" %}</li>
+                        <li><i class="fas fa-check"></i>{% trans "Essential KPIs" %}</li>
+                        <li><i class="fas fa-check"></i>{% trans "Responsive dashboard" %}</li>
+                        <li><i class="fas fa-check"></i>{% trans "Setup and handover" %}</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-4 dd-reveal">
+                <div class="dd-plan dd-plan--featured">
+                    <span class="dd-plan__flag">{% trans "Most Popular" %}</span>
+                    <div class="dd-plan__tier">{% trans "Business" %}</div>
+                    <h4>{% trans "Dashboard Business" %}</h4>
+                    <p class="dd-plan__desc">{% trans "For teams that need to explore data across several systems themselves." %}</p>
+                    <ul>
+                        <li><i class="fas fa-check"></i>{% trans "Multiple data sources" %}</li>
+                        <li><i class="fas fa-check"></i>{% trans "Interactive analytics" %}</li>
+                        <li><i class="fas fa-check"></i>{% trans "Filters" %}</li>
+                        <li><i class="fas fa-check"></i>{% trans "Advanced KPIs" %}</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-4 dd-reveal">
+                <div class="dd-plan">
+                    <div class="dd-plan__tier">{% trans "Enterprise" %}</div>
+                    <h4>{% trans "Dashboard Enterprise" %}</h4>
+                    <p class="dd-plan__desc">{% trans "A governed analytics platform spanning every system with ongoing support." %}</p>
+                    <ul>
+                        <li><i class="fas fa-check"></i>{% trans "Multiple systems" %}</li>
+                        <li><i class="fas fa-check"></i>{% trans "Custom integrations" %}</li>
+                        <li><i class="fas fa-check"></i>{% trans "Role-based access" %}</li>
+                        <li><i class="fas fa-check"></i>{% trans "Ongoing support" %}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══ FAQ ════════════════════════════════════════════════════════ -->
+<section class="dd-section">
+    <div class="dd-container">
+        <div class="row justify-content-center">
+            <div class="col-lg-9">
+                <div class="text-center mb-5 dd-reveal">
+                    <div class="dd-eyebrow">{% trans "FAQ" %}</div>
+                    <h2 class="dd-h2">{% trans "Frequently asked questions" %}</h2>
+                </div>
+                <div class="accordion dd-reveal" id="ddFaq">
+                    <div class="dd-faq__item accordion-item">
+                        <h3 class="accordion-header">
+                            <button class="dd-faq__btn collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#ddFaq1" aria-expanded="false" aria-controls="ddFaq1">
+                                {% trans "What is the difference between a dashboard and a report?" %} <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </h3>
+                        <div id="ddFaq1" class="accordion-collapse collapse" data-bs-parent="#ddFaq">
+                            <div class="dd-faq__body accordion-body">{% trans "A report is a fixed, pre-built snapshot of data. A dashboard is interactive and live: users filter, drill down and change the date range themselves, and the figures refresh automatically." %}</div>
+                        </div>
+                    </div>
+                    <div class="dd-faq__item accordion-item">
+                        <h3 class="accordion-header">
+                            <button class="dd-faq__btn collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#ddFaq2" aria-expanded="false" aria-controls="ddFaq2">
+                                {% trans "Do I need to replace the tools I already use?" %} <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </h3>
+                        <div id="ddFaq2" class="accordion-collapse collapse" data-bs-parent="#ddFaq">
+                            <div class="dd-faq__body accordion-body">{% trans "No. Dashboards sit on top of your existing systems and read from them. Your CRM, ERP, spreadsheets and machines keep working exactly as they do — the dashboard simply makes their data visible in one place." %}</div>
+                        </div>
+                    </div>
+                    <div class="dd-faq__item accordion-item">
+                        <h3 class="accordion-header">
+                            <button class="dd-faq__btn collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#ddFaq3" aria-expanded="false" aria-controls="ddFaq3">
+                                {% trans "How long does a dashboard take to build?" %} <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </h3>
+                        <div id="ddFaq3" class="accordion-collapse collapse" data-bs-parent="#ddFaq">
+                            <div class="dd-faq__body accordion-body">{% trans "A Dashboard Starter with a single data source usually takes 2 to 4 weeks. Dashboard Business typically takes 4 to 8 weeks. Dashboard Enterprise depends on the number of systems and integrations, usually 8 to 16 weeks." %}</div>
+                        </div>
+                    </div>
+                    <div class="dd-faq__item accordion-item">
+                        <h3 class="accordion-header">
+                            <button class="dd-faq__btn collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#ddFaq4" aria-expanded="false" aria-controls="ddFaq4">
+                                {% trans "Can you build industrial and IoT dashboards?" %} <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </h3>
+                        <div id="ddFaq4" class="accordion-collapse collapse" data-bs-parent="#ddFaq">
+                            <div class="dd-faq__body accordion-body">{% trans "Yes. We connect machine and sensor data through MQTT, Modbus and OPC-UA, then surface OEE, downtime, throughput, cycle time and machine state on a single industrial dashboard." %}</div>
+                        </div>
+                    </div>
+                    <div class="dd-faq__item accordion-item">
+                        <h3 class="accordion-header">
+                            <button class="dd-faq__btn collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#ddFaq5" aria-expanded="false" aria-controls="ddFaq5">
+                                {% trans "How do you decide which KPIs to show?" %} <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </h3>
+                        <div id="ddFaq5" class="accordion-collapse collapse" data-bs-parent="#ddFaq">
+                            <div class="dd-faq__body accordion-body">{% trans "We start by interviewing the people who will use the dashboard, then map each role to the decisions it makes. Only metrics that trigger an action make it into the final layout." %}</div>
+                        </div>
+                    </div>
+                    <div class="dd-faq__item accordion-item">
+                        <h3 class="accordion-header">
+                            <button class="dd-faq__btn collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#ddFaq6" aria-expanded="false" aria-controls="ddFaq6">
+                                {% trans "Can different users see different data?" %} <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </h3>
+                        <div id="ddFaq6" class="accordion-collapse collapse" data-bs-parent="#ddFaq">
+                            <div class="dd-faq__body accordion-body">{% trans "Yes. Role-based access controls both what a user can see and what they can change. A regional manager can be limited to their region while an executive sees every location." %}</div>
+                        </div>
+                    </div>
+                    <div class="dd-faq__item accordion-item">
+                        <h3 class="accordion-header">
+                            <button class="dd-faq__btn collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#ddFaq7" aria-expanded="false" aria-controls="ddFaq7">
+                                {% trans "Is the dashboard mobile-friendly?" %} <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </h3>
+                        <div id="ddFaq7" class="accordion-collapse collapse" data-bs-parent="#ddFaq">
+                            <div class="dd-faq__body accordion-body">{% trans "Every dashboard is responsive. Executives can review headline KPIs on a phone, and operational teams get the same detail views on a tablet mounted on the factory floor." %}</div>
+                        </div>
+                    </div>
+                    <div class="dd-faq__item accordion-item">
+                        <h3 class="accordion-header">
+                            <button class="dd-faq__btn collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#ddFaq8" aria-expanded="false" aria-controls="ddFaq8">
+                                {% trans "What happens after launch?" %} <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </h3>
+                        <div id="ddFaq8" class="accordion-collapse collapse" data-bs-parent="#ddFaq">
+                            <div class="dd-faq__body accordion-body">{% trans "We provide training, documentation and a maintenance window. Dashboard Enterprise clients also receive ongoing support covering new data sources, new KPIs and scheduled report delivery." %}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══ CTA ════════════════════════════════════════════════════════ -->
+<section style="padding:0;">
+    <div class="dd-container" style="padding:2rem 1.5rem 5rem;">
+        <div class="dd-cta dd-reveal">
+            <h2>{% trans "Ready to see your data clearly?" %}</h2>
+            <p>{% trans "Let's build a dashboard around the decisions your business actually makes." %}</p>
+            <div class="d-flex gap-3 justify-content-center flex-wrap">
+                <span class="btn btn-lg rounded-pill px-5 fw-800" aria-disabled="true" style="background:linear-gradient(135deg,var(--primary-600),var(--primary-500));color:#fff;border:none;box-shadow:0 14px 30px -14px rgba(79,70,229,.9);cursor:default;">
+                    {% trans "Start Your Project" %} <i class="fas fa-arrow-right ms-1"></i>
+                </span>
+                <a href="#db-process" class="btn btn-lg rounded-pill px-4 fw-700" style="background:var(--bg-surface-secondary);border:1px solid var(--border-color);color:var(--text-primary);">
+                    {% trans "See Our Process" %}
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    /* ── Scroll reveal ─────────────────────────────────────────── */
+    var revealTargets = document.querySelectorAll('.dd-reveal');
+    if (revealTargets.length) {
+        var revealObserver = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+        revealTargets.forEach(function (el, i) {
+            el.style.transitionDelay = ((i % 6) * 0.07) + 's';
+            revealObserver.observe(el);
+        });
+    }
+
+    /* ── Animated counters ─────────────────────────────────────── */
+    function formatNumber(value, decimals) {
+        if (decimals > 0) {
+            return value.toFixed(decimals);
+        }
+        return Math.round(value).toLocaleString('en-US');
+    }
+
+    function runCounter(el) {
+        var target = parseFloat(el.dataset.count);
+        if (isNaN(target)) return;
+        var decimals = parseInt(el.dataset.decimals, 10) || 0;
+        var duration = 1500;
+        var start = null;
+
+        function frame(now) {
+            if (start === null) start = now;
+            var progress = Math.min((now - start) / duration, 1);
+            var eased = 1 - Math.pow(1 - progress, 3);
+            el.textContent = formatNumber(target * eased, decimals);
+            if (progress < 1) requestAnimationFrame(frame);
+        }
+        requestAnimationFrame(frame);
+    }
+
+    var counters = document.querySelectorAll('.dd-count');
+    if (counters.length) {
+        var counterObserver = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                    runCounter(entry.target);
+                    counterObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.4 });
+        counters.forEach(function (el) { counterObserver.observe(el); });
+    }
+
+    /* ── Anatomy diagram ────────────────────────────────────────── */
+    var anatomy = document.querySelector('[data-anatomy]');
+    if (anatomy) {
+        var wires = anatomy.querySelector('[data-anatomy-wires]');
+        var pins = anatomy.querySelectorAll('[data-pin]');
+        var keyRows = anatomy.querySelectorAll('[data-key]');
+        var stacked = window.matchMedia('(max-width: 991px)');
+
+        function drawWires() {
+            if (!wires) return;
+            if (stacked.matches) {
+                wires.innerHTML = '';
+                return;
+            }
+            var box = anatomy.getBoundingClientRect();
+            if (!box.width || !box.height) return;
+            var marks = '';
+            for (var i = 0; i < pins.length; i++) {
+                var key = pins[i].getAttribute('data-pin');
+                var row = anatomy.querySelector('[data-key="' + key + '"]');
+                if (!row) continue;
+                var pin = pins[i].getBoundingClientRect();
+                var target = row.getBoundingClientRect();
+                var x1 = pin.right - box.left;
+                var y1 = pin.top - box.top + pin.height / 2;
+                var x2 = target.left - box.left - 12;
+                var y2 = target.top - box.top + target.height / 2;
+                var bend = Math.max(28, (x2 - x1) * 0.5);
+                marks += '<path class="dd-wire" data-wire="' + key + '" pathLength="1" style="animation-delay:' +
+                    (i * 0.08) + 's" d="M' + x1 + ' ' + y1 + ' C' + (x1 + bend) + ' ' + y1 + ' ' +
+                    (x2 - bend) + ' ' + y2 + ' ' + x2 + ' ' + y2 + '"/>';
+            }
+            wires.innerHTML = marks;
+        }
+
+        function lit(key) {
+            if (!wires) return;
+            var paths = wires.querySelectorAll('.dd-wire');
+            for (var i = 0; i < paths.length; i++) {
+                paths[i].classList.remove('is-lit');
+                if (!key || paths[i].getAttribute('data-wire') === key) paths[i].classList.add('is-lit');
+            }
+            var marks = anatomy.querySelectorAll('.dd-pin');
+            for (var j = 0; j < marks.length; j++) {
+                marks[j].classList.toggle('is-lit', !!key && marks[j].getAttribute('data-pin') === key);
+            }
+        }
+
+        Array.prototype.forEach.call(keyRows, function (row) {
+            row.addEventListener('mouseenter', function () { lit(row.getAttribute('data-key')); });
+            row.addEventListener('mouseleave', function () { lit(null); });
+        });
+
+        var resizeTimer = null;
+        window.addEventListener('resize', function () {
+            window.clearTimeout(resizeTimer);
+            resizeTimer = window.setTimeout(drawWires, 160);
+        });
+
+        drawWires();
+        if (wires) {
+            if (typeof IntersectionObserver !== 'undefined') {
+                new IntersectionObserver(function (entries, observer) {
+                    entries.forEach(function (entry) {
+                        if (!entry.isIntersecting) return;
+                        observer.disconnect();
+                        window.setTimeout(drawWires, 900);
+                        window.setTimeout(function () { wires.classList.add('is-drawn'); }, 1900);
+                    });
+                }, { threshold: 0.15 }).observe(anatomy);
+            }
+            wires.classList.add('is-ready');
+            window.setTimeout(function () { wires.classList.add('is-drawn'); }, 1900);
+        }
+        if (document.fonts && document.fonts.ready) {
+            document.fonts.ready.then(drawWires);
+        }
+    }
+
+    /* ── Mock dashboard charts ────────────────────────────────── */
+    if (typeof Chart !== 'undefined') {
+        Chart.defaults.font.family = getComputedStyle(document.body).fontFamily;
+        Chart.defaults.font.size = 10;
+        Chart.defaults.color = '#94a3b8';
+
+        var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        var actual = [128, 141, 136, 158, 172, 165, 189, 201, 196, 218, 232, 248];
+        var target = [135, 145, 152, 160, 172, 185, 195, 205, 216, 226, 238, 250];
+
+        var trendCanvas = document.getElementById('ddChartTrend');
+        if (trendCanvas) {
+            var ctx = trendCanvas.getContext('2d');
+            var fill = ctx.createLinearGradient(0, 0, 0, 132);
+            fill.addColorStop(0, 'rgba(79,70,229,.28)');
+            fill.addColorStop(1, 'rgba(79,70,229,0)');
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [
+                        {
+                            label: 'Actual',
+                            data: actual,
+                            borderColor: '#4f46e5',
+                            backgroundColor: fill,
+                            borderWidth: 2,
+                            fill: true,
+                            tension: .4,
+                            pointRadius: 0,
+                            pointHoverRadius: 4
+                        },
+                        {
+                            label: 'Target',
+                            data: target,
+                            borderColor: '#22d3ee',
+                            borderWidth: 1.5,
+                            borderDash: [4, 3],
+                            fill: false,
+                            tension: .4,
+                            pointRadius: 0,
+                            pointHoverRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#0f172a',
+                            padding: 8,
+                            cornerRadius: 6,
+                            displayColors: true,
+                            boxWidth: 8,
+                            boxHeight: 8
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            border: { display: false },
+                            ticks: { maxRotation: 0, autoSkipPadding: 14, font: { size: 9 } }
+                        },
+                        y: {
+                            grid: { color: 'rgba(148,163,184,.15)' },
+                            border: { display: false },
+                            ticks: { maxTicksLimit: 4, font: { size: 9 }, padding: 4 }
+                        }
+                    }
+                }
+            });
+        }
+
+        var channelCanvas = document.getElementById('ddChartChannel');
+        if (channelCanvas) {
+            new Chart(channelCanvas.getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Organic', 'Paid', 'Referral'],
+                    datasets: [{
+                        data: [46, 32, 22],
+                        backgroundColor: ['#4f46e5', '#06b6d4', '#8b5cf6'],
+                        borderColor: '#ffffff',
+                        borderWidth: 2,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '62%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#0f172a',
+                            padding: 8,
+                            cornerRadius: 6,
+                            boxWidth: 8,
+                            boxHeight: 8
+                        }
+                    }
+                }
+            });
+        }
+    }
+});
+</script>
+{% endblock %}

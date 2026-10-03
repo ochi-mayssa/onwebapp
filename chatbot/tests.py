@@ -180,6 +180,27 @@ class ChatbotResponseTests(TestCase):
         for chip in data['suggestions']:
             self.assertIn('title', chip)
 
+    def test_endpoint_returns_renderable_reply_parts(self):
+        data = self.post('what is rpa')
+
+        self.assertIn('reply_parts', data)
+        self.assertIn(data['reply_format'], ('paragraphs', 'bullets'))
+        self.assertTrue(data['reply_parts'])
+        # Every part must be a real slice of the answer, never invented text.
+        for part in data['reply_parts']:
+            self.assertIsInstance(part, str)
+            self.assertIn(part, data['reply'])
+
+    def test_reply_parts_reassemble_to_the_reply(self):
+        for message in ('what is rpa', 'tell me about the blog', 'what is web 4.0'):
+            with self.subTest(message=message):
+                data = self.post(message)
+                separator = ' ' if data['reply_format'] == 'paragraphs' else '\n'
+                joined = separator.join(data['reply_parts'])
+                self.assertEqual(
+                    ' '.join(joined.split()), ' '.join(data['reply'].split())
+                )
+
     def test_every_suggested_link_actually_works(self):
         for question in ('what is rpa', 'do you build ecommerce',
                          'what is social intelligence', 'tell me about the forum'):
@@ -240,6 +261,62 @@ class GenerateResponseUnitTests(TestCase):
         self.assertTrue(reply)
         self.assertIsInstance(suggestions, list)
         self.assertIsInstance(links, list)
+
+
+class SplitAnswerTests(TestCase):
+    """The chat bubble renders one bubble per answer, so the answer is cut into
+    pieces for display. Splitting must never change the words."""
+
+    def test_prose_splits_on_sentences(self):
+        parts, fmt = site_search.split_answer(
+            'Web 4.0 is the next stage of the web. It is user owned. It is open.'
+        )
+
+        self.assertEqual(fmt, 'paragraphs')
+        self.assertEqual(len(parts), 3)
+
+    def test_single_sentence_stays_one_part(self):
+        parts, fmt = site_search.split_answer('Short one sentence answer.')
+
+        self.assertEqual(fmt, 'paragraphs')
+        self.assertEqual(parts, ['Short one sentence answer.'])
+
+    def test_dash_list_keeps_its_lead_in(self):
+        parts, fmt = site_search.split_answer(
+            'Here is what you can do:\n- Start a discussion\n- Ask for help'
+        )
+
+        self.assertEqual(fmt, 'bullets')
+        self.assertEqual(parts, ['Here is what you can do:',
+                                 'Start a discussion', 'Ask for help'])
+
+    def test_numbered_list_keeps_every_item(self):
+        # Regression: the first line was being dropped as a false "lead-in".
+        parts, fmt = site_search.split_answer(
+            '1. First thing\n2. Second thing\n3. Third thing'
+        )
+
+        self.assertEqual(fmt, 'bullets')
+        self.assertEqual(parts, ['First thing', 'Second thing', 'Third thing'])
+
+    def test_one_dash_is_prose_not_a_list(self):
+        parts, fmt = site_search.split_answer(
+            'Our services are many.\n- and one of them is RPA'
+        )
+
+        self.assertEqual(fmt, 'paragraphs')
+        self.assertEqual(len(parts), 1)
+
+    def test_empty_answer(self):
+        self.assertEqual(site_search.split_answer(''), ([], 'paragraphs'))
+        self.assertEqual(site_search.split_answer(None), ([], 'paragraphs'))
+
+    def test_no_words_are_added_or_lost(self):
+        original = 'One two three. Four five six. Seven eight nine.'
+        parts, _ = site_search.split_answer(original)
+
+        self.assertEqual(' '.join(' '.join(parts).split()),
+                         ' '.join(original.split()))
 
 
 class NavbarSearchTests(TestCase):

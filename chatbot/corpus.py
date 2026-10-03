@@ -52,6 +52,8 @@ PAGE_SOURCES = (
     ('home:web_development', 'Web Development', PUBLIC),
     ('home:mobile_development', 'Mobile Development', PUBLIC),
     ('home:ecommerce_development', 'eCommerce Development', PUBLIC),
+    ('home:dashboard_development', 'Dashboard Development', PUBLIC),
+    ('home:browser_web_automation', 'Browser & Web Automation', PUBLIC),
     ('home:erp_service', 'ERP Service', PUBLIC),
     ('home:build_website', 'Request a Website', PUBLIC),
     ('home:video_explainer', 'Platform Overview', PUBLIC),

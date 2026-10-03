@@ -10,6 +10,8 @@ from .service_content import SERVICE_CONTENT
 from .decorators import require_plan_limit
 import jwt
 import datetime
+from django.template.loader import get_template
+from django.template import TemplateDoesNotExist
 from django.conf import settings
 
 def services_index(request):
@@ -224,6 +226,8 @@ def social_tracking(request):
 
 def service_detail(request, page):
     # Redirect specific tools to their dedicated views
+    if page in ('dashboard-development', 'dashboard_development'):
+        return redirect('home:dashboard_development')
     if page in ('link-analyzer', 'link_analyzer'):
         return redirect('services:link_analyzer')
     if page in ('social-media-tracking', 'social_media_tracking'):
@@ -263,7 +267,12 @@ def service_detail(request, page):
         return render(request, 'services/service_detail.html', context)
 
     page_clean = page.replace('-', '_')
-    return render(request, f'services/{page_clean}.html')
+    template_name = f'services/{page_clean}.html'
+    try:
+        get_template(template_name)
+    except TemplateDoesNotExist:
+        raise Http404(f"No service page named '{page_clean}'.")
+    return render(request, template_name)
 
 @login_required
 @require_plan_limit('seo_analytics')

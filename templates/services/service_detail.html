@@ -168,7 +168,13 @@
         <div class="d-flex justify-content-center gap-3">
             <a href="{% url 'users:signup' %}" class="btn btn-primary btn-lg px-5 py-3 rounded-3 fw-bold">{{ service.cta.text }}</a>
             {% if service.cta.secondary_link %}
-            <a href="{% url service.cta.secondary_link %}" class="btn btn-outline-secondary btn-lg px-5 py-3 rounded-3 fw-bold">{{ service.cta.secondary_text }}</a>
+            {# `as` swallows a missing route instead of raising: several entries
+               still point at pages that were removed, and a stale CTA must not
+               take the whole service page down. #}
+            {% url service.cta.secondary_link as secondary_url %}
+            {% if secondary_url %}
+            <a href="{{ secondary_url }}" class="btn btn-outline-secondary btn-lg px-5 py-3 rounded-3 fw-bold">{{ service.cta.secondary_text }}</a>
+            {% endif %}
             {% endif %}
         </div>
     </div>

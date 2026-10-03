@@ -189,6 +189,35 @@ class ServiceViewTests(TestCase):
         self.assertIn('followers', result)
 
 
+class ServiceDetailPageTests(TestCase):
+    """Every content service must render, dead CTA targets included.
+
+    Several slugs are aliases that redirect to a dedicated view, so follow the
+    redirect and assert on the page that actually renders.
+    """
+
+    def test_every_service_page_renders(self):
+        from services.service_content import SERVICE_CONTENT
+
+        self.assertTrue(SERVICE_CONTENT, "no services defined")
+        user = User.objects.create_user(username='detailuser', password='testpass')
+        self.client.force_login(user)
+
+        for slug in SERVICE_CONTENT:
+            with self.subTest(slug=slug):
+                response = self.client.get(reverse('services:detail', args=[slug]),
+                                            follow=True)
+                self.assertEqual(response.status_code, 200)
+
+    def test_social_tracking_page_renders_with_a_result(self):
+        """The overview cards are only reached once a result exists."""
+        user = User.objects.create_user(username='socialuser', password='testpass')
+        self.client.force_login(user)
+        response = self.client.post(reverse('services:social_tracking'),
+                                    {'handle': 'onwebapp'})
+        self.assertEqual(response.status_code, 200)
+
+
 class PaymentTests(TestCase):
     """Test payment plan listing, checkout, and webhooks."""
     

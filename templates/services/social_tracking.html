@@ -42,14 +42,14 @@
         <div class="row g-3 mb-3">
             <div class="col-md-6">
                 <div class="p-3 border border-secondary border-opacity-25 rounded-3 bg-dark bg-opacity-50">
-                    <small class="text-secondary">Total Likes</small>
-                    <div class="h4 mt-1 text-white">{{ result.platform_totals|dictsortreversed }}</div>
+                    <small class="text-secondary">Average Likes Per Post</small>
+                    <div class="h4 mt-1 text-white">{{ result.engagement_metrics.avg_likes_display }}</div>
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="p-3 border border-secondary border-opacity-25 rounded-3 bg-dark bg-opacity-50">
-                    <small class="text-secondary">Total Conversions</small>
-                    <div class="h4 mt-1 text-white">{% with total=0 %}{% for p,v in result.platform_totals.items %}{% with total=total|add:v.conversions %}{% endwith %}{% endfor %}{{ total }}{% endwith %}</div>
+                    <small class="text-secondary">Total Followers</small>
+                    <div class="h4 mt-1 text-white">{{ result.audience_metrics.followers_display }}</div>
                 </div>
             </div>
         </div>

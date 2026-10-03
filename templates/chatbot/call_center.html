@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% load i18n humanize %}
+
+{% block title %}{% trans 'Call Center' %} - OnWebApp{% endblock %}
+
+{% block content %}
+<section class="py-4">
+    <div class="container">
+
+        <div class="cc-tabs">
+            <a class="cc-tab active" href="{% url 'chatbot:call_center' %}">{% trans 'Queue' %}</a>
+            <a class="cc-tab" href="{% url 'chatbot:call_center_chats' %}">{% trans 'All chats' %}</a>
+        </div>
+
+        <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+            <div>
+                <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 rounded-pill px-3 py-2 mb-2">
+                    <i class="fas fa-headset me-2"></i>{% trans 'Live queue' %}
+                </span>
+                <h1 class="h3 fw-bold text-body mb-1">{% trans 'Call Center' %}</h1>
+                <p class="text-muted mb-0">
+                    {% trans 'Visitors the chatbot could not help and who asked for a person.' %}
+                </p>
+            </div>
+            <div class="text-end">
+                <div class="cc-stat">
+                    <span class="cc-stat-value">{{ open_total }}</span>
+                    <span class="cc-stat-label">{% trans 'waiting' %}</span>
+                </div>
+                <div class="cc-stat">
+                    <span class="cc-stat-value">{{ mine_total }}</span>
+                    <span class="cc-stat-label">{% trans 'assigned to me' %}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="cc-filters mb-3">
+            <div class="cc-filter-links">
+                {% for key, label in filter_labels.items %}
+                    <a class="cc-filter {% if selected_filter == key %}active{% endif %}"
+                       href="?filter={{ key }}{% if query %}&amp;q={{ query|urlencode }}{% endif %}">{{ label }}</a>
+                {% endfor %}
+            </div>
+            <form class="cc-search" method="get">
+                <input type="hidden" name="filter" value="{{ selected_filter }}">
+                <input type="search" name="q" value="{{ query }}"
+                       placeholder="{% trans 'Search name, email or reason' %}"
+                       aria-label="{% trans 'Search requests' %}">
+                <button type="submit"><i class="fas fa-magnifying-glass"></i></button>
+            </form>
+        </div>
+
+        {% if tickets %}
+        <div class="cc-list">
+            {% for ticket in tickets %}
+            <a class="cc-row {% if ticket.status == status_new %}is-new{% endif %}"
+               href="{% url 'chatbot:call_center_detail' ticket.pk %}">
+                <div class="cc-row-main">
+                    <div class="cc-row-head">
+                        <span class="cc-name">
+                            {% if ticket.requested_by %}
+                                {{ ticket.requested_by.get_full_name|default:ticket.requested_by.username }}
+                            {% else %}
+                                {% trans 'Anonymous visitor' %}
+                            {% endif %}
+                        </span>
+                        <span class="cc-badge cc-badge-{{ ticket.status|lower }}">{{ ticket.get_status_display }}</span>
+                        <span class="cc-wait cc-wait-{{ ticket.priority }}">{{ ticket.waiting_label }}</span>
+                    </div>
+                    <p class="cc-reason">{{ ticket.reason|default:_('No reason given') }}</p>
+                    <div class="cc-meta">
+                        <span><i class="fas fa-message me-1"></i>{{ ticket.message_total }}</span>
+                        {% if ticket.agent_total %}
+                            <span><i class="fas fa-headset me-1"></i>{{ ticket.agent_total }}</span>
+                        {% endif %}
+                        <span><i class="far fa-clock me-1"></i>{{ ticket.escalated_at|naturaltime }}</span>
+                        {% if ticket.assigned_to %}
+                            <span><i class="fas fa-user-check me-1"></i>{{ ticket.assigned_to.username }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <i class="fas fa-chevron-right cc-chevron"></i>
+            </a>
+            {% endfor %}
+        </div>
+
+        {% if paginator.num_pages > 1 %}
+        <nav class="mt-4" aria-label="{% trans 'Pagination' %}">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?{{ querystring }}&amp;page={{ page_obj.previous_page_number }}">{% trans 'Previous' %}</a></li>
+                {% endif %}
+                <li class="page-item active"><span class="page-link">{{ page_obj.number }} / {{ paginator.num_pages }}</span></li>
+                {% if page_obj.has_next %}
+                    <li class="page-item"><a class="page-link" href="?{{ querystring }}&amp;page={{ page_obj.next_page_number }}">{% trans 'Next' %}</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+
+        {% else %}
+        <div class="cc-empty">
+            <i class="fas fa-inbox"></i>
+            <p class="mb-1 fw-semibold">{% trans 'Nothing here' %}</p>
+            <p class="mb-0 text-muted">{% trans 'No requests match this filter.' %}</p>
+        </div>
+        {% endif %}
+
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_head %}
+{% include "chatbot/_call_center_styles.html" %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Keeps the queue count honest while an agent leaves this tab open.
+    (function () {
+        var endpoint = "{% url 'chatbot:call_center_api' %}";
+        var badge = document.querySelector('[data-cc-open-count]');
+        if (!badge || !window.fetch) { return; }
+        setInterval(function () {
+            fetch(endpoint + '?scope=open', { credentials: 'same-origin' })
+                .then(function (r) { return r.ok ? r.json() : null; })
+                .then(function (data) {
+                    if (data && typeof data.count === 'number' && badge) {
+                        badge.textContent = data.count;
+                    }
+                })
+                .catch(function () { /* offline is fine, it just stays stale */ });
+        }, 30000);
+    })();
+</script>
+{% endblock %}

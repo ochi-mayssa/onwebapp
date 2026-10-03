@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% load i18n humanize %}
+
+{% block title %}{% trans 'All chats' %} - OnWebApp{% endblock %}
+
+{% comment %}
+Read-only log of every conversation, escalated or not. Deliberately separate from
+the queue: the queue is who is waiting, this is what people asked.
+{% endcomment %}
+{% block content %}
+<section class="py-4">
+    <div class="container">
+
+        <div class="cc-tabs">
+            <a class="cc-tab" href="{% url 'chatbot:call_center' %}">{% trans 'Queue' %}</a>
+            <a class="cc-tab active" href="{% url 'chatbot:call_center_chats' %}">{% trans 'All chats' %}</a>
+        </div>
+
+        <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+            <div>
+                <span class="badge bg-secondary bg-opacity-10 text-body-secondary border border-secondary border-opacity-25 rounded-pill px-3 py-2 mb-2">
+                    <i class="fas fa-comments me-2"></i>{% trans 'Read only' %}
+                </span>
+                <h1 class="h3 fw-bold text-body mb-1">{% trans 'All chats' %}</h1>
+                <p class="text-muted mb-0">
+                    {% trans 'Every conversation on the site guide, including the ones nobody escalated.' %}
+                </p>
+            </div>
+            <div class="text-end">
+                <div class="cc-stat">
+                    <span class="cc-stat-value">{{ total_chats }}</span>
+                    <span class="cc-stat-label">{% trans 'conversations' %}</span>
+                </div>
+                <div class="cc-stat">
+                    <span class="cc-stat-value">{{ escalated_total }}</span>
+                    <span class="cc-stat-label">{% trans 'escalated' %}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="cc-filters mb-3">
+            <div class="cc-filter-links">
+                {% for key, label in filter_labels.items %}
+                    <a class="cc-filter {% if selected_filter == key %}active{% endif %}"
+                       href="?filter={{ key }}{% if query %}&amp;q={{ query|urlencode }}{% endif %}">{{ label }}</a>
+                {% endfor %}
+            </div>
+            <form class="cc-search" method="get">
+                <input type="hidden" name="filter" value="{{ selected_filter }}">
+                <input type="search" name="q" value="{{ query }}"
+                       placeholder="{% trans 'Search what they said' %}"
+                       aria-label="{% trans 'Search chats' %}">
+                <button type="submit"><i class="fas fa-magnifying-glass"></i></button>
+            </form>
+        </div>
+
+        {% if chats %}
+        <div class="cc-list">
+            {% for chat in chats %}
+            <a class="cc-row" href="{% url 'chatbot:call_center_chat' chat.session_id %}">
+                <div class="cc-row-main">
+                    <div class="cc-row-head">
+                        <span class="cc-name">
+                            {% if chat.user %}
+                                {{ chat.user.get_full_name|default:chat.user.username }}
+                            {% else %}
+                                {% trans 'Anonymous visitor' %}
+                            {% endif %}
+                        </span>
+                        {% if chat.has_ticket %}
+                            <span class="cc-badge cc-badge-claimed">{% trans 'Escalated' %}</span>
+                        {% else %}
+                            <span class="cc-badge cc-badge-plain">{% trans 'Bot only' %}</span>
+                        {% endif %}
+                    </div>
+                    <p class="cc-reason">
+                        {% if chat.preview %}{{ chat.preview.content|truncatechars:110 }}{% else %}{% trans 'No messages yet' %}{% endif %}
+                    </p>
+                    <div class="cc-meta">
+                        <span><i class="fas fa-message me-1"></i>{{ chat.message_total }}</span>
+                        <span><i class="fas fa-user me-1"></i>{{ chat.user_total }}</span>
+                        <span><i class="far fa-clock me-1"></i>{{ chat.updated_at|naturaltime }}</span>
+                        <span class="font-monospace">{{ chat.session_id|truncatechars:12 }}</span>
+                    </div>
+                </div>
+                <i class="fas fa-chevron-right cc-chevron"></i>
+            </a>
+            {% endfor %}
+        </div>
+
+        {% if paginator.num_pages > 1 %}
+        <nav class="mt-4" aria-label="{% trans 'Pagination' %}">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?{{ querystring }}&amp;page={{ page_obj.previous_page_number }}">{% trans 'Previous' %}</a></li>
+                {% endif %}
+                <li class="page-item active"><span class="page-link">{{ page_obj.number }} / {{ paginator.num_pages }}</span></li>
+                {% if page_obj.has_next %}
+                    <li class="page-item"><a class="page-link" href="?{{ querystring }}&amp;page={{ page_obj.next_page_number }}">{% trans 'Next' %}</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+
+        {% else %}
+        <div class="cc-empty">
+            <i class="fas fa-inbox"></i>
+            <p class="mb-1 fw-semibold">{% trans 'Nothing here' %}</p>
+            <p class="mb-0 text-muted">{% trans 'No conversations match this search.' %}</p>
+        </div>
+        {% endif %}
+
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_head %}
+{% include "chatbot/_call_center_styles.html" %}
+{% endblock %}

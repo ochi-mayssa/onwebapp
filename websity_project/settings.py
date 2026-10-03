@@ -464,6 +464,27 @@ SECURE_HSTS_PRELOAD = False
 # so it is harmless in local development where the header is never sent.
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
+# ===== CALL CENTRE / LIVE AGENT HANDOFF =====
+# Single source of truth for the chatbot's "talk to a person" escalation.
+# The bot reads this to decide which channels to offer, so the same numbers
+# are not hardcoded in a template, a bot answer and a CSS file.
+#
+# Leave `phone` / `whatsapp` empty until the real numbers are known; the bot
+# then offers only the channels that are actually configured instead of
+# handing out a placeholder that people would try to dial.
+CALL_CENTER = {
+    'ENABLED': os.environ.get('CALL_CENTER_ENABLED', '1').lower() not in ('0', 'false', 'no'),
+    # Digits (and an optional leading +) only - used to build the tel: link.
+    'PHONE': os.environ.get('CALL_CENTER_PHONE', ''),
+    # Shown to the reader. Defaults to PHONE when left empty.
+    'PHONE_DISPLAY': os.environ.get('CALL_CENTER_PHONE_DISPLAY', ''),
+    # Digits only, no "+" - used to build the wa.me link.
+    'WHATSAPP': os.environ.get('CALL_CENTER_WHATSAPP', ''),
+    'EMAIL': os.environ.get('CALL_CENTER_EMAIL', 'hello@onwebapp.com'),
+    'HOURS': os.environ.get('CALL_CENTER_HOURS', 'Monday to Friday, 9:00 - 18:00'),
+}
+
+
 # Sentry Configuration (Optional: for error tracking in production)
 SENTRY_DSN = os.environ.get('SENTRY_DSN', '')
 if SENTRY_DSN:

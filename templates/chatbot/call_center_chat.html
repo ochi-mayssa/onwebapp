@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% load i18n humanize %}
+
+{% block title %}{% trans 'Chat' %} {{ chat.session_id|truncatechars:12 }} - OnWebApp{% endblock %}
+
+{% comment %}
+One conversation, read-only. There is no reply box here on purpose: the queue is
+where replies happen, and this page's only way into it is the explicit escalate.
+{% endcomment %}
+{% block content %}
+<section class="py-4">
+    <div class="container">
+
+        <a class="cc-back" href="{% url 'chatbot:call_center_chats' %}">
+            <i class="fas fa-arrow-left me-2"></i>{% trans 'Back to all chats' %}
+        </a>
+
+        {% if messages %}
+            {% for notice in messages %}
+            <div class="alert alert-{{ notice.tags }} py-2">{{ notice }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="cc-detail-head">
+            <div>
+                <div class="cc-row-head">
+                    {% if ticket %}
+                        <span class="cc-badge cc-badge-{{ ticket.status|lower }}">{{ ticket.get_status_display }}</span>
+                    {% else %}
+                        <span class="cc-badge cc-badge-plain">{% trans 'Bot only' %}</span>
+                    {% endif %}
+                    <span class="cc-wait"><i class="far fa-clock me-1"></i>{{ chat.updated_at|naturaltime }}</span>
+                </div>
+                <h1 class="h4 fw-bold text-body mt-2 mb-1">
+                    {% if chat.user %}
+                        {{ chat.user.get_full_name|default:chat.user.username }}
+                    {% else %}
+                        {% trans 'Anonymous visitor' %}
+                    {% endif %}
+                </h1>
+                <p class="text-muted mb-0">
+                    <code>{{ chat.session_id }}</code>
+                    {% if chat.user %}
+                        &middot; <i class="fas fa-envelope me-1"></i>{{ chat.user.email|default:_('No email on file') }}
+                    {% endif %}
+                </p>
+            </div>
+            <div class="cc-actions">
+                {% if ticket %}
+                    <a class="btn btn-primary btn-sm" href="{% url 'chatbot:call_center_detail' ticket.pk %}">
+                        <i class="fas fa-headset me-1"></i>{% trans 'Open the ticket' %}
+                    </a>
+                {% elif user.is_staff %}
+                    <form method="post" action="{% url 'chatbot:call_center_escalate' chat.session_id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary btn-sm">
+                            <i class="fas fa-arrow-up-right-from-square me-1"></i>{% trans 'Escalate to the queue' %}
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <div class="cc-panel">
+                    <h2 class="h6 fw-semibold text-body mb-3">
+                        <i class="fas fa-comments me-2"></i>{% trans 'Conversation' %}
+                        <span class="cc-count">{{ transcript|length }}</span>
+                    </h2>
+                    <div class="cc-transcript">
+                        {% for message in transcript %}
+                        <div class="cc-msg cc-msg-{{ message.sender|lower }}">
+                            <div class="cc-msg-head">
+                                <strong>
+                                    {% if message.sender == 'USER' %}
+                                        {% if chat.user %}{{ chat.user.username }}{% else %}{% trans 'Visitor' %}{% endif %}
+                                    {% elif message.sender == 'BOT' %}{% trans 'Bot' %}
+                                    {% elif message.sender == 'AGENT' %}{{ message.agent_label }}{% endif %}
+                                </strong>
+                                <span>{{ message.timestamp|naturaltime }}</span>
+                                {% if ticket and message.timestamp >= ticket.escalated_at %}
+                                    <span class="cc-flag">{% trans 'after request' %}</span>
+                                {% endif %}
+                            </div>
+                            <p>{{ message.content|linebreaksbr }}</p>
+                        </div>
+                        {% empty %}
+                        <p class="text-muted mb-0">{% trans 'No messages in this session.' %}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="cc-panel">
+                    <h2 class="h6 fw-semibold text-body mb-3">
+                        <i class="fas fa-circle-info me-2"></i>{% trans 'About this conversation' %}
+                    </h2>
+
+                    {% if ticket %}
+                        <dl class="cc-details">
+                            <dt>{% trans 'Status' %}</dt>
+                            <dd>{{ ticket.get_status_display }}</dd>
+                            <dt>{% trans 'Asked for a person' %}</dt>
+                            <dd>{{ ticket.escalated_at|naturaltime }}</dd>
+                            <dt>{% trans 'Reason' %}</dt>
+                            <dd>{{ ticket.reason|default:_('No reason given') }}</dd>
+                            {% if ticket.assigned_to %}
+                                <dt>{% trans 'Answered by' %}</dt>
+                                <dd>{{ ticket.assigned_to.username }}</dd>
+                            {% endif %}
+                        </dl>
+                        <p class="text-muted small mb-0">
+                            {% trans 'Replies are sent from the ticket page, where they are recorded against the request.' %}
+                        </p>
+                    {% else %}
+                        <p class="text-muted small">
+                            {% trans 'Nobody asked for a person in this chat, so there is no ticket. The transcript is here so you can see what they were trying to do; escalate it if it needs a reply.' %}
+                        </p>
+                        {% if user.is_staff %}
+                        <form method="post" action="{% url 'chatbot:call_center_escalate' chat.session_id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary btn-sm w-100">
+                                <i class="fas fa-headset me-1"></i>{% trans 'Escalate to the queue' %}
+                            </button>
+                        </form>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_head %}
+{% include "chatbot/_call_center_styles.html" %}
+<style>
+    .cc-back { display: inline-block; font-size: .85rem; font-weight: 600; color: var(--text-secondary, #475569); text-decoration: none; margin-bottom: 1rem; }
+    .cc-back:hover { color: var(--primary-color, #6366f1); }
+
+    .cc-detail-head { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem; }
+    .cc-actions { display: flex; gap: .5rem; }
+    .cc-actions form { margin: 0; }
+
+    .cc-panel { background: var(--bg-surface, #fff); border: 1px solid var(--border-color, #e2e8f0); border-radius: 16px; padding: 1.15rem; margin-bottom: 1.25rem; }
+    .cc-count { display: inline-block; margin-left: .4rem; padding: .05rem .45rem; border-radius: 999px; background: var(--bg-surface-secondary, #f1f5f9); color: var(--text-secondary, #475569); font-size: .72rem; font-weight: 700; }
+
+    .cc-transcript { max-height: 560px; overflow-y: auto; }
+    .cc-msg { border-left: 3px solid var(--border-color, #e2e8f0); padding: .1rem 0 .1rem .8rem; margin-bottom: 1rem; }
+    .cc-msg-user { border-left-color: #94a3b8; }
+    .cc-msg-bot { border-left-color: var(--primary-color, #6366f1); }
+    .cc-msg-agent { border-left-color: #10b981; background: rgba(16, 185, 129, .06); border-radius: 0 10px 10px 0; padding: .5rem .8rem; }
+    .cc-msg-head { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; font-size: .76rem; color: var(--text-tertiary, #94a3b8); margin-bottom: .2rem; }
+    .cc-msg-head strong { font-size: .8rem; color: var(--text-primary, #1e293b); }
+    .cc-msg p { margin: 0; font-size: .9rem; color: var(--text-primary, #1e293b); }
+    .cc-flag { background: rgba(245, 158, 11, .16); color: #b45309; border-radius: 999px; padding: .05rem .4rem; font-weight: 600; }
+
+    .cc-details { display: grid; grid-template-columns: auto 1fr; gap: .35rem .75rem; font-size: .85rem; margin-bottom: 1rem; }
+    .cc-details dt { color: var(--text-tertiary, #94a3b8); font-weight: 600; }
+    .cc-details dd { margin: 0; color: var(--text-primary, #1e293b); }
+</style>
+{% endblock %}

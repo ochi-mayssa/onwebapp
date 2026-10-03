@@ -276,6 +276,16 @@ KNOWLEDGE_BASE = {
                 "url": "home:mobile_development",
             },
             {
+                "topic": ["dashboards", "dashboard", "dashboard development", "business intelligence", "bi", "kpi dashboards", "reporting"],
+                "answer": "We build custom dashboards for businesses that need a clearer view of their operations, performance, and data. Six types: Executive (high-level KPIs for decision makers), Operations (workflows, processes, teams and systems), Sales (leads, customers, orders and revenue indicators), Marketing & Website (traffic, engagement, conversions and digital performance), Industrial (production, machines, IoT data and operational KPIs), and fully Custom dashboards. Plans range from Dashboard Starter (one data source + essential KPIs + responsive dashboard) to Dashboard Enterprise (multiple systems + custom integrations + role-based access + advanced analytics + ongoing support).",
+                "url": "home:dashboard_development",
+            },
+            {
+                  "topic": ["automation", "browser automation", "web automation", "rpa", "bots", "scraping", "web scraping", "data entry automation", "scheduled runs", "workflow automation", "how do you automate"],
+                  "answer": "Browser and web automation is something we use ourselves rather than a service you can buy on its own. It is the layer that lets our team automate the repetitive clicking, copying, checking and data entry that would otherwise sit in a backlog. Six things we commonly apply it to internally: Data Entry & Back Office (automated form filling and record creation), Web Scraping & Collection (structured data pulled from listings, catalogues and portals on a schedule), System-to-System Transfer (moving records between portals and legacy tools that expose no API), Report Generation (daily and weekly reports compiled and delivered automatically), E-commerce Operations (price monitoring, inventory checks, competitor tracking and order sync), and Testing & QA Automation (end-to-end browser tests on every release). Every run is scheduled and logged in a console with step-by-step detail, failure screenshots, retries and alerts, and sensitive steps can pause for human approval. We only automate sites we are authorised to access and respect published terms and rate limits. If a project you are discussing would benefit from it, it gets scoped as part of that work rather than quoted as its own line item.",
+                "url": "home:browser_web_automation",
+            },
+            {
                 "topic": ["seo", "search engine optimization", "google ranking"],
                 "answer": "Our SEO services include keyword research, content analysis, performance optimization, and backlink monitoring. Every OnWebApp site ships with clean code, structured data, fast load times, and intelligent content optimization built into the platform.",
                 "url": "seo_analyzer:index",
@@ -433,6 +443,8 @@ PAGE_TITLES = {
     "home:demo_request": "Request a Demo",
     "home:web_development": "Web Development",
     "home:mobile_development": "Mobile Development",
+    "home:dashboard_development": "Dashboard Development",
+    "home:browser_web_automation": "Browser & Web Automation",
     "home:erp_service": "ERP Integration",
     "home:design_system": "Design System",
     "home:automation_home": "Website Automation",

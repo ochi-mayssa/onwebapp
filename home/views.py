@@ -28,9 +28,14 @@ def index(request):
     return render(request, 'home/index.html', {'form': form})
 
 
-def use_cases(request):
-    """Marketing page highlighting key use cases."""
-    return render(request, 'home/use_cases.html')
+# Unregistered: these views rendered templates that were never created, so the
+# routes returned HTTP 500. They are kept here for reference and can be restored
+# together with their templates. See home/urls.py.
+
+
+# def use_cases(request):
+#     """Marketing page highlighting key use cases."""
+#     return render(request, 'home/use_cases.html')
 
 
 def testimonials(request):
@@ -38,9 +43,9 @@ def testimonials(request):
     return render(request, 'home/testimonials.html')
 
 
-def features(request):
-    """Product features overview page."""
-    return render(request, 'home/features.html')
+# def features(request):
+#     """Product features overview page."""
+#     return render(request, 'home/features.html')
 
 
 def api_docs(request):
@@ -56,8 +61,8 @@ def rpa_bpa(request):
 def automation_home(request):
     return render(request, 'automation/automationhome.html')
 
-def help_center(request):
-    return render(request, 'home/help_center.html')
+# def help_center(request):
+#     return render(request, 'home/help_center.html')
 
 def privacy(request):
     return render(request, 'home/privacy.html')
@@ -65,17 +70,17 @@ def privacy(request):
 def terms(request):
     return render(request, 'home/terms.html')
 
-def security(request):
-    return render(request, 'home/security.html')
+# def security(request):
+#     return render(request, 'home/security.html')
 
-def free_tools(request):
-    return render(request, 'home/tools.html')
+# def free_tools(request):
+#     return render(request, 'home/tools.html')
 
-def demo_request(request):
-    return render(request, 'home/demo_request.html')
+# def demo_request(request):
+#     return render(request, 'home/demo_request.html')
 
-def webinars(request):
-    return render(request, 'home/webinars.html')
+# def webinars(request):
+#     return render(request, 'home/webinars.html')
 
 def build_website(request):
     """Handle website build requests using proper Django Forms."""
@@ -112,9 +117,9 @@ def build_website(request):
         'features_list': features_list
     })
 
-def design_system(request):
-    """Render the design system verification page."""
-    return render(request, 'design_system.html')
+# def design_system(request):
+#     """Render the design system verification page."""
+#     return render(request, 'design_system.html')
 
 def video_explainer(request):
     """Render the video explainer page for users who prefer watching over reading."""
@@ -149,6 +154,16 @@ def mobile_development(request):
 def ecommerce_development(request):
     """eCommerce development services page."""
     return render(request, 'software/ecommerce_development.html')
+
+
+def dashboard_development(request):
+    """Dashboard development services page."""
+    return render(request, 'software/dashboard_development.html')
+
+
+def browser_web_automation(request):
+    """Browser and web automation services page."""
+    return render(request, 'software/browser_web_automation.html')
 
 
 def erp_service(request):

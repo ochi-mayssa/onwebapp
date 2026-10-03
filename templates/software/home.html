@@ -364,7 +364,7 @@
         </div>
 
         <!-- Enterprise -->
-        <div class="sw-service-row" style="border-bottom:none;">
+        <div class="sw-service-row">
             <div class="sw-service-content">
                 <div class="sw-dev-tag" style="color:#f59e0b;">{% trans "ENTERPRISE SOFTWARE" %}</div>
                 <h3 class="fw-800 mb-2">{% trans "Enterprise-Grade Systems" %}</h3>
@@ -391,6 +391,70 @@
             <div class="sw-service-img">
                 <img src="{% static 'img/enterprise-software.webp' %}" alt="Enterprise Software">
                 <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(245,158,11,.15),transparent);border-radius:16px;"></div>
+            </div>
+        </div>
+
+        <!-- Dashboard Development -->
+        <div class="sw-service-row">
+            <div class="sw-service-img">
+                <img src="{% static 'img/data.jpg' %}" alt="Dashboard Development">
+                <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(14,165,233,.15),transparent);border-radius:16px;"></div>
+            </div>
+            <div class="sw-service-content">
+                <div class="sw-dev-tag" style="color:#0ea5e9;">{% trans "DASHBOARD DEVELOPMENT" %}</div>
+                <h3 class="fw-800 mb-2">{% trans "Custom Dashboards" %}</h3>
+                <p style="color:#64748b;font-size:.92rem;line-height:1.7;">{% trans "Custom dashboards for businesses that need a clearer view of their operations, performance, and data." %}</p>
+                <div class="sw-service-split">
+                    <div class="sw-service-split-item">
+                        <div class="sw-service-split-icon" style="background:rgba(14,165,233,.1);color:#0ea5e9;"><i class="fas fa-check"></i></div>
+                        <div><strong style="font-size:.85rem;">{% trans "Executive" %}</strong><p style="font-size:.78rem;color:#64748b;margin:0;">{% trans "High-level KPIs for decision makers" %}</p></div>
+                    </div>
+                    <div class="sw-service-split-item">
+                        <div class="sw-service-split-icon" style="background:rgba(14,165,233,.1);color:#0ea5e9;"><i class="fas fa-check"></i></div>
+                        <div><strong style="font-size:.85rem;">{% trans "Operations" %}</strong><p style="font-size:.78rem;color:#64748b;margin:0;">{% trans "Workflows, teams and systems" %}</p></div>
+                    </div>
+                    <div class="sw-service-split-item">
+                        <div class="sw-service-split-icon" style="background:rgba(14,165,233,.1);color:#0ea5e9;"><i class="fas fa-check"></i></div>
+                        <div><strong style="font-size:.85rem;">{% trans "Sales & Marketing" %}</strong><p style="font-size:.78rem;color:#64748b;margin:0;">{% trans "Revenue, traffic and conversions" %}</p></div>
+                    </div>
+                    <div class="sw-service-split-item">
+                        <div class="sw-service-split-icon" style="background:rgba(14,165,233,.1);color:#0ea5e9;"><i class="fas fa-check"></i></div>
+                        <div><strong style="font-size:.85rem;">{% trans "Industrial" %}</strong><p style="font-size:.78rem;color:#64748b;margin:0;">{% trans "Production, machines and IoT" %}</p></div>
+                    </div>
+                </div>
+                <a href="{% url 'home:dashboard_development' %}" class="btn rounded-pill px-4 fw-700 mt-3" style="background:#0ea5e9;color:#fff;">{% trans "Build Your Dashboard" %} <i class="fas fa-arrow-right ms-1"></i></a>
+            </div>
+        </div>
+
+        <!-- Browser & Web Automation -->
+        <div class="sw-service-row" style="border-bottom:none;">
+            <div class="sw-service-content">
+                <div class="sw-dev-tag" style="color:#8b5cf6;">{% trans "BROWSER & WEB AUTOMATION" %}</div>
+                <h3 class="fw-800 mb-2">{% trans "Automate the Repetitive Work" %}</h3>
+                <p style="color:#64748b;font-size:.92rem;line-height:1.7;">{% trans "Browser bots and web automations that handle the clicking, copying, checking and data entry your team repeats every day." %}</p>
+                <div class="sw-service-split">
+                    <div class="sw-service-split-item">
+                        <div class="sw-service-split-icon" style="background:rgba(139,92,246,.1);color:#8b5cf6;"><i class="fas fa-check"></i></div>
+                        <div><strong style="font-size:.85rem;">{% trans "Data Entry" %}</strong><p style="font-size:.78rem;color:#64748b;margin:0;">{% trans "Forms, records and back office" %}</p></div>
+                    </div>
+                    <div class="sw-service-split-item">
+                        <div class="sw-service-split-icon" style="background:rgba(139,92,246,.1);color:#8b5cf6;"><i class="fas fa-check"></i></div>
+                        <div><strong style="font-size:.85rem;">{% trans "Scraping" %}</strong><p style="font-size:.78rem;color:#64748b;margin:0;">{% trans "Structured data on a schedule" %}</p></div>
+                    </div>
+                    <div class="sw-service-split-item">
+                        <div class="sw-service-split-icon" style="background:rgba(139,92,246,.1);color:#8b5cf6;"><i class="fas fa-check"></i></div>
+                        <div><strong style="font-size:.85rem;">{% trans "Monitoring" %}</strong><p style="font-size:.78rem;color:#64748b;margin:0;">{% trans "Price, stock and site checks" %}</p></div>
+                    </div>
+                    <div class="sw-service-split-item">
+                        <div class="sw-service-split-icon" style="background:rgba(139,92,246,.1);color:#8b5cf6;"><i class="fas fa-check"></i></div>
+                        <div><strong style="font-size:.85rem;">{% trans "QA Automation" %}</strong><p style="font-size:.78rem;color:#64748b;margin:0;">{% trans "Browser tests on every release" %}</p></div>
+                    </div>
+                </div>
+                <a href="{% url 'home:browser_web_automation' %}" class="btn rounded-pill px-4 fw-700 mt-3" style="background:#8b5cf6;color:#fff;">{% trans "Automate a Workflow" %} <i class="fas fa-arrow-right ms-1"></i></a>
+            </div>
+            <div class="sw-service-img">
+                <img src="{% static 'img/automation.jpg' %}" alt="Browser and Web Automation">
+                <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(139,92,246,.15),transparent);border-radius:16px;"></div>
             </div>
         </div>
     </div>

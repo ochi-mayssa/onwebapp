@@ -11,7 +11,10 @@ from .corpus import user_can_read
 from .indexer import B, K1, load_index, loaded_index
 from .text_utils import STOPWORDS, split_sentences, tokenize, trim_to_sentence
 
-__all__ = ['answer', 'search', 'load_index', 'loaded_index']
+__all__ = ['answer', 'search', 'split_answer', 'load_index', 'loaded_index']
+
+# List markers the curated answers use, so "1." and "-" are both recognised.
+LIST_MARKER = re.compile(r'^(?:[-*\u2022]|\d+[.)])\s+')
 
 logger = logging.getLogger(__name__)
 
@@ -435,6 +438,37 @@ def _build_suggestions(index, pool, top_chunk, links, query_tokens):
             continue
         add(chunk.get('title', ''))
     return suggestions
+
+
+def split_answer(response):
+    """Break a finished answer into the pieces the UI should render.
+
+    The chat shows one bubble per answer, so a 400-character run-on paragraph is
+    hard to scan in a 380px column. An answer written as a list keeps its list
+    structure; anything else is split on sentence boundaries. Not one word of
+    the answer changes, and reassembling the pieces reproduces the original, so
+    this can never drift from ``reply``.
+
+    Returns ``(parts, format)`` where format is ``'bullets'`` or ``'paragraphs'``.
+    """
+    response = (response or '').strip()
+    if not response:
+        return [], 'paragraphs'
+
+    lines = [line.strip() for line in response.splitlines() if line.strip()]
+    marked = [line for line in lines if LIST_MARKER.match(line)]
+    # Every line marked, or a marked run of two or more after an unmarked lead.
+    # A lone "- " after prose is a dash in a sentence, not a list.
+    has_list = bool(marked) and (
+        len(marked) == len(lines)
+        or (len(marked) == len(lines) - 1 and len(marked) >= 2)
+    )
+    if has_list:
+        head = [] if LIST_MARKER.match(lines[0]) else [lines[0]]
+        return head + [LIST_MARKER.sub('', line) for line in marked], 'bullets'
+
+    sentences = split_sentences(response, min_length=1)
+    return (sentences or [response]), 'paragraphs'
 
 
 def _fallback(query, unique_hits, index, reason):

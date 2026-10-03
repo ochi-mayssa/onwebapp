@@ -1,0 +1,79 @@
+{% comment %}
+Shared styling for the staff-side call centre list pages (queue and chat log), so
+the two screens cannot drift apart. Staff tool, so it stays quiet: no gradients,
+no hover lifts, just a scannable list where waiting time and assignment are the
+things you can read fastest.
+{% endcomment %}
+<style>
+    .cc-stat { display: inline-block; min-width: 92px; }
+    .cc-stat-value { display: block; font-size: 1.6rem; font-weight: 700; line-height: 1.1; color: var(--text-primary, #1e293b); }
+    .cc-stat-label { font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; color: var(--text-tertiary, #94a3b8); }
+
+    .cc-tabs { display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-color, #e2e8f0); }
+    .cc-tab {
+        padding: .5rem .9rem; font-size: .88rem; font-weight: 600;
+        color: var(--text-secondary, #475569); text-decoration: none;
+        border-bottom: 2px solid transparent; margin-bottom: -1px;
+    }
+    .cc-tab:hover { color: var(--text-primary, #1e293b); }
+    .cc-tab.active { color: var(--primary-color, #6366f1); border-bottom-color: var(--primary-color, #6366f1); }
+
+    .cc-filters { display: flex; flex-wrap: wrap; gap: .75rem; justify-content: space-between; align-items: center; }
+    .cc-filter-links { display: flex; flex-wrap: wrap; gap: .4rem; }
+    .cc-filter {
+        padding: .35rem .85rem; border-radius: 999px; font-size: .82rem; font-weight: 600;
+        color: var(--text-secondary, #475569); border: 1px solid var(--border-color, #e2e8f0);
+        text-decoration: none; transition: all .2s;
+    }
+    .cc-filter:hover { color: var(--text-primary, #1e293b); border-color: var(--text-tertiary, #94a3b8); }
+    .cc-filter.active { background: var(--primary-color, #6366f1); border-color: var(--primary-color, #6366f1); color: #fff; }
+
+    .cc-search { display: flex; align-items: center; gap: .4rem; }
+    .cc-search input {
+        border: 1px solid var(--border-color, #e2e8f0); border-radius: 999px;
+        padding: .45rem .9rem; font-size: .85rem; min-width: 240px;
+        background: var(--bg-surface, #fff); color: var(--text-primary, #1e293b);
+    }
+    .cc-search button {
+        border: 1px solid var(--border-color, #e2e8f0); border-radius: 50%;
+        width: 34px; height: 34px; background: var(--bg-surface, #fff);
+        color: var(--text-secondary, #475569);
+    }
+
+    .cc-list { border: 1px solid var(--border-color, #e2e8f0); border-radius: 16px; overflow: hidden; background: var(--bg-surface, #fff); }
+    .cc-row {
+        display: flex; align-items: center; gap: 1rem; padding: 1rem 1.15rem;
+        border-bottom: 1px solid var(--border-color, #e2e8f0);
+        text-decoration: none; color: inherit; transition: background .15s;
+    }
+    .cc-row:last-child { border-bottom: none; }
+    .cc-row:hover { background: var(--bg-surface-secondary, #f8fafc); }
+    /* An unclaimed request is the only thing that needs to shout. */
+    .cc-row.is-new { border-left: 3px solid #ef4444; }
+
+    .cc-row-main { flex: 1; min-width: 0; }
+    .cc-row-head { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; margin-bottom: .2rem; }
+    .cc-name { font-weight: 600; font-size: .95rem; }
+
+    .cc-badge { font-size: .66rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; padding: .12rem .5rem; border-radius: 999px; }
+    .cc-badge-new { background: rgba(239, 68, 68, .12); color: #dc2626; }
+    .cc-badge-claimed { background: rgba(37, 99, 235, .12); color: #2563eb; }
+    .cc-badge-resolved { background: rgba(16, 185, 129, .12); color: #059669; }
+    .cc-badge-plain { background: var(--bg-surface-secondary, #f1f5f9); color: var(--text-secondary, #475569); }
+
+    .cc-wait { font-size: .68rem; font-weight: 600; padding: .12rem .5rem; border-radius: 999px; background: var(--bg-surface-secondary, #f1f5f9); color: var(--text-secondary, #475569); }
+    .cc-wait-2 { background: rgba(239, 68, 68, .12); color: #dc2626; }
+    .cc-wait-1 { background: rgba(245, 158, 11, .14); color: #b45309; }
+
+    .cc-reason { margin: 0 0 .35rem; font-size: .88rem; color: var(--text-secondary, #475569); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .cc-meta { display: flex; flex-wrap: wrap; gap: .85rem; font-size: .74rem; color: var(--text-tertiary, #94a3b8); }
+    .cc-chevron { color: var(--text-tertiary, #94a3b8); font-size: .8rem; }
+
+    .cc-empty { text-align: center; padding: 3.5rem 1rem; border: 1px dashed var(--border-color, #e2e8f0); border-radius: 16px; }
+    .cc-empty i { font-size: 1.8rem; color: var(--text-tertiary, #94a3b8); margin-bottom: .6rem; }
+
+    @media (max-width: 575.98px) {
+        .cc-search input { min-width: 0; width: 100%; }
+        .cc-search { width: 100%; }
+    }
+</style>

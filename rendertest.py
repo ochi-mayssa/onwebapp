@@ -15,6 +15,7 @@ checks = {
     "svcNum": c('id="svcNum"'),
     "svcJS": c('Scroll-pinned services'),
     "webDev": c('web_development'),
+    "dashDev": c('dashboard_development'),
     "erp": c('erp_integration'),
     "branding": c('branding:landing'),
     "automation": c('platform_monitoring:automation'),

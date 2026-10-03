@@ -3,15 +3,18 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse, NoReverseMatch
 from django.utils.html import escape
+from django.conf import settings
+from urllib.parse import quote
 import json
 import re
 import uuid
 
-from .models import ChatSession, ChatMessage
+from .models import CallRequest, ChatMessage, ChatSession
 from .knowledge_base import KNOWLEDGE_BASE, GENERAL_RESPONSES, PAGE_TITLES
 from .corpus import access_for_url_name, user_can_read
 from .text_utils import split_sentences, tokenize
 from . import search as site_search
+from django.utils import timezone
 
 _WORD_RE = re.compile(r'[a-z0-9]+')
 
@@ -22,6 +25,48 @@ GREETING_RE = re.compile(
 THANKS_RE = re.compile(
     r'\b(thanks|thank\s+you|thankyou|thx|cheers|appreciate(\s+it)?|grateful)\b')
 
+# Asking for a person. Kept deliberately narrow: every alternative here is a
+# phrase that only makes sense when the visitor wants to stop reading and talk
+# to someone. "talk about pricing" and "call the API" must not match.
+HUMAN_RE = re.compile(
+    r'\b(?:talk|speak|chat)\s+(?:to|with)\s+(?:a\s+|an\s+|the\s+|my\s+)?'
+    r'(?:human|person|people|agent|representative|rep|specialist|advisor|consultant|'
+    r'expert|someone|somebody|real\s+(?:human|person|agent)|actual\s+(?:human|person))\b'
+    r'|\b(?:call|ring|phone|dial)\s+(?:me\s+back|back|us\s+back|me\s+now|us\s+now|'
+    r'me|us|the\s+team|someone)\b'
+    r'|\b(?:human|live|real|actual)\s+(?:agent|person|human|representative|help)\b'
+    r'|\b(?:call\s*cent(?:er|re)|call\s+desk|(?:support|sales|hot)\s+'
+    r'(?:line|desk|number))\b'
+    r'|\bcontact\s+(?:the\s+)?(?:support|sales|service)\s+team\b'
+    r'|\bconnect\s+me\s+(?:to|with)\s+(?:the\s+|a\s+)?'
+    r'(?:support|team|sales|agent|human|person|someone|advisor)\b'
+    # "need a manager" escalates, "need a manager dashboard" is a product
+    # question, so the word has to end there.
+    r'|\b(?:want|need|like)\s+(?:to\s+)?(?:a\s+|the\s+|my\s+)?'
+    r'(?:manager|supervisor)(?!\s+\w)'
+    r'|\b(?:talk|speak|complain|escalate)\s+(?:to|with)?\s*(?:a\s+|the\s+|my\s+)?'
+    r'(?:manager|supervisor|boss)\b'
+    r'|\bescalat(?:e|ed|es|ing|ion)\b'
+    r'|\brequest\s+(?:a\s+)?(?:call\s*back|callback)\b'
+    r'|\btransfer\s+me\b')
+
+# "Tell me more", pricing, quotes and demos. These read like site questions but
+# are really about the visitor's own project, so a page link is not the end of
+# the answer: a person should be one click away from here. Kept to phrases that
+# only make sense for a project enquiry, so "explain how the RPA engine works"
+# (a documentation question the index answers well) is not dragged into it.
+DETAILS_RE = re.compile(
+    r'\b(?:more|extra|further|additional)\s+'
+    r'(?:details?|information|info|context|background)\b'
+    r'|\b(?:tell|show|give|explain|elaborate)\s+(?:us\s+|me\s+)?more\b'
+    r'|\b(?:details?|information|info)\s+(?:about|on|for|regarding)\b'
+    r'|\b(?:how\s+much|what\s+(?:does|will|would)\s+it\s+cost)\b'
+    r'|\b(?:pricing|prices?|costs?|quotes?|quotations?|estimates?|proposals?)\b'
+    r'|\b(?:demos?|demonstrations?|free\s+trials?|trials?)\b'
+    r'|\bbook\s+a\s+(?:call|consultation|meeting|demo)\b'
+    r'|\bget\s+(?:started|going)\b'
+    r'|\bi\s*(?:\'m|am)\s+interested\b')
+
 # The four pages the chatbot offers when it has nothing better to say.
 STARTER_SUGGESTIONS = [
     {'title': 'What is OnWebApp?', 'content': 'Learn about the platform'},
@@ -29,6 +74,175 @@ STARTER_SUGGESTIONS = [
     {'title': 'How much does it cost?', 'content': 'Check pricing'},
     {'title': 'How does automation work?', 'content': 'Learn about RPA & BPA'},
 ]
+
+# Always offered alongside a handoff so the visitor is never stuck on "no".
+HUMAN_SUGGESTION = {
+    'title': 'Still stuck? Talk to a person',
+    'content': 'Connect me with the team',
+}
+
+CALL_CENTER_WHATSAPP_TEXT = (
+    'Hi, I was using the OnWebApp site guide and would like to speak to someone.'
+)
+
+# Sentences to splice into the escalation reply. Lowercasing the button label
+# does not produce English ("call us now is the quickest way"), so each channel
+# carries its own phrasing.
+_CHANNEL_PHRASES = {
+    'call': 'call us',
+    'chat': 'message us on WhatsApp',
+    'form': 'send us a message',
+}
+
+
+def _join_phrases(phrases):
+    if len(phrases) == 1:
+        return phrases[0]
+    if len(phrases) == 2:
+        return f'{phrases[0]} or {phrases[1]}'
+    return ', '.join(phrases[:-1]) + f', or {phrases[-1]}'
+
+
+def wants_human(message):
+    """True when the visitor is asking for a person, not for an answer.
+
+    Single source of truth for the escalation decision: the reply builder and
+    the queue writer both call this, so a request can never answer with a page
+    link while also never reaching an agent.
+    """
+    lowered = (message or '').lower()
+    if not HUMAN_RE.search(lowered):
+        return False
+    # "hello, call me" still escalates: only a message that is nothing but a
+    # greeting is not asking for a person.
+    return not GREETING_RE.fullmatch(lowered.strip(' \t\n\r.!,'))
+
+
+def should_offer_human(message):
+    """True when this turn should offer the visitor a way to reach a person.
+
+    Three cases only, and each of them is a question a bot should not be left
+    to answer alone:
+
+    * they asked for a person, or mentioned the call centre directly;
+    * they asked for details, pricing, a quote or a demo;
+    * the bot could not answer, which is handled where the fallback happens.
+
+    Everything else gets no button at all. A "Call" button under every single
+    answer is read as part of the furniture and then ignored exactly when it
+    matters.
+    """
+    lowered = (message or '').lower()
+    return wants_human(lowered) or bool(DETAILS_RE.search(lowered))
+
+
+def _call_center():
+    """Normalised call centre config, with every field a plain string."""
+    cfg = getattr(settings, 'CALL_CENTER', None) or {}
+    return {
+        'enabled': bool(cfg.get('ENABLED', True)),
+        'phone': (cfg.get('PHONE') or '').strip(),
+        'phone_display': (cfg.get('PHONE_DISPLAY') or cfg.get('PHONE') or '').strip(),
+        'whatsapp': (cfg.get('WHATSAPP') or '').strip(),
+        'email': (cfg.get('EMAIL') or '').strip(),
+        'hours': (cfg.get('HOURS') or '').strip(),
+    }
+
+
+def _call_center_actions():
+    """Clickable channels for reaching a person, skipping unconfigured ones.
+
+    Returns nothing at all when the feature is switched off or no channel is
+    usable, so the caller can fall back to a plain "get in touch" answer
+    instead of rendering a row of dead buttons.
+    """
+    cfg = _call_center()
+    if not cfg['enabled']:
+        return []
+
+    actions = []
+
+    phone_digits = re.sub(r'[^\d+]', '', cfg['phone'])
+    if phone_digits:
+        actions.append({
+            'label': 'Call us now',
+            'detail': cfg['phone_display'],
+            'url': 'tel:' + phone_digits,
+            'icon': 'fas fa-phone',
+            'kind': 'call',
+        })
+
+    whatsapp_digits = re.sub(r'[^\d]', '', cfg['whatsapp'])
+    if whatsapp_digits:
+        actions.append({
+            'label': 'WhatsApp us',
+            'detail': cfg['whatsapp'],
+            'url': f'https://wa.me/{whatsapp_digits}'
+                   f'?text={quote(CALL_CENTER_WHATSAPP_TEXT)}',
+            'icon': 'fab fa-whatsapp',
+            'kind': 'chat',
+        })
+
+    contact_path = _resolve('contact:contact')
+    if contact_path and _page_is_live(contact_path):
+        actions.append({
+            'label': 'Send a message',
+            'detail': cfg['email'] or None,
+            'url': contact_path + '?from=chat',
+            'icon': 'fas fa-envelope',
+            'kind': 'form',
+        })
+
+    return actions
+
+
+def _contact_fallback_links(user=None):
+    """Contact page links for an escalation, even if the search index is stale.
+
+    _page_links drops any path the crawl index has not marked live. That is the
+    right call when recommending a page, but wrong here: an escalation with no
+    link and no buttons is exactly the dead end this feature exists to prevent.
+    """
+    links = _page_links('contact', user=user)
+    if links:
+        return links
+
+    path = _resolve('contact:contact')
+    if path and user_can_read(user, access_for_url_name('contact:contact')):
+        return [{'title': PAGE_TITLES.get('contact:contact', 'Contact Us'), 'url': path}]
+    return []
+
+
+def _handoff_reply(user=None):
+    """Escalation copy. Says what is actually available, never a dead end."""
+    cfg = _call_center()
+    actions = _call_center_actions()
+
+    if not actions:
+        # (reply, suggestions, links, actions)
+        return (
+            "I can pass this to the team. Use the Contact page and someone will "
+            "get back to you as soon as possible.",
+            [],
+            _contact_fallback_links(user=user),
+            [],
+        )
+
+    if len(actions) == 1:
+        lead = f"Of course - {_CHANNEL_PHRASES.get(actions[0]['kind'], 'get in touch')} is the quickest way to reach us."
+    else:
+        phrases = [_CHANNEL_PHRASES.get(a['kind'], 'get in touch') for a in actions]
+        lead = f"Of course - you can {_join_phrases(phrases)}."
+
+    hours = f" Our team is available {cfg['hours']}." if cfg['hours'] else ''
+
+    return (
+        f"{lead} I'll pass on the context of this chat so you don't have to "
+        f"repeat yourself.{hours}",
+        [],
+        [],
+        actions,
+    )
 
 
 def chatbot_view(request):
@@ -122,6 +336,108 @@ def _resolve_suggestions(suggestions):
     return resolved
 
 
+def _open_call_request(request, session, message, channels):
+    """Put an explicit request for a person into the call centre queue.
+
+    One ticket per chat session. Asking again after it was resolved reopens the
+    same ticket rather than piling up duplicates, and the original escalation
+    time is kept so the queue still shows how long this visitor has been waiting.
+    """
+    user = request.user if getattr(request, 'user', None) and request.user.is_authenticated else None
+    reason = ' '.join(message.split())[:200]
+    # `channels` is a list of clickable actions; the ticket only remembers which
+    # kind of channel the visitor picked first, not the button payload.
+    channel = channels[0]['kind'] if channels else ''
+
+    ticket, created = CallRequest.objects.get_or_create(
+        session=session,
+        defaults={
+            'requested_by': user,
+            'reason': reason,
+            'channel': channel,
+            'escalated_at': timezone.now(),
+        },
+    )
+
+    if not created:
+        changed = []
+        if ticket.status == CallRequest.STATUS_RESOLVED:
+            ticket.status = CallRequest.STATUS_NEW
+            ticket.resolved_at = None
+            ticket.assigned_to = None
+            ticket.assigned_at = None
+            changed += ['status', 'resolved_at', 'assigned_to', 'assigned_at']
+        # A repeat request is new information: refresh the reason and re-stamp
+        # the wait so a reopened ticket sorts to the top of the queue.
+        ticket.reason = reason
+        ticket.channel = channel or ticket.channel
+        if user and not ticket.requested_by_id:
+            ticket.requested_by = user
+            changed.append('requested_by')
+        changed += ['reason', 'channel']
+        ticket.save(update_fields=changed + ['updated_at'])
+
+    return ticket
+
+
+def _call_request_payload(ticket):
+    """What the visitor's widget is allowed to know about their own ticket."""
+    if not ticket:
+        return {'escalated': False, 'status': None, 'waiting': None}
+    return {
+        'escalated': True,
+        'status': ticket.status,
+        'waiting': ticket.waiting_label,
+    }
+
+
+@csrf_exempt
+def session_status(request):
+    """Let a waiting visitor receive the agent's replies.
+
+    Identified by session_id, the same opaque token the widget already sends and
+    stores, and it only ever returns messages for that one session. The
+    transcript itself is not exposed; an agent can post into the conversation,
+    and the visitor sees those messages appear.
+    """
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+    session_id = (request.GET.get('session_id') or '').strip()
+    if not session_id or len(session_id) > 100:
+        return JsonResponse({'error': 'Missing session'}, status=400)
+
+    try:
+        since = float(request.GET.get('since') or 0)
+    except (TypeError, ValueError):
+        since = 0
+
+    session = ChatSession.objects.filter(session_id=session_id).first()
+    if not session:
+        return JsonResponse({'messages': [], 'status': None, 'escalated': False})
+
+    ticket = CallRequest.objects.filter(session=session).first()
+    if not ticket:
+        return JsonResponse({'messages': [], 'status': None, 'escalated': False})
+
+    agent_messages = []
+    for message in session.messages.filter(sender=ChatMessage.SENDER_AGENT):
+        if message.timestamp.timestamp() > since:
+            agent_messages.append({
+                'id': message.pk,
+                'sender': 'AGENT',
+                'content': message.content,
+                'timestamp': message.timestamp.isoformat(),
+                'agent': message.agent_label(),
+            })
+
+    return JsonResponse({
+        'messages': agent_messages,
+        'now': timezone.now().isoformat(),
+        **_call_request_payload(ticket),
+    })
+
+
 @csrf_exempt
 def get_suggestions(request):
     if request.method != 'POST':
@@ -143,18 +459,48 @@ def get_suggestions(request):
             session=session, sender='USER', content=user_message_text
         )
 
+        handoff = []
+        flags = {}
+
         reply, suggestions, links = generate_response(
-            user_message_text, session, request.user
+            user_message_text, session, request.user, actions=handoff, flags=flags
         )
 
         ChatMessage.objects.create(
             session=session, sender='BOT', content=reply
         )
 
+        # The same answer, cut into renderable pieces so the bubble can show
+        # paragraphs or a list instead of one dense block of text.
+        reply_parts, reply_format = site_search.split_answer(reply)
+
+        # The way to reach a person is offered only on the turns that need one:
+        # they asked for a person or for details, or the bot could not answer.
+        # ENABLED switches off the channels, not the queue, so a switched-off
+        # call centre must not put a "Call" button on the page either.
+        offer_call = bool(flags.get('offer_call')) and _call_center()['enabled']
+
+        # Handoff buttons ride along with the answer so a reply that says "let me
+        # get you someone" is never a promise without a button behind it.
+        if offer_call and not handoff:
+            handoff = _call_center_actions()
+
+        # Only an explicit "get me a person" opens a ticket. The bot's
+        # low-confidence fallback also offers a person, and that must not fill
+        # the call centre with every unanswered question.
+        ticket = None
+        if wants_human(user_message_text):
+            ticket = _open_call_request(request, session, user_message_text, handoff)
+
         return JsonResponse({
             'reply': reply,
+            'reply_parts': reply_parts,
+            'reply_format': reply_format,
             'suggestions': suggestions,
             'links': links,
+            'actions': handoff,
+            'offer_call': offer_call,
+            'call': _call_request_payload(ticket),
             'session_id': session.session_id
         })
 
@@ -285,7 +631,7 @@ def _curated_match(message):
     return best
 
 
-def _order_reply(message_lower, session, user):
+def _order_reply(message_lower, session, user, flags=None):
     """Order and production tracking, which needs a login or an order number."""
     if not any(w in message_lower for w in ['order', 'production', 'progress']):
         return None
@@ -303,6 +649,10 @@ def _order_reply(message_lower, session, user):
             [],
             [],
         )
+    # The bot cannot reach the ERP adapter itself, so this is one of the turns
+    # where the visitor needs a person rather than a better answer.
+    if flags is not None:
+        flags['offer_call'] = True
     return (
         f"I couldn't reach the ERP adapter for order #{match_id.group(1)}. "
         "Our team can pull the live status for you.",
@@ -312,15 +662,33 @@ def _order_reply(message_lower, session, user):
     )
 
 
-def generate_response(message, session, user=None):
+def generate_response(message, session, user=None, actions=None, flags=None):
     """Answer any question about the site.
 
     Order of preference: small talk, then a hand-written answer when the visitor
     used the exact wording it was written for, then the site-wide index. The
     index is what lets the bot talk about any page, not just the curated set.
+
+    ``actions`` is an optional list that collects the live-agent buttons for this
+    turn. It is filled in place rather than returned, so the three-tuple result
+    that callers and tests already unpack stays unchanged. ``flags`` is filled in
+    the same way and carries ``offer_call``: whether this turn should show the
+    visitor a way to reach a person at all.
     """
     message_lower = message.lower()
     user = user or getattr(session, 'user', None)
+
+    if should_offer_human(message) and flags is not None:
+        flags['offer_call'] = True
+
+    # ── Asking for a person ──
+    # Checked before everything else so "I want to talk to someone about pricing"
+    # reaches a human instead of an answer about pricing.
+    if wants_human(message_lower):
+        reply, suggestions, links, handoff = _handoff_reply(user=user)
+        if actions is not None:
+            actions.extend(handoff)
+        return reply, suggestions, links
 
     # ── Greetings ──
     # Only when the message actually opens with one, or is very short: "hi-tech"
@@ -367,7 +735,7 @@ def generate_response(message, session, user=None):
         return match['answer'], follow_ups, _page_links(page_key, match, user=user)
 
     # ── Order / production tracking ──
-    order = _order_reply(message_lower, session, user)
+    order = _order_reply(message_lower, session, user, flags=flags)
     if order:
         return order
 
@@ -382,13 +750,23 @@ def generate_response(message, session, user=None):
 
     # ── Nothing confident in the index; fall back to a curated answer ──
     if match:
+        if flags is not None:
+            flags['offer_call'] = True
         return (match['answer'],
-                _resolve_suggestions(_get_follow_ups(message_lower)),
+                _resolve_suggestions(_get_follow_ups(message_lower) + [HUMAN_SUGGESTION]),
                 _page_links(page_key, match, user=user))
+
+    # Last resort: say it does not know, but never leave the visitor without a
+    # way to reach a person. This is where "the bot was useless" moments land,
+    # so the button is offered whether or not they asked for one.
+    if flags is not None:
+        flags['offer_call'] = True
+    if actions is not None and _call_center_actions():
+        actions.extend(_call_center_actions())
 
     return (
         result['response'],
-        _resolve_suggestions(STARTER_SUGGESTIONS),
+        _resolve_suggestions(STARTER_SUGGESTIONS + [HUMAN_SUGGESTION]),
         links or _page_links('home', extra_url_names=('home:automation_home',
                                                       'services:index', 'contact:contact'),
                              user=user),

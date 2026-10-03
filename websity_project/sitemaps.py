@@ -12,6 +12,8 @@ class StaticViewSitemap(Sitemap):
     def items(self):
         return [
             'home:home',
+            'home:dashboard_development',
+            'home:browser_web_automation',
             'services:index',
             'integration:integration_homepage',
             'integration:system_integration',
