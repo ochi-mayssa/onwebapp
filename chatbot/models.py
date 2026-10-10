@@ -6,6 +6,10 @@ from django.utils import timezone
 class ChatSession(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
     session_id = models.CharField(max_length=100, unique=True)
+    # Everything the guide remembers about this conversation: detected intent,
+    # qualification stage, page context and the slots filled in so far. Server
+    # side only — nothing here is ever sent back to the visitor verbatim.
+    state = models.JSONField(default=dict, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -198,4 +202,47 @@ class CallRequest(models.Model):
         if resolution:
             self.resolution = resolution[:2000]
         self.save(update_fields=['status', 'resolved_at', 'resolution', 'updated_at'])
+
+
+class ChatLead(models.Model):
+    """A conversation the guide turned into a qualified request.
+
+    Created only when the visitor confirms a consultation request, so the row
+    always reflects something the visitor actually asked for. The summary text
+    is written from the answers they gave during the chat — never guessed —
+    and is what the team reads first in the admin and on the transcript page.
+
+    One per session: confirming twice updates the existing lead rather than
+    queuing duplicates.
+    """
+
+    STATUS_NEW = 'new'
+    STATUS_CONTACTED = 'contacted'
+    STATUS_CLOSED = 'closed'
+    STATUS_CHOICES = [
+        (STATUS_NEW, 'New'),
+        (STATUS_CONTACTED, 'Contacted'),
+        (STATUS_CLOSED, 'Closed'),
+    ]
+
+    session = models.OneToOneField(ChatSession, on_delete=models.CASCADE,
+                                   related_name='lead')
+    # Canonical intent key (dashboard, erp, website, ...) plus a human label
+    # for list views where the key means nothing on its own.
+    intent = models.CharField(max_length=40, blank=True)
+    solution = models.CharField(max_length=120, blank=True)
+    summary = models.TextField()
+    # Raw qualification slots, so the team sees the answers behind the summary.
+    data = models.JSONField(default=dict, blank=True)
+    contact = models.CharField(max_length=200, blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES,
+                              default=STATUS_NEW, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.solution or self.intent or 'Lead'} ({self.get_status_display()})"
 

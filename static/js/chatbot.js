@@ -72,6 +72,8 @@
         var cfg = {
             endpoint: root.dataset.chatEndpoint || '/chatbot/suggestions/',
             statusEndpoint: root.dataset.chatStatusEndpoint || '',
+            pageContextEndpoint: root.dataset.chatPageContext || '',
+            leadEndpoint: root.dataset.chatLeadEndpoint || '',
             waiting: root.dataset.chatWaiting || 'Someone from the team will join this chat shortly.',
             greeting: root.dataset.chatGreeting || '',
             deferGreeting: root.dataset.chatDefer === '1',
@@ -83,6 +85,21 @@
             retry: root.dataset.chatRetry || 'Try again',
             empty: root.dataset.chatEmpty || "I'm not sure how to help with that.",
             handoff: root.dataset.chatHandoff || ''
+        };
+
+        // The page the visitor is reading from. The rendered default is the
+        // floor; the endpoint refines it with access and liveness checks, and
+        // the guide's opening line, its own second line, its first questions
+        // and its call to action all follow whatever has arrived by the time
+        // the panel opens.
+        var page = {
+            path: window.location.pathname,
+            title: document.title,
+            line: '',
+            suggestions: [],
+            ctas: [],
+            introShown: false,
+            ctasShown: false
         };
 
         var sessionId = readSessionId();
@@ -158,6 +175,32 @@
             if (greetingShown || !cfg.greeting) { return; }
             greetingShown = true;
             addBotMessage(cfg.greeting);
+            showPageIntro();
+        }
+
+        // The first things the guide says belong to the page being read: the
+        // opening line every visitor gets, then this page's own sentence and
+        // its questions, then — once the visitor has qualified — its call to
+        // action. Shown once whether they came from the copy rendered into
+        // the page or from the endpoint, so opening the panel twice never
+        // repeats them.
+        function showPageIntro() {
+            if (!greetingShown) { return; }
+            if (!page.introShown) {
+                page.introShown = true;
+                // The page's second message: its own words, right after the
+                // greeting, so the visitor knows the guide can see where they
+                // are without the greeting having to change per page.
+                if (page.line) { addBotMessage(page.line); }
+                addSuggestions(page.suggestions);
+            }
+            showPageCtas();
+        }
+
+        function showPageCtas() {
+            if (page.ctasShown || !page.ctas.length) { return; }
+            page.ctasShown = true;
+            addActions(page.ctas);
         }
 
         // A reply typed by a human in the call centre dashboard. Deliberately a
@@ -266,6 +309,87 @@
             append(node);
         }
 
+        // What the conversation has gathered, shown once there is enough of it.
+        // Replaced rather than stacked: a restarted project must not leave the
+        // old project's brief sitting in the log.
+        var summaryNode = null;
+        var leadCtaNode = null;
+        var leadCtaLabel = '';
+
+        function addLeadSummary(summary) {
+            if (!summary || !summary.title) { return; }
+            if (summaryNode && summaryNode.parentNode) { summaryNode.remove(); }
+            var node = el('div', 'owa-chat-summary');
+            node.appendChild(el('strong', 'owa-chat-summary-title', summary.title));
+            var bullets = (summary.bullets || []).filter(Boolean);
+            if (bullets.length) {
+                var list = el('ul', 'owa-chat-summary-list');
+                bullets.forEach(function (bullet) { list.appendChild(el('li', null, bullet)); });
+                node.appendChild(list);
+            }
+            summaryNode = node;
+            append(node, true);
+        }
+
+        // The one button the guide earns: it posts the session to the lead
+        // endpoint, which records the lead, writes the confirmation into the
+        // transcript the team reads, and opens the queue when the answers were
+        // complete enough. Only one of these is ever in the log — the next turn
+        // replaces it, so there is never a second "consultation" button.
+        function addLeadCta(cta) {
+            if (!cta || !cta.label || !cfg.leadEndpoint) { return; }
+            if (leadCtaNode && leadCtaNode.parentNode) { leadCtaNode.remove(); }
+            leadCtaLabel = cta.label;
+            var node = el('div', 'owa-chat-cta');
+            var button = el('button', 'owa-chat-cta-btn', cta.label);
+            button.type = 'button';
+            button.addEventListener('click', requestLead);
+            node.appendChild(button);
+            leadCtaNode = node;
+            append(node, true);
+        }
+
+        function requestLead() {
+            if (busy || !sessionId || !cfg.leadEndpoint) { return; }
+            var label = leadCtaLabel || 'Request a consultation';
+            setBusy(true);
+            addUserMessage(label);
+            showTyping();
+
+            window.fetch(cfg.leadEndpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken') || ''
+                },
+                body: JSON.stringify({ session_id: sessionId, label: label })
+            }).then(function (res) {
+                if (!res.ok) {
+                    var httpError = new Error('http ' + res.status);
+                    httpError.owaHttp = true;
+                    throw httpError;
+                }
+                return res.json();
+            }).then(function (data) {
+                hideTyping();
+                if (leadCtaNode && leadCtaNode.parentNode) { leadCtaNode.remove(); }
+                leadCtaNode = null;
+                addBotParts(data && data.reply_parts, data && data.reply_format,
+                            data && data.reply);
+                if (data && data.summary) { addLeadSummary(data.summary); }
+                addSuggestions(data && data.suggestions);
+                setCallOffer(data && data.offer_call);
+                beginLiveAgent(data && data.call);
+            }).catch(function () {
+                hideTyping();
+                // Nothing was recorded, so the button stays where it is and
+                // remains usable; only the visitor's line is left unanswered.
+                addBotMessage(cfg.errorHttp);
+            }).then(function () {
+                setBusy(false);
+            });
+        }
+
         /* ---------- live-agent handoff ---------- */
 
         // The way to reach a person is shown only when it is relevant to what
@@ -311,6 +435,46 @@
             if (row.childNodes.length) { append(row, true); }
         }
 
+        /* ---------- page context ---------- */
+
+        // The guide opens page-aware. The copy rendered into the page is the
+        // floor — it is there the moment the panel opens, online or not — and
+        // this refines it with the two things only the server knows: which
+        // pages are actually live and readable, and this page's call to action.
+        // A failed fetch is not an error the visitor should ever see.
+        function applyPageContext(data, remote) {
+            if (!data || typeof data !== 'object') { return; }
+            if (data.welcome && !greetingShown) { cfg.greeting = data.welcome; }
+            if (typeof data.page_intro === 'string' && data.page_intro) {
+                page.line = data.page_intro;
+            }
+            if (Array.isArray(data.suggestions) && data.suggestions.length) {
+                page.suggestions = data.suggestions;
+            }
+            if (Array.isArray(data.ctas)) { page.ctas = data.ctas; }
+            if (data.title) { page.title = data.title; }
+            if (remote) { page.fromEndpoint = true; }
+            showPageIntro();
+        }
+
+        function readDefaults() {
+            var node = root.querySelector('script[id^="owa-chat-"][type="application/json"]');
+            if (!node) { return; }
+            try {
+                applyPageContext(JSON.parse(node.textContent), false);
+            } catch (e) { /* a malformed default is not worth breaking for */ }
+        }
+
+        function loadPageContext() {
+            if (!cfg.pageContextEndpoint) { return; }
+            var url = cfg.pageContextEndpoint + '?path=' + encodeURIComponent(page.path);
+            if (sessionId) { url += '&session_id=' + encodeURIComponent(sessionId); }
+            window.fetch(url, { credentials: 'same-origin' })
+                .then(function (res) { return res.ok ? res.json() : null; })
+                .then(function (data) { applyPageContext(data, true); })
+                .catch(function () { /* the copy rendered with the page stands */ });
+        }
+
         /* ---------- network ---------- */
 
         function setBusy(state) {
@@ -336,7 +500,13 @@
             input.value = '';
             showTyping();
 
-            var payload = { message: text };
+            // The page travels with every question, so the guide's answers are
+            // about what the visitor is looking at even if the context request
+            // never made it back.
+            var payload = {
+                message: text,
+                page: { path: page.path, title: page.title }
+            };
             if (sessionId) { payload.session_id = sessionId; }
 
             var failed = false;
@@ -362,10 +532,18 @@
                 }
                 hideTyping();
                 var reply = (data && data.reply) || '';
+                var structured = (data && data.structured) || null;
                 addBotParts(data && data.reply_parts, data && data.reply_format, reply);
+                if (structured && structured.lead_summary) {
+                    addLeadSummary(structured.lead_summary);
+                }
                 addPageReference(data && data.links);
                 addSuggestions(data && data.suggestions);
+                if (structured && structured.recommendations) {
+                    addSuggestions(structured.recommendations);
+                }
                 addActions(data && data.actions);
+                if (structured && structured.cta) { addLeadCta(structured.cta); }
                 setCallOffer(data && data.offer_call);
                 beginLiveAgent(data && data.call);
             }).catch(function (error) {
@@ -589,8 +767,12 @@
             if (document.hidden) { stopPolling(); }
         });
 
+        // The copy rendered into the page first, so the guide opens page-aware
+        // even before any request completes; the endpoint refines it after.
+        readDefaults();
         if (!cfg.deferGreeting) { showGreetingOnce(); }
         resumeIfWaiting();
+        loadPageContext();
         startNudge();
 
         root.owaChat = {

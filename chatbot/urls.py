@@ -7,6 +7,10 @@ app_name = 'chatbot'
 urlpatterns = [
     path('', views.chatbot_view, name='chatbot'),
     path('suggestions/', views.get_suggestions, name='chatbot_suggestions'),
+    # Page-aware guide: what to say on the page the widget sits on, and the
+    # handover once the visitor asks for a consultation.
+    path('page-context/', views.page_context_view, name='page_context'),
+    path('lead/', views.request_lead, name='request_lead'),
     path('session-status/', views.session_status, name='session_status'),
     path('search/', views.search_page, name='search'),
     path('search/api/', views.site_search_api, name='search_api'),

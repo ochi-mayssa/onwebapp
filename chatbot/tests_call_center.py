@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
-from chatbot.models import CallRequest, ChatMessage, ChatSession
+from chatbot.models import CallRequest, ChatLead, ChatMessage, ChatSession
 
 
 FULL_CC = {
@@ -556,6 +556,36 @@ class ChatLogTests(TestCase):
         self.assertNotContains(response, "/reply/")
         self.assertContains(response, reverse("chatbot:call_center_escalate",
                                               args=[session.session_id]))
+
+    def test_the_transcript_leads_with_the_confirmed_brief(self):
+        session = self.make_chat("with-a-lead",
+                                 [("USER", "Request a Consultation"),
+                                  ("BOT", "Thank you - your request is with the team.")])
+        ChatLead.objects.create(
+            session=session,
+            intent="dashboard",
+            solution="A custom business dashboard",
+            summary="Lead intent: Dashboard\n\nBusiness:\nretail business",
+        )
+        self.client.force_login(self.agent)
+
+        response = self.client.get(
+            reverse("chatbot:call_center_chat", args=[session.session_id]))
+
+        self.assertContains(response, 'class="cc-panel cc-lead"')
+        self.assertContains(response, "A custom business dashboard")
+        # The same text the reply passed on, line breaks and all.
+        self.assertContains(response, "Lead intent: Dashboard")
+
+    def test_a_chat_without_a_lead_has_no_brief_panel(self):
+        session = self.make_chat("bot-only", [("USER", "hello"), ("BOT", "hi")])
+        self.client.force_login(self.agent)
+
+        response = self.client.get(
+            reverse("chatbot:call_center_chat", args=[session.session_id]))
+
+        self.assertEqual(response.context["lead"], None)
+        self.assertNotContains(response, "Lead brief")
 
     def test_escalate_creates_one_ticket_from_the_visitor_own_words(self):
         session = self.make_chat("needs-a-human",

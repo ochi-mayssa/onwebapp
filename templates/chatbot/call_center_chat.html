@@ -93,6 +93,30 @@ where replies happen, and this page's only way into it is the explicit escalate.
             </div>
 
             <div class="col-lg-5">
+                {% if lead %}
+                <div class="cc-panel cc-lead">
+                    <h2 class="h6 fw-semibold text-body mb-3">
+                        <i class="fas fa-file-lines me-2"></i>{% trans 'Lead brief' %}
+                        <span class="cc-badge cc-badge-lead-{{ lead.status }}">{{ lead.get_status_display }}</span>
+                    </h2>
+                    <dl class="cc-details">
+                        {% if lead.solution %}
+                            <dt>{% trans 'Solution' %}</dt>
+                            <dd>{{ lead.solution }}</dd>
+                        {% endif %}
+                        {% if lead.contact %}
+                            <dt>{% trans 'Contact' %}</dt>
+                            <dd>{{ lead.contact }}</dd>
+                        {% endif %}
+                        <dt>{% trans 'Received' %}</dt>
+                        <dd>{{ lead.created_at|naturaltime }}</dd>
+                    </dl>
+                    {% if lead.summary %}
+                    <div class="cc-lead-summary">{{ lead.summary }}</div>
+                    {% endif %}
+                </div>
+                {% endif %}
+
                 <div class="cc-panel">
                     <h2 class="h6 fw-semibold text-body mb-3">
                         <i class="fas fa-circle-info me-2"></i>{% trans 'About this conversation' %}
@@ -161,5 +185,24 @@ where replies happen, and this page's only way into it is the explicit escalate.
     .cc-details { display: grid; grid-template-columns: auto 1fr; gap: .35rem .75rem; font-size: .85rem; margin-bottom: 1rem; }
     .cc-details dt { color: var(--text-tertiary, #94a3b8); font-weight: 600; }
     .cc-details dd { margin: 0; color: var(--text-primary, #1e293b); }
+
+    /* The lead the visitor confirmed: the same summary the reply passed on,
+       read here first, above the ticket it belongs to. */
+    .cc-lead { border-left: 3px solid var(--primary-color, #6366f1); }
+    .cc-lead-summary {
+        background: var(--bg-surface-secondary, #f8fafc);
+        border: 1px solid var(--border-color, #e2e8f0);
+        border-radius: 10px;
+        padding: .7rem .85rem;
+        margin: 0;
+        font-size: .84rem;
+        line-height: 1.5;
+        color: var(--text-primary, #1e293b);
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+    }
+    .cc-badge-lead-new { background: rgba(239, 68, 68, .12); color: #dc2626; }
+    .cc-badge-lead-contacted { background: rgba(37, 99, 235, .12); color: #2563eb; }
+    .cc-badge-lead-closed { background: rgba(16, 185, 129, .12); color: #059669; }
 </style>
 {% endblock %}

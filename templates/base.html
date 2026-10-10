@@ -933,7 +933,7 @@
             ];
             
             const colorIdx = (opts && opts.colorIdx) || 0;
-            const selectedColor = colors[colorIdx { colors.length];
+            const selectedColor = colors[colorIdx % colors.length];
             
             const cfg = {
                 type: (opts && opts.type) || 'line',
@@ -1190,7 +1190,9 @@
          data-chat-defer="1"
            data-chat-endpoint="{% url 'chatbot:chatbot_suggestions' %}"
            data-chat-status-endpoint="{% url 'chatbot:session_status' %}"
-         data-chat-greeting="{% trans 'Hi! I am your OnWebApp guide. Ask me about services, pricing, or how to navigate the site.' %}"
+           data-chat-page-context="{% url 'chatbot:page_context' %}"
+           data-chat-lead-endpoint="{% url 'chatbot:request_lead' %}"
+         data-chat-greeting="{% trans 'Hello, how can I help you today?' %}"
          data-chat-ref-prefix="{% trans 'For more information, visit the' %}"
          data-chat-ref-page="{% trans 'page.' %}"
          data-chat-ref-pages="{% trans 'pages.' %}"
@@ -1200,6 +1202,10 @@
            data-chat-handoff="{% trans 'I would like to talk to a person' %}"
            data-chat-waiting="{% trans 'You are in the queue. A member of the team will join this chat shortly.' %}"
            data-chat-empty="{% trans 'I am not sure how to help with that.' %}">
+        <!-- The page's own welcome line and questions, rendered with the page
+             itself: the guide opens page-aware even offline, and the endpoint
+             only refines it with access and liveness checks. -->
+        {{ chat_defaults|json_script:"owa-chat-widget-defaults" }}
         <div class="owa-chat-panel" id="chatbot-panel" data-chat-panel role="dialog" tabindex="-1" aria-label="{% trans 'OnWebApp Guide' %}" aria-hidden="true">
             <div class="owa-chat-header">
                 <div class="owa-chat-header-title">
@@ -1326,7 +1332,7 @@
 
             function setActive(next){
                 if (!items.length) return;
-                activeIndex = (next + items.length) { items.length;
+                activeIndex = (next + items.length) % items.length;
                 items.forEach(function(el, i){
                     el.classList.toggle('active', i === activeIndex);
                 });

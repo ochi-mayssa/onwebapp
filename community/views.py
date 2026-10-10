@@ -212,35 +212,12 @@ def home(request):
         completed_count = OnboardingSession.objects.filter(
             user=request.user, status='completed'
         ).count()
-    
-    # Community statistics
-    from django.contrib.auth import get_user_model
-    User = get_user_model()
-    members_count = User.objects.filter(is_active=True).count()
-    projects_count = OnboardingSession.objects.filter(status='completed').count()
-    discussions_count = 0
-    try:
-        from forum.models import ForumPost
-        discussions_count = ForumPost.objects.filter(status='published').count()
-    except Exception:
-        pass
-    topics_count = 0
-    try:
-        from forum.models import ForumCategory
-        topics_count = ForumCategory.objects.count()
-    except Exception:
-        pass
-    
+
     return render(request, 'community/home.html', {
         'active_sessions': active_sessions,
         'completed_count': completed_count,
-        'stats': {
-            'members': members_count,
-            'projects': projects_count,
-            'discussions': discussions_count,
-            'topics': topics_count,
-        },
     })
+
 
 
 @login_required

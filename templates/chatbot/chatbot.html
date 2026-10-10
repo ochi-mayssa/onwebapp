@@ -17,7 +17,9 @@
                  data-chat-root
                  data-chat-endpoint="{% url 'chatbot:chatbot_suggestions' %}"
                  data-chat-status-endpoint="{% url 'chatbot:session_status' %}"
-                 data-chat-greeting="{% trans 'Hi! I am your OnWebApp guide. I can help you find services, check pricing, navigate the site, or answer questions. What are you looking for?' %}"
+                 data-chat-page-context="{% url 'chatbot:page_context' %}"
+                 data-chat-lead-endpoint="{% url 'chatbot:request_lead' %}"
+                 data-chat-greeting="{% trans 'Hello, how can I help you today?' %}"
                  data-chat-ref-prefix="{% trans 'For more information, visit the' %}"
                  data-chat-ref-page="{% trans 'page.' %}"
                  data-chat-ref-pages="{% trans 'pages.' %}"
@@ -27,6 +29,7 @@
                  data-chat-handoff="{% trans 'I would like to talk to a person' %}"
                  data-chat-waiting="{% trans 'You are in the queue. A member of the team will join this chat shortly.' %}"
                  data-chat-empty="{% trans 'I am not sure how to help with that.' %}">
+                {{ chat_defaults|json_script:"owa-chat-page-defaults" }}
                 <div style="padding:14px 20px;background:linear-gradient(135deg,#7c3aed,#a78bfa);color:#fff;font-weight:600;display:flex;align-items:center;gap:8px">
                     <i class="fas fa-robot"></i> {% trans 'OnWebApp Guide' %}
                 </div>

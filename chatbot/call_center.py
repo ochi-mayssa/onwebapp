@@ -23,7 +23,7 @@ from django.utils import timezone
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
-from .models import CallRequest, ChatMessage, ChatSession
+from .models import CallRequest, ChatLead, ChatMessage, ChatSession
 
 PAGE_SIZE = 25
 
@@ -354,6 +354,9 @@ def chat_detail(request, session_id):
         'chat': session,
         'transcript': list(session.messages.select_related('agent')),
         'ticket': ticket,
+        # The brief the visitor confirmed: solution, answers and status, the
+        # same text the reply passed on, so nobody reads two versions.
+        'lead': ChatLead.objects.filter(session=session).first(),
         'status_new': CallRequest.STATUS_NEW,
         'status_claimed': CallRequest.STATUS_CLAIMED,
         'status_resolved': CallRequest.STATUS_RESOLVED,

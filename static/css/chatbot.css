@@ -351,6 +351,70 @@
 }
 .owa-chat-chip i { font-size: .62rem; margin-right: 6px; opacity: .75; }
 
+/* ── Lead brief and its one button ──────────────────────────────────────── */
+
+/* The visitor's own answers, gathered back before anything is handed over:
+   read as a card in the log, not as another bubble, so it reads as a document
+   the team will also see. */
+.owa-chat-summary {
+    align-self: flex-start;
+    max-width: 100%;
+    background: var(--owa-accent-soft, #f3edff);
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-left: 3px solid var(--owa-accent);
+    border-radius: 10px;
+    padding: 10px 13px;
+    font-size: .82rem;
+    color: var(--text-primary, #1f2937);
+    animation: owa-offer-in .18s ease-out;
+}
+.owa-chat-summary-title {
+    display: block;
+    font-size: .74rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--owa-accent);
+    margin-bottom: 6px;
+}
+.owa-chat-summary-list {
+    margin: 0;
+    padding-left: 1.1em;
+}
+.owa-chat-summary-list li { margin: 0 0 .3em; }
+.owa-chat-summary-list li:last-child { margin-bottom: 0; }
+.owa-chat-summary-list li::marker { color: var(--owa-accent); }
+
+/* The single call to action the conversation earns. One of these is ever in
+   the log: the next turn replaces it instead of stacking buttons. */
+.owa-chat-cta {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 2px;
+}
+.owa-chat-cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    background: var(--owa-accent, #7c3aed);
+    border: 1px solid var(--owa-accent, #7c3aed);
+    color: #fff;
+    border-radius: 999px;
+    padding: 8px 18px;
+    min-height: 36px;
+    font-size: .82rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: var(--owa-shadow-md);
+    transition: transform .16s ease, box-shadow .2s ease, opacity .2s ease;
+}
+.owa-chat-cta-btn:hover { transform: translateY(-1px); box-shadow: var(--owa-shadow-lg); }
+.owa-chat-cta-btn:focus-visible {
+    outline: 2px solid var(--owa-accent);
+    outline-offset: 2px;
+}
+.owa-chat-cta-btn:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
 /* ── Composer ─────────────────────────────────────────────────────────── */
 
 /* Column now that the escape-hatch button sits above the input row. */

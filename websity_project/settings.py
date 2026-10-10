@@ -196,6 +196,9 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                # The guide's opening line and questions for this page, so the
+                # chatbot renders page-aware even before its endpoint answers.
+                'chatbot.context_processors.chat_defaults',
             ],
         },
     },

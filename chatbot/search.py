@@ -11,7 +11,8 @@ from .corpus import user_can_read
 from .indexer import B, K1, load_index, loaded_index
 from .text_utils import STOPWORDS, split_sentences, tokenize, trim_to_sentence
 
-__all__ = ['answer', 'search', 'split_answer', 'load_index', 'loaded_index']
+__all__ = ['answer', 'search', 'split_answer', 'load_index', 'loaded_index',
+           'page_is_live']
 
 # List markers the curated answers use, so "1." and "-" are both recognised.
 LIST_MARKER = re.compile(r'^(?:[-*\u2022]|\d+[.)])\s+')
@@ -438,6 +439,24 @@ def _build_suggestions(index, pool, top_chunk, links, query_tokens):
             continue
         add(chunk.get('title', ''))
     return suggestions
+
+
+def page_is_live(path):
+    """True unless the index knows this path is broken.
+
+    Several routes in this project still point at templates that do not exist,
+    so they resolve but return HTTP 500. The index records which pages actually
+    rendered, and the bot must never send a visitor to one of the broken ones.
+    """
+    if not path:
+        return False
+    try:
+        known = loaded_index().get('live_paths')
+    except Exception:
+        return True
+    if not known:
+        return True
+    return path in known
 
 
 def split_answer(response):

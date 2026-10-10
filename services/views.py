@@ -134,19 +134,8 @@ from . import erp_utils
 @login_required
 @require_plan_limit('erp_integration')
 def erp_integration(request):
-    """Primary ERP service view using ERPNext white-label backend with local simulation fallback."""
-    erp_site = getattr(request.user, 'erp_site', None)
-    erp_token = erp_utils.get_erp_token(request.user)
-    
-    # Use processor to get simulated data as well
-    erp_data = processors.process_erp_data(request.user.username)
-    
-    return render(request, 'services/erpnext_dashboard.html', {
-        'erp_site': erp_site,
-        'erp_token': erp_token,
-        'erp_data': erp_data,
-        'service': SERVICE_CONTENT['erp-integration']
-    })
+    """Primary ERP service view."""
+    return render(request, 'services/erp-service.html')
 
 
 @login_required

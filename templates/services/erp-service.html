@@ -1,393 +1,1207 @@
 {% extends "base.html" %}
-{% load i18n static %}
+{% load i18n %}
+{% load static %}
 
-{% block title %}{% trans "ERP Integration & Implementation" %} | OnWebApp{% endblock %}
+{% block title %}{% trans "ERP Systems" %} | OnWebApp{% endblock %}
 
-{% block meta_description %}{% trans "Enterprise Resource Planning integration, implementation, and consulting. ERPNext, SAP, Oracle, and custom ERP solutions for businesses of all sizes." %}{% endblock %}
+{% block meta_description %}{% trans "An ERP gives your business one structured system for finance, sales, inventory, purchasing, HR, projects, and manufacturing. Learn what ERP is, what it solves, and how OnWebApp designs it around the way you operate." %}{% endblock %}
 
 {% block extra_css %}
 <style>
-.er-hero{background:linear-gradient(135deg,#0f172a 0%,#1e293b 40%,#0f172a 100%);padding:10rem 0 9rem;position:relative;overflow:hidden}
-.er-hero::before{content:'';position:absolute;inset:0;background:url('{% static "img/dev.jpg" %}') center/cover no-repeat;opacity:.3}
-.er-hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:200px;background:linear-gradient(to top,var(--bg-body),transparent)}
-.er-hero .container{position:relative;z-index:2}
-.er-label{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#10b981;margin-bottom:.5rem;display:flex;align-items:center;gap:.4rem}
-.er-label i{font-size:.35rem}
-.er-h{font-weight:800;font-size:2rem;margin-bottom:.6rem}
-.er-sub{color:#94a3b8;font-size:.95rem;line-height:1.7;max-width:640px}
-.er-s{padding:5rem 0}
-.er-s-alt{background:#f8fafc;padding:5rem 0}
-.er-s-dark{background:#0f172a;padding:5rem 0}
-.er-s-green{background:linear-gradient(135deg,#065f46,#10b981);padding:5rem 0}
-.er-c{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:1.75rem;height:100%;transition:all .3s}
-.er-c:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(16,185,129,.12);border-color:#10b981}
-.er-c-dark{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:1.75rem;height:100%;transition:all .3s}
-.er-c-dark:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(16,185,129,.15);border-color:rgba(16,185,129,.3)}
-.er-c-icon{width:48px;height:48px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;font-size:1.1rem;margin-bottom:1rem}
-.er-c-icon.green{background:rgba(16,185,129,.1);color:#10b981}
-.er-c-icon.blue{background:rgba(37,99,235,.1);color:#2563eb}
-.er-c-icon.purple{background:rgba(147,51,234,.1);color:#9333ea}
-.er-c-icon.amber{background:rgba(245,158,11,.1);color:#f59e0b}
-.er-c-icon.rose{background:rgba(244,63,94,.1);color:#f43f5e}
-.er-container{max-width:1140px;margin:0 auto;padding:0 1.5rem}
-.er-cta-box{background:linear-gradient(135deg,#065f46,#10b981);border-radius:20px;padding:4rem 2rem;text-align:center;margin:0}
-.er-step{display:flex;align-items:flex-start;gap:1.5rem;padding:2rem 0;border-bottom:1px solid #e2e8f0}
-.er-step:last-child{border-bottom:none}
-.er-step-num{flex-shrink:0;width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#059669,#10b981);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:1rem}
-.er-list{list-style:none;padding:0;margin:0}
-.er-list li{padding:.5rem 0;font-size:.9rem;color:#475569;display:flex;align-items:flex-start;gap:.6rem}
-.er-list li i{color:#10b981;margin-top:.2rem;flex-shrink:0}
-.er-metric{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:2rem;text-align:center;height:100%}
-.er-metric-val{font-size:2rem;font-weight:800;color:#059669}
-.er-metric-label{font-size:.82rem;color:#64748b;margin-top:.3rem}
-.er-pill{display:inline-block;padding:.35rem .85rem;border-radius:20px;font-size:.72rem;font-weight:600;transition:all .2s}
-.er-pill:hover{transform:translateY(-1px)}
-.er-platform{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:2rem;text-align:center;height:100%;transition:all .3s}
-.er-platform:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,.08);border-color:#10b981}
-.er-platform-icon{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.4rem;margin:0 auto 1rem}
-.er-tab-row{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:2rem}
-.er-tab{padding:.6rem 1.25rem;border-radius:50rem;font-size:.82rem;font-weight:600;border:1.5px solid #e2e8f0;background:#fff;color:#64748b;cursor:pointer;transition:all .2s}
-.er-tab:hover,.er-tab.active{background:#10b981;color:#fff;border-color:#10b981}
-.er-case{background:#fff;border:1px solid #e2e8f0;border-radius:16px;overflow:hidden;height:100%;transition:all .3s}
-.er-case:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,.08)}
-.er-case-head{padding:1.5rem 1.75rem 1rem}
-.er-case-body{padding:0 1.75rem 1.75rem}
+.ep{--ink:#0F172A;--ink-2:#334155;--ink-3:#64748B;--accent:#14B8A6;--accent-d:#0D9488;--line:#E2E8F0;--line-2:#EEF2F7;--soft:#F8FAFC;--dark:#0F172A;--r:16px;--sh:0 18px 46px -30px rgba(15,23,42,.45)}
+.ep{color:var(--ink-2);font-size:1rem;line-height:1.7;overflow-x:hidden}
+.ep h1,.ep h2,.ep h3,.ep h4,.ep h5{font-family:var(--font-display);color:var(--ink);letter-spacing:-.02em}
+.ep-eyebrow{display:inline-flex;align-items:center;gap:.55rem;font-size:.72rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--accent-d);margin-bottom:1rem}
+.ep-eyebrow::before{content:"";width:26px;height:2px;background:var(--accent);border-radius:2px}
+.ep-h1{font-size:clamp(2.2rem,5vw,3.5rem);font-weight:800;line-height:1.07;margin-bottom:1.1rem}
+.ep-h2{font-size:clamp(1.65rem,3.4vw,2.5rem);font-weight:800;line-height:1.14;margin-bottom:1rem}
+.ep-lead{font-size:1.08rem;color:var(--ink-3);max-width:640px}
+.ep-sec{padding:5.5rem 0}
+.ep-center{text-align:center}
+.ep-center .ep-lead{margin-inline:auto}
+.ep-center .ep-eyebrow{justify-content:center}
+.ep-btn{display:inline-flex;align-items:center;gap:.55rem;font-weight:700;font-size:.95rem;padding:.85rem 1.5rem;border-radius:12px;border:1px solid transparent;transition:.25s ease;text-decoration:none;white-space:nowrap}
+.ep-btn--dark{background:var(--ink);color:#fff}
+.ep-btn--dark:hover{background:#1E293B;color:#fff;transform:translateY(-2px);box-shadow:0 14px 30px -18px rgba(15,23,42,.9)}
+.ep-btn--accent{background:var(--accent);color:#04312C}
+.ep-btn--accent:hover{background:#0EA5A0;color:#04312C;transform:translateY(-2px);box-shadow:0 14px 30px -18px rgba(20,184,166,.9)}
+.ep-btn--ghost{background:#fff;border-color:var(--line);color:var(--ink)}
+.ep-btn--ghost:hover{border-color:var(--ink);color:var(--ink);transform:translateY(-2px)}
+.ep-btn--ghost-d{background:transparent;border-color:rgba(255,255,255,.22);color:#fff}
+.ep-btn--ghost-d:hover{border-color:#fff;background:rgba(255,255,255,.06);color:#fff;transform:translateY(-2px)}
+.ep-btn i,.ep-btn svg{width:17px;height:17px}
+.ep-rv{opacity:0;transform:translateY(24px);transition:opacity .75s cubic-bezier(.22,1,.36,1),transform .75s cubic-bezier(.22,1,.36,1);transition-delay:var(--d,0s)}
+.ep-rv.is-in{opacity:1;transform:none}
+
+/* 01 HERO */
+.ep-hero{background:linear-gradient(180deg,#fff 0%,#F8FAFC 100%);padding:6.5rem 0 5.5rem;position:relative;overflow:hidden}
+.ep-hero::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(15,23,42,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(15,23,42,.035) 1px,transparent 1px);background-size:56px 56px;mask-image:radial-gradient(900px 520px at 70% 20%,#000,transparent 75%);-webkit-mask-image:radial-gradient(900px 520px at 70% 20%,#000,transparent 75%);pointer-events:none}
+.ep-hero__grid{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:3.5rem;align-items:center}
+.ep-hero__acts{display:flex;gap:.9rem;flex-wrap:wrap;margin-top:2rem}
+.ep-hero__meta{display:flex;gap:1.1rem;flex-wrap:wrap;margin-top:2.2rem;padding-top:1.6rem;border-top:1px solid var(--line)}
+.ep-hero__meta span{display:flex;align-items:center;gap:.5rem;font-size:.85rem;font-weight:600;color:var(--ink-3)}
+.ep-hero__meta i,.ep-hero__meta svg{width:15px;height:15px;color:var(--accent)}
+.ep-app{background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 40px 80px -50px rgba(15,23,42,.55),0 2px 6px rgba(15,23,42,.05);animation:epIn .9s .1s cubic-bezier(.22,1,.36,1) both}
+@keyframes epIn{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+.ep-app__bar{display:flex;align-items:center;gap:.45rem;padding:.7rem .9rem;background:#F8FAFC;border-bottom:1px solid var(--line-2)}
+.ep-app__dot{width:9px;height:9px;border-radius:50%;background:#E2E8F0}
+.ep-app__url{margin-left:.6rem;font-size:.7rem;font-weight:600;color:#94A3B8;background:#fff;border:1px solid var(--line-2);border-radius:7px;padding:.2rem .7rem}
+.ep-app__live{margin-left:auto;display:flex;align-items:center;gap:.4rem;font-size:.66rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--accent-d)}
+.ep-app__pulse{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:epPulse 1.8s ease-in-out infinite}
+@keyframes epPulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(20,184,166,.5)}50%{opacity:.7;box-shadow:0 0 0 6px rgba(20,184,166,0)}}
+.ep-app__body{display:grid;grid-template-columns:148px minmax(0,1fr);min-height:392px}
+.ep-app__side{background:#FBFCFD;border-right:1px solid var(--line-2);padding:.85rem .7rem;display:flex;flex-direction:column;gap:.15rem}
+.ep-app__brand{display:flex;align-items:center;gap:.45rem;font-family:var(--font-display);font-size:.76rem;font-weight:800;color:var(--ink);padding:.2rem .4rem .7rem;border-bottom:1px solid var(--line-2);margin-bottom:.55rem}
+.ep-app__logo{width:16px;height:16px;border-radius:5px;background:linear-gradient(135deg,var(--ink),var(--accent));flex:none}
+.ep-app__nav{display:flex;align-items:center;gap:.5rem;font-size:.73rem;font-weight:600;color:#64748B;padding:.42rem .5rem;border-radius:8px}
+.ep-app__nav svg{width:13px;height:13px;flex:none}
+.ep-app__nav.is-on{background:var(--ink);color:#fff}
+.ep-app__nav.is-on svg{color:var(--accent)}
+.ep-app__main{padding:1rem 1.1rem 1.2rem;display:flex;flex-direction:column;gap:.85rem;min-width:0}
+.ep-app__head{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem}
+.ep-app__title{font-family:var(--font-display);font-weight:800;font-size:.95rem;color:var(--ink)}
+.ep-app__sub{font-size:.68rem;color:#94A3B8;font-weight:600}
+.ep-app__chips{display:flex;gap:.3rem;background:#F1F5F9;padding:.2rem;border-radius:8px}
+.ep-app__chips span{font-size:.64rem;font-weight:700;color:#64748B;padding:.2rem .5rem;border-radius:6px}
+.ep-app__chips span.is-on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(15,23,42,.12)}
+.ep-app__kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.55rem}
+.ep-kpi{border:1px solid var(--line-2);border-radius:11px;padding:.6rem .65rem;background:#fff;animation:epIn .7s cubic-bezier(.22,1,.36,1) both}
+.ep-kpi:nth-child(1){animation-delay:.25s}.ep-kpi:nth-child(2){animation-delay:.34s}.ep-kpi:nth-child(3){animation-delay:.43s}.ep-kpi:nth-child(4){animation-delay:.52s}
+.ep-kpi__l{font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#94A3B8}
+.ep-kpi__v{font-family:var(--font-display);font-size:1.02rem;font-weight:800;color:var(--ink);line-height:1.3;margin-top:.15rem}
+.ep-kpi__s{font-size:.6rem;font-weight:700;color:var(--accent-d)}
+.ep-app__grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:.6rem;flex:1}
+.ep-chart{border:1px solid var(--line-2);border-radius:11px;padding:.7rem .75rem;display:flex;flex-direction:column;gap:.55rem;min-width:0;animation:epIn .7s .6s cubic-bezier(.22,1,.36,1) both}
+.ep-chart__t{display:flex;justify-content:space-between;align-items:center;font-size:.65rem;font-weight:700;color:#94A3B8;letter-spacing:.05em;text-transform:uppercase}
+.ep-chart__t strong{color:var(--ink);font-family:var(--font-display);font-size:.78rem;letter-spacing:0;text-transform:none}
+.ep-bars{display:flex;align-items:flex-end;gap:5px;height:92px;padding-top:4px;border-bottom:1px solid var(--line-2);position:relative}
+.ep-bars::after{content:"";position:absolute;left:0;right:0;top:38%;border-top:1px dashed #E2E8F0}
+.ep-bar{flex:1;border-radius:4px 4px 0 0;background:linear-gradient(180deg,#CBD5E1,#E2E8F0);min-width:0;transform-origin:bottom;animation:epGrow .8s cubic-bezier(.22,1,.36,1) both}
+.ep-bar.is-hi{background:linear-gradient(180deg,var(--accent),#5EEAD4)}
+@keyframes epGrow{from{transform:scaleY(.1);opacity:.4}to{transform:scaleY(1);opacity:1}}
+.ep-legend{display:flex;gap:.8rem;font-size:.6rem;font-weight:600;color:#94A3B8}
+.ep-legend span{display:flex;align-items:center;gap:.3rem}
+.ep-legend b{width:7px;height:7px;border-radius:2px;background:var(--accent);display:inline-block}
+.ep-feed{border:1px solid var(--line-2);border-radius:11px;padding:.7rem;display:flex;flex-direction:column;gap:.45rem;min-width:0;animation:epIn .7s .7s cubic-bezier(.22,1,.36,1) both}
+.ep-feed__t{font-size:.65rem;font-weight:700;color:#94A3B8;letter-spacing:.05em;text-transform:uppercase}
+.ep-feed__r{display:flex;gap:.5rem;align-items:flex-start;font-size:.68rem;color:var(--ink-2);line-height:1.4}
+.ep-feed__d{width:6px;height:6px;border-radius:50%;background:var(--accent);flex:none;margin-top:.32rem}
+.ep-feed__r:nth-child(3) .ep-feed__d{background:#6366F1}
+.ep-feed__r:nth-child(4) .ep-feed__d{background:#F59E0B}
+.ep-feed__r:nth-child(5) .ep-feed__d{background:#94A3B8}
+.ep-feed__r em{font-style:normal;color:#94A3B8;margin-left:auto;font-size:.6rem;white-space:nowrap;padding-left:.4rem}
+.ep-app__cap{display:flex;align-items:center;gap:.5rem;font-size:.75rem;color:#94A3B8;font-weight:600;margin-top:.85rem;justify-content:flex-end}
+.ep-app__cap::before{content:"";width:18px;height:1px;background:#CBD5E1}
+/* 02 DEFINITION */
+.ep-def{background:#fff}
+.ep-def__grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;margin-top:2.6rem}
+.ep-mod{position:relative;border:1px solid var(--line);border-radius:14px;padding:1.35rem 1.3rem 1.4rem;background:#fff;transition:.3s cubic-bezier(.22,1,.36,1);overflow:hidden}
+.ep-mod::after{content:"";position:absolute;left:0;top:0;height:2px;width:0;background:var(--accent);transition:width .4s cubic-bezier(.22,1,.36,1)}
+.ep-mod:hover{transform:translateY(-5px);border-color:#CBD5E1;box-shadow:0 24px 44px -30px rgba(15,23,42,.5)}
+.ep-mod:hover::after{width:100%}
+.ep-mod__ico{width:40px;height:40px;border-radius:11px;background:rgba(20,184,166,.1);color:#0F766E;display:flex;align-items:center;justify-content:center;margin-bottom:.9rem;transition:.3s}
+.ep-mod:hover .ep-mod__ico{background:var(--ink);color:var(--accent)}
+.ep-mod__ico svg{width:19px;height:19px}
+.ep-mod h5{font-size:1rem;font-weight:800;margin-bottom:.35rem}
+.ep-mod p{font-size:.87rem;color:var(--ink-3);margin:0;line-height:1.62}
+.ep-def__out{margin-top:2.4rem;padding:1.4rem 1.6rem;border-left:3px solid var(--accent);background:#F8FAFC;border-radius:0 12px 12px 0;font-size:1rem;color:var(--ink);font-weight:600;max-width:860px}
+
+/* 03 PROBLEM */
+.ep-dark{background:var(--dark);color:#94A3B8}
+.ep-dark h2,.ep-dark h3,.ep-dark h4,.ep-dark h5{color:#fff}
+.ep-dark .ep-eyebrow{color:var(--accent)}
+.ep-dark .ep-lead{color:#94A3B8}
+.ep-prob__intro{max-width:780px}
+.ep-tooltags{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1.6rem}
+.ep-tt{font-size:.78rem;font-weight:600;color:#CBD5E1;background:rgba(255,255,255,.05);border:1px dashed rgba(255,255,255,.18);padding:.4rem .8rem;border-radius:9px}
+.ep-frag{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.8rem;margin-top:2.6rem;padding:1.6rem 1.4rem;border:1px solid rgba(255,255,255,.08);border-radius:16px;background:rgba(255,255,255,.025)}
+.ep-frag__c{display:flex;flex-direction:column;align-items:center;text-align:center;gap:.55rem;position:relative}
+.ep-frag__dept,.ep-frag__tool{font-size:.76rem;font-weight:700;padding:.42rem .7rem;border-radius:9px;width:100%;line-height:1.3}
+.ep-frag__dept{background:rgba(255,255,255,.07);color:#E2E8F0;border:1px solid rgba(255,255,255,.1)}
+.ep-frag__tool{background:transparent;color:#F87171;border:1px dashed rgba(248,113,113,.4)}
+.ep-frag__link{width:1px;height:34px;background-image:linear-gradient(#64748B 45%,transparent 0);background-size:1px 8px;position:relative;opacity:.65}
+.ep-frag__link::after{content:"";position:absolute;left:50%;bottom:-3px;transform:translateX(-50%);width:7px;height:7px;border-radius:50%;border:1.5px solid #64748B;background:var(--dark)}
+.ep-frag__cap{grid-column:1/-1;text-align:center;font-size:.78rem;color:#64748B;letter-spacing:.1em;text-transform:uppercase;font-weight:700;margin-top:.4rem}
+.ep-prob__grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem;margin-top:2.4rem}
+.ep-prob__c{padding:1.35rem 1.25rem;border:1px solid rgba(255,255,255,.09);border-radius:14px;background:rgba(255,255,255,.03);transition:.3s}
+.ep-prob__c:hover{background:rgba(255,255,255,.06);border-color:rgba(20,184,166,.45);transform:translateY(-4px)}
+.ep-prob__c svg{width:20px;height:20px;color:var(--accent);margin-bottom:.75rem}
+.ep-prob__c h5{font-size:.98rem;font-weight:800;margin-bottom:.4rem}
+.ep-prob__c p{font-size:.86rem;color:#94A3B8;margin:0;line-height:1.62}
+
+/* 04 TRANSFORMATION */
+.ep-trans{background:var(--soft)}
+.ep-trans__grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:1.4rem;margin-top:2.8rem}
+.ep-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:1.9rem 1.5rem 1.6rem;position:relative;box-shadow:var(--sh)}
+.ep-card__tag{position:absolute;top:-11px;left:1.5rem;font-size:.66rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;padding:.32rem .8rem;border-radius:99px}
+.ep-card__tag--b{background:#F1F5F9;color:var(--ink-3);border:1px solid var(--line)}
+.ep-card__tag--a{background:var(--ink);color:var(--accent);border:1px solid var(--ink)}
+.ep-before{display:flex;flex-direction:column;gap:.6rem;margin-top:.6rem}
+.ep-bf{display:grid;grid-template-columns:minmax(0,1fr) 34px minmax(0,1fr);align-items:center;gap:.5rem;padding:.55rem .7rem;border-radius:11px;background:#F8FAFC;border:1px dashed var(--line)}
+.ep-bf span{font-size:.82rem;font-weight:700;color:var(--ink-2)}
+.ep-bf em{font-style:normal;font-size:.82rem;font-weight:600;color:#94A3B8;text-align:center;display:flex;align-items:center;justify-content:center;gap:.25rem}
+.ep-bf em svg{width:14px;height:14px;color:#CBD5E1}
+.ep-bf--2{margin-left:.6rem}
+.ep-bf--3{margin-left:1.2rem}
+.ep-trans__cap{font-size:.88rem;color:var(--ink-3);margin-top:.9rem;text-align:center}
+.ep-after{margin-top:.6rem;border:1px solid var(--line-2);border-radius:14px;background:linear-gradient(180deg,#fff,#F8FAFC);padding:.6rem}
+.ep-after svg{width:100%;height:auto;display:block}
+.ep-flow{stroke:#14B8A6;stroke-width:2;fill:none;stroke-dasharray:7 9;stroke-linecap:round;animation:epDash 1.5s linear infinite;opacity:0;transition:opacity .8s .2s ease}
+.is-in .ep-flow{opacity:1}
+@keyframes epDash{to{stroke-dashoffset:-32}}
+.ep-after__core{font-family:var(--font-display);font-weight:800;fill:#5EEAD4;font-size:16px}
+.ep-after__x{font-family:var(--font-display);font-weight:800;fill:#0F172A;font-size:14px}
+.ep-after__s{font-size:13px;fill:#475569;font-weight:600}
+.ep-after__o{font-family:var(--font-display);font-weight:800;fill:#04312C;font-size:13px}
+.ep-trans__foot{margin-top:2.6rem;text-align:center;font-family:var(--font-display);font-size:clamp(1.05rem,2.1vw,1.35rem);font-weight:800;color:var(--ink);max-width:760px;margin-inline:auto;line-height:1.5}
+.ep-trans__foot span{color:var(--accent-d)}
+/* 05 CAPABILITIES */
+.ep-cap{background:#fff}
+.ep-cap__wrap{display:grid;grid-template-columns:236px minmax(0,1fr);gap:1.4rem;margin-top:2.8rem;align-items:start}
+.ep-cap__tabs{display:flex;flex-direction:column;gap:.4rem;position:sticky;top:96px}
+.ep-tab{display:flex;align-items:center;gap:.65rem;width:100%;text-align:left;font-size:.9rem;font-weight:700;color:var(--ink-3);background:#fff;border:1px solid var(--line);border-radius:11px;padding:.72rem .85rem;cursor:pointer;transition:.25s;font-family:inherit}
+.ep-tab svg{width:16px;height:16px;flex:none}
+.ep-tab:hover{border-color:#CBD5E1;color:var(--ink);transform:translateX(3px)}
+.ep-tab.is-on{background:var(--ink);border-color:var(--ink);color:#fff;box-shadow:0 16px 30px -22px rgba(15,23,42,.95)}
+.ep-tab.is-on svg{color:var(--accent)}
+.ep-cap__panel{border:1px solid var(--line);border-radius:18px;background:#fff;box-shadow:var(--sh);overflow:hidden;transition:opacity .18s ease,transform .18s ease}
+.ep-cap__panel.is-swap{opacity:0;transform:translateY(8px)}
+.ep-cap__hd{padding:1.6rem 1.7rem 1.4rem;border-bottom:1px solid var(--line-2);background:linear-gradient(180deg,#FCFDFD,#fff)}
+.ep-cap__ico{width:42px;height:42px;border-radius:12px;background:var(--ink);color:var(--accent);display:flex;align-items:center;justify-content:center;margin-bottom:.9rem}
+.ep-cap__ico svg{width:20px;height:20px}
+.ep-cap__hd h3{font-size:1.45rem;font-weight:800;margin-bottom:.4rem}
+.ep-cap__hd p{font-size:.95rem;color:var(--ink-3);margin:0;max-width:560px}
+.ep-cap__caps{display:flex;flex-wrap:wrap;gap:.45rem;padding:1.15rem 1.7rem 0}
+.ep-cap__caps span{font-size:.78rem;font-weight:700;color:#0F766E;background:rgba(20,184,166,.1);border:1px solid rgba(20,184,166,.22);padding:.34rem .7rem;border-radius:8px}
+.ep-mock{margin:1.2rem 1.7rem 1.7rem;border:1px solid var(--line-2);border-radius:13px;overflow:hidden;background:#fff}
+.ep-mock__bar{display:flex;align-items:center;gap:.6rem;padding:.6rem .8rem;background:#F8FAFC;border-bottom:1px solid var(--line-2)}
+.ep-mock__t{font-size:.72rem;font-weight:800;color:var(--ink)}
+.ep-mock__search{flex:1;min-width:0;display:flex;align-items:center;gap:.4rem;height:26px;padding:0 .55rem;background:#fff;border:1px solid var(--line-2);border-radius:7px;font-size:.68rem;color:#94A3B8;overflow:hidden;white-space:nowrap}
+.ep-mock__search svg{width:12px;height:12px;flex:none}
+.ep-mock__btn{font-size:.68rem;font-weight:800;color:#fff;background:var(--accent);padding:.3rem .65rem;border-radius:7px;white-space:nowrap}
+.ep-mock__hd{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:.6rem;padding:.5rem .85rem;background:#FCFDFD;border-bottom:1px solid var(--line-2);font-size:.62rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#94A3B8}
+.ep-mock__r{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:.6rem;align-items:center;padding:.68rem .85rem;border-bottom:1px solid var(--line-2);font-size:.82rem;font-weight:600;color:var(--ink-2)}
+.ep-mock__r:last-of-type{border-bottom:0}
+.ep-mock__r:hover{background:#F8FAFC}
+.ep-mock__lab{display:flex;align-items:center;gap:.5rem;min-width:0}
+.ep-mock__lab::before{content:"";width:6px;height:6px;border-radius:50%;background:#CBD5E1;flex:none}
+.ep-mock__m{font-size:.74rem;color:#94A3B8;white-space:nowrap}
+.ep-pill{font-size:.66rem;font-weight:800;padding:.2rem .55rem;border-radius:99px;white-space:nowrap}
+.ep-pill--ok{background:rgba(20,184,166,.13);color:#0F766E}
+.ep-pill--wait{background:rgba(245,158,11,.15);color:#B45309}
+.ep-pill--idle{background:#F1F5F9;color:#64748B}
+.ep-cap__ft{display:flex;align-items:center;justify-content:space-between;gap:.6rem;padding:.55rem .85rem;background:#F8FAFC;border-top:1px solid var(--line-2);font-size:.68rem;color:#94A3B8;font-weight:600}
+.ep-cap__ft b{color:var(--ink)}
+
+/* 06 FIT */
+.ep-fit__p{max-width:780px}
+.ep-chain{display:flex;align-items:center;flex-wrap:wrap;gap:.55rem;margin-top:2.4rem;padding:1.5rem 1.4rem;border:1px solid rgba(255,255,255,.09);border-radius:16px;background:rgba(255,255,255,.03)}
+.ep-chain__s{display:flex;align-items:center;gap:.5rem;font-size:.78rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#CBD5E1;padding:.5rem .85rem;border:1px solid rgba(255,255,255,.13);border-radius:9px;background:rgba(255,255,255,.04);white-space:nowrap}
+.ep-chain__s.is-end{background:var(--accent);border-color:var(--accent);color:#04312C}
+.ep-chain__s.is-end svg{color:#04312C}
+.ep-chain__s svg{width:14px;height:14px;color:var(--accent)}
+.ep-chain__a{color:rgba(255,255,255,.3);display:flex}
+.ep-chain__a svg{width:15px;height:15px}
+.ep-fit__grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem;margin-top:1.6rem}
+.ep-fit__c{padding:1.4rem 1.3rem;border:1px solid rgba(255,255,255,.09);border-radius:14px;background:rgba(255,255,255,.03);transition:.3s}
+.ep-fit__c:hover{border-color:rgba(20,184,166,.5);background:rgba(20,184,166,.06);transform:translateY(-4px)}
+.ep-fit__c svg{width:19px;height:19px;color:var(--accent);margin-bottom:.7rem}
+.ep-fit__c h5{font-size:.98rem;font-weight:800;margin-bottom:.35rem}
+.ep-fit__c p{font-size:.85rem;color:#94A3B8;margin:0;line-height:1.6}
+
+/* 07 ARCHITECTURE */
+.ep-arch{background:var(--soft)}
+.ep-arch__box{margin-top:2.8rem;background:#fff;border:1px solid var(--line);border-radius:20px;padding:2.2rem 1.6rem 2rem;box-shadow:var(--sh);position:relative}
+.ep-arch__mods{display:flex;flex-wrap:wrap;justify-content:center;gap:.6rem;position:relative;padding-bottom:2rem}
+.ep-arch__m{position:relative;display:flex;align-items:center;gap:.45rem;font-size:.8rem;font-weight:700;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:10px;padding:.5rem .8rem;transition:.25s}
+.ep-arch__m:hover{border-color:var(--accent);color:#0F766E;transform:translateY(-3px);box-shadow:0 14px 26px -20px rgba(15,23,42,.7)}
+.ep-arch__m svg{width:14px;height:14px;color:var(--ink-3)}
+.ep-arch__m:hover svg{color:var(--accent)}
+.ep-arch__m::after{content:"";position:absolute;left:50%;bottom:-2rem;width:1px;height:2rem;background-image:linear-gradient(#CBD5E1 55%,transparent 0);background-size:1px 7px}
+.ep-arch__bus{position:absolute;left:6%;right:6%;bottom:0;height:1px;background-image:linear-gradient(90deg,#CBD5E1 55%,transparent 0);background-size:8px 1px}
+.ep-arch__mid{display:flex;flex-direction:column;align-items:center;gap:.7rem;margin-top:-.3rem}
+.ep-arch__arr{color:var(--accent);display:flex;animation:epBounce 2.2s ease-in-out infinite}
+.ep-arch__arr svg{width:20px;height:20px}
+@keyframes epBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
+.ep-arch__core{display:inline-flex;flex-direction:column;align-items:center;gap:.3rem;background:var(--ink);color:#fff;border-radius:16px;padding:1.25rem 2.6rem;box-shadow:0 26px 50px -32px rgba(15,23,42,1);position:relative;overflow:hidden}
+.ep-arch__core::before{content:"";position:absolute;inset:0;background:radial-gradient(120px 60px at 50% 0%,rgba(20,184,166,.35),transparent 70%)}
+.ep-arch__core strong{font-family:var(--font-display);font-size:1.32rem;letter-spacing:.14em;position:relative}
+.ep-arch__core span{font-size:.7rem;color:#5EEAD4;letter-spacing:.16em;text-transform:uppercase;font-weight:700;position:relative}
+.ep-arch__layers{display:flex;flex-direction:column;align-items:center;gap:.55rem;margin-top:1.4rem;width:100%;max-width:520px;margin-inline:auto}
+.ep-layer{width:100%;display:flex;align-items:center;justify-content:center;gap:.6rem;font-size:.88rem;font-weight:700;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:12px;padding:.75rem 1rem;text-align:center;transition:.25s}
+.ep-layer:hover{border-color:#CBD5E1;box-shadow:0 16px 30px -24px rgba(15,23,42,.8)}
+.ep-layer svg{width:16px;height:16px;color:var(--accent);flex:none}
+.ep-layer--accent{background:rgba(20,184,166,.07);border-color:rgba(20,184,166,.3);color:#0F766E}
+.ep-arch__link{display:flex;justify-content:center;color:#CBD5E1}
+.ep-arch__link svg{width:15px;height:15px}
+.ep-arch__cap{text-align:center;font-size:.9rem;color:var(--ink-3);margin-top:1.6rem;max-width:640px;margin-inline:auto}
+/* 08 PROCESS */
+.ep-proc{background:#fff}
+.ep-tl{list-style:none;padding:0;margin:3rem 0 0;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:1.1rem;position:relative}
+.ep-tl::before{content:"";position:absolute;left:0;right:0;top:23px;height:1px;background:var(--line)}
+.ep-tl::after{content:"";position:absolute;left:0;top:23px;height:1px;width:0;background:var(--accent);transition:width 1.6s .3s cubic-bezier(.22,1,.36,1)}
+.ep-tl.is-in::after{width:100%}
+.ep-tl__s{position:relative}
+.ep-tl__n{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;width:46px;height:46px;border-radius:50%;background:#fff;border:1.5px solid var(--line);font-family:var(--font-display);font-size:.86rem;font-weight:800;color:var(--ink-3);margin-bottom:1.1rem;transition:.35s}
+.ep-tl__s.is-in .ep-tl__n{border-color:var(--accent);color:#0F766E;background:#F0FDFA}
+.ep-tl__s:hover .ep-tl__n{background:var(--ink);border-color:var(--ink);color:var(--accent);transform:translateY(-3px)}
+.ep-tl__s h5{font-size:1rem;font-weight:800;margin-bottom:.45rem}
+.ep-tl__s p{font-size:.85rem;color:var(--ink-3);margin:0;line-height:1.65}
+
+/* 09 BENEFITS */
+.ep-ben{background:var(--soft)}
+.ep-ben__grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;margin-top:2.6rem}
+.ep-ben__c{background:#fff;border:1px solid var(--line);border-radius:14px;padding:1.5rem 1.4rem;transition:.3s;position:relative;overflow:hidden}
+.ep-ben__c::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent);transform:scaleY(0);transform-origin:top;transition:.4s cubic-bezier(.22,1,.36,1)}
+.ep-ben__c:hover{transform:translateY(-5px);box-shadow:0 26px 46px -32px rgba(15,23,42,.55)}
+.ep-ben__c:hover::before{transform:scaleY(1)}
+.ep-ben__n{font-family:var(--font-display);font-size:.74rem;font-weight:800;letter-spacing:.14em;color:#CBD5E1;margin-bottom:.7rem}
+.ep-ben__c h5{font-size:1.02rem;font-weight:800;margin-bottom:.4rem}
+.ep-ben__c p{font-size:.87rem;color:var(--ink-3);margin:0;line-height:1.62}
+
+/* 10 TYPES */
+.ep-types{background:#fff}
+.ep-types__grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;margin-top:2.6rem}
+.ep-ty{display:flex;gap:.95rem;align-items:flex-start;padding:1.35rem 1.3rem;border:1px solid var(--line);border-radius:14px;background:#fff;transition:.3s}
+.ep-ty:hover{border-color:#CBD5E1;transform:translateY(-4px);box-shadow:0 24px 42px -32px rgba(15,23,42,.6)}
+.ep-ty__ico{width:42px;height:42px;flex:none;border-radius:11px;background:#F1F5F9;color:var(--ink);display:flex;align-items:center;justify-content:center;transition:.3s}
+.ep-ty:hover .ep-ty__ico{background:var(--ink);color:var(--accent)}
+.ep-ty__ico svg{width:19px;height:19px}
+.ep-ty h5{font-size:.98rem;font-weight:800;margin-bottom:.3rem}
+.ep-ty p{font-size:.85rem;color:var(--ink-3);margin:0;line-height:1.6}
+
+/* 11 OPTIONS */
+.ep-opt{background:var(--soft)}
+.ep-opt__grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:1.1rem;margin-top:2.6rem}
+.ep-op{background:#fff;border:1px solid var(--line);border-radius:16px;padding:1.7rem 1.5rem;transition:.3s;position:relative}
+.ep-op:hover{transform:translateY(-5px);box-shadow:0 28px 50px -34px rgba(15,23,42,.6);border-color:#CBD5E1}
+.ep-op__ico{width:44px;height:44px;border-radius:12px;background:var(--ink);color:var(--accent);display:flex;align-items:center;justify-content:center;margin-bottom:1rem}
+.ep-op__ico svg{width:20px;height:20px}
+.ep-op h5{font-size:1.1rem;font-weight:800;margin-bottom:.5rem}
+.ep-op p{font-size:.89rem;color:var(--ink-3);margin:0;line-height:1.65}
+.ep-opt__foot{margin-top:1.6rem;font-size:.82rem;color:#94A3B8;max-width:760px}
+
+/* 12 CHECKLIST */
+.ep-check{background:#fff}
+.ep-check__grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:1.6rem;margin-top:2.6rem;align-items:start}
+.ep-list{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#fff}
+.ep-list__i{position:relative;display:flex;align-items:center;gap:.85rem;padding:1rem 1.2rem;border-bottom:1px solid var(--line-2);cursor:pointer;transition:.22s;user-select:none}
+.ep-list__i:last-child{border-bottom:0}
+.ep-list__i:hover{background:#F8FAFC}
+.ep-list__i input{position:absolute;opacity:0;width:1px;height:1px}
+.ep-list__b{width:22px;height:22px;flex:none;border-radius:7px;border:1.5px solid #CBD5E1;background:#fff;display:flex;align-items:center;justify-content:center;transition:.22s}
+.ep-list__b svg{width:13px;height:13px;color:#fff;opacity:0;transform:scale(.5);transition:.22s}
+.ep-list__t{font-size:.93rem;font-weight:600;color:var(--ink-2);line-height:1.5}
+.ep-list__i.is-on{background:#F0FDFA}
+.ep-list__i.is-on .ep-list__b{background:var(--accent);border-color:var(--accent)}
+.ep-list__i.is-on .ep-list__b svg{opacity:1;transform:scale(1)}
+.ep-list__i.is-on .ep-list__t{color:var(--ink);font-weight:700}
+.ep-list__i:focus-within .ep-list__b{outline:2px solid var(--accent);outline-offset:2px}
+.ep-res{position:sticky;top:96px;border:1px solid var(--line);border-radius:16px;padding:1.7rem 1.5rem;background:linear-gradient(180deg,#F8FAFC,#fff);box-shadow:var(--sh)}
+.ep-res__score{display:flex;align-items:baseline;gap:.5rem;margin-bottom:.6rem}
+.ep-res__num{font-family:var(--font-display);font-size:2.6rem;font-weight:800;color:var(--ink);line-height:1}
+.ep-res__of{font-size:.9rem;color:#94A3B8;font-weight:700}
+.ep-res__bar{height:7px;border-radius:99px;background:#E2E8F0;overflow:hidden;margin-bottom:1.1rem}
+.ep-res__fill{height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--accent),#5EEAD4);transition:width .5s cubic-bezier(.22,1,.36,1)}
+.ep-res__msg{font-size:.95rem;color:var(--ink-2);font-weight:600;line-height:1.6;margin-bottom:1rem;min-height:3.2em}
+.ep-res__final{font-size:.88rem;color:var(--ink-3);border-top:1px dashed var(--line);padding-top:1rem;margin-bottom:1.2rem;line-height:1.65}
+
+/* 13 CTA */
+.ep-cta{background:var(--dark);position:relative;overflow:hidden;padding:5.5rem 0}
+.ep-cta::before{content:"";position:absolute;inset:0;background:radial-gradient(700px 320px at 50% 0%,rgba(20,184,166,.18),transparent 70%);pointer-events:none}
+.ep-cta__in{position:relative;text-align:center;max-width:800px;margin-inline:auto}
+.ep-cta h2{font-size:clamp(1.9rem,4.4vw,3rem);font-weight:800;color:#fff;line-height:1.12;margin-bottom:1rem}
+.ep-cta p{color:#94A3B8;font-size:1.05rem;max-width:640px;margin:0 auto 2.2rem}
+.ep-cta__acts{display:flex;gap:.9rem;justify-content:center;flex-wrap:wrap}
+
+/* RESPONSIVE */
+@media (max-width:1199px){
+  .ep-hero__grid{grid-template-columns:1fr;gap:2.6rem}
+  .ep-app__body{min-height:0}
+  .ep-tl{grid-template-columns:repeat(3,minmax(0,1fr));row-gap:2.2rem}
+  .ep-tl::before,.ep-tl::after{display:none}
+  .ep-tl__s{border-top:1px solid var(--line);padding-top:1.2rem}
+  .ep-tl__n{position:absolute;top:-23px;left:0;margin:0}
+  .ep-tl__s h5{margin-top:1.6rem}
+}
+@media (max-width:991px){
+  .ep-sec{padding:4.25rem 0}
+  .ep-def__grid,.ep-ben__grid,.ep-types__grid,.ep-prob__grid,.ep-fit__grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .ep-trans__grid{grid-template-columns:1fr;gap:2.6rem}
+  .ep-cap__wrap{grid-template-columns:1fr}
+  .ep-cap__tabs{position:static;flex-direction:row;overflow-x:auto;padding-bottom:.4rem;gap:.5rem}
+  .ep-tab{width:auto;flex:0 0 auto;white-space:nowrap}
+  .ep-tab:hover{transform:none}
+  .ep-check__grid{grid-template-columns:1fr}
+  .ep-res{position:static}
+  .ep-frag{grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem 1.2rem;padding:1.4rem 1.2rem}
+  .ep-arch__mods{gap:.5rem;padding-bottom:0}
+  .ep-arch__m::after,.ep-arch__bus{display:none}
+  .ep-app__kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .ep-app__grid{grid-template-columns:1fr}
+}
+@media (max-width:767px){
+  .ep-tl{grid-template-columns:1fr;row-gap:0}
+  .ep-tl__s{border-top:0;border-left:1px solid var(--line);padding:0 0 1.8rem 2.6rem}
+  .ep-tl__s:last-child{border-left-color:transparent;padding-bottom:0}
+  .ep-tl__n{left:-23px;top:0;width:44px;height:44px}
+  .ep-tl__s h5{margin-top:0}
+}
+@media (max-width:575px){
+  .ep-sec{padding:3.5rem 0}
+  .ep-def__grid,.ep-ben__grid,.ep-types__grid,.ep-prob__grid,.ep-fit__grid{grid-template-columns:1fr}
+  .ep-hero{padding:4.5rem 0 3.5rem}
+  .ep-app__body{grid-template-columns:1fr}
+  .ep-app__side{flex-direction:row;flex-wrap:wrap;gap:.4rem;border-right:0;border-bottom:1px solid var(--line-2);align-items:center;padding:.7rem}
+  .ep-app__brand{width:100%;border-bottom:0;padding-bottom:.4rem;margin-bottom:.2rem}
+  .ep-app__nav{font-size:.68rem;padding:.32rem .5rem}
+  .ep-frag{grid-template-columns:1fr}
+  .ep-bf{grid-template-columns:1fr;gap:.25rem}
+  .ep-bf em{justify-content:flex-start}
+  .ep-bf--2,.ep-bf--3{margin-left:0}
+  .ep-hero__meta{gap:.75rem;flex-direction:column;align-items:flex-start}
+  .ep-mock__hd,.ep-mock__r{grid-template-columns:minmax(0,1fr) auto}
+  .ep-mock__m{display:none}
+  .ep-hero__acts .ep-btn,.ep-cta__acts .ep-btn{width:100%;justify-content:center}
+  .ep-chain__s{font-size:.72rem;padding:.45rem .7rem}
+}
+@media (prefers-reduced-motion:reduce){
+  .ep-rv{opacity:1!important;transform:none!important;transition:none!important}
+  .ep *,.ep *::before,.ep *::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+  .ep-flow{opacity:1}
+}
 </style>
 {% endblock %}
 
 {% block content %}
-<!-- Hero -->
-<section class="er-hero">
+<div class="ep">
+  <!-- 01 HERO -->
+  <section class="ep-hero" id="ep-hero">
     <div class="container">
-        <div class="er-label"><i class="fas fa-circle"></i> ERP INTEGRATION</div>
-        <h1 class="er-h text-white" style="font-size:2.75rem;max-width:700px;">Connect Your Business Systems Into One Unified Platform</h1>
-        <p class="er-sub mb-4">Enterprise Resource Planning integration, implementation, and consulting. We connect your finance, operations, HR, and supply chain into a single source of truth.</p>
-        <div class="d-flex gap-3 flex-wrap">
-            <a href="{% url 'community:home' %}" class="btn btn-success btn-lg px-5 rounded-pill fw-700">Start Your ERP Project <i class="fas fa-arrow-right ms-2"></i></a>
-            <a href="#erp-features" class="btn btn-outline-light btn-lg px-5 rounded-pill fw-700">Learn More</a>
+      <div class="ep-hero__grid">
+        <div>
+          <span class="ep-eyebrow">{% trans "Enterprise Resource Planning" %}</span>
+          <h1 class="ep-h1">{% trans "Run Your Business From One Place" %}</h1>
+          <p class="ep-lead">{% trans "An ERP brings the core operations of your business into one structured environment — from finance and sales to inventory, purchasing, HR, projects, and operations." %}</p>
+          <div class="ep-hero__acts">
+            <a href="{% url 'contact:contact' %}" class="ep-btn ep-btn--dark">{% trans "Discuss Your ERP" %}<i data-lucide="arrow-right"></i></a>
+            <a href="#ep-capabilities" class="ep-btn ep-btn--ghost">{% trans "Explore Capabilities" %}</a>
+          </div>
+          <div class="ep-hero__meta">
+            <span><i data-lucide="layers"></i>{% trans "One system, many functions" %}</span>
+            <span><i data-lucide="settings-2"></i>{% trans "Configured around your processes" %}</span>
+            <span><i data-lucide="trending-up"></i>{% trans "Built to grow with you" %}</span>
+          </div>
         </div>
-    </div>
-</section>
 
-<!-- Trust Bar -->
-<section class="er-s-alt">
-    <div class="er-container">
-        <div class="row g-4 text-center">
-            <div class="col-md-3 col-6"><div class="er-metric"><div class="er-metric-val">50+</div><div class="er-metric-label">ERP Implementations</div></div></div>
-            <div class="col-md-3 col-6"><div class="er-metric"><div class="er-metric-val">99.9%</div><div class="er-metric-label">System Uptime</div></div></div>
-            <div class="col-md-3 col-6"><div class="er-metric"><div class="er-metric-val">40%</div><div class="er-metric-label">Cost Reduction</div></div></div>
-            <div class="col-md-3 col-6"><div class="er-metric"><div class="er-metric-val">3x</div><div class="er-metric-label">Faster Reporting</div></div></div>
+        <div>
+          <div class="ep-app" aria-hidden="true">
+            <div class="ep-app__bar">
+              <span class="ep-app__dot"></span><span class="ep-app__dot"></span><span class="ep-app__dot"></span>
+              <span class="ep-app__url">erp.onwebapp.com</span>
+              <span class="ep-app__live"><span class="ep-app__pulse"></span>{% trans "Live" %}</span>
+            </div>
+            <div class="ep-app__body">
+              <aside class="ep-app__side">
+                <div class="ep-app__brand"><span class="ep-app__logo"></span>{% trans "OnWebApp ERP" %}</div>
+                <span class="ep-app__nav is-on"><i data-lucide="layout-dashboard"></i>{% trans "Overview" %}</span>
+                <span class="ep-app__nav"><i data-lucide="trending-up"></i>{% trans "Sales" %}</span>
+                <span class="ep-app__nav"><i data-lucide="wallet"></i>{% trans "Finance" %}</span>
+                <span class="ep-app__nav"><i data-lucide="boxes"></i>{% trans "Inventory" %}</span>
+                <span class="ep-app__nav"><i data-lucide="shopping-cart"></i>{% trans "Purchasing" %}</span>
+                <span class="ep-app__nav"><i data-lucide="users"></i>{% trans "HR" %}</span>
+                <span class="ep-app__nav"><i data-lucide="clipboard-list"></i>{% trans "Projects" %}</span>
+                <span class="ep-app__nav"><i data-lucide="factory"></i>{% trans "Manufacturing" %}</span>
+              </aside>
+              <div class="ep-app__main">
+                <div class="ep-app__head">
+                  <div>
+                    <div class="ep-app__title">{% trans "Overview" %}</div>
+                    <div class="ep-app__sub">{% trans "Operational summary" %}</div>
+                  </div>
+                  <div class="ep-app__chips"><span>7D</span><span class="is-on">30D</span><span>12M</span></div>
+                </div>
+                <div class="ep-app__kpis">
+                  <div class="ep-kpi"><div class="ep-kpi__l">{% trans "Revenue" %}</div><div class="ep-kpi__v">$128,400</div><div class="ep-kpi__s">{% trans "This month" %}</div></div>
+                  <div class="ep-kpi"><div class="ep-kpi__l">{% trans "Orders" %}</div><div class="ep-kpi__v">318</div><div class="ep-kpi__s">{% trans "Open orders" %}</div></div>
+                  <div class="ep-kpi"><div class="ep-kpi__l">{% trans "Inventory" %}</div><div class="ep-kpi__v">4,860</div><div class="ep-kpi__s">{% trans "Items in stock" %}</div></div>
+                  <div class="ep-kpi"><div class="ep-kpi__l">{% trans "Approvals" %}</div><div class="ep-kpi__v">27</div><div class="ep-kpi__s">{% trans "Pending review" %}</div></div>
+                </div>
+                <div class="ep-app__grid">
+                  <div class="ep-chart">
+                    <div class="ep-chart__t"><strong>{% trans "Sales &amp; financial activity" %}</strong><span>{% trans "Last 12 weeks" %}</span></div>
+                    <div class="ep-bars">
+                      <span class="ep-bar" style="height:38%"></span><span class="ep-bar" style="height:52%"></span>
+                      <span class="ep-bar" style="height:44%"></span><span class="ep-bar" style="height:63%"></span>
+                      <span class="ep-bar" style="height:49%"></span><span class="ep-bar" style="height:71%"></span>
+                      <span class="ep-bar" style="height:58%"></span><span class="ep-bar" style="height:66%"></span>
+                      <span class="ep-bar is-hi" style="height:84%"></span><span class="ep-bar" style="height:73%"></span>
+                      <span class="ep-bar is-hi" style="height:92%"></span><span class="ep-bar is-hi" style="height:78%"></span>
+                    </div>
+                    <div class="ep-legend"><span><b></b>{% trans "Recorded activity" %}</span><span><b style="background:#CBD5E1"></b>{% trans "Target line" %}</span></div>
+                  </div>
+                  <div class="ep-feed">
+                    <div class="ep-feed__t">{% trans "Recent activity" %}</div>
+                    <div class="ep-feed__r"><span class="ep-feed__d"></span>{% trans "Sales order SO-1842 confirmed" %}<em>2m</em></div>
+                    <div class="ep-feed__r"><span class="ep-feed__d"></span>{% trans "Invoice INV-2048 sent" %}<em>14m</em></div>
+                    <div class="ep-feed__r"><span class="ep-feed__d"></span>{% trans "Purchase order PO-0871 received" %}<em>1h</em></div>
+                    <div class="ep-feed__r"><span class="ep-feed__d"></span>{% trans "Timesheet approved on Projects" %}<em>3h</em></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="ep-app__cap">{% trans "Interface preview · illustrative sample data" %}</div>
         </div>
+      </div>
     </div>
-</section>
+  </section>
 
-<!-- What We Do -->
-<section class="er-s" id="erp-features">
-    <div class="er-container">
-        <div class="text-center mb-5">
-            <div class="er-label justify-content-center"><i class="fas fa-circle"></i> OUR ERP SERVICES</div>
-            <h2 class="er-h">End-to-End Enterprise Resource Planning</h2>
-            <p class="er-sub mx-auto">From strategy and selection to implementation and ongoing support, we handle every aspect of your ERP journey.</p>
-        </div>
-        <div class="row g-4">
-            <div class="col-md-4">
-                <div class="er-c">
-                    <div class="er-c-icon green"><i class="fas fa-search"></i></div>
-                    <h5 class="fw-700 mb-2">ERP Assessment</h5>
-                    <p class="text-secondary small mb-3">We evaluate your current systems, processes, and pain points to recommend the right ERP solution for your business.</p>
-                    <ul class="er-list">
-                        <li><i class="fas fa-check-circle"></i> Process audit & gap analysis</li>
-                        <li><i class="fas fa-check-circle"></i> Technology stack review</li>
-                        <li><i class="fas fa-check-circle"></i> ROI projection</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="er-c">
-                    <div class="er-c-icon blue"><i class="fas fa-cogs"></i></div>
-                    <h5 class="fw-700 mb-2">Implementation</h5>
-                    <p class="text-secondary small mb-3">Full-cycle ERP deployment with data migration, workflow configuration, and user training included.</p>
-                    <ul class="er-list">
-                        <li><i class="fas fa-check-circle"></i> System configuration</li>
-                        <li><i class="fas fa-check-circle"></i> Data migration & validation</li>
-                        <li><i class="fas fa-check-circle"></i> User training & documentation</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="er-c">
-                    <div class="er-c-icon purple"><i class="fas fa-plug"></i></div>
-                    <h5 class="fw-700 mb-2">Integration</h5>
-                    <p class="text-secondary small mb-3">Connect your ERP with existing tools: CRM, eCommerce, payment gateways, shipping, and more.</p>
-                    <ul class="er-list">
-                        <li><i class="fas fa-check-circle"></i> API-based integrations</li>
-                        <li><i class="fas fa-check-circle"></i> Real-time sync</li>
-                        <li><i class="fas fa-check-circle"></i> Custom connectors</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="er-c">
-                    <div class="er-c-icon amber"><i class="fas fa-chart-line"></i></div>
-                    <h5 class="fw-700 mb-2">Analytics & Reporting</h5>
-                    <p class="text-secondary small mb-3">Custom dashboards, automated reports, and real-time KPIs so you always know where your business stands.</p>
-                    <ul class="er-list">
-                        <li><i class="fas fa-check-circle"></i> Executive dashboards</li>
-                        <li><i class="fas fa-check-circle"></i> Financial reporting</li>
-                        <li><i class="fas fa-check-circle"></i> Operational metrics</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="er-c">
-                    <div class="er-c-icon rose"><i class="fas fa-headset"></i></div>
-                    <h5 class="fw-700 mb-2">Ongoing Support</h5>
-                    <p class="text-secondary small mb-3">Post-launch support, system updates, performance optimization, and continuous improvement.</p>
-                    <ul class="er-list">
-                        <li><i class="fas fa-check-circle"></i> 24/7 monitoring</li>
-                        <li><i class="fas fa-check-circle"></i> Version upgrades</li>
-                        <li><i class="fas fa-check-circle"></i> Performance tuning</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="er-c">
-                    <div class="er-c-icon green"><i class="fas fa-users-cog"></i></div>
-                    <h5 class="fw-700 mb-2">Custom Development</h5>
-                    <p class="text-secondary small mb-3">Tailored modules, workflows, and features built specifically for your unique business requirements.</p>
-                    <ul class="er-list">
-                        <li><i class="fas fa-check-circle"></i> Custom modules</li>
-                        <li><i class="fas fa-check-circle"></i> Workflow automation</li>
-                        <li><i class="fas fa-check-circle"></i> Mobile extensions</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+  <!-- 02 WHAT IS ERP -->
+  <section class="ep-sec ep-def" id="what-is-erp">
+    <div class="container">
+      <div class="ep-rv">
+        <span class="ep-eyebrow">{% trans "Definition" %}</span>
+        <h2 class="ep-h2">{% trans "What is an ERP?" %}</h2>
+        <p class="ep-lead">{% trans "ERP stands for Enterprise Resource Planning. It is business software that centralizes the information and the processes required to run day-to-day operations — so the whole organization works from one structured system instead of many disconnected ones." %}</p>
+      </div>
 
-<!-- ERP Platforms -->
-<section class="er-s-alt">
-    <div class="er-container">
-        <div class="text-center mb-5">
-            <div class="er-label justify-content-center"><i class="fas fa-circle"></i> PLATFORMS WE WORK WITH</div>
-            <h2 class="er-h">Choose the Right ERP for Your Business</h2>
-            <p class="er-sub mx-auto">We implement and customize the leading ERP platforms to match your exact needs.</p>
+      <div class="ep-def__grid">
+        <div class="ep-mod ep-rv" style="--d:.02s">
+          <div class="ep-mod__ico"><i data-lucide="wallet"></i></div>
+          <h5>{% trans "Finance" %}</h5>
+          <p>{% trans "Accounting, invoices, expenses, payments, financial records." %}</p>
         </div>
-        <div class="row g-4">
-            <div class="col-md-3 col-6">
-                <div class="er-platform">
-                    <div class="er-platform-icon" style="background:linear-gradient(135deg,#1e40af,#3b82f6);"><i class="fas fa-cube"></i></div>
-                    <h6 class="fw-700 mb-1">ERPNext</h6>
-                    <p class="text-secondary small mb-0">Open-source, modular, and highly customizable</p>
-                </div>
-            </div>
-            <div class="col-md-3 col-6">
-                <div class="er-platform">
-                    <div class="er-platform-icon" style="background:linear-gradient(135deg,#0369a1,#0ea5e9);"><i class="fas fa-building"></i></div>
-                    <h6 class="fw-700 mb-1">SAP Business One</h6>
-                    <p class="text-secondary small mb-0">Enterprise-grade for mid-to-large businesses</p>
-                </div>
-            </div>
-            <div class="col-md-3 col-6">
-                <div class="er-platform">
-                    <div class="er-platform-icon" style="background:linear-gradient(135deg,#c2410c,#f97316);"><i class="fas fa-database"></i></div>
-                    <h6 class="fw-700 mb-1">Oracle NetSuite</h6>
-                    <p class="text-secondary small mb-0">Cloud-native for growing companies</p>
-                </div>
-            </div>
-            <div class="col-md-3 col-6">
-                <div class="er-platform">
-                    <div class="er-platform-icon" style="background:linear-gradient(135deg,#7c3aed,#a78bfa);"><i class="fas fa-code"></i></div>
-                    <h6 class="fw-700 mb-1">Custom ERP</h6>
-                    <p class="text-secondary small mb-0">Built from scratch for unique requirements</p>
-                </div>
-            </div>
+        <div class="ep-mod ep-rv" style="--d:.07s">
+          <div class="ep-mod__ico"><i data-lucide="trending-up"></i></div>
+          <h5>{% trans "Sales" %}</h5>
+          <p>{% trans "Customers, leads, quotations, sales orders, sales activity." %}</p>
         </div>
-    </div>
-</section>
+        <div class="ep-mod ep-rv" style="--d:.12s">
+          <div class="ep-mod__ico"><i data-lucide="boxes"></i></div>
+          <h5>{% trans "Inventory" %}</h5>
+          <p>{% trans "Products, warehouses, stock levels, stock movements." %}</p>
+        </div>
+        <div class="ep-mod ep-rv" style="--d:.17s">
+          <div class="ep-mod__ico"><i data-lucide="shopping-cart"></i></div>
+          <h5>{% trans "Purchasing" %}</h5>
+          <p>{% trans "Suppliers, procurement, purchase orders, receiving." %}</p>
+        </div>
+        <div class="ep-mod ep-rv" style="--d:.22s">
+          <div class="ep-mod__ico"><i data-lucide="users"></i></div>
+          <h5>{% trans "Human Resources" %}</h5>
+          <p>{% trans "Employees, attendance, leave, payroll workflows." %}</p>
+        </div>
+        <div class="ep-mod ep-rv" style="--d:.27s">
+          <div class="ep-mod__ico"><i data-lucide="clipboard-list"></i></div>
+          <h5>{% trans "Projects" %}</h5>
+          <p>{% trans "Projects, tasks, timesheets, deadlines, resources." %}</p>
+        </div>
+      </div>
 
-<!-- How It Works -->
-<section class="er-s">
-    <div class="er-container">
-        <div class="row align-items-center">
-            <div class="col-lg-5 mb-4 mb-lg-0">
-                <div class="er-label"><i class="fas fa-circle"></i> HOW IT WORKS</div>
-                <h2 class="er-h">From Assessment to Go-Live in 4 Phases</h2>
-                <p class="er-sub mb-4">Our proven methodology ensures your ERP implementation is on time, on budget, and delivers real results.</p>
-                <div class="d-flex gap-3 flex-wrap">
-                    <span class="er-pill" style="background:rgba(16,185,129,.1);color:#059669;"><i class="fas fa-clock me-1"></i> 8-16 weeks typical</span>
-                    <span class="er-pill" style="background:rgba(16,185,129,.1);color:#059669;"><i class="fas fa-users me-1"></i> Dedicated team</span>
-                </div>
-            </div>
-            <div class="col-lg-7">
-                <div class="er-step">
-                    <div class="er-step-num">1</div>
-                    <div>
-                        <h6 class="fw-700 mb-1">Discovery & Assessment</h6>
-                        <p class="text-secondary small mb-0">We audit your current systems, map your processes, and identify the best ERP solution and integration approach.</p>
-                    </div>
-                </div>
-                <div class="er-step">
-                    <div class="er-step-num">2</div>
-                    <div>
-                        <h6 class="fw-700 mb-1">Design & Configuration</h6>
-                        <p class="text-secondary small mb-0">System architecture, module configuration, data mapping, and custom workflow design.</p>
-                    </div>
-                </div>
-                <div class="er-step">
-                    <div class="er-step-num">3</div>
-                    <div>
-                        <h6 class="fw-700 mb-1">Data Migration & Testing</h6>
-                        <p class="text-secondary small mb-0">Cleanse, transform, and migrate your data. Rigorous testing at every stage.</p>
-                    </div>
-                </div>
-                <div class="er-step">
-                    <div class="er-step-num">4</div>
-                    <div>
-                        <h6 class="fw-700 mb-1">Go-Live & Support</h6>
-                        <p class="text-secondary small mb-0">Training, parallel run, go-live support, and ongoing optimization.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+      <p class="ep-def__out ep-rv">{% trans "The result is a shared operational environment where different parts of the business work from the same information." %}</p>
     </div>
-</section>
+  </section>
+  <!-- 03 THE PROBLEM -->
+  <section class="ep-sec ep-dark" id="ep-problem">
+    <div class="container">
+      <div class="ep-prob__intro ep-rv">
+        <span class="ep-eyebrow">{% trans "The Problem" %}</span>
+        <h2 class="ep-h2">{% trans "Your Business Has More Systems Than It Should." %}</h2>
+        <p class="ep-lead">{% trans "Most businesses don't choose complexity — they accumulate it. Each new tool solves one small problem and adds one more place where the truth about the business lives." %}</p>
+        <div class="ep-tooltags">
+          <span class="ep-tt">{% trans "Spreadsheets" %}</span>
+          <span class="ep-tt">{% trans "Separate accounting tools" %}</span>
+          <span class="ep-tt">{% trans "CRM systems" %}</span>
+          <span class="ep-tt">{% trans "Inventory software" %}</span>
+          <span class="ep-tt">{% trans "Email" %}</span>
+          <span class="ep-tt">{% trans "Manual documents" %}</span>
+          <span class="ep-tt">{% trans "Disconnected departmental processes" %}</span>
+        </div>
+      </div>
 
-<!-- Industries -->
-<section class="er-s-alt">
-    <div class="er-container">
-        <div class="text-center mb-5">
-            <div class="er-label justify-content-center"><i class="fas fa-circle"></i> INDUSTRIES WE SERVE</div>
-            <h2 class="er-h">ERP Solutions for Every Sector</h2>
-        </div>
-        <div class="row g-3">
-            <div class="col-md-3 col-6">
-                <div class="er-c text-center py-4">
-                    <i class="fas fa-industry text-primary fs-2 mb-2"></i>
-                    <h6 class="fw-700 mb-1">Manufacturing</h6>
-                    <p class="text-secondary small mb-0">Production planning, inventory, quality</p>
-                </div>
-            </div>
-            <div class="col-md-3 col-6">
-                <div class="er-c text-center py-4">
-                    <i class="fas fa-truck text-success fs-2 mb-2"></i>
-                    <h6 class="fw-700 mb-1">Supply Chain</h6>
-                    <p class="text-secondary small mb-0">Logistics, procurement, warehouse</p>
-                </div>
-            </div>
-            <div class="col-md-3 col-6">
-                <div class="er-c text-center py-4">
-                    <i class="fas fa-heartbeat text-danger fs-2 mb-2"></i>
-                    <h6 class="fw-700 mb-1">Healthcare</h6>
-                    <p class="text-secondary small mb-0">Patient records, billing, compliance</p>
-                </div>
-            </div>
-            <div class="col-md-3 col-6">
-                <div class="er-c text-center py-4">
-                    <i class="fas fa-store text-warning fs-2 mb-2"></i>
-                    <h6 class="fw-700 mb-1">Retail</h6>
-                    <p class="text-secondary small mb-0">POS, inventory, multi-channel</p>
-                </div>
-            </div>
-            <div class="col-md-3 col-6">
-                <div class="er-c text-center py-4">
-                    <i class="fas fa-building text-info fs-2 mb-2"></i>
-                    <h6 class="fw-700 mb-1">Real Estate</h6>
-                    <p class="text-secondary small mb-0">Property management, leasing, facilities</p>
-                </div>
-            </div>
-            <div class="col-md-3 col-6">
-                <div class="er-c text-center py-4">
-                    <i class="fas fa-graduation-cap text-purple fs-2 mb-2" style="color:#9333ea;"></i>
-                    <h6 class="fw-700 mb-1">Education</h6>
-                    <p class="text-secondary small mb-0">Student records, finance, HR</p>
-                </div>
-            </div>
-            <div class="col-md-3 col-6">
-                <div class="er-c text-center py-4">
-                    <i class="fas fa-utensils text-warning fs-2 mb-2"></i>
-                    <h6 class="fw-700 mb-1">Hospitality</h6>
-                    <p class="text-secondary small mb-0">Reservations, inventory, staff</p>
-                </div>
-            </div>
-            <div class="col-md-3 col-6">
-                <div class="er-c text-center py-4">
-                    <i class="fas fa-hand-holding-usd text-success fs-2 mb-2"></i>
-                    <h6 class="fw-700 mb-1">Financial Services</h6>
-                    <p class="text-secondary small mb-0">Accounting, compliance, reporting</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+      <div class="ep-frag ep-rv" style="--d:.1s" role="img" aria-label="{% trans 'Five departments, five disconnected tools' %}">
+        <div class="ep-frag__c"><span class="ep-frag__dept">{% trans "Sales" %}</span><span class="ep-frag__link"></span><span class="ep-frag__tool">{% trans "Spreadsheet" %}</span></div>
+        <div class="ep-frag__c"><span class="ep-frag__dept">{% trans "Finance" %}</span><span class="ep-frag__link"></span><span class="ep-frag__tool">{% trans "Separate tool" %}</span></div>
+        <div class="ep-frag__c"><span class="ep-frag__dept">{% trans "Inventory" %}</span><span class="ep-frag__link"></span><span class="ep-frag__tool">{% trans "Separate tool" %}</span></div>
+        <div class="ep-frag__c"><span class="ep-frag__dept">{% trans "HR" %}</span><span class="ep-frag__link"></span><span class="ep-frag__tool">{% trans "Separate system" %}</span></div>
+        <div class="ep-frag__c"><span class="ep-frag__dept">{% trans "Projects" %}</span><span class="ep-frag__link"></span><span class="ep-frag__tool">{% trans "Manual process" %}</span></div>
+        <div class="ep-frag__cap">{% trans "Five departments · five sources of truth · no connection between them" %}</div>
+      </div>
 
-<!-- Case Studies -->
-<section class="er-s">
-    <div class="er-container">
-        <div class="text-center mb-5">
-            <div class="er-label justify-content-center"><i class="fas fa-circle"></i> SUCCESS STORIES</div>
-            <h2 class="er-h">Real Results From Real Implementations</h2>
+      <div class="ep-prob__grid">
+        <div class="ep-prob__c ep-rv" style="--d:.02s">
+          <i data-lucide="database"></i>
+          <h5>{% trans "Scattered Data" %}</h5>
+          <p>{% trans "Information exists in multiple places, in different formats, owned by different people." %}</p>
         </div>
-        <div class="row g-4">
-            <div class="col-md-4">
-                <div class="er-case">
-                    <div class="er-case-head">
-                        <span class="er-pill" style="background:rgba(16,185,129,.1);color:#059669;">Manufacturing</span>
-                        <h5 class="fw-700 mt-2 mb-0">Global Parts Corp</h5>
-                    </div>
-                    <div class="er-case-body">
-                        <p class="text-secondary small mb-3">Migrated from legacy system to ERPNext. Integrated production planning, inventory, and financials.</p>
-                        <div class="row g-2">
-                            <div class="col-6"><div class="text-center p-2 rounded" style="background:#f0fdf4;"><div class="fw-800 text-success">35%</div><div class="text-secondary" style="font-size:.7rem;">Cost Reduction</div></div></div>
-                            <div class="col-6"><div class="text-center p-2 rounded" style="background:#f0fdf4;"><div class="fw-800 text-success">50%</div><div class="text-secondary" style="font-size:.7rem;">Faster Reporting</div></div></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="er-case">
-                    <div class="er-case-head">
-                        <span class="er-pill" style="background:rgba(37,99,235,.1);color:#2563eb;">Retail</span>
-                        <h5 class="fw-700 mt-2 mb-0">Urban Outfitters Group</h5>
-                    </div>
-                    <div class="er-case-body">
-                        <p class="text-secondary small mb-3">Unified 12 retail locations with a single ERP. Real-time inventory sync across all channels.</p>
-                        <div class="row g-2">
-                            <div class="col-6"><div class="text-center p-2 rounded" style="background:#eff6ff;"><div class="fw-800 text-primary">12</div><div class="text-secondary" style="font-size:.7rem;">Locations Unified</div></div></div>
-                            <div class="col-6"><div class="text-center p-2 rounded" style="background:#eff6ff;"><div class="fw-800 text-primary">99.9%</div><div class="text-secondary" style="font-size:.7rem;">Inventory Accuracy</div></div></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="er-case">
-                    <div class="er-case-head">
-                        <span class="er-pill" style="background:rgba(147,51,234,.1);color:#9333ea;">Healthcare</span>
-                        <h5 class="fw-700 mt-2 mb-0">MedCare Hospital Network</h5>
-                    </div>
-                    <div class="er-case-body">
-                        <p class="text-secondary small mb-3">Implemented custom ERP for patient management, billing, and compliance across 5 facilities.</p>
-                        <div class="row g-2">
-                            <div class="col-6"><div class="text-center p-2 rounded" style="background:#faf5ff;"><div class="fw-800" style="color:#9333ea;">60%</div><div class="text-secondary" style="font-size:.7rem;">Faster Billing</div></div></div>
-                            <div class="col-6"><div class="text-center p-2 rounded" style="background:#faf5ff;"><div class="fw-800" style="color:#9333ea;">100%</div><div class="text-secondary" style="font-size:.7rem;">Compliance</div></div></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="ep-prob__c ep-rv" style="--d:.08s">
+          <i data-lucide="repeat"></i>
+          <h5>{% trans "Manual Processes" %}</h5>
+          <p>{% trans "Employees repeatedly enter or transfer the same information between tools." %}</p>
         </div>
+        <div class="ep-prob__c ep-rv" style="--d:.14s">
+          <i data-lucide="eye-off"></i>
+          <h5>{% trans "Limited Visibility" %}</h5>
+          <p>{% trans "Management cannot easily see the complete operational picture in one view." %}</p>
+        </div>
+        <div class="ep-prob__c ep-rv" style="--d:.2s">
+          <i data-lucide="layers"></i>
+          <h5>{% trans "Growing Complexity" %}</h5>
+          <p>{% trans "More customers, employees, products, and transactions create more operational difficulty." %}</p>
+        </div>
+      </div>
     </div>
-</section>
+  </section>
 
-<!-- CTA -->
-<section class="er-s-green">
-    <div class="er-container text-center">
-        <h2 class="text-white fw-800 mb-3" style="font-size:2rem;">Ready to Unify Your Business Systems?</h2>
-        <p class="text-white mb-4" style="max-width:600px;margin:0 auto;opacity:.9;">Let us assess your current setup and recommend the perfect ERP solution for your business. Free consultation, no commitment.</p>
-        <div class="d-flex gap-3 justify-content-center flex-wrap">
-            <a href="{% url 'community:home' %}" class="btn btn-light btn-lg px-5 rounded-pill fw-700">Get Free Assessment <i class="fas fa-arrow-right ms-2"></i></a>
-            <a href="#erp-features" class="btn btn-outline-light btn-lg px-5 rounded-pill fw-700">Explore Services</a>
+  <!-- 04 TRANSFORMATION -->
+  <section class="ep-sec ep-trans" id="ep-transformation">
+    <div class="container">
+      <div class="ep-center ep-rv">
+        <span class="ep-eyebrow">{% trans "The Transformation" %}</span>
+        <h2 class="ep-h2">{% trans "From Business Complexity to One Operational System" %}</h2>
+        <p class="ep-lead">{% trans "The same departments. The same work. A different way of holding it together." %}</p>
+      </div>
+
+      <div class="ep-trans__grid">
+        <div class="ep-card ep-rv" style="--d:.05s">
+          <span class="ep-card__tag ep-card__tag--b">{% trans "Before" %}</span>
+          <div class="ep-before">
+            <div class="ep-bf"><span>{% trans "Sales" %}</span><em><i data-lucide="arrow-down"></i></em><span>{% trans "Spreadsheet" %}</span></div>
+            <div class="ep-bf ep-bf--2"><span>{% trans "Finance" %}</span><em><i data-lucide="arrow-down"></i></em><span>{% trans "Separate tool" %}</span></div>
+            <div class="ep-bf ep-bf--3"><span>{% trans "Inventory" %}</span><em><i data-lucide="arrow-down"></i></em><span>{% trans "Spreadsheet" %}</span></div>
+            <div class="ep-bf ep-bf--2"><span>{% trans "HR" %}</span><em><i data-lucide="arrow-down"></i></em><span>{% trans "Separate system" %}</span></div>
+            <div class="ep-bf"><span>{% trans "Projects" %}</span><em><i data-lucide="arrow-down"></i></em><span>{% trans "Manual process" %}</span></div>
+          </div>
+          <p class="ep-trans__cap">{% trans "Every department holds its own version of the truth." %}</p>
         </div>
+
+        <div class="ep-card ep-rv" style="--d:.15s">
+          <span class="ep-card__tag ep-card__tag--a">{% trans "After" %}</span>
+          <div class="ep-after">
+            <svg viewBox="0 0 520 268" role="img" aria-label="{% trans 'All departments feeding one ERP producing a business overview' %}">
+              <text class="ep-after__s" x="6" y="34">{% trans "Sales" %}</text>
+              <text class="ep-after__s" x="6" y="86">{% trans "Finance" %}</text>
+              <text class="ep-after__s" x="6" y="138">{% trans "Inventory" %}</text>
+              <text class="ep-after__s" x="6" y="190">{% trans "HR" %}</text>
+              <text class="ep-after__s" x="6" y="242">{% trans "Projects" %}</text>
+
+              <path class="ep-flow" d="M78,30 C168,30 178,136 252,136" style="animation-delay:0s"></path>
+              <path class="ep-flow" d="M78,82 C168,82 178,136 252,136" style="animation-delay:.18s"></path>
+              <path class="ep-flow" d="M96,134 L252,134" style="animation-delay:.36s"></path>
+              <path class="ep-flow" d="M78,186 C168,186 178,138 252,138" style="animation-delay:.54s"></path>
+              <path class="ep-flow" d="M78,238 C168,238 178,138 252,138" style="animation-delay:.72s"></path>
+
+              <rect x="252" y="108" width="92" height="56" rx="13" fill="#0F172A"></rect>
+              <text class="ep-after__core" x="298" y="134" text-anchor="middle">ERP</text>
+              <text x="298" y="152" text-anchor="middle" fill="#94A3B8" font-size="10" font-weight="700" letter-spacing="1.4">CORE</text>
+
+              <path class="ep-flow" d="M344,136 L386,136" style="animation-delay:.9s"></path>
+              <path d="M386,131 L397,136 L386,141 Z" fill="#14B8A6"></path>
+              <rect x="401" y="108" width="114" height="56" rx="13" fill="#fff" stroke="#14B8A6" stroke-width="1.5"></rect>
+              <text class="ep-after__o" x="458" y="132" text-anchor="middle" font-size="12.5">{% trans "Business" %}</text>
+              <text class="ep-after__o" x="458" y="150" text-anchor="middle" font-size="12.5">{% trans "Overview" %}</text>
+            </svg>
+          </div>
+          <p class="ep-trans__cap">{% trans "Every department works from one operational system." %}</p>
+        </div>
+      </div>
+
+      <p class="ep-trans__foot ep-rv">{% trans "The goal isn't simply to install software." %} <span>{% trans "The goal is to create a better way to run the business." %}</span></p>
     </div>
-</section>
+  </section>
+  <!-- 05 CAPABILITIES -->
+  <section class="ep-sec ep-cap" id="ep-capabilities">
+    <div class="container">
+      <div class="ep-rv">
+        <span class="ep-eyebrow">{% trans "ERP Capabilities" %}</span>
+        <h2 class="ep-h2">{% trans "Everything Your Business Needs to Operate" %}</h2>
+        <p class="ep-lead">{% trans "Select a module to see what it manages and how it behaves inside the system." %}</p>
+      </div>
+
+      <div class="ep-cap__wrap ep-rv" style="--d:.08s">
+        <div class="ep-cap__tabs" role="tablist" aria-label="{% trans 'ERP modules' %}">
+          <button class="ep-tab is-on" type="button" role="tab" aria-selected="true" data-mod="finance"><i data-lucide="wallet"></i>{% trans "Finance" %}</button>
+          <button class="ep-tab" type="button" role="tab" aria-selected="false" data-mod="sales"><i data-lucide="trending-up"></i>{% trans "Sales" %}</button>
+          <button class="ep-tab" type="button" role="tab" aria-selected="false" data-mod="inventory"><i data-lucide="boxes"></i>{% trans "Inventory" %}</button>
+          <button class="ep-tab" type="button" role="tab" aria-selected="false" data-mod="purchasing"><i data-lucide="shopping-cart"></i>{% trans "Purchasing" %}</button>
+          <button class="ep-tab" type="button" role="tab" aria-selected="false" data-mod="hr"><i data-lucide="users"></i>{% trans "HR" %}</button>
+          <button class="ep-tab" type="button" role="tab" aria-selected="false" data-mod="projects"><i data-lucide="clipboard-list"></i>{% trans "Projects" %}</button>
+          <button class="ep-tab" type="button" role="tab" aria-selected="false" data-mod="manufacturing"><i data-lucide="factory"></i>{% trans "Manufacturing" %}</button>
+        </div>
+        <div class="ep-cap__panel" id="epPanel" role="tabpanel" aria-live="polite">
+          <div class="ep-cap__hd">
+            <div class="ep-cap__ico"><i data-lucide="wallet"></i></div>
+            <h3>{% trans "Financial Management" %}</h3>
+            <p>{% trans "Manage the financial side of the business with a clear view of invoices, expenses, payments, and reporting." %}</p>
+          </div>
+          <div class="ep-cap__caps">
+            <span>{% trans "Invoicing" %}</span><span>{% trans "Expenses" %}</span><span>{% trans "Payments" %}</span>
+            <span>{% trans "Accounts" %}</span><span>{% trans "Financial records" %}</span><span>{% trans "Financial reporting" %}</span>
+          </div>
+          <div class="ep-mock">
+            <div class="ep-mock__bar">
+              <span class="ep-mock__t">{% trans "Finance · Invoices" %}</span>
+              <span class="ep-mock__search"><i data-lucide="search"></i>{% trans "Search records" %}</span>
+              <span class="ep-mock__btn">{% trans "New" %}</span>
+            </div>
+            <div class="ep-mock__hd"><span>{% trans "Record" %}</span><span>{% trans "Reference" %}</span><span>{% trans "Status" %}</span></div>
+            <div class="ep-mock__r"><span class="ep-mock__lab">{% trans "Invoice INV-2048 · Northwind Ltd" %}</span><span class="ep-mock__m">{% trans "Today" %}</span><span class="ep-pill ep-pill--ok">{% trans "Sent" %}</span></div>
+            <div class="ep-mock__r"><span class="ep-mock__lab">{% trans "Expense EXP-0912 · Operations" %}</span><span class="ep-mock__m">{% trans "Today" %}</span><span class="ep-pill ep-pill--wait">{% trans "Approval" %}</span></div>
+            <div class="ep-mock__r"><span class="ep-mock__lab">{% trans "Payment PAY-0381 · Supplier batch" %}</span><span class="ep-mock__m">{% trans "Yesterday" %}</span><span class="ep-pill ep-pill--idle">{% trans "Scheduled" %}</span></div>
+            <div class="ep-mock__r"><span class="ep-mock__lab">{% trans "Accounts receivable · October" %}</span><span class="ep-mock__m">{% trans "30 days" %}</span><span class="ep-pill ep-pill--ok">{% trans "Posted" %}</span></div>
+            <div class="ep-cap__ft"><span>{% trans "Illustrative interface · sample records" %}</span><b>{% trans "Financial Management" %}</b></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 BUILT AROUND YOUR BUSINESS -->
+  <section class="ep-sec ep-dark" id="ep-fit">
+    <div class="container">
+      <div class="ep-fit__p ep-rv">
+        <span class="ep-eyebrow">{% trans "Built Around Your Business" %}</span>
+        <h2 class="ep-h2">{% trans "Your Business Isn't Standard. Your ERP Doesn't Have to Be." %}</h2>
+        <p class="ep-lead">{% trans "Every organization runs different workflows, approval processes, teams, products, customers, and operational requirements. An ERP should reflect how the business actually works — not the other way around." %}</p>
+      </div>
+
+      <div class="ep-chain ep-rv" style="--d:.08s">
+        <span class="ep-chain__s">{% trans "Standard ERP" %}</span>
+        <span class="ep-chain__a"><i data-lucide="arrow-down"></i></span>
+        <span class="ep-chain__s">{% trans "Configuration" %}</span>
+        <span class="ep-chain__a"><i data-lucide="arrow-down"></i></span>
+        <span class="ep-chain__s">{% trans "Business Rules" %}</span>
+        <span class="ep-chain__a"><i data-lucide="arrow-down"></i></span>
+        <span class="ep-chain__s">{% trans "Custom Workflows" %}</span>
+        <span class="ep-chain__a"><i data-lucide="arrow-down"></i></span>
+        <span class="ep-chain__s">{% trans "Custom Modules" %}</span>
+        <span class="ep-chain__a"><i data-lucide="arrow-down"></i></span>
+        <span class="ep-chain__s is-end"><i data-lucide="check"></i>{% trans "Your ERP" %}</span>
+      </div>
+
+      <div class="ep-fit__grid">
+        <div class="ep-fit__c ep-rv" style="--d:.02s">
+          <i data-lucide="sliders-horizontal"></i>
+          <h5>{% trans "Configure" %}</h5>
+          <p>{% trans "Adapt modules, fields, roles, permissions, and workflows to match how your teams already work." %}</p>
+        </div>
+        <div class="ep-fit__c ep-rv" style="--d:.08s">
+          <i data-lucide="puzzle"></i>
+          <h5>{% trans "Customize" %}</h5>
+          <p>{% trans "Build functionality where standard ERP capabilities are not enough for your operation." %}</p>
+        </div>
+        <div class="ep-fit__c ep-rv" style="--d:.14s">
+          <i data-lucide="workflow"></i>
+          <h5>{% trans "Automate" %}</h5>
+          <p>{% trans "Turn repetitive operational processes into structured, traceable workflows." %}</p>
+        </div>
+        <div class="ep-fit__c ep-rv" style="--d:.2s">
+          <i data-lucide="sprout"></i>
+          <h5>{% trans "Evolve" %}</h5>
+          <p>{% trans "Extend the ERP with new modules, reporting, and automation as the organization grows." %}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 07 ARCHITECTURE -->
+  <section class="ep-sec ep-arch" id="ep-architecture">
+    <div class="container">
+      <div class="ep-center ep-rv">
+        <span class="ep-eyebrow">{% trans "ERP Architecture" %}</span>
+        <h2 class="ep-h2">{% trans "One Operational Core for the Business" %}</h2>
+        <p class="ep-lead">{% trans "Every module writes into the same operational core, so business data, reporting, and automation all start from one place." %}</p>
+      </div>
+
+      <div class="ep-arch__box ep-rv" style="--d:.08s">
+        <div class="ep-arch__mods">
+          <span class="ep-arch__m"><i data-lucide="wallet"></i>{% trans "Finance" %}</span>
+          <span class="ep-arch__m"><i data-lucide="trending-up"></i>{% trans "Sales" %}</span>
+          <span class="ep-arch__m"><i data-lucide="boxes"></i>{% trans "Inventory" %}</span>
+          <span class="ep-arch__m"><i data-lucide="shopping-cart"></i>{% trans "Purchasing" %}</span>
+          <span class="ep-arch__m"><i data-lucide="users"></i>{% trans "HR" %}</span>
+          <span class="ep-arch__m"><i data-lucide="clipboard-list"></i>{% trans "Projects" %}</span>
+          <span class="ep-arch__m"><i data-lucide="factory"></i>{% trans "Manufacturing" %}</span>
+          <span class="ep-arch__bus"></span>
+        </div>
+
+        <div class="ep-arch__mid">
+          <span class="ep-arch__arr"><i data-lucide="arrow-down"></i></span>
+          <div class="ep-arch__core"><strong>ERP CORE</strong><span>{% trans "Shared operational system" %}</span></div>
+          <span class="ep-arch__arr"><i data-lucide="arrow-down"></i></span>
+        </div>
+
+        <div class="ep-arch__layers">
+          <div class="ep-layer"><i data-lucide="database"></i>{% trans "Business Data" %}</div>
+          <span class="ep-arch__link"><i data-lucide="arrow-down"></i></span>
+          <div class="ep-layer"><i data-lucide="bar-chart-3"></i>{% trans "Dashboards &amp; Business Intelligence" %}</div>
+          <span class="ep-arch__link"><i data-lucide="arrow-down"></i></span>
+          <div class="ep-layer ep-layer--accent"><i data-lucide="zap"></i>{% trans "Automation &amp; AI" %}</div>
+        </div>
+
+        <p class="ep-arch__cap">{% trans "The ERP is the operational foundation of the organization — not another tool sitting beside it." %}</p>
+      </div>
+    </div>
+  </section>
+  <!-- 08 HOW WE APPROACH ERP -->
+  <section class="ep-sec ep-proc" id="ep-approach">
+    <div class="container">
+      <div class="ep-rv">
+        <span class="ep-eyebrow">{% trans "How We Approach ERP" %}</span>
+        <h2 class="ep-h2">{% trans "From Business Processes to a Working ERP" %}</h2>
+        <p class="ep-lead">{% trans "A structured path from how your organization works today to a system your team can actually run on." %}</p>
+      </div>
+
+      <ol class="ep-tl" id="epTl">
+        <li class="ep-tl__s ep-rv" style="--d:.02s">
+          <span class="ep-tl__n">01</span>
+          <h5>{% trans "Understand" %}</h5>
+          <p>{% trans "We map your departments, processes, roles, existing tools, operational challenges, and reporting requirements." %}</p>
+        </li>
+        <li class="ep-tl__s ep-rv" style="--d:.08s">
+          <span class="ep-tl__n">02</span>
+          <h5>{% trans "Design" %}</h5>
+          <p>{% trans "We define the modules, workflows, permissions, business rules, and data structures the system needs." %}</p>
+        </li>
+        <li class="ep-tl__s ep-rv" style="--d:.14s">
+          <span class="ep-tl__n">03</span>
+          <h5>{% trans "Configure" %}</h5>
+          <p>{% trans "We set up forms, fields, roles, approvals, and reports around your operational requirements." %}</p>
+        </li>
+        <li class="ep-tl__s ep-rv" style="--d:.2s">
+          <span class="ep-tl__n">04</span>
+          <h5>{% trans "Customize" %}</h5>
+          <p>{% trans "Where standard capability falls short, we build custom modules, features, dashboards, and workflows." %}</p>
+        </li>
+        <li class="ep-tl__s ep-rv" style="--d:.26s">
+          <span class="ep-tl__n">05</span>
+          <h5>{% trans "Deploy" %}</h5>
+          <p>{% trans "We prepare and migrate data, test the system, configure users and security, then put it into production." %}</p>
+        </li>
+        <li class="ep-tl__s ep-rv" style="--d:.32s">
+          <span class="ep-tl__n">06</span>
+          <h5>{% trans "Evolve" %}</h5>
+          <p>{% trans "As the organization changes, the system is extended with new functionality, automation, and reporting." %}</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 09 WHAT ERP GIVES YOUR BUSINESS -->
+  <section class="ep-sec ep-ben" id="ep-benefits">
+    <div class="container">
+      <div class="ep-rv">
+        <span class="ep-eyebrow">{% trans "The Outcome" %}</span>
+        <h2 class="ep-h2">{% trans "More Control Over the Business" %}</h2>
+        <p class="ep-lead">{% trans "What a properly designed ERP makes possible for the people running the business every day." %}</p>
+      </div>
+
+      <div class="ep-ben__grid">
+        <div class="ep-ben__c ep-rv" style="--d:.02s">
+          <div class="ep-ben__n">01</div>
+          <h5>{% trans "One Source of Business Information" %}</h5>
+          <p>{% trans "Reduce scattered records and duplicated information across the organization." %}</p>
+        </div>
+        <div class="ep-ben__c ep-rv" style="--d:.07s">
+          <div class="ep-ben__n">02</div>
+          <h5>{% trans "Operational Visibility" %}</h5>
+          <p>{% trans "Understand what is happening across departments without chasing updates." %}</p>
+        </div>
+        <div class="ep-ben__c ep-rv" style="--d:.12s">
+          <div class="ep-ben__n">03</div>
+          <h5>{% trans "Structured Processes" %}</h5>
+          <p>{% trans "Turn informal processes into defined, repeatable workflows." %}</p>
+        </div>
+        <div class="ep-ben__c ep-rv" style="--d:.17s">
+          <div class="ep-ben__n">04</div>
+          <h5>{% trans "Faster Access to Information" %}</h5>
+          <p>{% trans "Give teams the information they need without searching through multiple systems." %}</p>
+        </div>
+        <div class="ep-ben__c ep-rv" style="--d:.22s">
+          <div class="ep-ben__n">05</div>
+          <h5>{% trans "Better Decisions" %}</h5>
+          <p>{% trans "Use operational and financial information to understand business performance." %}</p>
+        </div>
+        <div class="ep-ben__c ep-rv" style="--d:.27s">
+          <div class="ep-ben__n">06</div>
+          <h5>{% trans "A Foundation for Growth" %}</h5>
+          <p>{% trans "Build a system that can evolve as the organization becomes more complex." %}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 BUSINESS TYPES -->
+  <section class="ep-sec ep-types" id="ep-types">
+    <div class="container">
+      <div class="ep-rv">
+        <span class="ep-eyebrow">{% trans "Business Types" %}</span>
+        <h2 class="ep-h2">{% trans "Built for Different Ways of Working" %}</h2>
+        <p class="ep-lead">{% trans "The same core, shaped around how your organization actually operates." %}</p>
+      </div>
+
+      <div class="ep-types__grid">
+        <div class="ep-ty ep-rv" style="--d:.02s">
+          <div class="ep-ty__ico"><i data-lucide="factory"></i></div>
+          <div>
+            <h5>{% trans "Manufacturing" %}</h5>
+            <p>{% trans "Production, materials, inventory, purchasing, operations." %}</p>
+          </div>
+        </div>
+        <div class="ep-ty ep-rv" style="--d:.07s">
+          <div class="ep-ty__ico"><i data-lucide="shopping-bag"></i></div>
+          <div>
+            <h5>{% trans "Retail" %}</h5>
+            <p>{% trans "Products, inventory, sales, customers, purchasing." %}</p>
+          </div>
+        </div>
+        <div class="ep-ty ep-rv" style="--d:.12s">
+          <div class="ep-ty__ico"><i data-lucide="truck"></i></div>
+          <div>
+            <h5>{% trans "Distribution" %}</h5>
+            <p>{% trans "Warehouses, suppliers, products, customers, orders." %}</p>
+          </div>
+        </div>
+        <div class="ep-ty ep-rv" style="--d:.17s">
+          <div class="ep-ty__ico"><i data-lucide="briefcase"></i></div>
+          <div>
+            <h5>{% trans "Professional Services" %}</h5>
+            <p>{% trans "Projects, employees, timesheets, customers, invoices." %}</p>
+          </div>
+        </div>
+        <div class="ep-ty ep-rv" style="--d:.22s">
+          <div class="ep-ty__ico"><i data-lucide="trending-up"></i></div>
+          <div>
+            <h5>{% trans "Growing Companies" %}</h5>
+            <p>{% trans "Replace disconnected spreadsheets and applications with one centralized system." %}</p>
+          </div>
+        </div>
+        <div class="ep-ty ep-rv" style="--d:.27s">
+          <div class="ep-ty__ico"><i data-lucide="building-2"></i></div>
+          <div>
+            <h5>{% trans "Multi-Department Organizations" %}</h5>
+            <p>{% trans "Give teams specialized workflows while maintaining centralized business information." %}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11 ERP OPTIONS -->
+  <section class="ep-sec ep-opt" id="ep-options">
+    <div class="container">
+      <div class="ep-rv">
+        <span class="ep-eyebrow">{% trans "ERP Options" %}</span>
+        <h2 class="ep-h2">{% trans "Choose the Right ERP Foundation" %}</h2>
+        <p class="ep-lead">{% trans "There isn't one ERP that fits every organization. The right choice depends on your size, processes, budget, technical requirements, and growth plans." %}</p>
+      </div>
+
+      <div class="ep-opt__grid">
+        <div class="ep-op ep-rv" style="--d:.02s">
+          <div class="ep-op__ico"><i data-lucide="package"></i></div>
+          <h5>{% trans "ERPNext" %}</h5>
+          <p>{% trans "An open-source ERP platform covering accounting, sales, purchasing, inventory, manufacturing, projects, and HR. A flexible foundation that can be configured and extended." %}</p>
+        </div>
+        <div class="ep-op ep-rv" style="--d:.09s">
+          <div class="ep-op__ico"><i data-lucide="code-2"></i></div>
+          <h5>{% trans "Custom ERP" %}</h5>
+          <p>{% trans "For organizations with highly specific requirements, a custom ERP is built around your own processes — giving you control over functionality, workflows, architecture, and experience." %}</p>
+        </div>
+        <div class="ep-op ep-rv" style="--d:.16s">
+          <div class="ep-op__ico"><i data-lucide="layers"></i></div>
+          <h5>{% trans "Existing ERP" %}</h5>
+          <p>{% trans "Already running an ERP? It can be extended with custom modules, business logic, dashboards, and workflows where standard functionality doesn't fully match your requirements." %}</p>
+        </div>
+      </div>
+
+      <p class="ep-opt__foot ep-rv">{% trans "Platform names are used to describe the available options. OnWebApp is an independent service provider and is not affiliated with, or endorsed by, the vendors of the platforms listed above." %}</p>
+    </div>
+  </section>
+  <!-- 12 DOES YOUR BUSINESS NEED AN ERP -->
+  <section class="ep-sec ep-check" id="ep-needs">
+    <div class="container">
+      <div class="ep-rv">
+        <span class="ep-eyebrow">{% trans "Self-Assessment" %}</span>
+        <h2 class="ep-h2">{% trans "Has Your Business Outgrown Its Current Tools?" %}</h2>
+        <p class="ep-lead">{% trans "Tick every statement that sounds like your business today." %}</p>
+      </div>
+
+      <div class="ep-check__grid">
+        <div class="ep-list ep-rv" style="--d:.06s" id="epCheck">
+          <label class="ep-list__i"><input type="checkbox"><span class="ep-list__b"><i data-lucide="check"></i></span><span class="ep-list__t">{% trans "We rely heavily on spreadsheets." %}</span></label>
+          <label class="ep-list__i"><input type="checkbox"><span class="ep-list__b"><i data-lucide="check"></i></span><span class="ep-list__t">{% trans "Teams maintain separate records." %}</span></label>
+          <label class="ep-list__i"><input type="checkbox"><span class="ep-list__b"><i data-lucide="check"></i></span><span class="ep-list__t">{% trans "The same information is entered multiple times." %}</span></label>
+          <label class="ep-list__i"><input type="checkbox"><span class="ep-list__b"><i data-lucide="check"></i></span><span class="ep-list__t">{% trans "Inventory is difficult to track." %}</span></label>
+          <label class="ep-list__i"><input type="checkbox"><span class="ep-list__b"><i data-lucide="check"></i></span><span class="ep-list__t">{% trans "Reporting requires manual work." %}</span></label>
+          <label class="ep-list__i"><input type="checkbox"><span class="ep-list__b"><i data-lucide="check"></i></span><span class="ep-list__t">{% trans "Business processes are becoming difficult to control." %}</span></label>
+          <label class="ep-list__i"><input type="checkbox"><span class="ep-list__b"><i data-lucide="check"></i></span><span class="ep-list__t">{% trans "Our current software is becoming difficult to scale." %}</span></label>
+        </div>
+
+        <div class="ep-res ep-rv" style="--d:.12s">
+          <div class="ep-res__score">
+            <span class="ep-res__num" id="epScore">0</span>
+            <span class="ep-res__of">{% trans "of 7 signals matched" %}</span>
+          </div>
+          <div class="ep-res__bar"><span class="ep-res__fill" id="epFill"></span></div>
+          <p class="ep-res__msg" id="epMsg">{% trans "Start with the statements your team deals with every week." %}</p>
+          <p class="ep-res__final">{% trans "If several of these sound familiar, it may be time to rethink how your business operates digitally." %}</p>
+          <a href="{% url 'contact:contact' %}" class="ep-btn ep-btn--dark">{% trans "Discuss Your ERP" %}<i data-lucide="arrow-right"></i></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 13 FINAL CTA -->
+  <section class="ep-cta" id="ep-cta">
+    <div class="container">
+      <div class="ep-cta__in ep-rv">
+        <span class="ep-eyebrow" style="justify-content:center">{% trans "Build With OnWebApp" %}</span>
+        <h2>{% trans "Build a Better Way to Run Your Business" %}</h2>
+        <p>{% trans "Tell us how your business operates, where your current tools fall short, and what you want your ERP to accomplish." %}</p>
+        <div class="ep-cta__acts">
+          <a href="{% url 'contact:contact' %}" class="ep-btn ep-btn--accent">{% trans "Discuss Your ERP" %}<i data-lucide="arrow-right"></i></a>
+          <a href="{% url 'home:home' %}" class="ep-btn ep-btn--ghost-d">{% trans "Explore OnWebApp" %}</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+  var MODS = {
+    finance: {
+      icon: 'wallet',
+      title: '{% filter escapejs %}{% trans "Financial Management" %}{% endfilter %}',
+      desc: '{% filter escapejs %}{% trans "Manage the financial side of the business with a clear view of invoices, expenses, payments, and reporting." %}{% endfilter %}',
+      caps: ['{% filter escapejs %}{% trans "Invoicing" %}{% endfilter %}', '{% filter escapejs %}{% trans "Expenses" %}{% endfilter %}', '{% filter escapejs %}{% trans "Payments" %}{% endfilter %}', '{% filter escapejs %}{% trans "Accounts" %}{% endfilter %}', '{% filter escapejs %}{% trans "Financial records" %}{% endfilter %}', '{% filter escapejs %}{% trans "Financial reporting" %}{% endfilter %}'],
+      label: '{% filter escapejs %}{% trans "Finance · Invoices" %}{% endfilter %}',
+      unit: '{% filter escapejs %}{% trans "Record" %}{% endfilter %}',
+      rows: [
+        ['{% filter escapejs %}{% trans "Invoice INV-2048 · Northwind Ltd" %}{% endfilter %}', '{% filter escapejs %}{% trans "Today" %}{% endfilter %}', 'ok', '{% filter escapejs %}{% trans "Sent" %}{% endfilter %}'],
+        ['{% filter escapejs %}{% trans "Expense EXP-0912 · Operations" %}{% endfilter %}', '{% filter escapejs %}{% trans "Today" %}{% endfilter %}', 'wait', '{% filter escapejs %}{% trans "Approval" %}{% endfilter %}'],
+        ['{% filter escapejs %}{% trans "Payment PAY-0381 · Supplier batch" %}{% endfilter %}', '{% filter escapejs %}{% trans "Yesterday" %}{% endfilter %}', 'idle', '{% filter escapejs %}{% trans "Scheduled" %}{% endfilter %}'],
+        ['{% filter escapejs %}{% trans "Accounts receivable · October" %}{% endfilter %}', '{% filter escapejs %}{% trans "30 days" %}{% endfilter %}', 'ok', '{% filter escapejs %}{% trans "Posted" %}{% endfilter %}']
+      ]
+    },
+    sales: {
+      icon: 'trending-up',
+      title: '{% filter escapejs %}{% trans "Sales & CRM" %}{% endfilter %}',
+      desc: '{% filter escapejs %}{% trans "Manage the customer journey from first lead to completed sale, with the full history in one place." %}{% endfilter %}',
+      caps: ['{% filter escapejs %}{% trans "Leads" %}{% endfilter %}', '{% filter escapejs %}{% trans "Customers" %}{% endfilter %}', '{% filter escapejs %}{% trans "Opportunities" %}{% endfilter %}', '{% filter escapejs %}{% trans "Quotations" %}{% endfilter %}', '{% filter escapejs %}{% trans "Sales orders" %}{% endfilter %}', '{% filter escapejs %}{% trans "Customer history" %}{% endfilter %}'],
+      label: '{% filter escapejs %}{% trans "Sales · Orders" %}{% endfilter %}',
+      unit: '{% filter escapejs %}{% trans "Record" %}{% endfilter %}',
+      rows: [
+        ['{% filter escapejs %}{% trans "Sales order SO-1842 · Harbour Retail" %}{% endfilter %}', '{% filter escapejs %}{% trans "Today" %}{% endfilter %}', 'ok', '{% filter escapejs %}{% trans "Confirmed" %}{% endfilter %}'],
+        ['{% filter escapejs %}{% trans "Quotation QT-0773 · Meridian Group" %}{% endfilter %}', '{% filter escapejs %}{% trans "Today" %}{% endfilter %}', 'wait', '{% filter escapejs %}{% trans "Awaiting reply" %}{% endfilter %}'],
+        ['{% filter escapejs %}{% trans "Lead LD-0214 · Inbound enquiry" %}{% endfilter %}', '{% filter escapejs %}{% trans "This week" %}{% endfilter %}', 'ok', '{% filter escapejs %}{% trans "Qualified" %}{% endfilter %}'],
+        ['{% filter escapejs %}{% trans "Customer record · Atlas Foods" %}{% endfilter %}', '{% filter escapejs %}{% trans "Updated" %}{% endfilter %}', 'idle', '{% filter escapejs %}{% trans "Active" %}{% endfilter %}']
+      ]
+    },
+    inventory: {
+      icon: 'boxes',
+      title: '{% filter escapejs %}{% trans "Inventory Management" %}{% endfilter %}',
+      desc: '{% filter escapejs %}{% trans "Know what you have, where it is, and how it moves across locations." %}{% endfilter %}',
+      caps: ['{% filter escapejs %}{% trans "Products" %}{% endfilter %}', '{% filter escapejs %}{% trans "Stock levels" %}{% endfilter %}', '{% filter escapejs %}{% trans "Warehouses" %}{% endfilter %}', '{% filter escapejs %}{% trans "Stock movements" %}{% endfilter %}', '{% filter escapejs %}{% trans "Transfers" %}{% endfilter %}', '{% filter escapejs %}{% trans "Inventory tracking" %}{% endfilter %}'],
+      label: '{% filter escapejs %}{% trans "Inventory · Stock" %}{% endfilter %}',
+      unit: '{% filter escapejs %}{% trans "Record" %}{% endfilter %}',
+      rows: [
+        ['{% filter escapejs %}{% trans "Product SKU-1042 · Packaging roll" %}{% endfilter %}', '{% filter escapejs %}{% trans "Warehouse A" %}{% endfilter %}', 'ok', '{% filter escapejs %}{% trans "In stock" %}{% endfilter %}'],
+        ['{% filter escapejs %}{% trans "Transfer TR-0456 · A to B" %}{% endfilter %}', '{% filter escapejs %}{% trans "Today" %}{% endfilter %}', 'wait', '{% filter escapejs %}{% trans "In transit" %}{% endfilter %}'],
+        ['{% filter escapejs %}{% trans "Cycle count · Packaging" %}{% endfilter %}', '{% filter escapejs %}{% trans "Weekly" %}{% endfilter %}', 'idle', '{% filter escapejs %}{% trans "Scheduled" %}{% endfilter %}'],
+        ['{% filter escapejs %}{% trans "Movement MV-7712 · Goods received" %}{% endfilter %}', '{% filter escapejs %}{% trans "Today" %}{% endfilter %}', 'ok', '{% filter escapejs %}{% trans "Posted" %}{% endfilter %}']
+      ]
+    },
+    purchasing: {
+      icon: 'shopping-cart',
+      title: '{% filter escapejs %}{% trans "Purchasing" %}{% endfilter %}',
+      desc: '{% filter escapejs %}{% trans "Bring procurement into a structured workflow, from request through to receiving." %}{% endfilter %}',
+      caps: ['{% filter escapejs %}{% trans "Suppliers" %}{% endfilter %}', '{% filter escapejs %}{% trans "Purchase requests" %}{% endfilter %}', '{% filter escapejs %}{% trans "Purchase orders" %}{% endfilter %}', '{% filter escapejs %}{% trans "Receiving" %}{% endfilter %}', '{% filter escapejs %}{% trans "Supplier records" %}{% endfilter %}', '{% filter escapejs %}{% trans "Purchase history" %}{% endfilter %}'],
+      label: '{% filter escapejs %}{% trans "Purchasing · Orders" %}{% endfilter %}',
+      unit: '{% filter escapejs %}{% trans "Record" %}{% endfilter %}',
+      rows: [
+        ['{% filter escapejs %}{% trans "Purchase order PO-0871 · Vertex Supplies" %}{% endfilter %}', '{% filter escapejs %}{% trans "Today" %}{% endfilter %}', 'ok', '{% filter escapejs %}{% trans "Received" %}{% endfilter %}'],
+        ['{% filter escapejs %}{% trans "Purchase order PO-0870 · Vertex Supplies" %}{% endfilter %}', '{% filter escapejs %}{% trans "In transit" %}{% endfilter %}', 'wait', '{% filter escapejs %}{% trans "Open" %}{% endfilter %}'],
+        ['{% filter escapejs %}{% trans "Supplier record · Vertex Supplies" %}{% endfilter %}', '{% filter escapejs %}{% trans "Updated" %}{% endfilter %}', 'idle', '{% filter escapejs %}{% trans "Verified" %}{% endfilter %}'],
+        ['{% filter escapejs %}{% trans "Request for quotation RFQ-0318" %}{% endfilter %}', '{% filter escapejs %}{% trans "This week" %}{% endfilter %}', 'ok', '{% filter escapejs %}{% trans "Sent" %}{% endfilter %}']
+      ]
+    },
+    hr: {
+      icon: 'users',
+      title: '{% filter escapejs %}{% trans "Human Resources" %}{% endfilter %}',
+      desc: '{% filter escapejs %}{% trans "Centralize employee records and the HR operations that depend on them." %}{% endfilter %}',
+      caps: ['{% filter escapejs %}{% trans "Employee records" %}{% endfilter %}', '{% filter escapejs %}{% trans "Attendance" %}{% endfilter %}', '{% filter escapejs %}{% trans "Leave management" %}{% endfilter %}', '{% filter escapejs %}{% trans "Employee documents" %}{% endfilter %}', '{% filter escapejs %}{% trans "Payroll workflows" %}{% endfilter %}', '{% filter escapejs %}{% trans "HR reporting" %}{% endfilter %}'],
+      label: '{% filter escapejs %}{% trans "HR · Employees" %}{% endfilter %}',
+      unit: '{% filter escapejs %}{% trans "Record" %}{% endfilter %}',
+      rows: [
+        ['{% filter escapejs %}{% trans "Employee EMP-041 · Operations" %}{% endfilter %}', '{% filter escapejs %}{% trans "Active" %}{% endfilter %}', 'ok', '{% filter escapejs %}{% trans "On payroll" %}{% endfilter %}'],
+        ['{% filter escapejs %}{% trans "Leave request LR-0207" %}{% endfilter %}', '{% filter escapejs %}{% trans "Pending" %}{% endfilter %}', 'wait', '{% filter escapejs %}{% trans "Approval" %}{% endfilter %}'],
+        ['{% filter escapejs %}{% trans "Attendance · Clock-in log" %}{% endfilter %}', '{% filter escapejs %}{% trans "Today" %}{% endfilter %}', 'ok', '{% filter escapejs %}{% trans "Recorded" %}{% endfilter %}'],
+        ['{% filter escapejs %}{% trans "Payroll run · October" %}{% endfilter %}', '{% filter escapejs %}{% trans "Draft" %}{% endfilter %}', 'idle', '{% filter escapejs %}{% trans "Draft" %}{% endfilter %}']
+      ]
+    },
+    projects: {
+      icon: 'clipboard-list',
+      title: '{% filter escapejs %}{% trans "Project Management" %}{% endfilter %}',
+      desc: '{% filter escapejs %}{% trans "Plan work, assign teams, and keep deadlines and project performance visible." %}{% endfilter %}',
+      caps: ['{% filter escapejs %}{% trans "Projects" %}{% endfilter %}', '{% filter escapejs %}{% trans "Tasks" %}{% endfilter %}', '{% filter escapejs %}{% trans "Assignments" %}{% endfilter %}', '{% filter escapejs %}{% trans "Timesheets" %}{% endfilter %}', '{% filter escapejs %}{% trans "Deadlines" %}{% endfilter %}', '{% filter escapejs %}{% trans "Project reporting" %}{% endfilter %}'],
+      label: '{% filter escapejs %}{% trans "Projects · Work" %}{% endfilter %}',
+      unit: '{% filter escapejs %}{% trans "Record" %}{% endfilter %}',
+      rows: [
+        ['{% filter escapejs %}{% trans "Project PR-021 · Operations portal" %}{% endfilter %}', '{% filter escapejs %}{% trans "On track" %}{% endfilter %}', 'ok', '{% filter escapejs %}{% trans "Active" %}{% endfilter %}'],
+        ['{% filter escapejs %}{% trans "Task TK-1184 · Data migration" %}{% endfilter %}', '{% filter escapejs %}{% trans "Assigned" %}{% endfilter %}', 'wait', '{% filter escapejs %}{% trans "In progress" %}{% endfilter %}'],
+        ['{% filter escapejs %}{% trans "Timesheet TS-0931 · Week 40" %}{% endfilter %}', '{% filter escapejs %}{% trans "Submitted" %}{% endfilter %}', 'idle', '{% filter escapejs %}{% trans "Review" %}{% endfilter %}'],
+        ['{% filter escapejs %}{% trans "Milestone MS-006 · User testing" %}{% endfilter %}', '{% filter escapejs %}{% trans "Due soon" %}{% endfilter %}', 'wait', '{% filter escapejs %}{% trans "Upcoming" %}{% endfilter %}']
+      ]
+    },
+    manufacturing: {
+      icon: 'factory',
+      title: '{% filter escapejs %}{% trans "Manufacturing" %}{% endfilter %}',
+      desc: '{% filter escapejs %}{% trans "Manage production operations from planning through to completion." %}{% endfilter %}',
+      caps: ['{% filter escapejs %}{% trans "Bill of materials" %}{% endfilter %}', '{% filter escapejs %}{% trans "Work orders" %}{% endfilter %}', '{% filter escapejs %}{% trans "Production planning" %}{% endfilter %}', '{% filter escapejs %}{% trans "Materials" %}{% endfilter %}', '{% filter escapejs %}{% trans "Workstations" %}{% endfilter %}', '{% filter escapejs %}{% trans "Production tracking" %}{% endfilter %}'],
+      label: '{% filter escapejs %}{% trans "Manufacturing · Work orders" %}{% endfilter %}',
+      unit: '{% filter escapejs %}{% trans "Record" %}{% endfilter %}',
+      rows: [
+        ['{% filter escapejs %}{% trans "Work order WO-2291 · Line 2" %}{% endfilter %}', '{% filter escapejs %}{% trans "Running" %}{% endfilter %}', 'ok', '{% filter escapejs %}{% trans "In progress" %}{% endfilter %}'],
+        ['{% filter escapejs %}{% trans "Bill of materials BOM-014 · v3" %}{% endfilter %}', '{% filter escapejs %}{% trans "Released" %}{% endfilter %}', 'ok', '{% filter escapejs %}{% trans "Approved" %}{% endfilter %}'],
+        ['{% filter escapejs %}{% trans "Production plan · October" %}{% endfilter %}', '{% filter escapejs %}{% trans "Draft" %}{% endfilter %}', 'idle', '{% filter escapejs %}{% trans "Planned" %}{% endfilter %}'],
+        ['{% filter escapejs %}{% trans "Workstation WS-03 · Assembly" %}{% endfilter %}', '{% filter escapejs %}{% trans "Available" %}{% endfilter %}', 'wait', '{% filter escapejs %}{% trans "Scheduled" %}{% endfilter %}']
+      ]
+    }
+  };
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function icons() {
+    if (window.lucide && typeof window.lucide.createIcons === 'function') {
+      try { window.lucide.createIcons(); } catch (e) {}
+    }
+  }
+
+  /* ---------- module explorer ---------- */
+  var panel = document.getElementById('epPanel');
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('.ep-tab'));
+
+  function markup(key) {
+    var m = MODS[key];
+    if (!m) { return ''; }
+    var caps = m.caps.map(function (c) { return '<span>' + esc(c) + '</span>'; }).join('');
+    var rows = m.rows.map(function (r) {
+      return '<div class="ep-mock__r">' +
+        '<span class="ep-mock__lab">' + esc(r[0]) + '</span>' +
+        '<span class="ep-mock__m">' + esc(r[1]) + '</span>' +
+        '<span class="ep-pill ep-pill--' + r[2] + '">' + esc(r[3]) + '</span>' +
+        '</div>';
+    }).join('');
+    return '<div class="ep-cap__hd">' +
+      '<div class="ep-cap__ico"><i data-lucide="' + m.icon + '"></i></div>' +
+      '<h3>' + esc(m.title) + '</h3>' +
+      '<p>' + esc(m.desc) + '</p>' +
+      '</div>' +
+      '<div class="ep-cap__caps">' + caps + '</div>' +
+      '<div class="ep-mock">' +
+      '<div class="ep-mock__bar">' +
+      '<span class="ep-mock__t">' + esc(m.label) + '</span>' +
+      '<span class="ep-mock__search"><i data-lucide="search"></i>{% filter escapejs %}{% trans "Search records" %}{% endfilter %}</span>' +
+      '<span class="ep-mock__btn">{% filter escapejs %}{% trans "New" %}{% endfilter %}</span>' +
+      '</div>' +
+      '<div class="ep-mock__hd"><span>' + esc(m.unit) + '</span><span>{% filter escapejs %}{% trans "Reference" %}{% endfilter %}</span><span>{% filter escapejs %}{% trans "Status" %}{% endfilter %}</span></div>' +
+      rows +
+      '<div class="ep-cap__ft"><span>{% filter escapejs %}{% trans "Illustrative interface · sample records" %}{% endfilter %}</span><b>' + esc(m.title) + '</b></div>' +
+      '</div>';
+  }
+
+  function show(key, btn) {
+    tabs.forEach(function (t) {
+      var on = t === btn;
+      t.classList.toggle('is-on', on);
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+    if (!panel) { return; }
+    panel.classList.add('is-swap');
+    window.setTimeout(function () {
+      panel.innerHTML = markup(key);
+      panel.classList.remove('is-swap');
+      icons();
+    }, 150);
+  }
+
+  tabs.forEach(function (t) {
+    t.addEventListener('click', function () { show(t.getAttribute('data-mod'), t); });
+    t.addEventListener('keydown', function (e) {
+      var i = tabs.indexOf(t);
+      if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+        e.preventDefault();
+        tabs[(i + 1) % tabs.length].focus();
+      } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+        e.preventDefault();
+        tabs[(i - 1 + tabs.length) % tabs.length].focus();
+      }
+    });
+  });
+
+  if (panel) { panel.innerHTML = markup('finance'); }
+
+  /* ---------- scroll reveals ---------- */
+  var rvs = Array.prototype.slice.call(document.querySelectorAll('.ep-rv'));
+  var tl = document.getElementById('epTl');
+  if (tl) { rvs.push(tl); }
+
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) {
+          en.target.classList.add('is-in');
+          io.unobserve(en.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    rvs.forEach(function (el) { io.observe(el); });
+  } else {
+    rvs.forEach(function (el) { el.classList.add('is-in'); });
+  }
+
+  /* ---------- needs checklist ---------- */
+  var check = document.getElementById('epCheck');
+  var score = document.getElementById('epScore');
+  var fill = document.getElementById('epFill');
+  var msg = document.getElementById('epMsg');
+
+  var MSGS = [
+    '{% filter escapejs %}{% trans "Start with the statements your team deals with every week." %}{% endfilter %}',
+    '{% filter escapejs %}{% trans "A couple of these are already costing your team time." %}{% endfilter %}',
+    '{% filter escapejs %}{% trans "A few of these are slowing the team down every week." %}{% endfilter %}',
+    '{% filter escapejs %}{% trans "This is starting to affect how the business is run." %}{% endfilter %}',
+    '{% filter escapejs %}{% trans "Several of these are creating real operational friction." %}{% endfilter %}',
+    '{% filter escapejs %}{% trans "Your processes are likely harder to control than they need to be." %}{% endfilter %}',
+    '{% filter escapejs %}{% trans "Your business is running on workarounds more than on systems." %}{% endfilter %}',
+    '{% filter escapejs %}{% trans "Your current tools are probably beyond what they can handle." %}{% endfilter %}'
+  ];
+
+  if (check) {
+    var boxes = Array.prototype.slice.call(check.querySelectorAll('input[type="checkbox"]'));
+    var update = function () {
+      var n = 0;
+      boxes.forEach(function (b) {
+        var li = b.closest('.ep-list__i');
+        if (b.checked) { n += 1; }
+        if (li) { li.classList.toggle('is-on', b.checked); }
+      });
+      if (score) { score.textContent = String(n); }
+      if (fill) { fill.style.width = (n / boxes.length * 100) + '%'; }
+      if (msg) { msg.textContent = MSGS[n] || MSGS[0]; }
+    };
+    boxes.forEach(function (b) { b.addEventListener('change', update); });
+    update();
+  }
+
+  icons();
+})();
+
+</script>
 {% endblock %}

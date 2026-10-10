@@ -1,413 +1,583 @@
 {% extends 'community/base_community.html' %}
 {% load static i18n %}
 
+{% block title %}{% trans 'Community Services' %} | OnWebApp{% endblock %}
+
 {% block extra_css %}
 <style>
-    :root {
-        --c-primary: #4f46e5;
-        --c-primary-light: #eef2ff;
-        --c-dark: #0f172a;
-        --c-body: #334155;
-        --c-muted: #64748b;
-        --c-faint: #94a3b8;
-        --c-border: #e2e8f0;
-        --c-bg: #ffffff;
-        --c-bg-alt: #f8fafc;
-    }
+/* ============================================================
+   Community Services landing page
+   ============================================================ */
+.cs{
+    --ink:#1E293B; --ink-2:#475569; --muted:#64748B; --faint:#94A3B8;
+    --line:#E2E8F0; --line-2:#F1F5F9; --bg:#FAFAFA; --card:#FFFFFF;
+    --accent:#3B82F6; --accent-2:#2563EB; --accent-3:#60A5FA; --accent-4:#93C5FD; --accent-ink:#EFF6FF;
+    --accent-soft:rgba(59,130,246,.12);
+    --green:#22C55E; --green-2:#16A34A; --green-3:#4ADE80; --green-ink:#ECFDF5;
+    --purple:#A855F7; --purple-2:#9333EA; --purple-3:#C4B5FD; --purple-ink:#FAF5FF;
+    --pink:#EC4899; --pink-2:#DB2777; --pink-3:#F9A8D4; --pink-ink:#FDF2F8;
+    --orange:#F97316; --orange-2:#EA580C; --orange-3:#FB923C; --orange-ink:#FFF7ED;
+    --yellow:#EAB308; --yellow-2:#CA8A04; --yellow-3:#FACC15; --yellow-ink:#FEFCE8;
+    --radius:18px; --radius-sm:14px;
+    --shadow:0 2px 6px rgba(15,23,42,.04), 0 12px 28px -12px rgba(15,23,42,.18);
+    --shadow-soft:0 4px 14px rgba(15,23,42,.06);
+    background:var(--bg); color:var(--ink);
+}
+.cs h1,.cs h2,.cs h3,.cs h4{font-family:var(--font-display); letter-spacing:-.025em; color:var(--ink); font-weight:800}
+.cs a{text-decoration:none}
+.cs section{scroll-margin-top:86px}
+.cs img{max-width:100%}
+html{scroll-behavior:smooth}
+.cs ::selection{background:rgba(59,130,246,.3); color:var(--ink)}
+.cs a:focus-visible{outline:2px solid var(--accent); outline-offset:3px; border-radius:6px}
+.cs-pkg a:focus-visible{outline-offset:4px}
 
-    .c-reveal {
-        opacity: 0;
-        transform: translateY(30px);
-        transition: opacity .7s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1);
-    }
-    .c-reveal.visible { opacity: 1; transform: translateY(0); }
-    .c-stagger-1 { transition-delay: .05s; }
-    .c-stagger-2 { transition-delay: .12s; }
-    .c-stagger-3 { transition-delay: .19s; }
-    .c-stagger-4 { transition-delay: .26s; }
-    .c-stagger-5 { transition-delay: .33s; }
-    .c-stagger-6 { transition-delay: .40s; }
+/* ---------- Scroll progress bar ---------- */
+.cs-progress{
+    position:fixed; top:0; left:0; height:3px; z-index:9999;
+    background:linear-gradient(90deg,var(--accent),var(--accent-3));
+    transform-origin:left center; transform:scaleX(0);
+    pointer-events:none;
+}
+@media (prefers-reduced-motion:reduce){
+    .cs-progress{display:none}
+}
 
-    .c-btn-primary {
-        display: inline-flex; align-items: center; gap: .5rem;
-        padding: .85rem 2rem; background: var(--c-primary); color: #fff;
-        font-size: .9rem; font-weight: 700; border-radius: 10px;
-        border: none; text-decoration: none; transition: all .2s;
-    }
-    .c-btn-primary:hover { background: #4338ca; color: #fff; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(79,70,229,.25); }
-    .c-btn-outline {
-        display: inline-flex; align-items: center; gap: .5rem;
-        padding: .85rem 2rem; background: transparent; color: var(--c-dark);
-        font-size: .9rem; font-weight: 700; border-radius: 10px;
-        border: 2px solid var(--c-border); text-decoration: none; transition: all .2s;
-    }
-    .c-btn-outline:hover { border-color: var(--c-primary); color: var(--c-primary); transform: translateY(-1px); }
-    .c-btn-white {
-        display: inline-flex; align-items: center; gap: .5rem;
-        padding: .85rem 2rem; background: #fff; color: var(--c-dark);
-        font-size: .9rem; font-weight: 700; border-radius: 10px;
-        border: none; text-decoration: none; transition: all .2s;
-    }
-    .c-btn-white:hover { background: var(--c-primary-light); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(255,255,255,.2); }
+/* ---------- Shared: labels, heads, buttons ---------- */
+.cs-label{
+    display:inline-flex; align-items:center; gap:.6rem;
+    font-size:.72rem; font-weight:700; letter-spacing:.18em; text-transform:uppercase;
+    color:var(--accent-2);
+}
+.cs-label::before{content:""; width:26px; height:1px; background:var(--accent); opacity:.7}
+.cs-label--plain::before{display:none}
+.cs-label--dark{color:var(--accent-3)}
+.cs-label--dark::before{background:var(--accent-3)}
+.cs-head{max-width:720px; margin-bottom:clamp(2rem,4vw,3rem)}
+.cs-head--center{margin-left:auto; margin-right:auto; text-align:center}
+.cs-head--center .cs-label{justify-content:center}
+.cs-head h2{font-size:clamp(1.53rem,3.06vw,2.295rem); line-height:1.14; margin:.9rem 0 .85rem; text-wrap:balance}
+.cs-head .cs-sub{font-size:0.918rem; line-height:1.7; color:var(--muted); margin:0}
+.cs-sec{padding:clamp(3.25rem,7vw,5.5rem) 0}
+.cs-sec--white{background:#fff; border-top:1px solid var(--line); border-bottom:1px solid var(--line)}
+.cs-sec--soft-blue{background:var(--accent-ink); border-top:1px solid var(--line); border-bottom:1px solid var(--line)}
+.cs-sec--soft-green{background:var(--green-ink); border-top:1px solid var(--line); border-bottom:1px solid var(--line)}
+.cs-sec--soft-purple{background:var(--purple-ink); border-top:1px solid var(--line); border-bottom:1px solid var(--line)}
+.cs-sec--soft-pink{background:var(--pink-ink); border-top:1px solid var(--line); border-bottom:1px solid var(--line)}
 
-    .c-sec { padding: 5.5rem 0; }
-    .c-sec-alt { background: var(--c-bg-alt); }
-    .c-sec-dark { background: var(--c-dark); color: #fff; }
-    .c-sec-label {
-        display: inline-flex; align-items: center; gap: .5rem;
-        font-size: .68rem; font-weight: 700; letter-spacing: .12em;
-        text-transform: uppercase; color: var(--c-primary); margin-bottom: .6rem;
-    }
-    .c-sec-label::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--c-primary); }
-    .c-sec-title { font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 800; color: var(--c-dark); letter-spacing: -.01em; margin-bottom: .4rem; }
-    .c-sec-sub { font-size: .95rem; color: var(--c-muted); max-width: 520px; line-height: 1.6; }
-    .c-sec-dark .c-sec-title { color: #fff; }
-    .c-sec-dark .c-sec-sub { color: rgba(255,255,255,.5); }
+.cs-btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:.5rem;
+    font-weight:600; font-size:0.855rem; line-height:1;
+    padding:.9rem 1.45rem; border-radius:14px; border:1px solid transparent;
+    cursor:pointer; white-space:nowrap;
+    transition:transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease, color .18s ease;
+}
+.cs-btn svg{width:16px; height:16px; flex:none}
+.cs-btn:hover{transform:translateY(-2px)}
+.cs-btn:active{transform:translateY(0) scale(.98)}
+.cs-btn:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+.cs-btn--accent{background:var(--accent); color:#fff; box-shadow:0 8px 20px -8px rgba(59,130,246,.55)}
+.cs-btn--accent:hover{background:var(--accent-2); color:#fff}
+.cs-btn--green{background:var(--green); color:#fff; box-shadow:0 8px 20px -8px rgba(34,197,94,.55)}
+.cs-btn--green:hover{background:var(--green-2); color:#fff}
+.cs-btn--purple{background:var(--purple); color:#fff; box-shadow:0 8px 20px -8px rgba(168,85,247,.55)}
+.cs-btn--purple:hover{background:var(--purple-2); color:#fff}
+.cs-btn--pink{background:var(--pink); color:#fff; box-shadow:0 8px 20px -8px rgba(236,72,153,.55)}
+.cs-btn--pink:hover{background:var(--pink-2); color:#fff}
+.cs-btn--dark{background:var(--ink); color:#fff}
+.cs-btn--dark:hover{background:#1E293B; color:#fff}
+.cs-btn--ghost{background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.2); color:#fff}
+.cs-btn--ghost:hover{background:rgba(255,255,255,.15); border-color:rgba(255,255,255,.35); color:#fff}
+.cs-btn--outline{background:#fff; border-color:var(--line); color:var(--ink)}
+.cs-btn--outline:hover{border-color:var(--accent-3); background:var(--accent-ink); color:var(--accent-2)}
+.cs-btn--block{width:100%}
 
-    /* Hero */
-    .c-hero {
-        padding: 6.5rem 0 5rem;
-        background: linear-gradient(160deg, #fafbff 0%, #f1f0ff 40%, #eef2ff 100%);
-        position: relative; overflow: hidden;
-    }
-    .c-hero::before {
-        content: ''; position: absolute; top: -30%; right: -10%;
-        width: 600px; height: 600px;
-        background: radial-gradient(circle, rgba(79,70,229,.07) 0%, transparent 70%);
-        border-radius: 50%; pointer-events: none;
-    }
-    .c-hero .container { position: relative; }
-    .c-hero-eyebrow {
-        display: inline-flex; align-items: center; gap: .5rem;
-        font-size: .7rem; font-weight: 700; letter-spacing: .14em;
-        text-transform: uppercase; color: var(--c-primary); margin-bottom: 1.5rem;
-    }
-    .c-hero-eyebrow::before { content: ''; width: 24px; height: 2px; background: var(--c-primary); border-radius: 1px; }
-    .c-hero h1 {
-        font-size: clamp(2.2rem, 4.5vw, 3.2rem);
-        font-weight: 800; line-height: 1.12;
-        color: var(--c-dark); letter-spacing: -.02em; margin-bottom: 1.25rem;
-    }
-    .c-hero h1 em { font-style: normal; color: var(--c-primary); }
-    .c-hero-sub {
-        font-size: 1.05rem; line-height: 1.7;
-        color: var(--c-muted); max-width: 540px; margin-bottom: 2.5rem;
-    }
-    .c-hero-actions { display: flex; gap: .75rem; flex-wrap: wrap; align-items: center; margin-bottom: .75rem; }
-    .c-hero-trust {
-        font-size: .78rem; color: var(--c-faint); display: flex; align-items: center; gap: .5rem;
-    }
-    .c-hero-trust i { color: var(--c-primary); }
+/* ---------- Hero ---------- */
+.cs-hero{
+    position:relative; overflow:hidden; color:var(--ink);
+    padding:clamp(4rem,9vw,6.5rem) 0 clamp(3.5rem,8vw,5.5rem);
+    background:
+        radial-gradient(900px 400px at 10% -10%, rgba(59,130,246,.18), transparent 60%),
+        radial-gradient(800px 380px at 92% 5%, rgba(168,85,247,.14), transparent 55%),
+        radial-gradient(700px 350px at 50% 100%, rgba(34,197,94,.12), transparent 65%),
+        var(--bg);
+}
+.cs-hero::before{
+    content:""; position:absolute; inset:0; pointer-events:none;
+    background-image:
+        linear-gradient(rgba(59,130,246,.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(59,130,246,.06) 1px, transparent 1px);
+    background-size:48px 48px;
+    -webkit-mask-image:radial-gradient(circle at 30% 0%, #000 0%, transparent 70%);
+    mask-image:radial-gradient(circle at 30% 0%, #000 0%, transparent 70%);
+}
+.cs-hero__grid{
+    position:relative; display:grid;
+    grid-template-columns:minmax(0,1.08fr) minmax(320px,.92fr);
+    gap:clamp(2.25rem,5vw,4.5rem); align-items:center;
+}
+.cs-hero h1{
+    font-size:clamp(2.115rem,4.86vw,3.6rem); line-height:1.04; color:var(--ink);
+    letter-spacing:-.035em; margin:1.15rem 0 0;
+}
+.cs-hero__sup{
+    font-family:var(--font-display); font-weight:700;
+    font-size:clamp(1.035rem,2.07vw,1.44rem); color:var(--accent);
+    margin:.7rem 0 0; letter-spacing:-.015em;
+}
+.cs-hero__desc{
+    color:var(--ink-2); font-size:clamp(0.891rem,1.26vw,0.981rem);
+    line-height:1.7; max-width:54ch; margin:1.2rem 0 1.9rem;
+}
+.cs-hero__cta{display:flex; flex-wrap:wrap; gap:.8rem}
+.cs-hero__trust{
+    display:flex; align-items:center; gap:.5rem; margin-top:1.6rem;
+    font-size:0.765rem; color:var(--muted); font-weight:500;
+}
+.cs-hero__trust svg{width:15px; height:15px; color:var(--green); flex:none}
 
-    /* Growth Journey */
-    .c-journey {
-        display: flex; align-items: center; justify-content: center; gap: 0;
-        padding: 2rem 0; flex-wrap: wrap;
-    }
-    .c-journey-step {
-        display: flex; align-items: center; gap: .6rem;
-        padding: .7rem 1.2rem; border-radius: 10px;
-        background: var(--c-bg); border: 1px solid var(--c-border);
-        font-size: .82rem; font-weight: 700; color: var(--c-dark);
-        transition: all .3s; white-space: nowrap;
-    }
-    .c-journey-step.active {
-        background: var(--c-primary); color: #fff;
-        border-color: var(--c-primary); box-shadow: 0 4px 16px rgba(79,70,229,.2);
-    }
-    .c-journey-step i { font-size: .75rem; }
-    .c-journey-arrow {
-        color: var(--c-faint); font-size: .7rem; padding: 0 .3rem;
-        flex-shrink: 0;
-    }
 
-    /* Packages */
-    .c-pkg {
-        border-radius: 16px; border: 1px solid var(--c-border);
-        background: var(--c-bg); overflow: hidden;
-        transition: all .35s cubic-bezier(.22,1,.36,1); height: 100%;
-        display: flex; flex-direction: column;
-        position: relative;
-        box-shadow: 0 1px 3px rgba(0,0,0,.04), 0 4px 12px rgba(0,0,0,.02);
-    }
-    .c-pkg:hover {
-        box-shadow: 0 8px 32px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.04);
-        transform: translateY(-3px); border-color: #c7d2fe;
-    }
 
-    /* Basic — clean neutral */
-    .c-pkg .c-pkg-head { background: #fafbfc; border-bottom: 1px solid var(--c-border); }
-    .c-pkg .c-pkg-list li i { color: #94a3b8; }
-    .c-pkg .c-pkg-section h6 { color: #94a3b8; }
+/* Sticky mobile CTA bar */
+.cs-sticky-cta{
+    display:none; position:fixed; bottom:0; left:0; right:0; z-index:1000;
+    padding:.85rem 1rem; background:rgba(255,255,255,.98);
+    backdrop-filter:blur(12px); border-top:1px solid var(--line);
+    box-shadow:0 -8px 24px -8px rgba(15,23,42,.12);
+}
+.cs-sticky-cta__inner{display:flex; align-items:center; justify-content:space-between; gap:1rem; max-width:1200px; margin:0 auto}
+.cs-sticky-cta__text{font-size:0.72rem; color:var(--muted)}
+.cs-sticky-cta__text strong{color:var(--ink); font-weight:700}
+@media (max-width:767px){
+    .cs-sticky-cta{display:block}
+    .cs-final__cta{padding-bottom:80px}
+}
 
-    /* Featured (Startup) — elevated purple */
-    .c-pkg-featured {
-        border-color: rgba(79,70,229,.2);
-        box-shadow: 0 1px 3px rgba(79,70,229,.06), 0 8px 24px rgba(79,70,229,.08);
-    }
-    .c-pkg-featured:hover {
-        border-color: rgba(79,70,229,.35);
-        box-shadow: 0 12px 40px rgba(79,70,229,.12), 0 4px 12px rgba(79,70,229,.06);
-    }
-    .c-pkg-featured::before {
-        content: ''; position: absolute; top: 0; left: 0; right: 0;
-        height: 3px; background: linear-gradient(90deg, var(--c-primary), #818cf8);
-        border-radius: 16px 16px 0 0;
-    }
-    .c-pkg-featured .c-pkg-head { background: linear-gradient(180deg, #f5f3ff 0%, #fafbff 100%); border-bottom-color: rgba(79,70,229,.1); }
-    .c-pkg-featured .c-pkg-list li i { color: var(--c-primary); }
-    .c-pkg-featured .c-pkg-section h6 { color: var(--c-primary); }
-    .c-pkg-badge-featured {
-        position: absolute; top: .85rem; right: .85rem;
-        background: linear-gradient(135deg, var(--c-primary), #818cf8); color: #fff;
-        font-size: .6rem; font-weight: 700; letter-spacing: .08em;
-        text-transform: uppercase; padding: .25rem .6rem; border-radius: 5px;
-        z-index: 2; box-shadow: 0 2px 8px rgba(79,70,229,.25);
-    }
+/* Hero flow diagram */
+.cs-flowcard{
+    background:var(--card); border:1px solid var(--line);
+    border-radius:20px; padding:1.5rem 1.6rem 1.35rem;
+    box-shadow:var(--shadow-soft);
+}
+.cs-flowcard__bar{display:flex; align-items:center; justify-content:space-between; margin-bottom:1.25rem}
+.cs-flowcard__title{font-size:.7rem; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--muted)}
+.cs-flowcard__dots{display:flex; gap:.35rem}
+.cs-flowcard__dots i{width:8px; height:8px; border-radius:50%; background:var(--line-2)}
+.cs-flowcard__dots i:first-child{background:var(--accent)}
+.cs-flow{list-style:none; margin:0; padding:0; position:relative}
+.cs-flow__item{
+    position:relative; display:flex; align-items:center; gap:.95rem;
+    padding:.52rem 0 .52rem .1rem;
+}
+.cs-flow__item:not(:last-child)::after{
+    content:""; position:absolute; left:19px; top:calc(50% + 16px);
+    width:1px; height:calc(100% - 20px);
+    background:linear-gradient(180deg, var(--line), var(--line-2));
+}
+.cs-flow__ico{
+    width:38px; height:38px; border-radius:11px; display:grid; place-items:center; flex:none;
+    background:var(--accent-ink); border:1px solid var(--line); color:var(--accent);
+}
+.cs-flow__ico svg{width:17px; height:17px}
+.cs-flow__item.is-first .cs-flow__ico{background:var(--accent-ink); border-color:var(--accent-3); color:var(--accent)}
+.cs-flow__item.is-goal .cs-flow__ico{background:var(--accent); border-color:var(--accent); color:#fff}
+.cs-flow__txt{display:flex; flex-direction:column; gap:.14rem; min-width:0}
+.cs-flow__txt b{font-size:0.846rem; font-weight:700; color:var(--ink); font-family:var(--font-display); letter-spacing:-.01em}
+.cs-flow__txt small{font-size:0.702rem; color:var(--muted); line-height:1.4}
+.cs-flow__step{margin-left:auto; font-size:.68rem; font-weight:700; letter-spacing:.1em; color:var(--faint); flex:none}
+.cs-flow__item.is-goal .cs-flow__step{color:var(--accent-3)}
+@keyframes cs-glow{0%,100%{box-shadow:0 0 0 0 rgba(59,130,246,.4)}70%{box-shadow:0 0 0 12px rgba(59,130,246,0)}}
+.cs-flow__item.is-goal .cs-flow__ico{animation:cs-glow 2.8s ease-out infinite}
+.cs-flowcard__foot{
+    display:flex; align-items:center; gap:.55rem; margin-top:1.15rem;
+    padding-top:1rem; border-top:1px solid var(--line);
+    font-size:0.72rem; color:var(--muted); line-height:1.5;
+}
+.cs-flowcard__foot svg{width:14px; height:14px; color:var(--accent); flex:none}
+/* ---------- Growth path ---------- */
+.cs-path{display:grid; grid-template-columns:repeat(6, minmax(0,1fr)); gap:.9rem}
+.cs-stage{
+    position:relative; background:#fff; border:1px solid var(--line);
+    border-radius:var(--radius-sm); padding:1.25rem 1.05rem 1.15rem;
+    transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.cs-stage:hover{transform:translateY(-4px); box-shadow:var(--shadow); border-color:var(--accent-4)}
+.cs-stage--first{border-color:var(--accent-3)}
+.cs-stage--goal{background:linear-gradient(180deg, var(--accent-ink), #fff 70%)}
+.cs-stage__num{font-size:.68rem; font-weight:700; letter-spacing:.16em; color:var(--faint)}
+.cs-stage__ico{
+    width:42px; height:42px; border-radius:12px; display:grid; place-items:center;
+    background:var(--accent-ink); color:var(--accent); margin:.7rem 0 .85rem;
+}
+.cs-stage__ico svg{width:19px; height:19px}
+.cs-stage--goal .cs-stage__ico{background:var(--accent); color:#fff}
+.cs-stage:hover .cs-stage__ico{background:var(--accent); color:#fff}
+.cs-stage h3{font-size:0.873rem; font-weight:700; margin:0 0 .38rem}
+.cs-stage p{font-size:0.738rem; line-height:1.55; color:var(--muted); margin:0}
+.cs-stage:not(:last-child)::after{
+    content:""; position:absolute; top:35px; right:-.62rem;
+    width:7px; height:7px; z-index:2;
+    border-top:1.5px solid var(--faint); border-right:1.5px solid var(--faint);
+    transform:rotate(45deg);
+}
+.cs-path__note{
+    display:flex; align-items:center; gap:.55rem; margin:1.6rem 0 0;
+    font-size:0.81rem; font-weight:600; color:var(--ink-2);
+}
+.cs-path__note svg{width:16px; height:16px; color:var(--accent-2); flex:none}
 
-    /* Enterprise — dark premium */
-    .c-pkg-enterprise::before {
-        content: ''; position: absolute; top: 0; left: 0; right: 0;
-        height: 3px; background: linear-gradient(90deg, #334155, #64748b);
-        border-radius: 16px 16px 0 0;
-    }
-    .c-pkg-enterprise .c-pkg-head { background: linear-gradient(180deg, #f8fafc 0%, #fafbfc 100%); }
-    .c-pkg-enterprise .c-pkg-list li i { color: #475569; }
-    .c-pkg-enterprise .c-pkg-section h6 { color: #475569; }
-    .c-pkg-enterprise .c-pkg-badge-enterprise {
-        position: absolute; top: .85rem; right: .85rem;
-        background: linear-gradient(135deg, #1e293b, #334155); color: #fff;
-        font-size: .6rem; font-weight: 700; letter-spacing: .08em;
-        text-transform: uppercase; padding: .25rem .6rem; border-radius: 5px;
-        z-index: 2; box-shadow: 0 2px 8px rgba(15,23,42,.2);
-    }
+/* ---------- Packages ---------- */
+.cs-pkgs{display:grid; grid-template-columns:1fr 1.16fr 1fr; gap:1.3rem; align-items:stretch}
+.cs-pkg{
+    position:relative; display:flex; flex-direction:column;
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    padding:1.9rem 1.7rem; transition:box-shadow .2s ease, transform .2s ease;
+}
+.cs-pkg:hover{box-shadow:var(--shadow); transform:translateY(-4px)}
+.cs-pkg__badge{
+    position:absolute; top:-13px; left:50%; transform:translateX(-50%);
+    background:var(--accent); color:#fff;
+    font-size:.66rem; font-weight:800; letter-spacing:.13em; text-transform:uppercase;
+    padding:.44rem .95rem; border-radius:999px; white-space:nowrap;
+    box-shadow:0 10px 24px -12px rgba(59,130,246,.7);
+}
+.cs-pkg__label{font-size:.69rem; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--faint)}
+.cs-pkg__price{margin:1.05rem 0 .3rem}
+.cs-pkg__from{display:block; font-size:.76rem; color:var(--faint); font-weight:600; margin-bottom:.25rem}
+.cs-pkg__amount{
+    font-family:var(--font-display); font-size:clamp(1.89rem,2.88vw,2.385rem);
+    font-weight:800; letter-spacing:-.035em; line-height:1.05; color:var(--ink);
+}
+.cs-pkg__term{display:block; font-size:0.711rem; color:var(--muted); font-weight:600; margin-top:.3rem}
+.cs-pkg__title{font-size:1.098rem; line-height:1.32; margin:1.15rem 0 .6rem}
+.cs-pkg__desc{font-size:0.805rem; line-height:1.66; color:var(--muted); margin:0 0 1.4rem}
+.cs-pkg__group{margin-bottom:1.3rem}
+.cs-pkg__group h4{
+    font-size:.67rem; font-weight:700; letter-spacing:.15em; text-transform:uppercase;
+    color:var(--faint); margin:0 0 .75rem;
+}
+.cs-list{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:.6rem}
+.cs-list li{display:flex; gap:.62rem; font-size:0.801rem; line-height:1.5; color:var(--ink-2)}
+.cs-list li svg{width:15px; height:15px; color:var(--accent); flex:none; margin-top:.22rem}
+.cs-list li.is-later{color:var(--muted)}
+.cs-list li.is-later svg{color:var(--faint)}
+.cs-pkg__ideals{margin-top:auto; padding-top:1.3rem; border-top:1px dashed var(--line)}
+.cs-pkg__ideals h4{
+    font-size:.67rem; font-weight:700; letter-spacing:.15em; text-transform:uppercase;
+    color:var(--faint); margin:0 0 .7rem;
+}
+.cs-chips{display:flex; flex-wrap:wrap; gap:.42rem}
+.cs-chip{
+    font-size:.765rem; font-weight:600; color:var(--ink-2);
+    background:var(--line-2); border:1px solid var(--line);
+    padding:.32rem .68rem; border-radius:999px;
+}
+.cs-pkg__cta{margin-top:1.45rem}
+.cs-pkg--ent .cs-pkg__cta{margin-top:auto; padding-top:0}
+.cs-pkg--featured{
+    background:linear-gradient(180deg, #1E1E2E 0%, #181825 100%);
+    border-color:#2A2A3E;
+    box-shadow:0 34px 64px -34px rgba(15,23,42,.5);
+    padding:2.4rem 1.95rem 2.15rem;
+}
+.cs-pkg--featured::before{
+    content:""; position:absolute; inset:0; pointer-events:none; border-radius:inherit;
+    background:radial-gradient(460px 170px at 50% 0%, rgba(59,130,246,.18), transparent 72%);
+}
+.cs-pkg--featured:hover{transform:translateY(-6px)}
+.cs-pkg--featured .cs-pkg__label{color:var(--accent-4)}
+.cs-pkg--featured .cs-pkg__from,
+.cs-pkg--featured .cs-pkg__term{color:var(--faint)}
+.cs-pkg--featured .cs-pkg__amount{color:#fff}
+.cs-pkg--featured .cs-pkg__title{color:#fff; font-size:1.278rem; margin-top:1.3rem}
+.cs-pkg--featured .cs-pkg__desc{color:var(--faint)}
+.cs-pkg--featured .cs-pkg__group h4{color:var(--accent-4)}
+.cs-pkg--featured .cs-pkg__group--add h4{color:var(--faint)}
+.cs-pkg--featured .cs-list li{color:#E2E8F0}
+.cs-pkg--featured .cs-list li.is-later{color:var(--faint)}
+.cs-pkg--featured .cs-list li.is-later svg{color:var(--faint)}
+.cs-pkg--featured .cs-pkg__cta{margin-top:.4rem}
+.cs-pkg__note{
+    display:flex; gap:.6rem; align-items:flex-start; margin-top:auto;
+    padding-top:1.35rem; border-top:1px solid var(--line);
+    font-size:0.729rem; line-height:1.6; color:var(--muted);
+}
+.cs-pkg__note svg{width:15px; height:15px; color:var(--accent-4); flex:none; margin-top:.15rem}
+/* ---------- Growth timeline (horizontal) ---------- */
+.cs-tl{
+    list-style:none; margin:0; padding:0; position:relative;
+    display:grid; grid-template-columns:repeat(5, minmax(0,1fr)); gap:0 1.4rem;
+}
+.cs-tl__item{position:relative; display:flex; flex-direction:column; align-items:flex-start}
+.cs-tl__item:not(:last-child)::after{
+    content:""; position:absolute; top:21px; left:43px; right:calc(-1.4rem + 8px); height:1px; z-index:0;
+    background:linear-gradient(90deg, var(--accent-3), var(--line));
+}
+.cs-tl__item{position:relative; display:flex; flex-direction:column; align-items:flex-start}
+.cs-tl__marker{
+    position:relative; z-index:1; flex:none;
+    width:43px; height:43px; border-radius:50%;
+    display:grid; place-items:center;
+    background:#fff; border:1px solid var(--line);
+    font-family:var(--font-display); font-size:0.702rem; font-weight:800; color:var(--accent);
+    box-shadow:0 0 0 6px #fff;
+    margin-bottom:.85rem;
+}
+.cs-tl__item:first-child .cs-tl__marker{background:var(--accent); border-color:var(--accent); color:#fff}
+.cs-tl__body{padding-top:0}
+.cs-tl__body h3{font-size:1.044rem; font-weight:700; margin:0 0 .4rem}
+.cs-tl__body p{font-size:0.837rem; line-height:1.68; color:var(--muted); margin:0; max-width:56ch}
+.cs-tl__when{
+    display:inline-block; margin-bottom:.55rem;
+    font-size:.62rem; font-weight:800; letter-spacing:.13em; text-transform:uppercase;
+    color:var(--accent-2); background:var(--accent-ink);
+    padding:.24rem .62rem; border-radius:999px;
+}
+.cs-tl__chip{
+    display:inline-flex; align-items:center; gap:.4rem; margin-top:.7rem;
+    font-size:.62rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--faint); background:var(--bg); border:1px solid var(--line-2);
+    padding:.28rem .65rem; border-radius:999px;
+}
+.cs-tl__chip svg{width:13px; height:13px; flex:none}
+.cs-tl__chip.is-base{color:var(--green); border-color:rgba(34,197,94,.35); background:rgba(34,197,94,.08)}
+.cs-tl__hint{
+    display:inline-flex; align-items:center; gap:.5rem; margin-top:0;
+    font-size:0.783rem; font-weight:600; color:var(--accent-2);
+    background:var(--accent-ink); border-radius:999px; padding:.55rem 1rem;
+}
+.cs-tl__hint svg{width:15px; height:15px}
+.cs-tl__foot{display:flex; align-items:center; gap:.85rem; flex-wrap:wrap; margin-top:2.25rem}
 
-    .c-pkg-head {
-        padding: 1.75rem 1.75rem 1.4rem;
-    }
-    .c-pkg-name {
-        font-size: .64rem; font-weight: 700; letter-spacing: .1em;
-        text-transform: uppercase; color: var(--c-faint); margin-bottom: .35rem;
-    }
-    .c-pkg-price { margin-bottom: .5rem; display: flex; align-items: baseline; gap: .5rem; }
-    .c-pkg-price-val {
-        font-size: 1.5rem; font-weight: 800; color: var(--c-dark); letter-spacing: -.02em;
-    }
-    .c-pkg-featured .c-pkg-price-val { color: var(--c-primary); }
-    .c-pkg-price-label {
-        font-size: .68rem; color: var(--c-faint); font-weight: 500;
-    }
-    .c-pkg-head h3 {
-        font-size: 1.05rem; font-weight: 800; color: var(--c-dark);
-        margin-bottom: .3rem; line-height: 1.3;
-    }
-    .c-pkg-head p {
-        font-size: .82rem; color: var(--c-muted); margin: 0; line-height: 1.55;
-    }
+/* ---------- Comparison table ---------- */
+#comparison .cs-label{font-size:.64rem}
+#comparison .cs-head h2{font-size:clamp(1.3rem,2.5vw,1.85rem); margin:.6rem 0 .55rem}
+.cs-table-wrap{
+    overflow-x:auto; background:#fff;
+    border:1px solid var(--line); border-radius:var(--radius);
+    -webkit-overflow-scrolling:touch; overscroll-behavior-x:contain;
+}
+.cs-sr{position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0}
+.cs-table{width:100%; min-width:680px; border-collapse:collapse; font-size:0.72rem}
+.cs-table th,.cs-table td{padding:.62rem .9rem; text-align:center; border-bottom:1px solid var(--line-2)}
+.cs-table thead th{padding-top:1rem; padding-bottom:.9rem; border-bottom:1px solid var(--line); vertical-align:top}
+.cs-table .cs-feature{text-align:left; font-weight:600; color:var(--ink-2); font-size:0.71rem}
+.cs-table thead .cs-feature{font-size:.64rem; letter-spacing:.15em; text-transform:uppercase; color:var(--faint); vertical-align:bottom}
+.cs-table .cs-feature{position:sticky; left:0; z-index:1; background:#fff}
+.cs-table thead .cs-feature{background:#fff}
+.cs-th__name{
+    display:block; font-family:var(--font-display); font-size:0.75rem; font-weight:800;
+    letter-spacing:.05em; text-transform:uppercase; color:var(--ink);
+}
+.cs-th__price{display:block; font-size:0.67rem; color:var(--muted); font-weight:600; margin-top:.25rem}
+.cs-th__tag{
+    display:inline-block; margin-top:.45rem;
+    font-size:.56rem; font-weight:800; letter-spacing:.11em; text-transform:uppercase;
+    color:var(--accent-2); background:var(--accent-ink);
+    padding:.2rem .55rem; border-radius:999px;
+}
+.cs-table tbody tr:last-child th,
+.cs-table tbody tr:last-child td{border-bottom:0}
+.cs-table tbody tr:hover td{background:var(--accent-ink)}
+.cs-table .cs-f{
+    background:var(--accent-ink);
+    box-shadow:inset 1px 0 0 rgba(59,130,246,.2), inset -1px 0 0 rgba(59,130,246,.2);
+}
+.cs-table thead .cs-f{background:var(--accent-ink); border-top:3px solid var(--accent)}
+.cs-table tbody tr:hover td.cs-f{background:rgba(59,130,246,.12)}
+.cs-yes{width:15px; height:15px; color:var(--accent); stroke-width:2.4}
+.cs-no{color:var(--faint); font-weight:700}
+.cs-table tbody tr:hover th.cs-feature{background:var(--accent-ink)}
+.cs-table .cs-grp th{
+    text-align:left; font-size:.64rem; font-weight:800; letter-spacing:.15em;
+    text-transform:uppercase; color:var(--accent-2);
+    background:var(--bg); padding:1.05rem .9rem .45rem;
+}
+.cs-table tfoot td{border-bottom:0; border-top:1px solid var(--line); padding:.95rem .9rem}
+.cs-table tfoot td.cs-feature{background:#fff}
+.cs-table__foot{margin:.85rem 0 0; font-size:0.72rem; line-height:1.6; color:var(--faint); text-align:center}
+.cs-btn--sm{padding:.6rem 1.1rem; font-size:0.78rem; border-radius:11px}
 
-    .c-pkg-body {
-        padding: 1.4rem 1.75rem; flex: 1;
-    }
-    .c-pkg-section { margin-bottom: 1.1rem; }
-    .c-pkg-section:last-child { margin-bottom: 0; }
-    .c-pkg-section h6 {
-        font-size: .62rem; font-weight: 700; letter-spacing: .12em;
-        text-transform: uppercase; margin-bottom: .5rem;
-        padding-bottom: .35rem; border-bottom: 1px solid var(--c-border);
-    }
-    .c-pkg-list {
-        list-style: none; padding: 0; margin: 0;
-    }
-    .c-pkg-list li {
-        font-size: .82rem; color: var(--c-body); padding: .22rem 0;
-        display: flex; align-items: flex-start; gap: .5rem; line-height: 1.5;
-    }
-    .c-pkg-list li i {
-        font-size: .6rem; margin-top: .28rem; flex-shrink: 0;
-    }
-    .c-pkg-list-muted li { color: var(--c-muted); }
-    .c-pkg-list-muted li i { color: var(--c-faint) !important; }
-    .c-pkg-list-expandable li { color: var(--c-muted); }
-    .c-pkg-list-expandable li i { color: var(--c-primary) !important; font-size: .5rem; }
+/* ---------- Mobile comparison cards ---------- */
+.cs-tcards{display:none; gap:1rem}
+.cs-tcard{background:#fff; border:1px solid var(--line); border-radius:var(--radius); padding:1.3rem 1.15rem}
+.cs-tcard--featured{border-color:var(--accent); box-shadow:0 14px 34px -20px rgba(59,130,246,.5)}
+.cs-tcard__head{display:flex; align-items:center; gap:.55rem; flex-wrap:wrap; padding-bottom:.8rem; border-bottom:1px solid var(--line-2); margin-bottom:.35rem}
+.cs-tcard__name{font-family:var(--font-display); font-size:.92rem; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--ink)}
+.cs-tcard__price{font-size:.8rem; font-weight:600; color:var(--muted)}
+.cs-tcard__tag{margin-left:auto; font-size:.56rem; font-weight:800; letter-spacing:.11em; text-transform:uppercase; color:var(--accent-2); background:var(--accent-ink); padding:.22rem .58rem; border-radius:999px}
+.cs-tcard__group{font-size:.64rem; font-weight:800; letter-spacing:.15em; text-transform:uppercase; color:var(--accent-2); margin:.9rem 0 .2rem}
+.cs-tcard__row{display:flex; justify-content:space-between; align-items:center; gap:1rem; padding:.5rem 0; border-bottom:1px solid var(--line-2); font-size:.8rem}
+.cs-tcard__row:last-child{border-bottom:0}
+.cs-tcard__f{font-weight:600; color:var(--ink-2)}
+.cs-tcard__v{color:var(--muted); text-align:right; flex:none; font-weight:600}
+.cs-tcard__v.is-yes{color:var(--accent-2)}
+.cs-tcard__v.is-no{color:var(--faint)}
+.cs-tcard__cta{margin-top:1.05rem}
+.cs-tcard__cta .cs-btn{width:100%}
 
-    /* Growth Path Visual */
-    .c-pkg-growth {
-        margin-bottom: .9rem; padding: .65rem .75rem;
-        background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
-        border-radius: 10px; border: 1px solid rgba(79,70,229,.1);
-    }
-    .c-pkg-growth-track {
-        display: flex; align-items: center; justify-content: center;
-        gap: 0; flex-wrap: nowrap;
-    }
-    .c-pkg-growth-step {
-        display: flex; flex-direction: column; align-items: center;
-        gap: .15rem; padding: .2rem .2rem; border-radius: 6px;
-        transition: all .3s; min-width: 0;
-    }
-    .c-pkg-growth-step i {
-        font-size: .55rem; color: var(--c-primary); transition: all .3s; opacity: .4;
-    }
-    .c-pkg-growth-step span {
-        font-size: .48rem; font-weight: 600; color: var(--c-primary);
-        white-space: nowrap; transition: all .3s; opacity: .4;
-    }
-    .c-pkg-growth-step.active {
-        background: var(--c-primary); border-radius: 6px;
-        box-shadow: 0 2px 8px rgba(79,70,229,.2);
-    }
-    .c-pkg-growth-step.active i,
-    .c-pkg-growth-step.active span { color: #fff; opacity: 1; }
-    .c-pkg-growth-arrow {
-        color: var(--c-primary); font-size: .35rem; padding: 0 .05rem;
-        flex-shrink: 0; opacity: .25;
-    }
+/* ---------- Why OnWebApp ---------- */
+.cs-why{display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:1.1rem}
+.cs-why__card{
+    position:relative; background:#fff; border:1px solid var(--line);
+    border-radius:var(--radius); padding:1.95rem 1.85rem;
+    transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.cs-why__card:hover{transform:translateY(-4px); box-shadow:var(--shadow); border-color:var(--accent-4)}
+.cs-why__num{font-family:var(--font-display); font-size:0.792rem; font-weight:800; color:var(--faint); letter-spacing:.1em}
+.cs-why__ico{
+    position:absolute; top:1.7rem; right:1.7rem;
+    width:40px; height:40px; border-radius:11px; display:grid; place-items:center;
+    background:var(--accent-ink); color:var(--accent);
+}
+.cs-why__ico svg{width:18px; height:18px}
+.cs-why__card h3{font-size:0.873rem; letter-spacing:.09em; text-transform:uppercase; font-weight:800; margin:1.45rem 0 .6rem}
+.cs-why__card p{font-size:0.828rem; line-height:1.68; color:var(--muted); margin:0; max-width:48ch}
 
-    .c-pkg-foot {
-        padding: 1.1rem 1.75rem; border-top: 1px solid var(--c-border);
-        background: #fafbfc;
-    }
-    .c-pkg-featured .c-pkg-foot { background: linear-gradient(180deg, #f5f3ff 0%, #ede9fe 100%); border-top-color: rgba(79,70,229,.1); }
-    .c-pkg-enterprise .c-pkg-foot { background: #f8fafc; }
+/* ---------- Numbers ---------- */
+.cs-nums{
+    position:relative; border:0;
+    background:
+        radial-gradient(720px 300px at 50% -45%, rgba(59,130,246,.15), transparent 60%),
+        radial-gradient(600px 280px at 50% 120%, rgba(34,197,94,.1), transparent 55%),
+        var(--bg);
+    padding:clamp(3rem,5.5vw,4.5rem) 0;
+    border-top:1px solid var(--line); border-bottom:1px solid var(--line);
+}
+.cs-nums__grid{display:grid; grid-template-columns:repeat(4, minmax(0,1fr))}
+.cs-num{padding:0 1.4rem; text-align:center; border-left:1px solid var(--line)}
+.cs-num:first-child{border-left:0}
+.cs-num b{
+    display:block; font-family:var(--font-display);
+    font-size:clamp(2.115rem,3.96vw,2.97rem); font-weight:800;
+    letter-spacing:-.04em; color:var(--ink); line-height:1;
+}
+.cs-num b small{font-size:.42em; font-weight:700; letter-spacing:-.01em; color:var(--accent-3)}
+.cs-num span{display:block; margin-top:.75rem; font-size:0.787rem; color:var(--muted); font-weight:500}
 
-    /* CTA variants */
-    .c-pkg-cta {
-        display: flex; align-items: center; justify-content: center; gap: .45rem;
-        width: 100%; padding: .65rem 1.25rem; font-size: .8rem; font-weight: 700;
-        border-radius: 8px; text-decoration: none; transition: all .25s;
-        border: none; cursor: pointer;
-    }
-    .c-pkg-cta i { font-size: .65rem; transition: transform .2s; }
-    .c-pkg-cta:hover i { transform: translateX(2px); }
-    .c-pkg-cta-primary {
-        background: linear-gradient(135deg, var(--c-primary), #6366f1); color: #fff;
-        box-shadow: 0 2px 8px rgba(79,70,229,.2);
-    }
-    .c-pkg-cta-primary:hover {
-        background: linear-gradient(135deg, #4338ca, #4f46e5); color: #fff;
-        box-shadow: 0 4px 16px rgba(79,70,229,.3); transform: translateY(-1px);
-    }
-    .c-pkg-cta-outline {
-        background: transparent; color: var(--c-dark);
-        border: 1.5px solid var(--c-border);
-    }
-    .c-pkg-cta-outline:hover {
-        border-color: var(--c-primary); color: var(--c-primary);
-        background: rgba(79,70,229,.03); transform: translateY(-1px);
-    }
-    .c-pkg-cta-enterprise {
-        background: linear-gradient(135deg, #1e293b, #334155); color: #fff;
-        box-shadow: 0 2px 8px rgba(15,23,42,.15);
-    }
-    .c-pkg-cta-enterprise:hover {
-        background: linear-gradient(135deg, #0f172a, #1e293b); color: #fff;
-        box-shadow: 0 4px 16px rgba(15,23,42,.25); transform: translateY(-1px);
-    }
+/* ---------- FAQ ---------- */
+.cs-faq{max-width:820px; margin:0 auto; display:flex; flex-direction:column; gap:.7rem}
+.cs-faq__item{background:#fff; border:1px solid var(--line); border-radius:var(--radius-sm); overflow:hidden; transition:border-color .22s ease}
+.cs-faq__item.is-open{border-color:var(--accent-4)}
+.cs-faq__item:hover{border-color:var(--accent-4)}
+.cs-faq__item.is-open:hover{border-color:var(--accent-4)}
+.cs-faq__q{
+    width:100%; display:flex; align-items:center; justify-content:space-between; gap:1rem;
+    background:none; border:0; padding:1.15rem 1.3rem; cursor:pointer; text-align:left;
+    font-family:var(--font-display); font-size:0.873rem; font-weight:700;
+    letter-spacing:-.01em; color:var(--ink);
+    transition:color .18s ease;
+}
+.cs-faq__q:hover{color:var(--accent-2)}
+.cs-faq__q:focus-visible{outline:2px solid var(--accent); outline-offset:-2px}
+.cs-faq__ico{
+    width:30px; height:30px; border-radius:9px; display:grid; place-items:center;
+    background:var(--line-2); color:var(--muted); flex:none;
+    transition:background .22s ease, color .22s ease;
+}
+.cs-faq__ico svg{width:15px; height:15px; transition:transform .28s ease}
+.cs-faq__item.is-open .cs-faq__ico{background:var(--accent); color:#fff}
+.cs-faq__item.is-open .cs-faq__ico svg{transform:rotate(45deg)}
+.cs-faq__a{display:grid; grid-template-rows:0fr; transition:grid-template-rows .32s cubic-bezier(.4, 0, .2, 1)}
+.cs-faq__item.is-open .cs-faq__a{grid-template-rows:1fr}
+.cs-faq__inner{overflow:hidden}
+.cs-faq__inner p{margin:0; padding:0 1.3rem 1.3rem; font-size:0.815rem; line-height:1.72; color:var(--muted)}
 
-    /* Responsive growth path */
-    @media (max-width: 576px) {
-        .c-pkg-growth-track { flex-wrap: wrap; gap: .2rem; }
-        .c-pkg-growth-arrow { display: none; }
-        .c-pkg-growth-step { min-width: auto; }
-    }
+/* ---------- Final CTA ---------- */
+.cs-final{
+    position:relative; overflow:hidden; color:var(--ink);
+    padding:clamp(4rem,8vw,6rem) 0;
+    background:
+        radial-gradient(860px 420px at 50% 115%, rgba(59,130,246,.15), transparent 60%),
+        radial-gradient(700px 350px at 50% -20%, rgba(168,85,247,.1), transparent 55%),
+        var(--bg);
+    border-top:1px solid var(--line); border-bottom:1px solid var(--line);
+}
+.cs-final::before{
+    content:""; position:absolute; inset:0; pointer-events:none;
+    background-image:
+        linear-gradient(rgba(59,130,246,.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(59,130,246,.06) 1px, transparent 1px);
+    background-size:48px 48px;
+    -webkit-mask-image:radial-gradient(circle at 50% 100%, #000 0%, transparent 68%);
+    mask-image:radial-gradient(circle at 50% 100%, #000 0%, transparent 68%);
+}
+.cs-final__inner{position:relative; max-width:760px; margin:0 auto; text-align:center}
+.cs-final h2{font-size:clamp(1.71rem,3.6vw,2.61rem); color:var(--ink); margin:0 0 .9rem; letter-spacing:-.03em}
+.cs-final__sub{color:var(--muted); font-size:0.927rem; line-height:1.68; margin:0 0 2.1rem}
+.cs-final__cta{display:flex; justify-content:center; flex-wrap:wrap; gap:.8rem}
+.cs-final__forum{
+    display:inline-flex; align-items:center; gap:.35rem; margin-top:1.4rem;
+    font-size:0.81rem; font-weight:600; color:var(--accent);
+}
+.cs-final__forum:hover{text-decoration:underline}
+.cs-final__forum svg{width:14px; height:14px}
+.cs-final__note{
+    margin:2.1rem 0 0; font-family:var(--font-display);
+    font-size:0.945rem; font-weight:700; color:var(--ink); letter-spacing:-.01em;
+}
+.cs-final__ask{
+    margin-top:2.5rem; padding-top:1.7rem; border-top:1px solid var(--line);
+    font-size:0.81rem; color:var(--muted);
+}
+.cs-final__ask a{color:var(--accent); font-weight:600}
+.cs-final__ask a:hover{text-decoration:underline}
+footer.mt-5{margin-top:0 !important}
 
-    /* Growth Steps */
-    .c-growth-step {
-        display: flex; gap: 1.25rem; padding: 1.5rem;
-        border-radius: 14px; border: 1px solid var(--c-border);
-        background: var(--c-bg); transition: all .25s; align-items: flex-start;
-    }
-    .c-growth-step:hover { border-color: var(--c-primary); box-shadow: 0 4px 20px rgba(79,70,229,.06); }
-    .c-growth-num {
-        width: 44px; height: 44px; border-radius: 10px;
-        display: flex; align-items: center; justify-content: center;
-        font-size: .8rem; font-weight: 800; color: var(--c-primary);
-        background: var(--c-primary-light); flex-shrink: 0;
-    }
-    .c-growth-step h5 { font-size: .92rem; font-weight: 700; color: var(--c-dark); margin: 0 0 .25rem; }
-    .c-growth-step p { font-size: .82rem; color: var(--c-muted); margin: 0; line-height: 1.55; }
+/* ---------- Reveal ---------- */
+.cs-reveal{transition:opacity .6s ease, transform .6s ease; transition-delay:calc(var(--i, 0) * 60ms)}
+.cs-reveal:not(.in){opacity:0; transform:translateY(20px)}
+@media (prefers-reduced-motion:reduce){
+    .cs-reveal:not(.in){opacity:1; transform:none}
+    .cs-reveal{transition:none}
+    html{scroll-behavior:auto}
+    .cs-flow__item.is-goal .cs-flow__ico{animation:none}
+    .cs-btn,.cs-stage,.cs-pkg,.cs-why__card,.cs-faq__item{transition:none}
+}
 
-    /* Comparison Table */
-    .c-compare {
-        border-radius: 14px; border: 1px solid var(--c-border);
-        background: var(--c-bg); overflow: hidden;
-    }
-    .c-compare-head {
-        display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr;
-        border-bottom: 1px solid var(--c-border);
-    }
-    .c-compare-head > div {
-        padding: 1.1rem 1.25rem; font-size: .75rem; font-weight: 700;
-        text-transform: uppercase; letter-spacing: .06em; color: var(--c-muted);
-        text-align: center;
-    }
-    .c-compare-head > div:first-child { text-align: left; }
-    .c-compare-head > div.c-compare-highlight { color: var(--c-primary); background: var(--c-primary-light); }
-    .c-compare-row {
-        display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr;
-        border-bottom: 1px solid var(--c-border);
-    }
-    .c-compare-row:last-child { border-bottom: none; }
-    .c-compare-row > div {
-        padding: .75rem 1.25rem; font-size: .82rem; color: var(--c-body);
-        display: flex; align-items: center; justify-content: center;
-    }
-    .c-compare-row > div:first-child {
-        justify-content: flex-start; font-weight: 600; color: var(--c-dark);
-    }
-    .c-compare-row > div.c-compare-highlight { background: rgba(79,70,229,.02); }
-    .c-compare-check { color: var(--c-primary); font-size: .85rem; }
-    .c-compare-dash { color: var(--c-faint); font-size: .75rem; }
-
-    /* Stats */
-    .c-stat-row {
-        display: flex; justify-content: center; gap: 3rem; flex-wrap: wrap;
-        padding: 3rem 0; border-top: 1px solid var(--c-border); border-bottom: 1px solid var(--c-border);
-    }
-    .c-stat { text-align: center; padding: .5rem; min-width: 160px; }
-    .c-stat-num { font-size: clamp(1.8rem, 3vw, 2.4rem); font-weight: 800; color: var(--c-dark); line-height: 1; margin-bottom: .3rem; letter-spacing: -.02em; }
-    .c-stat-label { font-size: .78rem; color: var(--c-muted); }
-
-    /* CTA */
-    .c-final {
-        background: var(--c-dark); padding: 5rem 0; text-align: center;
-        position: relative; overflow: hidden;
-    }
-    .c-final::before {
-        content: ''; position: absolute; top: -50%; right: -10%;
-        width: 500px; height: 500px;
-        background: radial-gradient(circle, rgba(79,70,229,.15) 0%, transparent 70%);
-        border-radius: 50%; pointer-events: none;
-    }
-    .c-final h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 800; color: #fff; margin-bottom: .5rem; position: relative; }
-    .c-final p { font-size: 1rem; color: var(--c-faint); margin-bottom: 2rem; position: relative; max-width: 500px; margin-left: auto; margin-right: auto; }
-    .c-final-actions { display: flex; gap: .75rem; justify-content: center; flex-wrap: wrap; position: relative; margin-bottom: 1rem; }
-    .c-final-sub { font-size: .82rem; color: var(--c-faint); position: relative; }
-    .c-final-sub a { color: var(--c-primary); text-decoration: none; font-weight: 600; }
-    .c-final-sub a:hover { text-decoration: underline; }
-
-    /* FAQ */
-    .c-faq { border-bottom: 1px solid var(--c-border); padding: 1.25rem 0; }
-    .c-faq:last-child { border-bottom: none; }
-    .c-faq-q {
-        font-size: .92rem; font-weight: 700; color: var(--c-dark);
-        cursor: pointer; display: flex; justify-content: space-between; align-items: center;
-    }
-    .c-faq-q:hover { color: var(--c-primary); }
-    .c-faq-q i { font-size: .75rem; color: var(--c-faint); transition: transform .3s; }
-    .c-faq.open .c-faq-q i { transform: rotate(180deg); }
-    .c-faq-a {
-        font-size: .88rem; color: var(--c-muted); line-height: 1.7;
-        max-height: 0; overflow: hidden; transition: max-height .3s, padding .3s;
-    }
-    .c-faq.open .c-faq-a { max-height: 200px; padding-top: .75rem; }
-
-    /* Footer */
-    .c-foot {
-        background: var(--c-dark); border-top: 1px solid rgba(255,255,255,.08);
-        padding: 1.5rem 0; text-align: center;
-    }
-    .c-foot p { font-size: .75rem; color: rgba(255,255,255,.35); margin: 0; }
+/* ---------- Responsive ---------- */
+@media (max-width:1199px){
+    .cs-path{grid-template-columns:repeat(3, minmax(0,1fr)); gap:1.1rem}
+    .cs-stage:not(:last-child)::after{display:none}
+}
+@media (max-width:991px){
+    .cs-hero__grid{grid-template-columns:1fr; gap:2.6rem}
+    .cs-pkgs{grid-template-columns:1fr 1fr}
+    .cs-pkg--featured{grid-column:1/-1; order:-1}
+    .cs-pkg__badge{left:1.95rem; transform:none}
+    .cs-why{grid-template-columns:1fr}
+    .cs-nums__grid{grid-template-columns:repeat(2, minmax(0,1fr)); gap:2rem 0}
+    .cs-num:nth-child(odd){border-left:0}
+    .cs-tl{grid-template-columns:repeat(3, minmax(0,1fr)); gap:2rem 1.25rem}
+    .cs-tl__item:not(:last-child)::after{display:none}
+}
+@media (max-width:767px){
+    .cs-path{grid-template-columns:1fr 1fr}
+    .cs-pkgs{grid-template-columns:1fr}
+    .cs-pkg--featured{grid-column:auto}
+    .cs-hero__cta .cs-btn{flex:1 1 100%}
+    .cs-final__cta .cs-btn{flex:1 1 100%}
+    .cs-tl{grid-template-columns:1fr; gap:0}
+    .cs-tl::before{content:""; display:block; position:absolute; left:21px; right:auto; top:14px; bottom:14px; height:auto; width:1px; background:linear-gradient(180deg, var(--accent-3), var(--line))}
+    .cs-tl__item{flex-direction:row; align-items:flex-start; gap:1.4rem; padding-bottom:1.75rem}
+    .cs-tl__item:last-child{padding-bottom:0}
+    .cs-tl__marker{margin-bottom:0}
+    .cs-tl__body{padding-top:.35rem}
+    .cs-table-wrap{display:none}
+    .cs-tcards{display:grid}
+}
+@media (max-width:575px){
+    .cs-path{grid-template-columns:1fr}
+    .cs-nums__grid{grid-template-columns:1fr; gap:0}
+    .cs-num{border-left:0; border-top:1px solid var(--line); padding:1.5rem .5rem}
+    .cs-num:first-child{border-top:0}
+    .cs-pkg{padding:1.7rem 1.35rem}
+    .cs-pkg--featured{padding:2.1rem 1.35rem 1.9rem}
+    .cs-pkg__badge{left:1.35rem}
+    .cs-why__card{padding:1.6rem 1.35rem}
+    .cs-faq__q{font-size:0.828rem; padding:1.05rem 1.1rem}
+    .cs-faq__inner p{padding:0 1.1rem 1.15rem}
+}
 </style>
 {% endblock %}
 
@@ -418,27 +588,34 @@
             <i class="fas fa-users text-success me-2 fa-lg"></i>
             <span class="fw-bold text-heading">OnWebApp <span class="text-success fw-normal">Community</span></span>
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#communityNav">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#communityNav" aria-controls="communityNav" aria-expanded="false" aria-label="{% trans 'Toggle navigation' %}">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="communityNav">
             <ul class="navbar-nav ms-auto align-items-center">
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'community:dashboard' %}"><i class="fas fa-tachometer-alt me-1"></i> Dashboard</a>
+                    <a class="nav-link" href="{% url 'community:dashboard' %}"><i class="fas fa-tachometer-alt me-1"></i> {% trans "Dashboard" %}</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'community:wizard_start' %}?new=1"><i class="fas fa-magic me-1"></i> New Project</a>
+                    <a class="nav-link" href="{% url 'community:wizard_start' %}?new=1"><i class="fas fa-magic me-1"></i> {% trans "New Project" %}</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'community:brand_assist' %}"><i class="fas fa-paint-brush me-1"></i> Brand Assist</a>
+                    <a class="nav-link" href="{% url 'community:brand_assist' %}"><i class="fas fa-paint-brush me-1"></i> {% trans "Brand Assist" %}</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'forum:home' %}"><i class="fas fa-comments me-1"></i> Forum</a>
+                    <a class="nav-link" href="{% url 'forum:home' %}"><i class="fas fa-comments me-1"></i> {% trans "Forum" %}</a>
                 </li>
-                <li class="nav-item ms-lg-3">
-                    <span class="text-muted small me-2">{{ user.username }}</span>
-                    <a href="{% url 'users:logout' %}" class="btn btn-outline-secondary btn-sm">Log Out</a>
+                {% if user.is_authenticated %}
+                <li class="nav-item ms-lg-3 d-flex align-items-center gap-2">
+                    <a class="text-muted small text-decoration-none fw-600" href="{% url 'forum:user_profile' user.username %}">{{ user.username }}</a>
+                    <a href="{% url 'users:logout' %}" class="btn btn-outline-secondary btn-sm">{% trans "Log Out" %}</a>
                 </li>
+                {% else %}
+                <li class="nav-item ms-lg-3 d-flex align-items-center gap-2">
+                    <a href="{% url 'users:login_view' %}" class="btn btn-outline-secondary btn-sm">{% trans "Log in" %}</a>
+                    <a href="{% url 'users:signup' %}" class="btn btn-dark btn-sm">{% trans "Sign up" %}</a>
+                </li>
+                {% endif %}
             </ul>
         </div>
     </div>
@@ -446,495 +623,781 @@
 {% endblock %}
 
 {% block community_content %}
+<div class="cs">
+<!-- ============================= HERO ============================= -->
+<section class="cs-hero">
+    <div class="container cs-hero__grid">
+        <div class="cs-hero__copy cs-reveal">
+            <span class="cs-label cs-label--dark">{% trans "COMMUNITY SERVICES" %}</span>
+            <h1>{% trans "We Build Digital Foundations That Scale." %}</h1>
+            <p class="cs-hero__sup">{% trans "From First Website to Complete Digital Platform." %}</p>
+            <p class="cs-hero__desc">{% trans "We design and develop the website your business needs today — then extend it with automation, AI, CRM, and integrations as you grow. No rebuilds. No migrations. Just a foundation that keeps up." %}</p>
+            <div class="cs-hero__cta">
+                <a href="#packages" class="cs-btn cs-btn--accent">{% trans "Start Your Project" %} <i data-lucide="arrow-right"></i></a>
+                <a href="#package-basic" class="cs-btn cs-btn--ghost">{% trans "View Pricing" %}</a>
+            </div>
+            <div class="cs-hero__trust">
+                <i data-lucide="badge-check"></i>
+                <span>{% trans "Trusted by 200+ community projects worldwide" %}</span>
+            </div>
+        </div>
 
-<!-- HERO -->
-<section class="c-hero">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-7">
-                <div class="c-reveal">
-                    <div class="c-hero-eyebrow">START YOUR PROJECT</div>
-                    <h1>Start Small. Grow Over Time. <em>Your Infrastructure Is Ready.</em></h1>
-                    <p class="c-hero-sub">You do not need to build everything today. Start with what your business needs now. As your business grows, your digital infrastructure can grow with it.</p>
-                    <div class="c-hero-actions">
-                        <a href="#packages" class="c-btn-primary">Start Your Growth Journey <i class="fas fa-arrow-right"></i></a>
-                        <a href="#essential" class="c-btn-outline">Build My Website</a>
-                    </div>
-                    <div class="c-hero-trust">
-                        <i class="fas fa-check-circle"></i> Trusted by 200+ community projects worldwide
-                    </div>
+        <div class="cs-hero__visual cs-reveal" style="--i:1">
+            <div class="cs-flowcard">
+                <div class="cs-flowcard__bar">
+                    <span class="cs-flowcard__title">{% trans "What We Build" %}</span>
+                    <span class="cs-flowcard__dots" aria-hidden="true"><i></i><i></i><i></i></span>
+                </div>
+                <ol class="cs-flow">
+                    <li class="cs-flow__item is-first">
+                        <span class="cs-flow__ico"><i data-lucide="globe"></i></span>
+                        <span class="cs-flow__txt"><b>{% trans "Website" %}</b><small>{% trans "High-performance site that converts" %}</small></span>
+                        <span class="cs-flow__step">01</span>
+                    </li>
+                    <li class="cs-flow__item">
+                        <span class="cs-flow__ico"><i data-lucide="zap"></i></span>
+                        <span class="cs-flow__txt"><b>{% trans "Automation" %}</b><small>{% trans "Workflows that run themselves" %}</small></span>
+                        <span class="cs-flow__step">02</span>
+                    </li>
+                    <li class="cs-flow__item">
+                        <span class="cs-flow__ico"><i data-lucide="bot"></i></span>
+                        <span class="cs-flow__txt"><b>{% trans "AI Chatbot" %}</b><small>{% trans "24/7 customer support, no hiring" %}</small></span>
+                        <span class="cs-flow__step">03</span>
+                    </li>
+                    <li class="cs-flow__item">
+                        <span class="cs-flow__ico"><i data-lucide="building-2"></i></span>
+                        <span class="cs-flow__txt"><b>{% trans "Business Systems" %}</b><small>{% trans "CRM, booking, dashboards, bookings" %}</small></span>
+                        <span class="cs-flow__step">04</span>
+                    </li>
+                    <li class="cs-flow__item">
+                        <span class="cs-flow__ico"><i data-lucide="plug"></i></span>
+                        <span class="cs-flow__txt"><b>{% trans "Integrations" %}</b><small>{% trans "Connect your existing tools" %}</small></span>
+                        <span class="cs-flow__step">05</span>
+                    </li>
+                    <li class="cs-flow__item is-goal">
+                        <span class="cs-flow__ico"><i data-lucide="trending-up"></i></span>
+                        <span class="cs-flow__txt"><b>{% trans "Growth" %}</b><small>{% trans "Scale without ever rebuilding" %}</small></span>
+                        <span class="cs-flow__step">06</span>
+                    </li>
+                </ol>
+                <div class="cs-flowcard__foot">
+                    <i data-lucide="sparkles"></i>
+                    <span>{% trans "Start with the website. Add every other capability when your business is ready." %}</span>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- GROWTH JOURNEY VISUAL -->
-<section class="c-sec c-sec-alt">
+<!-- ======================= HOW WE BUILD =========================== -->
+<section class="cs-sec cs-sec--white" id="how-we-build">
     <div class="container">
-        <div class="c-sec-head text-center c-reveal">
-            <div class="c-sec-label justify-content-center">YOUR GROWTH PATH</div>
-            <h2 class="c-sec-title">Start Today. Grow Tomorrow. Never Start Over.</h2>
-            <p class="c-sec-sub mx-auto">Your digital foundation is designed to evolve with your business. Add new capabilities whenever you are ready.</p>
+        <div class="cs-head cs-head--center cs-reveal">
+            <span class="cs-label cs-label--plain">{% trans "HOW WE BUILD" %}</span>
+            <h2>{% trans "We Build for Today. Design for Tomorrow." %}</h2>
+            <p class="cs-sub">{% trans "Every project starts with a production-ready website. Then we extend it — automation, AI, CRM, integrations — without ever rebuilding the foundation." %}</p>
         </div>
-        <div class="c-reveal">
-            <div class="c-journey">
-                <div class="c-journey-step active"><i class="fas fa-laptop-code"></i> Website</div>
-                <span class="c-journey-arrow"><i class="fas fa-chevron-right"></i></span>
-                <div class="c-journey-step"><i class="fas fa-arrows-spin"></i> Automation</div>
-                <span class="c-journey-arrow"><i class="fas fa-chevron-right"></i></span>
-                <div class="c-journey-step"><i class="fas fa-brain"></i> AI Chatbot</div>
-                <span class="c-journey-arrow"><i class="fas fa-chevron-right"></i></span>
-                <div class="c-journey-step"><i class="fas fa-chart-line"></i> Business Systems</div>
-                <span class="c-journey-arrow"><i class="fas fa-chevron-right"></i></span>
-                <div class="c-journey-step"><i class="fas fa-plug"></i> Integrations</div>
-                <span class="c-journey-arrow"><i class="fas fa-chevron-right"></i></span>
-                <div class="c-journey-step"><i class="fas fa-rocket"></i> Growth</div>
+
+        <div class="cs-path">
+            <div class="cs-stage cs-stage--first cs-reveal" style="--i:0">
+                <span class="cs-stage__num">01</span>
+                <span class="cs-stage__ico"><i data-lucide="globe"></i></span>
+                <h3>{% trans "Website" %}</h3>
+                <p>{% trans "Fast, SEO-ready site that converts visitors." %}</p>
+            </div>
+            <div class="cs-stage cs-reveal" style="--i:1">
+                <span class="cs-stage__num">02</span>
+                <span class="cs-stage__ico"><i data-lucide="zap"></i></span>
+                <h3>{% trans "Automation" %}</h3>
+                <p>{% trans "Eliminate manual work with custom workflows." %}</p>
+            </div>
+            <div class="cs-stage cs-reveal" style="--i:2">
+                <span class="cs-stage__num">03</span>
+                <span class="cs-stage__ico"><i data-lucide="bot"></i></span>
+                <h3>{% trans "AI Chatbot" %}</h3>
+                <p>{% trans "24/7 customer support without hiring." %}</p>
+            </div>
+            <div class="cs-stage cs-reveal" style="--i:3">
+                <span class="cs-stage__num">04</span>
+                <span class="cs-stage__ico"><i data-lucide="building-2"></i></span>
+                <h3>{% trans "Business Systems" %}</h3>
+                <p>{% trans "CRM, booking, dashboards — built for you." %}</p>
+            </div>
+            <div class="cs-stage cs-reveal" style="--i:4">
+                <span class="cs-stage__num">05</span>
+                <span class="cs-stage__ico"><i data-lucide="plug"></i></span>
+                <h3>{% trans "Integrations" %}</h3>
+                <p>{% trans "Connect the tools your team already uses." %}</p>
+            </div>
+            <div class="cs-stage cs-stage--goal cs-reveal" style="--i:5">
+                <span class="cs-stage__num">06</span>
+                <span class="cs-stage__ico"><i data-lucide="trending-up"></i></span>
+                <h3>{% trans "Growth" %}</h3>
+                <p>{% trans "Scale on a foundation that never needs replacing." %}</p>
+            </div>
+        </div>
+
+        <p class="cs-path__note cs-reveal">
+            <i data-lucide="circle-check-big"></i>
+            <span>{% trans "One foundation. Infinite extensions." %}</span>
+        </p>
+    </div>
+</section>
+<!-- ======================== CHOOSE YOUR START ======================= -->
+<section class="cs-sec" id="packages">
+    <div class="container">
+        <div class="cs-head cs-head--center cs-reveal">
+            <span class="cs-label cs-label--plain">{% trans "CHOOSE YOUR START" %}</span>
+            <h2>{% trans "Three Ways to Begin. One Foundation." %}</h2>
+            <p class="cs-sub">{% trans "Pick the package that matches where you are today. Every tier shares the same extensible foundation." %}</p>
+        </div>
+
+        <div class="cs-pkgs">
+            <!-- 04 Basic -->
+            <article class="cs-pkg cs-reveal" id="package-basic" style="--i:0">
+                <span class="cs-pkg__label">{% trans "Basic package" %}</span>
+                <div class="cs-pkg__price">
+                    <span class="cs-pkg__from">{% trans "Starting at" %}</span>
+                    <span class="cs-pkg__amount">$499</span>
+                    <span class="cs-pkg__term">{% trans "One-time" %}</span>
+                </div>
+                <h3 class="cs-pkg__title">{% trans "Simple Website. Professional Start." %}</h3>
+                <p class="cs-pkg__desc">{% trans "A fast, SEO-ready website that converts visitors into leads." %}</p>
+                <div class="cs-pkg__group">
+                    <h4>{% trans "Included" %}</h4>
+                    <ul class="cs-list">
+                        <li><i data-lucide="check"></i>{% trans "High-performance, responsive website" %}</li>
+                        <li><i data-lucide="check"></i>{% trans "Home, About, Services, Contact pages" %}</li>
+                        <li><i data-lucide="check"></i>{% trans "Mobile-first, fast-loading design" %}</li>
+                        <li><i data-lucide="check"></i>{% trans "Contact form with spam protection" %}</li>
+                        <li><i data-lucide="check"></i>{% trans "Basic analytics setup (GA4)" %}</li>
+                        <li><i data-lucide="check"></i>{% trans "SSL, CDN, production deployment" %}</li>
+                    </ul>
+                </div>
+                <div class="cs-pkg__ideals">
+                    <h4>{% trans "Best for" %}</h4>
+                    <div class="cs-chips">
+                        <span class="cs-chip">{% trans "Landing pages" %}</span>
+                        <span class="cs-chip">{% trans "Portfolio sites" %}</span>
+                        <span class="cs-chip">{% trans "Local businesses" %}</span>
+                        <span class="cs-chip">{% trans "Company brochure sites" %}</span>
+                    </div>
+                </div>
+                <a class="cs-btn cs-btn--outline cs-btn--block cs-pkg__cta" href="{% url 'community:wizard_start' %}?new=1&amp;package=essential">{% trans "Start My Website" %} <i data-lucide="arrow-right"></i></a>
+            </article>
+
+            <!-- 05 Startup (featured) -->
+            <article class="cs-pkg cs-pkg--featured cs-reveal" id="package-startup" style="--i:1">
+                <span class="cs-pkg__badge">{% trans "Most popular" %}</span>
+                <span class="cs-pkg__label">{% trans "Startup package" %}</span>
+                <div class="cs-pkg__price">
+                    <span class="cs-pkg__from">{% trans "Starting at" %}</span>
+                    <span class="cs-pkg__amount">$1,499</span>
+                    <span class="cs-pkg__term">{% trans "Starting project price" %}</span>
+                </div>
+                <h3 class="cs-pkg__title">{% trans "Growth-Ready Foundation. No Rebuilds Ever." %}</h3>
+                <p class="cs-pkg__desc">{% trans "Production-ready site with extensible architecture. Add automation, AI, CRM, and integrations as you grow — no rebuilds." %}</p>
+                <div class="cs-pkg__group">
+                    <h4>{% trans "Start with" %}</h4>
+                    <ul class="cs-list">
+                        <li><i data-lucide="check"></i>{% trans "High-performance, custom website" %}</li>
+                        <li><i data-lucide="check"></i>{% trans "Growth-ready architecture" %}</li>
+                        <li><i data-lucide="check"></i>{% trans "Cloud infrastructure that scales with you" %}</li>
+                    </ul>
+                </div>
+                <div class="cs-pkg__group cs-pkg__group--add">
+                    <h4>{% trans "Add when you're ready" %}</h4>
+                    <ul class="cs-list">
+<li class="is-later"><i data-lucide="plus"></i>{% trans "Automation & workflows" %}</li>
+                        <li class="is-later"><i data-lucide="plus"></i>{% trans "AI chatbot & agents" %}</li>
+                        <li class="is-later"><i data-lucide="plus"></i>{% trans "CRM & business systems" %}</li>
+                        <li class="is-later"><i data-lucide="plus"></i>{% trans "Third-party integrations" %}</li>
+                        <li class="is-later"><i data-lucide="plus"></i>{% trans "Advanced analytics & reporting" %}</li>
+                    </ul>
+                </div>
+                <a class="cs-btn cs-btn--accent cs-btn--block cs-pkg__cta" href="{% url 'community:wizard_start' %}?new=1&amp;package=startup">{% trans "Start Your Project" %} <i data-lucide="arrow-right"></i></a>
+                <p class="cs-pkg__note">
+                    <i data-lucide="wallet"></i>
+                    <span>{% trans "Pay as you grow: every extension is a one-time add-on, never a rebuild." %}</span>
+                </p>
+            </article>
+
+            <!-- 06 Enterprise -->
+            <article class="cs-pkg cs-pkg--ent cs-reveal" id="package-enterprise" style="--i:2">
+                <span class="cs-pkg__label">{% trans "Premium Enterprise package" %}</span>
+                <div class="cs-pkg__price">
+                    <span class="cs-pkg__from">{% trans "Starting at" %}</span>
+                    <span class="cs-pkg__amount">$2,499</span>
+                    <span class="cs-pkg__term">{% trans "Starting project price" %}</span>
+                </div>
+                <h3 class="cs-pkg__title">{% trans "Complete Digital Platform. Built to Scale." %}</h3>
+                <p class="cs-pkg__desc">{% trans "Everything in Startup, plus advanced SEO, content infrastructure, analytics, custom integrations, and dedicated support — a complete platform for growing businesses." %}</p>
+                <div class="cs-pkg__group">
+                    <h4>{% trans "Everything in Startup, plus" %}</h4>
+                    <ul class="cs-list">
+                        <li><i data-lucide="check"></i>{% trans "Advanced SEO foundation" %}</li>
+                        <li><i data-lucide="check"></i>{% trans "Technical SEO audit & setup" %}</li>
+                        <li><i data-lucide="check"></i>{% trans "Keyword &amp; search strategy" %}</li>
+                        <li><i data-lucide="check"></i>{% trans "Content creation & publishing infrastructure" %}</li>
+                        <li><i data-lucide="check"></i>{% trans "Analytics &amp; conversion tracking" %}</li>
+                        <li><i data-lucide="check"></i>{% trans "Custom integrations & API access" %}</li>
+                        <li><i data-lucide="check"></i>{% trans "Enterprise-grade scalable architecture" %}</li>
+                    </ul>
+                </div>
+                <a class="cs-btn cs-btn--dark cs-btn--block cs-pkg__cta" href="{% url 'community:wizard_start' %}?new=1&amp;package=enterprise">{% trans "Build Your Platform" %} <i data-lucide="arrow-right"></i></a>
+            </article>
+        </div>
+    </div>
+</section>
+<!-- ======================= AFTER LAUNCH ROADMAP =================== -->
+<section class="cs-sec cs-sec--white" id="journey">
+    <div class="container">
+        <div class="cs-head cs-reveal">
+            <span class="cs-label">{% trans "AFTER LAUNCH" %}</span>
+            <h2>{% trans "Your Roadmap After Launch." %}</h2>
+            <p class="cs-sub">{% trans "Every extension is a one-time add-on you switch on when you're ready. The foundation never changes." %}</p>
+        </div>
+
+        <ol class="cs-tl">
+            <li class="cs-tl__item cs-reveal">
+                <span class="cs-tl__marker">01</span>
+                <div class="cs-tl__body">
+                    <span class="cs-tl__when">{% trans "Launch week" %}</span>
+                    <h3>{% trans "Website" %}</h3>
+                    <p>{% trans "Fast, SEO-ready site that converts visitors — live in days, not months." %}</p>
+                    <span class="cs-tl__chip is-base"><i data-lucide="circle-check"></i> {% trans "Included from day one" %}</span>
+                </div>
+            </li>
+            <li class="cs-tl__item cs-reveal" style="--i:1">
+                <span class="cs-tl__marker">02</span>
+                <div class="cs-tl__body">
+                    <span class="cs-tl__when">{% trans "Weeks 2–4" %}</span>
+                    <h3>{% trans "Automation" %}</h3>
+                    <p>{% trans "Invoicing, follow-ups, and reports run themselves — reclaim hours every week." %}</p>
+                    <span class="cs-tl__chip"><i data-lucide="plus-circle"></i> {% trans "One-time add-on" %}</span>
+                </div>
+            </li>
+            <li class="cs-tl__item cs-reveal" style="--i:2">
+                <span class="cs-tl__marker">03</span>
+                <div class="cs-tl__body">
+                    <span class="cs-tl__when">{% trans "Month 2" %}</span>
+                    <h3>{% trans "AI Chatbot" %}</h3>
+                    <p>{% trans "Answers customers 24/7 and qualifies leads — without hiring." %}</p>
+                    <span class="cs-tl__chip"><i data-lucide="plus-circle"></i> {% trans "One-time add-on" %}</span>
+                </div>
+            </li>
+            <li class="cs-tl__item cs-reveal" style="--i:3">
+                <span class="cs-tl__marker">04</span>
+                <div class="cs-tl__body">
+                    <span class="cs-tl__when">{% trans "Month 3" %}</span>
+                    <h3>{% trans "Business Systems" %}</h3>
+                    <p>{% trans "CRM, booking, dashboards — one place for all your data." %}</p>
+                    <span class="cs-tl__chip"><i data-lucide="plus-circle"></i> {% trans "One-time add-on" %}</span>
+                </div>
+            </li>
+            <li class="cs-tl__item cs-reveal" style="--i:4">
+                <span class="cs-tl__marker">05</span>
+                <div class="cs-tl__body">
+                    <span class="cs-tl__when">{% trans "Ongoing" %}</span>
+                    <h3>{% trans "Integrations" %}</h3>
+                    <p>{% trans "Connect the tools your team already uses — add any integration anytime." %}</p>
+                    <span class="cs-tl__chip"><i data-lucide="plus-circle"></i> {% trans "One-time add-on" %}</span>
+                </div>
+            </li>
+        </ol>
+
+        <div class="cs-tl__foot cs-reveal">
+            <p class="cs-tl__hint">
+                <i data-lucide="git-branch"></i>
+                <span>{% trans "One foundation. Infinite extensions." %}</span>
+            </p>
+            <a class="cs-btn cs-btn--outline cs-btn--sm" href="#packages">{% trans "Plan Your Roadmap" %} <i data-lucide="arrow-right"></i></a>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== PACKAGE COMPARISON ======================= -->
+<section class="cs-sec" id="comparison">
+    <div class="container">
+        <div class="cs-head cs-head--center cs-reveal">
+            <span class="cs-label cs-label--plain">{% trans "PACKAGES AT A GLANCE" %}</span>
+            <h2>{% trans "Compare Every Tier" %}</h2>
+        </div>
+
+        <div class="cs-table-wrap cs-reveal">
+            <table class="cs-table">
+                <caption class="cs-sr">{% trans "Package comparison: Basic, Startup and Enterprise" %}</caption>
+                <thead>
+                    <tr>
+                        <th class="cs-feature" scope="col">{% trans "Feature" %}</th>
+                        <th scope="col">
+                            <span class="cs-th__name">{% trans "Basic" %}</span>
+                            <span class="cs-th__price">$499</span>
+                        </th>
+                        <th class="cs-f" scope="col">
+                            <span class="cs-th__name">{% trans "Startup" %}</span>
+                            <span class="cs-th__price">$1,499</span>
+                            <span class="cs-th__tag">{% trans "Recommended" %}</span>
+                        </th>
+                        <th scope="col">
+                            <span class="cs-th__name">{% trans "Enterprise" %}</span>
+                            <span class="cs-th__price">$2,499</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="cs-grp"><th colspan="4" scope="colgroup">{% trans "Core website" %}</th></tr>
+                    <tr>
+                        <th scope="row" class="cs-feature">{% trans "Pages included" %}</th>
+                        <td>{% trans "4 core pages" %}</td>
+                        <td class="cs-f">{% trans "Unlimited" %}</td>
+                        <td>{% trans "Unlimited" %}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" class="cs-feature">{% trans "Analytics &amp; conversion tracking" %}</th>
+                        <td>{% trans "GA4 setup" %}</td>
+                        <td class="cs-f">{% trans "GA4 setup" %}</td>
+                        <td>{% trans "+ conversion tracking" %}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" class="cs-feature">{% trans "Advanced SEO foundation" %}</th>
+                        <td><span class="cs-no" aria-hidden="true">&mdash;</span><span class="cs-sr">{% trans "Not included" %}</span></td>
+                        <td class="cs-f"><span class="cs-no" aria-hidden="true">&mdash;</span><span class="cs-sr">{% trans "Not included" %}</span></td>
+                        <td><i data-lucide="check" class="cs-yes" aria-hidden="true"></i><span class="cs-sr">{% trans "Included" %}</span></td>
+                    </tr>
+                    <tr>
+                        <th scope="row" class="cs-feature">{% trans "Content creation infrastructure" %}</th>
+                        <td><span class="cs-no" aria-hidden="true">&mdash;</span><span class="cs-sr">{% trans "Not included" %}</span></td>
+                        <td class="cs-f"><span class="cs-no" aria-hidden="true">&mdash;</span><span class="cs-sr">{% trans "Not included" %}</span></td>
+                        <td><i data-lucide="check" class="cs-yes" aria-hidden="true"></i><span class="cs-sr">{% trans "Included" %}</span></td>
+                    </tr>
+                    <tr class="cs-grp"><th colspan="4" scope="colgroup">{% trans "Growth &amp; automation" %}</th></tr>
+                    <tr>
+                        <th scope="row" class="cs-feature">{% trans "Scalable architecture" %}</th>
+                        <td><span class="cs-no" aria-hidden="true">&mdash;</span><span class="cs-sr">{% trans "Not included" %}</span></td>
+                        <td class="cs-f">{% trans "Cloud, scales with you" %}</td>
+                        <td>{% trans "Enterprise-grade" %}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" class="cs-feature">{% trans "Automation &amp; workflows" %}</th>
+                        <td><span class="cs-no" aria-hidden="true">&mdash;</span><span class="cs-sr">{% trans "Not included" %}</span></td>
+                        <td class="cs-f">{% trans "Add-on" %}</td>
+                        <td>{% trans "Add-on" %}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" class="cs-feature">{% trans "AI chatbot &amp; agents" %}</th>
+                        <td><span class="cs-no" aria-hidden="true">&mdash;</span><span class="cs-sr">{% trans "Not included" %}</span></td>
+                        <td class="cs-f">{% trans "Add-on" %}</td>
+                        <td>{% trans "Add-on" %}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" class="cs-feature">{% trans "CRM &amp; business systems" %}</th>
+                        <td><span class="cs-no" aria-hidden="true">&mdash;</span><span class="cs-sr">{% trans "Not included" %}</span></td>
+                        <td class="cs-f">{% trans "Add-on" %}</td>
+                        <td>{% trans "Add-on" %}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" class="cs-feature">{% trans "Integrations" %}</th>
+                        <td><span class="cs-no" aria-hidden="true">&mdash;</span><span class="cs-sr">{% trans "Not included" %}</span></td>
+                        <td class="cs-f">{% trans "Add-ons" %}</td>
+                        <td>{% trans "Custom + API" %}</td>
+                    </tr>
+                    <tr class="cs-grp"><th colspan="4" scope="colgroup">{% trans "Support" %}</th></tr>
+                    <tr>
+                        <th scope="row" class="cs-feature">{% trans "Support after launch" %}</th>
+                        <td>{% trans "24/7" %}</td>
+                        <td class="cs-f">{% trans "24/7" %}</td>
+                        <td>{% trans "24/7 + dedicated" %}</td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td class="cs-feature"></td>
+                        <td></td>
+                        <td class="cs-f">
+                            <a class="cs-btn cs-btn--accent cs-btn--sm" href="{% url 'community:wizard_start' %}?new=1&amp;package=startup">{% trans "Start with Startup" %} <i data-lucide="arrow-right"></i></a>
+                        </td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        <p class="cs-table__foot">
+            {% trans "Every package includes: professional website, responsive design, quick launch, flexible payment plans and 50% upfront payment." %}
+        </p>
+    </div>
+</section>
+<!-- ======================= WHY ONWEBAPP ========================== -->
+<section class="cs-sec cs-sec--white" id="why">
+    <div class="container">
+        <div class="cs-head cs-head--center cs-reveal">
+            <span class="cs-label cs-label--plain">{% trans "WHY ONWEBAPP" %}</span>
+            <h2>{% trans "We Build Foundations. Not Just Websites." %}</h2>
+        </div>
+
+        <div class="cs-why">
+            <div class="cs-why__card cs-reveal" style="--i:0">
+                <span class="cs-why__num">01</span>
+                <span class="cs-why__ico"><i data-lucide="target"></i></span>
+                <h3>{% trans "Start with what you need" %}</h3>
+                <p>{% trans "We build exactly what you need today. No upsells. No bloat." %}</p>
+            </div>
+            <div class="cs-why__card cs-reveal" style="--i:1">
+                <span class="cs-why__num">02</span>
+                <span class="cs-why__ico"><i data-lucide="refresh-cw"></i></span>
+                <h3>{% trans "Grow without rebuilding" %}</h3>
+                <p>{% trans "The foundation never changes. Every extension is a one-time add-on." %}</p>
+            </div>
+            <div class="cs-why__card cs-reveal" style="--i:2">
+                <span class="cs-why__num">03</span>
+                <span class="cs-why__ico"><i data-lucide="wallet"></i></span>
+                <h3>{% trans "Control every dollar" %}</h3>
+                <p>{% trans "Pay for what you use. Extend when you are ready. Budget stays in your hands." %}</p>
+            </div>
+            <div class="cs-why__card cs-reveal" style="--i:3">
+                <span class="cs-why__num">04</span>
+                <span class="cs-why__ico"><i data-lucide="handshake"></i></span>
+                <h3>{% trans "Partner, not vendor" %}</h3>
+                <p>{% trans "We don't just deliver code. We stay to extend, optimize, and grow with you." %}</p>
             </div>
         </div>
     </div>
 </section>
 
-<!-- PACKAGES -->
-<section class="c-sec" id="packages">
-    <div class="container">
-        <div class="c-sec-head text-center c-reveal">
-            <div class="c-sec-label justify-content-center">CHOOSE WHERE YOU START</div>
-            <h2 class="c-sec-title">Start with what you need today.<br>Build what your business needs tomorrow.</h2>
-            <p class="c-sec-sub mx-auto">Every project starts with a clear foundation. As your needs evolve, OnWebApp evolves with you.</p>
+<!-- ======================= BY THE NUMBERS ======================== -->
+<section class="cs-nums">
+    <div class="container cs-nums__grid">
+        <div class="cs-num cs-reveal" style="--i:0">
+            <b>9</b>
+            <span>{% trans "Projects launched" %}</span>
         </div>
-        <div class="row g-4 justify-content-center align-items-stretch">
-
-            <!-- Basic Package -->
-            <div class="col-lg-4 c-reveal c-stagger-1" id="essential">
-                <div class="c-pkg">
-                    <div class="c-pkg-head">
-                        <div class="c-pkg-name">Basic Package</div>
-                        <div class="c-pkg-price">
-                            <span class="c-pkg-price-val">Starting at $499</span>
-                            <span class="c-pkg-price-label">One-time</span>
-                        </div>
-                        <h3>Simple Website. Professional Start.</h3>
-                        <p>A clean, responsive website built around the essential needs of your business.</p>
-                    </div>
-                    <div class="c-pkg-body">
-                        <div class="c-pkg-section">
-                            <h6>What's Included</h6>
-                            <ul class="c-pkg-list">
-                                <li><i class="fas fa-check"></i> Professional responsive website</li>
-                                <li><i class="fas fa-check"></i> Essential pages and sections</li>
-                                <li><i class="fas fa-check"></i> Mobile-friendly design</li>
-                                <li><i class="fas fa-check"></i> Contact form</li>
-                                <li><i class="fas fa-check"></i> Basic website functionality</li>
-                                <li><i class="fas fa-check"></i> Deployment-ready setup</li>
-                            </ul>
-                        </div>
-                        <div class="c-pkg-section">
-                            <h6>Ideal For</h6>
-                            <ul class="c-pkg-list c-pkg-list-muted">
-                                <li><i class="fas fa-check"></i> Landing pages</li>
-                                <li><i class="fas fa-check"></i> Portfolio websites</li>
-                                <li><i class="fas fa-check"></i> Small businesses</li>
-                                <li><i class="fas fa-check"></i> Simple company websites</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="c-pkg-foot">
-                        <a href="{% url 'community:wizard_start' %}?new=1&package=essential" class="c-pkg-cta c-pkg-cta-outline">Start My Website <i class="fas fa-arrow-right"></i></a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Startup Package -->
-            <div class="col-lg-4 c-reveal c-stagger-2">
-                <div class="c-pkg c-pkg-featured">
-                    <div class="c-pkg-badge-featured">Most Popular</div>
-                    <div class="c-pkg-head">
-                        <div class="c-pkg-name">Startup Package</div>
-                        <div class="c-pkg-price">
-                            <span class="c-pkg-price-val">Starting at $1,499</span>
-                            <span class="c-pkg-price-label">Starting project price</span>
-                        </div>
-                        <h3>Start Small. Grow Without Starting Over.</h3>
-                        <p>Launch with what you need today and add automation, AI, integrations, and business systems as your business grows.</p>
-                    </div>
-                    <div class="c-pkg-body">
-                        <div class="c-pkg-section">
-                            <h6>Start With</h6>
-                            <ul class="c-pkg-list">
-                                <li><i class="fas fa-check"></i> Professional custom website</li>
-                                <li><i class="fas fa-check"></i> Growth-ready architecture</li>
-                                <li><i class="fas fa-check"></i> Scalable infrastructure</li>
-                            </ul>
-                        </div>
-                        <div class="c-pkg-section">
-                            <h6>Add When You're Ready</h6>
-                            <ul class="c-pkg-list c-pkg-list-expandable">
-                                <li><i class="fas fa-plus"></i> Automation</li>
-                                <li><i class="fas fa-plus"></i> AI & Chatbots</li>
-                                <li><i class="fas fa-plus"></i> CRM & Business Systems</li>
-                                <li><i class="fas fa-plus"></i> Integrations</li>
-                                <li><i class="fas fa-plus"></i> Advanced functionality</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="c-pkg-foot">
-                        <a href="{% url 'community:wizard_start' %}?new=1&package=startup" class="c-pkg-cta c-pkg-cta-primary">Start My Growth Journey <i class="fas fa-arrow-right"></i></a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Enterprise Package -->
-            <div class="col-lg-4 c-reveal c-stagger-3">
-                <div class="c-pkg c-pkg-enterprise">
-                    <div class="c-pkg-badge-enterprise">Premium</div>
-                    <div class="c-pkg-head">
-                        <div class="c-pkg-name">Enterprise Package</div>
-                        <div class="c-pkg-price">
-                            <span class="c-pkg-price-val">Starting at $2,499</span>
-                            <span class="c-pkg-price-label">Starting project price</span>
-                        </div>
-                        <h3>Build the Foundation. Scale the System.</h3>
-                        <p>Everything in Startup, plus advanced SEO, content infrastructure, analytics, integrations, and capabilities designed for growing businesses.</p>
-                    </div>
-                    <div class="c-pkg-body">
-                        <div class="c-pkg-section">
-                            <h6>Everything in Startup, Plus</h6>
-                            <ul class="c-pkg-list">
-                                <li><i class="fas fa-check"></i> Advanced SEO foundation</li>
-                                <li><i class="fas fa-check"></i> Technical SEO audit</li>
-                                <li><i class="fas fa-check"></i> Keyword & search strategy</li>
-                                <li><i class="fas fa-check"></i> Content creation infrastructure</li>
-                                <li><i class="fas fa-check"></i> Analytics & conversion tracking</li>
-                                <li><i class="fas fa-check"></i> Advanced integrations</li>
-                                <li><i class="fas fa-check"></i> Scalable business architecture</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="c-pkg-foot">
-                        <a href="{% url 'community:wizard_start' %}?new=1&package=enterprise" class="c-pkg-cta c-pkg-cta-enterprise">Build My Growth System <i class="fas fa-arrow-right"></i></a>
-                    </div>
-                </div>
-            </div>
-
+        <div class="cs-num cs-reveal" style="--i:1">
+            <b>14 <small>{% trans "Days" %}</small></b>
+            <span>{% trans "Avg. days to launch" %}</span>
+        </div>
+        <div class="cs-num cs-reveal" style="--i:2">
+            <b>98%</b>
+            <span>{% trans "Client satisfaction" %}</span>
+        </div>
+        <div class="cs-num cs-reveal" style="--i:3">
+            <b>24/7</b>
+            <span>{% trans "Support access" %}</span>
         </div>
     </div>
 </section>
 
-<!-- GROWTH JOURNEY STEPS -->
-<section class="c-sec c-sec-alt">
+<!-- ============================ FAQ ============================== -->
+<section class="cs-sec" id="faq">
     <div class="container">
-        <div class="c-sec-head text-center c-reveal">
-            <div class="c-sec-label justify-content-center">HOW IT GROWS</div>
-            <h2 class="c-sec-title">Your Growth Journey</h2>
-            <p class="c-sec-sub mx-auto">Start with a website. Add capabilities as your business evolves. No rebuilding required.</p>
+        <div class="cs-head cs-head--center cs-reveal">
+            <span class="cs-label cs-label--plain">{% trans "COMMON QUESTIONS" %}</span>
+            <h2>{% trans "Straight Answers. No Fluff." %}</h2>
+            <p class="cs-sub">{% trans "Everything you need to know before you start." %}</p>
         </div>
-        <div class="row g-4 justify-content-center">
-            <div class="col-md-6 col-lg-4 c-reveal c-stagger-1">
-                <div class="c-growth-step">
-                    <div class="c-growth-num">01</div>
-                    <div>
-                        <h5>Website</h5>
-                        <p>A professional website with the essential pages and functionality needed to launch your business.</p>
-                    </div>
+
+        <div class="cs-faq">
+            <div class="cs-faq__item cs-reveal">
+                <button class="cs-faq__q" type="button" aria-expanded="false" aria-controls="faq-a1" id="faq-q1">
+                    <span>{% trans "What separates the three packages?" %}</span>
+                    <span class="cs-faq__ico"><i data-lucide="plus"></i></span>
+                </button>
+                <div class="cs-faq__a" id="faq-a1" role="region" aria-labelledby="faq-q1">
+                    <div class="cs-faq__inner"><p>{% trans "Basic = fast, SEO-ready website. Startup = website + extensible architecture for automation, AI, CRM. Enterprise = complete platform with advanced SEO, content infrastructure, analytics, custom integrations, dedicated support." %}</p></div>
                 </div>
             </div>
-            <div class="col-md-6 col-lg-4 c-reveal c-stagger-2">
-                <div class="c-growth-step">
-                    <div class="c-growth-num">02</div>
-                    <div>
-                        <h5>Automation</h5>
-                        <p>Automate repetitive business processes and workflows as your operations grow.</p>
-                    </div>
+
+            <div class="cs-faq__item cs-reveal">
+                <button class="cs-faq__q" type="button" aria-expanded="false" aria-controls="faq-a2" id="faq-q2">
+                    <span>{% trans "How does pay-as-you-grow work?" %}</span>
+                    <span class="cs-faq__ico"><i data-lucide="plus"></i></span>
+                </button>
+                <div class="cs-faq__a" id="faq-a2" role="region" aria-labelledby="faq-q2">
+                    <div class="cs-faq__inner"><p>{% trans "Start with the foundation you need. Add automation, AI, CRM, integrations as one-time add-ons. The foundation never changes." %}</p></div>
                 </div>
             </div>
-            <div class="col-md-6 col-lg-4 c-reveal c-stagger-3">
-                <div class="c-growth-step">
-                    <div class="c-growth-num">03</div>
-                    <div>
-                        <h5>AI Chatbot</h5>
-                        <p>Add an AI-powered chatbot to assist customers and answer questions automatically.</p>
-                    </div>
+
+            <div class="cs-faq__item cs-reveal">
+                <button class="cs-faq__q" type="button" aria-expanded="false" aria-controls="faq-a3" id="faq-q3">
+                    <span>{% trans "What does Enterprise SEO include?" %}</span>
+                    <span class="cs-faq__ico"><i data-lucide="plus"></i></span>
+                </button>
+                <div class="cs-faq__a" id="faq-a3" role="region" aria-labelledby="faq-q3">
+                    <div class="cs-faq__inner"><p>{% trans "Technical audit, keyword strategy, on-page foundation, content publishing infrastructure, analytics dashboard — everything to rank and convert." %}</p></div>
                 </div>
             </div>
-            <div class="col-md-6 col-lg-4 c-reveal c-stagger-4">
-                <div class="c-growth-step">
-                    <div class="c-growth-num">04</div>
-                    <div>
-                        <h5>Business Systems</h5>
-                        <p>Add CRM, booking, customer management, dashboards, or other business functionality when needed.</p>
-                    </div>
+
+            <div class="cs-faq__item cs-reveal">
+                <button class="cs-faq__q" type="button" aria-expanded="false" aria-controls="faq-a4" id="faq-q4">
+                    <span>{% trans "Do I need everything upfront?" %}</span>
+                    <span class="cs-faq__ico"><i data-lucide="plus"></i></span>
+                </button>
+                <div class="cs-faq__a" id="faq-a4" role="region" aria-labelledby="faq-q4">
+                    <div class="cs-faq__inner"><p>{% trans "No. Start with what you need. Add capabilities as one-time add-ons when you are ready." %}</p></div>
                 </div>
             </div>
-            <div class="col-md-6 col-lg-4 c-reveal c-stagger-5">
-                <div class="c-growth-step">
-                    <div class="c-growth-num">05</div>
-                    <div>
-                        <h5>Integrations</h5>
-                        <p>Connect your business with external platforms, APIs, and other systems as you scale.</p>
-                    </div>
+
+            <div class="cs-faq__item cs-reveal">
+                <button class="cs-faq__q" type="button" aria-expanded="false" aria-controls="faq-a5" id="faq-q5">
+                    <span>{% trans "How long until launch?" %}</span>
+                    <span class="cs-faq__ico"><i data-lucide="plus"></i></span>
+                </button>
+                <div class="cs-faq__a" id="faq-a5" role="region" aria-labelledby="faq-q5">
+                    <div class="cs-faq__inner"><p>{% trans "Most projects launch in 14 days. Content readiness and package scope affect timing." %}</p></div>
+                </div>
+            </div>
+
+            <div class="cs-faq__item cs-reveal">
+                <button class="cs-faq__q" type="button" aria-expanded="false" aria-controls="faq-a6" id="faq-q6">
+                    <span>{% trans "Can I upgrade later?" %}</span>
+                    <span class="cs-faq__ico"><i data-lucide="plus"></i></span>
+                </button>
+                <div class="cs-faq__a" id="faq-a6" role="region" aria-labelledby="faq-q6">
+                    <div class="cs-faq__inner"><p>{% trans "Yes. Your website and foundation carry over. Upgrades extend what you have — no restart." %}</p></div>
+                </div>
+            </div>
+
+            <div class="cs-faq__item cs-reveal">
+                <button class="cs-faq__q" type="button" aria-expanded="false" aria-controls="faq-a7" id="faq-q7">
+                    <span>{% trans "Do I need technical skills?" %}</span>
+                    <span class="cs-faq__ico"><i data-lucide="plus"></i></span>
+                </button>
+                <div class="cs-faq__a" id="faq-a7" role="region" aria-labelledby="faq-q7">
+                    <div class="cs-faq__inner"><p>{% trans "No. We handle setup, deployment, configuration. You get a simple workspace to manage content and track progress." %}</p></div>
+                </div>
+            </div>
+
+            <div class="cs-faq__item cs-reveal">
+                <button class="cs-faq__q" type="button" aria-expanded="false" aria-controls="faq-a8" id="faq-q8">
+                    <span>{% trans "Is there ongoing support?" %}</span>
+                    <span class="cs-faq__ico"><i data-lucide="plus"></i></span>
+                </button>
+                <div class="cs-faq__a" id="faq-a8" role="region" aria-labelledby="faq-q8">
+                    <div class="cs-faq__inner"><p>{% trans "Yes. 24/7 support after launch. We keep extending your system as you grow." %}</p></div>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- PACKAGE COMPARISON -->
-<section class="c-sec">
+<!-- ========================= FINAL CTA =========================== -->
+<section class="cs-final">
     <div class="container">
-        <div class="c-sec-head text-center c-reveal">
-            <div class="c-sec-label justify-content-center">SIDE BY SIDE</div>
-            <h2 class="c-sec-title">Package Comparison</h2>
-        </div>
-        <div class="c-reveal">
-            <div class="c-compare">
-                <div class="c-compare-head">
-                    <div>Feature</div>
-                    <div>Basic &mdash; $499</div>
-                    <div class="c-compare-highlight">Startup &mdash; $1,499</div>
-                    <div>Enterprise &mdash; $2,499</div>
-                </div>
-                <div class="c-compare-row">
-                    <div>Professional website</div>
-                    <div><i class="fas fa-check c-compare-check"></i></div>
-                    <div class="c-compare-highlight"><i class="fas fa-check c-compare-check"></i></div>
-                    <div><i class="fas fa-check c-compare-check"></i></div>
-                </div>
-                <div class="c-compare-row">
-                    <div>Growth-ready infrastructure</div>
-                    <div><i class="fas fa-minus c-compare-dash"></i></div>
-                    <div class="c-compare-highlight"><i class="fas fa-check c-compare-check"></i></div>
-                    <div><i class="fas fa-check c-compare-check"></i></div>
-                </div>
-                <div class="c-compare-row">
-                    <div>Scalable architecture</div>
-                    <div><i class="fas fa-minus c-compare-dash"></i></div>
-                    <div class="c-compare-highlight"><i class="fas fa-check c-compare-check"></i></div>
-                    <div><i class="fas fa-check c-compare-check"></i></div>
-                </div>
-                <div class="c-compare-row">
-                    <div>Add automation when needed</div>
-                    <div><i class="fas fa-minus c-compare-dash"></i></div>
-                    <div class="c-compare-highlight"><i class="fas fa-check c-compare-check"></i></div>
-                    <div><i class="fas fa-check c-compare-check"></i></div>
-                </div>
-                <div class="c-compare-row">
-                    <div>Add AI features when needed</div>
-                    <div><i class="fas fa-minus c-compare-dash"></i></div>
-                    <div class="c-compare-highlight"><i class="fas fa-check c-compare-check"></i></div>
-                    <div><i class="fas fa-check c-compare-check"></i></div>
-                </div>
-                <div class="c-compare-row">
-                    <div>Add CRM and business systems</div>
-                    <div><i class="fas fa-minus c-compare-dash"></i></div>
-                    <div class="c-compare-highlight"><i class="fas fa-check c-compare-check"></i></div>
-                    <div><i class="fas fa-check c-compare-check"></i></div>
-                </div>
-                <div class="c-compare-row">
-                    <div>Advanced SEO foundation</div>
-                    <div><i class="fas fa-minus c-compare-dash"></i></div>
-                    <div class="c-compare-highlight"><i class="fas fa-minus c-compare-dash"></i></div>
-                    <div><i class="fas fa-check c-compare-check"></i></div>
-                </div>
-                <div class="c-compare-row">
-                    <div>Content creation infrastructure</div>
-                    <div><i class="fas fa-minus c-compare-dash"></i></div>
-                    <div class="c-compare-highlight"><i class="fas fa-minus c-compare-dash"></i></div>
-                    <div><i class="fas fa-check c-compare-check"></i></div>
-                </div>
-                <div class="c-compare-row">
-                    <div>Analytics & conversion tracking</div>
-                    <div><i class="fas fa-minus c-compare-dash"></i></div>
-                    <div class="c-compare-highlight"><i class="fas fa-minus c-compare-dash"></i></div>
-                    <div><i class="fas fa-check c-compare-check"></i></div>
-                </div>
-                <div class="c-compare-row">
-                    <div>50% upfront payment</div>
-                    <div><i class="fas fa-minus c-compare-dash"></i></div>
-                    <div class="c-compare-highlight"><i class="fas fa-check c-compare-check"></i></div>
-                    <div><i class="fas fa-check c-compare-check"></i></div>
-                </div>
-                <div class="c-compare-row">
-                    <div>Flexible payment plan</div>
-                    <div><i class="fas fa-minus c-compare-dash"></i></div>
-                    <div class="c-compare-highlight"><i class="fas fa-check c-compare-check"></i></div>
-                    <div><i class="fas fa-check c-compare-check"></i></div>
-                </div>
-                <div class="c-compare-row">
-                    <div>Responsive design</div>
-                    <div><i class="fas fa-check c-compare-check"></i></div>
-                    <div class="c-compare-highlight"><i class="fas fa-check c-compare-check"></i></div>
-                    <div><i class="fas fa-check c-compare-check"></i></div>
-                </div>
-                <div class="c-compare-row">
-                    <div>Quick launch</div>
-                    <div><i class="fas fa-check c-compare-check"></i></div>
-                    <div class="c-compare-highlight"><i class="fas fa-check c-compare-check"></i></div>
-                    <div><i class="fas fa-check c-compare-check"></i></div>
-                </div>
+        <div class="cs-final__inner cs-reveal">
+            <h2>{% trans "Ready to Build?" %}</h2>
+            <p class="cs-final__sub">{% trans "200+ projects launched. Your foundation is waiting." %}</p>
+            <div class="cs-final__cta">
+                <a class="cs-btn cs-btn--accent" href="{% url 'community:wizard_start' %}?new=1&amp;package=startup">{% trans "Start Your Project" %} <i data-lucide="arrow-right"></i></a>
+                <a class="cs-btn cs-btn--ghost" href="{% url 'community:wizard_start' %}?new=1&amp;package=enterprise">{% trans "Enterprise" %}</a>
             </div>
+            <a class="cs-final__forum" href="{% url 'forum:home' %}">{% trans "Join the Community" %} <i data-lucide="arrow-up-right"></i></a>
+            <p class="cs-final__note">{% trans "No commitment. Just results." %}</p>
+            <p class="cs-final__ask">
+                {% trans "Questions?" %}
+                <a href="{% url 'contact:contact' %}">{% trans "Talk to us" %}</a>
+                {% trans "We reply in hours." %}
+            </p>
         </div>
     </div>
 </section>
 
-<!-- WHY ONWEBAPP -->
-<section class="c-sec c-sec-alt">
-    <div class="container">
-        <div class="c-sec-head text-center c-reveal">
-            <div class="c-sec-label justify-content-center">WHY ONWEBAPP</div>
-            <h2 class="c-sec-title">Not Just a Website. A Growth Foundation.</h2>
-        </div>
-        <div class="row g-4">
-            <div class="col-md-6 col-lg-3 c-reveal c-stagger-1">
-                <div class="c-growth-step" style="flex-direction:column;text-align:center;align-items:center;">
-                    <div style="width:48px;height:48px;border-radius:12px;background:var(--c-primary-light);display:flex;align-items:center;justify-content:center;margin-bottom:.75rem;"><i class="fas fa-seedling" style="color:var(--c-primary);font-size:1.1rem;"></i></div>
-                    <h5>Start Small</h5>
-                    <p>Begin with what your business needs today. No overselling, no unnecessary complexity.</p>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-3 c-reveal c-stagger-2">
-                <div class="c-growth-step" style="flex-direction:column;text-align:center;align-items:center;">
-                    <div style="width:48px;height:48px;border-radius:12px;background:var(--c-primary-light);display:flex;align-items:center;justify-content:center;margin-bottom:.75rem;"><i class="fas fa-expand" style="color:var(--c-primary);font-size:1.1rem;"></i></div>
-                    <h5>Grow Without Starting Over</h5>
-                    <p>Your digital foundation is built to evolve. Add new capabilities without rebuilding from scratch.</p>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-3 c-reveal c-stagger-3">
-                <div class="c-growth-step" style="flex-direction:column;text-align:center;align-items:center;">
-                    <div style="width:48px;height:48px;border-radius:12px;background:var(--c-primary-light);display:flex;align-items:center;justify-content:center;margin-bottom:.75rem;"><i class="fas fa-hand-holding-dollar" style="color:var(--c-primary);font-size:1.1rem;"></i></div>
-                    <h5>Control Your Investment</h5>
-                    <p>Pay for what you use. Expand when you are ready. Your budget stays in your control.</p>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-3 c-reveal c-stagger-4">
-                <div class="c-growth-step" style="flex-direction:column;text-align:center;align-items:center;">
-                    <div style="width:48px;height:48px;border-radius:12px;background:var(--c-primary-light);display:flex;align-items:center;justify-content:center;margin-bottom:.75rem;"><i class="fas fa-handshake" style="color:var(--c-primary);font-size:1.1rem;"></i></div>
-                    <h5>Long-Term Partnership</h5>
-                    <p>We are not just a vendor. OnWebApp is your technology partner for the long run.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+<div class="cs-progress" aria-hidden="true"></div>
 
-<!-- STATS -->
-<section class="c-sec">
-    <div class="container">
-        <div class="c-sec-head text-center c-reveal">
-            <div class="c-sec-label justify-content-center">BY THE NUMBERS</div>
-        </div>
-        <div class="c-reveal">
-            <div class="c-stat-row">
-                <div class="c-stat">
-                    <div class="c-stat-num">{{ stats.members|default:"200+" }}</div>
-                    <div class="c-stat-label">Community projects launched</div>
-                </div>
-                <div class="c-stat">
-                    <div class="c-stat-num">14</div>
-                    <div class="c-stat-label">Days average time to launch</div>
-                </div>
-                <div class="c-stat">
-                    <div class="c-stat-num">98%</div>
-                    <div class="c-stat-label">Client satisfaction rate</div>
-                </div>
-                <div class="c-stat">
-                    <div class="c-stat-num">24/7</div>
-                    <div class="c-stat-label">Access to your support team</div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- FAQ -->
-<section class="c-sec c-sec-alt">
-    <div class="container">
-        <div class="row g-5">
-            <div class="col-lg-5 c-reveal">
-                <div class="c-sec-label">FAQ</div>
-                <h2 class="c-sec-title" style="font-size:clamp(1.4rem,2.5vw,1.8rem);">Common Questions, Answered</h2>
-                <p class="c-sec-sub" style="margin-top:.75rem;">Everything you need to know before getting started.</p>
-            </div>
-            <div class="col-lg-7 c-reveal">
-                <div class="c-faq open">
-                    <div class="c-faq-q" onclick="this.parentElement.classList.toggle('open')">What is the difference between the three packages? <i class="fas fa-chevron-down"></i></div>
-                    <div class="c-faq-a">The <strong>Enterprise Package</strong> ($2,499) includes everything in the Startup Package plus SEO setup and a built-in content creator for blog posts and landing pages. The <strong>Startup Package</strong> ($1,499) gives you a professional website with growth-ready architecture. The <strong>Basic Package</strong> ($499) is for clients who only need a simple, straightforward website.</div>
-                </div>
-                <div class="c-faq">
-                    <div class="c-faq-q" onclick="this.parentElement.classList.toggle('open')">How does the pay-as-you-grow model work? <i class="fas fa-chevron-down"></i></div>
-                    <div class="c-faq-a">For the Startup and Enterprise packages, you pay 50% upfront for your website. The remaining balance can be paid through a flexible monthly plan. After launch, you can request additional features like automation, AI chatbots, or CRM systems. Each capability is developed and paid for separately.</div>
-                </div>
-                <div class="c-faq">
-                    <div class="c-faq-q" onclick="this.parentElement.classList.toggle('open')">What is included in the Enterprise SEO setup? <i class="fas fa-chevron-down"></i></div>
-                    <div class="c-faq-a">The Enterprise Package includes a full SEO audit, keyword research for your industry, meta tag optimization, Google Analytics setup, and a content strategy. You also get a content creator for blog posts, landing pages, product descriptions, and more.</div>
-                </div>
-                <div class="c-faq">
-                    <div class="c-faq-q" onclick="this.parentElement.classList.toggle('open')">Do I need to buy everything from day one? <i class="fas fa-chevron-down"></i></div>
-                    <div class="c-faq-a">No. The core principle is that you start with what you need today. Your website is built on a growth-ready foundation, so when you are ready to add automation, AI, or other capabilities, they integrate seamlessly without rebuilding.</div>
-                </div>
-                <div class="c-faq">
-                    <div class="c-faq-q" onclick="this.parentElement.classList.toggle('open')">How long does a typical project take? <i class="fas fa-chevron-down"></i></div>
-                    <div class="c-faq-a">Most websites go live within 2 to 3 weeks. The Basic Package is typically faster due to its simpler scope. Need it faster? Ask about our priority track.</div>
-                </div>
-                <div class="c-faq">
-                    <div class="c-faq-q" onclick="this.parentElement.classList.toggle('open')">Can I upgrade from Basic to Startup or Enterprise later? <i class="fas fa-chevron-down"></i></div>
-                    <div class="c-faq-a">Yes. If you start with the Basic Package and later decide you want growth capabilities, we can migrate you to the Startup or Enterprise Package foundation. Your existing website is preserved and enhanced, not rebuilt.</div>
-                </div>
-                <div class="c-faq">
-                    <div class="c-faq-q" onclick="this.parentElement.classList.toggle('open')">Do I need any technical skills? <i class="fas fa-chevron-down"></i></div>
-                    <div class="c-faq-a">None at all. We handle everything from setup to launch and give you a simple dashboard to manage things afterward.</div>
-                </div>
-                <div class="c-faq">
-                    <div class="c-faq-q" onclick="this.parentElement.classList.toggle('open')">Do you offer ongoing support? <i class="fas fa-chevron-down"></i></div>
-                    <div class="c-faq-a">Yes. Every project includes dedicated post-launch support, with optional maintenance plans for long-term peace of mind.</div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- FINAL CTA -->
-<section class="c-final c-reveal">
-    <div class="container">
-        <h2>Start Your Growth Journey Today</h2>
-        <p>Join the community projects already trusting OnWebApp to power their digital presence.</p>
-        <div class="c-final-actions">
-            <a href="{% url 'community:wizard_start' %}?new=1&package=startup" class="c-btn-white">Start Your Growth Journey <i class="fas fa-arrow-right"></i></a>
-            <a href="{% url 'community:wizard_start' %}?new=1&package=enterprise" class="c-btn-white" style="background:#059669;"><i class="fas fa-crown me-1"></i> Enterprise Package</a>
-            <a href="{% url 'forum:home' %}" class="c-btn-outline" style="border-color:rgba(255,255,255,.25);color:#fff;"><i class="fas fa-comments me-1"></i> Community Forum</a>
-        </div>
-        <div class="c-final-sub">
-            No commitment. Just momentum.<br>
-            Still have questions? <a href="{% url 'community:dashboard' %}">Talk to our team</a> — we usually reply within a few hours.
-        </div>
-    </div>
-</section>
-
-<!-- FOOTER -->
-<div class="c-foot">
-    <div class="container">
-        <p>&copy; 2026 OnWebApp Community Services. Simplified for your focus.</p>
+<div class="cs-sticky-cta" aria-hidden="true">
+    <div class="cs-sticky-cta__inner">
+        <span class="cs-sticky-cta__text">
+            <strong>{% trans "Start Your Project" %}</strong>
+            {% trans "from $1,499" %}
+        </span>
+        <a class="cs-btn cs-btn--accent" href="{% url 'community:wizard_start' %}?new=1&package=startup">{% trans "Start Now" %} <i data-lucide="arrow-right"></i></a>
     </div>
 </div>
-
+</div>
 {% endblock %}
-
-{% block footer %}{% endblock %}
 
 {% block extra_js %}
 <script>
-(function(){
-    var observer = new IntersectionObserver(function(entries) {
-        entries.forEach(function(entry) {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
+(function () {
+    'use strict';
+
+    function initIcons() {
+        if (window.lucide && typeof window.lucide.createIcons === 'function') {
+            window.lucide.createIcons({ attrs: { 'stroke-width': 1.8 } });
+        }
+    }
+    initIcons();
+
+    /* Mobile comparison cards (built from the table) */
+    var cmpTable = document.querySelector('#comparison .cs-table');
+    if (cmpTable && cmpTable.tHead && cmpTable.tBodies.length) {
+        var tiers = [];
+        Array.prototype.forEach.call(cmpTable.tHead.rows[0].cells, function (c, i) {
+            if (i === 0) { return; }
+            var tag = c.querySelector('.cs-th__tag');
+            var nameEl = c.querySelector('.cs-th__name');
+            var priceEl = c.querySelector('.cs-th__price');
+            tiers.push({
+                name: nameEl ? nameEl.textContent.trim() : '',
+                price: priceEl ? priceEl.textContent.trim() : '',
+                tag: tag ? tag.textContent.trim() : '',
+                featured: c.classList.contains('cs-f')
+            });
+        });
+        var items = [];
+        Array.prototype.forEach.call(cmpTable.tBodies[0].rows, function (row) {
+            if (row.classList.contains('cs-grp')) {
+                items.push({ g: row.cells[0].textContent.trim() });
+                return;
+            }
+            var vals = [];
+            for (var k = 1; k < row.cells.length; k++) {
+                var cell = row.cells[k];
+                var sr = cell.querySelector('.cs-sr');
+                vals.push({
+                    text: sr ? sr.textContent.trim() : cell.textContent.replace(/\s+/g, ' ').trim(),
+                    yes: !!cell.querySelector('.cs-yes'),
+                    no: !!cell.querySelector('.cs-no')
+                });
+            }
+            items.push({ f: row.cells[0].textContent.replace(/\s+/g, ' ').trim(), v: vals });
+        });
+        var cards = document.createElement('div');
+        cards.className = 'cs-tcards';
+        tiers.forEach(function (t, idx) {
+            var card = document.createElement('div');
+            card.className = 'cs-tcard' + (t.featured ? ' cs-tcard--featured' : '');
+            var head = document.createElement('div');
+            head.className = 'cs-tcard__head';
+            var name = document.createElement('span');
+            name.className = 'cs-tcard__name';
+            name.textContent = t.name;
+            var price = document.createElement('span');
+            price.className = 'cs-tcard__price';
+            price.textContent = t.price;
+            head.appendChild(name);
+            head.appendChild(price);
+            if (t.tag) {
+                var tagEl = document.createElement('span');
+                tagEl.className = 'cs-tcard__tag';
+                tagEl.textContent = t.tag;
+                head.appendChild(tagEl);
+            }
+            card.appendChild(head);
+            var list = document.createElement('div');
+            list.className = 'cs-tcard__list';
+            items.forEach(function (it) {
+                if (it.g) {
+                    var g = document.createElement('div');
+                    g.className = 'cs-tcard__group';
+                    g.textContent = it.g;
+                    list.appendChild(g);
+                    return;
+                }
+                var r = document.createElement('div');
+                r.className = 'cs-tcard__row';
+                var f = document.createElement('span');
+                f.className = 'cs-tcard__f';
+                f.textContent = it.f;
+                var v = document.createElement('span');
+                var val = it.v[idx];
+                v.className = 'cs-tcard__v' + (val && val.yes ? ' is-yes' : (val && val.no ? ' is-no' : ''));
+                v.textContent = val ? val.text : '';
+                r.appendChild(f);
+                r.appendChild(v);
+                list.appendChild(r);
+            });
+            card.appendChild(list);
+            cards.appendChild(card);
+        });
+        var cmpFoot = cmpTable.tFoot;
+        if (cmpFoot) {
+            var cmpBtn = cmpFoot.querySelector('a.cs-btn');
+            if (cmpBtn && cmpBtn.parentNode && cmpBtn.parentNode.cellIndex > 0) {
+                var target = cards.children[cmpBtn.parentNode.cellIndex - 1];
+                if (target) {
+                    var cta = document.createElement('div');
+                    cta.className = 'cs-tcard__cta';
+                    cta.appendChild(cmpBtn.cloneNode(true));
+                    target.appendChild(cta);
+                }
+            }
+        }
+        var cmpWrap = cmpTable.parentNode;
+        if (cmpWrap && cmpWrap.parentNode) {
+            cmpWrap.parentNode.insertBefore(cards, cmpWrap.nextSibling);
+        }
+    }
+
+    /* Scroll progress bar */
+    var progress = document.querySelector('.cs-progress');
+    if (progress) {
+        function updateProgress() {
+            var doc = document.documentElement;
+            var scrolled = (doc.scrollTop || document.body.scrollTop) / (doc.scrollHeight - doc.clientHeight);
+            progress.style.transform = 'scaleX(' + Math.min(1, Math.max(0, scrolled)) + ')';
+        }
+        window.addEventListener('scroll', updateProgress, { passive: true });
+        updateProgress();
+    }
+
+    var reveals = document.querySelectorAll('.cs-reveal');
+    if ('IntersectionObserver' in window) {
+        var observer = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('in');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.05, rootMargin: '0px 0px -30px 0px' });
+        Array.prototype.forEach.call(reveals, function (el) { observer.observe(el); });
+        window.setTimeout(function () {
+            Array.prototype.forEach.call(reveals, function (el) {
+                if (el.getBoundingClientRect().top < window.innerHeight) { el.classList.add('in'); }
+            });
+        }, 90);
+    } else {
+        Array.prototype.forEach.call(reveals, function (el) { el.classList.add('in'); });
+    }
+
+    var faqItems = document.querySelectorAll('.cs-faq__item');
+    Array.prototype.forEach.call(faqItems, function (item) {
+        var btn = item.querySelector('.cs-faq__q');
+        if (!btn) { return; }
+        btn.addEventListener('click', function () {
+            var wasOpen = item.classList.contains('is-open');
+            Array.prototype.forEach.call(faqItems, function (other) {
+                other.classList.remove('is-open');
+                var otherBtn = other.querySelector('.cs-faq__q');
+                if (otherBtn) { otherBtn.setAttribute('aria-expanded', 'false'); }
+            });
+            if (!wasOpen) {
+                item.classList.add('is-open');
+                btn.setAttribute('aria-expanded', 'true');
             }
         });
-    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-
-    document.querySelectorAll('.c-reveal').forEach(function(el) {
-        observer.observe(el);
     });
+
+    /* Sticky mobile CTA: show after hero scroll */
+    var stickyCta = document.querySelector('.cs-sticky-cta');
+    var hero = document.querySelector('.cs-hero');
+    if (stickyCta && hero) {
+        var heroBottom = hero.offsetTop + hero.offsetHeight;
+        function toggleSticky() {
+            if (window.scrollY > heroBottom - 100) {
+                stickyCta.style.display = 'block';
+                stickyCta.style.animation = 'slideUp .25s ease-out forwards';
+            } else {
+                stickyCta.style.display = 'none';
+            }
+        }
+        window.addEventListener('scroll', toggleSticky, { passive: true });
+        toggleSticky();
+    }
 })();
+
+/* Sticky CTA entrance animation */
+var style = document.createElement('style');
+style.textContent = '@keyframes slideUp{from{opacity:0;transform:translateY(100%)}to{opacity:1;transform:translateY(0)}}';
+document.head.appendChild(style);
 </script>
 {% endblock %}

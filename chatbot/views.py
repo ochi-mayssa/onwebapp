@@ -9,10 +9,13 @@ import json
 import re
 import uuid
 
-from .models import CallRequest, ChatMessage, ChatSession
+from .models import CallRequest, ChatLead, ChatMessage, ChatSession
 from .knowledge_base import KNOWLEDGE_BASE, GENERAL_RESPONSES, PAGE_TITLES
 from .corpus import access_for_url_name, user_can_read
+from .intents import INTENTS
 from .text_utils import split_sentences, tokenize
+from . import conversation
+from . import page_context
 from . import search as site_search
 from django.utils import timezone
 
@@ -262,17 +265,11 @@ def _resolve(url_name):
 def _page_is_live(path):
     """True unless the index knows this path is broken.
 
-    Several routes in this project still point at templates that do not exist,
-    so they resolve but return HTTP 500. The index records which pages actually
-    rendered, and the bot must never send a visitor to one of the broken ones.
+    Lives in :mod:`chatbot.search` now so the page-context layer can ask the
+    same question without importing this module; kept as a alias here because
+    the reply builder calls it in a dozen places.
     """
-    try:
-        known = site_search.loaded_index().get('live_paths')
-    except Exception:
-        return True
-    if not known:
-        return True
-    return path in known
+    return site_search.page_is_live(path)
 
 
 def _page_links(page_key, section=None, extra_url_names=(), user=None):
@@ -445,7 +442,11 @@ def get_suggestions(request):
 
     try:
         data = json.loads(request.body)
-        user_message_text = escape(data.get('message', '').strip())
+        # The engine reads the visitor's own words: apostrophes are characters,
+        # not entities, and ``i'm interested`` must still be recognised. Only
+        # the copy stored in the transcript is escaped.
+        raw_message = (data.get('message') or '').strip()
+        user_message_text = escape(raw_message)
         session_id = data.get('session_id')
 
         if not session_id:
@@ -455,6 +456,10 @@ def get_suggestions(request):
             session.user = request.user
             session.save()
 
+        # Where the visitor is reading from. The guide's answer, its
+        # suggestions and the questions it asks all depend on it.
+        conversation.remember_page(session, data.get('page'))
+
         ChatMessage.objects.create(
             session=session, sender='USER', content=user_message_text
         )
@@ -463,12 +468,23 @@ def get_suggestions(request):
         flags = {}
 
         reply, suggestions, links = generate_response(
-            user_message_text, session, request.user, actions=handoff, flags=flags
+            raw_message, session, request.user, actions=handoff, flags=flags
         )
+
+        # After a detour the pending qualification question rides along with
+        # whatever answer the visitor did get, so the flow never stalls. When
+        # the turn carries its own structured payload the front end renders the
+        # question itself instead.
+        pending = flags.get('pending_question')
+        if pending and not flags.get('structured'):
+            reply = f"{reply.rstrip()} {pending}"
 
         ChatMessage.objects.create(
             session=session, sender='BOT', content=reply
         )
+        # Conversation state only ever lives on the session: page, stage,
+        # answers. Nothing here is sent back to the visitor.
+        session.save()
 
         # The same answer, cut into renderable pieces so the bubble can show
         # paragraphs or a list instead of one dense block of text.
@@ -487,10 +503,11 @@ def get_suggestions(request):
 
         # Only an explicit "get me a person" opens a ticket. The bot's
         # low-confidence fallback also offers a person, and that must not fill
-        # the call centre with every unanswered question.
+        # the call centre with every unanswered question. The same raw text the
+        # reply was built from decides, so the two can never disagree.
         ticket = None
-        if wants_human(user_message_text):
-            ticket = _open_call_request(request, session, user_message_text, handoff)
+        if wants_human(raw_message):
+            ticket = _open_call_request(request, session, raw_message, handoff)
 
         return JsonResponse({
             'reply': reply,
@@ -501,6 +518,10 @@ def get_suggestions(request):
             'actions': handoff,
             'offer_call': offer_call,
             'call': _call_request_payload(ticket),
+            # Everything beyond the words: intent, stage, recommendations and
+            # the summary block. None on turns the conversation engine let the
+            # normal answer pipeline handle.
+            'structured': flags.get('structured'),
             'session_id': session.session_id
         })
 
@@ -509,6 +530,159 @@ def get_suggestions(request):
     except Exception as e:
         print(f"[!] Chatbot Error: {e}")
         return JsonResponse({'error': 'Something went wrong.'}, status=500)
+
+
+def _json_body(request):
+    """The decoded request body, or None when it is not valid JSON."""
+    try:
+        body = json.loads(request.body)
+    except json.JSONDecodeError:
+        return None
+    return body if isinstance(body, dict) else None
+
+
+def _authenticated_user(request):
+    user = getattr(request, 'user', None)
+    return user if user and user.is_authenticated else None
+
+
+@csrf_exempt
+def page_context_view(request):
+    """What the guide should say on the page it is embedded in.
+
+    The widget calls this on load with the path it is sitting on and gets back
+    a welcome line, the page's own second sentence, the questions worth
+    suggesting there and any call to action
+    the page carries — every URL resolved against the real URL table and
+    filtered for the visitor's access level and the index's live pages. When a
+    session id travels with it the page is remembered, so the very first
+    message already knows where the visitor is reading from.
+    """
+    if request.method == 'GET':
+        path = request.GET.get('path') or ''
+        session_id = request.GET.get('session_id') or ''
+    elif request.method == 'POST':
+        body = _json_body(request)
+        if body is None:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+        path = body.get('path') or ''
+        session_id = body.get('session_id') or ''
+    else:
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+    context = page_context.resolve_context(path, user=_authenticated_user(request))
+
+    session_id = str(session_id).strip()[:100]
+    if session_id:
+        session = ChatSession.objects.filter(session_id=session_id).first()
+        if session:
+            conversation.remember_page(
+                session, {'path': context.get('path'), 'title': context.get('title')})
+            session.save(update_fields=['state', 'updated_at'])
+
+    return JsonResponse(context)
+
+
+@csrf_exempt
+def request_lead(request):
+    """The visitor confirmed: hand this conversation to the team as a lead.
+
+    Everything in the summary comes from answers they actually gave — the
+    transcript is stored as-is on the session, and the row is written once per
+    session so a double click updates it instead of queueing duplicates. The
+    same handover also opens a form ticket, which is how the queue learns there
+    is a person waiting behind it.
+    """
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+    body = _json_body(request)
+    if body is None:
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+
+    session_id = str(body.get('session_id') or '').strip()[:100]
+    session = ChatSession.objects.filter(session_id=session_id).first() \
+        if session_id else None
+    if not session:
+        return JsonResponse({'error': 'Unknown session'}, status=400)
+
+    state = conversation.load_state(session)
+    intent = state.get('intent') or ''
+    if intent not in INTENTS:
+        # Nothing has been said yet, so there is no summary to hand over and
+        # nothing to qualify a call about.
+        return JsonResponse(
+            {'error': 'There is not enough in this chat to hand over yet.'},
+            status=400)
+
+    fields = conversation.lead_fields(state)
+    summary = conversation.team_summary(state)
+
+    lead, created = ChatLead.objects.get_or_create(
+        session=session,
+        defaults={'intent': fields['intent'], 'solution': fields['solution'],
+                  'contact': fields['contact'], 'summary': summary,
+                  'data': fields['data']},
+    )
+    changed = []
+    for name in ('intent', 'solution', 'contact'):
+        if getattr(lead, name) != fields[name]:
+            setattr(lead, name, fields[name])
+            changed.append(name)
+    if lead.summary != summary:
+        lead.summary = summary
+        changed.append('summary')
+    if lead.data != fields['data']:
+        lead.data = fields['data']
+        changed.append('data')
+    if changed:
+        lead.save(update_fields=changed + ['updated_at'])
+
+    state['stage'] = 'ready'
+    state['lead_submitted'] = True
+    session.state = state
+    session.save()
+
+    reply = (
+        "Thank you - your request is with the team. I have passed on this "
+        "conversation along with the summary above, so there is no need to "
+        "repeat anything. Someone will get back to you."
+    )
+
+    # The press and its confirmation are written once, on the first submission:
+    # a double click must not leave the agent reading the confirmation twice.
+    if created:
+        label = str(body.get('label') or '').strip()[:200]
+        if not label:
+            label = 'Request a consultation'
+        # The button press is the visitor's own line, so it belongs in the
+        # transcript the agent reads - they will see what was asked for.
+        ChatMessage.objects.create(
+            session=session, sender='USER', content=escape(label))
+        ChatMessage.objects.create(session=session, sender='BOT', content=reply)
+
+    ticket = _open_call_request(
+        request, session,
+        f"Consultation requested - {lead.solution or lead.intent}",
+        [{'kind': 'form'}],
+    )
+
+    reply_parts, reply_format = site_search.split_answer(reply)
+    return JsonResponse({
+        'reply': reply,
+        'reply_parts': reply_parts,
+        'reply_format': reply_format,
+        'summary': conversation.lead_summary(state),
+        'lead': {
+            'intent': lead.intent,
+            'solution': lead.solution,
+            'summary': lead.summary,
+            'status': lead.status,
+            'created': created,
+        },
+        'call': _call_request_payload(ticket),
+        'session_id': session.session_id,
+    })
 
 
 # ── Navbar site search ──────────────────────────────────────────────────────
@@ -665,15 +839,21 @@ def _order_reply(message_lower, session, user, flags=None):
 def generate_response(message, session, user=None, actions=None, flags=None):
     """Answer any question about the site.
 
-    Order of preference: small talk, then a hand-written answer when the visitor
-    used the exact wording it was written for, then the site-wide index. The
-    index is what lets the bot talk about any page, not just the curated set.
+    Order of preference: small talk, then the conversation engine — which
+    turns a stated requirement into a recommendation, a qualification and a
+    summary the visitor can hand over — then a hand-written answer when the
+    visitor used the exact wording it was written for, then the site-wide
+    index. The index is what lets the bot talk about any page, not just the
+    curated set.
 
-    ``actions`` is an optional list that collects the live-agent buttons for this
-    turn. It is filled in place rather than returned, so the three-tuple result
-    that callers and tests already unpack stays unchanged. ``flags`` is filled in
-    the same way and carries ``offer_call``: whether this turn should show the
-    visitor a way to reach a person at all.
+    ``message`` is the visitor's raw text; escaping belongs to the transcript,
+    not to the reasoning. ``actions`` is an optional list that collects the
+    live-agent buttons for this turn. It is filled in place rather than
+    returned, so the three-tuple result that callers and tests already unpack
+    stays unchanged. ``flags`` is filled in the same way and carries
+    ``offer_call`` (whether this turn should show a way to reach a person),
+    ``structured`` (the conversation layer's payload) and ``pending_question``
+    (an unanswered qualification question worth re-offering).
     """
     message_lower = message.lower()
     user = user or getattr(session, 'user', None)
@@ -727,6 +907,17 @@ def generate_response(message, session, user=None, actions=None, flags=None):
                     [{'title': 'Ask something else', 'content': 'What else can I help with?'}],
                     links,
                 )
+
+    # ── Understand, recommend, qualify, convert ──
+    # The guide's own flow: a stated requirement or an explicit ask turns the
+    # answer into a recommendation and then one useful question at a time. It
+    # sits after the small talk and page-link turns so those keep their exact
+    # behaviour, and before the curated answers so a real project brief is
+    # qualified rather than answered with a paragraph. Returning None means
+    # "not my turn" and the pipeline below runs unchanged.
+    turn = conversation.handle_turn(message, session, user=user, flags=flags)
+    if turn is not None:
+        return turn
 
     # ── A curated answer the visitor clearly asked for ──
     page_key, match, strength = _curated_match(message)
