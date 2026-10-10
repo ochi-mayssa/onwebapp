@@ -398,6 +398,27 @@
     .dd-rv__tiles{grid-template-columns:1fr}
 }
 
+/* ── Responsive dashboards ─────────────────────────────────────────── */
+.dd-sub{font-family:var(--font-display);font-weight:800;font-size:clamp(1.25rem,2.4vw,1.6rem);text-align:center;margin:0 0 .9rem;color:var(--text-primary)}
+.dd-devices{display:grid;grid-template-columns:repeat(3,1fr);gap:1.15rem}
+.dd-device{background:var(--bg-surface);border:1px solid var(--border-color);border-top:4px solid var(--dc);border-radius:var(--radius-xl);padding:1.55rem 1.5rem;height:100%;overflow:hidden}
+.dd-device__img{display:block;width:calc(100% + 3rem);height:260px;margin:-1.55rem -1.5rem 1.2rem;object-fit:cover;object-position:center}
+.dd-device h4{font-family:var(--font-display);font-size:1.05rem;font-weight:800;display:flex;align-items:center;gap:.6rem;margin:0 0 .55rem;color:var(--text-primary)}
+.dd-device h4 i{color:var(--dc);font-size:1rem}
+.dd-device p{margin:0;color:var(--text-secondary);font-size:.92rem;line-height:1.75}
+.dd-points{list-style:none;max-width:1040px;margin:0 auto;padding:0;display:grid;grid-template-columns:repeat(2,1fr);gap:.25rem 2.5rem}
+.dd-points li{display:flex;align-items:flex-start;gap:.7rem;padding:.6rem 0;font-size:.93rem;line-height:1.7;color:var(--text-secondary)}
+.dd-points li i{color:var(--primary-color);font-size:.75rem;margin-top:.45rem;flex-shrink:0}
+.dd-points li b{color:var(--text-primary)}
+.dd-team{display:grid;grid-template-columns:repeat(2,1fr);gap:1.3rem 2.5rem;max-width:1040px;margin:1.75rem auto 0}
+.dd-tmember{display:flex;align-items:flex-start;gap:.95rem}
+.dd-tmember__ic{flex-shrink:0;width:42px;height:42px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;font-size:1rem;color:var(--dc);background:var(--dc-soft)}
+.dd-tmember p{margin:0;font-size:.92rem;line-height:1.7;color:var(--text-secondary)}
+.dd-tmember b{color:var(--text-primary)}
+.dd-xchips{display:flex;flex-wrap:wrap;gap:.6rem;justify-content:center;margin-top:1.6rem}
+.dd-xchip{display:inline-flex;align-items:center;gap:.5rem;padding:.5rem 1.05rem;border-radius:999px;background:var(--bg-surface);border:1px solid var(--border-color);font-size:.85rem;font-weight:700;color:var(--text-primary);box-shadow:0 10px 22px -18px rgba(2,6,23,.5)}
+.dd-xchip i{color:#10b981;font-size:.72rem}
+
 /* ── Responsive ───────────────────────────────────────────────────── */
 @media(max-width:1199px){
     .dd-hero__inner{grid-template-columns:1fr;gap:2.75rem}
@@ -463,11 +484,15 @@
     .dd-mock__brand{display:none}
     .dd-mock__nav{white-space:nowrap}
     .dd-board__tiles{grid-template-columns:repeat(3,1fr)}
+    .dd-devices{grid-template-columns:1fr}
+    .dd-device__img{height:320px}
 }
 @media(max-width:767px){
     .dd-board__tiles{grid-template-columns:1fr}
     .dd-faq__btn{padding:1.1rem 1.15rem}
     .dd-faq__body{padding:0 1.15rem 1.2rem}
+    .dd-points{grid-template-columns:1fr}
+    .dd-team{grid-template-columns:1fr}
 }
 @media(max-width:575px){
     .dd-shot{margin-top:2.25rem;border-radius:14px}
@@ -1564,6 +1589,81 @@
     </div>
 </section>
 
+<!-- ══ RESPONSIVE ══════════════════════════════════════════════════ -->
+<section class="dd-section dd-section--alt" id="db-responsive">
+    <div class="dd-container">
+        <div class="text-center mb-5 dd-reveal">
+            <div class="dd-eyebrow">{% trans "Responsive Dashboards" %}</div>
+            <h2 class="dd-h2">{% trans "Your Business Insights." %} <span class="dd-grad-ink">{% trans "On Every Screen." %}</span></h2>
+            <p class="dd-lede mx-auto">{% trans "Your business doesn't stop when you leave your desk. Your dashboards shouldn't either." %}</p>
+            <div class="dd-xchips">
+                <span class="dd-xchip"><i class="fas fa-check"></i>{% trans "No separate mobile application" %}</span>
+                <span class="dd-xchip"><i class="fas fa-check"></i>{% trans "No awkward layouts" %}</span>
+                <span class="dd-xchip"><i class="fas fa-check"></i>{% trans "Just clear, actionable data on every screen" %}</span>
+            </div>
+        </div>
+
+        <div class="mt-5 dd-reveal">
+            <h3 class="dd-sub">{% trans "Designed for the Way You Work" %}</h3>
+            <div class="dd-devices">
+                <div class="dd-device" style="--dc:#4f46e5">
+                    <img class="dd-device__img" src="{% static 'img/pic1.png' %}" alt="{% trans 'Desktop dashboard' %}">
+                    <h4>{% trans "Desktop — Analyze in Detail" %}</h4>
+                    <p>{% trans "Explore comprehensive KPI grids, interactive charts, detailed reports, and side-by-side comparisons. Get the full picture when you need to investigate performance and make strategic decisions." %}</p>
+                </div>
+                <div class="dd-device" style="--dc:#0891b2">
+                    <img class="dd-device__img" src="{% static 'img/pic2.png' %}" alt="{% trans 'Tablet dashboard' %}">
+                    <h4>{% trans "Tablet — Stay Connected" %}</h4>
+                    <p>{% trans "Navigate touch-friendly dashboards with adaptive layouts and readable visualizations. Ideal for team meetings, business reviews, site visits, and operational check-ins." %}</p>
+                </div>
+                <div class="dd-device" style="--dc:#7c3aed">
+                    <img class="dd-device__img" src="{% static 'img/pic3.png' %}" alt="{% trans 'Mobile dashboard' %}">
+                    <h4>{% trans "Mobile — Act on the Go" %}</h4>
+                    <p>{% trans "See your most important metrics at a glance. Access priority KPIs, filter results, explore trends, and drill into the details directly from your phone." %}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-5 text-center dd-reveal">
+            <h3 class="dd-sub">{% trans "More Than a Smaller Screen" %}</h3>
+            <p class="dd-lede mx-auto">{% trans "Responsive design means adapting the entire experience, not simply shrinking the interface." %}</p>
+        </div>
+        <ul class="dd-points dd-reveal">
+            <li><i class="fas fa-check"></i><span><b>{% trans "Adaptive layouts" %}:</b> {% trans "Charts, cards, tables, and filters reorganize intelligently for each screen size." %}</span></li>
+            <li><i class="fas fa-check"></i><span><b>{% trans "Touch-first interactions" %}:</b> {% trans "Navigate reports, adjust filters, and explore data without relying on a mouse." %}</span></li>
+            <li><i class="fas fa-check"></i><span><b>{% trans "Clear visualizations" %}:</b> {% trans "Charts and metrics remain readable, with layouts designed to prevent clipping and unnecessary scrolling." %}</span></li>
+            <li><i class="fas fa-check"></i><span><b>{% trans "Performance by design" %}:</b> {% trans "Efficient data loading and optimized queries help dashboards remain responsive on mobile connections." %}</span></li>
+            <li><i class="fas fa-check"></i><span><b>{% trans "Consistent business data" %}:</b> {% trans "Your team works from the same underlying data and reporting logic across devices, subject to the same access permissions." %}</span></li>
+        </ul>
+
+        <div class="mt-5 text-center dd-reveal">
+            <h3 class="dd-sub">{% trans "Built Around Your Team" %}</h3>
+            <p class="dd-lede mx-auto">{% trans "Different roles need different insights, wherever they work." %}</p>
+        </div>
+        <div class="dd-team dd-reveal">
+            <div class="dd-tmember" style="--dc:#4f46e5;--dc-soft:rgba(79,70,229,.12)">
+                <span class="dd-tmember__ic"><i class="fas fa-chart-line"></i></span>
+                <p><b>{% trans "Executives" %}</b> {% trans "monitor performance between meetings." %}</p>
+            </div>
+            <div class="dd-tmember" style="--dc:#059669;--dc-soft:rgba(5,150,105,.12)">
+                <span class="dd-tmember__ic"><i class="fas fa-handshake"></i></span>
+                <p><b>{% trans "Sales teams" %}</b> {% trans "review opportunities before client calls." %}</p>
+            </div>
+            <div class="dd-tmember" style="--dc:#7c3aed;--dc-soft:rgba(124,58,237,.12)">
+                <span class="dd-tmember__ic"><i class="fas fa-gears"></i></span>
+                <p><b>{% trans "Operations managers" %}</b> {% trans "check production metrics on the floor." %}</p>
+            </div>
+            <div class="dd-tmember" style="--dc:#ea580c;--dc-soft:rgba(234,88,12,.12)">
+                <span class="dd-tmember__ic"><i class="fas fa-location-dot"></i></span>
+                <p><b>{% trans "Field teams" %}</b> {% trans "access the information they need on-site." %}</p>
+            </div>
+        </div>
+        <div class="mt-4 text-center dd-reveal">
+            <p class="dd-lede mx-auto" style="font-weight:600;color:var(--text-primary);">{% trans "Everyone gets a dashboard designed for their workflow, device, and responsibilities." %}</p>
+        </div>
+    </div>
+</section>
+
 <!-- ══ INDUSTRIES ═════════════════════════════════════════════════ -->
 <section class="dd-section">
     <div class="dd-container">
@@ -1740,11 +1840,11 @@
 <section style="padding:0;">
     <div class="dd-container" style="padding:2rem 1.5rem 5rem;">
         <div class="dd-cta dd-reveal">
-            <h2>{% trans "Ready to see your data clearly?" %}</h2>
-            <p>{% trans "Let's build a dashboard around the decisions your business actually makes." %}</p>
+            <h2>{% trans "One Dashboard. Every Device. Better Decisions." %}</h2>
+            <p>{% trans "Build your dashboard once. Give your team a consistent, accessible experience across every screen." %}</p>
             <div class="d-flex gap-3 justify-content-center flex-wrap">
                 <span class="btn btn-lg rounded-pill px-5 fw-800" aria-disabled="true" style="background:linear-gradient(135deg,var(--primary-600),var(--primary-500));color:#fff;border:none;box-shadow:0 14px 30px -14px rgba(79,70,229,.9);cursor:default;">
-                    {% trans "Start Your Project" %} <i class="fas fa-arrow-right ms-1"></i>
+                    {% trans "Build Your Custom Dashboard" %} <i class="fas fa-arrow-right ms-1"></i>
                 </span>
                 <a href="#db-process" class="btn btn-lg rounded-pill px-4 fw-700" style="background:var(--bg-surface-secondary);border:1px solid var(--border-color);color:var(--text-primary);">
                     {% trans "See Our Process" %}
