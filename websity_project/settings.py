@@ -85,6 +85,7 @@ INSTALLED_APPS = [
     'branding',
     'root_dashboard',
     'digital_presence',
+    'dashboard_inquiry',
 ]
 
 ASGI_APPLICATION = 'websity_project.asgi.application'

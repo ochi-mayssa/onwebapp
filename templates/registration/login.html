@@ -3,564 +3,538 @@
 {% block title %}{% trans 'Sign In' %}{% endblock %}
 
 {% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
 
 {% block extra_css %}
 <style>
-.auth-page {
-    min-height: 100vh;
+/* ══ OnWebApp auth — page-scoped split-screen design ══════════════ */
+.lp-page {
+    --lp-navy: #0F172A;
+    --lp-cyan: #6366f1;
+    --lp-cyan-deep: #4f46e5;
+    --lp-cyan-soft: rgba(99, 102, 241, .14);
+    --lp-violet: #818cf8;
+    --lp-white: #FFFFFF;
+    --lp-off: #F8FAFC;
+    --lp-ink: #0F172A;
+    --lp-muted: #64748B;
+    --lp-border: #E2E8F0;
+    --lp-radius: 10px;
     display: flex;
-    background: var(--bg-body);
+    min-height: 100vh;
+    background: var(--lp-off);
+    font-family: var(--font-body, 'Inter', sans-serif);
+    color: var(--lp-ink);
 }
 
-/* Left Panel - Brand */
-.auth-brand {
-    flex: 1;
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+/* Signup view: mirror the split so the form sits on the left */
+.lp-page--flip { flex-direction: row-reverse; }
+
+/* ── Left: brand panel (~52%) ─────────────────────────────────── */
+.lp-brand {
+    flex: 0 0 52%;
+    background: var(--lp-navy);
+    color: #fff;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 3rem;
+    justify-content: space-between;
+    padding: 2.5rem 3.5rem;
     position: relative;
     overflow: hidden;
+    border-right: 1px solid rgba(255, 255, 255, .06);
 }
-.auth-brand::before {
-    content: '';
-    position: absolute;
-    top: -200px;
-    right: -200px;
-    width: 500px;
-    height: 500px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(59,130,246,.12) 0%, transparent 70%);
-}
-.auth-brand::after {
-    content: '';
-    position: absolute;
-    bottom: -150px;
-    left: -150px;
-    width: 400px;
-    height: 400px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(139,92,246,.08) 0%, transparent 70%);
-}
-.auth-brand-content {
+.lp-brand__top { position: relative; z-index: 2; }
+.lp-brand__logo { height: 34px; width: auto; filter: brightness(0) invert(1); display: block; }
+.lp-brand__caption {
     position: relative;
-    z-index: 1;
-    text-align: center;
-    max-width: 400px;
+    z-index: 2;
+    margin: 2rem 0 0;
+    font-size: .78rem;
+    font-weight: 600;
+    letter-spacing: .04em;
+    color: rgba(255, 255, 255, .42);
 }
-.auth-brand-logo {
-    height: 48px;
-    margin-bottom: 2rem;
-    filter: brightness(0) invert(1);
-}
-.auth-brand h2 {
-    color: #fff;
-    font-size: 2rem;
-    font-weight: 800;
-    letter-spacing: -.03em;
-    margin-bottom: 1rem;
-    line-height: 1.2;
-}
-.auth-brand h2 span {
-    background: linear-gradient(135deg, #60a5fa, #a78bfa);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-.auth-brand p {
-    color: rgba(255,255,255,.5);
-    font-size: .95rem;
-    line-height: 1.7;
-    margin-bottom: 2.5rem;
-}
-.auth-brand-features {
+
+/* ── Hero (logo + welcome) ────────────────────────────────────── */
+.lp-hero {
+    position: relative;
+    z-index: 2;
+    flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    text-align: left;
-}
-.auth-brand-feature {
-    display: flex;
-    align-items: center;
-    gap: .75rem;
-    color: rgba(255,255,255,.6);
-    font-size: .85rem;
-}
-.auth-brand-feature i {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    background: rgba(255,255,255,.06);
-    border: 1px solid rgba(255,255,255,.08);
-    display: flex;
     align-items: center;
     justify-content: center;
-    font-size: .75rem;
-    color: #60a5fa;
-    flex-shrink: 0;
+    text-align: center;
+    padding: 2rem 0;
 }
-
-/* Right Panel - Form */
-.auth-form-panel {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem;
+.lp-hero__logo {
+    width: clamp(190px, 22vw, 280px);
+    height: auto;
+    display: block;
+    margin-bottom: 1.8rem;
 }
-.auth-form-wrapper {
-    width: 100%;
-    max-width: 420px;
-}
-.auth-form-header {
-    margin-bottom: 2rem;
-}
-.auth-form-header img {
-    height: 36px;
-    margin-bottom: 1.5rem;
-}
-.auth-form-header h1 {
-    font-size: 1.75rem;
+.lp-hero__title {
+    font-family: var(--font-display, 'Plus Jakarta Sans', sans-serif);
+    font-size: clamp(1.6rem, 2.6vw, 2.2rem);
     font-weight: 800;
-    color: var(--text-primary);
     letter-spacing: -.03em;
-    margin-bottom: .4rem;
-}
-.auth-form-header p {
-    color: var(--text-secondary);
-    font-size: .9rem;
-}
-
-/* Tabs */
-.auth-tabs {
-    display: flex;
-    background: var(--bg-surface-secondary);
-    border-radius: 12px;
-    padding: 4px;
-    margin-bottom: 2rem;
-    border: 1px solid var(--border-color);
-}
-.auth-tab {
-    flex: 1;
-    padding: .65rem 1rem;
-    border: none;
-    background: none;
-    border-radius: 10px;
-    font-size: .85rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-    cursor: pointer;
-    transition: all .25s;
-    text-transform: none;
-    letter-spacing: 0;
-    box-shadow: none;
-    margin-top: 0;
-    width: auto;
-    height: auto;
-}
-.auth-tab.active {
-    background: var(--bg-surface);
-    color: var(--text-primary);
-    box-shadow: 0 2px 8px rgba(0,0,0,.06);
-}
-.auth-tab:hover:not(.active) {
-    color: var(--text-primary);
-}
-
-/* Form */
-.auth-form {
-    display: none;
-}
-.auth-form.active {
-    display: block;
-}
-.auth-form .input-group {
-    position: relative;
-    margin-bottom: 1rem;
-}
-.auth-form .input-group label {
-    display: block;
-    font-size: .8rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-    margin-bottom: .4rem;
-}
-.auth-form .input-icon {
-    position: absolute;
-    left: 14px;
-    top: 38px;
-    color: var(--text-muted);
-    font-size: .85rem;
-    pointer-events: none;
-    transition: color .2s;
-}
-.auth-form input[type="text"],
-.auth-form input[type="email"],
-.auth-form input[type="password"] {
-    width: 100%;
-    padding: .7rem .7rem .7rem 2.5rem;
-    border: 1px solid var(--border-color);
-    border-radius: 10px;
-    background: var(--bg-surface-secondary);
-    color: var(--text-primary);
-    font-size: .9rem;
-    transition: all .25s;
-}
-.auth-form input:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(37,99,235,.1);
-    background: var(--bg-surface);
-}
-.auth-form input::placeholder {
-    color: var(--text-muted);
-}
-
-/* Password toggle */
-.pw-toggle {
-    position: absolute;
-    right: 10px;
-    top: 34px;
-    background: none;
-    border: none;
-    color: var(--text-muted);
-    cursor: pointer;
-    padding: 4px;
-    font-size: .85rem;
-    z-index: 2;
-    transition: color .2s;
-    width: auto;
-    height: auto;
-    margin: 0;
-    border-radius: 6px;
-    text-transform: none;
-    letter-spacing: 0;
-    box-shadow: none;
-}
-.pw-toggle:hover {
-    color: var(--primary-color);
-}
-
-/* Links row */
-.auth-links {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-}
-.auth-links a {
-    font-size: .82rem;
-    color: var(--primary-color);
-    text-decoration: none;
-    font-weight: 500;
-}
-.auth-links a:hover {
-    text-decoration: underline;
-}
-
-/* Submit button */
-.auth-submit {
-    width: 100%;
-    padding: .8rem;
-    border: none;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    line-height: 1.15;
+    margin: 0 0 .7rem;
     color: #fff;
-    font-size: .9rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all .3s;
-    box-shadow: 0 4px 16px rgba(37,99,235,.25);
-    text-transform: none;
-    letter-spacing: 0;
-    margin-top: 0;
 }
-.auth-submit:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(37,99,235,.35);
+.lp-hero__sub {
+    color: rgba(255, 255, 255, .6);
+    font-size: 1rem;
+    line-height: 1.7;
+    max-width: 400px;
+    margin: 0;
 }
 
-/* Footer text */
-.auth-footer-text {
-    text-align: center;
-    margin-top: 1.5rem;
-    font-size: .85rem;
-    color: var(--text-secondary);
+/* ── Right: auth panel (~48%) ─────────────────────────────────── */
+.lp-auth {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2.5rem 2rem;
+    background: var(--lp-off);
 }
-.auth-footer-text a {
-    font-weight: 600;
-    color: var(--primary-color);
-    text-decoration: none;
+.lp-auth__inner {
+    width: 100%; max-width: 440px;
+    background: var(--lp-white);
+    border: 1px solid var(--lp-border);
+    border-radius: 16px;
+    padding: 2.4rem 2.4rem 1.9rem;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, .04), 0 12px 32px -12px rgba(15, 23, 42, .12);
 }
-.auth-footer-text a:hover {
-    text-decoration: underline;
+.lp-auth__brand { display: none; align-items: center; gap: .6rem; margin-bottom: 1.5rem; }
+.lp-auth__brand img { height: 30px; width: auto; }
+.lp-auth__logo { height: 34px; width: auto; display: block; margin-bottom: 1.4rem; }
+.lp-auth__title {
+    font-family: var(--font-display, 'Plus Jakarta Sans', sans-serif);
+    font-size: 1.6rem; font-weight: 800; letter-spacing: -.025em;
+    margin: 0 0 .4rem; color: var(--lp-ink);
+}
+.lp-auth__sub { color: var(--lp-muted); font-size: .93rem; margin: 0 0 1.7rem; }
+
+/* ── Form fields ──────────────────────────────────────────────── */
+.lp-field { margin-bottom: 1.1rem; }
+.lp-field label {
+    display: block; font-size: .82rem; font-weight: 600;
+    color: var(--lp-ink); margin-bottom: .45rem; letter-spacing: -.01em;
+}
+.lp-input-wrap { position: relative; display: flex; align-items: center; }
+.lp-input-wrap > svg, .lp-input-wrap > i {
+    position: absolute; left: 15px;
+    width: 17px; height: 17px;
+    color: #94A3B8; pointer-events: none;
+    transition: color .18s;
+}
+.lp-input {
+    width: 100%; height: 50px;
+    padding: 0 15px 0 44px;
+    border: 1px solid var(--lp-border);
+    border-radius: 12px;
+    background: var(--lp-white);
+    color: var(--lp-ink);
+    font-size: .93rem;
+    font-family: inherit;
+    transition: border-color .18s, box-shadow .18s, background .18s;
+}
+.lp-input::placeholder { color: #A0AEC0; }
+.lp-input:hover:not(:focus) { border-color: #CBD5E1; }
+.lp-input:focus {
+    outline: none;
+    border-color: var(--lp-cyan-deep);
+    box-shadow: 0 0 0 4px var(--lp-cyan-soft);
+}
+.lp-input-wrap:focus-within > svg, .lp-input-wrap:focus-within > i { color: var(--lp-cyan-deep); }
+.lp-input.is-invalid { border-color: #DC2626; background: #FFFBFB; }
+.lp-input.is-invalid:focus { box-shadow: 0 0 0 4px rgba(220, 38, 38, .1); }
+.lp-input:-webkit-autofill,
+.lp-input:-webkit-autofill:hover,
+.lp-input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px var(--lp-white) inset;
+    -webkit-text-fill-color: var(--lp-ink);
+    caret-color: var(--lp-ink);
+}
+.lp-pw-toggle {
+    position: absolute; right: 8px;
+    display: grid; place-items: center;
+    width: 34px; height: 34px;
+    border: none; background: none;
+    border-radius: 9px; cursor: pointer;
+    color: #94A3B8; transition: color .15s, background .15s;
+}
+.lp-pw-toggle:hover { color: var(--lp-ink); background: #F1F5F9; }
+.lp-pw-toggle:focus-visible { outline: 2px solid var(--lp-cyan-deep); outline-offset: 1px; }
+.lp-pw-toggle svg { width: 17px; height: 17px; }
+.lp-error {
+    display: flex; align-items: center; gap: .3rem;
+    margin-top: .4rem;
+    font-size: .78rem; font-weight: 500; color: #DC2626;
 }
 
-/* Alert */
-.auth-alert {
-    padding: .75rem 1rem;
-    border-radius: 10px;
-    font-size: .85rem;
-    font-weight: 500;
-    margin-bottom: 1rem;
-    border-left: 3px solid;
+/* ── Row: remember / forgot ───────────────────────────────────── */
+.lp-row {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 1rem; margin: .1rem 0 1.4rem;
 }
-.auth-alert--error {
-    background: rgba(239,68,68,.08);
-    color: #dc2626;
-    border-color: #dc2626;
+.lp-check { display: flex; align-items: center; gap: .55rem; cursor: pointer; user-select: none; }
+.lp-check input {
+    width: 17px; height: 17px; accent-color: var(--lp-cyan-deep);
+    cursor: pointer; border-radius: 5px;
 }
-.auth-alert--success {
-    background: rgba(16,185,129,.08);
-    color: #059669;
-    border-color: #059669;
-}
+.lp-check span { font-size: .85rem; color: var(--lp-muted); transition: color .15s; }
+.lp-check:hover span { color: var(--lp-ink); }
+.lp-link { font-size: .85rem; font-weight: 600; color: var(--lp-cyan-deep); text-decoration: none; transition: color .15s; }
+.lp-link:hover { color: #4338ca; text-decoration: underline; text-underline-offset: 2px; }
 
-/* Terms */
-.auth-terms {
-    font-size: .75rem;
-    color: var(--text-muted);
-    text-align: center;
-    margin-top: 1rem;
-    line-height: 1.5;
+/* ── Buttons ──────────────────────────────────────────────────── */
+.lp-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+    width: 100%; height: 50px;
+    border: none; border-radius: 12px;
+    font-size: .95rem; font-weight: 700; font-family: inherit;
+    letter-spacing: -.01em; cursor: pointer;
+    transition: background .18s, box-shadow .18s, transform .12s, border-color .18s, color .18s;
 }
-.auth-terms a {
-    color: var(--primary-color);
-    text-decoration: none;
+.lp-btn--primary {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    color: #fff;
+    box-shadow: 0 1px 2px rgba(79, 70, 229, .35), inset 0 1px 0 rgba(255, 255, 255, .12);
 }
+.lp-btn--primary:hover { background: linear-gradient(135deg, #5b5ef0 0%, #4338ca 100%); box-shadow: 0 4px 14px -4px rgba(79, 70, 229, .5); }
+.lp-btn--primary:active { transform: translateY(1px); box-shadow: 0 1px 2px rgba(79, 70, 229, .3); }
+.lp-btn--primary:disabled { opacity: .65; cursor: not-allowed; transform: none; }
+.lp-btn--ghost {
+    background: var(--lp-white); color: var(--lp-ink);
+    border: 1px solid var(--lp-border);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, .04);
+}
+.lp-btn--ghost:hover { border-color: var(--lp-cyan-deep); color: var(--lp-cyan-deep); background: #FAFAFF; }
+.lp-btn--ghost:active { transform: translateY(1px); }
+.lp-btn .lp-spinner {
+    width: 15px; height: 15px;
+    border: 2px solid rgba(255, 255, 255, .4);
+    border-top-color: #fff; border-radius: 50%;
+    animation: lpSpin .7s linear infinite; display: none;
+}
+.lp-btn.is-loading .lp-spinner { display: inline-block; }
+@keyframes lpSpin { to { transform: rotate(360deg); } }
 
-/* Responsive */
-@media (max-width: 991px) {
-    .auth-brand {
-        display: none;
-    }
-    .auth-form-panel {
-        min-height: 100vh;
-    }
+/* ── Divider + swap link ──────────────────────────────────────── */
+.lp-divider {
+    display: flex; align-items: center; gap: .9rem;
+    margin: 1.5rem 0 1rem;
+    font-size: .8rem; font-weight: 600; color: var(--lp-muted);
 }
-@media (max-width: 575px) {
-    .auth-form-panel {
-        padding: 1.5rem;
-    }
-    .auth-form-header h1 {
-        font-size: 1.5rem;
-    }
+.lp-divider::before, .lp-divider::after {
+    content: ''; flex: 1; height: 1px; background: var(--lp-border);
+}
+.lp-swap { margin: 0 0 .3rem; }
+
+/* ── Alerts ───────────────────────────────────────────────────── */
+.lp-alerts { margin-bottom: 1.1rem; }
+.lp-alert {
+    padding: .7rem .9rem; border-radius: 10px;
+    font-size: .84rem; font-weight: 500; margin-bottom: .5rem;
+    border: 1px solid;
+}
+.lp-alert:last-child { margin-bottom: 0; }
+.lp-alert--error { background: #FEF2F2; color: #B91C1C; border-color: #FECACA; }
+.lp-alert--success { background: #F0FDF4; color: #15803D; border-color: #BBF7D0; }
+
+/* ── Strength meter ───────────────────────────────────────────── */
+.lp-strength { margin-top: .55rem; }
+.lp-strength__track { display: flex; gap: 4px; }
+.lp-strength__seg { flex: 1; height: 4px; border-radius: 999px; background: var(--lp-border); transition: background .2s; }
+.lp-strength__seg.is-on-1 { background: #DC2626; }
+.lp-strength__seg.is-on-2 { background: #F59E0B; }
+.lp-strength__seg.is-on-3 { background: #84CC16; }
+.lp-strength__seg.is-on-4 { background: #16A34A; }
+.lp-strength__label { display: block; margin-top: .28rem; font-size: .72rem; font-weight: 600; color: var(--lp-muted); }
+
+/* ── Footer links ─────────────────────────────────────────────── */
+.lp-foot {
+    display: flex; flex-wrap: wrap; align-items: center; gap: .4rem 1.1rem;
+    margin-top: 1.4rem; padding-top: 1.2rem;
+    border-top: 1px solid var(--lp-border);
+    font-size: .78rem; color: var(--lp-muted);
+}
+.lp-foot a { color: var(--lp-muted); text-decoration: none; font-weight: 500; transition: color .15s; }
+.lp-foot a:hover { color: var(--lp-cyan-deep); }
+.lp-terms { margin: 1rem 0 0; font-size: .74rem; color: var(--lp-muted); line-height: 1.55; }
+.lp-terms a { color: var(--lp-cyan-deep); text-decoration: none; }
+.lp-terms a:hover { text-decoration: underline; }
+
+/* ── Responsive ───────────────────────────────────────────────── */
+@media (max-width: 1100px) {
+    .lp-brand { flex-basis: 46%; padding: 2.25rem 2.25rem; }
+}
+@media (max-width: 820px) {
+    .lp-page { flex-direction: column; }
+    .lp-brand { display: none; }
+    .lp-auth { flex: 1; align-items: flex-start; padding: 2rem 1.5rem 2.5rem; }
+    .lp-auth__brand { display: flex; }
+    .lp-auth__logo { display: none; }
+}
+@media (max-width: 480px) {
+    .lp-auth { padding: 1.25rem 1rem 2rem; }
+    .lp-auth__inner { padding: 1.6rem 1.35rem 1.4rem; border-radius: 14px; }
+    .lp-auth__title { font-size: 1.4rem; }
+    .lp-row { flex-direction: column; align-items: flex-start; gap: .7rem; }
 }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="auth-page">
+<div class="lp-page{% if active_panel == 'signup' %} lp-page--flip{% endif %}">
 
-    <!-- Left: Brand Panel -->
-    <div class="auth-brand">
-        <div class="auth-brand-content">
-            <h2>{% trans "Build." %} <span>{% trans "Automate." %}</span> {% trans "Scale." %}</h2>
-            <p>{% trans "All-in-one platform for web development, AI automation, ERP integration, and digital transformation." %}</p>
-            <div class="auth-brand-features">
-                <div class="auth-brand-feature">
-                    <i class="fas fa-link"></i>
-                    <span>{% trans "Seamless ERP & API integration" %}</span>
-                </div>
-                <div class="auth-brand-feature">
-                    <i class="fas fa-brain"></i>
-                    <span>{% trans "Built-in AI and automation" %}</span>
-                </div>
-                <div class="auth-brand-feature">
-                    <i class="fas fa-shield-halved"></i>
-                    <span>{% trans "GDPR, ISO 27001, WCAG compliant" %}</span>
-                </div>
-            </div>
+    <!-- ══ LEFT: brand experience ══ -->
+    <aside class="lp-brand">
+        <div class="lp-brand__top">
+            <img class="lp-brand__logo" src="{% static 'img/logo.png' %}" alt="OnWebApp">
         </div>
-    </div>
 
-    <!-- Right: Form Panel -->
-    <div class="auth-form-panel">
-        <div class="auth-form-wrapper">
+        <div class="lp-hero">
+            <img class="lp-hero__logo" src="{% static 'img/logo.png' %}" alt="">
+            {% if active_panel == 'signup' %}
+                <h1 class="lp-hero__title">{% trans "Join OnWebApp today." %}</h1>
+                <p class="lp-hero__sub">{% trans "Create your account and start connecting your operations in minutes." %}</p>
+            {% else %}
+                <h1 class="lp-hero__title">{% trans "Welcome back to OnWebApp." %}</h1>
+                <p class="lp-hero__sub">{% trans "Sign in to continue to your connected workspace." %}</p>
+            {% endif %}
+        </div>
 
-            <div class="auth-form-header">
+        <p class="lp-brand__caption">{% trans "AI Automation  ·  System Integration  ·  Business Intelligence" %}</p>
+    </aside>
+
+    <!-- ══ RIGHT: authentication ══ -->
+    <main class="lp-auth">
+        <div class="lp-auth__inner">
+
+            <div class="lp-auth__brand">
                 <img src="{% static 'img/logo.png' %}" alt="OnWebApp">
-                <h1 id="auth-title">{% trans "Welcome back" %}</h1>
-                <p id="auth-subtitle">{% trans "Sign in to your account to continue." %}</p>
             </div>
 
-            <!-- Tabs -->
-            <div class="auth-tabs">
-                <button type="button" class="auth-tab active" data-tab="login" id="tab-login">{% trans "Sign In" %}</button>
-                <button type="button" class="auth-tab" data-tab="signup" id="tab-signup">{% trans "Sign Up" %}</button>
-            </div>
-
-            <!-- Alerts -->
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="auth-alert auth-alert--error">{{ message }}</div>
-                {% endfor %}
+            {% if active_panel == 'signup' %}
+                <img class="lp-auth__logo" src="{% static 'img/logo.png' %}" alt="OnWebApp">
+                <h2 class="lp-auth__title">{% trans "Create your account" %}</h2>
+                <p class="lp-auth__sub">{% trans "Start building connected operations in minutes." %}</p>
+            {% else %}
+                <img class="lp-auth__logo" src="{% static 'img/logo.png' %}" alt="OnWebApp">
+                <h2 class="lp-auth__title">{% trans "Welcome back" %}</h2>
+                <p class="lp-auth__sub">{% trans "Sign in to your OnWebApp account." %}</p>
             {% endif %}
 
-            <!-- LOGIN FORM -->
-            <form method="post" action="{% url 'users:login_view' %}" class="auth-form active" id="form-login">
+            {% if messages %}
+                <div class="lp-alerts" role="status" aria-live="polite">
+                    {% for message in messages %}
+                        <div class="lp-alert {% if message.tags == 'success' %}lp-alert--success{% else %}lp-alert--error{% endif %}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% if active_panel == 'signup' %}
+            <!-- ══ SIGNUP FORM ══ -->
+            <form method="post" action="{% url 'users:signup' %}" novalidate>
                 {% csrf_token %}
 
-                {% if form.non_field_errors %}
-                    <div class="auth-alert auth-alert--error">
-                        {% for error in form.non_field_errors %}{{ error }}{% endfor %}
-                    </div>
-                {% endif %}
-
-                <div class="input-group">
-                    <label for="login-email">{% trans "Email" %}</label>
-                    <i class="fas fa-envelope input-icon"></i>
-                    <input type="email" id="login-email" name="email" placeholder="{% trans 'you@example.com' %}" required autocomplete="email">
-                </div>
-
-                <div class="input-group">
-                    <label for="login-password">{% trans "Password" %}</label>
-                    <i class="fas fa-lock input-icon"></i>
-                    <input type="password" id="login-password" name="password" placeholder="{% trans 'Enter your password' %}" required autocomplete="current-password">
-                    <button type="button" class="pw-toggle" onclick="togglePw('login-password', this)" aria-label="{% trans 'Show password' %}">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                </div>
-
-                <div class="auth-links">
-                    <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:.82rem;color:var(--text-secondary);">
-                        <input type="checkbox" name="remember" style="width:16px;height:16px;cursor:pointer;">
-                        {% trans "Remember me" %}
-                    </label>
-                    <a href="{% url 'users:password_reset' %}">{% trans "Forgot password?" %}</a>
-                </div>
-
-                <button type="submit" class="auth-submit">{% trans "Sign In" %}</button>
-            </form>
-
-            <!-- SIGNUP FORM -->
-            <form method="post" action="{% url 'users:signup' %}" class="auth-form" id="form-signup">
-                {% csrf_token %}
-
-                {% if signup_form.errors %}
-                    <div class="auth-alert auth-alert--error">
-                        {% for field, errors in signup_form.errors.items %}
-                            {% for error in errors %}{{ error }} {% endfor %}
-                        {% endfor %}
-                    </div>
-                {% endif %}
-
-                <div class="input-group">
+                <div class="lp-field">
                     <label for="signup-username">{% trans "Username" %}</label>
-                    <i class="fas fa-user input-icon"></i>
-                    <input type="text" id="signup-username" name="username" placeholder="{% trans 'Choose a username' %}" required
-                           value="{% if signup_form.username.value %}{{ signup_form.username.value }}{% endif %}">
+                    <div class="lp-input-wrap">
+                        <i data-lucide="user"></i>
+                        <input type="text" id="signup-username" name="username" class="lp-input {% if signup_form.username.errors %}is-invalid{% endif %}"
+                               placeholder="{% trans 'Choose a username' %}" required autocomplete="username"
+                               value="{% if signup_form.username.value %}{{ signup_form.username.value }}{% endif %}">
+                    </div>
+                    {% for error in signup_form.username.errors %}<span class="lp-error">{{ error }}</span>{% endfor %}
                 </div>
 
-                <div class="input-group">
-                    <label for="signup-email">{% trans "Email" %}</label>
-                    <i class="fas fa-envelope input-icon"></i>
-                    <input type="email" id="signup-email" name="email" placeholder="{% trans 'you@example.com' %}" required
-                           value="{% if signup_form.email.value %}{{ signup_form.email.value }}{% endif %}">
+                <div class="lp-field">
+                    <label for="signup-email">{% trans "Email address" %}</label>
+                    <div class="lp-input-wrap">
+                        <i data-lucide="mail"></i>
+                        <input type="email" id="signup-email" name="email" class="lp-input {% if signup_form.email.errors %}is-invalid{% endif %}"
+                               placeholder="{% trans 'you@company.com' %}" required autocomplete="email"
+                               value="{% if signup_form.email.value %}{{ signup_form.email.value }}{% endif %}">
+                    </div>
+                    {% for error in signup_form.email.errors %}<span class="lp-error">{{ error }}</span>{% endfor %}
                 </div>
 
-                <div class="input-group">
+                <div class="lp-field">
                     <label for="signup-password1">{% trans "Password" %}</label>
-                    <i class="fas fa-lock input-icon"></i>
-                    <input type="password" id="signup-password1" name="password1" placeholder="{% trans 'Create a password' %}" required>
-                    <button type="button" class="pw-toggle" onclick="togglePw('signup-password1', this)" aria-label="{% trans 'Show password' %}">
-                        <i class="fas fa-eye"></i>
-                    </button>
+                    <div class="lp-input-wrap">
+                        <i data-lucide="lock"></i>
+                        <input type="password" id="signup-password1" name="password1"
+                               class="lp-input {% if signup_form.password1.errors %}is-invalid{% endif %}"
+                               placeholder="{% trans 'Create a password' %}" required autocomplete="new-password"
+                               aria-describedby="signup-strength-label">
+                        <button type="button" class="lp-pw-toggle" onclick="togglePw('signup-password1', this)" aria-label="{% trans 'Show password' %}">
+                            <i data-lucide="eye" class="lp-eye-open"></i>
+                            <i data-lucide="eye-off" class="lp-eye-closed" style="display:none"></i>
+                        </button>
+                    </div>
+                    {% for error in signup_form.password1.errors %}<span class="lp-error">{{ error }}</span>{% endfor %}
+                    <div class="lp-strength" id="signup-strength" aria-hidden="true">
+                        <div class="lp-strength__track">
+                            <span class="lp-strength__seg"></span>
+                            <span class="lp-strength__seg"></span>
+                            <span class="lp-strength__seg"></span>
+                            <span class="lp-strength__seg"></span>
+                        </div>
+                        <span class="lp-strength__label" id="signup-strength-label"></span>
+                    </div>
                 </div>
 
-                <div class="input-group">
-                    <label for="signup-password2">{% trans "Confirm Password" %}</label>
-                    <i class="fas fa-lock input-icon"></i>
-                    <input type="password" id="signup-password2" name="password2" placeholder="{% trans 'Confirm your password' %}" required>
-                    <button type="button" class="pw-toggle" onclick="togglePw('signup-password2', this)" aria-label="{% trans 'Show password' %}">
-                        <i class="fas fa-eye"></i>
-                    </button>
+                <div class="lp-field">
+                    <label for="signup-password2">{% trans "Confirm password" %}</label>
+                    <div class="lp-input-wrap">
+                        <i data-lucide="lock"></i>
+                        <input type="password" id="signup-password2" name="password2"
+                               class="lp-input {% if signup_form.password2.errors %}is-invalid{% endif %}"
+                               placeholder="{% trans 'Confirm your password' %}" required autocomplete="new-password">
+                        <button type="button" class="lp-pw-toggle" onclick="togglePw('signup-password2', this)" aria-label="{% trans 'Show password' %}">
+                            <i data-lucide="eye" class="lp-eye-open"></i>
+                            <i data-lucide="eye-off" class="lp-eye-closed" style="display:none"></i>
+                        </button>
+                    </div>
+                    {% for error in signup_form.password2.errors %}<span class="lp-error">{{ error }}</span>{% endfor %}
                 </div>
 
-                <button type="submit" class="auth-submit">{% trans "Create Account" %}</button>
+                <button type="submit" class="lp-btn lp-btn--primary">
+                    <span class="lp-spinner" aria-hidden="true"></span>{% trans "Create account" %}
+                </button>
 
-                <p class="auth-terms">
-                    {% trans "By signing up, you agree to our" %} <a href="#">{% trans "Terms" %}</a> {% trans "&" %} <a href="#">{% trans "Privacy Policy" %}</a>
+                <p class="lp-terms">
+                    {% trans "By creating an account you agree to our" %}
+                    <a href="{% url 'home:terms' %}">{% trans "Terms" %}</a> {% trans "and" %}
+                    <a href="{% url 'home:privacy' %}">{% trans "Privacy Policy" %}</a>.
                 </p>
             </form>
 
-            <div class="auth-footer-text" id="auth-footer">
-                <span id="auth-footer-text">{% trans "Don&#39;t have an account?" %}</span>
-                <a href="#" id="auth-footer-link" onclick="switchTab('signup'); return false;">{% trans "Sign Up" %}</a>
+            <p class="lp-divider">{% trans "Already have an account?" %}</p>
+            <div class="lp-swap">
+                <a href="{% url 'users:login_view' %}" class="lp-btn lp-btn--ghost">{% trans "Sign in" %}</a>
+            </div>
+
+            {% else %}
+            <!-- ══ LOGIN FORM ══ -->
+            <form method="post" action="{% url 'users:login_view' %}" novalidate>
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.GET.next|default:'' }}">
+
+                <div class="lp-field">
+                    <label for="login-email">{% trans "Email address" %}</label>
+                    <div class="lp-input-wrap">
+                        <i data-lucide="mail"></i>
+                        <input type="email" id="login-email" name="email" class="lp-input"
+                               placeholder="{% trans 'you@company.com' %}" required autocomplete="email">
+                    </div>
+                </div>
+
+                <div class="lp-field">
+                    <label for="login-password">{% trans "Password" %}</label>
+                    <div class="lp-input-wrap">
+                        <i data-lucide="lock"></i>
+                        <input type="password" id="login-password" name="password" class="lp-input"
+                               placeholder="{% trans 'Enter your password' %}" required autocomplete="current-password">
+                        <button type="button" class="lp-pw-toggle" onclick="togglePw('login-password', this)" aria-label="{% trans 'Show password' %}">
+                            <i data-lucide="eye" class="lp-eye-open"></i>
+                            <i data-lucide="eye-off" class="lp-eye-closed" style="display:none"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="lp-row">
+                    <label class="lp-check">
+                        <input type="checkbox" name="remember">
+                        <span>{% trans "Remember me" %}</span>
+                    </label>
+                    <a class="lp-link" href="{% url 'users:password_reset' %}">{% trans "Forgot password?" %}</a>
+                </div>
+
+                <button type="submit" class="lp-btn lp-btn--primary">
+                    <span class="lp-spinner" aria-hidden="true"></span>{% trans "Sign in" %}
+                </button>
+            </form>
+
+            <p class="lp-divider">{% trans "New to OnWebApp?" %}</p>
+            <div class="lp-swap">
+                <a href="{% url 'users:signup' %}" class="lp-btn lp-btn--ghost">{% trans "Create an account" %}</a>
+            </div>
+
+            {% endif %}
+
+            <div class="lp-foot">
+                <span>{% trans "© OnWebApp" %}</span>
+                <a href="{% url 'home:privacy' %}">{% trans "Privacy Policy" %}</a>
+                <a href="{% url 'home:terms' %}">{% trans "Terms" %}</a>
+                <a href="{% url 'contact:contact' %}">{% trans "Support" %}</a>
             </div>
 
         </div>
-    </div>
+    </main>
 
 </div>
+{% endblock %}
 
-<!-- Hidden i18n strings for JS tab switching -->
-<span id="i18n-login-title" style="display:none">{% trans "Welcome back" %}</span>
-<span id="i18n-login-sub" style="display:none">{% trans "Sign in to your account to continue." %}</span>
-<span id="i18n-login-footer" style="display:none">{% trans "Don't have an account?" %}</span>
-<span id="i18n-login-link" style="display:none">{% trans "Sign Up" %}</span>
-<span id="i18n-signup-title" style="display:none">{% trans "Create account" %}</span>
-<span id="i18n-signup-sub" style="display:none">{% trans "Get started with your free account." %}</span>
-<span id="i18n-signup-footer" style="display:none">{% trans "Already have an account?" %}</span>
-<span id="i18n-signup-link" style="display:none">{% trans "Sign In" %}</span>
-
+{% block extra_js %}
+{{ block.super }}
 <script>
 function togglePw(inputId, btn) {
     var input = document.getElementById(inputId);
-    var icon = btn.querySelector('i');
-    if (input.type === 'password') {
-        input.type = 'text';
-        icon.classList.replace('fa-eye', 'fa-eye-slash');
-    } else {
-        input.type = 'password';
-        icon.classList.replace('fa-eye-slash', 'fa-eye');
+    var open = btn.querySelector('.lp-eye-open');
+    var closed = btn.querySelector('.lp-eye-closed');
+    var showing = input.type === 'text';
+    input.type = showing ? 'password' : 'text';
+    if (open && closed) {
+        open.style.display = showing ? '' : 'none';
+        closed.style.display = showing ? 'none' : '';
     }
+    btn.setAttribute('aria-label', showing ? "{% filter escapejs %}{% trans 'Show password' %}{% endfilter %}" : "{% filter escapejs %}{% trans 'Hide password' %}{% endfilter %}");
 }
 
-function i18n(id) {
-    return document.getElementById(id).textContent;
+function scorePassword(pw) {
+    if (!pw) return 0;
+    var score = 0;
+    if (pw.length >= 8) score++;
+    if (pw.length >= 12) score++;
+    if (/[a-z]/.test(pw) && /[A-Z]/.test(pw)) score++;
+    if (/\d/.test(pw) && /[^A-Za-z0-9]/.test(pw)) score++;
+    return Math.min(score, 4);
 }
 
-function switchTab(tab) {
-    document.querySelectorAll('.auth-tab').forEach(function(t) { t.classList.remove('active'); });
-    document.querySelectorAll('.auth-form').forEach(function(f) { f.classList.remove('active'); });
-
-    document.getElementById('tab-' + tab).classList.add('active');
-    document.getElementById('form-' + tab).classList.add('active');
-
-    var title = document.getElementById('auth-title');
-    var sub = document.getElementById('auth-subtitle');
-    var footerText = document.getElementById('auth-footer-text');
-    var footerLink = document.getElementById('auth-footer-link');
-
-    if (tab === 'login') {
-        title.textContent = i18n('i18n-login-title');
-        sub.textContent = i18n('i18n-login-sub');
-        footerText.textContent = i18n('i18n-login-footer');
-        footerLink.textContent = i18n('i18n-login-link');
-        footerLink.onclick = function() { switchTab('signup'); return false; };
-    } else {
-        title.textContent = i18n('i18n-signup-title');
-        sub.textContent = i18n('i18n-signup-sub');
-        footerText.textContent = i18n('i18n-signup-footer');
-        footerLink.textContent = i18n('i18n-signup-link');
-        footerLink.onclick = function() { switchTab('login'); return false; };
-    }
+function updateStrength(pw) {
+    var segs = document.querySelectorAll('#signup-strength .lp-strength__seg');
+    var label = document.getElementById('signup-strength-label');
+    if (!segs.length || !label) return;
+    var score = scorePassword(pw);
+    var labels = ['', '{% filter escapejs %}{% trans "Weak" %}{% endfilter %}', '{% filter escapejs %}{% trans "Fair" %}{% endfilter %}', '{% filter escapejs %}{% trans "Good" %}{% endfilter %}', '{% filter escapejs %}{% trans "Strong" %}{% endfilter %}'];
+    segs.forEach(function(seg, i) {
+        seg.className = 'lp-strength__seg';
+        if (pw && i < score) seg.classList.add('is-on-' + score);
+    });
+    label.textContent = pw ? labels[score] : '';
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.auth-tab').forEach(function(tab) {
-        tab.addEventListener('click', function() {
-            switchTab(this.dataset.tab);
+    /* Disable submit + show spinner while posting (prevents double-submit) */
+    document.querySelectorAll('form').forEach(function(form) {
+        form.addEventListener('submit', function() {
+            var btn = form.querySelector('.lp-btn--primary');
+            if (!btn || btn.dataset.busy) return;
+            btn.dataset.busy = '1';
+            btn.disabled = true;
+            btn.classList.add('is-loading');
         });
     });
 
-    var activePanel = "{{ active_panel|default:'login' }}";
-    if (activePanel === 'signup') {
-        switchTab('signup');
-    }
+    /* Live password strength (signup only) */
+    var pw1 = document.getElementById('signup-password1');
+    if (pw1) pw1.addEventListener('input', function() { updateStrength(this.value); });
 });
 </script>
 {% endblock %}

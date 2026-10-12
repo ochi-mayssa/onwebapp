@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+{% load i18n static humanize %}
+
+{% block title %}{% trans "Request a Dashboard Quote" %} | OnWebApp{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ── Base ─────────────────────────────────────────────────────────── */
+.ddq-container{max-width:1040px;margin:0 auto;padding:0 1.5rem}
+.ddq-section{padding:6rem 0}
+.ddq-grid{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:3rem;align-items:start}
+@media(max-width:991px){.ddq-grid{grid-template-columns:1fr;gap:2.25rem}}
+
+/* ── Type ─────────────────────────────────────────────────────────── */
+.ddq-eyebrow{display:inline-flex;align-items:center;gap:.5rem;font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.14em;color:var(--primary-color);margin-bottom:.95rem}
+.ddq-eyebrow::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor}
+.ddq-h2{font-family:var(--font-display);font-weight:800;font-size:clamp(1.7rem,3.2vw,2.4rem);line-height:1.16;margin-bottom:1.2rem}
+.ddq-lede{color:var(--text-secondary);font-size:1rem;line-height:1.8}
+.ddq-points{list-style:none;padding:0;margin:2rem 0 0;display:grid;gap:.9rem}
+.ddq-points li{display:flex;align-items:flex-start;gap:.7rem;font-size:.92rem;color:var(--text-secondary);line-height:1.6}
+.ddq-points i{color:var(--success);margin-top:.3rem;font-size:.78rem}
+.ddq-back{display:inline-flex;align-items:center;gap:.45rem;margin-top:2rem;font-size:.85rem;font-weight:700;color:var(--text-secondary);text-decoration:none;transition:color .2s}
+.ddq-back:hover{color:var(--primary-color)}
+
+/* ── Card + package chip ──────────────────────────────────────────── */
+.ddq-card{background:var(--bg-surface);border:1px solid var(--border-color);border-radius:var(--radius-xl);padding:2.1rem 1.9rem;box-shadow:var(--card-shadow-lg)}
+.ddq-pkg{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.85rem 1.1rem;border:1px solid var(--border-color);background:var(--bg-surface-secondary);border-radius:14px;margin-bottom:1.6rem}
+.ddq-pkg__label{font-size:.72rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--text-tertiary)}
+.ddq-pkg__value{display:inline-flex;align-items:center;gap:.5rem;font-weight:800;color:var(--primary-color);font-size:.95rem}
+.ddq-pkg__value i{font-size:.8rem}
+.ddq-pkg--price{margin-top:-.9rem;margin-bottom:1.4rem}
+.ddq-pkg__value--price{font-family:var(--font-display);font-size:1.5rem;letter-spacing:-.02em}
+.ddq-price__note{margin:-.9rem 0 1.5rem;font-size:.78rem;line-height:1.55;color:var(--text-tertiary)}
+
+/* ── Form ─────────────────────────────────────────────────────────── */
+.ddq-field{margin-bottom:1.1rem}
+.ddq-field label{display:block;font-size:.82rem;font-weight:700;margin-bottom:.4rem;color:var(--text-primary)}
+.ddq-field label .req{color:#dc2626;margin-left:.15rem}
+.ddq-field .form-control,.ddq-field .form-select{border-radius:12px;padding:.72rem .95rem;font-size:.92rem;border-color:var(--border-color);background:var(--bg-surface)}
+.ddq-field .form-control:focus,.ddq-field .form-select:focus{border-color:var(--primary-color);box-shadow:0 0 0 .2rem var(--primary-glow)}
+.ddq-field .form-control.is-invalid,.ddq-field .form-select.is-invalid{border-color:#dc2626;background-image:none}
+.ddq-field .form-control.is-invalid:focus,.ddq-field .form-select.is-invalid:focus{box-shadow:0 0 0 .2rem rgba(220,38,38,.14)}
+.ddq-error{display:block;margin-top:.35rem;font-size:.76rem;font-weight:600;color:#b91c1c}
+.ddq-field .helptext{display:block;font-size:.76rem;color:var(--text-tertiary);margin-top:.3rem}
+.ddq-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:575px){.ddq-row{grid-template-columns:1fr}}
+.ddq-submit{display:flex;align-items:center;justify-content:center;gap:.5rem;width:100%;margin-top:.6rem;padding:.9rem 1.2rem;border-radius:999px;border:none;background:var(--grad-primary);color:#fff;font-size:.95rem;font-weight:800;cursor:pointer;box-shadow:0 12px 28px -10px var(--primary-glow);transition:.3s}
+.ddq-submit:hover{filter:brightness(1.06);transform:translateY(-2px);color:#fff}
+.ddq-submit[disabled]{opacity:.7;cursor:not-allowed;transform:none;filter:none}
+.ddq-alert{padding:.9rem 1.1rem;border-radius:12px;background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;font-size:.85rem;margin-bottom:1.3rem}
+.ddq-alert:focus{outline:none}
+.ddq-alert ul{margin:.4rem 0 0;padding-left:1.1rem}
+/* Honeypot — hidden from real users, tempting to bots */
+.ddq-hp{position:absolute!important;left:-9999px!important;width:1px;height:1px;overflow:hidden}
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="ddq-section">
+    <div class="ddq-container">
+        <div class="ddq-grid">
+
+            <div>
+                <div class="ddq-eyebrow">{% trans "Dashboard Development" %}</div>
+                <h2 class="ddq-h2">{% trans "Let's scope your dashboard." %}</h2>
+                <p class="ddq-lede">{% trans "Tell us what you need to see and which systems hold your data. Starting prices scale with data sources and complexity — we'll confirm a fixed quote after a short scoping call, with no obligation." %}</p>
+                <ul class="ddq-points">
+                    <li><i class="fas fa-check" aria-hidden="true"></i>{% trans "A short call to understand your goals and data." %}</li>
+                    <li><i class="fas fa-check" aria-hidden="true"></i>{% trans "A written scope with features and a delivery timeline." %}</li>
+                    <li><i class="fas fa-check" aria-hidden="true"></i>{% trans "A fixed quote before any work begins." %}</li>
+                </ul>
+                <a class="ddq-back" href="{% url 'home:dashboard_development' %}#pricing">
+                    <i class="fas fa-arrow-left" aria-hidden="true"></i>{% trans "Back to pricing" %}
+                </a>
+            </div>
+
+            <div class="ddq-card">
+                <div class="ddq-pkg">
+                    <span class="ddq-pkg__label">{% trans "Selected package" %}</span>
+                    <span class="ddq-pkg__value"><i class="fas fa-layer-group" aria-hidden="true"></i>{{ package_label }}</span>
+                </div>
+                {% if package_price %}
+                <div class="ddq-pkg ddq-pkg--price">
+                    <span class="ddq-pkg__label">{% trans "Starting at" %}</span>
+                    <span class="ddq-pkg__value ddq-pkg__value--price">${{ package_price|floatformat:0|intcomma }}</span>
+                </div>
+                <p class="ddq-price__note">{% trans "Your final quote is confirmed after we scope the data sources and complexity together." %}</p>
+                {% endif %}
+
+                {% if form.errors %}
+                <div class="ddq-alert" role="alert" tabindex="-1" id="ddq-alert">
+                    <strong>{% trans "Please fix the following:" %}</strong>
+                    <ul>
+                        {% for field in form.visible_fields %}
+                            {% for error in field.errors %}
+                                <li><a href="#{{ field.id_for_label }}">{{ field.label|cut:" *" }} — {{ error }}</a></li>
+                            {% endfor %}
+                        {% endfor %}
+                        {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
+                <form method="post" novalidate id="ddq-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="package" value="{{ package }}">
+                    {# Honeypot — visually hidden, only bots fill it #}
+                    <div class="ddq-hp" aria-hidden="true">
+                        <label for="id_website">Website</label>
+                        <input type="text" id="id_website" name="website" tabindex="-1" autocomplete="off">
+                    </div>
+
+                    <div class="ddq-row">
+                        <div class="ddq-field">
+                            <label for="{{ form.name.id_for_label }}">{% trans "Your name" %}<span class="req" aria-hidden="true">*</span></label>
+                            {{ form.name }}
+                            {% if form.name.errors %}<span class="ddq-error" id="{{ form.name.id_for_label }}-error">{{ form.name.errors|first }}</span>{% endif %}
+                        </div>
+                        <div class="ddq-field">
+                            <label for="{{ form.email.id_for_label }}">{% trans "Work email" %}<span class="req" aria-hidden="true">*</span></label>
+                            {{ form.email }}
+                            {% if form.email.errors %}<span class="ddq-error" id="{{ form.email.id_for_label }}-error">{{ form.email.errors|first }}</span>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="ddq-row">
+                        <div class="ddq-field">
+                            <label for="{{ form.company.id_for_label }}">{% trans "Company" %}</label>
+                            {{ form.company }}
+                            {% if form.company.errors %}<span class="ddq-error" id="{{ form.company.id_for_label }}-error">{{ form.company.errors|first }}</span>{% endif %}
+                        </div>
+                        <div class="ddq-field">
+                            <label for="{{ form.phone.id_for_label }}">{% trans "Phone" %}</label>
+                            {{ form.phone }}
+                            {% if form.phone.errors %}<span class="ddq-error" id="{{ form.phone.id_for_label }}-error">{{ form.phone.errors|first }}</span>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="ddq-field">
+                        <label for="{{ form.data_sources.id_for_label }}">{% trans "Data sources" %}</label>
+                        {{ form.data_sources }}
+                        {% if form.data_sources.errors %}<span class="ddq-error" id="{{ form.data_sources.id_for_label }}-error">{{ form.data_sources.errors|first }}</span>{% endif %}
+                    </div>
+
+                    <div class="ddq-row">
+                        <div class="ddq-field">
+                            <label for="{{ form.budget.id_for_label }}">{% trans "Budget" %}</label>
+                            {{ form.budget }}
+                            {% if form.budget.errors %}<span class="ddq-error" id="{{ form.budget.id_for_label }}-error">{{ form.budget.errors|first }}</span>{% endif %}
+                        </div>
+                        <div class="ddq-field">
+                            <label for="{{ form.timeline.id_for_label }}">{% trans "Timeline" %}</label>
+                            {{ form.timeline }}
+                            {% if form.timeline.errors %}<span class="ddq-error" id="{{ form.timeline.id_for_label }}-error">{{ form.timeline.errors|first }}</span>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="ddq-field">
+                        <label for="{{ form.message.id_for_label }}">{% trans "What do you want to see?" %}</label>
+                        {{ form.message }}
+                        {% if form.message.errors %}<span class="ddq-error" id="{{ form.message.id_for_label }}-error">{{ form.message.errors|first }}</span>{% endif %}
+                    </div>
+
+                    <button type="submit" class="ddq-submit" id="ddq-submit">
+                        {% trans "Send my request" %} <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+(function () {
+    var form = document.getElementById('ddq-form');
+    var submit = document.getElementById('ddq-submit');
+    if (form && submit) {
+        form.addEventListener('submit', function () {
+            if (submit.dataset.busy) return;
+            submit.dataset.busy = '1';
+            submit.disabled = true;
+            submit.style.opacity = '.7';
+        });
+    }
+    var alertBox = document.getElementById('ddq-alert');
+    if (alertBox) alertBox.focus();
+})();
+</script>
+{% endblock %}

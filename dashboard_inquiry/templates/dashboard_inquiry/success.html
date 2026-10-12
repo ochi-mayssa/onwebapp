@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans "Request Received" %} | OnWebApp{% endblock %}
+
+{% block extra_css %}
+<style>
+.ddq-container{max-width:640px;margin:0 auto;padding:0 1.5rem}
+.ddq-section{padding:6.5rem 0;text-align:center}
+.ddq-ok__icon{width:78px;height:78px;margin:0 auto 1.6rem;border-radius:50%;background:linear-gradient(135deg,#10b981,#059669);display:grid;place-items:center;color:#fff;font-size:1.8rem;box-shadow:0 16px 40px -12px rgba(16,185,129,.5)}
+.ddq-eyebrow{display:inline-flex;align-items:center;gap:.5rem;font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.14em;color:var(--primary-color);margin-bottom:.95rem}
+.ddq-eyebrow::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor}
+.ddq-h2{font-family:var(--font-display);font-weight:800;font-size:clamp(1.7rem,3.2vw,2.4rem);line-height:1.16;margin-bottom:1.2rem}
+.ddq-lede{color:var(--text-secondary);font-size:1.02rem;line-height:1.8}
+.ddq-ref{display:inline-flex;align-items:center;gap:.5rem;margin-top:1.6rem;padding:.55rem 1.1rem;border-radius:999px;background:var(--bg-surface-secondary);border:1px solid var(--border-color);font-size:.85rem;font-weight:700;color:var(--text-primary)}
+.ddq-ref i{color:var(--primary-color);font-size:.8rem}
+.ddq-actions{display:flex;flex-wrap:wrap;gap:.75rem;justify-content:center;margin-top:2.2rem}
+.ddq-btn{display:inline-flex;align-items:center;gap:.5rem;padding:.85rem 1.5rem;border-radius:999px;font-size:.9rem;font-weight:800;text-decoration:none;transition:.3s}
+.ddq-btn--primary{background:var(--grad-primary);color:#fff;box-shadow:0 12px 28px -10px var(--primary-glow);border:none}
+.ddq-btn--primary:hover{filter:brightness(1.06);transform:translateY(-2px);color:#fff}
+.ddq-btn--ghost{background:var(--bg-surface-secondary);border:1px solid var(--border-color);color:var(--text-primary)}
+.ddq-btn--ghost:hover{border-color:var(--primary-color);color:var(--primary-color);transform:translateY(-2px)}
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="ddq-section">
+    <div class="ddq-container">
+        <div class="ddq-ok__icon"><i class="fas fa-check" aria-hidden="true"></i></div>
+        <div class="ddq-eyebrow">{% trans "Request received" %}</div>
+        <h2 class="ddq-h2">{% trans "Thank you — we're on it." %}</h2>
+        <p class="ddq-lede">{% trans "Your dashboard request has reached our team. We'll review the details and get back to you within one business day to arrange a short call." %}</p>
+
+        {% if reference %}
+        <div class="ddq-ref"><i class="fas fa-hashtag" aria-hidden="true"></i>{% trans "Your reference:" %} {{ reference }}</div>
+        {% endif %}
+
+        <div class="ddq-actions">
+            <a class="ddq-btn ddq-btn--primary" href="{% url 'home:dashboard_development' %}">
+                {% trans "Back to Dashboard Development" %} <i class="fas fa-arrow-right" aria-hidden="true"></i>
+            </a>
+            <a class="ddq-btn ddq-btn--ghost" href="{% url 'home:dashboard_development' %}#pricing">
+                {% trans "Review plans" %}
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}
