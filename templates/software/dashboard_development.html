@@ -575,7 +575,8 @@
 }
 
 /* ── Case study video ────────────────────────────────────────── */
-.dd-case{max-width:900px;margin:0 auto}
+.dd-cases{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.75rem;align-items:start}
+.dd-case{min-width:0}
 .dd-case__frame{position:relative;border-radius:16px;overflow:hidden;background:#000;box-shadow:0 30px 80px -30px rgba(0,0,0,.7);border:1px solid rgba(255,255,255,.08)}
 .dd-case__frame video{display:block;width:100%;height:auto;aspect-ratio:16/9;background:#000}
 .dd-case__overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;background:linear-gradient(180deg,rgba(15,23,42,.12),rgba(15,23,42,.5));cursor:pointer;transition:opacity .25s,visibility .25s}
@@ -588,6 +589,7 @@
 .dd-case__meta-title{font-weight:700;font-size:.95rem;color:#fff;margin:0}
 .dd-case__meta-desc{margin:.2rem 0 0;font-size:.85rem;color:#94a3b8}
 .dd-case__meta-time{display:inline-flex;align-items:center;gap:.4rem;font-size:.82rem;font-weight:600;color:#a5b4fc;white-space:nowrap}
+@media (max-width:860px){.dd-cases{grid-template-columns:1fr}}
 @media (max-width:560px){.dd-case__play{width:60px;height:60px;font-size:1.15rem}.dd-case__meta{flex-direction:column;align-items:flex-start}}
 
 </style>
@@ -1735,21 +1737,23 @@
     </div>
 </section>
 
-<!-- ══ CASE STUDY ═══════════════════════════════════════════════════ -->
+<!-- ══ CASE STUDIES ════════════════════════════════════════════════ -->
 <section class="dd-section dd-section--dark">
     <div class="dd-container">
         <div class="text-center mb-5 dd-reveal">
-            <div class="dd-eyebrow dd-eyebrow--light">{% trans "Case Study" %}</div>
-            <h2 class="dd-h2">{% trans "OnWebApp Supervisor Dashboard in action" %}</h2>
-            <p class="dd-lede dd-lede--light mx-auto">{% trans "See how a supervisor keeps every workflow, team, and KPI in one live view." %}</p>
+            <div class="dd-eyebrow dd-eyebrow--light">{% trans "Case Studies" %}</div>
+            <h2 class="dd-h2">{% trans "See OnWebApp in action" %}</h2>
+            <p class="dd-lede dd-lede--light mx-auto">{% trans "Real walkthroughs of OnWebApp — from the supervisor dashboard to fully unified systems." %}</p>
         </div>
+
+        <div class="dd-cases">
         <div class="dd-case dd-reveal">
             <div class="dd-case__frame">
-                <video id="ddCaseVideo" preload="metadata" playsinline>
+                <video preload="metadata" playsinline>
                     <source src="{% static 'vid/case1.mp4' %}" type="video/mp4">
                 </video>
-                <div class="dd-case__overlay" id="ddCaseOverlay">
-                    <button class="dd-case__play" id="ddCasePlay" type="button" aria-label="{% trans 'Play case study video' %}"><i class="fas fa-play"></i></button>
+                <div class="dd-case__overlay">
+                    <button class="dd-case__play" type="button" aria-label="{% trans 'Play case study video' %}"><i class="fas fa-play"></i></button>
                     <span class="dd-case__hint">{% trans "Click to play" %}</span>
                 </div>
             </div>
@@ -1758,8 +1762,28 @@
                     <p class="dd-case__meta-title">{% trans "Supervisor Dashboard" %}</p>
                     <p class="dd-case__meta-desc">{% trans "A live walkthrough of the OnWebApp supervisor dashboard." %}</p>
                 </div>
-                <span class="dd-case__meta-time" id="ddCaseTime"><i class="fas fa-play-circle"></i> {% trans "Case study" %}</span>
+                <span class="dd-case__meta-time"><i class="fas fa-play-circle"></i> {% trans "Case study" %}</span>
             </div>
+        </div>
+
+        <div class="dd-case dd-reveal">
+            <div class="dd-case__frame">
+                <video preload="metadata" playsinline>
+                    <source src="{% static 'vid/case2.mp4' %}" type="video/mp4">
+                </video>
+                <div class="dd-case__overlay">
+                    <button class="dd-case__play" type="button" aria-label="{% trans 'Play case study video' %}"><i class="fas fa-play"></i></button>
+                    <span class="dd-case__hint">{% trans "Click to play" %}</span>
+                </div>
+            </div>
+            <div class="dd-case__meta">
+                <div>
+                    <p class="dd-case__meta-title">{% trans "Unified Systems" %}</p>
+                    <p class="dd-case__meta-desc">{% trans "From fragmented tools to one connected workspace." %}</p>
+                </div>
+                <span class="dd-case__meta-time"><i class="fas fa-play-circle"></i> {% trans "Case study" %}</span>
+            </div>
+        </div>
         </div>
     </div>
 </section>
@@ -2282,35 +2306,38 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    /* ── Case study video player ──────────────────────────────── */
-    var ddCaseVideo = document.getElementById('ddCaseVideo');
-    var ddCaseOverlay = document.getElementById('ddCaseOverlay');
-    var ddCasePlay = document.getElementById('ddCasePlay');
-    var ddCaseTime = document.getElementById('ddCaseTime');
-    if (ddCaseVideo && ddCaseOverlay && ddCasePlay) {
+    /* ── Case study video players ─────────────────────────────── */
+    var ddCaseBlocks = document.querySelectorAll('.dd-case');
+    Array.prototype.forEach.call(ddCaseBlocks, function (block) {
+        var video = block.querySelector('video');
+        var overlay = block.querySelector('.dd-case__overlay');
+        var playBtn = block.querySelector('.dd-case__play');
+        var timeEl = block.querySelector('.dd-case__meta-time');
+        if (!video || !overlay || !playBtn) { return; }
+
         var ddFmt = function (s) {
             s = Math.round(s);
             var m = Math.floor(s / 60), r = s % 60;
             return m + ':' + (r < 10 ? '0' : '') + r;
         };
-        ddCaseVideo.addEventListener('loadedmetadata', function () {
-            if (ddCaseTime && isFinite(ddCaseVideo.duration) && ddCaseVideo.duration > 0) {
-                ddCaseTime.innerHTML = '<i class="fas fa-clock"></i> ' + ddFmt(ddCaseVideo.duration);
+        video.addEventListener('loadedmetadata', function () {
+            if (timeEl && isFinite(video.duration) && video.duration > 0) {
+                timeEl.innerHTML = '<i class="fas fa-clock"></i> ' + ddFmt(video.duration);
             }
         });
         var ddStart = function () {
-            ddCaseOverlay.classList.add('is-hidden');
-            ddCaseVideo.controls = true;
-            var p = ddCaseVideo.play();
-            if (p && p.catch) { p.catch(function () { ddCaseVideo.controls = true; }); }
+            overlay.classList.add('is-hidden');
+            video.controls = true;
+            var p = video.play();
+            if (p && p.catch) { p.catch(function () { video.controls = true; }); }
         };
-        ddCasePlay.addEventListener('click', function (e) { e.stopPropagation(); ddStart(); });
-        ddCaseOverlay.addEventListener('click', ddStart);
-        ddCaseVideo.addEventListener('ended', function () {
-            ddCaseVideo.controls = false;
-            ddCaseOverlay.classList.remove('is-hidden');
+        playBtn.addEventListener('click', function (e) { e.stopPropagation(); ddStart(); });
+        overlay.addEventListener('click', ddStart);
+        video.addEventListener('ended', function () {
+            video.controls = false;
+            overlay.classList.remove('is-hidden');
         });
-    }
+    });
 });
 </script>
 {% endblock %}
