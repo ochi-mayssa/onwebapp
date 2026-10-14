@@ -89,7 +89,7 @@
   const keywordScript = document.getElementById('chart-data-keyword');
   if (keywordScript && typeof initChartFromJSON === 'function') {
     const getThemeColor = (varName) => getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
-    const primaryColor = getThemeColor('--neon-blue') || '#06b6d4';
+    const primaryColor = getThemeColor('--neon-blue') || '#6366F1';
     try { initChartFromJSON('keywordChart','chart-data-keyword',{type:'bar', color: primaryColor}); } catch (err) { console.warn('Chart init error', err); }
   }
 </script>

@@ -37,7 +37,7 @@
 .dd-hero{position:relative;overflow:hidden;padding:7rem 0 6rem;background:linear-gradient(160deg,#0a0f1e 0%,#141d36 48%,#0a0f1e 100%)}
 .dd-hero__grid{position:absolute;inset:0;z-index:1;background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,.08) 1px,transparent 0);background-size:28px 28px;-webkit-mask-image:linear-gradient(to bottom,#000 0%,transparent 88%);mask-image:linear-gradient(to bottom,#000 0%,transparent 88%)}
 .dd-hero__glow{position:absolute;z-index:1;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(79,70,229,.38) 0%,transparent 68%);filter:blur(80px);top:-220px;right:-160px;pointer-events:none}
-.dd-hero__glow--2{width:520px;height:520px;background:radial-gradient(circle,rgba(6,182,212,.22) 0%,transparent 68%);top:auto;bottom:-240px;right:auto;left:-180px}
+.dd-hero__glow--2{width:520px;height:520px;background:radial-gradient(circle,rgba(99,102,241,.22) 0%,transparent 68%);top:auto;bottom:-240px;right:auto;left:-180px}
 .dd-hero__inner{position:relative;z-index:2;display:grid;grid-template-columns:minmax(0,1.06fr) minmax(0,.94fr);gap:3.5rem;align-items:center}
 .dd-hero__copy{max-width:none;margin:0;text-align:left}
 .dd-hero__copy p{color:#94a3b8;font-size:1.02rem;line-height:1.75;max-width:540px;margin:0}
@@ -295,7 +295,7 @@
 .dd-board__bars{position:relative;display:flex;align-items:flex-end;gap:4px;height:78px}
 .dd-board__bars i{flex:1;border-radius:2px 2px 0 0;background:linear-gradient(180deg,#a5b4fc,#4f46e5)}
 .dd-board__goal{position:absolute;left:0;right:0;top:46%;border-top:1px dashed rgba(225,29,72,.65)}
-.dd-board__ring{width:78px;height:78px;margin:0 auto;border-radius:50%;background:conic-gradient(#4f46e5 0 42%,#06b6d4 42% 68%,#8b5cf6 68% 86%,#e2e8f0 86% 100%);display:flex;align-items:center;justify-content:center}
+.dd-board__ring{width:78px;height:78px;margin:0 auto;border-radius:50%;background:conic-gradient(#4f46e5 0 42%,#6366F1 42% 68%,#8b5cf6 68% 86%,#e2e8f0 86% 100%);display:flex;align-items:center;justify-content:center}
 .dd-board__ring::before{content:'';position:absolute;width:52px;height:52px;border-radius:50%;background:#fff}
 .dd-board__ring span{position:relative;font-family:var(--font-display);font-size:.9rem;font-weight:800;color:#0f172a}
 .dd-board--dc{color:#94a3b8;font-size:.8rem}
@@ -692,7 +692,7 @@
                             <div class="dd-mock__canvas"><canvas id="ddChartChannel" aria-label="{% trans 'Website traffic split by channel' %}" role="img"></canvas></div>
                             <div class="dd-mock__legend">
                                 <span><i style="background:#4f46e5"></i>{% trans "Organic" %}</span>
-                                <span><i style="background:#06b6d4"></i>{% trans "Paid" %}</span>
+                                <span><i style="background:#6366F1"></i>{% trans "Paid" %}</span>
                                 <span><i style="background:#8b5cf6"></i>{% trans "Referral" %}</span>
                             </div>
                         </div>
@@ -834,7 +834,7 @@
                 <div class="dd-board">
                     <div class="dd-board__strip">
                         <span class="dd-board__micro">{% trans "Automated refresh" %}</span>
-                        <span class="dd-pin" data-pin="1" style="--pc:#06b6d4">1</span>
+                        <span class="dd-pin" data-pin="1" style="--pc:#6366F1">1</span>
                     </div>
                     <div class="dd-board__strip">
                         <span class="dd-board__chip is-on">{% trans "Last 30 days" %}</span>
@@ -906,7 +906,7 @@
             </div>
 
             <div class="dd-anatomy__key">
-                <div class="dd-keyrow" data-key="1" style="--dc:#06b6d4">
+                <div class="dd-keyrow" data-key="1" style="--dc:#6366F1">
                     <span class="dd-keyrow__no">1</span>
                     <div>
 <h5 class="dd-h3">{% trans "Real-Time Updates" %}</h5>
@@ -1729,7 +1729,7 @@
             <span class="dd-ind"><i class="fas fa-building" style="color:#2563eb"></i>{% trans "Real Estate" %}</span>
             <span class="dd-ind"><i class="fas fa-graduation-cap" style="color:#ea580c"></i>{% trans "Education" %}</span>
             <span class="dd-ind"><i class="fas fa-utensils" style="color:#e11d48"></i>{% trans "Hospitality" %}</span>
-            <span class="dd-ind"><i class="fas fa-truck-fast" style="color:#06b6d4"></i>{% trans "Logistics" %}</span>
+            <span class="dd-ind"><i class="fas fa-truck-fast" style="color:#4F46E5"></i>{% trans "Logistics" %}</span>
             <span class="dd-ind"><i class="fas fa-coins" style="color:#64748b"></i>{% trans "Banking & Finance" %}</span>
             <span class="dd-ind"><i class="fas fa-wheat-awn" style="color:#16a34a"></i>{% trans "Agriculture" %}</span>
             <span class="dd-ind"><i class="fas fa-bolt" style="color:#ca8a04"></i>{% trans "Energy & Utilities" %}</span>
@@ -2260,7 +2260,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     labels: ['Organic', 'Paid', 'Referral'],
                     datasets: [{
                         data: [46, 32, 22],
-                        backgroundColor: ['#4f46e5', '#06b6d4', '#8b5cf6'],
+                        backgroundColor: ['#4f46e5', '#6366F1', '#8b5cf6'],
                         borderColor: '#ffffff',
                         borderWidth: 2,
                         hoverOffset: 4

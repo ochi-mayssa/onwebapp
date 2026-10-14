@@ -1,0 +1,68 @@
+/* OnWebApp landing design system
+   Shared tokens + primitives for service and landing pages.
+   Palette: site blue (indigo #6366F1 / #4F46E5 / #4338CA) with violet secondary.
+   Usage: link after theme.css, use .ls-* classes and --ls-* variables.
+   Example: .my-page{--accent:var(--ls-brand);--action:var(--ls-brand-deep)} */
+
+:root{
+  --ls-brand:#6366F1;           /* bright accent - icons, dark backgrounds, gradients */
+  --ls-brand-deep:#4F46E5;      /* primary buttons/links on white (6.31:1) */
+  --ls-brand-dark:#4338CA;      /* hover / strong links (7.9:1) */
+  --ls-violet:#C358DC;          /* secondary accent */
+  --ls-violet-ink:#6D3FC7;      /* accessible violet on white (6.6:1) */
+  --ls-navy:#080B2C;            /* dark sections */
+  --ls-ink:#0A0F2E;             /* headings */
+  --ls-ink-2:#334155;           /* body copy */
+  --ls-ink-3:#64748B;           /* muted copy */
+  --ls-line:#E2E8F0;            /* borders */
+  --ls-soft:#F8FAFC;            /* alternating section background */
+  --ls-brand-soft:rgba(99,102,241,.13);
+}
+
+/* Section rhythm */
+.ls-sec{padding:5rem 0}
+.ls-center{text-align:center}
+
+/* Eyebrow label with accent-gradient rule */
+.ls-eyebrow{display:inline-flex;align-items:center;gap:.55rem;font-size:.72rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--ls-brand-deep);margin-bottom:1rem}
+.ls-eyebrow::before{content:"";width:26px;height:2px;background:linear-gradient(90deg,var(--ls-brand),var(--ls-violet));border-radius:2px}
+.ls-center .ls-eyebrow{justify-content:center}
+
+/* Headings and leads */
+.ls-h2{font-family:var(--font-display,inherit);font-size:clamp(1.62rem,3vw,2.35rem);font-weight:800;line-height:1.15;letter-spacing:-.02em;color:var(--ls-ink);margin:0 0 1rem}
+.ls-lead{font-size:1.04rem;color:var(--ls-ink-3);max-width:660px}
+.ls-center .ls-lead{margin-inline:auto}
+.ls-fine{font-size:.84rem;color:var(--ls-ink-3)}
+
+/* Cards */
+.ls-card{background:#fff;border:1px solid var(--ls-line);border-radius:14px;padding:1.65rem 1.5rem;transition:border-color .2s ease,transform .2s ease,box-shadow .2s ease}
+.ls-card:hover{border-color:var(--ls-brand-deep);transform:translateY(-3px);box-shadow:0 18px 44px -30px rgba(8,11,44,.45)}
+.ls-card h3{font-size:1.08rem;font-weight:750;margin:0 0 .4rem;color:var(--ls-ink)}
+.ls-card p{margin:0;font-size:.93rem;color:var(--ls-ink-3)}
+
+/* Buttons */
+.ls-btn{display:inline-flex;align-items:center;gap:.55rem;font-weight:700;font-size:.95rem;padding:.86rem 1.5rem;border-radius:12px;border:1px solid transparent;transition:background .2s ease,border-color .2s ease,transform .15s ease;text-decoration:none;white-space:nowrap;min-height:48px;cursor:pointer}
+.ls-btn svg{width:17px;height:17px;transition:transform .2s ease}
+.ls-btn--primary{background:var(--ls-brand-deep);color:#fff;box-shadow:0 14px 28px -20px rgba(79,70,229,.9)}
+.ls-btn--primary:hover{background:var(--ls-brand-dark);transform:translateY(-2px)}
+.ls-btn--primary:hover svg{transform:translateX(3px)}
+.ls-btn--ghost{background:#fff;border-color:var(--ls-line);color:var(--ls-ink)}
+.ls-btn--ghost:hover{border-color:var(--ls-brand-deep);color:var(--ls-brand-dark);transform:translateY(-2px)}
+.ls-btn--dark{background:var(--ls-navy);color:#fff}
+.ls-btn--dark:hover{background:#161C4A;transform:translateY(-2px)}
+.ls-btn:focus-visible{outline:3px solid rgba(99,102,241,.55);outline-offset:3px;border-radius:10px}
+
+/* Tags */
+.ls-tag{display:inline-flex;align-items:center;gap:.4rem;font-size:.68rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:.34rem .72rem;border-radius:999px;background:var(--ls-brand-soft);color:var(--ls-brand-dark);border:1px solid rgba(99,102,241,.32);white-space:nowrap}
+
+/* Scroll reveal (add .ls-rv to any element, optional style="--d:.1s") */
+.ls-rv{opacity:0;transform:translateY(22px);transition:opacity .7s cubic-bezier(.22,1,.36,1),transform .7s cubic-bezier(.22,1,.36,1);transition-delay:var(--d,0s)}
+.ls-rv.is-in{opacity:1;transform:none}
+
+/* Focus for shared components */
+.ls-card:focus-visible,.ls-tag:focus-visible{outline:3px solid rgba(99,102,241,.55);outline-offset:3px}
+
+@media (prefers-reduced-motion:reduce){
+  .ls-rv{opacity:1!important;transform:none!important;transition:none!important}
+  .ls-btn,.ls-card{transition:none!important}
+}

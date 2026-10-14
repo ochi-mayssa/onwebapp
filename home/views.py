@@ -161,6 +161,11 @@ def dashboard_development(request):
     return render(request, 'software/dashboard_development.html')
 
 
+def api_solutions(request):
+    """API Solutions landing page."""
+    return render(request, 'services/API.html')
+
+
 def browser_web_automation(request):
     """Browser and web automation services page."""
     return render(request, 'software/browser_web_automation.html')

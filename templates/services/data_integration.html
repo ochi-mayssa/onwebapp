@@ -47,7 +47,7 @@
         position: relative;
         overflow: hidden;
         background:
-            radial-gradient(circle at 30% 60%, rgba(6,182,212,.06) 0%, transparent 50%),
+            radial-gradient(circle at 30% 60%, rgba(99,102,241,.06) 0%, transparent 50%),
             radial-gradient(circle at 70% 30%, rgba(139,92,246,.05) 0%, transparent 50%),
             var(--bg-body);
     }
@@ -91,9 +91,9 @@
         width: 100%;
         height: 0%;
         border-radius: 4px;
-        background: linear-gradient(180deg, #06b6d4, #3b82f6, #8b5cf6, #10b981);
+        background: linear-gradient(180deg, #6366F1, #3b82f6, #8b5cf6, #10b981);
         transition: height .6s ease;
-        box-shadow: 0 0 20px rgba(6,182,212,.5);
+        box-shadow: 0 0 20px rgba(99,102,241,.5);
     }
 
     /*  flowing particles  */
@@ -106,7 +106,7 @@
         z-index: 2;
         pointer-events: none;
     }
-    .di-pipeline-particle:nth-child(1) { background: #06b6d4; box-shadow: 0 0 14px 3px rgba(6,182,212,.6); animation: ppFlow 4s ease-in-out infinite; }
+    .di-pipeline-particle:nth-child(1) { background: #6366F1; box-shadow: 0 0 14px 3px rgba(99,102,241,.6); animation: ppFlow 4s ease-in-out infinite; }
     .di-pipeline-particle:nth-child(2) { background: #3b82f6; box-shadow: 0 0 14px 3px rgba(59,130,246,.6); animation: ppFlow 4s ease-in-out 1s infinite; }
     .di-pipeline-particle:nth-child(3) { background: #8b5cf6; box-shadow: 0 0 14px 3px rgba(139,92,246,.6); animation: ppFlow 4s ease-in-out 2s infinite; }
     .di-pipeline-particle:nth-child(4) { background: #10b981; box-shadow: 0 0 14px 3px rgba(16,185,129,.6); animation: ppFlow 4s ease-in-out 3s infinite; }
@@ -139,12 +139,12 @@
         width: 64px; height: 64px;
         border-radius: 50%;
         background: var(--bg-surface);
-        border: 4px solid var(--step-color, #06b6d4);
+        border: 4px solid var(--step-color, #6366F1);
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 1.4rem;
-        color: var(--step-color, #06b6d4);
+        color: var(--step-color, #6366F1);
         z-index: 5;
         box-shadow: 0 0 0 6px rgba(0,0,0,.04), 0 8px 32px rgba(0,0,0,.12);
         transition: all .4s cubic-bezier(.25,.46,.45,.94);
@@ -154,7 +154,7 @@
         position: absolute;
         inset: -10px;
         border-radius: 50%;
-        border: 3px solid var(--step-color, #06b6d4);
+        border: 3px solid var(--step-color, #6366F1);
         opacity: 0;
         animation: ppRing 2.2s ease-in-out infinite;
     }
@@ -181,7 +181,7 @@
         position: absolute;
         inset: 0;
         border-radius: 3px;
-        background: linear-gradient(90deg, var(--step-color, #06b6d4), transparent);
+        background: linear-gradient(90deg, var(--step-color, #6366F1), transparent);
     }
     .di-pipeline-step--left .pp-arm {
         left: calc(50% + 38px);
@@ -189,7 +189,7 @@
         width: calc(50% - 38px - 48px);
     }
     .di-pipeline-step--left .pp-arm::before {
-        background: linear-gradient(90deg, var(--step-color, #06b6d4) 0%, var(--step-color, #06b6d4) 40%, transparent 100%);
+        background: linear-gradient(90deg, var(--step-color, #6366F1) 0%, var(--step-color, #6366F1) 40%, transparent 100%);
     }
     .di-pipeline-step--right .pp-arm {
         right: calc(50% + 38px);
@@ -197,7 +197,7 @@
         width: calc(50% - 38px - 48px);
     }
     .di-pipeline-step--right .pp-arm::before {
-        background: linear-gradient(270deg, var(--step-color, #06b6d4) 0%, var(--step-color, #06b6d4) 40%, transparent 100%);
+        background: linear-gradient(270deg, var(--step-color, #6366F1) 0%, var(--step-color, #6366F1) 40%, transparent 100%);
     }
 
     /*  card  */
@@ -221,7 +221,7 @@
         position: absolute;
         top: 0; left: 0;
         width: 100%; height: 4px;
-        background: linear-gradient(90deg, var(--step-color, #06b6d4), transparent 80%);
+        background: linear-gradient(90deg, var(--step-color, #6366F1), transparent 80%);
         opacity: 0;
         transition: opacity .4s;
     }
@@ -238,8 +238,8 @@
     .pp-card:hover::after { left: 130%; }
     .pp-card:hover {
         transform: translateY(-8px) scale(1.02);
-        box-shadow: 0 20px 60px rgba(0,0,0,.1), 0 0 0 1px var(--step-color, #06b6d4);
-        border-color: var(--step-color, #06b6d4);
+        box-shadow: 0 20px 60px rgba(0,0,0,.1), 0 0 0 1px var(--step-color, #6366F1);
+        border-color: var(--step-color, #6366F1);
     }
     .pp-card:hover::before { opacity: 1; }
 
@@ -256,8 +256,8 @@
         align-items: center;
         justify-content: center;
         font-size: 1.15rem;
-        background: color-mix(in srgb, var(--step-color, #06b6d4) 10%, transparent);
-        color: var(--step-color, #06b6d4);
+        background: color-mix(in srgb, var(--step-color, #6366F1) 10%, transparent);
+        color: var(--step-color, #6366F1);
         flex-shrink: 0;
         position: relative;
         z-index: 2;
@@ -268,7 +268,7 @@
         position: absolute;
         inset: -6px;
         border-radius: 20px;
-        background: var(--step-color, #06b6d4);
+        background: var(--step-color, #6366F1);
         opacity: 0;
         filter: blur(14px);
         transition: opacity .4s;
@@ -280,7 +280,7 @@
     .pp-card-num {
         width: 28px; height: 28px;
         border-radius: 50%;
-        background: linear-gradient(135deg, var(--step-color, #06b6d4), color-mix(in srgb, var(--step-color, #06b6d4) 60%, #000));
+        background: linear-gradient(135deg, var(--step-color, #6366F1), color-mix(in srgb, var(--step-color, #6366F1) 60%, #000));
         color: #fff;
         font-size: .65rem;
         font-weight: 800;
@@ -296,7 +296,7 @@
         margin-bottom: .4rem;
         transition: color .3s;
     }
-    .pp-card:hover h5 { color: var(--step-color, #06b6d4); }
+    .pp-card:hover h5 { color: var(--step-color, #6366F1); }
     .pp-card p {
         color: var(--text-muted);
         font-size: .85rem;
@@ -336,7 +336,7 @@
     .di-metric-card:hover {
         transform: translateY(-4px);
         box-shadow: 0 12px 32px rgba(0,0,0,.06);
-        border-color: #06b6d4;
+        border-color: #6366F1;
     }
 
     .di-metric-icon {
@@ -346,8 +346,8 @@
         align-items: center;
         justify-content: center;
         font-size: .95rem;
-        background: rgba(6,182,212,.08);
-        color: #06b6d4;
+        background: rgba(99,102,241,.08);
+        color:#4F46E5;
         margin-bottom: .6rem;
         transition: all .4s;
     }
@@ -358,7 +358,7 @@
         font-weight: 800;
         line-height: 1;
         margin-bottom: .25rem;
-        color: #06b6d4;
+        color:#4F46E5;
     }
 
     .di-metric-label {
@@ -385,7 +385,7 @@
         position: relative;
         overflow: hidden;
         background:
-            radial-gradient(circle at 15% 45%, rgba(6,182,212,.07) 0%, transparent 45%),
+            radial-gradient(circle at 15% 45%, rgba(99,102,241,.07) 0%, transparent 45%),
             radial-gradient(circle at 85% 25%, rgba(139,92,246,.06) 0%, transparent 45%),
             radial-gradient(circle at 50% 90%, rgba(236,72,153,.04) 0%, transparent 40%),
             var(--bg-surface-secondary);
@@ -429,10 +429,10 @@
         box-shadow: 0 4px 20px rgba(0,0,0,.1);
     }
     .di-cap-arrow:hover {
-        background: linear-gradient(135deg, #06b6d4, #3b82f6);
+        background: linear-gradient(135deg, #6366F1, #3b82f6);
         color: #fff;
         border-color: transparent;
-        box-shadow: 0 4px 24px rgba(6,182,212,.35);
+        box-shadow: 0 4px 24px rgba(99,102,241,.35);
     }
     .di-cap-arrow--left  { left: 0; }
     .di-cap-arrow--right { right: 0; }
@@ -462,7 +462,7 @@
     .di-cap-rail-fill {
         height: 100%;
         width: 0%;
-        background: linear-gradient(90deg, #06b6d4, #3b82f6, #8b5cf6, #10b981, #f59e0b, #ec4899);
+        background: linear-gradient(90deg, #6366F1, #3b82f6, #8b5cf6, #10b981, #f59e0b, #ec4899);
         border-radius: 4px;
         transition: width .5s ease;
         position: relative;
@@ -476,12 +476,12 @@
         width: 12px; height: 12px;
         border-radius: 50%;
         background: #fff;
-        box-shadow: 0 0 12px 2px rgba(6,182,212,.6);
+        box-shadow: 0 0 12px 2px rgba(99,102,241,.6);
         animation: capPulseDot 1.8s ease-in-out infinite;
     }
     @keyframes capPulseDot {
-        0%, 100% { box-shadow: 0 0 6px 2px rgba(6,182,212,.3); }
-        50%      { box-shadow: 0 0 18px 4px rgba(6,182,212,.6); }
+        0%, 100% { box-shadow: 0 0 6px 2px rgba(99,102,241,.3); }
+        50%      { box-shadow: 0 0 18px 4px rgba(99,102,241,.6); }
     }
 
     /* single timeline card */
@@ -513,7 +513,7 @@
         position: absolute;
         top: 0; left: 0;
         width: 100%; height: 4px;
-        background: linear-gradient(90deg, var(--cap-color, #06b6d4), transparent 80%);
+        background: linear-gradient(90deg, var(--cap-color, #6366F1), transparent 80%);
         opacity: 0;
         transition: opacity .4s;
     }
@@ -533,9 +533,9 @@
         transform: translateY(-10px) scale(1.02);
         box-shadow:
             0 24px 64px rgba(0,0,0,.1),
-            0 0 0 1px var(--cap-color, #06b6d4),
+            0 0 0 1px var(--cap-color, #6366F1),
             inset 0 1px 0 rgba(255,255,255,.08);
-        border-color: var(--cap-color, #06b6d4);
+        border-color: var(--cap-color, #6366F1);
     }
     .di-cap-card:hover::before { opacity: 1; }
 
@@ -562,7 +562,7 @@
         position: absolute;
         inset: -6px;
         border-radius: 24px;
-        background: var(--cap-color, #06b6d4);
+        background: var(--cap-color, #6366F1);
         opacity: 0;
         filter: blur(14px);
         transition: opacity .4s;
@@ -577,7 +577,7 @@
         top: -10px; right: -10px;
         width: 32px; height: 32px;
         border-radius: 50%;
-        background: linear-gradient(135deg, var(--cap-color, #06b6d4), color-mix(in srgb, var(--cap-color, #06b6d4) 60%, #000));
+        background: linear-gradient(135deg, var(--cap-color, #6366F1), color-mix(in srgb, var(--cap-color, #6366F1) 60%, #000));
         color: #fff;
         font-size: .7rem;
         font-weight: 800;
@@ -595,7 +595,7 @@
         margin-bottom: .5rem;
         transition: color .3s;
     }
-    .di-cap-card:hover h5 { color: var(--cap-color, #06b6d4); }
+    .di-cap-card:hover h5 { color: var(--cap-color, #6366F1); }
 
     .di-cap-card p {
         color: var(--text-muted);
@@ -620,7 +620,7 @@
     .di-cap-item.active .di-cap-drop {
         background: repeating-linear-gradient(
             to bottom,
-            var(--cap-color, #06b6d4) 0 4px,
+            var(--cap-color, #6366F1) 0 4px,
             transparent 4px 8px
         );
         background-size: 2px 8px;
@@ -646,7 +646,7 @@
         position: absolute;
         inset: -6px;
         border-radius: 50%;
-        border: 2px solid var(--cap-color, #06b6d4);
+        border: 2px solid var(--cap-color, #6366F1);
         opacity: 0;
         transition: opacity .3s;
         animation: ringPulse 1.6s ease-in-out infinite;
@@ -657,9 +657,9 @@
     }
     .di-cap-item:hover .di-cap-dot,
     .di-cap-item.active .di-cap-dot {
-        border-color: var(--cap-color, #06b6d4);
-        background: var(--cap-color, #06b6d4);
-        box-shadow: 0 0 16px var(--cap-color, #06b6d4);
+        border-color: var(--cap-color, #6366F1);
+        background: var(--cap-color, #6366F1);
+        box-shadow: 0 0 16px var(--cap-color, #6366F1);
     }
     .di-cap-item:hover .di-cap-dot::after,
     .di-cap-item.active .di-cap-dot::after { opacity: 1; }
@@ -768,7 +768,7 @@
         top: 50%; left: 50%;
         transform: translate(-50%,-50%);
         width: 500px; height: 500px;
-        background: radial-gradient(circle, rgba(6,182,212,.06), transparent 70%);
+        background: radial-gradient(circle, rgba(99,102,241,.06), transparent 70%);
         pointer-events: none;
     }
     .di-cta h2 {
@@ -795,11 +795,11 @@
         font-weight: 700;
         font-size: .95rem;
         color: #fff;
-        background: linear-gradient(135deg, #06b6d4, #0891b2);
+        background: linear-gradient(135deg, #6366F1, #0891b2);
         border: none;
         text-decoration: none;
         transition: all .35s cubic-bezier(.25,.46,.45,.94);
-        box-shadow: 0 4px 24px rgba(6,182,212,.35);
+        box-shadow: 0 4px 24px rgba(99,102,241,.35);
         position: relative;
         overflow: hidden;
     }
@@ -815,7 +815,7 @@
     }
     .cta-btn-primary:hover {
         transform: translateY(-2px) scale(1.03);
-        box-shadow: 0 8px 32px rgba(6,182,212,.5);
+        box-shadow: 0 8px 32px rgba(99,102,241,.5);
         color: #fff;
     }
     .cta-btn-primary:hover::after { left: 130%; }
@@ -836,8 +836,8 @@
         transition: all .35s;
     }
     .cta-btn-secondary:hover {
-        border-color: #06b6d4;
-        color: #06b6d4;
+        border-color: #6366F1;
+        color:#4F46E5;
         transform: translateY(-2px);
     }
 
@@ -863,13 +863,13 @@
         transition: all .3s;
     }
     .cta-trust-badge:hover {
-        border-color: #06b6d4;
-        color: #06b6d4;
+        border-color: #6366F1;
+        color:#4F46E5;
         transform: translateY(-1px);
     }
     .cta-trust-badge i {
         font-size: .85rem;
-        color: #06b6d4;
+        color:#4F46E5;
     }
 
     @media (max-width: 576px) {
@@ -1011,26 +1011,26 @@
     <div class="container">
         <nav aria-label="breadcrumb" class="mb-4">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{% url 'home:home' %}" class="text-decoration-none" style="color:#06b6d4;">{% trans "Home" %}</a></li>
-                <li class="breadcrumb-item"><a href="{% url 'services:index' %}" class="text-decoration-none" style="color:#06b6d4;">{% trans "Services" %}</a></li>
-                <li class="breadcrumb-item"><a href="{% url 'integration:integration_homepage' %}" class="text-decoration-none" style="color:#06b6d4;">{% trans "Integration" %}</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'home:home' %}" class="text-decoration-none" style="color:#4F46E5;">{% trans "Home" %}</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'services:index' %}" class="text-decoration-none" style="color:#4F46E5;">{% trans "Services" %}</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'integration:integration_homepage' %}" class="text-decoration-none" style="color:#4F46E5;">{% trans "Integration" %}</a></li>
                 <li class="breadcrumb-item active text-secondary" aria-current="page">{% trans "Data Integration" %}</li>
             </ol>
         </nav>
         <div class="row align-items-center g-5">
             <div class="col-lg-8">
-                <span class="badge rounded-pill px-3 py-2 mb-3" style="background:rgba(6,182,212,.12);border:1px solid rgba(6,182,212,.25);color:#06b6d4;font-size:.8rem;font-weight:700;letter-spacing:.04em;">
+                <span class="badge rounded-pill px-3 py-2 mb-3" style="background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.25);color:#4F46E5;font-size:.8rem;font-weight:700;letter-spacing:.04em;">
                     <i class="fas fa-database me-1"></i> {% trans "Data Integration" %}
                 </span>
                 <h1 class="display-5 fw-800 text-white mb-3">
                     {% trans "Data Warehouse " %}
-                    <span style="background:linear-gradient(135deg,#06b6d4,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">{% trans "& Unified Analytics" %}</span>
+                    <span style="background:linear-gradient(135deg,#6366F1,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">{% trans "& Unified Analytics" %}</span>
                 </h1>
                 <p class="lead mb-4" style="color:#94a3b8;max-width:560px;">
                     {% trans "Consolidate data from every source into a single Enterprise Data Warehouse. Real-time synchronization, data virtualization, and automated ETL pipelines give you one version of truth." %}
                 </p>
                 <div class="d-flex flex-wrap gap-3">
-                    <a href="{% url 'contact:contact' %}" class="btn btn-primary btn-lg px-5 py-3 rounded-pill fw-700" style="box-shadow:0 0 25px rgba(6,182,212,.35);">
+                    <a href="{% url 'contact:contact' %}" class="btn btn-primary btn-lg px-5 py-3 rounded-pill fw-700" style="box-shadow:0 0 25px rgba(99,102,241,.35);">
                         {% trans "Request a Quote" %} <i class="fas fa-arrow-right ms-2"></i>
                     </a>
                     <a href="#architecture" class="btn btn-outline-light btn-lg px-5 py-3 rounded-pill fw-700">
@@ -1060,7 +1060,7 @@
                 <div class="row g-3">
                     <div class="col-6">
                         <div class="p-3 rounded-3 h-100" style="background:var(--bg-surface);border:1px solid var(--border-color);">
-                            <div style="width:36px;height:36px;border-radius:10px;background:rgba(6,182,212,.1);color:#06b6d4;display:flex;align-items:center;justify-content:center;font-size:.85rem;margin-bottom:.6rem;"><i class="fas fa-compress-alt"></i></div>
+                            <div style="width:36px;height:36px;border-radius:10px;background:rgba(99,102,241,.1);color:#4F46E5;display:flex;align-items:center;justify-content:center;font-size:.85rem;margin-bottom:.6rem;"><i class="fas fa-compress-alt"></i></div>
                             <h6 class="fw-700 mb-1" style="font-size:.85rem;">{% trans "Extract" %}</h6>
                             <small style="color:var(--text-muted);font-size:.75rem;">{% trans "Pull data from databases, APIs, files, and SaaS apps." %}</small>
                         </div>
@@ -1147,11 +1147,11 @@
 
             <div class="di-cap-track" id="capTrack">
                 <!-- 01  EDW -->
-                <div class="di-cap-item" style="--cap-color:#06b6d4;">
+                <div class="di-cap-item" style="--cap-color:#6366F1;">
                     <div class="di-cap-card">
                         <div class="di-cap-inner">
                             <div class="di-cap-icon-wrap">
-                                <div class="di-cap-icon" style="background:rgba(6,182,212,.1);color:#06b6d4;">
+                                <div class="di-cap-icon" style="background:rgba(99,102,241,.1);color:#4F46E5;">
                                     <i class="fas fa-layer-group"></i>
                                 </div>
                                 <span class="di-cap-num">01</span>
@@ -1286,7 +1286,7 @@
                 </div>
 
                 <!-- 01 CONNECT — left -->
-                <div class="di-pipeline-step di-pipeline-step--left" style="--step-color:#06b6d4;">
+                <div class="di-pipeline-step di-pipeline-step--left" style="--step-color:#6366F1;">
                     <div class="pp-card">
                         <div class="pp-card-head">
                             <div class="pp-card-icon"><i class="fas fa-plug"></i></div>
@@ -1388,7 +1388,7 @@
         <div class="modal fade" id="ucModalManufacturing" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content" style="background:var(--bg-surface);border:1px solid var(--border-color);border-radius:20px;overflow:hidden;">
-                    <div class="modal-header border-0 pb-0" style="background:linear-gradient(135deg,#06b6d4 0%,#0891b2 100%);padding:2rem 2rem 1.5rem;">
+                    <div class="modal-header border-0 pb-0" style="background:linear-gradient(135deg,#6366F1 0%,#0891b2 100%);padding:2rem 2rem 1.5rem;">
                         <div>
                             <h4 class="fw-800 text-white mb-1">{% trans "Manufacturing" %}</h4>
                             <p class="mb-0" style="color:rgba(255,255,255,.8);font-size:.9rem;">{% trans "Real-Time Operational Intelligence" %}</p>
@@ -1400,24 +1400,24 @@
                         <div class="row g-3 mb-3">
                             <div class="col-sm-4">
                                 <div class="p-3 rounded-3" style="background:var(--bg-surface-secondary);">
-                                    <div class="fw-700 mb-1" style="color:#06b6d4;"><i class="fas fa-broadcast-tower me-1"></i> {% trans "IoT Sensors" %}</div>
+                                    <div class="fw-700 mb-1" style="color:#4F46E5;"><i class="fas fa-broadcast-tower me-1"></i> {% trans "IoT Sensors" %}</div>
                                     <small class="text-muted">{% trans "Real-time shop-floor monitoring with predictive alerts." %}</small>
                                 </div>
                             </div>
                             <div class="col-sm-4">
                                 <div class="p-3 rounded-3" style="background:var(--bg-surface-secondary);">
-                                    <div class="fw-700 mb-1" style="color:#06b6d4;"><i class="fas fa-server me-1"></i> {% trans "ERP" %}</div>
+                                    <div class="fw-700 mb-1" style="color:#4F46E5;"><i class="fas fa-server me-1"></i> {% trans "ERP" %}</div>
                                     <small class="text-muted">{% trans "Inventory and production data synced with procurement." %}</small>
                                 </div>
                             </div>
                             <div class="col-sm-4">
                                 <div class="p-3 rounded-3" style="background:var(--bg-surface-secondary);">
-                                    <div class="fw-700 mb-1" style="color:#06b6d4;"><i class="fas fa-check-circle me-1"></i> {% trans "Quality Control" %}</div>
+                                    <div class="fw-700 mb-1" style="color:#4F46E5;"><i class="fas fa-check-circle me-1"></i> {% trans "Quality Control" %}</div>
                                     <small class="text-muted">{% trans "Automated defect detection with trend analytics." %}</small>
                                 </div>
                             </div>
                         </div>
-                        <div class="alert alert-light border-0 rounded-3 mb-0" style="background:rgba(6,182,212,.06);">
+                        <div class="alert alert-light border-0 rounded-3 mb-0" style="background:rgba(99,102,241,.06);">
                             <strong>{% trans "Key Outcome:" %}</strong> {% trans "30% reduction in downtime through predictive maintenance alerts." %}
                         </div>
                     </div>
@@ -1552,7 +1552,7 @@
     <div class="container py-4">
         <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-4 p-4 p-md-5 rounded-4" style="background:var(--bg-surface);border:1px solid var(--border-color);box-shadow:0 4px 24px rgba(0,0,0,.04);">
             <div class="d-flex align-items-center gap-3">
-                <div style="width:52px;height:52px;border-radius:14px;background:rgba(6,182,212,.1);color:#06b6d4;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;">
+                <div style="width:52px;height:52px;border-radius:14px;background:rgba(99,102,241,.1);color:#4F46E5;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;">
                     <i class="fas fa-file-pdf"></i>
                 </div>
                 <div>

@@ -13,6 +13,7 @@ class StaticViewSitemap(Sitemap):
         return [
             'home:home',
             'home:dashboard_development',
+            'home:api_solutions',
             'home:browser_web_automation',
             'services:index',
             'integration:integration_homepage',

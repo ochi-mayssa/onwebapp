@@ -21,6 +21,7 @@ urlpatterns = [
     path('software/mobile-development/', views.mobile_development, name='mobile_development'),
     path('software/ecommerce-development/', views.ecommerce_development, name='ecommerce_development'),
     path('software/dashboard-development/', views.dashboard_development, name='dashboard_development'),
+    path('software/api-solutions/', views.api_solutions, name='api_solutions'),
     path('software/browser-web-automation/', views.browser_web_automation, name='browser_web_automation'),
     path('services/erp/', views.erp_service, name='erp_service'),
     path('overview/', views.video_explainer, name='video_explainer'),

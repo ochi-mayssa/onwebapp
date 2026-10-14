@@ -1,0 +1,841 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans "API Solutions &amp; Integration Services" %} | OnWebApp{% endblock %}
+{% block meta_description %}{% trans "Discover ready-to-use APIs for data processing, website analysis, AI, and business integrations. Explore OnWebApp API subscriptions or request custom API development." %}{% endblock %}
+{% block og_title %}{% trans "API Solutions &amp; Integration Services" %} | OnWebApp{% endblock %}
+{% block og_description %}{% trans "Discover ready-to-use APIs for data processing, website analysis, AI, and business integrations. Explore OnWebApp API subscriptions or request custom API development." %}{% endblock %}
+{% block twitter_title %}{% trans "API Solutions &amp; Integration Services" %} | OnWebApp{% endblock %}
+{% block twitter_description %}{% trans "Discover ready-to-use APIs for data processing, website analysis, AI, and business integrations. Explore OnWebApp API subscriptions or request custom API development." %}{% endblock %}
+
+{% block extra_css %}
+<style>
+.ap{--ink:var(--ls-ink);--ink-2:var(--ls-ink-2);--ink-3:var(--ls-ink-3);--brand:var(--ls-brand);--violet:var(--ls-violet);--violet-ink:var(--ls-violet-ink);--action:var(--ls-brand-deep);--action-dark:var(--ls-brand-dark);--accent-soft:var(--ls-brand-soft);--line:var(--ls-line);--soft:var(--ls-soft);--dark:var(--ls-navy);--r:14px;--sh:0 18px 44px -30px rgba(8,11,44,.45)}
+.ap{color:var(--ink-2);font-size:1rem;line-height:1.7;overflow-x:clip;scroll-behavior:smooth}
+.ap section[id]{scroll-margin-top:calc(var(--ap-nav-h,60px) + 60px)}
+.ap h1,.ap h2{text-wrap:balance}
+.ap p{text-wrap:pretty}
+.ap h1,.ap h2,.ap h3,.ap h4{font-family:var(--font-display);color:var(--ink);letter-spacing:-.02em}
+.ap svg.lucide{width:1em;height:1em}
+.ap a:focus-visible,.ap button:focus-visible{outline:3px solid rgba(99,102,241,.55);outline-offset:3px;border-radius:10px}
+.ap-eyebrow{display:inline-flex;align-items:center;gap:.55rem;font-size:.72rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--action);margin-bottom:1rem}
+.ap-eyebrow::before{content:"";width:26px;height:2px;background:linear-gradient(90deg,var(--brand),var(--violet));border-radius:2px}
+.ap-h1{font-size:clamp(2rem,4.8vw,3.25rem);font-weight:800;line-height:1.08;margin-bottom:1.1rem}
+.ap-h1__hl{color:var(--action);background:linear-gradient(100deg,var(--action),var(--violet));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.ap-h2{font-size:clamp(1.62rem,3.2vw,2.35rem);font-weight:800;line-height:1.15;margin-bottom:1rem}
+.ap-lead{font-size:1.04rem;color:var(--ink-3);max-width:660px}
+.ap-sec{padding:5rem 0}
+.ap-center{text-align:center}
+.ap-center .ap-lead{margin-inline:auto}
+.ap-center .ap-eyebrow{justify-content:center}
+.ap-btn{display:inline-flex;align-items:center;gap:.55rem;font-weight:700;font-size:.95rem;padding:.86rem 1.5rem;border-radius:12px;border:1px solid transparent;transition:background .2s ease,border-color .2s ease,box-shadow .2s ease,transform .15s ease;text-decoration:none;white-space:nowrap;min-height:48px}
+.ap-btn svg{width:17px;height:17px;transition:transform .2s ease}
+.ap-btn--primary{background:var(--action);color:#fff;box-shadow:0 14px 28px -20px rgba(79,70,229,.9)}
+.ap-btn--primary:hover{background:var(--action-dark);transform:translateY(-2px)}
+.ap-btn--primary:hover svg{transform:translateX(3px)}
+.ap-btn--dark{background:var(--ink);color:#fff}
+.ap-btn--dark:hover{background:#161C4A;transform:translateY(-2px);box-shadow:0 14px 30px -20px rgba(8,11,44,.85)}
+.ap-btn--ghost{background:#fff;border-color:var(--line);color:var(--ink)}
+.ap-btn--ghost:hover{border-color:var(--action);color:var(--action-dark);transform:translateY(-2px)}
+.ap-btn--ghost-d{background:transparent;border-color:rgba(255,255,255,.34);color:#fff}
+.ap-btn--ghost-d:hover{border-color:#fff;background:rgba(255,255,255,.08)}
+.ap-rv{opacity:0;transform:translateY(22px);transition:opacity .7s cubic-bezier(.22,1,.36,1),transform .7s cubic-bezier(.22,1,.36,1);transition-delay:var(--d,0s)}
+.ap-rv.is-in{opacity:1;transform:none}
+.ap-fine{font-size:.84rem;color:var(--ink-3)}
+.ap-tag{display:inline-flex;align-items:center;gap:.4rem;font-size:.68rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:.34rem .72rem;border-radius:999px;background:var(--accent-soft);color:var(--action-dark);border:1px solid rgba(99,102,241,.32);white-space:nowrap}
+.ap-tag--live::before{content:"";width:7px;height:7px;border-radius:50%;background:#4F46E5;box-shadow:0 0 0 3px rgba(79,70,229,.22)}
+
+/* SECTION SUBNAV */
+.ap-subnav{position:sticky;top:var(--ap-nav-h,60px);z-index:1010;background:#fff;border-bottom:1px solid var(--line)}
+.ap-subnav__in{display:flex;gap:.3rem;overflow-x:auto;padding:.5rem 0;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.ap-subnav__in::-webkit-scrollbar{display:none}
+.ap-subnav a{flex:0 0 auto;display:inline-flex;align-items:center;min-height:38px;padding:.45rem .9rem;border-radius:999px;font-size:.85rem;font-weight:700;color:var(--ink-3);text-decoration:none;white-space:nowrap;transition:background .15s ease,color .15s ease}
+.ap-subnav a:hover{background:var(--soft);color:var(--ink)}
+.ap-subnav a.is-active{background:var(--accent-soft);color:var(--action)}
+.ap-subnav a:focus-visible{outline:3px solid rgba(99,102,241,.55);outline-offset:2px}
+
+/* HERO */
+.ap-hero{background:#fff;padding:5.5rem 0 4.5rem;position:relative;overflow:hidden;border-bottom:1px solid var(--line)}
+.ap-hero::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(8,11,44,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(8,11,44,.04) 1px,transparent 1px);background-size:54px 54px;mask-image:radial-gradient(880px 480px at 74% 20%,#000,transparent 74%);-webkit-mask-image:radial-gradient(880px 480px at 74% 20%,#000,transparent 74%);pointer-events:none}
+.ap-hero__grid{position:relative;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:3rem;align-items:center}
+.ap-hero__acts{display:flex;gap:.85rem;flex-wrap:wrap;margin-top:1.9rem}
+.ap-trustline{margin-top:1.1rem;font-size:.88rem;color:var(--ink-3)}
+.ap-console{background:var(--dark);border:1px solid rgba(255,255,255,.08);border-radius:18px;box-shadow:var(--sh);overflow:hidden;position:relative}
+.ap-console::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--brand),var(--violet))}
+.ap-console__top{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.85rem 1.1rem;border-bottom:1px solid rgba(255,255,255,.08)}
+.ap-dots{display:flex;gap:.4rem}
+.ap-dots span{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.18)}
+.ap-console__title{color:#E2E8F0;font-size:.8rem;font-weight:700}
+.ap-sample{font-size:.64rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:var(--action);padding:.24rem .55rem;border-radius:999px;white-space:nowrap}
+.ap-flow{display:flex;align-items:center;gap:.55rem;padding:1rem 1.1rem .2rem;color:#CBD5E1;font-size:.76rem;font-weight:700}
+.ap-flow__node{display:inline-flex;align-items:center;gap:.42rem;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:999px;padding:.34rem .68rem;white-space:nowrap}
+.ap-flow__node svg{width:14px;height:14px;color:var(--brand)}
+.ap-flow__line{flex:1;height:1px;background:linear-gradient(90deg,rgba(99,102,241,0),rgba(99,102,241,.75),rgba(99,102,241,0))}
+.ap-req{margin:1rem 1.1rem 0;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:.85rem .9rem;background:rgba(255,255,255,.03)}
+.ap-req__row{display:flex;align-items:center;gap:.65rem;flex-wrap:wrap}
+.ap-method{font-size:.68rem;font-weight:800;letter-spacing:.08em;background:var(--action);color:#fff;border-radius:7px;padding:.28rem .55rem}
+.ap-path{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.84rem;color:#E2E8F0;word-break:break-all}
+.ap-req__meta{margin-top:.55rem;color:#94a3b8;font-size:.72rem}
+.ap-resp{margin:1rem 1.1rem;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:.85rem .9rem;background:rgba(255,255,255,.025)}
+.ap-resp__row{display:flex;align-items:center;justify-content:space-between;gap:.8rem;margin-bottom:.55rem}
+.ap-status{display:inline-flex;align-items:center;gap:.42rem;font-size:.7rem;font-weight:800;color:#fff;background:var(--action);border-radius:999px;padding:.22rem .6rem}
+.ap-status svg{width:12px;height:12px}
+.ap-resp__meta{color:#94a3b8;font-size:.7rem}
+.ap-code{margin:0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.8rem;line-height:1.8;color:#E2E8F0;white-space:pre-wrap;word-break:break-word}
+.ap-code .k{color:#A5B4FC}.ap-code .s{color:#E9D5FF}.ap-code .n{color:#FDE68A}.ap-code .b{color:#94a3b8}
+.ap-console__foot{padding:.8rem 1.1rem 1rem;color:#94a3b8;font-size:.72rem;border-top:1px solid rgba(255,255,255,.08)}
+
+/* TRUST STRIP */
+.ap-trust{background:#fff;border-bottom:1px solid var(--line)}
+.ap-trust__row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;padding:1.15rem 0}
+.ap-trust__item{display:flex;align-items:center;justify-content:center;gap:.65rem;color:var(--ink-2);font-weight:700;font-size:.92rem}
+.ap-trust__item svg{width:19px;height:19px;color:var(--action)}
+.ap-trust__item+.ap-trust__item{border-left:1px solid var(--line)}
+
+/* BENEFITS */
+.ap-fig{margin:2.4rem 0 0;text-align:center}
+.ap-fig img{display:block;width:100%;max-width:860px;height:auto;margin-inline:auto;border-radius:var(--r)}
+.ap-card{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:1.65rem 1.5rem;transition:border-color .2s ease,transform .2s ease,box-shadow .2s ease}
+.ap-card:hover{border-color:var(--action);transform:translateY(-3px);box-shadow:var(--sh)}
+.ap-card__ic{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,rgba(99,102,241,.17),rgba(195,88,220,.12));color:var(--action-dark);margin-bottom:1rem}
+.ap-card__ic svg{width:22px;height:22px}
+.ap-card h3{font-size:1.08rem;font-weight:750;margin:0 0 .4rem}
+.ap-card p{margin:0;font-size:.93rem;color:var(--ink-3)}
+
+/* CATALOGUE */
+.ap-cats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.2rem;margin-top:2.4rem}
+.ap-cat{display:flex;flex-direction:column}
+.ap-cat__foot{margin-top:auto}
+.ap-cat__src{display:flex;flex-wrap:wrap;gap:.45rem;margin:.95rem 0 .2rem}
+.ap-mini{margin-top:1rem;border:1px solid var(--line);border-radius:12px;background:var(--soft);padding:.8rem .85rem;min-height:104px}
+.ap-mini__cap{display:block;font-size:.66rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-bottom:.55rem}
+.ap-mini__table{width:100%;border-collapse:collapse;font-size:.72rem;color:var(--ink-2)}
+.ap-mini__table th,.ap-mini__table td{text-align:left;padding:.28rem .3rem;border-bottom:1px solid var(--line);font-weight:600}
+.ap-mini__table tr:last-child th,.ap-mini__table tr:last-child td{border-bottom:0}
+.ap-ok{display:inline-flex;align-items:center;gap:.28rem;color:var(--action-dark);font-weight:800}
+.ap-ok svg{width:12px;height:12px}
+.ap-bars{display:grid;gap:.45rem}
+.ap-bar{height:8px;border-radius:999px;background:#E8EEF5;position:relative;overflow:hidden}
+.ap-bar span{position:absolute;inset:0 auto 0 0;border-radius:999px;background:var(--brand)}
+.ap-io{display:grid;grid-template-columns:1fr 1fr;gap:.55rem}
+.ap-pane{background:#fff;border:1px solid var(--line);border-radius:9px;padding:.5rem .55rem;font-size:.68rem;color:var(--ink-2)}
+.ap-pane strong{display:block;font-size:.62rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);margin-bottom:.2rem}
+.ap-diagram{display:flex;align-items:center;gap:.4rem}
+.ap-node{flex:1;background:#fff;border:1px solid var(--line);border-radius:9px;padding:.42rem .3rem;text-align:center;font-size:.64rem;font-weight:800;color:var(--ink)}
+.ap-node.is-api{border-color:var(--action);color:var(--action-dark);background:rgba(99,102,241,.1)}
+.ap-link{width:18px;height:2px;background:var(--brand);border-radius:2px;flex-shrink:0}
+.ap-chips{display:flex;flex-wrap:wrap;gap:.4rem}
+.ap-chip{font-size:.66rem;font-weight:700;background:#fff;border:1px solid var(--line);border-radius:999px;padding:.24rem .55rem;color:var(--ink-2)}
+.ap-cat__link{padding-top:1.1rem;font-weight:750;font-size:.9rem;color:var(--action-dark);text-decoration:none;display:inline-flex;gap:.45rem;align-items:center}
+.ap-cat__link:hover{text-decoration:underline;text-underline-offset:3px}
+.ap-cat__link svg{width:15px;height:15px;transition:transform .2s ease}
+.ap-cat__link:hover svg{transform:translateX(4px)}
+.ap-note{margin:1.6rem auto 0;max-width:760px;text-align:center}
+
+/* PRODUCT PREVIEW */
+.ap-preview{margin-top:2.4rem;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:#fff;box-shadow:var(--sh)}
+.ap-preview__grid{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr)}
+.ap-preview__info{padding:2rem 1.8rem;border-right:1px solid var(--line)}
+.ap-kv{display:grid;grid-template-columns:130px minmax(0,1fr);gap:.5rem .9rem;margin:1.2rem 0;padding:0;list-style:none;font-size:.88rem}
+.ap-kv dt{color:var(--ink-3);font-weight:700}
+.ap-kv dd{margin:0;color:var(--ink);font-weight:600}
+.ap-preview__acts{display:flex;gap:.7rem;flex-wrap:wrap;margin-top:1.3rem}
+.ap-preview__code{background:var(--dark);padding:1.7rem 1.6rem;color:#E2E8F0}
+.ap-preview__code h3{color:#fff;font-size:1rem;margin:.9rem 0 .5rem}
+.ap-preview__code h3:first-child{margin-top:0}
+.ap-preview__code pre{margin:0 0 .4rem;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.76rem;line-height:1.75;white-space:pre-wrap;word-break:break-word;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.09);border-radius:10px;padding:.75rem .8rem}
+.ap-preview__code .k{color:#A5B4FC}.ap-preview__code .s{color:#E9D5FF}.ap-preview__code .n{color:#FDE68A}.ap-preview__code .c{color:#94a3b8}
+
+/* HOW */
+.ap-steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1.1rem;margin-top:2.4rem;position:relative}
+.ap-step{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:1.6rem 1.35rem;position:relative;z-index:1}
+.ap-steps::before{content:"";position:absolute;top:42px;left:7%;right:7%;height:2px;background:repeating-linear-gradient(90deg,var(--line) 0 7px,transparent 7px 15px)}
+.ap-step__n{display:flex;align-items:center;gap:.6rem;font-weight:800;color:var(--action-dark);margin-bottom:.8rem}
+.ap-step__n span{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--accent-soft);border:1px solid rgba(99,102,241,.3);font-size:.95rem}
+.ap-step h3{font-size:1.03rem;margin:0 0 .35rem}
+.ap-step p{margin:0;font-size:.9rem;color:var(--ink-3)}
+
+/* AUDIENCES */
+.ap-dark{background:var(--dark);color:#E2E8F0}
+.ap-dark .ap-h2{color:#fff}
+.ap-dark .ap-lead{color:#94a3b8}
+.ap-dark .ap-eyebrow{color:#A5B4FC}
+.ap-dark .ap-eyebrow::before{background:linear-gradient(90deg,var(--brand),var(--violet))}
+.ap-aud{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-top:2.4rem}
+.ap-aud__card{background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:1.9rem 1.7rem}
+.ap-aud__card h3{color:#fff;font-size:1.25rem;margin:0 0 .5rem}
+.ap-aud__card p{margin:0 0 1.2rem;font-size:.94rem;color:#94a3b8}
+.ap-dev{border:1px solid rgba(255,255,255,.1);border-radius:12px;background:#080B2C;padding:1rem .95rem;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.74rem;line-height:1.75;color:#E2E8F0;white-space:pre-wrap;word-break:break-word}
+.ap-dev .k{color:#A5B4FC}.ap-dev .s{color:#E9D5FF}.ap-dev .c{color:#64748B}
+.ap-sys{display:flex;align-items:stretch;gap:.5rem}
+.ap-sys__node{flex:1;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:.7rem .5rem;text-align:center;font-size:.68rem;font-weight:800;color:#fff}
+.ap-sys__node small{display:block;margin-top:.25rem;font-size:.62rem;font-weight:600;color:#94a3b8}
+.ap-sys__node.is-api{border-color:var(--brand);box-shadow:inset 0 0 0 1px rgba(99,102,241,.35)}
+.ap-sys__wire{position:relative;flex:0 0 34px;align-self:center;height:2px;background:rgba(148,163,184,.35);border-radius:2px;overflow:hidden}
+.ap-sys__wire::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,var(--brand),transparent);transform:translateX(-100%);animation:apwire 2.8s linear infinite}
+.ap-sys__wire:last-child::after{animation-delay:1.4s}
+
+/* PRICING */
+.ap-price{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.2rem;margin-top:2.6rem;align-items:stretch}
+.ap-plan{background:#fff;border:1px solid var(--line);border-radius:18px;padding:1.9rem 1.6rem;display:flex;flex-direction:column;position:relative}
+.ap-plan--rec{border:1px solid var(--violet);box-shadow:0 24px 55px -36px rgba(160,66,190,.55)}
+.ap-plan__flag{position:absolute;top:-12px;left:1.6rem;display:inline-flex;font-size:.66rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--violet-ink);background:#fff;border:1px solid rgba(195,88,220,.32);border-radius:999px;padding:.26rem .65rem}
+.ap-plan__tier{font-size:.78rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.ap-plan__amt{font-family:var(--font-display);font-size:2.45rem;font-weight:800;color:var(--ink);letter-spacing:-.02em;margin:.5rem 0 0;line-height:1}
+.ap-plan__amt small{font-size:.9rem;font-weight:600;color:var(--ink-3);letter-spacing:0}
+@media (min-width:961px){.ap-plan--rec{margin-top:-14px}}
+.ap-plan__desc{font-size:.9rem;color:var(--ink-3);margin:.6rem 0 1.15rem;min-height:2.55em}
+.ap-plan__list{list-style:none;padding:0;margin:0 0 1.6rem;display:grid;gap:.58rem;flex:1}
+.ap-plan__list li{display:flex;gap:.55rem;font-size:.88rem;color:var(--ink-2);align-items:flex-start;line-height:1.5}
+.ap-plan__list svg{color:var(--action);margin-top:.24rem;width:14px;height:14px;flex-shrink:0}
+.ap-plan .ap-btn{width:100%;justify-content:center}
+.ap-ent{margin-top:1.35rem;background:var(--soft);border:1px dashed var(--line);border-radius:var(--r);padding:1.55rem 1.65rem;display:flex;flex-wrap:wrap;gap:1rem;justify-content:space-between;align-items:center}
+.ap-ent h3{font-size:1.08rem;margin:0 0 .2rem}
+.ap-ent p{margin:0;font-size:.9rem;color:var(--ink-3);max-width:650px}
+
+/* CUSTOM */
+.ap-custom{background:var(--dark);border-radius:22px;padding:3rem 2.5rem;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:2.75rem;align-items:center;box-shadow:var(--sh);position:relative;overflow:hidden}
+.ap-custom::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--brand),var(--violet))}
+.ap-custom .ap-eyebrow{color:#A5B4FC}
+.ap-custom h2{color:#fff}
+.ap-custom .ap-lead{color:#94a3b8}
+.ap-custom__list{list-style:none;padding:0;margin:1.6rem 0 1.8rem;display:grid;gap:.7rem}
+.ap-custom__list li{display:flex;gap:.7rem;align-items:center;font-weight:650;color:#E2E8F0;font-size:.95rem}
+.ap-custom__list svg{width:32px;height:32px;border-radius:9px;padding:8px;background:rgba(99,102,241,.13);color:var(--brand);flex-shrink:0}
+.ap-arch{background:#080B2C;border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:1.35rem 1.2rem}
+.ap-arch__row{display:flex;align-items:center;gap:.55rem}
+.ap-arch__node{flex:1;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.035);border-radius:12px;padding:.7rem .55rem;text-align:center;color:#fff;font-size:.72rem;font-weight:800}
+.ap-arch__node small{display:block;margin-top:.22rem;color:#94a3b8;font-size:.62rem;font-weight:600}
+.ap-arch__node.is-api{border-color:var(--brand);box-shadow:inset 0 0 0 1px rgba(99,102,241,.35)}
+.ap-arch__wire{flex:0 0 30px;height:2px;background:rgba(148,163,184,.35);border-radius:2px;position:relative;overflow:hidden}
+.ap-arch__wire::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,var(--brand),transparent);transform:translateX(-100%);animation:apwire 3s linear infinite}
+.ap-arch__cap{margin:.9rem 0 0;color:#94a3b8;font-size:.72rem}
+@keyframes apwire{to{transform:translateX(100%)}}
+
+/* FAQ */
+.ap-faq{max-width:820px;margin:2.2rem auto 0;text-align:left}
+.ap-faq__item{border:1px solid var(--line);border-radius:14px;margin-bottom:.8rem;background:#fff;overflow:hidden}
+.ap-faq__btn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:1rem;background:#fff;border:0;padding:1.05rem 1.2rem;font-weight:750;color:var(--ink);font-size:.98rem;text-align:left;min-height:56px}
+.ap-faq__btn svg{width:18px;height:18px;color:var(--action);transition:transform .25s ease;flex-shrink:0}
+.ap-faq__btn:not(.collapsed) svg{transform:rotate(180deg)}
+.ap-faq__body{color:var(--ink-2);font-size:.93rem}
+.ap-faq__body a{color:var(--action-dark);font-weight:700}
+.ap-faq__item.accordion-item{border:1px solid var(--line);border-radius:14px;margin-bottom:.8rem;background:#fff;overflow:hidden}
+.ap-faq__btn.accordion-button{background:#fff;border:0;box-shadow:none}
+.ap-faq__btn.accordion-button::after{display:none}
+.ap-faq__btn.accordion-button.collapsed{color:var(--ink)}
+.ap-faq__btn.accordion-button:not(.collapsed){background:rgba(99,102,241,.07);color:var(--action);box-shadow:none}
+.ap-faq__btn.accordion-button:hover{background:var(--soft)}
+.ap-faq__btn.accordion-button:not(.collapsed):hover{background:rgba(99,102,241,.11)}
+.ap-faq__btn.accordion-button:focus{box-shadow:none}
+.ap-faq__btn.accordion-button:focus-visible{outline:3px solid rgba(99,102,241,.55);outline-offset:-3px}
+.ap-faq__body.accordion-body{padding:.2rem 1.2rem 1.25rem}
+
+/* FINAL */
+.ap-final{background:var(--dark);border-radius:0;padding:3.1rem 1.5rem;text-align:center;box-shadow:none;position:relative;overflow:hidden}
+.ap-final::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--brand),var(--violet))}
+.ap-final h2{color:#fff;font-size:clamp(1.6rem,3.2vw,2.25rem);margin:0 0 .65rem}
+.ap-final p{color:#94a3b8;max-width:580px;margin:0 auto 1.8rem}
+.ap-final__acts{display:flex;gap:.85rem;justify-content:center;flex-wrap:wrap}
+.ap-xlink{color:var(--action-dark);font-weight:700;text-decoration:none}
+.ap-xlink:hover{text-decoration:underline;text-underline-offset:3px}
+
+/* CODE COPY BUTTONS */
+.ap-code,.ap-preview__code pre,.ap-dev{position:relative}
+.ap-copy{position:absolute;top:6px;right:6px;z-index:2;font-size:.64rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:.3rem .6rem;border-radius:7px;border:1px solid rgba(255,255,255,.18);background:rgba(8,11,44,.75);color:#CBD5E1;cursor:pointer;line-height:1.2;transition:background .15s ease,color .15s ease,border-color .15s ease}
+.ap-copy:hover,.ap-copy.is-done{background:var(--action);color:#fff;border-color:transparent}
+.ap-copy:focus-visible{outline:3px solid rgba(99,102,241,.55);outline-offset:2px}
+
+/* MOBILE STICKY CTA */
+.ap-mbar{display:none}
+
+@media (max-width:1024px){
+  .ap-cats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .ap-preview__grid{grid-template-columns:1fr}
+  .ap-preview__info{border-right:0;border-bottom:1px solid var(--line)}
+}
+@media (max-width:960px){
+  .ap-hero__grid,.ap-custom{grid-template-columns:1fr;gap:2.4rem}
+  .ap-steps,.ap-aud,.ap-price{grid-template-columns:1fr}
+  .ap-price{max-width:460px;margin-inline:auto}
+  .ap-custom{padding:2.4rem 1.6rem}
+  .ap-steps::before{display:none}
+}
+@media (max-width:640px){
+  .ap-sec{padding:3.75rem 0}
+  .ap-cats{grid-template-columns:1fr}
+  .ap-trust__row{grid-template-columns:1fr;gap:.7rem;text-align:left}
+  .ap-trust__item{justify-content:flex-start}
+  .ap-trust__item+.ap-trust__item{border-left:0}
+  .ap-io{grid-template-columns:1fr}
+  .ap-final{padding:2.5rem 1.4rem}
+  .ap-plan__flag{left:1.2rem}
+  .ap-mbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:1040;padding:.6rem .9rem calc(.6rem + env(safe-area-inset-bottom));background:#fff;border-top:1px solid var(--line);box-shadow:0 -12px 30px -24px rgba(8,11,44,.55)}
+  .ap-mbar .ap-btn{flex:1;justify-content:center}
+  body:has(.ap-mbar){padding-bottom:76px}
+  body:has(.ap-mbar) .chatbot-fab{bottom:96px}
+}
+@media (prefers-reduced-motion:reduce){
+  .ap{scroll-behavior:auto}
+  .ap-rv{opacity:1!important;transform:none!important;transition:none!important}
+  .ap-sys__wire::after,.ap-arch__wire::after{animation:none!important}
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ap">
+
+  <!-- HERO -->
+  <section class="ap-hero" id="ap-overview" aria-labelledby="api-hero-title">
+    <div class="container">
+      <div class="ap-hero__grid">
+        <div class="ap-rv">
+          <span class="ap-eyebrow">{% trans "API Solutions &amp; Integration" %}</span>
+          <h1 class="ap-h1" id="api-hero-title"><span class="ap-h1__hl">{% trans "The APIs you need." %}</span><br>{% trans "The integrations you don't have to build." %}</h1>
+          <p class="ap-lead">{% trans "Access practical APIs for data processing, website analysis, AI-powered workflows, and business integrations. Choose a plan, connect your applications, and build more with less development overhead." %}</p>
+          <div class="ap-hero__acts">
+            <a href="#ap-catalogue" class="ap-btn ap-btn--primary">{% trans "Explore API Solutions" %} <i data-lucide="arrow-right" aria-hidden="true"></i></a>
+            <a href="{% url 'home:api_docs' %}" class="ap-btn ap-btn--ghost"><i data-lucide="book-open" aria-hidden="true"></i> {% trans "View API docs" %}</a>
+            <a href="{% url 'contact:contact' %}" class="ap-btn ap-btn--ghost">{% trans "Request an API" %}</a>
+          </div>
+          <p class="ap-trustline">{% trans "For developers, startups, and growing businesses." %}</p>
+        </div>
+
+        <div class="ap-rv" style="--d:.1s">
+          <div class="ap-console" role="img" aria-label="{% trans 'Illustrative API console showing an example request and sample JSON response' %}">
+            <div class="ap-console__top">
+              <div class="ap-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+              <span class="ap-console__title">{% trans "API console" %}</span>
+              <span class="ap-sample">{% trans "Sample interface" %}</span>
+            </div>
+            <div class="ap-flow" aria-hidden="true">
+              <span class="ap-flow__node"><i data-lucide="laptop"></i>{% trans "Your app" %}</span>
+              <span class="ap-flow__line"></span>
+              <span class="ap-flow__node"><i data-lucide="server"></i>{% trans "OnWebApp API" %}</span>
+              <span class="ap-flow__line"></span>
+              <span class="ap-flow__node"><i data-lucide="braces"></i>JSON</span>
+            </div>
+            <div class="ap-req">
+              <div class="ap-req__row">
+                <span class="ap-method">GET</span>
+                <code class="ap-path">/api/v1/website-analysis</code>
+              </div>
+              <div class="ap-req__meta">{% trans "Illustrative endpoint" %}</div>
+            </div>
+            <div class="ap-resp">
+              <div class="ap-resp__row">
+                <span class="ap-status"><i data-lucide="check" aria-hidden="true"></i>200 OK</span>
+                <span class="ap-resp__meta">JSON · {% trans "sample payload" %}</span>
+              </div>
+<pre class="ap-code"><span class="b">{</span>
+  <span class="s">"status"</span>: <span class="s">"success"</span>,
+  <span class="s">"data"</span>: <span class="b">{</span>
+    <span class="s">"score"</span>: <span class="n">92</span>,
+    <span class="s">"pages_analyzed"</span>: <span class="n">24</span>
+  <span class="b">}</span>
+<span class="b">}</span></pre>
+            </div>
+            <p class="ap-console__foot">{% trans "Illustrative example only. This sample payload is not a live OnWebApp API result." %}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION SUBNAV -->
+  <nav class="ap-subnav" aria-label="{% trans 'Page sections' %}">
+    <div class="container ap-subnav__in">
+      <a href="#ap-overview" class="is-active">{% trans "Overview" %}</a>
+      <a href="#ap-catalogue">{% trans "Catalogue" %}</a>
+      <a href="#ap-product">{% trans "Product" %}</a>
+      <a href="#ap-how">{% trans "How it works" %}</a>
+      <a href="#ap-pricing">{% trans "Pricing" %}</a>
+      <a href="#ap-faq">FAQ</a>
+    </div>
+  </nav>
+
+  <!-- TRUST STRIP -->
+  <section class="ap-trust" aria-label="{% trans 'API service highlights' %}">
+    <div class="container">
+      <div class="ap-trust__row">
+        <div class="ap-trust__item ap-rv"><i data-lucide="package" aria-hidden="true"></i><span>{% trans "Ready-to-use functionality" %}</span></div>
+        <div class="ap-trust__item ap-rv" style="--d:.06s"><i data-lucide="file-text" aria-hidden="true"></i><span>{% trans "Clear integration documentation" %}</span></div>
+        <div class="ap-trust__item ap-rv" style="--d:.12s"><i data-lucide="credit-card" aria-hidden="true"></i><span>{% trans "Subscription-based access" %}</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BENEFITS -->
+  <section class="ap-sec" style="background:#fff" aria-labelledby="api-benefits">
+    <div class="container">
+      <div class="ap-center ap-rv">
+        <span class="ap-eyebrow">{% trans "Why APIs" %}</span>
+        <h2 class="ap-h2" id="api-benefits">{% trans "Build your product, not every component behind it." %}</h2>
+        <p class="ap-lead">{% trans "Access useful functionality through APIs and focus your development resources on what makes your product different." %}</p>
+      </div>
+      <figure class="ap-fig ap-rv">
+        <img src="{% static 'img/api.png' %}" alt="{% trans 'Four illustrated API benefits: accelerate development, connect your stack, controlled API access, and scale with your needs' %}" width="1600" height="900">
+      </figure>
+    </div>
+  </section>
+
+  <!-- CATALOGUE -->
+  <section class="ap-sec" id="ap-catalogue" style="background:var(--soft)" aria-labelledby="api-catalogue">
+    <div class="container">
+      <div class="ap-center ap-rv">
+        <span class="ap-eyebrow">{% trans "API catalogue" %}</span>
+        <h2 class="ap-h2" id="api-catalogue">{% trans "One place for the APIs your business needs." %}</h2>
+        <p class="ap-lead">{% trans "Discover API products by functionality, integration requirements, and use case." %}</p>
+      </div>
+
+      <div class="ap-cats">
+        <article class="ap-card ap-cat ap-rv" aria-labelledby="api-cat-brand">
+          <div class="ap-card__ic"><i data-lucide="palette" aria-hidden="true"></i></div>
+          <h3 id="api-cat-brand">{% trans "Websity Branding API" %}</h3>
+          <p>{% trans "A JSON REST interface over brand collections, project requests, assets, messaging, notifications, feedback, and webhooks." %}</p>
+          <div class="ap-cat__foot">
+            <div class="ap-cat__src"><span class="ap-tag ap-tag--live">{% trans "Live now" %}</span></div>
+            <div class="ap-mini" aria-hidden="true">
+              <span class="ap-mini__cap">{% trans "Example endpoint" %}</span>
+              <table class="ap-mini__table">
+                <tr><th scope="col">{% trans "Method" %}</th><th scope="col">{% trans "Path" %}</th></tr>
+                <tr><td>GET</td><td>/api/branding/requests/</td></tr>
+              </table>
+            </div>
+            <a class="ap-cat__link" href="{% url 'home:api_docs' %}" aria-label="{% trans 'View Websity Branding API documentation' %}">{% trans "View docs" %} <i data-lucide="arrow-right" aria-hidden="true"></i></a>
+          </div>
+        </article>
+
+        <article class="ap-card ap-cat ap-rv" style="--d:.06s" aria-labelledby="api-cat-data">
+          <div class="ap-card__ic"><i data-lucide="database" aria-hidden="true"></i></div>
+          <h3 id="api-cat-data">{% trans "Data &amp; Processing APIs" %}</h3>
+          <p>{% trans "Helpers for validation, transformation, normalization, and structured output." %}</p>
+          <div class="ap-cat__foot">
+            <div class="ap-cat__src"><span class="ap-tag">{% trans "By request" %}</span></div>
+            <div class="ap-mini" aria-hidden="true">
+              <span class="ap-mini__cap">{% trans "Example payload layout" %}</span>
+              <table class="ap-mini__table">
+                <tr><th scope="col">{% trans "Field" %}</th><th scope="col">{% trans "Check" %}</th></tr>
+                <tr><td>email</td><td><span class="ap-ok"><i data-lucide="check"></i>{% trans "valid format" %}</span></td></tr>
+                <tr><td>amount</td><td><span class="ap-ok"><i data-lucide="check"></i>{% trans "numeric" %}</span></td></tr>
+              </table>
+            </div>
+            <a class="ap-cat__link" href="{% url 'contact:contact' %}" aria-label="{% trans 'Request access to Data and Processing APIs' %}">{% trans "Request access" %} <i data-lucide="arrow-right" aria-hidden="true"></i></a>
+          </div>
+        </article>
+
+        <article class="ap-card ap-cat ap-rv" style="--d:.12s" aria-labelledby="api-cat-seo">
+          <div class="ap-card__ic"><i data-lucide="search" aria-hidden="true"></i></div>
+          <h3 id="api-cat-seo">{% trans "Website &amp; SEO APIs" %}</h3>
+          <p>{% trans "Website checks, URL validation, metadata extraction, and SEO-related data." %}</p>
+          <div class="ap-cat__foot">
+            <div class="ap-cat__src"><span class="ap-tag">{% trans "By request" %}</span></div>
+            <div class="ap-mini" aria-hidden="true">
+              <span class="ap-mini__cap">{% trans "Example audit layout" %}</span>
+              <div class="ap-bars"><div class="ap-bar"><span style="width:72%"></span></div><div class="ap-bar"><span style="width:48%"></span></div><div class="ap-bar"><span style="width:86%"></span></div></div>
+            </div>
+            <a class="ap-cat__link" href="{% url 'contact:contact' %}" aria-label="{% trans 'Request access to Website and SEO APIs' %}">{% trans "Request access" %} <i data-lucide="arrow-right" aria-hidden="true"></i></a>
+          </div>
+        </article>
+
+        <article class="ap-card ap-cat ap-rv" style="--d:.18s" aria-labelledby="api-cat-ai">
+          <div class="ap-card__ic"><i data-lucide="brain" aria-hidden="true"></i></div>
+          <h3 id="api-cat-ai">{% trans "AI &amp; Text APIs" %}</h3>
+          <p>{% trans "Supported classification, content processing, and AI-assisted analysis." %}</p>
+          <div class="ap-cat__foot">
+            <div class="ap-cat__src"><span class="ap-tag">{% trans "By request" %}</span></div>
+            <div class="ap-mini" aria-hidden="true">
+              <span class="ap-mini__cap">{% trans "Example input and output layout" %}</span>
+              <div class="ap-io">
+                <div class="ap-pane"><strong>{% trans "Input" %}</strong>{% trans "Support ticket text" %}</div>
+                <div class="ap-pane"><strong>{% trans "Output" %}</strong>{% trans "Sample category label" %}</div>
+              </div>
+            </div>
+            <a class="ap-cat__link" href="{% url 'contact:contact' %}" aria-label="{% trans 'Request access to AI and Text APIs' %}">{% trans "Request access" %} <i data-lucide="arrow-right" aria-hidden="true"></i></a>
+          </div>
+        </article>
+
+        <article class="ap-card ap-cat ap-rv" style="--d:.24s" aria-labelledby="api-cat-business">
+          <div class="ap-card__ic"><i data-lucide="building-2" aria-hidden="true"></i></div>
+          <h3 id="api-cat-business">{% trans "Business &amp; Integration APIs" %}</h3>
+          <p>{% trans "System connectivity and application-to-application data exchange." %}</p>
+          <ul class="ap-fine" style="list-style:none;margin:.9rem 0 0;padding:0;display:grid;gap:.35rem">
+            <li>{% trans "Business-system connectivity" %}</li>
+            <li>{% trans "Application data exchange" %}</li>
+          </ul>
+          <div class="ap-cat__foot">
+            <div class="ap-cat__src"><span class="ap-tag">{% trans "By request" %}</span></div>
+            <div class="ap-mini" aria-hidden="true">
+              <span class="ap-mini__cap">{% trans "Example connection pattern" %}</span>
+              <div class="ap-diagram"><span class="ap-node">{% trans "Website" %}</span><span class="ap-link"></span><span class="ap-node is-api">API</span><span class="ap-link"></span><span class="ap-node">{% trans "System" %}</span></div>
+            </div>
+            <a class="ap-cat__link" href="{% url 'contact:contact' %}" aria-label="{% trans 'Request access to Business and Integration APIs' %}">{% trans "Request access" %} <i data-lucide="arrow-right" aria-hidden="true"></i></a>
+          </div>
+        </article>
+
+        <article class="ap-card ap-cat ap-rv" style="--d:.30s" aria-labelledby="api-cat-external">
+          <div class="ap-card__ic"><i data-lucide="plug" aria-hidden="true"></i></div>
+          <h3 id="api-cat-external">{% trans "External API Integrations" %}</h3>
+          <p>{% trans "Authorized access to eligible third-party capabilities where supported." %}</p>
+          <ul class="ap-fine" style="list-style:none;margin:.9rem 0 0;padding:0;display:grid;gap:.35rem">
+            <li>{% trans "Eligible third-party APIs" %}</li>
+            <li>{% trans "Authorized integration arrangements" %}</li>
+          </ul>
+          <div class="ap-cat__foot">
+            <div class="ap-cat__src"><span class="ap-tag">{% trans "Third-party eligibility varies" %}</span></div>
+            <div class="ap-mini" aria-hidden="true">
+              <span class="ap-mini__cap">{% trans "Example access pattern" %}</span>
+              <div class="ap-chips"><span class="ap-chip">{% trans "Provider account" %}</span><span class="ap-chip">OAuth / API key</span><span class="ap-chip">{% trans "Scoped access" %}</span></div>
+            </div>
+            <a class="ap-cat__link" href="{% url 'contact:contact' %}" aria-label="{% trans 'Request access to External API Integrations' %}">{% trans "Request access" %} <i data-lucide="arrow-right" aria-hidden="true"></i></a>
+          </div>
+        </article>
+      </div>
+      <p class="ap-fine ap-note ap-rv">{% trans "Catalogue note: only the Branding API has live reference documentation today; all other categories are handled by request." %}</p>
+    </div>
+  </section>
+
+  <!-- PRODUCT PREVIEW -->
+  <section class="ap-sec" id="ap-product" aria-labelledby="api-product">
+    <div class="container">
+      <div class="ap-center ap-rv">
+        <span class="ap-eyebrow">{% trans "API product preview" %}</span>
+        <h2 class="ap-h2" id="api-product">{% trans "See what you're integrating before you subscribe." %}</h2>
+        <p class="ap-lead">{% trans "This reusable preview currently shows the documented Branding API. Dynamic product records can replace these fields when a catalogue backend is connected." %}</p>
+      </div>
+
+      <!-- Reusable product component: replace static values with APIProduct fields. -->
+      <div class="ap-preview ap-rv">
+        <div class="ap-preview__grid">
+          <div class="ap-preview__info">
+            <span class="ap-tag">{% trans "Available · documented API" %}</span>
+            <h3 style="font-size:1.35rem;margin:.9rem 0 .45rem">{% trans "Websity Branding API" %}</h3>
+            <p class="ap-fine">{% trans "A JSON REST interface over brand collections, project requests, assets, messaging, notifications, feedback, and webhooks." %}</p>
+            <dl class="ap-kv">
+              <dt>{% trans "Category" %}</dt><dd>{% trans "Brand operations" %}</dd>
+              <dt>{% trans "Provider" %}</dt><dd>OnWebApp</dd>
+              <dt>{% trans "Authentication" %}</dt><dd>JWT Bearer</dd>
+              <dt>{% trans "Use cases" %}</dt><dd>{% trans "Collections, requests, assets, messages, notifications, feedback, webhooks" %}</dd>
+              <dt>{% trans "Subscription" %}</dt><dd>{% trans "By inquiry — no live API subscription plan is connected to this preview." %}</dd>
+            </dl>
+            <div class="ap-preview__acts">
+              <a class="ap-btn ap-btn--primary" href="{% url 'home:api_docs' %}">{% trans "View API Details" %} <i data-lucide="arrow-right" aria-hidden="true"></i></a>
+              <a class="ap-btn ap-btn--ghost" href="{% url 'schema' %}">{% trans "OpenAPI schema" %}</a>
+            </div>
+          </div>
+          <div class="ap-preview__code">
+            <h3>{% trans "Developer preview" %}</h3>
+            <pre><span class="c"># Illustrative request pattern</span>
+<span class="k">GET</span> <span class="s">/api/branding/requests/?status=in_progress&amp;page_size=50</span>
+<span class="c">Authorization: Bearer &lt;ACCESS_TOKEN&gt;</span></pre>
+            <h3>{% trans "Example response" %}</h3>
+<pre><span class="b">{</span>
+  <span class="s">"count"</span>: <span class="n">128</span>,
+  <span class="s">"next"</span>: <span class="s">"…?page=2"</span>,
+  <span class="s">"previous"</span>: <span class="b">null</span>,
+  <span class="s">"results"</span>: <span class="b">[</span>
+    <span class="b">{</span><span class="s">"id"</span>: <span class="s">"…"</span>, <span class="s">"status"</span>: <span class="s">"in_progress"</span></span><span class="b">}</span>
+  <span class="b">]</span>
+<span class="b">}</span></pre>
+            <p class="ap-fine" style="color:#94a3b8;margin:.7rem 0 0">{% trans "Sample response format only. Replace placeholder values with a real documented response before relying on it." %}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="ap-sec" id="ap-how" style="background:var(--soft)" aria-labelledby="api-how">
+    <div class="container">
+      <div class="ap-center ap-rv">
+        <span class="ap-eyebrow">{% trans "Process" %}</span>
+        <h2 class="ap-h2" id="api-how">{% trans "From discovery to deployment." %}</h2>
+      </div>
+      <div class="ap-steps">
+        <div class="ap-step ap-rv"><div class="ap-step__n"><span>01</span>{% trans "Discover" %}</div><p>{% trans "Find the API that matches your functionality and integration requirements." %}</p></div>
+        <div class="ap-step ap-rv" style="--d:.06s"><div class="ap-step__n"><span>02</span>{% trans "Subscribe" %}</div><p>{% trans "Select an available plan and review the API's usage limits." %}</p></div>
+        <div class="ap-step ap-rv" style="--d:.12s"><div class="ap-step__n"><span>03</span>{% trans "Integrate" %}</div><p>{% trans "Follow the documentation, configure authentication, and connect your application." %}</p></div>
+        <div class="ap-step ap-rv" style="--d:.18s"><div class="ap-step__n"><span>04</span>{% trans "Manage" %}</div><p>{% trans "Review your subscription and usage information wherever supported." %}</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DEVELOPERS / BUSINESSES -->
+  <section class="ap-sec ap-dark" aria-labelledby="api-audiences">
+    <div class="container">
+      <div class="ap-center ap-rv">
+        <span class="ap-eyebrow">{% trans "Who it is for" %}</span>
+        <h2 class="ap-h2" id="api-audiences">{% trans "One API layer, two ways to use it." %}</h2>
+      </div>
+      <div class="ap-aud">
+        <div class="ap-aud__card ap-rv">
+          <h3>{% trans "Less boilerplate. More building." %}</h3>
+          <p>{% trans "Integrate existing capabilities, reduce repetitive implementation, and spend more time building the features that differentiate your product." %}</p>
+          <div class="ap-dev" aria-label="{% trans 'Illustrative developer request' %}"><span class="c"># Illustrative request pattern</span>
+<span class="k">GET</span> <span class="s">/api/branding/requests/?status=in_progress</span>
+<span class="c">Authorization: Bearer &lt;ACCESS_TOKEN&gt;</span></div>
+        </div>
+        <div class="ap-aud__card ap-rv" style="--d:.08s">
+          <h3>{% trans "Connect the systems your business depends on." %}</h3>
+          <p>{% trans "Find practical API solutions to support your applications, connect digital tools, and streamline data exchange across business workflows." %}</p>
+          <div class="ap-sys" role="img" aria-label="{% trans 'Diagram: website and business application connected through an API layer' %}">
+            <div class="ap-sys__node">{% trans "Website" %}<small>{% trans "Client experience" %}</small></div>
+            <div class="ap-sys__wire" aria-hidden="true"></div>
+            <div class="ap-sys__node is-api">API<small>{% trans "Integration layer" %}</small></div>
+            <div class="ap-sys__wire" aria-hidden="true"></div>
+            <div class="ap-sys__node">{% trans "Business app" %}<small>{% trans "Operations data" %}</small></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="ap-sec" id="ap-pricing" aria-labelledby="api-pricing">
+    <div class="container">
+      <div class="ap-center ap-rv">
+        <span class="ap-eyebrow">{% trans "Pricing" %}</span>
+        <h2 class="ap-h2" id="api-pricing">{% trans "Simple plans for every stage of development." %}</h2>
+        <p class="ap-lead">{% trans "Choose a subscription based on your API access and usage requirements." %}</p>
+      </div>
+      <div class="ap-price">
+        <div class="ap-plan ap-rv">
+          <div class="ap-plan__tier">{% trans "Free" %}</div>
+          <div class="ap-plan__amt">$0 <small>/ {% trans "month" %}</small></div>
+          <p class="ap-plan__desc">{% trans "Evaluate selected free API access before committing." %}</p>
+          <ul class="ap-plan__list">
+            <li><i data-lucide="check" aria-hidden="true"></i>{% trans "Selected free API access" %}</li>
+            <li><i data-lucide="check" aria-hidden="true"></i>{% trans "Limited monthly request quota" %}</li>
+            <li><i data-lucide="check" aria-hidden="true"></i>{% trans "Documentation and examples" %}</li>
+            <li><i data-lucide="check" aria-hidden="true"></i>{% trans "Basic support resources" %}</li>
+          </ul>
+          <a href="{% url 'contact:contact' %}" class="ap-btn ap-btn--ghost">{% trans "Request free access" %}</a>
+        </div>
+
+        <div class="ap-plan ap-plan--rec ap-rv" style="--d:.06s">
+          <span class="ap-plan__flag">{% trans "Proposed · Popular" %}</span>
+          <div class="ap-plan__tier">{% trans "Pro" %}</div>
+          <div class="ap-plan__amt">$19 <small>/ {% trans "month" %}</small></div>
+          <p class="ap-plan__desc">{% trans "For developers and teams moving from evaluation to production use." %}</p>
+          <ul class="ap-plan__list">
+            <li><i data-lucide="check" aria-hidden="true"></i>{% trans "Access to eligible paid APIs" %}</li>
+            <li><i data-lucide="check" aria-hidden="true"></i>{% trans "Higher usage allowances" %}</li>
+            <li><i data-lucide="check" aria-hidden="true"></i>{% trans "Usage information where supported" %}</li>
+            <li><i data-lucide="check" aria-hidden="true"></i>{% trans "Standard support" %}</li>
+          </ul>
+          <a href="{% url 'contact:contact' %}" class="ap-btn ap-btn--primary">{% trans "Request Pro access" %}</a>
+        </div>
+
+        <div class="ap-plan ap-rv" style="--d:.12s">
+          <span class="ap-plan__flag">{% trans "Proposed" %}</span>
+          <div class="ap-plan__tier">{% trans "Business" %}</div>
+          <div class="ap-plan__amt">$79 <small>/ {% trans "month" %}</small></div>
+          <p class="ap-plan__desc">{% trans "For businesses with larger integration or production requirements." %}</p>
+          <ul class="ap-plan__list">
+            <li><i data-lucide="check" aria-hidden="true"></i>{% trans "Higher usage allowances" %}</li>
+            <li><i data-lucide="check" aria-hidden="true"></i>{% trans "Eligible business API products" %}</li>
+            <li><i data-lucide="check" aria-hidden="true"></i>{% trans "Team access where implemented" %}</li>
+            <li><i data-lucide="check" aria-hidden="true"></i>{% trans "Priority support where available" %}</li>
+          </ul>
+          <a href="{% url 'contact:contact' %}" class="ap-btn ap-btn--dark">{% trans "Request Business access" %}</a>
+        </div>
+      </div>
+
+      <div class="ap-ent ap-rv">
+        <div>
+          <h3>{% trans "Enterprise and custom API work" %}</h3>
+          <p>{% trans "Higher limits, dedicated integration work, agreed service commitments, or custom API development are handled as a separate inquiry." %}</p>
+        </div>
+        <a href="{% url 'contact:contact' %}" class="ap-btn ap-btn--dark">{% trans "Contact Sales" %}</a>
+      </div>
+      <p class="ap-fine ap-note ap-rv">{% trans "Pro and Business figures are proposed planning prices, not live checkout prices. This page does not process API subscriptions, enforce quotas, or display live usage. Third-party API costs and limits may differ." %} <a class="ap-xlink" href="#ap-faq">{% trans "See the FAQ" %} &rarr;</a></p>
+    </div>
+  </section>
+
+  <!-- CUSTOM API -->
+  <section class="ap-sec" style="padding-top:0" aria-labelledby="api-custom">
+    <div class="container">
+      <div class="ap-custom ap-rv">
+        <div>
+          <span class="ap-eyebrow">{% trans "Need something specific?" %}</span>
+          <h2 class="ap-h2" id="api-custom">{% trans "An API that fits your workflow, built around your requirements." %}</h2>
+          <p class="ap-lead">{% trans "Tell us what you need to connect, automate, or build. We'll assess the requirements and help you determine the right API development or integration approach." %}</p>
+          <ul class="ap-custom__list">
+            <li><i data-lucide="wand-sparkles" aria-hidden="true"></i>{% trans "Custom API requirements assessment" %}</li>
+            <li><i data-lucide="plug" aria-hidden="true"></i>{% trans "Third-party eligibility review" %}</li>
+            <li><i data-lucide="clipboard-check" aria-hidden="true"></i>{% trans "Implementation planning" %}</li>
+          </ul>
+          <a href="{% url 'contact:contact' %}" class="ap-btn ap-btn--primary" style="margin-top:1.4rem">{% trans "Discuss Your Requirements" %} <i data-lucide="arrow-right" aria-hidden="true"></i></a>
+        </div>
+        <div class="ap-arch" role="img" aria-label="{% trans 'Architecture diagram: client application connected to a custom API layer and external business systems' %}">
+          <div class="ap-arch__row">
+            <div class="ap-arch__node">{% trans "Client application" %}<small>{% trans "Website or app" %}</small></div>
+            <div class="ap-arch__wire" aria-hidden="true"></div>
+            <div class="ap-arch__node is-api">{% trans "Custom API layer" %}<small>{% trans "Designed integration" %}</small></div>
+            <div class="ap-arch__wire" aria-hidden="true"></div>
+            <div class="ap-arch__node">{% trans "External systems" %}<small>{% trans "Business services" %}</small></div>
+          </div>
+          <p class="ap-arch__cap">{% trans "Architecture pattern only. It does not imply that a specific custom integration has been delivered." %}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="ap-sec" id="ap-faq" style="background:var(--soft)" aria-labelledby="api-faq">
+    <div class="container">
+      <div class="ap-center ap-rv">
+        <span class="ap-eyebrow">{% trans "FAQ" %}</span>
+        <h2 class="ap-h2" id="api-faq">{% trans "API questions, answered directly." %}</h2>
+        <p class="ap-fine" style="margin:-.35rem 0 0"><a class="ap-xlink" href="#ap-pricing">{% trans "See plan details in Pricing" %} &rarr;</a></p>
+      </div>
+      <div class="accordion ap-faq ap-rv" id="apiFaq">
+        <div class="ap-faq__item accordion-item">
+          <h3 class="accordion-header"><button class="ap-faq__btn accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#apiFaq1" aria-expanded="false" aria-controls="apiFaq1">{% trans "What is an API, and how can I use it?" %}<i data-lucide="chevron-down" aria-hidden="true"></i></button></h3>
+          <div id="apiFaq1" class="accordion-collapse collapse" data-bs-parent="#apiFaq"><div class="ap-faq__body accordion-body">{% trans "An API is a documented way for software to request data or actions over HTTP. You send an authenticated request, receive a structured response, and handle errors using the documented status codes. Only APIs with published documentation here are ready for direct integration; other categories require an inquiry first." %}</div></div>
+        </div>
+        <div class="ap-faq__item accordion-item">
+          <h3 class="accordion-header"><button class="ap-faq__btn accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#apiFaq2" aria-expanded="false" aria-controls="apiFaq2">{% trans "What is included in an OnWebApp API subscription?" %}<i data-lucide="chevron-down" aria-hidden="true"></i></button></h3>
+          <div id="apiFaq2" class="accordion-collapse collapse" data-bs-parent="#apiFaq"><div class="ap-faq__body accordion-body">{% trans "There is no self-serve API subscription, quota dashboard, or API checkout connected to this catalogue yet. A subscription would mean documented access, credentials, usage terms, and support where supported. Until those product records exist, use the contact inquiry route to request access." %}</div></div>
+        </div>
+        <div class="ap-faq__item accordion-item">
+          <h3 class="accordion-header"><button class="ap-faq__btn accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#apiFaq3" aria-expanded="false" aria-controls="apiFaq3">{% trans "Can I integrate an API into my existing website or application?" %}<i data-lucide="chevron-down" aria-hidden="true"></i></button></h3>
+          <div id="apiFaq3" class="accordion-collapse collapse" data-bs-parent="#apiFaq"><div class="ap-faq__body accordion-body">{% trans "Yes, when the endpoint exists and its documentation, authentication method, and use case are supported. We do not promise compatibility with every programming language, framework, provider, or authentication method. For anything outside the documented Branding API, request a compatibility review first." %}</div></div>
+        </div>
+        <div class="ap-faq__item accordion-item">
+          <h3 class="accordion-header"><button class="ap-faq__btn accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#apiFaq4" aria-expanded="false" aria-controls="apiFaq4">{% trans "Do you provide third-party APIs?" %}<i data-lucide="chevron-down" aria-hidden="true"></i></button></h3>
+          <div id="apiFaq4" class="accordion-collapse collapse" data-bs-parent="#apiFaq"><div class="ap-faq__body accordion-body">{% trans "Only through eligible, authorized integration arrangements. No third-party provider list is published on this page, and availability varies by provider terms. Ask about a specific provider before assuming it is supported." %}</div></div>
+        </div>
+        <div class="ap-faq__item accordion-item">
+          <h3 class="accordion-header"><button class="ap-faq__btn accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#apiFaq5" aria-expanded="false" aria-controls="apiFaq5">{% trans "How do API request limits and usage quotas work?" %}<i data-lucide="chevron-down" aria-hidden="true"></i></button></h3>
+          <div id="apiFaq5" class="accordion-collapse collapse" data-bs-parent="#apiFaq"><div class="ap-faq__body accordion-body">{% trans "There is no universal published quota table for the catalogue categories on this page. Limits are defined per API and subscription where supported. Quotas, enforcement, and usage reporting are confirmed during the access request, not assumed from these planning tiers." %}</div></div>
+        </div>
+        <div class="ap-faq__item accordion-item">
+          <h3 class="accordion-header"><button class="ap-faq__btn accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#apiFaq6" aria-expanded="false" aria-controls="apiFaq6">{% trans "Can OnWebApp develop a custom API for my business?" %}<i data-lucide="chevron-down" aria-hidden="true"></i></button></h3>
+          <div id="apiFaq6" class="accordion-collapse collapse" data-bs-parent="#apiFaq"><div class="ap-faq__body accordion-body">{% trans "Yes, as a separate assessed service. Share the systems, data, workflows, authentication constraints, and success criteria. We will review feasibility and propose an implementation approach rather than promising delivery before assessment." %}</div></div>
+        </div>
+        <div class="ap-faq__item accordion-item">
+          <h3 class="accordion-header"><button class="ap-faq__btn accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#apiFaq7" aria-expanded="false" aria-controls="apiFaq7">{% trans "How do API authentication and credentials work?" %}<i data-lucide="chevron-down" aria-hidden="true"></i></button></h3>
+          <div id="apiFaq7" class="accordion-collapse collapse" data-bs-parent="#apiFaq"><div class="ap-faq__body accordion-body">{% trans "The documented Branding API uses JWT Bearer authentication. Other APIs use only the authentication method stated in their product documentation when available. Never expose secrets in frontend code; keep provider credentials and tokens on the server." %}</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="ap-sec" style="padding-top:0;padding-bottom:0" aria-labelledby="api-final">
+    <div class="ap-final ap-rv">
+      <h2 id="api-final">{% trans "Find your API. Connect your systems. Move forward." %}</h2>
+      <p>{% trans "Explore available API products or tell us what your application needs." %}</p>
+      <div class="ap-final__acts">
+        <a href="#ap-catalogue" class="ap-btn ap-btn--primary">{% trans "Explore APIs" %} <i data-lucide="arrow-right" aria-hidden="true"></i></a>
+        <a href="{% url 'contact:contact' %}" class="ap-btn ap-btn--ghost-d">{% trans "Request a Custom API" %}</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- MOBILE STICKY CTA -->
+  <div class="ap-mbar">
+    <a href="{% url 'contact:contact' %}" class="ap-btn ap-btn--primary">{% trans "Request an API" %} <i data-lucide="arrow-right" aria-hidden="true"></i></a>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% trans "Copy" as t_copy %}{% trans "Copied" as t_copied %}{% trans "Copy code example" as t_copy_code %}
+<script>
+(function () {
+  /* sticky navbar height for subnav + anchor offsets */
+  var nb = document.querySelector('.navbar');
+  function setNavH() {
+    document.documentElement.style.setProperty('--ap-nav-h', (nb ? nb.offsetHeight : 60) + 'px');
+  }
+  setNavH();
+  window.addEventListener('resize', setNavH);
+
+  /* reveal on scroll */
+  var els = document.querySelectorAll('.ap-rv');
+  if (!('IntersectionObserver' in window) || !els.length) {
+    Array.prototype.forEach.call(els, function (el) { el.classList.add('is-in'); });
+  } else {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
+      });
+    }, { threshold: .12, rootMargin: '0px 0px -8% 0px' });
+    Array.prototype.forEach.call(els, function (el) { io.observe(el); });
+  }
+
+  /* copy buttons on code samples */
+  function fallbackCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (err) {}
+    document.body.removeChild(ta);
+  }
+  var T_COPY = '{{ t_copy|escapejs }}', T_COPIED = '{{ t_copied|escapejs }}', T_ARIA = '{{ t_copy_code|escapejs }}';
+  var blocks = document.querySelectorAll('.ap-code, .ap-preview__code pre, .ap-dev');
+  Array.prototype.forEach.call(blocks, function (el) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'ap-copy';
+    btn.textContent = T_COPY;
+    btn.setAttribute('aria-label', T_ARIA);
+    btn.addEventListener('click', function () {
+      var clone = el.cloneNode(true);
+      var inner = clone.querySelector('.ap-copy');
+      if (inner && inner.parentNode) { inner.parentNode.removeChild(inner); }
+      var text = clone.textContent.replace(/\s+$/, '');
+      var done = function () {
+        btn.textContent = T_COPIED;
+        btn.classList.add('is-done');
+        setTimeout(function () { btn.textContent = T_COPY; btn.classList.remove('is-done'); }, 1600);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done, function () { fallbackCopy(text); done(); });
+      } else {
+        fallbackCopy(text);
+        done();
+      }
+    });
+    el.appendChild(btn);
+  });
+
+  /* section subnav scroll-spy */
+  var subLinks = document.querySelectorAll('.ap-subnav a[href^="#"]');
+  if (subLinks.length) {
+    var subnav = document.querySelector('.ap-subnav');
+    var lastActive = null;
+    var spy = function () {
+      var base = (nb ? nb.offsetHeight : 60) + 66;
+      var current = null;
+      Array.prototype.forEach.call(subLinks, function (a) {
+        var target = document.getElementById(a.getAttribute('href').slice(1));
+        if (target && target.getBoundingClientRect().top <= base) { current = a; }
+      });
+      if (!current) { current = subLinks[0]; }
+      Array.prototype.forEach.call(subLinks, function (a) {
+        a.classList.toggle('is-active', a === current);
+      });
+      if (current !== lastActive) {
+        lastActive = current;
+        var r = subnav.getBoundingClientRect();
+        if (current.scrollIntoView && r.top >= 0 && r.bottom <= window.innerHeight) {
+          current.scrollIntoView({ inline: 'center', block: 'nearest' });
+        }
+      }
+    };
+    window.addEventListener('scroll', spy, { passive: true });
+    window.addEventListener('resize', spy);
+    spy();
+  }
+})();
+</script>
+{% endblock %}

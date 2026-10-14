@@ -17,6 +17,11 @@ from django.conf import settings
 def services_index(request):
     return render(request, 'services/index.html')
 
+
+def api_integration(request):
+    """Legacy API route; redirect to the canonical API Solutions page."""
+    return redirect('home:api_solutions', permanent=True)
+
 @login_required
 @require_plan_limit('industrial_automation')
 def industrial_automation(request):

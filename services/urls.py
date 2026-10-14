@@ -4,6 +4,7 @@ from . import views
 app_name = 'services'
 urlpatterns = [
     path('', views.services_index, name='index'),
+    path('api-integration/', views.api_integration, name='api_integration'),
     path('industrial-automation/', views.industrial_automation, name='industrial_automation'),
     path('smart-factory/', views.smart_factory, name='smart_factory'),
     path('iot-integration/', views.iot_integration, name='iot_integration'),
