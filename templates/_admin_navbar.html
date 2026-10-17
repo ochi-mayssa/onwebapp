@@ -1,0 +1,86 @@
+{% load i18n static web_tags %}
+{# Dedicated navbar for superusers — replaces the public marketing nav everywhere. #}
+<nav class="navbar navbar-expand-lg navbar-glass sticky-top py-2">
+    <div class="container">
+        <a class="navbar-brand py-0 d-flex align-items-center gap-2 me-3" href="{% url 'projects:admin_dashboard' %}">
+            <img src="{% static 'img/logo.png' %}" alt="OnWebApp" height="32" class="d-inline-block align-text-top">
+            <span class="fw-800 text-slate-900">OnWebApp</span>
+            <span class="badge ms-1 px-2 py-1 d-none d-md-inline-flex align-items-center" style="background: rgba(79,70,229,.12); color:#4F46E5; font-size:0.65rem; letter-spacing:0.05em;">
+                <i class="fas fa-shield-halved me-1"></i>{% trans "ADMIN" %}
+            </span>
+        </a>
+
+        <div class="d-flex align-items-center order-lg-2 gap-2">
+            <a class="btn btn-sm btn-light rounded-pill border fw-700 d-inline-flex align-items-center" href="{% url 'home:home' %}">
+                <i class="fas fa-globe"></i><span class="d-none d-sm-inline ms-1">{% trans "View site" %}</span>
+            </a>
+
+            <button id="themeToggle" class="btn btn-sm btn-light rounded-pill px-3 border-0" title="{% trans 'Toggle theme' %}">
+                <i id="themeIcon" class="fas fa-moon"></i>
+            </button>
+
+            <div class="dropdown">
+                <button class="user-dropdown-toggle d-flex align-items-center gap-2" type="button" id="adminProfileMenu" data-bs-toggle="dropdown" aria-expanded="false">
+                    <div class="user-avatar-sm" style="background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%);">
+                        {{ user.username|slice:":1"|upper }}
+                    </div>
+                    <i class="fas fa-chevron-down small opacity-50 d-none d-lg-block"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow-xl border-0 rounded-24 p-3" aria-labelledby="adminProfileMenu" style="min-width: 260px;">
+                    <li class="px-3 py-2 mb-2 border-bottom">
+                        <span class="d-block fw-800 text-slate-900">{{ user.username }}</span>
+                        <span class="d-block x-small text-slate-500">{{ user.email }}</span>
+                        <span class="badge mt-1" style="background: rgba(79,70,229,.12); color:#4F46E5; font-size:0.6rem;">{% trans "SUPERUSER" %}</span>
+                    </li>
+                    <li><a class="dropdown-item" href="{% url 'projects:admin_dashboard' %}"><span class="service-icon"><i class="fas fa-shield-halved"></i></span>{% trans "Admin Dashboard" %}</a></li>
+                    <li><a class="dropdown-item" href="{% url 'projects:platform_dashboard' %}"><span class="service-icon"><i class="fas fa-tachometer-alt"></i></span>{% trans "Platform" %}</a></li>
+                    <li><a class="dropdown-item" href="{% url 'crm:dashboard' %}"><span class="service-icon"><i class="fas fa-users"></i></span>{% trans "CRM Center" %}</a></li>
+                    <li><a class="dropdown-item" href="{% url 'home:admin_api_requests' %}"><span class="service-icon"><i class="fas fa-code"></i></span>{% trans "API Requests" %}</a></li>
+                    <li><a class="dropdown-item" href="{% url 'users:profile_dashboard' %}"><span class="service-icon"><i class="fas fa-user-circle"></i></span>{% trans "Profile" %}</a></li>
+                    <li><a class="dropdown-item" href="/admin/"><span class="service-icon"><i class="fas fa-cog"></i></span>{% trans "Django Admin" %}</a></li>
+                    <li class="px-3 py-2 border-top mt-2 pt-3">
+                        <a class="btn btn-primary btn-sm w-100 rounded-pill fw-800 py-2" href="{% url 'users:logout' %}"><i class="fas fa-sign-out-alt me-2"></i>{% trans "Log Out" %}</a>
+                    </li>
+                </ul>
+            </div>
+
+            <button class="navbar-toggler ms-1 border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#adminNav" aria-controls="adminNav" aria-expanded="false" aria-label="{% trans 'Toggle navigation' %}">
+                <div class="hamburger"><span></span><span></span></div>
+            </button>
+        </div>
+
+        <div class="collapse navbar-collapse order-lg-1" id="adminNav">
+            <ul class="navbar-nav ms-auto me-2 admin-nav-links">
+                <li class="nav-item"><a class="nav-link" href="{% url 'projects:admin_dashboard' %}"><i class="fas fa-shield-halved me-1"></i> {% trans "Dashboard" %}</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'projects:platform_dashboard' %}"><i class="fas fa-tachometer-alt me-1"></i> {% trans "Platform" %}</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'crm:dashboard' %}"><i class="fas fa-users me-1"></i> {% trans "CRM" %}</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'home:admin_api_requests' %}"><i class="fas fa-code me-1"></i> {% trans "API Requests" %}</a></li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="adminSystemMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-server me-1"></i> {% trans "System" %}
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-xl border-0 rounded-24 p-3" aria-labelledby="adminSystemMenu" style="min-width:220px;">
+                        <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% monitoring_url %}"><i class="fas fa-desktop me-2" style="color:#4F46E5;font-size:.8rem;"></i>{% trans "Monitoring" %}</a></li>
+                        <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'root_dashboard:command_center' %}"><i class="fas fa-crown me-2" style="color:#4F46E5;font-size:.8rem;"></i>{% trans "Root Command" %}</a></li>
+                        <li><a class="dropdown-item rounded-2 py-2 px-3" href="/admin/"><i class="fas fa-cog me-2" style="color:#4F46E5;font-size:.8rem;"></i>{% trans "Django Admin" %}</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<style>
+/* Tight, predictable admin nav layout */
+.admin-nav-links .nav-link {
+    white-space: nowrap;
+    font-size: .88rem;
+    font-weight: 600;
+    padding: .5rem .65rem;
+    border-radius: 10px;
+}
+.admin-nav-links .nav-link:hover { color: #4F46E5; }
+@media (max-width: 991.98px) {
+    .admin-nav-links .nav-link { padding: .65rem .25rem; }
+    .admin-nav-links { margin-bottom: .5rem; }
+}
+</style>

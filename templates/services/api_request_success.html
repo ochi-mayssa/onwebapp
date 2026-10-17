@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans "API Request Received" %} | OnWebApp{% endblock %}
+
+{% block extra_css %}
+<style>
+.rqs-section{padding:5rem 0 6rem}
+.rqs-wrap{max-width:680px;margin:0 auto;padding:0 1.5rem;text-align:center}
+.rqs-icon{width:64px;height:64px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:rgba(79,70,229,.12);color:#4F46E5;font-size:1.4rem;margin-bottom:1.4rem}
+.rqs-h1{font-family:var(--font-display);font-weight:800;font-size:clamp(1.6rem,3vw,2.2rem);letter-spacing:-.02em;color:var(--text-primary);margin-bottom:.9rem;text-wrap:balance}
+.rqs-lede{color:var(--text-secondary);font-size:1rem;line-height:1.8;margin-bottom:1.6rem}
+.rqs-ref{display:inline-flex;flex-direction:column;gap:.35rem;padding:1rem 1.6rem;border:1px dashed rgba(79,70,229,.45);background:rgba(79,70,229,.06);border-radius:14px;margin-bottom:1.8rem}
+.rqs-ref__label{font-size:.68rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#4F46E5}
+.rqs-ref__value{font-family:var(--font-display);font-size:1.25rem;font-weight:800;letter-spacing:.02em;color:var(--text-primary)}
+.rqs-steps{list-style:none;padding:0;margin:0 0 2rem;display:grid;gap:.7rem;text-align:left}
+.rqs-steps li{display:flex;gap:.7rem;align-items:flex-start;font-size:.9rem;color:var(--text-secondary);line-height:1.6}
+.rqs-steps i{color:#4F46E5;margin-top:.28rem;font-size:.75rem}
+.rqs-acts{display:flex;flex-wrap:wrap;gap:.7rem;justify-content:center}
+.rqs-btn{display:inline-flex;align-items:center;gap:.45rem;padding:.75rem 1.4rem;border-radius:999px;font-size:.88rem;font-weight:750;text-decoration:none;transition:.2s}
+.rqs-btn--primary{background:#4F46E5;color:#fff}
+.rqs-btn--primary:hover{background:#4338CA;color:#fff}
+.rqs-btn--ghost{border:1px solid var(--border-color);color:var(--text-secondary)}
+.rqs-btn--ghost:hover{border-color:#4F46E5;color:#4F46E5}
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="rqs-section">
+    <div class="rqs-wrap">
+        <div class="rqs-icon"><i class="fas fa-check" aria-hidden="true"></i></div>
+        <h1 class="rqs-h1">{% trans "Your API request was received." %}</h1>
+        {% if reference %}
+        <p class="rqs-lede">{% trans "Thank you - our team will review your request and get back to you. Keep this reference to track your request:" %}</p>
+        <div class="rqs-ref">
+            <span class="rqs-ref__label">{% trans "Request reference" %}</span>
+            <span class="rqs-ref__value">{{ reference }}</span>
+        </div>
+        {% else %}
+        <p class="rqs-lede">{% trans "Thank you - our team will review your request and get back to you." %}</p>
+        {% endif %}
+        <ul class="rqs-steps">
+            <li><i class="fas fa-check" aria-hidden="true"></i>{% trans "Our team reviews every request manually - no automated decisions." %}</li>
+            <li><i class="fas fa-check" aria-hidden="true"></i>{% trans "You receive an email confirmation now, and an update whenever the status changes." %}</li>
+            <li><i class="fas fa-check" aria-hidden="true"></i>{% trans "Signed-in clients can track their requests from their account." %}</li>
+        </ul>
+        <div class="rqs-acts">
+            <a class="rqs-btn rqs-btn--primary" href="{% url 'home:api_solutions' %}">{% trans "Back to API Solutions" %}</a>
+            {% if user.is_authenticated %}
+            <a class="rqs-btn rqs-btn--ghost" href="{% url 'users:api_requests_list' %}">{% trans "View my API requests" %}</a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+<script>
+try { localStorage.removeItem('onwebapp_api_request_draft'); } catch (e) {}
+</script>
+{% endblock %}

@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "API Requests" %} | {% trans "Admin" %}{% endblock %}
+
+{% block extra_css %}
+<style>
+.arq-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.9rem;margin-bottom:1.5rem}
+.arq-stat{background:var(--bg-surface);border:1px solid var(--border-color);border-radius:14px;padding:1rem 1.1rem}
+.arq-stat__label{font-size:.68rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text-tertiary)}
+.arq-stat__value{font-family:var(--font-display);font-size:1.5rem;font-weight:800;color:var(--text-primary);line-height:1.2;margin-top:.15rem}
+.arq-stat--accent .arq-stat__value{color:#4F46E5}
+.arq-filters{background:var(--bg-surface);border:1px solid var(--border-color);border-radius:14px;padding:1rem 1.1rem;margin-bottom:1.25rem}
+.arq-table{background:var(--bg-surface);border:1px solid var(--border-color);border-radius:14px;overflow:hidden}
+.arq-table table{margin:0}
+.arq-table th{font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);font-weight:800;border-top:0;border-bottom:1px solid var(--border-color);background:transparent;padding:.85rem 1rem}
+.arq-table td{padding:.85rem 1rem;vertical-align:middle;font-size:.88rem;border-bottom-color:var(--border-color)}
+.arq-table tr:last-child td{border-bottom:0}
+.arq-ref{font-family:var(--font-display);font-weight:800;font-size:.82rem;color:#4F46E5;letter-spacing:.02em}
+.arq-sub{display:block;font-size:.74rem;color:var(--text-tertiary);margin-top:.1rem}
+.arq-viewbtn{display:inline-flex;align-items:center;gap:.35rem;font-size:.8rem;font-weight:700;color:#4F46E5;text-decoration:none;white-space:nowrap}
+.arq-viewbtn:hover{text-decoration:underline;text-underline-offset:3px}
+.arq-empty{text-align:center;padding:3rem 1rem;color:var(--text-secondary)}
+.arq-empty i{font-size:1.6rem;color:#818CF8;margin-bottom:.7rem;display:block}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+        <div>
+            <h1 class="fw-800 text-slate-900 mb-1">{% trans "API Requests" %}</h1>
+            <p class="text-secondary mb-0">{% trans "Review, assign and track every API request from clients." %}</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a class="btn btn-outline-secondary rounded-pill px-4 fw-700" href="{% url 'admin:home_apirequest_changelist' %}">
+                <i class="fas fa-cog me-1"></i>{% trans "Django Admin" %}
+            </a>
+        </div>
+    </div>
+
+    <div class="arq-stats">
+        <div class="arq-stat arq-stat--accent">
+            <div class="arq-stat__label">{% trans "Active" %}</div>
+            <div class="arq-stat__value">{{ stats.total }}</div>
+        </div>
+        <div class="arq-stat">
+            <div class="arq-stat__label">{% trans "Pending" %}</div>
+            <div class="arq-stat__value">{{ stats.pending }}</div>
+        </div>
+        <div class="arq-stat">
+            <div class="arq-stat__label">{% trans "Under Review" %}</div>
+            <div class="arq-stat__value">{{ stats.under_review }}</div>
+        </div>
+        <div class="arq-stat">
+            <div class="arq-stat__label">{% trans "In Progress" %}</div>
+            <div class="arq-stat__value">{{ stats.in_progress }}</div>
+        </div>
+        <div class="arq-stat">
+            <div class="arq-stat__label">{% trans "Completed" %}</div>
+            <div class="arq-stat__value">{{ stats.completed }}</div>
+        </div>
+        <div class="arq-stat">
+            <div class="arq-stat__label">{% trans "Rejected" %}</div>
+            <div class="arq-stat__value">{{ stats.rejected }}</div>
+        </div>
+        <div class="arq-stat">
+            <div class="arq-stat__label">{% trans "Archived" %}</div>
+            <div class="arq-stat__value">{{ stats.archived }}</div>
+        </div>
+    </div>
+
+    <form method="get" class="arq-filters">
+        <div class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label small fw-800 mb-1" for="arq-q">{% trans "Search" %}</label>
+                <input type="text" name="q" id="arq-q" class="form-control" value="{{ search }}" placeholder="{% trans 'Reference, name, email, company, API…' %}">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small fw-800 mb-1" for="arq-status">{% trans "Status" %}</label>
+                <select name="status" id="arq-status" class="form-select">
+                    <option value="">{% trans "All" %}</option>
+                    {% for value, label in status_choices %}
+                    <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small fw-800 mb-1" for="arq-type">{% trans "Type" %}</label>
+                <select name="type" id="arq-type" class="form-select">
+                    <option value="">{% trans "All" %}</option>
+                    {% for value, label in type_choices %}
+                    <option value="{{ value }}" {% if type_filter == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <div class="form-check ms-1">
+                    <input class="form-check-input" type="checkbox" name="archived" value="1" id="arq-archived" {% if show_archived %}checked{% endif %}>
+                    <label class="form-check-label small fw-700" for="arq-archived">{% trans "Include archived" %}</label>
+                </div>
+            </div>
+            <div class="col-md-1 d-grid">
+                <button type="submit" class="btn btn-primary rounded-pill fw-700">{% trans "Apply" %}</button>
+            </div>
+        </div>
+    </form>
+
+    <div class="arq-table">
+        {% if page_obj.object_list %}
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th>{% trans "Reference" %}</th>
+                        <th>{% trans "Client" %}</th>
+                        <th>{% trans "Type" %}</th>
+                        <th>{% trans "API" %}</th>
+                        <th>{% trans "Status" %}</th>
+                        <th>{% trans "Assigned" %}</th>
+                        <th>{% trans "Created" %}</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in page_obj %}
+                    <tr>
+                        <td>
+                            <span class="arq-ref">{{ r.reference }}</span>
+                            {% if r.is_archived %}<span class="badge bg-secondary bg-opacity-10 text-secondary ms-1" style="font-size:.62rem;">{% trans "Archived" %}</span>{% endif %}
+                        </td>
+                        <td>
+                            {{ r.full_name }}
+                            <span class="arq-sub">{{ r.business_email }}{% if r.company_name %} · {{ r.company_name }}{% endif %}</span>
+                        </td>
+                        <td>{{ r.get_request_type_display }}</td>
+                        <td>{{ r.api_name_or_category }}</td>
+                        <td>{% include "services/_api_status_badge.html" with status=r.status %}</td>
+                        <td>{{ r.assigned_to.username|default:"—" }}</td>
+                        <td>
+                            {{ r.created_at|date:"M j, Y" }}
+                            <span class="arq-sub">{{ r.created_at|time:"H:i" }}</span>
+                        </td>
+                        <td class="text-end">
+                            <a class="arq-viewbtn" href="{% url 'home:admin_api_request_detail' r.pk %}">{% trans "Manage" %} <i class="fas fa-arrow-right" style="font-size:.65rem;"></i></a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="arq-empty">
+            <i class="fas fa-inbox" aria-hidden="true"></i>
+            <p class="fw-700 mb-1">{% trans "No API requests found." %}</p>
+            <p class="small mb-0">{% trans "Adjust the filters above, or wait for clients to submit requests." %}</p>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if page_obj.has_other_pages %}
+    <nav class="d-flex justify-content-between align-items-center mt-3" aria-label="{% trans 'Pagination' %}">
+        <span class="small text-secondary fw-600">
+            {% blocktrans with n=page_obj.paginator.count %}{{ n }} request(s){% endblocktrans %}
+        </span>
+        <ul class="pagination pagination-sm mb-0">
+            <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}&status={{ status_filter }}&type={{ type_filter }}&q={{ search }}{% if show_archived %}&archived=1{% endif %}">{% trans "Previous" %}</a>
+            </li>
+            <li class="page-item disabled"><span class="page-link">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span></li>
+            <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}&status={{ status_filter }}&type={{ type_filter }}&q={{ search }}{% if show_archived %}&archived=1{% endif %}">{% trans "Next" %}</a>
+            </li>
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}

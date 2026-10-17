@@ -548,13 +548,17 @@
     
     <!-- Minimalist Navigation -->
     {% block navbar %} 
+    {% if user.is_authenticated and user.is_superuser %}
+    <!-- Superusers get the dedicated admin navbar everywhere -->
+    {% include "_admin_navbar.html" %}
+    {% else %}
     <!-- Top Bar -->
     <div class="oh-topbar">
         <div class="container d-flex align-items-center justify-content-between">
             <div class="oh-topbar-left">
                 <a class="oh-topbar-community" href="{% url 'community:home' %}">{% trans 'Community' %}<span class="oh-topbar-new" data-community-badge>{% trans 'New' %}</span></a>
                 <a href="{% url 'home:about' %}">{% trans 'About Us' %}</a>
-                <a href="{% url 'branding:landing' %}">{% trans 'Branding' %}</a>
+                <a href="{% url 'blog:index' %}">{% trans 'Insights' %}</a>
             </div>
             <div class="oh-topbar-right">
                 <a href="{% url 'contact:contact' %}">{% trans 'Support' %}</a>
@@ -653,6 +657,10 @@
                             <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'crm:dashboard' %}">
                                 <span class="service-icon"><i class="fas fa-users"></i></span>
                                 CRM Center
+                            </a></li>
+                            <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'admin:home_apirequest_changelist' %}">
+                                <span class="service-icon"><i class="fas fa-code"></i></span>
+                                {% trans 'API Requests' %}
                             </a></li>
                         {% endif %}
 
@@ -754,45 +762,34 @@
                         </li>
                     {% endif %}
                     <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="designMenuUnified" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            {% trans 'Design' %}
+                        </a>
+                        {% include "./_design_dropdown.html" with menu_id="designMenuUnified" %}
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="softwareMenuUnified" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            {% trans 'Software' %}
+                        </a>
+                        {% include "./_software_dropdown.html" with menu_id="softwareMenuUnified" %}
+                    </li>
+                    <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="technologyMenuUnified" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             {% trans 'Technology' %}
                         </a>
-                        <ul class="dropdown-menu shadow-xl border-0 rounded-24 p-3" aria-labelledby="technologyMenuUnified" style="min-width:220px;">
-                            <li><span class="dropdown-header px-3 py-1" style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b;">{% trans 'Design' %}</span></li>
-                            <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'home:ux_design' %}"><i class="fas fa-compass-drafting me-2" style="color:#7c3aed;font-size:.8rem;"></i>{% trans 'UX Design' %}</a></li>
-                            <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'home:ui_design' %}"><i class="fas fa-pen-nib me-2" style="color:#4F46E5;font-size:.8rem;"></i>{% trans 'UI Design' %}</a></li>
+                        <ul class="dropdown-menu shadow-xl border-0 rounded-24 p-3" aria-labelledby="technologyMenuUnified" style="min-width:240px;">
+                            <li><span class="dropdown-header px-3 py-1" style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b;">{% trans 'Integration' %}</span></li>
+                            <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'integration:integration_homepage' %}"><i class="fas fa-plug me-2" style="color:#2563eb;font-size:.8rem;"></i>{% trans 'Integration Services' %}</a></li>
+                            <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'integration:system_integration' %}"><i class="fas fa-project-diagram me-2" style="color:#4F46E5;font-size:.8rem;"></i>{% trans 'System Integration' %}</a></li>
+                            <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'integration:data_integration' %}"><i class="fas fa-database me-2" style="color:#0ea5e9;font-size:.8rem;"></i>{% trans 'Data Integration' %}</a></li>
+                            <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'integration:b2b_integration' %}"><i class="fas fa-handshake me-2" style="color:#7c3aed;font-size:.8rem;"></i>{% trans 'B2B Integration' %}</a></li>
+                            <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'integration:social_media_integration' %}"><i class="fas fa-hashtag me-2" style="color:#9333ea;font-size:.8rem;"></i>{% trans 'Social Media Integration' %}</a></li>
                             <li><hr class="dropdown-divider border-0" style="border-top:1px solid rgba(15,23,42,.08);margin:4px 0"></li>
-                            <li><span class="dropdown-header px-3 py-1" style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b;">{% trans 'Software' %}</span></li>
-                            <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'home:software_home' %}"><i class="fas fa-laptop-code me-2" style="color:#2563eb;font-size:.8rem;"></i>{% trans 'Software Home' %}</a></li>
-                            <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'home:web_development' %}"><i class="fas fa-globe me-2" style="color:#2563eb;font-size:.8rem;"></i>{% trans 'Web Development' %}</a></li>
-                            <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'home:mobile_development' %}"><i class="fas fa-mobile-alt me-2" style="color:#4F46E5;font-size:.8rem;"></i>{% trans 'Mobile App Development' %}</a></li>
-                            <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'home:ecommerce_development' %}"><i class="fas fa-shopping-cart me-2" style="color:#9333ea;font-size:.8rem;"></i>{% trans 'eCommerce Development' %}</a></li>
-                            <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'home:dashboard_development' %}"><i class="fas fa-chart-line me-2" style="color:#0ea5e9;font-size:.8rem;"></i>{% trans 'Dashboard Development' %}</a></li>
-                            <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'home:api_solutions' %}"><i class="fas fa-code me-2" style="color:#4F46E5;font-size:.8rem;"></i>{% trans 'API Solutions' %}</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="integrationMenuUnified" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            {% trans 'Integration' %}
-                        </a>
-                        {% include "./_integration_dropdown.html" with menu_id="integrationMenuUnified" %}
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="automationMenuUnified" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            {% trans 'Automation' %}
-                        </a>
-                        <ul class="dropdown-menu shadow-xl border-0 rounded-24 p-3" aria-labelledby="automationMenuUnified" style="min-width:220px;">
+                            <li><span class="dropdown-header px-3 py-1" style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b;">{% trans 'Automation' %}</span></li>
                             <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'home:automation_home' %}"><i class="fas fa-house me-2" style="color:#D9A441;font-size:.8rem;"></i>{% trans 'Automation Home' %}</a></li>
-                            <li><hr class="dropdown-divider" style="border-color:rgba(15,23,42,.06);margin:.25rem 0"></li>
                             <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'home:rpa_bpa' %}"><i class="fas fa-robot me-2" style="color:#7c3aed;font-size:.8rem;"></i>{% trans 'RPA & BPA' %}</a></li>
                             <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'home:browser_web_automation' %}"><i class="fas fa-mouse-pointer me-2" style="color:#0ea5e9;font-size:.8rem;"></i>{% trans 'Browser & Web Automation' %}</a></li>
                         </ul>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="insightsMenuUnified" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            {% trans 'Insights' %}
-                        </a>
-                        {% include "./_insights_dropdown.html" with menu_id="insightsMenuUnified" %}
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="seoMenuUnified" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -811,6 +808,7 @@
             <!-- Mobile Auth is now handled by the user-dropdown in order-lg-2 -->
         </div>
     </nav>
+    {% endif %}
     {% endblock %}
 
     {% block content %}
@@ -843,8 +841,9 @@
     <!-- Payment Modal -->
     {% include 'includes/payment_modal.html' %}
 
-    <!-- Footer -->
+    <!-- Footer (hidden for superusers — they get the admin shell, not the public site chrome) -->
     {% block footer %}
+    {% if not user.is_authenticated or not user.is_superuser %}
     <footer class="oh-footer">
       <div class="oh-footer-inner">
         <div class="oh-footer-grid">
@@ -887,6 +886,7 @@
         </div>
       </div>
     </footer>
+    {% endif %}
     {% endblock %}
 
     <!-- Back to Top -->

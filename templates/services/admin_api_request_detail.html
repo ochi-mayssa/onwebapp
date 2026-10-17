@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{{ api_request.reference }} | {% trans "API Requests" %}{% endblock %}
+
+{% block extra_css %}
+<style>
+.ard-section{background:var(--bg-surface);border:1px solid var(--border-color);border-radius:14px;padding:1.3rem 1.4rem;margin-bottom:1.1rem}
+.ard-label{font-size:.68rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:.35rem}
+.ard-value{font-size:.92rem;line-height:1.7;color:var(--text-primary);white-space:pre-line;word-break:break-word}
+.ard-ref{font-family:var(--font-display);font-size:1.35rem;font-weight:800;letter-spacing:.02em;color:#4F46E5}
+.ard-meta{font-size:.8rem;color:var(--text-secondary)}
+.ard-timeline{list-style:none;padding:0;margin:0}
+.ard-timeline li{position:relative;padding:0 0 1.2rem 1.6rem;border-left:2px solid var(--border-color);margin-left:.45rem}
+.ard-timeline li:last-child{border-left-color:transparent;padding-bottom:0}
+.ard-timeline li::before{content:'';position:absolute;left:-6px;top:.2rem;width:10px;height:10px;border-radius:50%;background:#4F46E5;border:2px solid var(--bg-surface)}
+.ard-timeline .ard-when{font-size:.72rem;color:var(--text-tertiary);margin-top:.15rem}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width:1100px;">
+
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-success alert-dismissible fade show rounded-3" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{% trans 'Close' %}"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <a class="d-inline-flex align-items-center gap-1 small fw-700 text-secondary text-decoration-none mb-3" href="{% url 'home:admin_api_requests' %}">
+        <i class="fas fa-arrow-left"></i>{% trans "Back to API Requests" %}
+    </a>
+
+    <div class="d-flex flex-wrap align-items-center gap-3 mb-4">
+        <div>
+            <div class="ard-ref">{{ api_request.reference }}</div>
+            <div class="ard-meta">{{ api_request.get_request_type_display }} · {% trans "Submitted" %} {{ api_request.created_at|date:"M j, Y H:i" }}</div>
+        </div>
+        {% include "services/_api_status_badge.html" with status=api_request.status %}
+        {% if api_request.is_archived %}<span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill">{% trans "Archived" %}</span>{% endif %}
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="ard-section">
+                <div class="ard-label">{% trans "Business Use Case" %}</div>
+                <div class="ard-value">{{ api_request.use_case|default:"—" }}</div>
+            </div>
+            <div class="ard-section">
+                <div class="ard-label">{% trans "Required Features" %}</div>
+                <div class="ard-value">{{ api_request.required_features|default:"—" }}</div>
+            </div>
+            <div class="row g-0">
+                <div class="col-sm-6 pe-sm-2">
+                    <div class="ard-section">
+                        <div class="ard-label">{% trans "Expected Usage" %}</div>
+                        <div class="ard-value">{{ api_request.expected_usage|default:"—" }}</div>
+                    </div>
+                </div>
+                <div class="col-sm-6 ps-sm-2">
+                    <div class="ard-section">
+                        <div class="ard-label">{% trans "Budget Range" %}</div>
+                        <div class="ard-value">{{ api_request.get_budget_range_display|default:"—" }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="ard-section">
+                <div class="ard-label">{% trans "Additional Requirements" %}</div>
+                <div class="ard-value">{{ api_request.additional_requirements|default:"—" }}</div>
+            </div>
+
+            <div class="ard-section">
+                <div class="ard-label">{% trans "Status History" %}</div>
+                <ul class="ard-timeline mt-3">
+                    {% for log in history %}
+                    <li>
+                        <div class="fw-800 small">
+                            {% if log.from_status %}
+                            {{ log.get_from_status_display }} → {{ log.get_to_status_display }}
+                            {% else %}
+                            {{ log.get_to_status_display }}
+                            {% endif %}
+                        </div>
+                        {% if log.note %}<div class="small text-secondary">{{ log.note }}</div>{% endif %}
+                        <div class="ard-when">
+                            {{ log.created_at|date:"M j, Y H:i" }}
+                            {% if log.changed_by %} · {{ log.changed_by.username }}{% endif %}
+                        </div>
+                    </li>
+                    {% empty %}
+                    <li class="small text-secondary">{% trans "No history recorded." %}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="ard-section">
+                <div class="ard-label mb-3">{% trans "Manage Request" %}</div>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label small fw-800 mb-1" for="{{ form.status.id_for_label }}">{% trans "Status" %}</label>
+                        {{ form.status }}
+                        {% if form.status.errors %}<div class="text-danger small mt-1">{{ form.status.errors|first }}</div>{% endif %}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-800 mb-1" for="{{ form.assigned_to.id_for_label }}">{% trans "Assigned to" %}</label>
+                        {{ form.assigned_to }}
+                        {% if form.assigned_to.errors %}<div class="text-danger small mt-1">{{ form.assigned_to.errors|first }}</div>{% endif %}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-800 mb-1" for="{{ form.internal_notes.id_for_label }}">{% trans "Internal Notes" %}</label>
+                        {{ form.internal_notes }}
+                        <div class="form-text">{% trans "Staff-only — never shown to the client." %}</div>
+                        {% if form.internal_notes.errors %}<div class="text-danger small mt-1">{{ form.internal_notes.errors|first }}</div>{% endif %}
+                    </div>
+                    <div class="form-check mb-3">
+                        {{ form.is_archived }}
+                        <label class="form-check-label small fw-700" for="{{ form.is_archived.id_for_label }}">{% trans "Archive this request" %}</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary rounded-pill fw-800 w-100 py-2">
+                        <i class="fas fa-save me-1"></i>{% trans "Save Changes" %}
+                    </button>
+                </form>
+            </div>
+
+            <div class="ard-section">
+                <div class="ard-label">{% trans "Client" %}</div>
+                <div class="fw-800">{{ api_request.full_name }}</div>
+                <a class="small text-primary text-decoration-none" href="mailto:{{ api_request.business_email }}">{{ api_request.business_email }}</a>
+                {% if api_request.company_name %}<div class="small text-secondary mt-1">{{ api_request.company_name }}</div>{% endif %}
+                {% if api_request.user %}
+                <div class="small text-secondary mt-2">
+                    <i class="fas fa-link me-1"></i>{% trans "Linked account:" %} {{ api_request.user.username }}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="ard-section">
+                <div class="ard-label">{% trans "Meta" %}</div>
+                <div class="ard-meta">
+                    {% trans "Submitted" %}: {{ api_request.created_at|date:"M j, Y H:i" }}<br>
+                    {% trans "Last updated" %}: {{ api_request.updated_at|date:"M j, Y H:i" }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

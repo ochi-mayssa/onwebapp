@@ -1,5 +1,8 @@
 from django import forms
-from .models import ConsultationRequest, WebsiteBuildRequest
+from django.contrib.auth import get_user_model
+from .models import ConsultationRequest, WebsiteBuildRequest, APIRequest
+
+User = get_user_model()
 
 class ConsultationForm(forms.ModelForm):
     class Meta:
@@ -27,3 +30,96 @@ class WebsiteBuildForm(forms.ModelForm):
             'timeline': forms.Select(attrs={'class': 'form-select'}),
             'message': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
         }
+
+
+class APIRequestForm(forms.ModelForm):
+    class Meta:
+        model = APIRequest
+        fields = [
+            'full_name', 'business_email', 'company_name', 'request_type',
+            'api_name_or_category', 'use_case', 'required_features',
+            'expected_usage', 'budget_range', 'additional_requirements',
+        ]
+        widgets = {
+            'full_name': forms.TextInput(attrs={
+                'class': 'form-control', 'placeholder': 'Full Name',
+                'autocomplete': 'name', 'autofocus': True,
+            }),
+            'business_email': forms.EmailInput(attrs={
+                'class': 'form-control', 'placeholder': 'you@company.com',
+                'autocomplete': 'email',
+                'aria-describedby': 'id_business_email-help',
+            }),
+            'company_name': forms.TextInput(attrs={
+                'class': 'form-control', 'placeholder': 'Company Name (Optional)',
+                'autocomplete': 'organization',
+            }),
+            'request_type': forms.Select(attrs={
+                'class': 'form-select',
+                'aria-describedby': 'id_request_type-help',
+            }),
+            'api_name_or_category': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'e.g. Payments API, SEO data, custom invoicing API',
+                'aria-describedby': 'id_api_name_or_category-help id_api_name_or_category-hint3p',
+            }),
+            'use_case': forms.Textarea(attrs={
+                'class': 'form-control', 'rows': 4,
+                'placeholder': 'What do you want to achieve with this API?',
+                'aria-describedby': 'id_use_case-help id_use_case-counter',
+            }),
+            'required_features': forms.Textarea(attrs={
+                'class': 'form-control', 'rows': 3,
+                'placeholder': 'Describe the functionality you need',
+                'aria-describedby': 'id_required_features-help id_required_features-counter',
+            }),
+            'expected_usage': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'e.g. ~10,000 requests/day (Optional)',
+                'aria-describedby': 'id_expected_usage-help',
+            }),
+            'budget_range': forms.Select(attrs={
+                'class': 'form-select',
+                'aria-describedby': 'id_budget_range-help',
+            }),
+            'additional_requirements': forms.Textarea(attrs={
+                'class': 'form-control', 'rows': 3,
+                'placeholder': 'Any other requirements? (Optional)',
+            }),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['budget_range'].choices = [('', 'Prefer not to say')] + list(APIRequest.BUDGET_CHOICES)
+        # Mark errored fields for styling and assistive tech.
+        for name, field in self.fields.items():
+            if self.errors.get(name):
+                css = field.widget.attrs.get('class', '')
+                if 'is-invalid' not in css:
+                    field.widget.attrs['class'] = f'{css} is-invalid'.strip()
+                field.widget.attrs['aria-invalid'] = 'true'
+
+
+class APIRequestAdminActionForm(forms.ModelForm):
+    """Staff-only management form used on the custom admin API requests page."""
+
+    class Meta:
+        model = APIRequest
+        fields = ['status', 'assigned_to', 'internal_notes', 'is_archived']
+        widgets = {
+            'status': forms.Select(attrs={'class': 'form-select'}),
+            'assigned_to': forms.Select(attrs={'class': 'form-select'}),
+            'internal_notes': forms.Textarea(attrs={
+                'class': 'form-control', 'rows': 3,
+                'placeholder': 'Staff-only notes — never shown to the client.',
+            }),
+            'is_archived': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['assigned_to'].queryset = User.objects.filter(
+            is_staff=True, is_active=True,
+        ).order_by('username')
+        self.fields['assigned_to'].required = False
+        self.fields['assigned_to'].empty_label = '— Unassigned —'

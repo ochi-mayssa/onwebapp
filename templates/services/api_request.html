@@ -1,0 +1,388 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans "Request an API" %} | OnWebApp{% endblock %}
+{% block meta_description %}{% trans "Request an existing API, a third-party API integration, or a custom API built for your business. Tell us what you need and our team will review your request." %}{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ── Base ─────────────────────────────────────────────────────────── */
+.rq-container{max-width:1080px;margin:0 auto;padding:0 1.5rem}
+.rq-section{padding:5rem 0 6rem}
+.rq-grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:3rem;align-items:start}
+@media(max-width:991px){.rq-grid{grid-template-columns:1fr;gap:2.25rem}}
+
+/* ── Type ─────────────────────────────────────────────────────────── */
+.rq-eyebrow{display:inline-flex;align-items:center;gap:.55rem;font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.16em;color:#4F46E5;margin-bottom:1rem}
+.rq-eyebrow::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor}
+.rq-h1{font-family:var(--font-display);font-weight:800;font-size:clamp(1.7rem,3.2vw,2.4rem);line-height:1.16;letter-spacing:-.02em;color:var(--text-primary);margin-bottom:1.1rem;text-wrap:balance}
+.rq-lede{color:var(--text-secondary);font-size:1rem;line-height:1.8;text-wrap:pretty}
+.rq-points{list-style:none;padding:0;margin:2rem 0 0;display:grid;gap:.9rem}
+.rq-points li{display:flex;align-items:flex-start;gap:.7rem;font-size:.92rem;color:var(--text-secondary);line-height:1.6}
+.rq-points i{color:#4F46E5;margin-top:.3rem;font-size:.78rem}
+.rq-back{display:inline-flex;align-items:center;gap:.45rem;margin-top:2rem;font-size:.85rem;font-weight:700;color:var(--text-secondary);text-decoration:none;transition:color .2s}
+.rq-back:hover{color:#4F46E5}
+.rq-mine{display:inline-flex;align-items:center;gap:.45rem;margin-top:1rem;font-size:.85rem;font-weight:700;color:#4F46E5;text-decoration:none}
+.rq-mine:hover{text-decoration:underline;text-underline-offset:3px}
+
+/* ── Card ─────────────────────────────────────────────────────────── */
+.rq-card{background:var(--bg-surface);border:1px solid var(--border-color);border-radius:18px;padding:2.1rem 1.9rem;box-shadow:var(--card-shadow-lg)}
+
+/* ── Progress ─────────────────────────────────────────────────────── */
+.rq-steps{list-style:none;display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;padding:0;margin:0 0 1.6rem}
+.rq-steps__item{display:flex;flex-direction:column;gap:.45rem;font-size:.72rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--text-tertiary)}
+.rq-steps__item::after{content:'';display:block;height:3px;border-radius:999px;background:var(--border-color);transition:background .25s}
+.rq-steps__item.is-current{color:#4F46E5}
+.rq-steps__item.is-current::after{background:#818CF8}
+.rq-steps__item.is-done{color:#4338CA}
+.rq-steps__item.is-done::after{background:#4F46E5}
+
+/* ── Steps ────────────────────────────────────────────────────────── */
+.rq-step{border:0;padding:0;margin:0;min-width:0}
+.rq-step+.rq-step{margin-top:1.4rem}
+.rq-step__title{font-size:1rem;font-weight:800;color:var(--text-primary);margin:0 0 .2rem;padding:0}
+.rq-step__sub{font-size:.82rem;color:var(--text-secondary);margin:0 0 1.2rem;line-height:1.55}
+.rq-js .rq-step:not(.is-active){display:none}
+
+/* ── Form ─────────────────────────────────────────────────────────── */
+.rq-field{margin-bottom:1.1rem}
+.rq-field label{display:block;font-size:.82rem;font-weight:700;margin-bottom:.4rem;color:var(--text-primary)}
+.rq-field label .req{color:#dc2626;margin-left:.15rem}
+.rq-field .form-control,.rq-field .form-select{border-radius:12px;padding:.72rem .95rem;font-size:.92rem;border-color:var(--border-color);background:var(--bg-surface)}
+.rq-field .form-control:focus,.rq-field .form-select:focus{border-color:#4F46E5;box-shadow:0 0 0 .2rem rgba(79,70,229,.15)}
+.rq-field .form-control.is-invalid,.rq-field .form-select.is-invalid{border-color:#dc2626;background-image:none}
+.rq-field .form-control.is-invalid:focus,.rq-field .form-select.is-invalid:focus{box-shadow:0 0 0 .2rem rgba(220,38,38,.14)}
+.rq-error{display:block;margin-top:.35rem;font-size:.76rem;font-weight:600;color:#b91c1c}
+.rq-help{margin:.35rem 0 0;font-size:.76rem;line-height:1.5;color:var(--text-tertiary)}
+.rq-hint{margin:.35rem 0 0;font-size:.76rem;line-height:1.5;color:#4338CA;font-weight:600}
+.rq-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:575px){.rq-row{grid-template-columns:1fr}}
+
+/* ── Counters ─────────────────────────────────────────────────────── */
+.rq-count{display:block;margin-top:.35rem;font-size:.72rem;font-weight:600;color:var(--text-tertiary);text-align:right}
+.rq-count.is-warn{color:#b45309}
+.rq-count.is-max{color:#b91c1c}
+
+/* ── Nav ──────────────────────────────────────────────────────────── */
+.rq-nav{display:flex;gap:.7rem;margin-top:.6rem}
+.rq-nav button{flex:1}
+.rq-nav [data-nav="back"],.rq-nav [data-nav="next"]{display:none}
+.rq-js .rq-nav [data-nav="back"],.rq-js .rq-nav [data-nav="next"]{display:inline-flex;align-items:center;justify-content:center;gap:.45rem;border-radius:999px;font-size:.9rem;font-weight:800;cursor:pointer;transition:.2s}
+.rq-js .rq-nav [data-nav="back"]{flex:0 0 auto;padding:.85rem 1.3rem;border:1px solid var(--border-color);background:transparent;color:var(--text-secondary)}
+.rq-js .rq-nav [data-nav="back"]:hover{color:#4F46E5;border-color:#818CF8}
+.rq-js .rq-nav [data-nav="next"]{padding:.85rem 1.4rem;border:1px solid #4F46E5;background:#fff;color:#4F46E5}
+.rq-js .rq-nav [data-nav="next"]:hover{background:#EEF2FF}
+.rq-js .rq-nav.is-final [data-nav="back"]{display:inline-flex}
+.rq-js .rq-nav.is-final [data-nav="next"]{display:none}
+.rq-js .rq-nav [data-nav="submit"]{display:none}
+.rq-js .rq-nav.is-final [data-nav="submit"]{display:flex}
+.rq-submit{display:flex;align-items:center;justify-content:center;gap:.5rem;width:100%;padding:.9rem 1.2rem;border-radius:999px;border:none;background:#4F46E5;color:#fff;font-size:.95rem;font-weight:800;cursor:pointer;transition:.25s}
+.rq-submit:hover{background:#4338CA;transform:translateY(-1px)}
+.rq-submit[disabled]{opacity:.7;cursor:not-allowed;transform:none}
+.rq-alert{padding:.9rem 1.1rem;border-radius:12px;background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;font-size:.85rem;margin-bottom:1.3rem}
+.rq-alert:focus{outline:none}
+.rq-alert ul{margin:.4rem 0 0;padding-left:1.1rem}
+.rq-note{margin:1.1rem 0 0;font-size:.78rem;line-height:1.6;color:var(--text-tertiary)}
+/* Honeypot — hidden from real users, tempting to bots */
+.rq-hp{position:absolute!important;left:-9999px!important;width:1px;height:1px;overflow:hidden}
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="rq-section">
+    <div class="rq-container">
+        <div class="rq-grid">
+
+            <div>
+                <div class="rq-eyebrow">{% trans "API Solutions" %}</div>
+                <h1 class="rq-h1">{% trans "Tell us which API you need." %}</h1>
+                <p class="rq-lede">{% trans "Looking for an existing API, a third-party integration, or a custom API built around your business? Describe what you need and our team will review your request." %}</p>
+                <ul class="rq-points">
+                    <li><i class="fas fa-check" aria-hidden="true"></i>{% trans "Existing OnWebApp APIs, available by request." %}</li>
+                    <li><i class="fas fa-check" aria-hidden="true"></i>{% trans "Third-party API integrations, handled case by case." %}</li>
+                    <li><i class="fas fa-check" aria-hidden="true"></i>{% trans "Custom API development for your exact requirements." %}</li>
+                    <li><i class="fas fa-check" aria-hidden="true"></i>{% trans "You receive a reference ID and can track the status of your request." %}</li>
+                </ul>
+                {% if user.is_authenticated %}
+                <a class="rq-mine" href="{% url 'users:api_requests_list' %}"><i class="fas fa-list-check" aria-hidden="true"></i>{% trans "View my API requests" %}</a>
+                {% endif %}
+                <a class="rq-back" href="{% url 'home:api_solutions' %}">
+                    <i class="fas fa-arrow-left" aria-hidden="true"></i>{% trans "Back to API Solutions" %}
+                </a>
+            </div>
+
+            <div class="rq-card">
+                <script>document.documentElement.classList.add('rq-js');</script>
+                {% if form.errors %}
+                <div class="rq-alert" role="alert" tabindex="-1" id="rq-alert">
+                    <strong>{% trans "Please fix the following:" %}</strong>
+                    <ul>
+                        {% for field in form.visible_fields %}
+                            {% for error in field.errors %}
+                                <li><a href="#{{ field.id_for_label }}">{{ field.label }} — {{ error }}</a></li>
+                            {% endfor %}
+                        {% endfor %}
+                        {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
+                <form method="post" novalidate id="rq-form">
+                    {% csrf_token %}
+                    {# Honeypot — visually hidden, only bots fill it #}
+                    <div class="rq-hp" aria-hidden="true">
+                        <label for="id_website">Website</label>
+                        <input type="text" id="id_website" name="website" tabindex="-1" autocomplete="off">
+                    </div>
+
+                    <ol class="rq-steps" aria-label="{% trans 'Request progress' %}">
+                        <li class="rq-steps__item is-current" data-step-dot="1" aria-current="step">{% trans "About you" %}</li>
+                        <li class="rq-steps__item" data-step-dot="2">{% trans "What you need" %}</li>
+                        <li class="rq-steps__item" data-step-dot="3">{% trans "Details" %}</li>
+                    </ol>
+
+                    <fieldset class="rq-step is-active" data-step="1">
+                        <legend class="rq-step__title">{% trans "About you" %}</legend>
+                        <p class="rq-step__sub">{% trans "So our team knows who to reply to." %}</p>
+
+                        <div class="rq-row">
+                            <div class="rq-field">
+                                <label for="{{ form.full_name.id_for_label }}">{% trans "Full Name" %}<span class="req" aria-hidden="true">*</span></label>
+                                {{ form.full_name }}
+                                {% if form.full_name.errors %}<span class="rq-error" id="{{ form.full_name.id_for_label }}-error">{{ form.full_name.errors|first }}</span>{% endif %}
+                            </div>
+                            <div class="rq-field">
+                                <label for="{{ form.business_email.id_for_label }}">{% trans "Business Email" %}<span class="req" aria-hidden="true">*</span></label>
+                                {{ form.business_email }}
+                                <p class="rq-help" id="id_business_email-help">{% trans "We'll send your reference ID and updates to this email." %}</p>
+                                {% if form.business_email.errors %}<span class="rq-error" id="{{ form.business_email.id_for_label }}-error">{{ form.business_email.errors|first }}</span>{% endif %}
+                            </div>
+                        </div>
+
+                        <div class="rq-field">
+                            <label for="{{ form.company_name.id_for_label }}">{% trans "Company Name" %}</label>
+                            {{ form.company_name }}
+                            {% if form.company_name.errors %}<span class="rq-error" id="{{ form.company_name.id_for_label }}-error">{{ form.company_name.errors|first }}</span>{% endif %}
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="rq-step" data-step="2">
+                        <legend class="rq-step__title">{% trans "What you need" %}</legend>
+                        <p class="rq-step__sub">{% trans "Choose the request type and tell us which API you have in mind." %}</p>
+
+                        <div class="rq-field">
+                            <label for="{{ form.request_type.id_for_label }}">{% trans "API Request Type" %}<span class="req" aria-hidden="true">*</span></label>
+                            {{ form.request_type }}
+                            <p class="rq-help" id="id_request_type-help">{% trans "Existing = our own APIs · Third-party = an external service · Custom = built for you." %}</p>
+                            {% if form.request_type.errors %}<span class="rq-error" id="{{ form.request_type.id_for_label }}-error">{{ form.request_type.errors|first }}</span>{% endif %}
+                        </div>
+
+                        <div class="rq-field">
+                            <label for="{{ form.api_name_or_category.id_for_label }}">{% trans "API Name or Category" %}<span class="req" aria-hidden="true">*</span></label>
+                            {{ form.api_name_or_category }}
+                            <p class="rq-help" id="id_api_name_or_category-help">{% trans "A short name or category is enough — you can refine details later." %}</p>
+                            <p class="rq-hint" id="id_api_name_or_category-hint3p" hidden>{% trans "Third-party request: name the service you want integrated (e.g. Stripe, Google Maps)." %}</p>
+                            {% if form.api_name_or_category.errors %}<span class="rq-error" id="{{ form.api_name_or_category.id_for_label }}-error">{{ form.api_name_or_category.errors|first }}</span>{% endif %}
+                        </div>
+
+                        <div class="rq-field">
+                            <label for="{{ form.use_case.id_for_label }}">{% trans "Business Use Case" %}<span class="req" aria-hidden="true">*</span></label>
+                            {{ form.use_case }}
+                            <span class="rq-count" id="id_use_case-counter" data-count-for="{{ form.use_case.id_for_label }}" data-warn="20" aria-hidden="true">0 {% trans "characters" %}</span>
+                            <p class="rq-help" id="id_use_case-help">{% trans "A sentence or two about what you want to achieve helps us respond faster." %}</p>
+                            {% if form.use_case.errors %}<span class="rq-error" id="{{ form.use_case.id_for_label }}-error">{{ form.use_case.errors|first }}</span>{% endif %}
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="rq-step" data-step="3">
+                        <legend class="rq-step__title">{% trans "Details" %}</legend>
+                        <p class="rq-step__sub">{% trans "The more detail you give now, the smoother the review." %}</p>
+
+                        <div class="rq-field">
+                            <label for="{{ form.required_features.id_for_label }}">{% trans "Required Features" %}<span class="req" aria-hidden="true">*</span></label>
+                            {{ form.required_features }}
+                            <span class="rq-count" id="id_required_features-counter" data-count-for="{{ form.required_features.id_for_label }}" data-warn="10" aria-hidden="true">0 {% trans "characters" %}</span>
+                            <p class="rq-help" id="id_required_features-help">{% trans "List the actions or data you need (e.g. create, sync, export)." %}</p>
+                            {% if form.required_features.errors %}<span class="rq-error" id="{{ form.required_features.id_for_label }}-error">{{ form.required_features.errors|first }}</span>{% endif %}
+                        </div>
+
+                        <div class="rq-field rq-conditional" data-conditional="usage">
+                            <label for="{{ form.expected_usage.id_for_label }}">{% trans "Expected Usage or Volume" %}</label>
+                            {{ form.expected_usage }}
+                            <p class="rq-help" id="id_expected_usage-help">{% trans "Optional. An estimate helps us size the solution — skip it if unsure." %}</p>
+                            {% if form.expected_usage.errors %}<span class="rq-error" id="{{ form.expected_usage.id_for_label }}-error">{{ form.expected_usage.errors|first }}</span>{% endif %}
+                        </div>
+
+                        <div class="rq-field">
+                            <label for="{{ form.budget_range.id_for_label }}">{% trans "Budget Range" %}</label>
+                            {{ form.budget_range }}
+                            <p class="rq-help" id="id_budget_range-help">{% trans "Optional and non-binding — it only helps us tailor the proposal." %}</p>
+                            {% if form.budget_range.errors %}<span class="rq-error" id="{{ form.budget_range.id_for_label }}-error">{{ form.budget_range.errors|first }}</span>{% endif %}
+                        </div>
+
+                        <div class="rq-field">
+                            <label for="{{ form.additional_requirements.id_for_label }}">{% trans "Additional Requirements" %}</label>
+                            {{ form.additional_requirements }}
+                            {% if form.additional_requirements.errors %}<span class="rq-error" id="{{ form.additional_requirements.id_for_label }}-error">{{ form.additional_requirements.errors|first }}</span>{% endif %}
+                        </div>
+                    </fieldset>
+
+                    <div class="rq-nav" id="rq-nav">
+                        <button type="button" class="rq-nav-btn" data-nav="back"><i class="fas fa-arrow-left" aria-hidden="true"></i>{% trans "Back" %}</button>
+                        <button type="button" class="rq-nav-btn" data-nav="next">{% trans "Continue" %}<i class="fas fa-arrow-right" aria-hidden="true"></i></button>
+                        <button type="submit" class="rq-submit" id="rq-submit" data-nav="submit">
+                            {% trans "Submit API Request" %} <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                    <p class="rq-note">{% trans "Fields marked with * are required. Your request is reviewed by our team; we use your details only to respond to this request." %}</p>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+(function () {
+    var form = document.getElementById('rq-form');
+    if (!form) return;
+
+    var DRAFT_KEY = 'onwebapp_api_request_draft';
+    var steps = Array.prototype.slice.call(form.querySelectorAll('.rq-step'));
+    var dots = Array.prototype.slice.call(form.querySelectorAll('[data-step-dot]'));
+    var nav = document.getElementById('rq-nav');
+    var btnBack = nav.querySelector('[data-nav="back"]');
+    var btnNext = nav.querySelector('[data-nav="next"]');
+    var submit = document.getElementById('rq-submit');
+    var typeField = form.elements['request_type'];
+    var usageWrap = form.querySelector('[data-conditional="usage"]');
+    var hint3p = document.getElementById('id_api_name_or_category-hint3p');
+    var current = 0;
+
+    /* ── Step machinery ─────────────────────────────────────────── */
+    function stepFields(i) {
+        return Array.prototype.slice.call(steps[i].querySelectorAll('input, select, textarea'))
+            .filter(function (el) { return el.name && el.name !== 'website' && !el.disabled && el.type !== 'hidden'; });
+    }
+    function showStep(i) {
+        current = Math.max(0, Math.min(i, steps.length - 1));
+        steps.forEach(function (s, n) { s.classList.toggle('is-active', n === current); });
+        dots.forEach(function (d, n) {
+            d.classList.toggle('is-current', n === current);
+            d.classList.toggle('is-done', n < current);
+            if (n === current) { d.setAttribute('aria-current', 'step'); } else { d.removeAttribute('aria-current'); }
+        });
+        nav.classList.toggle('is-final', current === steps.length - 1);
+        var focusable = stepFields(current)[0];
+        if (focusable) focusable.focus({ preventScroll: false });
+    }
+    function validateStep(i) {
+        var ok = true, firstBad = null;
+        stepFields(i).forEach(function (el) {
+            if (!el.checkValidity()) {
+                ok = false;
+                el.classList.add('is-invalid');
+                el.setAttribute('aria-invalid', 'true');
+                if (!firstBad) firstBad = el;
+            }
+        });
+        if (firstBad) firstBad.focus();
+        return ok;
+    }
+    btnNext.addEventListener('click', function () { if (validateStep(current)) showStep(current + 1); });
+    btnBack.addEventListener('click', function () { showStep(current - 1); });
+
+    /* If the server returned errors, jump to the step with the first invalid field. */
+    var firstInvalid = form.querySelector('.is-invalid');
+    if (firstInvalid) {
+        var target = firstInvalid.closest('.rq-step');
+        showStep(target ? steps.indexOf(target) : 0);
+    } else {
+        showStep(0);
+    }
+
+    /* ── Conditional fields ─────────────────────────────────────── */
+    function syncType() {
+        var t = typeField ? typeField.value : '';
+        var isCustom = t === 'custom';
+        var isThird = t === 'third_party';
+        if (usageWrap) {
+            usageWrap.hidden = isCustom;
+            var usageInput = usageWrap.querySelector('input, select, textarea');
+            if (usageInput) usageInput.disabled = isCustom;
+        }
+        if (hint3p) hint3p.hidden = !isThird;
+    }
+    if (typeField) { typeField.addEventListener('change', function () { syncType(); saveDraft(); }); }
+    syncType();
+
+    /* ── Character counters ─────────────────────────────────────── */
+    Array.prototype.forEach.call(form.querySelectorAll('[data-count-for]'), function (counter) {
+        var el = document.getElementById(counter.getAttribute('data-count-for'));
+        if (!el) return;
+        var warnAt = parseInt(counter.getAttribute('data-warn'), 10) || 0;
+        var suffix = counter.textContent.trim();
+        function update() {
+            var n = el.value.length;
+            counter.textContent = n + ' ' + suffix;
+            counter.classList.toggle('is-warn', n > 0 && n < warnAt);
+            counter.classList.toggle('is-max', el.maxLength > 0 && n >= el.maxLength);
+        }
+        el.addEventListener('input', update);
+        update();
+    });
+
+    /* ── Draft autosave ─────────────────────────────────────────── */
+    var saveTimer = null;
+    function fieldValues() {
+        var data = {};
+        Array.prototype.forEach.call(form.elements, function (el) {
+            if (!el.name || el.name === 'csrfmiddlewaretoken' || el.name === 'website') return;
+            if (el.type === 'checkbox' || el.type === 'radio') { data[el.name] = el.checked; }
+            else { data[el.name] = el.value; }
+        });
+        return data;
+    }
+    function saveDraft() {
+        try {
+            localStorage.setItem(DRAFT_KEY, JSON.stringify({ step: current + 1, fields: fieldValues() }));
+        } catch (e) { /* storage unavailable — ignore */ }
+    }
+    function restoreDraft() {
+        var raw;
+        try { raw = localStorage.getItem(DRAFT_KEY); } catch (e) { return; }
+        if (!raw) return;
+        var draft;
+        try { draft = JSON.parse(raw); } catch (e) { return; }
+        if (!draft || !draft.fields) return;
+        Object.keys(draft.fields).forEach(function (name) {
+            var el = form.elements[name];
+            if (!el || el.disabled) return;
+            var val = draft.fields[name];
+            if (el.type === 'checkbox' || el.type === 'radio') { el.checked = !!val; }
+            else if (!el.value) { el.value = val; }
+        });
+        syncType();
+        if (draft.step > 1 && !form.querySelector('.is-invalid')) showStep(draft.step - 1);
+    }
+    restoreDraft();
+    form.addEventListener('input', function () {
+        clearTimeout(saveTimer);
+        saveTimer = setTimeout(saveDraft, 300);
+    });
+
+    /* ── Submit guard (unchanged) ───────────────────────────────── */
+    form.addEventListener('submit', function () {
+        if (submit.dataset.busy) return;
+        submit.dataset.busy = '1';
+        submit.disabled = true;
+        submit.style.opacity = '.7';
+    });
+    var alertBox = document.getElementById('rq-alert');
+    if (alertBox) alertBox.focus();
+})();
+</script>
+{% endblock %}

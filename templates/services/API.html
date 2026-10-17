@@ -297,7 +297,7 @@
           <div class="ap-hero__acts">
             <a href="#ap-catalogue" class="ap-btn ap-btn--primary">{% trans "Explore API Solutions" %} <i data-lucide="arrow-right" aria-hidden="true"></i></a>
             <a href="{% url 'home:api_docs' %}" class="ap-btn ap-btn--ghost"><i data-lucide="book-open" aria-hidden="true"></i> {% trans "View API docs" %}</a>
-            <a href="{% url 'contact:contact' %}" class="ap-btn ap-btn--ghost">{% trans "Request an API" %}</a>
+            <a href="{% url 'home:request_api' %}" class="ap-btn ap-btn--ghost">{% trans "Request an API" %}</a>
           </div>
           <p class="ap-trustline">{% trans "For developers, startups, and growing businesses." %}</p>
         </div>
@@ -421,7 +421,7 @@
                 <tr><td>amount</td><td><span class="ap-ok"><i data-lucide="check"></i>{% trans "numeric" %}</span></td></tr>
               </table>
             </div>
-            <a class="ap-cat__link" href="{% url 'contact:contact' %}" aria-label="{% trans 'Request access to Data and Processing APIs' %}">{% trans "Request access" %} <i data-lucide="arrow-right" aria-hidden="true"></i></a>
+            <a class="ap-cat__link" href="{% url 'home:request_api' %}" aria-label="{% trans 'Request access to Data and Processing APIs' %}">{% trans "Request access" %} <i data-lucide="arrow-right" aria-hidden="true"></i></a>
           </div>
         </article>
 
@@ -435,7 +435,7 @@
               <span class="ap-mini__cap">{% trans "Example audit layout" %}</span>
               <div class="ap-bars"><div class="ap-bar"><span style="width:72%"></span></div><div class="ap-bar"><span style="width:48%"></span></div><div class="ap-bar"><span style="width:86%"></span></div></div>
             </div>
-            <a class="ap-cat__link" href="{% url 'contact:contact' %}" aria-label="{% trans 'Request access to Website and SEO APIs' %}">{% trans "Request access" %} <i data-lucide="arrow-right" aria-hidden="true"></i></a>
+            <a class="ap-cat__link" href="{% url 'home:request_api' %}" aria-label="{% trans 'Request access to Website and SEO APIs' %}">{% trans "Request access" %} <i data-lucide="arrow-right" aria-hidden="true"></i></a>
           </div>
         </article>
 
@@ -452,7 +452,7 @@
                 <div class="ap-pane"><strong>{% trans "Output" %}</strong>{% trans "Sample category label" %}</div>
               </div>
             </div>
-            <a class="ap-cat__link" href="{% url 'contact:contact' %}" aria-label="{% trans 'Request access to AI and Text APIs' %}">{% trans "Request access" %} <i data-lucide="arrow-right" aria-hidden="true"></i></a>
+            <a class="ap-cat__link" href="{% url 'home:request_api' %}" aria-label="{% trans 'Request access to AI and Text APIs' %}">{% trans "Request access" %} <i data-lucide="arrow-right" aria-hidden="true"></i></a>
           </div>
         </article>
 
@@ -470,7 +470,7 @@
               <span class="ap-mini__cap">{% trans "Example connection pattern" %}</span>
               <div class="ap-diagram"><span class="ap-node">{% trans "Website" %}</span><span class="ap-link"></span><span class="ap-node is-api">API</span><span class="ap-link"></span><span class="ap-node">{% trans "System" %}</span></div>
             </div>
-            <a class="ap-cat__link" href="{% url 'contact:contact' %}" aria-label="{% trans 'Request access to Business and Integration APIs' %}">{% trans "Request access" %} <i data-lucide="arrow-right" aria-hidden="true"></i></a>
+            <a class="ap-cat__link" href="{% url 'home:request_api' %}" aria-label="{% trans 'Request access to Business and Integration APIs' %}">{% trans "Request access" %} <i data-lucide="arrow-right" aria-hidden="true"></i></a>
           </div>
         </article>
 
@@ -488,7 +488,7 @@
               <span class="ap-mini__cap">{% trans "Example access pattern" %}</span>
               <div class="ap-chips"><span class="ap-chip">{% trans "Provider account" %}</span><span class="ap-chip">OAuth / API key</span><span class="ap-chip">{% trans "Scoped access" %}</span></div>
             </div>
-            <a class="ap-cat__link" href="{% url 'contact:contact' %}" aria-label="{% trans 'Request access to External API Integrations' %}">{% trans "Request access" %} <i data-lucide="arrow-right" aria-hidden="true"></i></a>
+            <a class="ap-cat__link" href="{% url 'home:request_api' %}" aria-label="{% trans 'Request access to External API Integrations' %}">{% trans "Request access" %} <i data-lucide="arrow-right" aria-hidden="true"></i></a>
           </div>
         </article>
       </div>
@@ -610,7 +610,7 @@
             <li><i data-lucide="check" aria-hidden="true"></i>{% trans "Documentation and examples" %}</li>
             <li><i data-lucide="check" aria-hidden="true"></i>{% trans "Basic support resources" %}</li>
           </ul>
-          <a href="{% url 'contact:contact' %}" class="ap-btn ap-btn--ghost">{% trans "Request free access" %}</a>
+          <a href="{% url 'home:request_api' %}" class="ap-btn ap-btn--ghost">{% trans "Request free access" %}</a>
         </div>
 
         <div class="ap-plan ap-plan--rec ap-rv" style="--d:.06s">
@@ -624,7 +624,7 @@
             <li><i data-lucide="check" aria-hidden="true"></i>{% trans "Usage information where supported" %}</li>
             <li><i data-lucide="check" aria-hidden="true"></i>{% trans "Standard support" %}</li>
           </ul>
-          <a href="{% url 'contact:contact' %}" class="ap-btn ap-btn--primary">{% trans "Request Pro access" %}</a>
+          <a href="{% url 'home:request_api' %}" class="ap-btn ap-btn--primary">{% trans "Request Pro access" %}</a>
         </div>
 
         <div class="ap-plan ap-rv" style="--d:.12s">
@@ -638,7 +638,7 @@
             <li><i data-lucide="check" aria-hidden="true"></i>{% trans "Team access where implemented" %}</li>
             <li><i data-lucide="check" aria-hidden="true"></i>{% trans "Priority support where available" %}</li>
           </ul>
-          <a href="{% url 'contact:contact' %}" class="ap-btn ap-btn--dark">{% trans "Request Business access" %}</a>
+          <a href="{% url 'home:request_api' %}" class="ap-btn ap-btn--dark">{% trans "Request Business access" %}</a>
         </div>
       </div>
 
@@ -666,7 +666,7 @@
             <li><i data-lucide="plug" aria-hidden="true"></i>{% trans "Third-party eligibility review" %}</li>
             <li><i data-lucide="clipboard-check" aria-hidden="true"></i>{% trans "Implementation planning" %}</li>
           </ul>
-          <a href="{% url 'contact:contact' %}" class="ap-btn ap-btn--primary" style="margin-top:1.4rem">{% trans "Discuss Your Requirements" %} <i data-lucide="arrow-right" aria-hidden="true"></i></a>
+          <a href="{% url 'home:request_api' %}" class="ap-btn ap-btn--primary" style="margin-top:1.4rem">{% trans "Discuss Your Requirements" %} <i data-lucide="arrow-right" aria-hidden="true"></i></a>
         </div>
         <div class="ap-arch" role="img" aria-label="{% trans 'Architecture diagram: client application connected to a custom API layer and external business systems' %}">
           <div class="ap-arch__row">
@@ -730,14 +730,14 @@
       <p>{% trans "Explore available API products or tell us what your application needs." %}</p>
       <div class="ap-final__acts">
         <a href="#ap-catalogue" class="ap-btn ap-btn--primary">{% trans "Explore APIs" %} <i data-lucide="arrow-right" aria-hidden="true"></i></a>
-        <a href="{% url 'contact:contact' %}" class="ap-btn ap-btn--ghost-d">{% trans "Request a Custom API" %}</a>
+        <a href="{% url 'home:request_api' %}" class="ap-btn ap-btn--ghost-d">{% trans "Request a Custom API" %}</a>
       </div>
     </div>
   </section>
 
   <!-- MOBILE STICKY CTA -->
   <div class="ap-mbar">
-    <a href="{% url 'contact:contact' %}" class="ap-btn ap-btn--primary">{% trans "Request an API" %} <i data-lucide="arrow-right" aria-hidden="true"></i></a>
+    <a href="{% url 'home:request_api' %}" class="ap-btn ap-btn--primary">{% trans "Request an API" %} <i data-lucide="arrow-right" aria-hidden="true"></i></a>
   </div>
 
 </div>

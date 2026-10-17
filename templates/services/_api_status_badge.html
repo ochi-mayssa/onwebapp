@@ -1,0 +1,15 @@
+{% load i18n %}
+{# Usage: {% include "services/_api_status_badge.html" with status=api_request.status %} #}
+{% if status == 'pending' %}
+<span class="badge rounded-pill" style="background:rgba(107,114,128,.12);color:#4b5563;">{% trans "Pending" %}</span>
+{% elif status == 'under_review' %}
+<span class="badge rounded-pill" style="background:rgba(14,165,233,.12);color:#0369a1;">{% trans "Under Review" %}</span>
+{% elif status == 'approved' %}
+<span class="badge rounded-pill" style="background:rgba(79,70,229,.12);color:#4338ca;">{% trans "Approved" %}</span>
+{% elif status == 'in_progress' %}
+<span class="badge rounded-pill" style="background:rgba(99,102,241,.14);color:#4F46E5;">{% trans "In Progress" %}</span>
+{% elif status == 'completed' %}
+<span class="badge rounded-pill" style="background:rgba(22,163,74,.12);color:#15803d;">{% trans "Completed" %}</span>
+{% elif status == 'rejected' %}
+<span class="badge rounded-pill" style="background:rgba(220,38,38,.12);color:#b91c1c;">{% trans "Rejected" %}</span>
+{% endif %}

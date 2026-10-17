@@ -14,7 +14,7 @@ from django.urls import reverse
 from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
 from django.conf import settings
-from home.models import WebsiteBuildRequest, ConsultationRequest
+from home.models import WebsiteBuildRequest, ConsultationRequest, APIRequest
 from services.decorators import DEFAULT_SERVICES
 from django.views.decorators.http import require_POST
 from .decorators import require_premium_plan
@@ -258,6 +258,48 @@ def consultations_list(request):
     return render(request, 'users/consultations_list.html', context)
 
 
+@login_required
+def api_requests_list(request):
+    """Client tracking: the logged-in user's own API requests (ownership enforced)."""
+    qs = APIRequest.objects.filter(user=request.user, is_archived=False)
+
+    status = request.GET.get('status') or ''
+    request_type = request.GET.get('type') or ''
+    search = request.GET.get('q') or ''
+
+    if status:
+        qs = qs.filter(status=status)
+
+    if request_type:
+        qs = qs.filter(request_type=request_type)
+
+    if search:
+        qs = qs.filter(
+            Q(reference__icontains=search)
+            | Q(api_name_or_category__icontains=search)
+            | Q(use_case__icontains=search)
+            | Q(company_name__icontains=search)
+        )
+
+    qs = qs.order_by('-created_at')
+
+    from django.core.paginator import Paginator
+
+    paginator = Paginator(qs, 10)
+    page_number = request.GET.get('page') or 1
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'page_obj': page_obj,
+        'status': status,
+        'request_type': request_type,
+        'search': search,
+        'status_choices': APIRequest.STATUS_CHOICES,
+        'type_choices': APIRequest.REQUEST_TYPE_CHOICES,
+    }
+    return render(request, 'users/api_requests_list.html', context)
+
+
 @require_http_methods(["GET", "POST"])
 def signup(request):
     """Handle user registration."""
@@ -319,11 +361,13 @@ def login_view(request):
         password = request.POST.get('password')
         user = None
         if email and password:
-            try:
-                user_obj = User.objects.get(email__iexact=email)
+            # Email is not unique on the User model, so a single email can
+            # belong to more than one account — try each match until one
+            # authenticates instead of crashing on .get().
+            for user_obj in User.objects.filter(email__iexact=email).order_by('-last_login', 'id'):
                 user = authenticate(request, username=user_obj.username, password=password)
-            except User.DoesNotExist:
-                user = None
+                if user:
+                    break
 
         if user:
             login(request, user)
@@ -332,6 +376,9 @@ def login_view(request):
             next_url = request.GET.get('next') or request.POST.get('next')
             if next_url:
                 return redirect(next_url)
+            # Admins land on their own dashboard, not the public homepage.
+            if user.is_superuser:
+                return redirect('projects:admin_dashboard')
             return redirect('home:home')
         else:
             messages.error(request, 'Invalid email or password')

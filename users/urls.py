@@ -18,6 +18,7 @@ urlpatterns = [
     path('profile/security/two-factor/', views.two_factor_settings, name='two_factor_settings'),
     path('profile/security/api-keys/', views.api_keys, name='api_keys'),
     path('profile/consultations/', views.consultations_list, name='consultations_list'),
+    path('profile/api-requests/', views.api_requests_list, name='api_requests_list'),
 
     # Password reset URLs
     path('password-reset/', views.UserPasswordResetView.as_view(), name='password_reset'),

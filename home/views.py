@@ -1,6 +1,13 @@
-from django.shortcuts import render, redirect
-from .forms import ConsultationForm, WebsiteBuildForm
-from .models import WebsiteBuildRequest
+from django.contrib import messages
+from django.contrib.auth.decorators import user_passes_test
+from django.core.paginator import Paginator
+from django.shortcuts import render, redirect, get_object_or_404
+from django.utils import timezone
+from datetime import timedelta
+
+from .forms import ConsultationForm, WebsiteBuildForm, APIRequestForm, APIRequestAdminActionForm
+from .models import WebsiteBuildRequest, APIRequest
+from .notifications import notify_admins, notify_client_submitted
 
 # Create your views here.
 
@@ -186,3 +193,157 @@ def api_status(request):
         'version': '1.0',
         'timestamp': timezone.now().isoformat(),
     })
+
+
+def request_api(request):
+    """Render and process the public 'Request an API' form."""
+    if request.method == 'POST':
+        # Honeypot: real users never see or fill this field. Silently drop bots.
+        if request.POST.get('website', ''):
+            return redirect('home:request_api_success')
+
+        form = APIRequestForm(request.POST)
+        if form.is_valid():
+            api_request = form.save(commit=False)
+            if request.user.is_authenticated:
+                api_request.user = request.user
+
+            # Duplicate guard: one similar submission per email per 24 hours.
+            duplicate = APIRequest.objects.filter(
+                business_email__iexact=api_request.business_email.strip(),
+                api_name_or_category__iexact=api_request.api_name_or_category.strip(),
+                created_at__gte=timezone.now() - timedelta(hours=24),
+            ).exists()
+            if duplicate:
+                form.add_error(
+                    None,
+                    'A similar request from this email was already submitted in the '
+                    'last 24 hours. We are already reviewing it - no need to resend.',
+                )
+            else:
+                api_request.save()
+                notify_admins(api_request)
+                notify_client_submitted(api_request)
+                request.session['api_request_reference'] = api_request.reference
+                return redirect('home:request_api_success')
+    else:
+        initial = {}
+        if request.user.is_authenticated:
+            user = request.user
+            full_name = user.get_full_name().strip() if user.get_full_name() else ''
+            initial['full_name'] = full_name or user.username
+            initial['business_email'] = user.email
+            profile = getattr(user, 'profile', None)
+            if profile and getattr(profile, 'company_name', ''):
+                initial['company_name'] = profile.company_name
+        form = APIRequestForm(initial=initial)
+
+    return render(request, 'services/api_request.html', {'form': form})
+
+
+def request_api_success(request):
+    """Confirmation page after a successful API request submission."""
+    return render(request, 'services/api_request_success.html', {
+        'reference': request.session.get('api_request_reference', ''),
+    })
+
+
+# ── Admin: API requests management ────────────────────────────────────────
+
+
+superuser_required = user_passes_test(lambda u: u.is_active and u.is_superuser)
+
+
+@superuser_required
+def admin_api_requests(request):
+    """Custom admin page listing all API requests (superusers only)."""
+    qs = APIRequest.objects.select_related('assigned_to', 'user')
+
+    show_archived = request.GET.get('archived') == '1'
+    if not show_archived:
+        qs = qs.filter(is_archived=False)
+
+    status_filter = request.GET.get('status') or ''
+    type_filter = request.GET.get('type') or ''
+    search = (request.GET.get('q') or '').strip()
+
+    if status_filter and dict(APIRequest.STATUS_CHOICES).get(status_filter):
+        qs = qs.filter(status=status_filter)
+    if type_filter and dict(APIRequest.REQUEST_TYPE_CHOICES).get(type_filter):
+        qs = qs.filter(request_type=type_filter)
+    if search:
+        from django.db.models import Q
+        qs = qs.filter(
+            Q(reference__icontains=search)
+            | Q(full_name__icontains=search)
+            | Q(business_email__icontains=search)
+            | Q(company_name__icontains=search)
+            | Q(api_name_or_category__icontains=search)
+        )
+
+    base = APIRequest.objects.all()
+    stats = {
+        'total': base.filter(is_archived=False).count(),
+        'pending': base.filter(is_archived=False, status='pending').count(),
+        'under_review': base.filter(is_archived=False, status='under_review').count(),
+        'in_progress': base.filter(is_archived=False, status='in_progress').count(),
+        'completed': base.filter(is_archived=False, status='completed').count(),
+        'rejected': base.filter(is_archived=False, status='rejected').count(),
+        'archived': base.filter(is_archived=True).count(),
+    }
+
+    paginator = Paginator(qs, 15)
+    page_obj = paginator.get_page(request.GET.get('page'))
+
+    context = {
+        'page_obj': page_obj,
+        'stats': stats,
+        'status_filter': status_filter,
+        'type_filter': type_filter,
+        'search': search,
+        'show_archived': show_archived,
+        'status_choices': APIRequest.STATUS_CHOICES,
+        'type_choices': APIRequest.REQUEST_TYPE_CHOICES,
+    }
+    return render(request, 'services/admin_api_requests.html', context)
+
+
+@superuser_required
+def admin_api_request_detail(request, pk):
+    """Manage a single API request: status, assignment, notes, history."""
+    api_request = get_object_or_404(
+        APIRequest.objects.select_related('assigned_to', 'user'), pk=pk,
+    )
+
+    if request.method == 'POST':
+        # Capture BEFORE validation: ModelForm._post_clean() writes cleaned
+        # data onto the instance during is_valid(), so reading it after would
+        # already show the new status.
+        old_status = api_request.status
+        form = APIRequestAdminActionForm(request.POST, instance=api_request)
+        if form.is_valid():
+            new_status = form.cleaned_data['status']
+            # Save everything except the status, then let change_status()
+            # apply the transition (so the log + client email always fire).
+            api_request = form.save(commit=False)
+            api_request.status = old_status
+            api_request.save()
+            if api_request.change_status(new_status, changed_by=request.user):
+                messages.success(
+                    request,
+                    f'{api_request.reference} moved to '
+                    f'{api_request.get_status_display()} — the client was notified.',
+                )
+            else:
+                messages.success(request, f'{api_request.reference} updated.')
+            return redirect('home:admin_api_request_detail', pk=pk)
+    else:
+        form = APIRequestAdminActionForm(instance=api_request)
+
+    history = api_request.status_logs.select_related('changed_by').order_by('-created_at')
+    context = {
+        'api_request': api_request,
+        'form': form,
+        'history': history,
+    }
+    return render(request, 'services/admin_api_request_detail.html', context)
