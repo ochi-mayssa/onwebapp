@@ -1,6 +1,10 @@
 from django.contrib.auth import get_user_model
+from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
+
+import time
+from unittest import mock
 
 User = get_user_model()
 
@@ -90,3 +94,94 @@ class LoginRedirectTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'id="softwareMenuUnified"')
         self.assertNotContains(response, 'ADMIN')
+
+
+class VerificationEmailTests(TestCase):
+    """Verification emails are multipart, OnWebApp-branded and actually dispatched."""
+
+    PASSWORD = 'Str0ng-Passw0rd!2026'
+
+    def test_send_verification_email_task_delivers_multipart(self):
+        from .tasks import send_verification_email
+
+        user = User.objects.create_user('grace', 'grace@example.com', self.PASSWORD)
+        mail.outbox.clear()
+        result = send_verification_email(user.id, 'http://testserver/users/verify-email/uid/token/')
+        self.assertEqual(result, 'Email sent')
+
+        messages = [m for m in mail.outbox if 'Verify your email' in m.subject]
+        self.assertEqual(len(messages), 1)
+        message = messages[0]
+        self.assertEqual(message.subject, 'Verify your email for OnWebApp')
+        self.assertIn('grace@example.com', message.to)
+        self.assertIn('/users/verify-email/', message.body)
+        self.assertTrue(message.alternatives)
+        self.assertEqual(message.alternatives[0][1], 'text/html')
+        self.assertIn('/users/verify-email/', message.alternatives[0][0])
+        self.assertNotIn('AutomationIQ', message.subject)
+        self.assertNotIn('AutomationIQ', message.alternatives[0][0])
+
+    def test_send_verification_email_unknown_user(self):
+        from .tasks import send_verification_email
+
+        self.assertEqual(send_verification_email(999999, 'http://x/'), 'Unknown user')
+
+    def test_signup_dispatches_verification_task_inline(self):
+        with mock.patch('users.tasks.send_verification_email') as task:
+            response = self.client.post(reverse('users:signup'), {
+                'username': 'grace',
+                'email': 'grace@example.com',
+                'password1': self.PASSWORD,
+                'password2': self.PASSWORD,
+            })
+            self.assertEqual(response.status_code, 302)
+            # The dispatch thread runs inline (no Celery worker); wait for the call.
+            for _ in range(100):
+                if task.called:
+                    break
+                time.sleep(0.05)
+            self.assertTrue(task.called, 'verification task was not dispatched')
+            user_id, verify_url = task.call_args[0]
+            self.assertEqual(user_id, User.objects.get(username='grace').pk)
+            self.assertIn('/users/verify-email/', verify_url)
+
+
+class PasswordResetEmailTests(TestCase):
+    def _request_reset(self, **kwargs):
+        user = User.objects.create_user('ada', 'ada@example.com', 'Str0ng-Passw0rd!2026')
+        # Ignore the welcome email sent by the projects signal on user creation.
+        mail.outbox.clear()
+        response = self.client.post(
+            reverse('users:password_reset'),
+            {'email': user.email},
+            **kwargs,
+        )
+        messages = [m for m in mail.outbox if 'Reset your password' in m.subject]
+        return user, response, (messages[0] if messages else None)
+
+    def test_reset_email_delivered_with_https_link_behind_proxy(self):
+        user, response, message = self._request_reset(
+            secure=True,
+            HTTP_X_FORWARDED_PROTO='https',
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertIsNotNone(message)
+        self.assertIn('OnWebApp', message.subject)
+        self.assertNotIn('AutomationIQ', message.subject)
+        self.assertIn(user.email, message.to)
+        # HTTPS when the proxy reports a secure request (SECURE_PROXY_SSL_HEADER).
+        self.assertIn('https://', message.body)
+        self.assertNotIn('http://', message.body)
+        self.assertIn('/users/reset/', message.body)
+
+    def test_reset_email_has_html_alternative(self):
+        _, _, message = self._request_reset()
+        self.assertIsNotNone(message)
+        self.assertTrue(message.alternatives)
+        self.assertEqual(message.alternatives[0][1], 'text/html')
+        self.assertIn('/users/reset/', message.alternatives[0][0])
+
+    def test_reset_email_http_in_local_dev(self):
+        _, _, message = self._request_reset()
+        self.assertIsNotNone(message)
+        self.assertIn('http://', message.body)

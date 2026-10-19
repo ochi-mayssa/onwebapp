@@ -1,8 +1,9 @@
 import logging
 
 from django.conf import settings
-from django.core.mail import send_mail
 from django.shortcuts import redirect, render
+
+from home.emails import send_notification_email
 
 from .forms import DashboardInquiryForm
 from .models import PACKAGE_PRICES
@@ -37,6 +38,7 @@ def quote(request):
                 inquiry.user = request.user
             inquiry.save()
             _notify_team(inquiry)
+            _notify_customer(inquiry)
             request.session['dd_inquiry_reference'] = inquiry.reference
             return redirect('dashboard_inquiry:success')
     else:
@@ -57,9 +59,16 @@ def success(request):
     })
 
 
+def _team_recipients():
+    return [
+        getattr(settings, 'ADMIN_EMAIL', ''),
+        getattr(settings, 'DASHBOARD_INQUIRY_EMAIL', ''),
+        settings.DEFAULT_FROM_EMAIL,
+    ]
+
+
 def _notify_team(inquiry):
     """Best-effort notification email. Failures are logged, never raised to the user."""
-    recipient = getattr(settings, 'DASHBOARD_INQUIRY_EMAIL', None) or settings.DEFAULT_FROM_EMAIL
     subject = f"[Dashboard Inquiry] {inquiry.get_package_display()} — {inquiry.name}"
     body = (
         f"Reference: {inquiry.reference}\n"
@@ -73,12 +82,32 @@ def _notify_team(inquiry):
         f"Timeline: {inquiry.timeline or '—'}\n\n"
         f"Message:\n{inquiry.message or '—'}\n"
     )
-    try:
-        send_mail(
-            subject, body,
-            settings.DEFAULT_FROM_EMAIL,
-            [recipient],
-            fail_silently=True,
-        )
-    except Exception:
-        logger.exception("Failed to send dashboard inquiry notification for %s", inquiry.reference)
+    send_notification_email(
+        subject=subject,
+        recipients=_team_recipients(),
+        text_body=body,
+        label='dashboard-inquiry-team',
+    )
+
+
+def _notify_customer(inquiry):
+    """Confirmation email to the customer. Failures are logged, never raised."""
+    send_notification_email(
+        subject=f'We received your quote request ({inquiry.reference})',
+        recipients=[inquiry.email],
+        template_name='emails/dashboard_inquiry_confirmation.html',
+        context={
+            'name': inquiry.name,
+            'reference': inquiry.reference,
+            'package_label': inquiry.get_package_display(),
+        },
+        text_body=(
+            f'Hello {inquiry.name},\n\n'
+            f'Thank you for your interest in a dashboard development quote. '
+            f'Your reference is {inquiry.reference} '
+            f'(package: {inquiry.get_package_display()}).\n'
+            f'Our team will review your requirements and contact you shortly.\n\n'
+            f'OnWebApp\n'
+        ),
+        label='dashboard-inquiry-customer',
+    )

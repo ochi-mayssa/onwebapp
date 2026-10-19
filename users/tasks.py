@@ -8,22 +8,32 @@ from .models import UserERP
 
 logger = logging.getLogger(__name__)
 
-from django.core.mail import EmailMessage
 from django.conf import settings
-from django.template.loader import render_to_string
+from home.emails import send_notification_email
 
 @shared_task
 def send_verification_email(user_id, verify_url):
-    """Celery task to send a verification email."""
+    """Send the email-verification message (Celery task; also called directly)."""
     try:
         user = User.objects.get(id=user_id)
-        subject = 'Verify your email for AutomationIQ'
-        html = render_to_string('emails/verify_email.html', {'user': user, 'verify_url': verify_url})
-        EmailMessage(subject, html, settings.DEFAULT_FROM_EMAIL, [user.email]).send(fail_silently=False)
-        return f"Email sent to {user.email}"
-    except Exception as e:
-        logger.error(f"Failed to send verification email: {str(e)}")
-        return f"Error sending email: {str(e)}"
+    except User.DoesNotExist:
+        logger.error('send_verification_email: user %s does not exist', user_id)
+        return 'Unknown user'
+    ok = send_notification_email(
+        subject='Verify your email for OnWebApp',
+        recipients=[user.email],
+        template_name='emails/verify_email.html',
+        context={'user': user, 'verify_url': verify_url},
+        text_body=(
+            f'Hello {user.get_short_name() or user.username},\n\n'
+            f'Please verify your email address by opening the link below:\n'
+            f'{verify_url}\n\n'
+            f'If you did not create this account, you can ignore this message.\n\n'
+            f'OnWebApp\n'
+        ),
+        label='verification',
+    )
+    return 'Email sent' if ok else 'Email failed'
 
 @shared_task
 def provision_erpnext_instance(user_id):

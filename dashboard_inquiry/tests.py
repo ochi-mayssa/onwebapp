@@ -1,7 +1,26 @@
-from django.test import TestCase
+from unittest import mock
+
+from django.core import mail
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from .models import DashboardInquiry
+
+
+def _quote_payload(**overrides):
+    data = {
+        'name': 'Ada Lovelace',
+        'email': 'ada@example.com',
+        'company': 'Analytical Engines',
+        'phone': '+1 555 0100',
+        'package': 'business',
+        'data_sources': 'SQL, ERP',
+        'budget': '5-15',
+        'timeline': '1-2m',
+        'message': 'We need a multi-source operations dashboard.',
+    }
+    data.update(overrides)
+    return data
 
 
 class DashboardInquiryTests(TestCase):
@@ -80,3 +99,47 @@ class DashboardInquiryTests(TestCase):
     def test_success_page_renders(self):
         response = self.client.get(reverse('dashboard_inquiry:success'))
         self.assertEqual(response.status_code, 200)
+
+
+class QuoteEmailTests(TestCase):
+    """Quote submissions send a team notification + customer confirmation."""
+
+    def test_post_sends_team_and_customer_emails(self):
+        mail.outbox.clear()
+        response = self.client.post(
+            reverse('dashboard_inquiry:quote'),
+            _quote_payload(),
+        )
+        self.assertEqual(response.status_code, 302)
+
+        team = [m for m in mail.outbox if 'Dashboard Inquiry' in m.subject]
+        customer = [m for m in mail.outbox if 'quote request' in m.subject]
+        self.assertEqual(len(team), 1)
+        self.assertEqual(len(customer), 1)
+        self.assertIn('ada@example.com', customer[0].to)
+        self.assertIn('DD-', customer[0].body)
+        self.assertTrue(customer[0].alternatives)
+        self.assertEqual(customer[0].alternatives[0][1], 'text/html')
+
+    @override_settings(ADMIN_EMAIL='boss@onwebapp.com', DASHBOARD_INQUIRY_EMAIL='team@onwebapp.com')
+    def test_team_notification_includes_admin_email(self):
+        mail.outbox.clear()
+        self.client.post(reverse('dashboard_inquiry:quote'), _quote_payload())
+        team = [m for m in mail.outbox if 'Dashboard Inquiry' in m.subject]
+        self.assertEqual(len(team), 1)
+        self.assertIn('boss@onwebapp.com', team[0].to)
+        self.assertIn('team@onwebapp.com', team[0].to)
+
+    def test_inquiry_is_persisted_when_email_delivery_fails(self):
+        mail.outbox.clear()
+        with mock.patch(
+            'home.emails.EmailMultiAlternatives.send',
+            side_effect=OSError('smtp down'),
+        ):
+            with self.assertLogs('home.emails', level='ERROR'):
+                response = self.client.post(
+                    reverse('dashboard_inquiry:quote'),
+                    _quote_payload(),
+                )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(DashboardInquiry.objects.count(), 1)

@@ -1,46 +1,50 @@
-"""Best-effort notification emails for API requests. Failures are logged, never raised."""
+"""Notification emails for API requests.
+
+All delivery goes through ``home.emails.send_notification_email`` (Resend SMTP
+in production). Failures are logged, never raised: the database state of a
+request must not depend on email delivery.
+"""
 import logging
 
 from django.conf import settings
-from django.core.mail import send_mail
+from django.urls import reverse
 
+from .emails import send_notification_email
 from .models import APIRequest
 
 logger = logging.getLogger(__name__)
 
 
+def _site_absolute(path):
+    """Build an absolute HTTPS URL from SITE_URL for use inside emails."""
+    return f'{settings.SITE_URL.rstrip("/")}{path}'
+
+
 def _admin_recipients():
-    explicit = getattr(settings, 'API_REQUEST_EMAIL', None)
-    if explicit:
-        return [explicit]
-    from django.contrib.auth import get_user_model
-    User = get_user_model()
-    emails = list(
-        User.objects.filter(is_staff=True, is_active=True)
-        .exclude(email='')
-        .values_list('email', flat=True)
-        .distinct()[:25]
-    )
-    return emails or [settings.DEFAULT_FROM_EMAIL]
-
-
-def _send(subject, body, recipients):
-    if not recipients:
-        return
-    try:
-        send_mail(
-            subject, body,
-            settings.DEFAULT_FROM_EMAIL,
-            recipients,
-            fail_silently=True,
+    recipients = [
+        getattr(settings, 'ADMIN_EMAIL', ''),
+        getattr(settings, 'API_REQUEST_EMAIL', ''),
+    ]
+    if not any(recipients):
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        recipients.extend(
+            User.objects.filter(is_staff=True, is_active=True)
+            .exclude(email='')
+            .values_list('email', flat=True)
+            .distinct()[:25]
         )
-    except Exception:
-        logger.exception('Failed to send API request email: %s', subject)
+    if not any(recipients):
+        recipients.append(settings.DEFAULT_FROM_EMAIL)
+    return recipients
 
 
 def notify_admins(api_request):
     """Notify the admin team about a new API request."""
     subject = f'[API Request] {api_request.reference} - {api_request.full_name}'
+    admin_url = _site_absolute(
+        reverse('home:admin_api_request_detail', args=[api_request.pk])
+    )
     body = (
         f'A new API request was submitted.\n\n'
         f'Reference: {api_request.reference}\n'
@@ -53,34 +57,60 @@ def notify_admins(api_request):
         f'Budget: {api_request.get_budget_range_display() if api_request.budget_range else "-"}\n\n'
         f'Use case:\n{api_request.use_case}\n\n'
         f'Required features:\n{api_request.required_features}\n\n'
-        f'Additional requirements:\n{api_request.additional_requirements or "-"}\n'
+        f'Additional requirements:\n{api_request.additional_requirements or "-"}\n\n'
+        f'Open in admin:\n{admin_url}\n'
     )
-    _send(subject, body, _admin_recipients())
+    send_notification_email(
+        subject=subject,
+        recipients=_admin_recipients(),
+        text_body=body,
+        label='api-request-admin',
+    )
 
 
 def notify_client_submitted(api_request):
     """Confirmation email to the client after submission."""
     subject = f'We received your API request ({api_request.reference})'
-    body = (
+    tracking_url = _site_absolute(reverse('users:api_requests_list'))
+    context = {
+        'api_request': api_request,
+        'reference': api_request.reference,
+        'full_name': api_request.full_name,
+        'tracking_url': tracking_url,
+    }
+    text_body = (
         f'Hello {api_request.full_name},\n\n'
         f'Thank you for your API request. Your reference is {api_request.reference}.\n'
         f'Our team will review it and get back to you. '
         f'You will receive an email when the status of your request changes.\n\n'
-        f'You can track this request from your OnWebApp account.\n'
+        f'You can track this request from your OnWebApp account: {tracking_url}\n'
     )
-    _send(subject, body, [api_request.business_email])
+    send_notification_email(
+        subject=subject,
+        recipients=[api_request.business_email],
+        template_name='emails/api_request_received.html',
+        context=context,
+        text_body=text_body,
+        label='api-request-ack',
+    )
 
 
 def notify_client_status_change(api_request, old_status, new_status):
-    """Optional client notification when an admin updates the request status."""
+    """Client notification when an admin updates the request status."""
     labels = dict(APIRequest.STATUS_CHOICES)
     old_label = labels.get(old_status, old_status)
     new_label = labels.get(new_status, new_status)
     subject = f'Your API request {api_request.reference} is now {new_label}'
+    tracking_url = _site_absolute(reverse('users:api_requests_list'))
     body = (
         f'Hello {api_request.full_name},\n\n'
         f'The status of your API request {api_request.reference} has changed:\n'
         f'  {old_label} -> {new_label}\n\n'
-        f'You can view the request from your OnWebApp account.\n'
+        f'You can view the request from your OnWebApp account: {tracking_url}\n'
     )
-    _send(subject, body, [api_request.business_email])
+    send_notification_email(
+        subject=subject,
+        recipients=[api_request.business_email],
+        text_body=body,
+        label='api-request-status',
+    )

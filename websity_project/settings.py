@@ -312,20 +312,33 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 ERP_GATEWAY_URL = os.environ.get('ERP_GATEWAY_URL', 'http://localhost:3000')
 ERP_DOMAIN = os.environ.get('ERP_DOMAIN', 'onwebapp.com')
 
-# Email configuration: read from environment when available. If EMAIL_HOST_USER/PASSWORD
-# are not set, fall back to the console backend so developers see emails locally.
-EMAIL_HOST = os.environ.get('EMAIL_HOST', '')
-EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
-EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True').lower() in ('1', 'true', 'yes')
-DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@example.com')
+# Email configuration (Resend SMTP in production, console backend in dev).
+# Resolution logic lives in email_config.py so it can be unit-tested.
+# See docs/RESEND_SETUP.md for Coolify/DNS setup instructions.
+from .email_config import resolve_email_config  # noqa: E402
 
-if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD and EMAIL_HOST:
-    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-else:
-    # Safe default for local dev: prints emails to console
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+_email = resolve_email_config(os.environ)
+EMAIL_BACKEND = _email['EMAIL_BACKEND']
+EMAIL_HOST = _email['EMAIL_HOST']
+EMAIL_PORT = _email['EMAIL_PORT']
+EMAIL_HOST_USER = _email['EMAIL_HOST_USER']
+EMAIL_HOST_PASSWORD = _email['EMAIL_HOST_PASSWORD']
+EMAIL_USE_TLS = _email['EMAIL_USE_TLS']
+EMAIL_USE_SSL = _email['EMAIL_USE_SSL']
+EMAIL_TIMEOUT = _email['EMAIL_TIMEOUT']
+DEFAULT_FROM_EMAIL = _email['DEFAULT_FROM_EMAIL']
+SERVER_EMAIL = _email['SERVER_EMAIL']
+# Preferred internal recipient for operational notifications (API requests,
+# dashboard quotes, ...). Empty means "use the app-specific fallbacks".
+ADMIN_EMAIL = _email['ADMIN_EMAIL']
+
+if not DEBUG and not _email['EMAIL_CONFIGURED']:
+    import logging as _settings_logging
+    _settings_logging.getLogger('websity_project.settings').error(
+        'EMAIL_HOST/EMAIL_HOST_USER and RESEND_API_KEY (or EMAIL_HOST_PASSWORD) are '
+        'not set: transactional emails are NOT being delivered (console backend '
+        'active). Configure Resend in your environment - see docs/RESEND_SETUP.md.'
+    )
 
 # Stripe configuration - read from environment for safety. Empty values are allowed for local dev.
 STRIPE_PUBLISHABLE_KEY = os.environ.get('STRIPE_PUBLISHABLE_KEY', '')

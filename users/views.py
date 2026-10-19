@@ -21,7 +21,10 @@ from .decorators import require_premium_plan
 from django.utils.dateparse import parse_date
 from django.db.models import Q
 import hashlib
+import logging
 import secrets
+
+logger = logging.getLogger(__name__)
 
 # Password reset imports
 from django.contrib.auth.views import PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
@@ -317,7 +320,31 @@ def signup(request):
                         try:
                             func.delay(*args)
                         except Exception:
-                            pass
+                            logger.exception(
+                                'Background task not dispatched: %s',
+                                getattr(func, '__name__', func),
+                            )
+                    t = threading.Thread(target=_run, daemon=True)
+                    t.start()
+
+                def _dispatch_email(func, *args):
+                    """Send via Celery when enabled, otherwise run inline.
+
+                    This deployment has no Celery worker; without the inline
+                    fallback verification emails were silently dropped.
+                    Still runs off the request thread.
+                    """
+                    def _run():
+                        try:
+                            if settings.USE_CELERY:
+                                func.delay(*args)
+                            else:
+                                func(*args)
+                        except Exception:
+                            logger.exception(
+                                'Email task failed: %s',
+                                getattr(func, '__name__', func),
+                            )
                     t = threading.Thread(target=_run, daemon=True)
                     t.start()
 
@@ -331,7 +358,7 @@ def signup(request):
                 uid = urlsafe_base64_encode(force_bytes(user.pk))
                 token = default_token_generator.make_token(user)
                 verify_url = request.build_absolute_uri(reverse('users:verify_email', args=[uid, token]))
-                _fire_task(send_verification_email, user.id, verify_url)
+                _dispatch_email(send_verification_email, user.id, verify_url)
             except Exception:
                 pass
 
@@ -571,6 +598,7 @@ def logout_view(request):
 class UserPasswordResetView(PasswordResetView):
     template_name = 'registration/password_reset_form.html'
     email_template_name = 'emails/password_reset_email.html'
+    html_email_template_name = 'emails/password_reset_email_html.html'
     subject_template_name = 'emails/password_reset_subject.txt'
     form_class = CustomPasswordResetForm
     success_url = '/users/password-reset/done/'

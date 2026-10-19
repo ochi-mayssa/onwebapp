@@ -1,9 +1,18 @@
-<p>Hello {{ user.username }},</p>
+{% extends "emails/base_email.html" %}
+{% block title %}Verify your email - OnWebApp{% endblock %}
+{% block content %}
+<p>Hello {{ user.get_short_name|default:user.username }},</p>
 
-<p>Thanks for creating an account at AutomationIQ. Please verify your email by clicking the link below:</p>
+<p>Thanks for creating an account at OnWebApp. Please verify your email address by clicking the button below:</p>
 
-<p><a href="{{ verify_url }}">Verify my email</a></p>
+<p style="margin:28px 0;">
+  <a href="{{ verify_url }}" style="display:inline-block;background-color:#4F46E5;color:#ffffff;text-decoration:none;padding:12px 24px;border-radius:6px;font-weight:bold;">Verify my email</a>
+</p>
+
+<p style="font-size:13px;color:#5a5f78;">If the button does not work, paste this link into your browser:<br>
+<a href="{{ verify_url }}" style="color:#4F46E5;">{{ verify_url }}</a></p>
 
 <p>If you didn't create this account, you can ignore this message.</p>
 
-<p>Thanks,<br/>AutomationIQ Team</p>
+<p>Thanks,<br>OnWebApp</p>
+{% endblock %}
