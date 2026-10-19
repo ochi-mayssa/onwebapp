@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     # Project apps
     'home',
     'users',
+    'campaigns',
     'services',
     'blog',
     'contact',
@@ -331,6 +332,19 @@ SERVER_EMAIL = _email['SERVER_EMAIL']
 # Preferred internal recipient for operational notifications (API requests,
 # dashboard quotes, ...). Empty means "use the app-specific fallbacks".
 ADMIN_EMAIL = _email['ADMIN_EMAIL']
+
+# Email campaign delivery limits. There is no Celery worker in this
+# deployment: campaigns are delivered by a bounded daemon thread in small
+# batches (see campaigns/delivery.py and docs/EMAIL_CAMPAIGNS.md).
+CAMPAIGN_MAX_RECIPIENTS = int(os.environ.get('CAMPAIGN_MAX_RECIPIENTS', '500'))
+CAMPAIGN_BATCH_SIZE = int(os.environ.get('CAMPAIGN_BATCH_SIZE', '5'))
+CAMPAIGN_BATCH_DELAY_SECONDS = float(os.environ.get('CAMPAIGN_BATCH_DELAY_SECONDS', '2.5'))
+
+# Mandatory email verification. Production can never disable this; only a
+# development server may relax it via EMAIL_VERIFICATION_REQUIRED=False.
+from .email_config import verification_policy  # noqa: E402
+
+EMAIL_VERIFICATION_REQUIRED = verification_policy(os.environ, DEBUG)
 
 if not DEBUG and not _email['EMAIL_CONFIGURED']:
     import logging as _settings_logging

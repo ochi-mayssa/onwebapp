@@ -119,7 +119,8 @@ class OnboardingForm(forms.ModelForm):
 class NotificationPreferencesForm(forms.ModelForm):
     class Meta:
         model = UserProfile
-        fields = ['phone_number', 'sms_notifications_enabled', 'email_notifications_enabled']
+        fields = ['phone_number', 'sms_notifications_enabled', 'email_notifications_enabled',
+                  'marketing_emails_enabled']
         widgets = {
             'phone_number': forms.TextInput(attrs={'class': 'form-control'}),
         }

@@ -1,0 +1,17 @@
+{% load i18n %}
+{% if page_obj.has_other_pages %}
+<nav class="d-flex justify-content-between align-items-center mt-3" aria-label="{% trans 'Pagination' %}">
+    <span class="small text-secondary fw-600">
+        {% blocktrans with n=page_obj.paginator.count %}{{ n }} record(s){% endblocktrans %}
+    </span>
+    <ul class="pagination pagination-sm mb-0">
+        <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}&status={{ status_filter|default:'' }}">{% trans "Previous" %}</a>
+        </li>
+        <li class="page-item disabled"><span class="page-link">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span></li>
+        <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}&status={{ status_filter|default:'' }}">{% trans "Next" %}</a>
+        </li>
+    </ul>
+</nav>
+{% endif %}

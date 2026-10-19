@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Confirm Campaign" %} | {% trans "Email Campaigns" %}{% endblock %}
+
+{% block extra_css %}
+<style>
+.cmp-card{background:var(--bg-surface);border:1px solid var(--border-color);border-radius:14px;padding:1.25rem 1.4rem}
+.cmp-preview-frame{border:1px solid var(--border-color);border-radius:14px;overflow:hidden;background:#f4f5fa}
+.cmp-count{font-family:var(--font-display);font-size:2rem;font-weight:800;color:#4F46E5;line-height:1.1}
+.cmp-sample{font-size:.82rem;color:var(--text-secondary)}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width:920px;">
+    <div class="mb-4">
+        <h1 class="fw-800 text-slate-900 mb-1">{% trans "Confirm & Send" %}</h1>
+        <p class="text-secondary mb-0">{% trans "Review the preview and the recipient count. Sending starts in the background and cannot be repeated." %}</p>
+    </div>
+
+    <div class="cmp-card mb-3">
+        <div class="row g-3 align-items-center">
+            <div class="col-md-6">
+                <div class="cmp-label">{% trans "Campaign" %}</div>
+                <div class="fw-800">{{ campaign.name }}</div>
+                <div class="text-secondary small">{{ campaign.subject }}</div>
+                <span class="badge mt-1" style="background: rgba(79,70,229,.12); color:#4F46E5;">{{ campaign.get_audience_display }}</span>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <div class="cmp-label">{% trans "Recipients" %}</div>
+                <div class="cmp-count">{{ recipient_count }}</div>
+                {% if recipient_sample %}
+                <div class="cmp-sample">
+                    {% for e in recipient_sample %}{{ e }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                    {% if recipient_count > 10 %}…{% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% if recipient_count == 0 %}
+    <div class="alert alert-warning rounded-3">{% trans "No eligible recipients for this audience. Nothing will be sent." %}</div>
+    {% endif %}
+
+    <div class="cmp-card mb-4">
+        <div class="cmp-label mb-2">{% trans "Preview" %}</div>
+        <div class="cmp-preview-frame p-3">{{ preview|safe }}</div>
+    </div>
+
+    <form method="post" class="d-flex gap-2 flex-wrap">
+        {% csrf_token %}
+        <button type="submit" name="send" value="1" class="btn btn-primary rounded-pill px-5 fw-800" {% if recipient_count == 0 %}disabled{% endif %}>
+            <i class="fas fa-paper-plane me-1"></i>{% trans "Send campaign" %}
+        </button>
+        <a class="btn btn-outline-secondary rounded-pill px-4 fw-700" href="{% url 'campaigns:compose' %}">{% trans "Back to compose" %}</a>
+    </form>
+    <form method="post" action="{% url 'campaigns:cancel' campaign.pk %}" class="mt-2">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-link text-secondary small">{% trans "Cancel this draft" %}</button>
+    </form>
+</div>
+{% endblock %}

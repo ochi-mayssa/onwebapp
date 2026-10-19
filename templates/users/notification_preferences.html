@@ -34,6 +34,13 @@
                                 Enable email notifications
                             </label>
                         </div>
+                        <div class="form-check form-switch mb-4">
+                            {{ form.marketing_emails_enabled }}
+                            <label class="form-check-label" for="{{ form.marketing_emails_enabled.id_for_label }}">
+                                Receive marketing and campaign emails
+                            </label>
+                            <div class="form-text">Transactional messages (verification, password reset, request updates) are always sent.</div>
+                        </div>
                         <div class="d-flex justify-content-between">
                             <a href="{% url 'users:profile_dashboard' %}" class="btn btn-outline-secondary">
                                 Back to profile

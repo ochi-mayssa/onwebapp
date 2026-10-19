@@ -20,6 +20,7 @@ from django.views.decorators.http import require_POST
 from .decorators import require_premium_plan
 from django.utils.dateparse import parse_date
 from django.db.models import Q
+from django.db import transaction
 import hashlib
 import logging
 import secrets
@@ -148,7 +149,7 @@ def delete_account(request):
     user.save()
     auth_logout(request)
     messages.success(request, 'Your account has been deactivated.')
-    return redirect('home')
+    return redirect('home:home')
 
 
 @login_required
@@ -303,14 +304,47 @@ def api_requests_list(request):
     return render(request, 'users/api_requests_list.html', context)
 
 
+def _verification_url(user):
+    """Absolute, SITE_URL-based (HTTPS in production) verification link."""
+    from django.utils.http import urlsafe_base64_encode
+    from django.utils.encoding import force_bytes
+    from django.contrib.auth.tokens import default_token_generator
+    uid = urlsafe_base64_encode(force_bytes(user.pk))
+    token = default_token_generator.make_token(user)
+    path = reverse('users:verify_email', args=[uid, token])
+    return f'{settings.SITE_URL.rstrip("/")}{path}'
+
+
+def _send_verification_now(user, verify_url):
+    """Send the verification email synchronously and report the true outcome.
+
+    The current deployment has no Celery worker; sending in-process keeps the
+    result visible to the registration/resend responses (failures are logged
+    by the centralized email helper and never reported as success).
+    """
+    from .tasks import send_verification_email
+    try:
+        result = send_verification_email(user.id, verify_url)
+    except Exception:
+        logger.exception('Verification email failed for user %s', user.id)
+        return False
+    return result == 'Email sent'
+
+
 @require_http_methods(["GET", "POST"])
 def signup(request):
     """Handle user registration."""
     if request.method == 'POST':
         form = SignUpForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            
+            if settings.EMAIL_VERIFICATION_REQUIRED:
+                # Pending, inactive account until the email is verified.
+                user = form.save(commit=False)
+                user.is_active = False
+                user.save()
+            else:
+                user = form.save()
+
             # Start ERPNext Provisioning in background (non-blocking)
             try:
                 import threading
@@ -327,43 +361,30 @@ def signup(request):
                     t = threading.Thread(target=_run, daemon=True)
                     t.start()
 
-                def _dispatch_email(func, *args):
-                    """Send via Celery when enabled, otherwise run inline.
-
-                    This deployment has no Celery worker; without the inline
-                    fallback verification emails were silently dropped.
-                    Still runs off the request thread.
-                    """
-                    def _run():
-                        try:
-                            if settings.USE_CELERY:
-                                func.delay(*args)
-                            else:
-                                func(*args)
-                        except Exception:
-                            logger.exception(
-                                'Email task failed: %s',
-                                getattr(func, '__name__', func),
-                            )
-                    t = threading.Thread(target=_run, daemon=True)
-                    t.start()
-
-                from .tasks import provision_erpnext_instance, send_verification_email
+                from .tasks import provision_erpnext_instance
                 _fire_task(provision_erpnext_instance, user.id)
-
-                # Async verification email
-                from django.utils.http import urlsafe_base64_encode
-                from django.utils.encoding import force_bytes
-                from django.contrib.auth.tokens import default_token_generator
-                uid = urlsafe_base64_encode(force_bytes(user.pk))
-                token = default_token_generator.make_token(user)
-                verify_url = request.build_absolute_uri(reverse('users:verify_email', args=[uid, token]))
-                _dispatch_email(send_verification_email, user.id, verify_url)
             except Exception:
-                pass
+                logger.exception('Could not dispatch ERP provisioning for user %s', user.id)
+
+            if settings.EMAIL_VERIFICATION_REQUIRED:
+                verify_url = _verification_url(user)
+                if _send_verification_now(user, verify_url):
+                    messages.success(
+                        request,
+                        'Almost there! Check your inbox for a verification link '
+                        'to activate your account.',
+                    )
+                else:
+                    messages.error(
+                        request,
+                        'Your account was created, but we could not send the '
+                        'verification email. Please use the resend option on '
+                        'the next page in a moment.',
+                    )
+                return redirect('users:check_email')
 
             login(request, user)
-            messages.success(request, 'Account created successfully! A verification email is being sent.')
+            messages.success(request, 'Account created successfully!')
             return redirect('users:onboarding')
         else:
             # Form has errors, re-render with errors
@@ -374,8 +395,57 @@ def signup(request):
             return render(request, 'registration/login.html', {'signup_form': form, 'active_panel': 'signup'})
     else:
         form = SignUpForm()
-    
+
     return render(request, 'registration/login.html', {'signup_form': form, 'active_panel': 'signup'})
+
+
+@require_http_methods(["GET"])
+def check_email(request):
+    """Confirmation page shown after registration (no account details exposed)."""
+    return render(request, 'registration/check_email.html')
+
+
+@require_http_methods(["POST"])
+def resend_verification(request):
+    """Resend the verification email (rate-limited, generic responses).
+
+    Always answers with the same generic message so the endpoint cannot be
+    used to discover which addresses have accounts. Throttling is keyed on
+    the submitted address and applies equally to unknown addresses.
+    """
+    generic = (
+        'If an account exists for this address and still needs verification, '
+        'a new email has been sent. Check your inbox and spam folder.'
+    )
+    email = (request.POST.get('email') or '').strip().lower()
+    if not email:
+        messages.success(request, generic)
+        return redirect('users:check_email')
+
+    from django.core.cache import cache
+    throttle_key = f'verification-resend:{email}'
+    if not cache.add(throttle_key, '1', timeout=60):
+        messages.error(
+            request,
+            'Too many resend requests. Please wait a minute before trying again.',
+        )
+        return redirect('users:check_email')
+
+    user = (
+        User.objects.filter(email__iexact=email, is_active=False)
+        .order_by('-date_joined')
+        .first()
+    )
+    if user:
+        profile, _ = UserProfile.objects.get_or_create(user=user)
+        if not profile.email_verified:
+            verify_url = _verification_url(user)
+            if not _send_verification_now(user, verify_url):
+                logger.error(
+                    'Resend verification email failed for user %s', user.id,
+                )
+    messages.success(request, generic)
+    return redirect('users:check_email')
 
 
 @require_http_methods(["GET", "POST"])
@@ -408,7 +478,25 @@ def login_view(request):
                 return redirect('projects:admin_dashboard')
             return redirect('home:home')
         else:
-            messages.error(request, 'Invalid email or password')
+            # Distinguish "correct password but pending verification" from a
+            # wrong password without revealing account existence to anyone who
+            # does not already know the password (ModelBackend rejects
+            # inactive accounts, so authenticate() returns None above).
+            pending_verification = False
+            if email and password:
+                for user_obj in User.objects.filter(email__iexact=email, is_active=False):
+                    if user_obj.check_password(password):
+                        pending_verification = True
+                        break
+            if pending_verification:
+                messages.error(
+                    request,
+                    'Your account is pending email verification. Open the link '
+                    'in your inbox (check spam too), or resend it from the '
+                    'Check your email page.',
+                )
+            else:
+                messages.error(request, 'Invalid email or password')
             return render(request, 'registration/login.html', {'signup_form': signup_form, 'active_panel': 'login'})
     
     return render(request, 'registration/login.html', {'signup_form': signup_form, 'active_panel': 'login'})
@@ -423,24 +511,69 @@ def _get_client_ip(request):
 
 @require_http_methods(["GET"])
 def verify_email(request, uidb64, token):
+    """Activate an account after secure token validation.
+
+    The token (Django's default generator) is time-limited and binds to the
+    user's password + last login: logging the user in here invalidates it, so
+    a link cannot be used twice. A user id alone never activates anything.
+    """
     from django.utils.http import urlsafe_base64_decode
     from django.utils.encoding import force_str
     from django.contrib.auth.tokens import default_token_generator
+
+    user = None
     try:
         uid = force_str(urlsafe_base64_decode(uidb64))
-        user = User.objects.get(pk=uid)
+        if uid.isdigit():
+            user = User.objects.filter(pk=uid).first()
     except Exception:
         user = None
 
-    if user and default_token_generator.check_token(user, token):
-        profile, _ = UserProfile.objects.get_or_create(user=user)
+    token_valid = bool(user and default_token_generator.check_token(user, token))
+
+    if not user:
+        return render(request, 'registration/verification_result.html', {
+            'state': 'invalid',
+        })
+
+    profile, _ = UserProfile.objects.get_or_create(user=user)
+    already_verified = profile.email_verified and user.is_active
+
+    if not token_valid:
+        if already_verified:
+            return render(request, 'registration/verification_result.html', {
+                'state': 'already',
+            })
+        return render(request, 'registration/verification_result.html', {
+            'state': 'invalid',
+        })
+
+    if already_verified:
+        return render(request, 'registration/verification_result.html', {
+            'state': 'already',
+        })
+
+    with transaction.atomic():
+        user.is_active = True
+        user.save(update_fields=['is_active'])
         profile.email_verified = True
-        profile.save()
-        ActivityLog.objects.create(user=user, action='email_verified', ip_address=_get_client_ip(request))
-        messages.success(request, 'Email verified successfully.')
-        return redirect('users:dashboard')
-    messages.error(request, 'Invalid or expired verification link.')
-    return redirect('home')
+        profile.save(update_fields=['email_verified'])
+
+    ActivityLog.objects.create(
+        user=user, action='email_verified',
+        ip_address=_get_client_ip(request),
+    )
+    messages.success(request, 'Email verified successfully. Your account is now active.')
+    login(request, user)
+
+    if user.is_superuser:
+        next_url = reverse('projects:admin_dashboard')
+    else:
+        next_url = reverse('users:onboarding')
+    return render(request, 'registration/verification_result.html', {
+        'state': 'success',
+        'next_url': next_url,
+    })
 
 
 def _get_community_redirect(profile):

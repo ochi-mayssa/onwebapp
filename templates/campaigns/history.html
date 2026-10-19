@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Campaign History" %} | {% trans "Email Campaigns" %}{% endblock %}
+
+{% block extra_css %}
+<style>
+.cmp-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.9rem;margin-bottom:1.5rem}
+.cmp-stat{background:var(--bg-surface);border:1px solid var(--border-color);border-radius:14px;padding:1rem 1.1rem}
+.cmp-stat__label{font-size:.68rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text-tertiary)}
+.cmp-stat__value{font-family:var(--font-display);font-size:1.5rem;font-weight:800;color:var(--text-primary);line-height:1.2;margin-top:.15rem}
+.cmp-filters{background:var(--bg-surface);border:1px solid var(--border-color);border-radius:14px;padding:1rem 1.1rem;margin-bottom:1.25rem}
+.cmp-table{background:var(--bg-surface);border:1px solid var(--border-color);border-radius:14px;overflow:hidden}
+.cmp-table table{margin:0}
+.cmp-table th{font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);font-weight:800;border-top:0;border-bottom:1px solid var(--border-color);background:transparent;padding:.85rem 1rem}
+.cmp-table td{padding:.85rem 1rem;vertical-align:middle;font-size:.88rem;border-bottom-color:var(--border-color)}
+.cmp-table tr:last-child td{border-bottom:0}
+.cmp-viewbtn{display:inline-flex;align-items:center;gap:.35rem;font-size:.8rem;font-weight:700;color:#4F46E5;text-decoration:none;white-space:nowrap}
+.cmp-viewbtn:hover{text-decoration:underline;text-underline-offset:3px}
+.cmp-empty{text-align:center;padding:3rem 1rem;color:var(--text-secondary)}
+.cmp-empty i{font-size:1.6rem;color:#818CF8;margin-bottom:.7rem;display:block}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+        <div>
+            <h1 class="fw-800 text-slate-900 mb-1">{% trans "Email Campaigns" %}</h1>
+            <p class="text-secondary mb-0">{% trans "Compose marketing campaigns and track per-recipient delivery." %}</p>
+        </div>
+        <a class="btn btn-primary rounded-pill px-4 fw-700" href="{% url 'campaigns:compose' %}">
+            <i class="fas fa-plus me-1"></i>{% trans "New campaign" %}
+        </a>
+    </div>
+
+    <div class="cmp-stats">
+        <div class="cmp-stat">
+            <div class="cmp-stat__label">{% trans "Total" %}</div>
+            <div class="cmp-stat__value">{{ page_obj.paginator.count }}</div>
+        </div>
+    </div>
+
+    <form method="get" class="cmp-filters">
+        <div class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label small fw-800 mb-1" for="cmp-status">{% trans "Status" %}</label>
+                <select name="status" id="cmp-status" class="form-select">
+                    <option value="">{% trans "All" %}</option>
+                    {% for value, label in status_choices %}
+                    <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2 d-grid">
+                <button type="submit" class="btn btn-primary rounded-pill fw-700">{% trans "Apply" %}</button>
+            </div>
+        </div>
+    </form>
+
+    <div class="cmp-table">
+        {% if page_obj.object_list %}
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th>{% trans "Reference" %}</th>
+                        <th>{% trans "Name" %}</th>
+                        <th>{% trans "Status" %}</th>
+                        <th>{% trans "Recipients" %}</th>
+                        <th>{% trans "Sent" %}</th>
+                        <th>{% trans "Failed" %}</th>
+                        <th>{% trans "Pending" %}</th>
+                        <th>{% trans "Created by" %}</th>
+                        <th>{% trans "Created" %}</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for campaign in page_obj.object_list %}
+                    <tr>
+                        <td class="fw-800" style="color:#4F46E5;">{{ campaign.reference }}</td>
+                        <td>{{ campaign.name }}<span class="d-block small text-secondary">{{ campaign.subject }}</span></td>
+                        <td>
+                            <span class="badge" style="background: rgba(79,70,229,.12); color:#4F46E5;">{{ campaign.get_status_display }}</span>
+                            {% if campaign.looks_interrupted %}<span class="badge bg-warning text-dark ms-1">{% trans "Interrupted" %}</span>{% endif %}
+                        </td>
+                        <td>{{ campaign.total_recipients }}</td>
+                        <td>{{ campaign.sent_count }}</td>
+                        <td>{{ campaign.failed_count }}</td>
+                        <td>{{ campaign.pending_count }}</td>
+                        <td>{{ campaign.created_by|default:"—" }}</td>
+                        <td>{{ campaign.created_at|date:"Y-m-d H:i" }}</td>
+                        <td><a class="cmp-viewbtn" href="{% url 'campaigns:detail' campaign.pk %}">{% trans "Details" %} <i class="fas fa-arrow-right"></i></a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="cmp-empty">
+            <i class="fas fa-envelope-open-text"></i>
+            {% trans "No campaigns yet." %}
+        </div>
+        {% endif %}
+    </div>
+
+    {% if page_obj.has_other_pages %}
+    <nav class="d-flex justify-content-between align-items-center mt-3" aria-label="{% trans 'Pagination' %}">
+        <span class="small text-secondary fw-600">{{ page_obj.paginator.count }} {% trans "campaign(s)" %}</span>
+        <ul class="pagination pagination-sm mb-0">
+            <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}&status={{ status_filter }}">{% trans "Previous" %}</a>
+            </li>
+            <li class="page-item disabled"><span class="page-link">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span></li>
+            <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}&status={{ status_filter }}">{% trans "Next" %}</a>
+            </li>
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "New Campaign" %} | {% trans "Email Campaigns" %}{% endblock %}
+
+{% block extra_css %}
+<style>
+.cmp-card{background:var(--bg-surface);border:1px solid var(--border-color);border-radius:14px;padding:1.25rem 1.4rem}
+.cmp-label{font-size:.7rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--text-tertiary)}
+#id_selected_users{max-height:260px;overflow-y:auto;border:1px solid var(--border-color);border-radius:10px;padding:.75rem 1rem;background:transparent}
+#id_selected_users li{list-style:none}
+#id_selected_users label{font-size:.85rem;font-weight:600}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width:860px;">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+        <div>
+            <h1 class="fw-800 text-slate-900 mb-1">{% trans "New Email Campaign" %}</h1>
+            <p class="text-secondary mb-0">{% trans "Compose a marketing campaign. You will see a preview and the recipient count before anything is sent." %}</p>
+        </div>
+        <a class="btn btn-outline-secondary rounded-pill px-4 fw-700" href="{% url 'campaigns:history' %}">
+            <i class="fas fa-history me-1"></i>{% trans "History" %}
+        </a>
+    </div>
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger rounded-3">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        <div class="cmp-card mb-3">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label small fw-800 mb-1" for="{{ form.name.id_for_label }}">{% trans "Campaign name" %}</label>
+                    {{ form.name }}
+                    {% if form.name.errors %}<div class="text-danger small mt-1">{{ form.name.errors }}</div>{% endif %}
+                    <div class="form-text">{% trans "Internal only — never shown to recipients." %}</div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-800 mb-1" for="{{ form.subject.id_for_label }}">{% trans "Subject" %}</label>
+                    {{ form.subject }}
+                    {% if form.subject.errors %}<div class="text-danger small mt-1">{{ form.subject.errors }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="cmp-card mb-3">
+            <label class="form-label small fw-800 mb-1" for="{{ form.body_text.id_for_label }}">{% trans "Plain-text body" %}</label>
+            {{ form.body_text }}
+            {% if form.body_text.errors %}<div class="text-danger small mt-1">{{ form.body_text.errors }}</div>{% endif %}
+            <label class="form-label small fw-800 mb-1 mt-3" for="{{ form.body_html.id_for_label }}">{% trans "HTML body (optional)" %}</label>
+            {{ form.body_html }}
+            {% if form.body_html.errors %}<div class="text-danger small mt-1">{{ form.body_html.errors }}</div>{% endif %}
+            <div class="form-text">{% trans "Basic formatting tags only. Scripts and unsafe attributes are stripped automatically." %}</div>
+        </div>
+
+        <div class="cmp-card mb-4">
+            <label class="form-label small fw-800 mb-1" for="{{ form.audience.id_for_label }}">{% trans "Recipients" %}</label>
+            {{ form.audience }}
+            {% if form.audience.errors %}<div class="text-danger small mt-1">{{ form.audience.errors }}</div>{% endif %}
+            <div class="form-text mb-3">{% trans "Staff accounts, inactive users, invalid addresses and marketing opt-outs are always excluded." %}</div>
+            <div id="selectedUsersBlock" class="mt-2">
+                <label class="form-label small fw-800 mb-1">{% trans "Selected clients" %}</label>
+                {{ form.selected_users }}
+                {% if form.selected_users.errors %}<div class="text-danger small mt-1">{{ form.selected_users.errors }}</div>{% endif %}
+            </div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary rounded-pill px-4 fw-700">
+                <i class="fas fa-arrow-right me-1"></i>{% trans "Continue to preview" %}
+            </button>
+            <a class="btn btn-outline-secondary rounded-pill px-4 fw-700" href="{% url 'campaigns:history' %}">{% trans "Discard" %}</a>
+        </div>
+    </form>
+</div>
+<script>
+(function () {
+    var audience = document.getElementById('id_audience');
+    var block = document.getElementById('selectedUsersBlock');
+    function sync() { block.style.display = audience.value === 'selected' ? '' : 'none'; }
+    audience.addEventListener('change', sync);
+    sync();
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{% trans 'Check Your Email' %} | OnWebApp{% endblock %}
+
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block extra_css %}
+<style>
+.vf-page {
+    min-height: calc(100vh - 76px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #F8FAFC;
+    padding: 3rem 1rem;
+}
+.vf-card {
+    width: 100%;
+    max-width: 460px;
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 14px;
+    padding: 2.25rem 2rem;
+    text-align: left;
+}
+.vf-icon {
+    width: 52px; height: 52px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(79,70,229,.12);
+    color: #4F46E5;
+    font-size: 1.3rem;
+    margin-bottom: 1.1rem;
+}
+.vf-title { font-size: 1.35rem; font-weight: 800; color: #0F172A; margin-bottom: .5rem; }
+.vf-text { color: #64748B; font-size: .93rem; line-height: 1.6; margin-bottom: 1.25rem; }
+.vf-alert {
+    border: 1px solid #E2E8F0;
+    border-radius: 10px;
+    padding: .75rem .9rem;
+    font-size: .88rem;
+    margin-bottom: 1rem;
+    background: #F8FAFC;
+    color: #0F172A;
+}
+.vf-alert--success { background: #F0FDF4; color: #15803D; border-color: #BBF7D0; }
+.vf-alert--error { background: #FEF2F2; color: #B91C1C; border-color: #FECACA; }
+.vf-label { font-size: .78rem; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: #64748B; display: block; margin-bottom: .4rem; }
+.vf-input {
+    width: 100%;
+    border: 1px solid #E2E8F0;
+    border-radius: 10px;
+    padding: .7rem .9rem;
+    font-size: .95rem;
+    margin-bottom: .8rem;
+}
+.vf-input:focus { outline: none; border-color: #4F46E5; box-shadow: 0 0 0 3px rgba(79,70,229,.15); }
+.vf-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    background: #4F46E5; color: #fff; border: 0;
+    border-radius: 999px; padding: .7rem 1.6rem;
+    font-weight: 800; font-size: .92rem;
+    cursor: pointer; width: 100%;
+}
+.vf-btn:hover { background: #4338CA; }
+.vf-link { color: #4F46E5; font-weight: 700; font-size: .88rem; text-decoration: none; }
+.vf-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+.vf-foot { margin-top: 1.2rem; text-align: center; font-size: .88rem; color: #64748B; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="vf-page">
+    <div class="vf-card">
+        <div class="vf-icon"><i data-lucide="mail-check"></i></div>
+        <h1 class="vf-title">{% trans "Check your email" %}</h1>
+        <p class="vf-text">
+            {% trans "We sent a verification link to your inbox. Open it to activate your account. The link expires in a few days." %}
+        </p>
+
+        {% if messages %}
+        <div role="status" aria-live="polite">
+            {% for message in messages %}
+            <div class="vf-alert {% if message.tags == 'success' %}vf-alert--success{% elif message.tags == 'error' %}vf-alert--error{% endif %}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <form method="post" action="{% url 'users:resend_verification' %}">
+            {% csrf_token %}
+            <label class="vf-label" for="resend-email">{% trans "Did not get it? Resend" %}</label>
+            <input class="vf-input" type="email" id="resend-email" name="email" required
+                   placeholder="{% trans 'you@company.com' %}" autocomplete="email">
+            <button type="submit" class="vf-btn">{% trans "Resend verification email" %}</button>
+        </form>
+
+        <p class="vf-foot">
+            <a class="vf-link" href="{% url 'users:login_view' %}">{% trans "Back to sign in" %}</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Unsubscribe" %} | OnWebApp{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width:560px;">
+    <div class="cmp-card" style="background:var(--bg-surface);border:1px solid var(--border-color);border-radius:14px;padding:2rem;">
+        {% if invalid %}
+        <h1 class="fw-800 text-slate-900 mb-2">{% trans "Invalid link" %}</h1>
+        <p class="text-secondary mb-0">{% trans "This unsubscribe link is not valid. Please use the link from a campaign email, or adjust your preferences in your account." %}</p>
+
+        {% elif done %}
+        <h1 class="fw-800 text-slate-900 mb-2">{% trans "You have been unsubscribed" %}</h1>
+        <p class="text-secondary">{% trans "You will no longer receive marketing or campaign emails from OnWebApp." %}</p>
+        <p class="small text-secondary mb-0">{% trans "Transactional messages (account verification, password resets, request updates) are still sent." %}</p>
+
+        {% elif already %}
+        <h1 class="fw-800 text-slate-900 mb-2">{% trans "Already unsubscribed" %}</h1>
+        <p class="text-secondary mb-0">{% trans "This address is already opted out of marketing emails. No changes were made." %}</p>
+
+        {% else %}
+        <h1 class="fw-800 text-slate-900 mb-2">{% trans "Unsubscribe from marketing emails?" %}</h1>
+        <p class="text-secondary">{% trans "Confirm to stop receiving marketing and campaign emails. Transactional messages are not affected." %}</p>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary rounded-pill px-4 fw-700">{% trans "Unsubscribe" %}</button>
+        </form>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

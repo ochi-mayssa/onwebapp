@@ -16,6 +16,19 @@ CONSOLE_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'OnWebApp <notifications@onwebapp.com>'
 
 
+def verification_policy(env, debug):
+    """Decide whether email verification is mandatory.
+
+    Security requirement: production (``DEBUG=False``) can NEVER disable
+    verification, regardless of environment configuration. Only a development
+    server may relax it, and only when explicitly asked (default: enabled).
+    """
+    requested = (env.get('EMAIL_VERIFICATION_REQUIRED') or 'True').strip().lower() in ('1', 'true', 'yes')
+    if not debug:
+        return True
+    return requested
+
+
 def resolve_email_config(env):
     """Return Django email settings derived from an environment mapping.
 

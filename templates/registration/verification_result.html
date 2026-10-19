@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}
+{% if state == 'success' %}{% trans 'Email Verified' %}{% elif state == 'already' %}{% trans 'Already Verified' %}{% else %}{% trans 'Invalid Link' %}{% endif %} | OnWebApp
+{% endblock %}
+
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block extra_css %}
+<style>
+.vf-page {
+    min-height: calc(100vh - 76px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #F8FAFC;
+    padding: 3rem 1rem;
+}
+.vf-card {
+    width: 100%;
+    max-width: 460px;
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 14px;
+    padding: 2.25rem 2rem;
+    text-align: center;
+}
+.vf-icon {
+    width: 56px; height: 56px;
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 1.1rem;
+    font-size: 1.4rem;
+}
+.vf-icon--ok { background: rgba(34,197,94,.14); color: #16A34A; }
+.vf-icon--warn { background: rgba(234,179,8,.16); color: #CA8A04; }
+.vf-icon--bad { background: rgba(239,68,68,.14); color: #DC2626; }
+.vf-title { font-size: 1.35rem; font-weight: 800; color: #0F172A; margin-bottom: .5rem; }
+.vf-text { color: #64748B; font-size: .93rem; line-height: 1.6; margin-bottom: 1.5rem; }
+.vf-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    background: #4F46E5; color: #fff; border: 0;
+    border-radius: 999px; padding: .7rem 1.8rem;
+    font-weight: 800; font-size: .92rem;
+    cursor: pointer; text-decoration: none;
+}
+.vf-btn:hover { background: #4338CA; color: #fff; }
+.vf-link { color: #4F46E5; font-weight: 700; font-size: .88rem; text-decoration: none; }
+.vf-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+.vf-foot { margin-top: 1.2rem; font-size: .88rem; color: #64748B; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="vf-page">
+    <div class="vf-card">
+        {% if state == 'success' %}
+        <div class="vf-icon vf-icon--ok"><i data-lucide="badge-check"></i></div>
+        <h1 class="vf-title">{% trans "Email verified" %}</h1>
+        <p class="vf-text">{% trans "Your account is now active and you have been signed in automatically." %}</p>
+        <a class="vf-btn" href="{{ next_url }}">{% trans "Continue" %}</a>
+
+        {% elif state == 'already' %}
+        <div class="vf-icon vf-icon--warn"><i data-lucide="circle-check-big"></i></div>
+        <h1 class="vf-title">{% trans "Already verified" %}</h1>
+        <p class="vf-text">{% trans "This email address has already been verified. For security, this link was not used again — just sign in to continue." %}</p>
+        <a class="vf-btn" href="{% url 'users:login_view' %}">{% trans "Sign in" %}</a>
+
+        {% else %}
+        <div class="vf-icon vf-icon--bad"><i data-lucide="link-2-off"></i></div>
+        <h1 class="vf-title">{% trans "Invalid or expired link" %}</h1>
+        <p class="vf-text">{% trans "This verification link is invalid, has expired, or was already used. Request a new one from the page below, then check your inbox again." %}</p>
+        <a class="vf-btn" href="{% url 'users:check_email' %}">{% trans "Get a new link" %}</a>
+        <p class="vf-foot">
+            <a class="vf-link" href="{% url 'users:login_view' %}">{% trans "Back to sign in" %}</a>
+        </p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

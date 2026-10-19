@@ -50,6 +50,9 @@ class UserProfile(models.Model):
     phone_number = models.CharField(max_length=20, blank=True, null=True)
     sms_notifications_enabled = models.BooleanField(default=False)
     email_notifications_enabled = models.BooleanField(default=True)
+    # Marketing emails (campaigns) can be opted out of; transactional email
+    # (verification, password reset, API request updates) is never affected.
+    marketing_emails_enabled = models.BooleanField(default=True)
     two_factor_enabled = models.BooleanField(default=False)
     
     # Company Information
