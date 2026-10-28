@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     'services',
     'blog',
     'contact',
+    'automation',
     'chatbot',
     'payments',
     'seo_analyzer',
@@ -398,6 +399,58 @@ CELERY_BEAT_SCHEDULE = {
         'schedule': 86400.0,  # Every 24 hours
     },
 }
+
+# Worker safety: a single automation task has an internal bounded retry loop, so
+# Celery redelivery is not used. These limits are the last-resort process guard.
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = int(os.environ.get('CELERY_TASK_TIME_LIMIT', '300'))
+CELERY_TASK_SOFT_TIME_LIMIT = int(os.environ.get('CELERY_TASK_SOFT_TIME_LIMIT', '240'))
+CELERY_TASK_ACKS_LATE = True
+CELERY_TASK_REJECT_ON_WORKER_LOST = True
+CELERY_WORKER_PREFETCH_MULTIPLIER = 1
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_ACCEPT_CONTENT = ['json']
+
+# ===== AUTOMATION EXECUTION SECURITY =====
+# A dedicated Fernet key (urlsafe base64, 32 bytes) is preferred. See
+# docs/AUTOMATION_DEPLOYMENT.md. In development a key is derived from SECRET_KEY.
+AUTOMATION_CREDENTIAL_ENCRYPTION_KEY = os.environ.get('AUTOMATION_CREDENTIAL_ENCRYPTION_KEY', '')
+
+# 'celery' in production; 'inline' is a local-development/testing fallback.
+# Inline execution runs inside the web request and MUST NOT be used for production.
+AUTOMATION_EXECUTION_MODE = os.environ.get(
+    'AUTOMATION_EXECUTION_MODE',
+    'celery' if USE_CELERY else 'inline',
+).strip().lower()
+
+AUTOMATION_EXECUTION_TIMEOUT_SECONDS = float(os.environ.get('AUTOMATION_EXECUTION_TIMEOUT_SECONDS', '60'))
+AUTOMATION_MAX_EXECUTION_ATTEMPTS = int(os.environ.get('AUTOMATION_MAX_EXECUTION_ATTEMPTS', '3'))
+AUTOMATION_RETRY_BACKOFF_SECONDS = float(os.environ.get('AUTOMATION_RETRY_BACKOFF_SECONDS', '2'))
+# A `running` execution younger than this is assumed to belong to a live worker
+# and will not be executed a second time. Should exceed the task time limit.
+AUTOMATION_STALE_EXECUTION_SECONDS = float(os.environ.get('AUTOMATION_STALE_EXECUTION_SECONDS', '900'))
+AUTOMATION_MAX_STEPS = int(os.environ.get('AUTOMATION_MAX_STEPS', '20'))
+AUTOMATION_MAX_PAYLOAD_BYTES = int(os.environ.get('AUTOMATION_MAX_PAYLOAD_BYTES', '65536'))
+
+# Outbound HTTP policy. Private/loopback/link-local destinations are blocked by
+# default; enabling this is for local tests only.
+AUTOMATION_ALLOW_PRIVATE_OUTBOUND = os.environ.get(
+    'AUTOMATION_ALLOW_PRIVATE_OUTBOUND', 'False'
+).lower() in ('1', 'true', 'yes', 'on')
+AUTOMATION_ALLOWED_OUTBOUND_PORTS = os.environ.get('AUTOMATION_ALLOWED_OUTBOUND_PORTS', '80,443,8443')
+AUTOMATION_OUTBOUND_TIMEOUT_SECONDS = float(os.environ.get('AUTOMATION_OUTBOUND_TIMEOUT_SECONDS', '10'))
+AUTOMATION_MAX_HTTP_RESPONSE_BYTES = int(os.environ.get('AUTOMATION_MAX_HTTP_RESPONSE_BYTES', '1048576'))
+AUTOMATION_MAX_EMAIL_RECIPIENTS = int(os.environ.get('AUTOMATION_MAX_EMAIL_RECIPIENTS', '20'))
+AUTOMATION_WEBHOOK_MAX_BODY_BYTES = int(os.environ.get('AUTOMATION_WEBHOOK_MAX_BODY_BYTES', '1048576'))
+
+# Stripe may use a distinct endpoint secret for /automation/billing/webhook/stripe/.
+# Fall back to the existing payments secret for backwards compatibility.
+AUTOMATION_STRIPE_WEBHOOK_SECRET = os.environ.get(
+    'AUTOMATION_STRIPE_WEBHOOK_SECRET',
+    STRIPE_WEBHOOK_SECRET,
+)
 
 # ClamAV virus scanning configuration
 CLAMAV_ENABLED = os.environ.get('CLAMAV_ENABLED', 'False').lower() in ('1', 'true', 'yes')

@@ -2,6 +2,12 @@
 
 Use this checklist to prepare the Websity platform for production deployment.
 
+> Automation execution has additional hard requirements (Redis, Celery worker,
+> credential encryption key, Stripe webhook secret). See
+> [`docs/AUTOMATION_DEPLOYMENT.md`](AUTOMATION_DEPLOYMENT.md) before deploying the
+> `automation` app. The current repository does **not** define a Coolify worker or
+> Redis service.
+
 ## Pre-Deployment (1-2 days before)
 
 ### Code & Dependencies

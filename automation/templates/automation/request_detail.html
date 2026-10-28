@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}Automation request status{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="card shadow-sm border-0 rounded-4 p-4">
+    <h1>{{ request.title }}</h1>
+    <p class="text-muted">Status: {{ request.get_status_display }}</p>
+    <p>{{ request.description }}</p>
+    {% if request.requirement_notes %}<p><strong>Notes:</strong> {{ request.requirement_notes }}</p>{% endif %}
+  </div>
+</div>
+{% endblock %}

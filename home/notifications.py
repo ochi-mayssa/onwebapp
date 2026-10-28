@@ -10,7 +10,7 @@ from django.conf import settings
 from django.urls import reverse
 
 from .emails import send_notification_email
-from .models import APIRequest
+from .models import APIRequest, RPAConsultationRequest
 
 logger = logging.getLogger(__name__)
 
@@ -113,4 +113,77 @@ def notify_client_status_change(api_request, old_status, new_status):
         recipients=[api_request.business_email],
         text_body=body,
         label='api-request-status',
+    )
+
+
+# ── RPA consultation requests ──────────────────────────────────────────────
+
+
+def _rpa_admin_url(rpa_request):
+    return _site_absolute(
+        reverse('admin:home_rpaconsultationrequest_change', args=[rpa_request.pk])
+    )
+
+
+def notify_rpa_admins(rpa_request):
+    """Notify the admin team about a new RPA consultation request."""
+    subject = f'[RPA Consultation] {rpa_request.reference} - {rpa_request.full_name}'
+    body = (
+        f'A new RPA consultation request was submitted.\n\n'
+        f'Reference: {rpa_request.reference}\n'
+        f'Name: {rpa_request.full_name}\n'
+        f'Email: {rpa_request.business_email}\n'
+        f'Company: {rpa_request.company_name or "-"}\n'
+        f'Current tools: {rpa_request.current_tools or "-"}\n'
+        f'Task frequency: {rpa_request.get_task_frequency_display() or "-"}\n'
+        f'Time spent: {rpa_request.time_spent or "-"}\n\n'
+        f'Process to automate:\n{rpa_request.process_to_automate}\n\n'
+        f'Additional requirements:\n{rpa_request.additional_requirements or "-"}\n\n'
+        f'Open in admin:\n{_rpa_admin_url(rpa_request)}\n'
+    )
+    send_notification_email(
+        subject=subject,
+        recipients=_admin_recipients(),
+        text_body=body,
+        label='rpa-consultation-admin',
+    )
+
+
+def notify_rpa_client_submitted(rpa_request):
+    """Confirmation email to the visitor after submitting a consultation."""
+    subject = f'We received your RPA consultation request ({rpa_request.reference})'
+    body = (
+        f'Hello {rpa_request.full_name},\n\n'
+        f'Thank you for your RPA consultation request. Your reference is '
+        f'{rpa_request.reference}.\n\n'
+        f'Our team will review the process you described and get back to you with '
+        f'a practical next step. You will receive an email when the status of your '
+        f'request changes.\n'
+    )
+    send_notification_email(
+        subject=subject,
+        recipients=[rpa_request.business_email],
+        text_body=body,
+        label='rpa-consultation-ack',
+    )
+
+
+def notify_rpa_client_status_change(rpa_request, old_status, new_status):
+    """Client notification when an admin updates the consultation status."""
+    labels = dict(RPAConsultationRequest.STATUS_CHOICES)
+    old_label = labels.get(old_status, old_status)
+    new_label = labels.get(new_status, new_status)
+    subject = f'Your RPA consultation request {rpa_request.reference} is now {new_label}'
+    body = (
+        f'Hello {rpa_request.full_name},\n\n'
+        f'The status of your RPA consultation request {rpa_request.reference} '
+        f'has changed:\n'
+        f'  {old_label} -> {new_label}\n\n'
+        f'Reply to this email if you have any questions about the next steps.\n'
+    )
+    send_notification_email(
+        subject=subject,
+        recipients=[rpa_request.business_email],
+        text_body=body,
+        label='rpa-consultation-status',
     )

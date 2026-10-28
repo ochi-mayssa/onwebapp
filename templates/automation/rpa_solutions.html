@@ -1,0 +1,774 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans "RPA Solutions & Business Process Automation" %} | OnWebApp{% endblock %}
+
+{% block meta_description %}{% trans "Automate repetitive business tasks with OnWebApp RPA solutions. Streamline workflows, reduce manual errors, and connect your business applications." %}{% endblock %}
+
+{% block meta_keywords %}{% trans "Robotic Process Automation Services, business process automation, RPA implementation, workflow automation services, repetitive task automation, RPA for business applications" %}{% endblock %}
+
+{% block og_title %}{% trans "RPA Solutions — Robotic Process Automation" %} | OnWebApp{% endblock %}
+
+{% block og_description %}{% trans "Eliminate repetitive manual work with software bots that handle routine business processes across your existing applications." %}{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ── Tokens ─────────────────────────────────────────────────────────── */
+.rp-root{
+    --rp-navy:#0B1220;
+    --rp-navy-2:#111C33;
+    --rp-navy-3:#1B2A47;
+    --rp-line:#1E2D4D;
+    --rp-violet:#7C3AED;
+    --rp-violet-2:#A78BFA;
+    --rp-violet-ink:#5B21B6;
+    --rp-violet-soft:rgba(124,58,237,.08);
+    --rp-ink:#0F172A;
+    --rp-body:#5B6478;
+    --rp-soft:#F6F7FB;
+    --rp-border:#E6E8F0;
+    --rp-white:#fff;
+}
+/* ── Layout ─────────────────────────────────────────────────────────── */
+.rp-root .rp-wrap{max-width:1140px;margin:0 auto;padding:0 32px;width:100%}
+.rp-root .rp-sec{padding:6rem 0}
+.rp-root .rp-sec--soft{background:var(--rp-soft)}
+.rp-root .rp-center{text-align:center;max-width:720px;margin:0 auto}
+/* ── Type ───────────────────────────────────────────────────────────── */
+.rp-root .rp-eyebrow{
+    display:inline-flex;align-items:center;gap:.55rem;
+    font-size:.72rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--rp-violet);margin-bottom:1rem;
+}
+.rp-root .rp-eyebrow::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor}
+.rp-root .rp-eyebrow--light{color:var(--rp-violet-2)}
+.rp-root .rp-h1,.rp-root .rp-h2,.rp-root .rp-h3{font-family:var(--font-display);letter-spacing:-.02em;color:var(--rp-ink);text-wrap:balance}
+.rp-root .rp-h1{font-size:clamp(2rem,4.4vw,3.1rem);font-weight:800;line-height:1.1;margin:0 0 1.1rem}
+.rp-root .rp-h2{font-size:clamp(1.6rem,3.2vw,2.3rem);font-weight:800;line-height:1.18;margin:0 0 .9rem}
+.rp-root .rp-h3{font-size:1.02rem;font-weight:800;line-height:1.35;margin:0 0 .5rem}
+.rp-root .rp-lede{color:var(--rp-body);font-size:1.02rem;line-height:1.8;margin:0}
+.rp-root .rp-lede+.rp-lede{margin-top:1rem}
+.rp-root .rp-note{margin:2rem 0 0;font-size:.85rem;line-height:1.7;color:var(--rp-body);border-left:2px solid var(--rp-violet-2);padding-left:1rem;text-align:left;max-width:64ch;margin-inline:auto}
+/* ── Buttons ────────────────────────────────────────────────────────── */
+.rp-root .rp-btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:.5rem;
+    padding:.85rem 1.7rem;border-radius:999px;border:1px solid transparent;
+    font-size:.9rem;font-weight:800;text-decoration:none;cursor:pointer;
+    transition:background-color .2s,border-color .2s,color .2s,transform .2s;
+}
+.rp-root .rp-btn--primary{background:var(--rp-violet);color:#fff}
+.rp-root .rp-btn--primary:hover{background:var(--rp-violet-ink);color:#fff;transform:translateY(-1px)}
+.rp-root .rp-btn--ghost{background:transparent;border-color:var(--rp-border);color:var(--rp-ink)}
+.rp-root .rp-btn--ghost:hover{border-color:var(--rp-violet);color:var(--rp-violet-ink)}
+.rp-root .rp-btn--light{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.18);color:#fff}
+.rp-root .rp-btn--light:hover{background:rgba(255,255,255,.13);color:#fff}
+.rp-root .rp-btn--sm{padding:.7rem 1.3rem;font-size:.84rem}
+/* ── Hero ───────────────────────────────────────────────────────────── */
+.rp-root .rp-hero{position:relative;background:var(--rp-navy);color:#fff;overflow:hidden;padding:6.5rem 0 6rem}
+.rp-root .rp-hero::after{
+    content:'';position:absolute;inset:0;pointer-events:none;
+    background:
+        radial-gradient(720px 420px at 88% 18%,rgba(124,58,237,.20),transparent 68%),
+        radial-gradient(560px 340px at 8% 92%,rgba(99,102,241,.14),transparent 70%);
+}
+.rp-root .rp-hero__grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:3.5rem;align-items:center}
+.rp-root .rp-hero__eyebrow{display:inline-flex;align-items:center;gap:.55rem;font-size:.72rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--rp-violet-2);margin-bottom:1.1rem}
+.rp-root .rp-hero__eyebrow::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor}
+.rp-root .rp-hero h1{font-family:var(--font-display);font-size:clamp(2.1rem,4.6vw,3.25rem);font-weight:800;line-height:1.08;letter-spacing:-.025em;color:#fff;margin:0 0 1.15rem;text-wrap:balance}
+.rp-root .rp-hero__lede{color:rgba(255,255,255,.72);font-size:1.03rem;line-height:1.8;max-width:56ch;margin:0 0 1.9rem}
+.rp-root .rp-hero__cta{display:flex;flex-wrap:wrap;gap:.75rem;margin-bottom:1.5rem}
+.rp-root .rp-hero__support{font-size:.83rem;color:rgba(255,255,255,.55);line-height:1.65;margin:0}
+/* Hero workflow illustration */
+.rp-root .rp-diagram{
+    background:linear-gradient(160deg,rgba(255,255,255,.05),rgba(255,255,255,.02));
+    border:1px solid var(--rp-line);border-radius:20px;padding:1.6rem 1.5rem;
+}
+.rp-root .rp-diagram__cap{display:block;font-size:.68rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.42);margin-bottom:1.1rem}
+.rp-root .rp-diagram svg{display:block;width:100%;height:auto}
+.rp-root .rp-flow__path{stroke-dasharray:5 7;animation:rp-dash 22s linear infinite}
+@keyframes rp-dash{to{stroke-dashoffset:-240}}
+.rp-root .rp-diagram__legend{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1.2rem}
+.rp-root .rp-chip{
+    display:inline-flex;align-items:center;gap:.4rem;
+    padding:.35rem .75rem;border-radius:999px;
+    background:rgba(255,255,255,.05);border:1px solid var(--rp-line);
+    font-size:.74rem;font-weight:700;color:rgba(255,255,255,.72);
+}
+.rp-root .rp-chip i{color:var(--rp-violet-2);font-size:.7rem}
+/* ── Cards ──────────────────────────────────────────────────────────── */
+.rp-root .rp-grid{display:grid;gap:1.25rem;margin-top:2.75rem}
+.rp-root .rp-grid--3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.rp-root .rp-grid--2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.rp-root .rp-card{
+    background:var(--rp-white);border:1px solid var(--rp-border);border-radius:16px;
+    padding:1.7rem 1.6rem;transition:border-color .2s,box-shadow .2s,transform .2s;
+}
+.rp-root .rp-card:hover{border-color:rgba(124,58,237,.38);box-shadow:0 12px 30px rgba(15,23,42,.07);transform:translateY(-2px)}
+.rp-root .rp-card__icon{
+    width:42px;height:42px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;
+    background:var(--rp-violet-soft);color:var(--rp-violet);font-size:1rem;margin-bottom:1rem;
+}
+.rp-root .rp-card__body{color:var(--rp-body);font-size:.9rem;line-height:1.75;margin:0}
+.rp-root .rp-card--feature{background:var(--rp-navy);border-color:var(--rp-navy-2)}
+.rp-root .rp-card--feature .rp-h3{color:#fff}
+.rp-root .rp-card--feature .rp-card__body{color:rgba(255,255,255,.68)}
+.rp-root .rp-card--feature .rp-card__icon{background:rgba(124,58,237,.2);color:var(--rp-violet-2)}
+/* ── Use-case cards ─────────────────────────────────────────────────── */
+.rp-root .rp-use{
+    display:flex;gap:1rem;align-items:flex-start;
+    background:var(--rp-white);border:1px solid var(--rp-border);border-radius:16px;padding:1.5rem;
+    transition:border-color .2s,box-shadow .2s;
+}
+.rp-root .rp-use:hover{border-color:rgba(124,58,237,.38);box-shadow:0 12px 30px rgba(15,23,42,.07)}
+.rp-root .rp-use__icon{
+    flex:0 0 auto;width:44px;height:44px;border-radius:12px;
+    display:inline-flex;align-items:center;justify-content:center;
+    background:var(--rp-violet-soft);color:var(--rp-violet);font-size:1.02rem;
+}
+.rp-root .rp-use .rp-h3{margin-bottom:.35rem}
+/* ── Timeline (How it works) ────────────────────────────────────────── */
+.rp-root .rp-steps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0;margin-top:3rem;position:relative}
+.rp-root .rp-steps::before{
+    content:'';position:absolute;top:23px;left:9%;right:9%;height:2px;
+    background:linear-gradient(90deg,var(--rp-violet),rgba(124,58,237,.25));
+}
+.rp-root .rp-step{position:relative;padding:0 .85rem;text-align:center}
+.rp-root .rp-step__num{
+    position:relative;z-index:1;width:46px;height:46px;margin:0 auto 1.1rem;
+    border-radius:50%;display:inline-flex;align-items:center;justify-content:center;
+    background:var(--rp-white);border:2px solid var(--rp-violet);
+    color:var(--rp-violet-ink);font-family:var(--font-display);font-weight:800;font-size:.95rem;
+    box-shadow:0 0 0 6px var(--rp-white);
+}
+.rp-root .rp-step h3{font-family:var(--font-display);font-size:.95rem;font-weight:800;color:var(--rp-ink);margin:0 0 .45rem}
+.rp-root .rp-step p{color:var(--rp-body);font-size:.83rem;line-height:1.7;margin:0}
+/* ── Comparison table ───────────────────────────────────────────────── */
+.rp-root .rp-table-wrap{margin-top:2.5rem;border:1px solid var(--rp-border);border-radius:16px;overflow:hidden;background:var(--rp-white)}
+.rp-root .rp-table-scroll{overflow-x:auto}
+.rp-root table.rp-table{width:100%;border-collapse:collapse;min-width:620px}
+.rp-root .rp-table th,.rp-root .rp-table td{padding:1.05rem 1.35rem;text-align:left;vertical-align:top;font-size:.88rem;line-height:1.65;border-bottom:1px solid var(--rp-border)}
+.rp-root .rp-table thead th{background:var(--rp-soft);font-family:var(--font-display);font-weight:800;color:var(--rp-ink);font-size:.85rem;letter-spacing:.01em}
+.rp-root .rp-table thead th:first-child{color:var(--rp-body);font-weight:700}
+.rp-root .rp-table tbody th{font-weight:700;color:var(--rp-ink);background:#FBFBFE;width:26%}
+.rp-root .rp-table td{color:var(--rp-body)}
+.rp-root .rp-table tbody tr:last-child th,.rp-root .rp-table tbody tr:last-child td{border-bottom:0}
+/* ── Pricing ────────────────────────────────────────────────────────── */
+.rp-root .rp-price{
+    display:flex;flex-direction:column;background:var(--rp-white);
+    border:1px solid var(--rp-border);border-radius:18px;padding:2rem 1.8rem;
+    transition:border-color .2s,box-shadow .2s;
+}
+.rp-root .rp-price:hover{border-color:rgba(124,58,237,.4);box-shadow:0 14px 34px rgba(15,23,42,.08)}
+.rp-root .rp-price--featured{border-color:var(--rp-violet);position:relative;box-shadow:0 18px 44px rgba(124,58,237,.13)}
+.rp-root .rp-price__tag{
+    position:absolute;top:-13px;left:1.8rem;
+    background:var(--rp-violet);color:#fff;font-size:.68rem;font-weight:800;
+    letter-spacing:.1em;text-transform:uppercase;padding:.35rem .8rem;border-radius:999px;
+}
+.rp-root .rp-price__name{font-family:var(--font-display);font-size:1.12rem;font-weight:800;color:var(--rp-ink);margin:0 0 .25rem}
+.rp-root .rp-price__sub{font-size:.83rem;color:var(--rp-body);margin:0 0 1.2rem}
+.rp-root .rp-price__amount{font-family:var(--font-display);font-size:1.45rem;font-weight:800;color:var(--rp-ink);margin:0 0 1.3rem;padding-bottom:1.2rem;border-bottom:1px solid var(--rp-border)}
+.rp-root .rp-price__list{list-style:none;padding:0;margin:0 0 1.6rem;display:grid;gap:.65rem}
+.rp-root .rp-price__list li{display:flex;gap:.6rem;align-items:flex-start;font-size:.87rem;color:var(--rp-body);line-height:1.6}
+.rp-root .rp-price__list i{color:var(--rp-violet);margin-top:.28rem;font-size:.74rem}
+.rp-root .rp-price .rp-btn{margin-top:auto;width:100%}
+/* ── Form ───────────────────────────────────────────────────────────── */
+.rp-root .rp-form-grid{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:3.5rem;align-items:start}
+.rp-root .rp-points{list-style:none;padding:0;margin:1.75rem 0 0;display:grid;gap:.85rem}
+.rp-root .rp-points li{display:flex;gap:.7rem;align-items:flex-start;font-size:.9rem;color:var(--rp-body);line-height:1.65}
+.rp-root .rp-points i{color:var(--rp-violet);margin-top:.3rem;font-size:.76rem}
+.rp-root .rp-card--form{background:var(--rp-white);border:1px solid var(--rp-border);border-radius:18px;padding:2.1rem;box-shadow:0 18px 44px rgba(15,23,42,.06)}
+.rp-root .rp-field{margin-bottom:1.15rem}
+.rp-root .rp-field label{display:block;font-size:.82rem;font-weight:700;color:var(--rp-ink);margin-bottom:.4rem}
+.rp-root .rp-field label .rp-req{color:#dc2626;margin-left:.15rem}
+.rp-root .rpaf-control{
+    width:100%;padding:.75rem .95rem;font-size:.92rem;border-radius:11px;
+    border:1px solid var(--rp-border);background:var(--rp-white);color:var(--rp-ink);
+    transition:border-color .2s,box-shadow .2s;font-family:inherit;
+}
+.rp-root .rpaf-control:focus{outline:none;border-color:var(--rp-violet);box-shadow:0 0 0 .2rem rgba(124,58,237,.15)}
+.rp-root .rpaf-control.is-invalid{border-color:#dc2626}
+.rp-root .rpaf-control.is-invalid:focus{box-shadow:0 0 0 .2rem rgba(220,38,38,.14)}
+.rp-root .rp-help{margin:.35rem 0 0;font-size:.76rem;line-height:1.55;color:#6B7280}
+.rp-root .rp-error{display:block;margin-top:.35rem;font-size:.77rem;font-weight:600;color:#b91c1c}
+.rp-root .rp-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.rp-root .rp-alert{
+    padding:.9rem 1.1rem;border-radius:12px;background:#fef2f2;border:1px solid #fecaca;
+    color:#b91c1c;font-size:.85rem;margin-bottom:1.3rem;
+}
+.rp-root .rp-alert ul{margin:.4rem 0 0;padding-left:1.1rem}
+.rp-root .rp-success{
+    display:flex;gap:.9rem;align-items:flex-start;
+    padding:1.2rem 1.35rem;border-radius:14px;
+    background:rgba(124,58,237,.06);border:1px solid rgba(124,58,237,.28);
+    margin-bottom:1.6rem;
+}
+.rp-root .rp-success__icon{
+    flex:0 0 auto;width:36px;height:36px;border-radius:50%;
+    background:var(--rp-violet);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:.85rem;
+}
+.rp-root .rp-success h3{font-family:var(--font-display);font-size:.98rem;font-weight:800;color:var(--rp-ink);margin:0 0 .3rem}
+.rp-root .rp-success p{margin:0;font-size:.86rem;color:var(--rp-body);line-height:1.7}
+.rp-root .rp-success__ref{
+    display:inline-block;margin-top:.5rem;padding:.3rem .7rem;border-radius:8px;
+    background:var(--rp-white);border:1px dashed rgba(124,58,237,.45);
+    font-family:var(--font-display);font-weight:800;font-size:.82rem;color:var(--rp-violet-ink);
+}
+.rp-root .rp-submit{
+    width:100%;display:inline-flex;align-items:center;justify-content:center;gap:.5rem;
+    padding:.9rem 1.4rem;border-radius:999px;border:none;cursor:pointer;
+    background:var(--rp-violet);color:#fff;font-size:.93rem;font-weight:800;
+    transition:background-color .2s,transform .2s;font-family:inherit;
+}
+.rp-root .rp-submit:hover{background:var(--rp-violet-ink);transform:translateY(-1px)}
+.rp-root .rp-submit[disabled]{opacity:.65;cursor:not-allowed;transform:none}
+.rp-root .rp-form-note{margin:1rem 0 0;font-size:.76rem;line-height:1.65;color:#6B7280}
+/* Honeypot — hidden from real users, tempting to bots */
+.rp-root .rp-hp{position:absolute!important;left:-9999px!important;width:1px;height:1px;overflow:hidden}
+/* ── Final CTA ──────────────────────────────────────────────────────── */
+.rp-root .rp-cta{background:var(--rp-navy);color:#fff;padding:5.5rem 0;position:relative;overflow:hidden}
+.rp-root .rp-cta::after{
+    content:'';position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(680px 380px at 50% 0%,rgba(124,58,237,.22),transparent 70%);
+}
+.rp-root .rp-cta__inner{position:relative;z-index:1;max-width:720px;margin:0 auto;text-align:center}
+.rp-root .rp-cta h2{font-family:var(--font-display);font-size:clamp(1.6rem,3.4vw,2.35rem);font-weight:800;line-height:1.18;letter-spacing:-.02em;color:#fff;margin:0 0 1rem;text-wrap:balance}
+.rp-root .rp-cta p{color:rgba(255,255,255,.68);font-size:1rem;line-height:1.8;margin:0 0 2rem}
+/* ── Footer strip ───────────────────────────────────────────────────── */
+.rp-root .rp-related{display:flex;flex-wrap:wrap;justify-content:center;gap:.6rem;margin-top:2.25rem}
+.rp-root .rp-related a{
+    display:inline-flex;align-items:center;gap:.4rem;padding:.5rem 1rem;border-radius:999px;
+    border:1px solid var(--rp-border);background:var(--rp-white);
+    font-size:.8rem;font-weight:700;color:var(--rp-body);text-decoration:none;transition:.2s;
+}
+.rp-root .rp-related a:hover{border-color:var(--rp-violet);color:var(--rp-violet-ink)}
+/* ── Responsive ─────────────────────────────────────────────────────── */
+@media(max-width:991px){
+    .rp-root .rp-sec{padding:4.5rem 0}
+    .rp-root .rp-hero{padding:4.5rem 0}
+    .rp-root .rp-hero__grid,.rp-root .rp-form-grid{grid-template-columns:1fr;gap:2.5rem}
+    .rp-root .rp-grid--3{grid-template-columns:1fr 1fr}
+    .rp-root .rp-steps{grid-template-columns:1fr;gap:1.6rem}
+    .rp-root .rp-steps::before{top:0;bottom:0;left:23px;right:auto;width:2px;height:auto}
+    .rp-root .rp-step{display:grid;grid-template-columns:46px 1fr;gap:1.1rem;text-align:left;padding:0;align-items:start}
+    .rp-root .rp-step__num{margin:0}
+    .rp-root .rp-step h3{margin-top:.35rem}
+}
+@media(max-width:767px){
+    .rp-root .rp-wrap{padding:0 20px}
+    .rp-root .rp-grid--3,.rp-root .rp-grid--2,.rp-root .rp-row{grid-template-columns:1fr}
+    .rp-root .rp-card--form{padding:1.5rem 1.25rem}
+    .rp-root .rp-hero__cta{flex-direction:column;align-items:stretch}
+    .rp-root .rp-hero__cta .rp-btn{width:100%}
+}
+@media(prefers-reduced-motion:reduce){
+    .rp-root .rp-flow__path{animation:none}
+    .rp-root .rp-card,.rp-root .rp-use,.rp-root .rp-price,
+    .rp-root .rp-btn,.rp-root .rp-submit{transition:none}
+    .rp-root .rp-card:hover,.rp-root .rp-use:hover,
+    .rp-root .rp-btn--primary:hover,.rp-root .rp-submit:hover{transform:none}
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="rp-root">
+
+<!-- A — HERO -->
+<section class="rp-hero">
+    <div class="wrap rp-hero__grid">
+        <div>
+            <span class="rp-hero__eyebrow">{% trans "Robotic Process Automation" %}</span>
+            <h1>{% trans "Automate Repetitive Tasks. Focus on What Matters." %}</h1>
+            <p class="rp-hero__lede">{% trans "Eliminate repetitive manual work with software bots that handle routine business processes across your existing applications. OnWebApp helps you automate workflows, reduce manual errors, and give your team more time to focus on growth." %}</p>
+            <div class="rp-hero__cta">
+                <a href="#consultation" class="rp-btn rp-btn--primary">{% trans "Automate Your Workflow" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+                <a href="#use-cases" class="rp-btn rp-btn--light">{% trans "Explore Use Cases" %} <i class="fas fa-arrow-down" aria-hidden="true"></i></a>
+            </div>
+            <p class="rp-hero__support">{% trans "Built around your business processes. Designed to work with your existing tools." %}</p>
+        </div>
+
+        <div class="rp-diagram">
+            <span class="rp-diagram__cap">{% trans "A routine task, handled end to end" %}</span>
+            <svg viewBox="0 0 420 250" role="img" aria-labelledby="rp-diagram-title rp-diagram-desc">
+                <title id="rp-diagram-title">{% trans "Automated workflow diagram" %}</title>
+                <desc id="rp-diagram-desc">{% trans "A schedule triggers a software bot that reads data, validates it against business rules, updates your business system, and notifies the team." %}</desc>
+                <!-- connectors -->
+                <path class="rp-flow__path" d="M78 52 H210 V96" fill="none" stroke="#7C3AED" stroke-width="1.6" stroke-linecap="round"/>
+                <path class="rp-flow__path" d="M210 132 V168" fill="none" stroke="#7C3AED" stroke-width="1.6" stroke-linecap="round"/>
+                <path class="rp-flow__path" d="M210 204 H78" fill="none" stroke="#7C3AED" stroke-width="1.6" stroke-linecap="round"/>
+                <path class="rp-flow__path" d="M246 114 H330" fill="none" stroke="#7C3AED" stroke-width="1.6" stroke-linecap="round"/>
+                <!-- node: trigger -->
+                <g>
+                    <rect x="24" y="30" width="108" height="44" rx="10" fill="#16233C" stroke="#27406B"/>
+                    <circle cx="42" cy="52" r="4" fill="#A78BFA"/>
+                    <text x="56" y="50" fill="#E8ECF6" font-size="11" font-family="Inter,sans-serif" font-weight="600">Trigger</text>
+                    <text x="56" y="63" fill="#8A97B4" font-size="9" font-family="Inter,sans-serif">Schedule / event</text>
+                </g>
+                <!-- node: bot -->
+                <g>
+                    <rect x="140" y="96" width="140" height="46" rx="10" fill="#7C3AED"/>
+                    <circle cx="160" cy="119" r="4" fill="#fff"/>
+                    <text x="174" y="116" fill="#fff" font-size="11.5" font-family="Inter,sans-serif" font-weight="700">Software bot</text>
+                    <text x="174" y="129" fill="rgba(255,255,255,.75)" font-size="9" font-family="Inter,sans-serif">Reads, validates, updates</text>
+                </g>
+                <!-- node: business system -->
+                <g>
+                    <rect x="152" y="168" width="116" height="44" rx="10" fill="#16233C" stroke="#27406B"/>
+                    <circle cx="170" cy="190" r="4" fill="#A78BFA"/>
+                    <text x="184" y="188" fill="#E8ECF6" font-size="11" font-family="Inter,sans-serif" font-weight="600">Your systems</text>
+                    <text x="184" y="201" fill="#8A97B4" font-size="9" font-family="Inter,sans-serif">ERP, CRM, files</text>
+                </g>
+                <!-- node: source -->
+                <g>
+                    <rect x="24" y="168" width="116" height="44" rx="10" fill="#16233C" stroke="#27406B"/>
+                    <circle cx="42" cy="190" r="4" fill="#A78BFA"/>
+                    <text x="56" y="188" fill="#E8ECF6" font-size="11" font-family="Inter,sans-serif" font-weight="600">Source data</text>
+                    <text x="56" y="201" fill="#8A97B4" font-size="9" font-family="Inter,sans-serif">Inbox, portal, file</text>
+                </g>
+                <!-- node: notify -->
+                <g>
+                    <rect x="300" y="92" width="96" height="44" rx="10" fill="#16233C" stroke="#27406B"/>
+                    <circle cx="318" cy="114" r="4" fill="#A78BFA"/>
+                    <text x="332" y="112" fill="#E8ECF6" font-size="11" font-family="Inter,sans-serif" font-weight="600">Notify</text>
+                    <text x="332" y="125" fill="#8A97B4" font-size="9" font-family="Inter,sans-serif">Team alert</text>
+                </g>
+            </svg>
+            <div class="rp-diagram__legend">
+                <span class="rp-chip"><i class="fas fa-check" aria-hidden="true"></i>{% trans "No screen switching" %}</span>
+                <span class="rp-chip"><i class="fas fa-check" aria-hidden="true"></i>{% trans "Fewer manual errors" %}</span>
+                <span class="rp-chip"><i class="fas fa-check" aria-hidden="true"></i>{% trans "Audit trail" %}</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- B — THE PROBLEM -->
+<section class="rp-sec">
+    <div class="wrap">
+        <div class="rp-center">
+            <span class="rp-eyebrow">{% trans "The Problem" %}</span>
+            <h2 class="rp-h2">{% trans "Your Team Shouldn't Spend Hours on Repetitive Tasks." %}</h2>
+            <p class="rp-lede">{% trans "Manual processes slow down operations, create avoidable errors, and prevent your team from focusing on higher-value work." %}</p>
+        </div>
+        <div class="rp-grid rp-grid--3">
+            <div class="rp-card">
+                <div class="rp-card__icon"><i class="fas fa-keyboard" aria-hidden="true"></i></div>
+                <h3 class="rp-h3">{% trans "Repetitive Data Entry" %}</h3>
+                <p class="rp-card__body">{% trans "Stop copying information between spreadsheets, websites, and business systems manually." %}</p>
+            </div>
+            <div class="rp-card">
+                <div class="rp-card__icon"><i class="fas fa-file-lines" aria-hidden="true"></i></div>
+                <h3 class="rp-h3">{% trans "Time-Consuming Document Processing" %}</h3>
+                <p class="rp-card__body">{% trans "Automate routine document handling, data extraction, and report preparation." %}</p>
+            </div>
+            <div class="rp-card">
+                <div class="rp-card__icon"><i class="fas fa-link" aria-hidden="true"></i></div>
+                <h3 class="rp-h3">{% trans "Disconnected Applications" %}</h3>
+                <p class="rp-card__body">{% trans "Connect repetitive steps across existing tools without rebuilding your entire software stack." %}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- C — USE CASES -->
+<section class="rp-sec rp-sec--soft" id="use-cases">
+    <div class="wrap">
+        <div class="rp-center">
+            <span class="rp-eyebrow">{% trans "Automation Use Cases" %}</span>
+            <h2 class="rp-h2">{% trans "RPA Solutions for Everyday Business Operations" %}</h2>
+            <p class="rp-lede">{% trans "From simple repetitive tasks to multi-step business workflows, we design automations around the way your business works." %}</p>
+        </div>
+        <div class="rp-grid rp-grid--3">
+            <article class="rp-use">
+                <div class="rp-use__icon"><i class="fas fa-receipt" aria-hidden="true"></i></div>
+                <div>
+                    <h3 class="rp-h3">{% trans "Invoice &amp; Document Processing" %}</h3>
+                    <p class="rp-card__body">{% trans "Extract information from invoices, organize files, validate records, and transfer data into business systems." %}</p>
+                </div>
+            </article>
+            <article class="rp-use">
+                <div class="rp-use__icon"><i class="fas fa-arrows-rotate" aria-hidden="true"></i></div>
+                <div>
+                    <h3 class="rp-h3">{% trans "Data Entry &amp; Synchronization" %}</h3>
+                    <p class="rp-card__body">{% trans "Transfer, clean, validate, and update data across spreadsheets, databases, and applications." %}</p>
+                </div>
+            </article>
+            <article class="rp-use">
+                <div class="rp-use__icon"><i class="fas fa-address-book" aria-hidden="true"></i></div>
+                <div>
+                    <h3 class="rp-h3">{% trans "CRM &amp; Customer Operations" %}</h3>
+                    <p class="rp-card__body">{% trans "Update customer records, organize incoming requests, and automate routine administrative steps." %}</p>
+                </div>
+            </article>
+            <article class="rp-use">
+                <div class="rp-use__icon"><i class="fas fa-warehouse" aria-hidden="true"></i></div>
+                <div>
+                    <h3 class="rp-h3">{% trans "ERP &amp; Back-Office Tasks" %}</h3>
+                    <p class="rp-card__body">{% trans "Automate repetitive updates involving orders, inventory, business records, and operational reports." %}</p>
+                </div>
+            </article>
+            <article class="rp-use">
+                <div class="rp-use__icon"><i class="fas fa-window-restore" aria-hidden="true"></i></div>
+                <div>
+                    <h3 class="rp-h3">{% trans "Browser-Based Automation" %}</h3>
+                    <p class="rp-card__body">{% trans "Automate repetitive browser actions such as navigating web applications, collecting permitted information, and entering data." %}</p>
+                </div>
+            </article>
+            <article class="rp-use">
+                <div class="rp-use__icon"><i class="fas fa-chart-column" aria-hidden="true"></i></div>
+                <div>
+                    <h3 class="rp-h3">{% trans "Reporting &amp; Administration" %}</h3>
+                    <p class="rp-card__body">{% trans "Collect information, prepare recurring reports, organize files, and notify teams when routine tasks are complete." %}</p>
+                </div>
+            </article>
+        </div>
+    </div>
+</section>
+
+<!-- D — HOW IT WORKS -->
+<section class="rp-sec">
+    <div class="wrap">
+        <div class="rp-center">
+            <span class="rp-eyebrow">{% trans "How It Works" %}</span>
+            <h2 class="rp-h2">{% trans "From Manual Process to Automated Workflow" %}</h2>
+            <p class="rp-lede">{% trans "Every automation follows the same path — from understanding the task as it runs today to keeping it reliable once it is live." %}</p>
+        </div>
+        <ol class="rp-steps">
+            <li class="rp-step">
+                <span class="rp-step__num" aria-hidden="true">1</span>
+                <div>
+                    <h3>{% trans "Discover" %}</h3>
+                    <p>{% trans "Analyze current processes and identify suitable automation opportunities." %}</p>
+                </div>
+            </li>
+            <li class="rp-step">
+                <span class="rp-step__num" aria-hidden="true">2</span>
+                <div>
+                    <h3>{% trans "Design" %}</h3>
+                    <p>{% trans "Map workflows, business rules, integrations, and approval steps." %}</p>
+                </div>
+            </li>
+            <li class="rp-step">
+                <span class="rp-step__num" aria-hidden="true">3</span>
+                <div>
+                    <h3>{% trans "Build &amp; Test" %}</h3>
+                    <p>{% trans "Develop the automation and test normal scenarios, unexpected inputs, and error handling." %}</p>
+                </div>
+            </li>
+            <li class="rp-step">
+                <span class="rp-step__num" aria-hidden="true">4</span>
+                <div>
+                    <h3>{% trans "Deploy" %}</h3>
+                    <p>{% trans "Configure execution, permissions, scheduling, and human approvals." %}</p>
+                </div>
+            </li>
+            <li class="rp-step">
+                <span class="rp-step__num" aria-hidden="true">5</span>
+                <div>
+                    <h3>{% trans "Monitor &amp; Improve" %}</h3>
+                    <p>{% trans "Track executions, handle failures, and improve workflow reliability." %}</p>
+                </div>
+            </li>
+        </ol>
+    </div>
+</section>
+
+<!-- E — RPA vs API INTEGRATION -->
+<section class="rp-sec rp-sec--soft">
+    <div class="wrap">
+        <div class="rp-center">
+            <span class="rp-eyebrow">{% trans "RPA vs API Integration" %}</span>
+            <h2 class="rp-h2">{% trans "The Right Automation for the Right Task" %}</h2>
+            <p class="rp-lede">{% trans "Not every process needs a software bot. We help determine whether a workflow is better suited to RPA, API integration, or a combination of both." %}</p>
+        </div>
+        <div class="rp-table-wrap">
+            <div class="rp-table-scroll" tabindex="0" role="region" aria-label="{% trans 'Comparison of RPA and API integration' %}">
+                <table class="rp-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">{% trans "Consideration" %}</th>
+                            <th scope="col">{% trans "RPA (software bots)" %}</th>
+                            <th scope="col">{% trans "API integration" %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row">{% trans "User-interface automation" %}</th>
+                            <td>{% trans "Works through the same screens a person uses — clicks, forms, and file dialogs." %}</td>
+                            <td>{% trans "Not applicable. Runs behind the interface with no visible interaction." %}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">{% trans "Direct system-to-system integration" %}</th>
+                            <td>{% trans "Indirect. Data is moved by driving the interface of each system." %}</td>
+                            <td>{% trans "Direct. Systems exchange data programmatically and consistently." %}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">{% trans "Compatibility with legacy applications" %}</th>
+                            <td>{% trans "Strong. Older tools and private portals can be automated without vendor changes." %}</td>
+                            <td>{% trans "Limited. Only possible when the system exposes a usable API or database access." %}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">{% trans "Typical use cases" %}</th>
+                            <td>{% trans "Invoice entry, portal submissions, back-office updates, report downloads, screen-based transfers." %}</td>
+                            <td>{% trans "Payments, CRM sync, inventory feeds, notifications, and structured data exchange." %}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">{% trans "Reliability and maintainability" %}</th>
+                            <td>{% trans "Sensitive to interface changes, so workflows are logged, validated, and reviewed regularly." %}</td>
+                            <td>{% trans "Stable and versioned, and usually the first choice when an API is available." %}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <p class="rp-note">{% trans "We use APIs when direct integration is practical and RPA when processes depend on user-interface actions or systems that are difficult to integrate directly." %}</p>
+    </div>
+</section>
+
+<!-- F — WHY ONWEBAPP -->
+<section class="rp-sec">
+    <div class="wrap">
+        <div class="rp-center">
+            <span class="rp-eyebrow">{% trans "Why OnWebApp?" %}</span>
+            <h2 class="rp-h2">{% trans "Automation That Fits Your Business" %}</h2>
+        </div>
+        <div class="rp-grid rp-grid--2">
+            <div class="rp-card">
+                <div class="rp-card__icon"><i class="fas fa-diagram-project" aria-hidden="true"></i></div>
+                <h3 class="rp-h3">{% trans "Built Around Your Workflow" %}</h3>
+                <p class="rp-card__body">{% trans "Tailored automations based on real business processes." %}</p>
+            </div>
+            <div class="rp-card">
+                <div class="rp-card__icon"><i class="fas fa-puzzle-piece" aria-hidden="true"></i></div>
+                <h3 class="rp-h3">{% trans "Works With Existing Tools" %}</h3>
+                <p class="rp-card__body">{% trans "Designed to complement current applications and systems." %}</p>
+            </div>
+            <div class="rp-card">
+                <div class="rp-card__icon"><i class="fas fa-clipboard-check" aria-hidden="true"></i></div>
+                <h3 class="rp-h3">{% trans "Controlled &amp; Traceable" %}</h3>
+                <p class="rp-card__body">{% trans "Plan for access controls, execution logs, validation, and exception handling." %}</p>
+            </div>
+            <div class="rp-card">
+                <div class="rp-card__icon"><i class="fas fa-layer-group" aria-hidden="true"></i></div>
+                <h3 class="rp-h3">{% trans "Designed to Scale" %}</h3>
+                <p class="rp-card__body">{% trans "Start with one repetitive task and expand as automation needs grow." %}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- G — PRICING AND ENGAGEMENT -->
+<section class="rp-sec rp-sec--soft">
+    <div class="wrap">
+        <div class="rp-center">
+            <span class="rp-eyebrow">{% trans "Pricing and Engagement" %}</span>
+            <h2 class="rp-h2">{% trans "Start Small. Automate More Over Time." %}</h2>
+            <p class="rp-lede">{% trans "Each engagement is scoped to your process, so pricing is quoted per project rather than sold as an unlimited package." %}</p>
+        </div>
+        <div class="rp-grid rp-grid--3">
+            <div class="rp-price">
+                <h3 class="rp-price__name">{% trans "Starter" %}</h3>
+                <p class="rp-price__sub">{% trans "Single-Process Automation" %}</p>
+                <p class="rp-price__amount">{% trans "Custom quote" %}</p>
+                <ul class="rp-price__list">
+                    <li><i class="fas fa-check" aria-hidden="true"></i>{% trans "One defined workflow" %}</li>
+                    <li><i class="fas fa-check" aria-hidden="true"></i>{% trans "Process assessment" %}</li>
+                    <li><i class="fas fa-check" aria-hidden="true"></i>{% trans "Development and testing" %}</li>
+                    <li><i class="fas fa-check" aria-hidden="true"></i>{% trans "Deployment documentation" %}</li>
+                </ul>
+                <a href="#consultation" class="rp-btn rp-btn--ghost rp-btn--sm">{% trans "Request a quote" %}</a>
+            </div>
+            <div class="rp-price rp-price--featured">
+                <span class="rp-price__tag">{% trans "Most chosen" %}</span>
+                <h3 class="rp-price__name">{% trans "Business" %}</h3>
+                <p class="rp-price__sub">{% trans "Multi-Step Automation" %}</p>
+                <p class="rp-price__amount">{% trans "Custom quote" %}</p>
+                <ul class="rp-price__list">
+                    <li><i class="fas fa-check" aria-hidden="true"></i>{% trans "More complex workflow design" %}</li>
+                    <li><i class="fas fa-check" aria-hidden="true"></i>{% trans "Multiple process steps or integrations" %}</li>
+                    <li><i class="fas fa-check" aria-hidden="true"></i>{% trans "Validation and exception handling" %}</li>
+                    <li><i class="fas fa-check" aria-hidden="true"></i>{% trans "Optional monitoring and support" %}</li>
+                </ul>
+                <a href="#consultation" class="rp-btn rp-btn--primary rp-btn--sm">{% trans "Request a quote" %}</a>
+            </div>
+            <div class="rp-price">
+                <h3 class="rp-price__name">{% trans "Enterprise" %}</h3>
+                <p class="rp-price__sub">{% trans "Automation Across Operations" %}</p>
+                <p class="rp-price__amount">{% trans "Based on scope" %}</p>
+                <ul class="rp-price__list">
+                    <li><i class="fas fa-check" aria-hidden="true"></i>{% trans "Multiple automation workflows" %}</li>
+                    <li><i class="fas fa-check" aria-hidden="true"></i>{% trans "Integration architecture" %}</li>
+                    <li><i class="fas fa-check" aria-hidden="true"></i>{% trans "Access and execution controls" %}</li>
+                    <li><i class="fas fa-check" aria-hidden="true"></i>{% trans "Tailored support and maintenance" %}</li>
+                </ul>
+                <a href="#consultation" class="rp-btn rp-btn--ghost rp-btn--sm">{% trans "Request a quote" %}</a>
+            </div>
+        </div>
+        <p class="rp-note">{% trans "Recurring fees may apply for hosting, execution capacity, monitoring, maintenance, and support. They are agreed separately from the build cost, and each project is scoped to the processes it covers." %}</p>
+    </div>
+</section>
+
+<!-- H — CONSULTATION FORM -->
+<section class="rp-sec" id="consultation">
+    <div class="wrap">
+        <div class="rp-form-grid">
+            <div>
+                <span class="rp-eyebrow">{% trans "Free Assessment" %}</span>
+                <h2 class="rp-h2">{% trans "Tell Us What You Want to Automate" %}</h2>
+                <p class="rp-lede">{% trans "Tell us about one process that takes too much time. We'll help you assess its automation potential and identify a practical next step." %}</p>
+                <ul class="rp-points">
+                    <li><i class="fas fa-check" aria-hidden="true"></i>{% trans "A realistic view of whether the process is worth automating." %}</li>
+                    <li><i class="fas fa-check" aria-hidden="true"></i>{% trans "An indication of the approach — RPA, API integration, or both." %}</li>
+                    <li><i class="fas fa-check" aria-hidden="true"></i>{% trans "No obligation, and no automated decisions — a person reviews every request." %}</li>
+                </ul>
+            </div>
+
+            <div class="rp-card--form">
+                {% if rpa_reference %}
+                <div class="rp-success" role="status">
+                    <span class="rp-success__icon"><i class="fas fa-check" aria-hidden="true"></i></span>
+                    <div>
+                        <h3>{% trans "Your request was received." %}</h3>
+                        <p>{% trans "Thank you - our team will review the process you described and get back to you. Keep this reference:" %}</p>
+                        <span class="rp-success__ref">{{ rpa_reference }}</span>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if form.errors %}
+                <div class="rp-alert" role="alert" tabindex="-1" id="rp-alert">
+                    <strong>{% trans "Please fix the following:" %}</strong>
+                    <ul>
+                        {% for field in form.visible_fields %}
+                            {% for error in field.errors %}
+                            <li><a href="#{{ field.id_for_label }}">{{ field.label }} — {{ error }}</a></li>
+                            {% endfor %}
+                        {% endfor %}
+                        {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
+                <form method="post" action="{% url 'home:rpa_solutions' %}#consultation" novalidate id="rp-form">
+                    {% csrf_token %}
+                    {# Honeypot — visually hidden, only bots fill it #}
+                    <div class="rp-hp" aria-hidden="true">
+                        <label for="id_website">Website</label>
+                        <input type="text" id="id_website" name="website" tabindex="-1" autocomplete="off">
+                    </div>
+
+                    <div class="rp-row">
+                        <div class="rp-field">
+                            <label for="{{ form.full_name.id_for_label }}">{% trans "Full name" %}<span class="rp-req" aria-hidden="true">*</span></label>
+                            {{ form.full_name }}
+                            {% if form.full_name.errors %}<span class="rp-error" id="{{ form.full_name.id_for_label }}-error">{{ form.full_name.errors|first }}</span>{% endif %}
+                        </div>
+                        <div class="rp-field">
+                            <label for="{{ form.business_email.id_for_label }}">{% trans "Business email" %}<span class="rp-req" aria-hidden="true">*</span></label>
+                            {{ form.business_email }}
+                            {% if form.business_email.errors %}<span class="rp-error" id="{{ form.business_email.id_for_label }}-error">{{ form.business_email.errors|first }}</span>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="rp-row">
+                        <div class="rp-field">
+                            <label for="{{ form.company_name.id_for_label }}">{% trans "Company name" %}</label>
+                            {{ form.company_name }}
+                            {% if form.company_name.errors %}<span class="rp-error" id="{{ form.company_name.id_for_label }}-error">{{ form.company_name.errors|first }}</span>{% endif %}
+                        </div>
+                        <div class="rp-field">
+                            <label for="{{ form.current_tools.id_for_label }}">{% trans "Current tools or applications" %}<span class="rp-req" aria-hidden="true">*</span></label>
+                            {{ form.current_tools }}
+                            <p class="rp-help">{% trans "The systems this task touches today." %}</p>
+                            {% if form.current_tools.errors %}<span class="rp-error" id="{{ form.current_tools.id_for_label }}-error">{{ form.current_tools.errors|first }}</span>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="rp-field">
+                        <label for="{{ form.process_to_automate.id_for_label }}">{% trans "Process to automate" %}<span class="rp-req" aria-hidden="true">*</span></label>
+                        {{ form.process_to_automate }}
+                        <p class="rp-help">{% trans "What happens today, who does it, and what it produces." %}</p>
+                        {% if form.process_to_automate.errors %}<span class="rp-error" id="{{ form.process_to_automate.id_for_label }}-error">{{ form.process_to_automate.errors|first }}</span>{% endif %}
+                    </div>
+
+                    <div class="rp-row">
+                        <div class="rp-field">
+                            <label for="{{ form.task_frequency.id_for_label }}">{% trans "Task frequency" %}</label>
+                            {{ form.task_frequency }}
+                            {% if form.task_frequency.errors %}<span class="rp-error" id="{{ form.task_frequency.id_for_label }}-error">{{ form.task_frequency.errors|first }}</span>{% endif %}
+                        </div>
+                        <div class="rp-field">
+                            <label for="{{ form.time_spent.id_for_label }}">{% trans "Approximate time spent" %}</label>
+                            {{ form.time_spent }}
+                            {% if form.time_spent.errors %}<span class="rp-error" id="{{ form.time_spent.id_for_label }}-error">{{ form.time_spent.errors|first }}</span>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="rp-field">
+                        <label for="{{ form.additional_requirements.id_for_label }}">{% trans "Additional requirements" %}</label>
+                        {{ form.additional_requirements }}
+                        {% if form.additional_requirements.errors %}<span class="rp-error" id="{{ form.additional_requirements.id_for_label }}-error">{{ form.additional_requirements.errors|first }}</span>{% endif %}
+                    </div>
+
+                    <button type="submit" class="rp-submit" id="rp-submit">
+                        {% trans "Request an RPA Consultation" %} <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                    </button>
+                    <p class="rp-form-note">{% trans "Fields marked with * are required. We use your details only to respond to this request." %}</p>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- I — FINAL CTA -->
+<section class="rp-cta">
+    <div class="wrap rp-cta__inner">
+        <h2>{% trans "What If Your Team Could Stop Doing the Same Task Every Day?" %}</h2>
+        <p>{% trans "Let's identify the repetitive work slowing down your business and explore how automation can help." %}</p>
+        <a href="#consultation" class="rp-btn rp-btn--primary">{% trans "Request an RPA Consultation" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+        <div class="rp-related">
+            <a href="{% url 'home:automation_home' %}"><i class="fas fa-bolt" aria-hidden="true"></i>{% trans "Automation overview" %}</a>
+            <a href="{% url 'home:rpa_bpa' %}"><i class="fas fa-gears" aria-hidden="true"></i>{% trans "RPA &amp; BPA explained" %}</a>
+            <a href="{% url 'home:browser_web_automation' %}"><i class="fas fa-window-restore" aria-hidden="true"></i>{% trans "Browser automation" %}</a>
+        </div>
+    </div>
+</section>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+(function () {
+    var form = document.getElementById('rp-form');
+    if (!form) return;
+
+    var submit = document.getElementById('rp-submit');
+    var sent = false;
+
+    form.addEventListener('submit', function (event) {
+        if (sent) { event.preventDefault(); return; }
+
+        if (!form.checkValidity()) {
+            // Let the browser surface the first invalid field; the server
+            // still re-validates everything.
+            return;
+        }
+
+        // Duplicate-submission guard: the button locks once the request leaves
+        // the browser. The server applies its own 24-hour duplicate check.
+        sent = true;
+        submit.disabled = true;
+        submit.setAttribute('aria-busy', 'true');
+        submit.firstChild.nodeValue = ' {% trans "Sending…" %} ';
+    });
+
+    // Move focus to the error summary so keyboard and screen-reader users
+    // land on it after a failed submission.
+    var alert = document.getElementById('rp-alert');
+    if (alert) { alert.focus(); }
+})();
+</script>
+{% endblock %}

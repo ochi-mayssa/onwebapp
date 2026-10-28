@@ -36,6 +36,8 @@ urlpatterns = [
     path('services-old-redirect/', RedirectView.as_view(url=reverse_lazy('platform_monitoring:hub'), permanent=False), name='services_index_redirect'),
     path('platform/redirect/', RedirectView.as_view(url=reverse_lazy('platform_monitoring:hub'), permanent=False), name='platform_redirect'),
     path('contact/', include('contact.urls', namespace='contact')),
+    path('', include('home.urls', namespace='home')),
+    path('automation/', include('automation.urls', namespace='automation')),
     path('blog/', include('blog.urls', namespace='blog')),
     path('payments/', include('payments.urls', namespace='payments')),
     path('seo/', include('seo_analyzer.urls', namespace='seo_analyzer')),
@@ -69,7 +71,6 @@ urlpatterns = [
 
     path('accounts/', include('django.contrib.auth.urls')),
     path('robots.txt', TemplateView.as_view(template_name='robots.txt', content_type='text/plain'), name='robots_txt'),
-    path('', include('home.urls', namespace='home')),
     path('sitemap.xml', sitemap, {'sitemaps': {'static': StaticViewSitemap(), 'projects': ProjectSitemap() if ProjectSitemap else None}}, name='sitemap'),
 ]
 

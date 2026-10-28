@@ -15,6 +15,7 @@ class StaticViewSitemap(Sitemap):
             'home:dashboard_development',
             'home:api_solutions',
             'home:browser_web_automation',
+            'home:rpa_solutions',
             'services:index',
             'integration:integration_homepage',
             'integration:system_integration',

@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth import get_user_model
-from .models import ConsultationRequest, WebsiteBuildRequest, APIRequest
+from .models import ConsultationRequest, WebsiteBuildRequest, APIRequest, RPAConsultationRequest
 
 User = get_user_model()
 
@@ -123,3 +123,77 @@ class APIRequestAdminActionForm(forms.ModelForm):
         ).order_by('username')
         self.fields['assigned_to'].required = False
         self.fields['assigned_to'].empty_label = '— Unassigned —'
+
+
+class RPAConsultationForm(forms.ModelForm):
+    """Public consultation form for the RPA solutions landing page."""
+
+    class Meta:
+        model = RPAConsultationRequest
+        fields = [
+            'full_name', 'business_email', 'company_name', 'current_tools',
+            'process_to_automate', 'task_frequency', 'time_spent',
+            'additional_requirements',
+        ]
+        widgets = {
+            'full_name': forms.TextInput(attrs={
+                'class': 'rpaf-control', 'placeholder': 'Full Name',
+                'autocomplete': 'name', 'autofocus': True,
+            }),
+            'business_email': forms.EmailInput(attrs={
+                'class': 'rpaf-control', 'placeholder': 'you@company.com',
+                'autocomplete': 'email',
+            }),
+            'company_name': forms.TextInput(attrs={
+                'class': 'rpaf-control', 'placeholder': 'Company Name (Optional)',
+                'autocomplete': 'organization',
+            }),
+            'current_tools': forms.TextInput(attrs={
+                'class': 'rpaf-control',
+                'placeholder': 'e.g. Excel, SAP, an internal web portal',
+            }),
+            'process_to_automate': forms.Textarea(attrs={
+                'class': 'rpaf-control', 'rows': 4,
+                'placeholder': 'Describe the repetitive process you want automated',
+            }),
+            'task_frequency': forms.Select(attrs={'class': 'rpaf-control'}),
+            'time_spent': forms.TextInput(attrs={
+                'class': 'rpaf-control',
+                'placeholder': 'e.g. about 6 hours a week (Optional)',
+            }),
+            'additional_requirements': forms.Textarea(attrs={
+                'class': 'rpaf-control', 'rows': 3,
+                'placeholder': 'Any other requirements? (Optional)',
+            }),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['company_name'].required = False
+        self.fields['task_frequency'].required = False
+        self.fields['task_frequency'].choices = [('', 'Select how often…')] + list(
+            RPAConsultationRequest.FREQUENCY_CHOICES
+        )
+        self.fields['time_spent'].required = False
+        self.fields['additional_requirements'].required = False
+        # Mark errored fields for styling and assistive tech.
+        for name, field in self.fields.items():
+            if self.errors.get(name):
+                css = field.widget.attrs.get('class', '')
+                if 'is-invalid' not in css:
+                    field.widget.attrs['class'] = f'{css} is-invalid'.strip()
+                field.widget.attrs['aria-invalid'] = 'true'
+
+    def clean_business_email(self):
+        return (self.cleaned_data.get('business_email') or '').strip().lower()
+
+    def clean_current_tools(self):
+        return (self.cleaned_data.get('current_tools') or '').strip()
+
+    def clean_process_to_automate(self):
+        value = (self.cleaned_data.get('process_to_automate') or '').strip()
+        if len(value) < 15:
+            raise forms.ValidationError(
+                'Please describe the process in a little more detail (at least 15 characters).'
+            )
+        return value

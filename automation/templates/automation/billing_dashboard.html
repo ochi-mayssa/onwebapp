@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Automation billing{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <h1 class="mb-4">Automation billing</h1>
+
+  <div class="card shadow-sm border-0 rounded-4 p-4 mb-4">
+    {% if subscription %}
+      <h2 class="h4">{{ subscription.plan.name }}</h2>
+      <p class="mb-1">Status: <strong>{{ subscription.get_status_display }}</strong></p>
+      <p class="mb-1">Payment status: {{ subscription.payment_status }}</p>
+      {% if subscription.billing_period_end %}
+        <p class="mb-1">Current period ends: {{ subscription.billing_period_end }}</p>
+      {% endif %}
+      {% if quota and quota.limit %}
+        <p class="mb-0">Executions this month: {{ quota.used }}/{{ quota.limit }}</p>
+      {% endif %}
+    {% else %}
+      <p class="mb-0 text-muted">No subscription yet. Choose a plan below.</p>
+    {% endif %}
+  </div>
+
+  <h2 class="h4 mb-3">Available plans</h2>
+  <div class="row g-3 mb-4">
+    {% for plan in plans %}
+      <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm rounded-4 p-4">
+          <h3 class="h5">{{ plan.name }}</h3>
+          <p class="mb-2">{{ plan.currency }} {{ plan.price }}/month</p>
+          <p class="small text-muted">{{ plan.monthly_execution_limit }} executions/month</p>
+          <form method="post" action="{% url 'automation:billing_checkout' %}">
+            {% csrf_token %}
+            <input type="hidden" name="plan_id" value="{{ plan.pk }}">
+            <button type="submit" class="btn btn-primary">Choose {{ plan.name }}</button>
+          </form>
+        </div>
+      </div>
+    {% empty %}
+      <p class="text-muted">No plans are configured. Ask an administrator to add one.</p>
+    {% endfor %}
+  </div>
+
+  <h2 class="h4 mb-3">Recent billing events</h2>
+  {% if events %}
+    <div class="list-group">
+      {% for event in events %}
+        <div class="list-group-item d-flex justify-content-between">
+          <span>{{ event.event_type }} <span class="text-muted">({{ event.provider }})</span></span>
+          <span class="badge {% if event.processed %}bg-success{% else %}bg-warning text-dark{% endif %}">
+            {% if event.processed %}processed{% else %}pending{% endif %}
+          </span>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-muted">No billing events yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

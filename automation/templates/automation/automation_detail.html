@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Automation detail{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="card shadow-sm border-0 rounded-4 p-4 mb-4">
+    <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+      <div>
+        <h1 class="mb-2">{{ workflow.title }}</h1>
+        <p class="text-muted mb-0">{{ workflow.get_status_display }} &middot; Trigger: {{ workflow.trigger }}</p>
+      </div>
+      {% if workflow.status == 'active' %}
+        <form method="post" action="{% url 'automation:workflow_trigger' workflow.pk %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-primary">Run now</button>
+        </form>
+      {% endif %}
+    </div>
+    {% if subscription %}
+      <p class="small text-muted mt-3 mb-0">
+        Subscription: {{ subscription.get_status_display }}
+        {% if quota and quota.limit %}
+          &middot; Usage this month: {{ quota.used }}/{{ quota.limit }}
+        {% endif %}
+      </p>
+    {% endif %}
+    <pre class="bg-light p-3 rounded mt-3">{{ workflow.config|pprint }}</pre>
+  </div>
+
+  <h2>Recent executions</h2>
+  {% if executions %}
+    <div class="list-group">
+      {% for execution in executions %}
+        <div class="list-group-item">
+          <div class="d-flex justify-content-between">
+            <strong>{{ execution.get_status_display }}</strong>
+            <span class="text-muted">{{ execution.created_at }}</span>
+          </div>
+          <div class="small">
+            {{ execution.trigger }}
+            &middot; attempts: {{ execution.attempt_count }}
+            {% if execution.failure_code %}&middot; code: {{ execution.failure_code }}{% endif %}
+          </div>
+          {% if execution.error_message %}
+            <div class="small text-danger">{{ execution.error_message }}</div>
+          {% endif %}
+          <a class="small" href="{% url 'automation:execution_status' execution.pk %}">View status JSON</a>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-muted">No execution history available yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

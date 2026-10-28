@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Managed Automation Plans{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row align-items-center mb-5">
+    <div class="col-lg-7">
+      <p class="text-primary fw-semibold text-uppercase">Managed automation service</p>
+      <h1 class="display-5 fw-bold">Automation built for your operations, without hiring a full internal team.</h1>
+      <p class="lead text-secondary">Request a workflow, approve the setup, and let the OnWebApp team configure, monitor, and maintain it for you.</p>
+      <div class="d-flex gap-3 flex-wrap mt-4">
+        <a class="btn btn-primary btn-lg" href="{% url 'automation:request_form' %}">Request automation</a>
+        <a class="btn btn-outline-primary btn-lg" href="{% url 'automation:my_automations' %}">My automations</a>
+      </div>
+    </div>
+    <div class="col-lg-5">
+      <div class="card shadow-sm border-0 rounded-4 p-4 bg-light">
+        <h3 class="mb-3">Monthly plans</h3>
+        {% for plan in plans %}
+          <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+            <div>
+              <strong>{{ plan.name }}</strong>
+              <div class="small text-muted">{{ plan.limit }}</div>
+            </div>
+            <span class="fw-semibold">{{ plan.price }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4 text-center">
+    <div class="col-md-4"><div class="card h-100 shadow-sm border-0 p-4"><h4>Review</h4><p>We assess your process, integration needs, and approval flow.</p></div></div>
+    <div class="col-md-4"><div class="card h-100 shadow-sm border-0 p-4"><h4>Configure</h4><p>We design the workflow, test it, and verify operating limits.</p></div></div>
+    <div class="col-md-4"><div class="card h-100 shadow-sm border-0 p-4"><h4>Monitor</h4><p>We maintain uptime, logs, alerts, and renewals as part of the plan.</p></div></div>
+  </div>
+</div>
+{% endblock %}

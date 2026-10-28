@@ -2,12 +2,17 @@ from django.contrib import messages
 from django.contrib.auth.decorators import user_passes_test
 from django.core.paginator import Paginator
 from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
 from django.utils import timezone
 from datetime import timedelta
 
-from .forms import ConsultationForm, WebsiteBuildForm, APIRequestForm, APIRequestAdminActionForm
-from .models import WebsiteBuildRequest, APIRequest
+from .forms import (
+    ConsultationForm, WebsiteBuildForm, APIRequestForm, APIRequestAdminActionForm,
+    RPAConsultationForm,
+)
+from .models import WebsiteBuildRequest, APIRequest, RPAConsultationRequest
 from .notifications import notify_admins, notify_client_submitted
+from .notifications import notify_rpa_admins, notify_rpa_client_submitted
 
 # Create your views here.
 
@@ -64,6 +69,64 @@ def about(request):
 
 def rpa_bpa(request):
     return render(request, 'automation/RPA & BPA.html')
+
+
+def rpa_solutions(request):
+    """RPA solutions landing page with the consultation request form.
+
+    The page and the form share one URL: a successful submission redirects
+    back with the reference stashed in the session so the browser never
+    re-posts on refresh.
+    """
+    reference = ''
+    if request.method == 'POST':
+        # Honeypot: real visitors never see or fill this field. Silently drop bots.
+        if request.POST.get('website', ''):
+            return redirect('home:rpa_solutions')
+
+        form = RPAConsultationForm(request.POST)
+        if form.is_valid():
+            rpa_request = form.save(commit=False)
+            if request.user.is_authenticated:
+                rpa_request.user = request.user
+
+            # Duplicate guard: one similar submission per email per 24 hours.
+            duplicate = RPAConsultationRequest.objects.filter(
+                business_email__iexact=rpa_request.business_email,
+                process_to_automate__iexact=rpa_request.process_to_automate.strip(),
+                created_at__gte=timezone.now() - timedelta(hours=24),
+            ).exists()
+            if duplicate:
+                form.add_error(
+                    None,
+                    'A similar consultation request from this email was already '
+                    'submitted in the last 24 hours. We are already reviewing it - '
+                    'no need to resend.',
+                )
+            else:
+                rpa_request.save()
+                notify_rpa_admins(rpa_request)
+                notify_rpa_client_submitted(rpa_request)
+                request.session['rpa_reference'] = rpa_request.reference
+                return redirect(f"{reverse('home:rpa_solutions')}#consultation")
+    else:
+        reference = request.session.pop('rpa_reference', '')
+        form = RPAConsultationForm()
+        if request.user.is_authenticated:
+            user = request.user
+            full_name = user.get_full_name().strip() if user.get_full_name() else ''
+            if full_name or user.username:
+                form.fields['full_name'].initial = full_name or user.username
+            if user.email:
+                form.fields['business_email'].initial = user.email
+            profile = getattr(user, 'profile', None)
+            if profile and getattr(profile, 'company_name', ''):
+                form.fields['company_name'].initial = profile.company_name
+
+    return render(request, 'automation/rpa_solutions.html', {
+        'form': form,
+        'rpa_reference': reference,
+    })
 
 def automation_home(request):
     return render(request, 'automation/automationhome.html')

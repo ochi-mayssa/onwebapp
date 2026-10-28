@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}My automations{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <h1 class="mb-4">My automations</h1>
+  {% if workflows %}
+    <div class="row g-3">
+      {% for workflow in workflows %}
+        <div class="col-md-6">
+          <div class="card h-100 border-0 shadow-sm rounded-4 p-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h3 class="h5 mb-0">{{ workflow.title }}</h3>
+              <span class="badge bg-primary">{{ workflow.get_status_display }}</span>
+            </div>
+            <p class="text-muted mb-3">{{ workflow.description|default:'No description yet.' }}</p>
+            <a href="{% url 'automation:automation_detail' workflow.pk %}" class="btn btn-outline-primary">Open details</a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="alert alert-info">No automations yet. <a href="{% url 'automation:request_form' %}">Submit your first request.</a></div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load i18n %}
+{% load i18n static %}
 
 {% block title %}{% trans "Browser & Web Automation" %} | OnWebApp{% endblock %}
 
@@ -10,613 +10,391 @@
 {% block og_description %}{% trans "Browser automation is one layer of a larger system. It works alongside OnWebApp's workflow engine, integrations, data processing, monitoring, and automation capabilities." %}{% endblock %}
 
 {% block extra_css %}
+{% include 'automation/_ax_styles.html' %}
 <style>
-/* ── Base ─────────────────────────────────────────────────────────── */
-.bwa-container{width:100%;max-width:none;margin:0 auto;padding:0 clamp(1.5rem,4vw,4rem)}
-.bwa-section{padding:5.5rem 0}
-.bwa-section--alt{background:var(--bg-surface-secondary)}
-.bwa-section--dark{background:var(--slate-900);color:#fff}
-
-/* ── Type ─────────────────────────────────────────────────────────── */
-.bwa-eyebrow{display:inline-flex;align-items:center;gap:.5rem;font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.14em;color:var(--primary-color);margin-bottom:.75rem}
-.bwa-eyebrow::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor}
-.bwa-eyebrow--light{color:#a5b4fc}
-.bwa-h2{font-family:var(--font-display);font-weight:800;font-size:clamp(1.7rem,3.2vw,2.4rem);line-height:1.16;margin-bottom:1rem}
-.bwa-h3{font-family:var(--font-display);font-weight:800;font-size:1.28rem;margin-bottom:.5rem}
-.bwa-lede{color:var(--text-secondary);font-size:1rem;line-height:1.75;max-width:640px}
-.bwa-lede--light{color:#94a3b8}
-.bwa-section--dark .bwa-h2{color:#fff}
-.bwa-center{text-align:center}
-.bwa-center .bwa-eyebrow{justify-content:center}
-.bwa-center .bwa-lede{margin-left:auto;margin-right:auto}
-
-/* ── Reveal ───────────────────────────────────────────────────────── */
-.bwa-reveal{opacity:0;transform:translateY(26px);transition:opacity .65s cubic-bezier(.22,.8,.3,1),transform .65s cubic-bezier(.22,.8,.3,1)}
-.bwa-reveal.is-visible{opacity:1;transform:none}
-@media(prefers-reduced-motion:reduce){.bwa-reveal{opacity:1;transform:none;transition:none}}
-
-/* ── Hero ─────────────────────────────────────────────────────────── */
-.bwa-hero{position:relative;overflow:hidden;padding:8rem 0 6.5rem;background:linear-gradient(160deg,#0a0f1e 0%,#141d36 48%,#0a0f1e 100%)}
-.bwa-hero__grid{position:absolute;inset:0;z-index:1;background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,.08) 1px,transparent 0);background-size:28px 28px;-webkit-mask-image:linear-gradient(to bottom,#000 0%,transparent 88%);mask-image:linear-gradient(to bottom,#000 0%,transparent 88%)}
-.bwa-hero__glow{position:absolute;z-index:1;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(79,70,229,.38) 0%,transparent 68%);filter:blur(80px);top:-220px;right:-160px;pointer-events:none}
-.bwa-hero__glow--2{width:520px;height:520px;background:radial-gradient(circle,rgba(99,102,241,.22) 0%,transparent 68%);top:auto;bottom:-240px;right:auto;left:-180px}
-.bwa-hero__inner{position:relative;z-index:2}
-.bwa-hero .bwa-container{max-width:none;padding-left:clamp(1.5rem,4vw,4rem);padding-right:clamp(1.5rem,4vw,4rem)}
-.bwa-hero__copy{max-width:920px;margin:0 auto;text-align:center}
-.bwa-hero__copy .bwa-eyebrow{justify-content:center}
-.bwa-hero__copy .bwa-chips{justify-content:center}
-.bwa-hero__copy p{color:#94a3b8;font-size:1.05rem;line-height:1.75;max-width:620px;margin-left:auto;margin-right:auto}
-.bwa-hero h1{font-family:var(--font-display);font-weight:800;font-size:clamp(2.3rem,5.2vw,3.6rem);line-height:1.06;color:#fff;letter-spacing:-.02em;margin-bottom:1rem}
-.bwa-grad{background:linear-gradient(120deg,#818cf8 0%,#a78bfa 55%,#22d3ee 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
-.bwa-hero__actions{display:flex;flex-wrap:wrap;gap:.75rem;justify-content:center;margin-top:2rem}
-.bwa-chips{display:flex;flex-wrap:wrap;gap:.5rem}
-.bwa-chip{display:inline-flex;align-items:center;gap:.45rem;padding:.42rem .9rem;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:#cbd5e1;font-size:.78rem;font-weight:600;backdrop-filter:blur(10px)}
-.bwa-chip i{color:#a5b4fc;font-size:.75rem}
-@media(prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
-.bwa-section{scroll-margin-top:92px}
-
-/* ── Know more ────────────────────────────────────────────────────── */
-.bwa-more{display:flex;justify-content:center;margin-top:2.75rem}
-.bwa-more__btn{display:inline-flex;align-items:center;gap:.6rem;padding:.85rem 1.85rem;border-radius:999px;font-size:.95rem;font-weight:800;color:#fff;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);backdrop-filter:blur(10px);transition:transform .3s ease,background .3s ease,border-color .3s ease,box-shadow .3s ease}
-.bwa-more__btn:hover,.bwa-more__btn:focus-visible{background:var(--grad-primary);border-color:transparent;transform:translateY(-2px);box-shadow:0 14px 30px -12px var(--primary-glow);color:#fff}
-.bwa-more__btn i{font-size:.8rem;animation:bwaBob 1.9s ease-in-out infinite}
-@keyframes bwaBob{0%,100%{transform:translateY(0)}50%{transform:translateY(3px)}}
-.bwa-more__hint{display:block;text-align:center;margin-top:.7rem;font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.42)}
-
-
-/* ── Cards ────────────────────────────────────────────────────────── */
-.bwa-card{position:relative;overflow:hidden;height:100%;background:var(--bg-surface);border:1px solid var(--border-color);border-radius:var(--radius-xl);padding:1.7rem;transition:transform .35s ease,box-shadow .35s ease,border-color .35s ease}
-.bwa-card::after{content:'';position:absolute;inset:0;background:linear-gradient(115deg,transparent 32%,rgba(255,255,255,.6) 48%,transparent 64%);transform:translateX(-130%);transition:transform .8s ease;pointer-events:none}
-.bwa-card:hover{transform:translateY(-6px);box-shadow:var(--card-shadow-lg);border-color:var(--dc,var(--primary-color))}
-.bwa-card:hover::after{transform:translateX(130%)}
-.bwa-icon{width:52px;height:52px;border-radius:15px;display:inline-flex;align-items:center;justify-content:center;font-size:1.15rem;margin-bottom:1.1rem;background:var(--dc-soft,rgba(79,70,229,.1));color:var(--dc,var(--primary-color))}
-.bwa-card p{color:var(--text-secondary);font-size:.9rem;line-height:1.7;margin:0}
-.bwa-card--dark{background:rgba(255,255,255,.045);border-color:rgba(255,255,255,.1);color:#fff}
-.bwa-card--dark:hover{border-color:rgba(255,255,255,.24);box-shadow:none}
-.bwa-card--dark p{color:#94a3b8}
-.bwa-card--dark .bwa-h3{color:#fff}
-.bwa-card__tags{list-style:none;padding:0;margin:1rem 0 0;font-size:.84rem;color:#94a3b8}
-.bwa-card__tags li{display:flex;align-items:flex-start;gap:.45rem;padding:.28rem 0}
-.bwa-card__tags li i{color:#34d399;font-size:.7rem;margin-top:.34rem}
-
-
-/* ── Process ──────────────────────────────────────────────────────── */
-.bwa-step{display:flex;gap:1.4rem;padding:1.6rem 0;border-bottom:1px solid var(--border-color)}
-.bwa-step:last-child{border-bottom:none}
-.bwa-step__num{flex-shrink:0;width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.95rem;color:#fff;background:linear-gradient(135deg,var(--primary-600),var(--primary-500))}
-.bwa-step h5{font-weight:700;margin-bottom:.4rem;font-size:1.02rem}
-.bwa-step p{margin:0;color:var(--text-secondary);font-size:.9rem;line-height:1.7}
-.bwa-tags{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.75rem}
-.bwa-tag{display:inline-flex;align-items:center;gap:.4rem;padding:.32rem .75rem;border-radius:999px;background:var(--bg-surface-secondary);border:1px solid var(--border-color);font-size:.76rem;font-weight:600;color:var(--text-secondary)}
-.bwa-tag i{font-size:.6rem;color:var(--success)}
-
-/* ── List rows (dark section) ─────────────────────────────────────── */
-.bwa-list{list-style:none;padding:0;margin:1.1rem 0 0;font-size:.84rem;color:#94a3b8}
-.bwa-list li{display:flex;align-items:flex-start;gap:.55rem;padding:.36rem 0}
-.bwa-list li i{color:#34d399;font-size:.7rem;margin-top:.34rem}
-
-/* ── Industries ───────────────────────────────────────────────────── */
-.bwa-industries{display:flex;flex-wrap:wrap;gap:.6rem;justify-content:center}
-.bwa-ind{display:inline-flex;align-items:center;gap:.5rem;padding:.5rem 1.05rem;border-radius:999px;background:var(--bg-surface);border:1px solid var(--border-color);font-size:.84rem;font-weight:600;color:var(--text-secondary);transition:.25s}
-.bwa-ind:hover{border-color:var(--primary-color);color:var(--primary-color);transform:translateY(-2px)}
-.bwa-ind i{font-size:.8rem}
-
-/* ── Pricing ──────────────────────────────────────────────────────── */
-.bwa-plan{display:flex;flex-direction:column;height:100%;background:var(--bg-surface);border:1px solid var(--border-color);border-radius:var(--radius-xl);padding:2rem 1.75rem;position:relative;transition:.35s}
-.bwa-plan:hover{transform:translateY(-5px);box-shadow:var(--card-shadow-lg)}
-.bwa-plan--featured{border-color:var(--primary-color);box-shadow:0 18px 44px -18px var(--primary-glow)}
-.bwa-plan__flag{position:absolute;top:-.8rem;left:50%;transform:translateX(-50%);background:var(--grad-primary);color:#fff;font-size:.62rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:.3rem .9rem;border-radius:999px;white-space:nowrap}
-.bwa-plan__tier{font-size:.7rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--primary-color);margin-bottom:.5rem}
-.bwa-plan h4{font-family:var(--font-display);font-weight:800;font-size:1.22rem;margin-bottom:.6rem}
-.bwa-plan__desc{color:var(--text-secondary);font-size:.87rem;line-height:1.65;min-height:2.9rem}
-.bwa-plan ul{list-style:none;padding:0;margin:1.2rem 0 0;font-size:.86rem;color:var(--text-secondary);flex-grow:1}
-.bwa-plan ul li{display:flex;align-items:flex-start;gap:.5rem;padding:.42rem 0;border-bottom:1px solid var(--border-color)}
-.bwa-plan ul li:last-child{border-bottom:none}
-.bwa-plan ul i{color:var(--success);font-size:.7rem;margin-top:.35rem}
-
-
-/* ── CTA ──────────────────────────────────────────────────────────── */
-.bwa-cta{position:relative;overflow:hidden;background:linear-gradient(130deg,var(--primary-600) 0%,var(--primary-500) 55%,#8b5cf6 100%);border-radius:26px;padding:4.5rem 2rem;text-align:center;color:#fff}
-.bwa-cta::after{content:'';position:absolute;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.18) 0%,transparent 65%);bottom:-260px;right:-120px;pointer-events:none}
-.bwa-cta > *{position:relative;z-index:1}
-.bwa-cta h2{font-family:var(--font-display);font-weight:800;font-size:clamp(1.6rem,3.4vw,2.35rem);line-height:1.2;margin-bottom:1rem}
-.bwa-cta p{color:rgba(255,255,255,.82);max-width:540px;margin:0 auto 2rem}
-
-/* ── Readable content width inside full-width sections ────────────── */
-.bwa-container > .row,.bwa-container > .bwa-chain,.bwa-container > .bwa-industries,
-.bwa-container > .bwa-cta,.bwa-container > .bwa-plan,.bwa-container > p{max-width:1560px;margin-left:auto;margin-right:auto}
-.bwa-container > .row > [class*=col-]{max-width:none}
-
-/* ── Responsive ───────────────────────────────────────────────────── */
-@media(max-width:1199px){
-}
-@media(max-width:991px){
-    .bwa-section,.bwa-section--alt{padding:3.5rem 0}
-    .bwa-hero{padding:6rem 0 4.5rem}
-    .bwa-step{flex-direction:column;text-align:center;align-items:center}
-    .bwa-cta{padding:3rem 1.25rem}
-    .bwa-more{margin-top:2rem}
-}
-@media(max-width:575px){
-    .bwa-hero__actions .btn{width:100%}
-    .bwa-more__btn{width:100%;justify-content:center}
-}
-    .bwa-hero__line{font-family:var(--font-display);font-weight:700;font-size:1.06rem;color:#fff;margin:-.35rem 0 1.7rem;opacity:.95}
-    .bwa-chain{position:relative;max-width:760px;margin:0 auto}
-    .bwa-chain::before{content:'';position:absolute;left:23px;top:20px;bottom:20px;width:2px;background-image:linear-gradient(180deg,var(--primary-color) 55%,transparent 0);background-size:2px 10px}
-    .bwa-chain .bwa-step{position:relative;border-bottom:none;padding:1.05rem 0}
-    .bwa-chain .bwa-step__num{background:var(--bg-surface);color:var(--primary-color);border:2px solid var(--primary-color);z-index:1;box-shadow:0 0 0 6px var(--bg-body)}
-    .bwa-section--alt .bwa-chain .bwa-step__num{box-shadow:0 0 0 6px var(--bg-alt,var(--bg-body))}
-    .bwa-chain .bwa-step--on .bwa-step__num{background:linear-gradient(135deg,var(--primary-600),var(--primary-500));color:#fff;border-color:transparent;box-shadow:0 8px 20px -8px var(--primary-glow),0 0 0 6px var(--bg-body)}
-    .bwa-plan--q .bwa-plan__tier{font-size:.98rem;letter-spacing:normal;text-transform:none;color:var(--text-primary);font-weight:700;margin-bottom:.55rem;min-height:auto}
-    .bwa-plan--q .bwa-plan__desc{min-height:0}
+    .ax-grad{background:linear-gradient(120deg,#c4b5fd 0%,#a78bfa 45%,#67e8f9 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+    .ax-card--accent{border-color:rgba(124,58,237,.32);background:linear-gradient(180deg,#fff 0%,#f7f3ff 100%);box-shadow:0 18px 40px rgba(124,58,237,.1)}
+    .ax-dark-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;margin-top:2.25rem}
+    .ax-dark-item{display:flex;gap:.9rem;align-items:flex-start;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:1.25rem 1.35rem}
+    .ax-dark-item i{color:#a78bfa;font-size:1rem;margin-top:.2rem}
+    .ax-dark-item h3{color:#fff;font-size:.95rem;font-weight:700;margin:0 0 .3rem}
+    .ax-dark-item p{color:rgba(255,255,255,.6);font-size:.86rem;line-height:1.65;margin:0}
+    .ax-dark-item--wide{grid-column:1/-1}
+    .ax-sec--dark .ax-label{color:#a78bfa}
+    @media(max-width:991px){
+        .ax-dark-grid{grid-template-columns:1fr}
+        .ax-dark-item--wide{grid-column:auto}
+    }
+    @media(prefers-reduced-motion:reduce){
+        .ax-btn:hover{transform:none}
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <!-- HERO -->
-<section class="bwa-hero">
-    <div class="bwa-hero__grid"></div>
-    <div class="bwa-hero__glow"></div>
-    <div class="bwa-hero__glow bwa-hero__glow--2"></div>
-    <div class="bwa-container bwa-hero__inner">
-        <div class="bwa-hero__copy">
-            <div class="bwa-eyebrow bwa-eyebrow--light">{% trans "Browser Automation" %}</div>
-            <h1>{% trans "Browser Automation That" %} <span class="bwa-grad">{% trans "Connects the Unconnected" %}</span></h1>
-            <p>
-                {% trans "When systems don't provide an API, OnWebApp can interact with them through the browser—automating repetitive actions across the tools your business already uses." %}
-            </p>
-            <p class="bwa-hero__line">{% trans "Automate the work. Keep your existing systems." %}</p>
-            <div class="bwa-hero__actions">
-                <a href="{% url 'home:automation_home' %}" class="btn btn-lg rounded-pill px-5 fw-800" style="background:var(--grad-primary);border:none;color:#fff;box-shadow:0 12px 28px -10px var(--primary-glow);">
-                    {% trans "Explore Automation" %} <i class="fas fa-arrow-right ms-1"></i>
-                </a>
-                <a href="#bwa-content" class="btn btn-lg rounded-pill px-4 fw-700" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);color:#fff;backdrop-filter:blur(10px);">
-                    {% trans "What It Enables" %}
-                </a>
-            </div>
-            <div class="bwa-chips mt-4">
-                <span class="bwa-chip"><i class="fas fa-compass"></i>{% trans "Navigate any portal" %}</span>
-                <span class="bwa-chip"><i class="fas fa-database"></i>{% trans "Extract data" %}</span>
-                <span class="bwa-chip"><i class="fas fa-paper-plane"></i>{% trans "Submit forms" %}</span>
-                <span class="bwa-chip"><i class="fas fa-right-left"></i>{% trans "Move data across systems" %}</span>
-            </div>
+<section class="ax-hero">
+    <div class="ax-hero__shade"></div>
+    <div class="ax-hero__fade"></div>
+    <div class="wrap ax-hero__inner">
+        <a href="{% url 'home:automation_home' %}" class="ax-hero__eyebrow">{% trans "Browser Automation" %}</a>
+        <h1 class="ax-hero__title">{% trans "Browser Automation That" %} <span class="ax-grad">{% trans "Connects the Unconnected" %}</span></h1>
+        <p class="ax-hero__sub">{% trans "When systems don't provide an API, OnWebApp can interact with them through the browser—automating repetitive actions across the tools your business already uses." %}</p>
+        <p class="ax-hero__sub" style="margin-top:-.5rem;color:rgba(255,255,255,.88);font-weight:600">{% trans "Automate the work. Keep your existing systems." %}</p>
+        <div class="ax-hero__actions">
+            <a href="{% url 'home:automation_home' %}" class="ax-btn ax-btn--primary">{% trans "Explore Automation" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+            <a href="#capabilities" class="ax-btn ax-btn--ghost">{% trans "What It Enables" %} <i class="fas fa-arrow-down" aria-hidden="true"></i></a>
+            <a href="{% url 'contact:contact' %}" class="ax-btn ax-btn--ghost">{% trans "Talk to Our Team" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
         </div>
-
-        <!-- Know more to content -->
-        <div class="bwa-more">
-            <div>
-                <a href="#bwa-content" class="bwa-more__btn">{% trans "Know More" %} <i class="fas fa-chevron-down"></i></a>
-                <span class="bwa-more__hint">{% trans "Where it sits in the stack" %}</span>
-            </div>
+        <div class="ax-chips" style="margin-top:1.75rem">
+            <span class="ax-chip ax-chip--violet"><i class="fas fa-compass" aria-hidden="true"></i>{% trans "Navigate any portal" %}</span>
+            <span class="ax-chip ax-chip--indigo"><i class="fas fa-database" aria-hidden="true"></i>{% trans "Extract data" %}</span>
+            <span class="ax-chip ax-chip--blue"><i class="fas fa-paper-plane" aria-hidden="true"></i>{% trans "Submit forms" %}</span>
+            <span class="ax-chip ax-chip--violet"><i class="fas fa-right-left" aria-hidden="true"></i>{% trans "Move data across systems" %}</span>
         </div>
     </div>
 </section>
 
 <!-- WHAT BROWSER AUTOMATION ENABLES -->
-<section class="bwa-section bwa-section--alt" id="bwa-content">
-    <div class="bwa-container">
-        <div class="bwa-center mb-5 bwa-reveal">
-            <div class="bwa-eyebrow">{% trans "What Browser Automation Enables" %}</div>
-            <h2 class="bwa-h2">{% trans "Turn Manual Browser Work Into Automated Workflows" %}</h2>
-            <p class="bwa-lede">{% trans "Many business processes still depend on clicking through dashboards, portals, and web applications. OnWebApp uses browser automation as part of larger workflows to handle these repetitive interactions reliably." %}</p>
+<section class="ax-sec" id="capabilities">
+    <div class="wrap">
+        <div class="ax-center">
+            <span class="ax-label">{% trans "What Browser Automation Enables" %}</span>
+            <h2 class="ax-h2">{% trans "Turn Manual Browser Work Into Automated Workflows" %}</h2>
+            <p class="ax-lead">{% trans "Many business processes still depend on clicking through dashboards, portals, and web applications. OnWebApp uses browser automation as part of larger workflows to handle these repetitive interactions reliably." %}</p>
         </div>
-        <div class="row g-4">
-            <div class="col-lg-3 col-md-6">
-                <div class="bwa-card bwa-reveal" style="--dc:#4f46e5;--dc-soft:rgba(79,70,229,.1)">
-                    <div class="bwa-icon"><i class="fas fa-compass"></i></div>
-                    <h3 class="bwa-h3">{% trans "Navigate web applications automatically" %}</h3>
-                    <p>{% trans "Open portals, dashboards and internal tools, move through the screens a person would normally click, and reach the right page reliably every time." %}</p>
-                </div>
+        <div class="ax-grid ax-grid--4">
+            <div class="ax-card">
+                <div class="ax-card__icon ax-card__icon--violet"><i class="fas fa-compass" aria-hidden="true"></i></div>
+                <h3 class="ax-card__title">{% trans "Navigate web applications automatically" %}</h3>
+                <p class="ax-card__body">{% trans "Open portals, dashboards and internal tools, move through the screens a person would normally click, and reach the right page reliably every time." %}</p>
             </div>
-            <div class="col-lg-3 col-md-6">
-                <div class="bwa-card bwa-reveal" style="--dc:#0ea5e9;--dc-soft:rgba(14,165,233,.1)">
-                    <div class="bwa-icon"><i class="fas fa-keyboard"></i></div>
-                    <h3 class="bwa-h3">{% trans "Enter and validate information" %}</h3>
-                    <p>{% trans "Fill in forms, check the values against business rules, and only submit once the data is actually correct." %}</p>
-                </div>
+            <div class="ax-card">
+                <div class="ax-card__icon ax-card__icon--indigo"><i class="fas fa-keyboard" aria-hidden="true"></i></div>
+                <h3 class="ax-card__title">{% trans "Enter and validate information" %}</h3>
+                <p class="ax-card__body">{% trans "Fill in forms, check the values against business rules, and only submit once the data is actually correct." %}</p>
             </div>
-            <div class="col-lg-3 col-md-6">
-                <div class="bwa-card bwa-reveal" style="--dc:#22c55e;--dc-soft:rgba(34,197,94,.1)">
-                    <div class="bwa-icon"><i class="fas fa-database"></i></div>
-                    <h3 class="bwa-h3">{% trans "Extract data from web interfaces" %}</h3>
-                    <p>{% trans "Read structured information out of web pages and feed it into the next stage of the workflow." %}</p>
-                </div>
+            <div class="ax-card">
+                <div class="ax-card__icon ax-card__icon--blue"><i class="fas fa-database" aria-hidden="true"></i></div>
+                <h3 class="ax-card__title">{% trans "Extract data from web interfaces" %}</h3>
+                <p class="ax-card__body">{% trans "Read structured information out of web pages and feed it into the next stage of the workflow." %}</p>
             </div>
-            <div class="col-lg-3 col-md-6">
-                <div class="bwa-card bwa-reveal" style="--dc:#f59e0b;--dc-soft:rgba(245,158,11,.1)">
-                    <div class="bwa-icon"><i class="fas fa-file-arrow-down"></i></div>
-                    <h3 class="bwa-h3">{% trans "Upload and download documents" %}</h3>
-                    <p>{% trans "Handle files that only exist inside a web interface, from invoices and reports to attachments and statements." %}</p>
-                </div>
+            <div class="ax-card">
+                <div class="ax-card__icon ax-card__icon--gold"><i class="fas fa-file-arrow-down" aria-hidden="true"></i></div>
+                <h3 class="ax-card__title">{% trans "Upload and download documents" %}</h3>
+                <p class="ax-card__body">{% trans "Handle files that only exist inside a web interface, from invoices and reports to attachments and statements." %}</p>
             </div>
-            <div class="col-lg-3 col-md-6">
-                <div class="bwa-card bwa-reveal" style="--dc:#8b5cf6;--dc-soft:rgba(139,92,246,.1)">
-                    <div class="bwa-icon"><i class="fas fa-paper-plane"></i></div>
-                    <h3 class="bwa-h3">{% trans "Submit forms and requests" %}</h3>
-                    <p>{% trans "Complete and lodge requests through portals that have no API, applying the same validation a person would." %}</p>
-                </div>
+            <div class="ax-card">
+                <div class="ax-card__icon ax-card__icon--violet"><i class="fas fa-paper-plane" aria-hidden="true"></i></div>
+                <h3 class="ax-card__title">{% trans "Submit forms and requests" %}</h3>
+                <p class="ax-card__body">{% trans "Complete and lodge requests through portals that have no API, applying the same validation a person would." %}</p>
             </div>
-            <div class="col-lg-3 col-md-6">
-                <div class="bwa-card bwa-reveal" style="--dc:#ec4899;--dc-soft:rgba(236,72,153,.1)">
-                    <div class="bwa-icon"><i class="fas fa-right-left"></i></div>
-                    <h3 class="bwa-h3">{% trans "Move information between disconnected systems" %}</h3>
-                    <p>{% trans "Transfer data from one platform into another when the two cannot talk to each other directly." %}</p>
-                </div>
+            <div class="ax-card">
+                <div class="ax-card__icon ax-card__icon--indigo"><i class="fas fa-right-left" aria-hidden="true"></i></div>
+                <h3 class="ax-card__title">{% trans "Move information between disconnected systems" %}</h3>
+                <p class="ax-card__body">{% trans "Transfer data from one platform into another when the two cannot talk to each other directly." %}</p>
             </div>
-            <div class="col-lg-3 col-md-6">
-                <div class="bwa-card bwa-reveal" style="--dc:#6366F1;--dc-soft:rgba(99,102,241,.1)">
-                    <div class="bwa-icon"><i class="fas fa-code-branch"></i></div>
-                    <h3 class="bwa-h3">{% trans "Trigger actions based on workflow conditions" %}</h3>
-                    <p>{% trans "Start browser work automatically when a business rule is met, rather than on a fixed schedule alone." %}</p>
-                </div>
+            <div class="ax-card">
+                <div class="ax-card__icon ax-card__icon--blue"><i class="fas fa-code-branch" aria-hidden="true"></i></div>
+                <h3 class="ax-card__title">{% trans "Trigger actions based on workflow conditions" %}</h3>
+                <p class="ax-card__body">{% trans "Start browser work automatically when a business rule is met, rather than on a fixed schedule alone." %}</p>
             </div>
-            <div class="col-lg-3 col-md-6">
-                <div class="bwa-card bwa-reveal" style="--dc:#6366f1;--dc-soft:rgba(99,102,241,.1)">
-                    <div class="bwa-icon"><i class="fas fa-wave-square"></i></div>
-                    <h3 class="bwa-h3">{% trans "Monitor browser-based processes" %}</h3>
-                    <p>{% trans "Track what ran, what succeeded and what needs attention, instead of finding out when something breaks." %}</p>
-                </div>
+            <div class="ax-card">
+                <div class="ax-card__icon ax-card__icon--gold"><i class="fas fa-wave-square" aria-hidden="true"></i></div>
+                <h3 class="ax-card__title">{% trans "Monitor browser-based processes" %}</h3>
+                <p class="ax-card__body">{% trans "Track what ran, what succeeded and what needs attention, instead of finding out when something breaks." %}</p>
             </div>
         </div>
     </div>
 </section>
 
 <!-- BEYOND APIS -->
-<section class="bwa-section">
-    <div class="bwa-container">
-        <div class="bwa-center mb-5 bwa-reveal">
-            <div class="bwa-eyebrow">{% trans "Beyond APIs" %}</div>
-            <h2 class="bwa-h2">{% trans "When There's No API, Automation Doesn't Stop" %}</h2>
-            <p class="bwa-lede">{% trans "Modern integrations often rely on APIs. But businesses still use legacy platforms, private portals, internal tools, and third-party applications that aren't designed for direct integration." %}</p>
-            <p class="bwa-lede">{% trans "That's where browser automation becomes part of the OnWebApp automation layer." %}</p>
+<section class="ax-sec ax-sec--soft">
+    <div class="wrap">
+        <div class="ax-center">
+            <span class="ax-label ax-label--indigo">{% trans "Beyond APIs" %}</span>
+            <h2 class="ax-h2">{% trans "When There's No API, Automation Doesn't Stop" %}</h2>
+            <p class="ax-lead">{% trans "Modern integrations often rely on APIs. But businesses still use legacy platforms, private portals, internal tools, and third-party applications that aren't designed for direct integration." %}</p>
+            <p class="ax-lead" style="margin-top:1rem">{% trans "That's where browser automation becomes part of the OnWebApp automation layer." %}</p>
         </div>
-        <div class="row g-4 align-items-stretch">
-            <div class="col-lg-4">
-                <div class="bwa-plan bwa-plan--q bwa-reveal">
-                    <div class="bwa-plan__tier">{% trans "API available?" %}</div>
-                    <h4>{% trans "Use a direct integration." %}</h4>
-                    <p class="bwa-plan__desc">{% trans "Where a supported API exists, it is always the cleaner, faster and more stable route." %}</p>
-                </div>
+        <div class="ax-grid ax-grid--3">
+            <div class="ax-card">
+                <div class="ax-card__icon ax-card__icon--indigo"><i class="fas fa-plug" aria-hidden="true"></i></div>
+                <h3 class="ax-card__title">{% trans "API available?" %}</h3>
+                <p class="ax-card__body">{% trans "Use a direct integration. Where a supported API exists, it is always the cleaner, faster and more stable route." %}</p>
             </div>
-            <div class="col-lg-4">
-                <div class="bwa-plan bwa-plan--q bwa-plan--featured bwa-reveal">
-                    <div class="bwa-plan__flag">{% trans "Browser Automation" %}</div>
-                    <div class="bwa-plan__tier">{% trans "No API available?" %}</div>
-                    <h4>{% trans "Automate the browser interaction." %}</h4>
-                    <p class="bwa-plan__desc">{% trans "The same work a person does through the interface, performed reliably and re-run as often as needed." %}</p>
-                </div>
+            <div class="ax-card ax-card--accent">
+                <div class="ax-card__icon ax-card__icon--violet"><i class="fas fa-mouse-pointer" aria-hidden="true"></i></div>
+                <h3 class="ax-card__title">{% trans "No API available?" %}</h3>
+                <p class="ax-card__body">{% trans "Automate the browser interaction. The same work a person does through the interface, performed reliably and re-run as often as needed." %}</p>
             </div>
-            <div class="col-lg-4">
-                <div class="bwa-plan bwa-plan--q bwa-reveal">
-                    <div class="bwa-plan__tier">{% trans "Multiple systems involved?" %}</div>
-                    <h4>{% trans "Connect the entire process through a unified workflow." %}</h4>
-                    <p class="bwa-plan__desc">{% trans "APIs, browser steps and manual checkpoints handled as one connected process rather than separate jobs." %}</p>
-                </div>
+            <div class="ax-card">
+                <div class="ax-card__icon ax-card__icon--blue"><i class="fas fa-sitemap" aria-hidden="true"></i></div>
+                <h3 class="ax-card__title">{% trans "Multiple systems involved?" %}</h3>
+                <p class="ax-card__body">{% trans "Connect the entire process through a unified workflow. APIs, browser steps and manual checkpoints handled as one connected process rather than separate jobs." %}</p>
             </div>
         </div>
     </div>
 </section>
 
 <!-- HOW IT FITS INTO ONWEBAPP -->
-<section class="bwa-section bwa-section--alt">
-    <div class="bwa-container">
-        <div class="bwa-center mb-4 bwa-reveal">
-            <div class="bwa-eyebrow">{% trans "How It Fits Into OnWebApp" %}</div>
-            <h2 class="bwa-h2">{% trans "Browser Automation Is One Layer of a Larger System" %}</h2>
-            <p class="bwa-lede">{% trans "Every automated process runs through the same path, whether it ends at an API, a database, or a browser." %}</p>
+<section class="ax-sec ax-sec--tint">
+    <div class="wrap">
+        <div class="ax-feat">
+            <div class="ax-feat__copy">
+                <span class="ax-label">{% trans "How It Fits Into OnWebApp" %}</span>
+                <h2 class="ax-h2">{% trans "Browser Automation Is One Layer of a Larger System" %}</h2>
+                <p class="ax-feat__lead">{% trans "Every automated process runs through the same path, whether it ends at an API, a database, or a browser." %}</p>
+                <div class="ax-feat__items">
+                    <div class="ax-feat__item">
+                        <div class="ax-feat__icon"><i class="fas fa-bolt" aria-hidden="true"></i></div>
+                        <div>
+                            <h3>{% trans "Trigger" %}</h3>
+                            <p>{% trans "A schedule, a webhook, a new record, or a completed step in another workflow." %}</p>
+                        </div>
+                    </div>
+                    <div class="ax-feat__item">
+                        <div class="ax-feat__icon"><i class="fas fa-diagram-project" aria-hidden="true"></i></div>
+                        <div>
+                            <h3>{% trans "Workflow Engine" %}</h3>
+                            <p>{% trans "The process is loaded, its state tracked, and its branches resolved." %}</p>
+                        </div>
+                    </div>
+                    <div class="ax-feat__item">
+                        <div class="ax-feat__icon"><i class="fas fa-scale-balanced" aria-hidden="true"></i></div>
+                        <div>
+                            <h3>{% trans "Business Logic" %}</h3>
+                            <p>{% trans "Rules, thresholds and required approvals are applied before anything is actioned." %}</p>
+                        </div>
+                    </div>
+                    <div class="ax-feat__item">
+                        <div class="ax-feat__icon" style="background:linear-gradient(135deg,rgba(124,58,237,.22),rgba(124,58,237,.08))"><i class="fas fa-mouse-pointer" aria-hidden="true"></i></div>
+                        <div>
+                            <h3>{% trans "API Integration / Browser Automation" %}</h3>
+                            <p>{% trans "The step is carried out through a direct API call, or through the browser when no API exists." %}</p>
+                        </div>
+                    </div>
+                    <div class="ax-feat__item">
+                        <div class="ax-feat__icon"><i class="fas fa-database" aria-hidden="true"></i></div>
+                        <div>
+                            <h3>{% trans "Data Processing" %}</h3>
+                            <p>{% trans "Extracted values are normalised, transformed and written where they belong." %}</p>
+                        </div>
+                    </div>
+                    <div class="ax-feat__item">
+                        <div class="ax-feat__icon"><i class="fas fa-paper-plane" aria-hidden="true"></i></div>
+                        <div>
+                            <h3>{% trans "Action" %}</h3>
+                            <p>{% trans "Records are updated, documents filed, requests submitted and the next step released." %}</p>
+                        </div>
+                    </div>
+                    <div class="ax-feat__item">
+                        <div class="ax-feat__icon"><i class="fas fa-chart-line" aria-hidden="true"></i></div>
+                        <div>
+                            <h3>{% trans "Reporting & Monitoring" %}</h3>
+                            <p>{% trans "The run is logged, timed and surfaced on dashboards and alerts." %}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="ax-callout">
+                    <p>{% trans "Browser automation doesn't operate in isolation. It works alongside OnWebApp's workflow engine, integrations, data processing, monitoring, and automation capabilities." %}</p>
+                </div>
+            </div>
+            <div class="ax-feat__media">
+                <img src="{% static 'img/websiteautomation.png' %}" alt="{% trans 'Operator monitoring browser automation dashboards across multiple screens' %}" loading="lazy">
+            </div>
         </div>
-        <div class="bwa-chain bwa-reveal">
-            <div class="bwa-step">
-                <div class="bwa-step__num">1</div>
-                <div>
-                    <h5>{% trans "Trigger" %}</h5>
-                    <p>{% trans "A schedule, a webhook, a new record, or a completed step in another workflow." %}</p>
-                </div>
-            </div>
-            <div class="bwa-step">
-                <div class="bwa-step__num">2</div>
-                <div>
-                    <h5>{% trans "Workflow Engine" %}</h5>
-                    <p>{% trans "The process is loaded, its state tracked, and its branches resolved." %}</p>
-                </div>
-            </div>
-            <div class="bwa-step">
-                <div class="bwa-step__num">3</div>
-                <div>
-                    <h5>{% trans "Business Logic" %}</h5>
-                    <p>{% trans "Rules, thresholds and required approvals are applied before anything is actioned." %}</p>
-                </div>
-            </div>
-            <div class="bwa-step bwa-step--on">
-                <div class="bwa-step__num"><i class="fas fa-mouse-pointer"></i></div>
-                <div>
-                    <h5>{% trans "API Integration / Browser Automation" %}</h5>
-                    <p>{% trans "The step is carried out through a direct API call, or through the browser when no API exists." %}</p>
-                </div>
-            </div>
-            <div class="bwa-step">
-                <div class="bwa-step__num">5</div>
-                <div>
-                    <h5>{% trans "Data Processing" %}</h5>
-                    <p>{% trans "Extracted values are normalised, transformed and written where they belong." %}</p>
-                </div>
-            </div>
-            <div class="bwa-step">
-                <div class="bwa-step__num">6</div>
-                <div>
-                    <h5>{% trans "Action" %}</h5>
-                    <p>{% trans "Records are updated, documents filed, requests submitted and the next step released." %}</p>
-                </div>
-            </div>
-            <div class="bwa-step">
-                <div class="bwa-step__num">7</div>
-                <div>
-                    <h5>{% trans "Reporting & Monitoring" %}</h5>
-                    <p>{% trans "The run is logged, timed and surfaced on dashboards and alerts." %}</p>
-                </div>
-            </div>
-        </div>
-        <p class="bwa-lede bwa-center mt-5 bwa-reveal">{% trans "Browser automation doesn't operate in isolation. It works alongside OnWebApp's workflow engine, integrations, data processing, monitoring, and automation capabilities." %}</p>
     </div>
 </section>
 
 <!-- EXAMPLE WORKFLOW -->
-<section class="bwa-section">
-    <div class="bwa-container">
-        <div class="row g-5 align-items-start">
-            <div class="col-lg-5">
-                <div class="bwa-eyebrow bwa-reveal">{% trans "Example Workflow" %}</div>
-                <h2 class="bwa-h2 bwa-reveal">{% trans "From Customer Request to Completed Operation" %}</h2>
-                <p class="bwa-lede bwa-reveal">{% trans "A single request, carried through the layers above until the work is genuinely finished and visible." %}</p>
-            </div>
-            <div class="col-lg-7">
-                <div class="bwa-chain bwa-reveal">
-                    <div class="bwa-step">
-                        <div class="bwa-step__num">1</div>
-                        <div>
-                            <h5>{% trans "Customer Request" %}</h5>
-                            <p>{% trans "A request enters the system." %}</p>
-                        </div>
+<section class="ax-sec">
+    <div class="wrap">
+        <div class="ax-feat ax-feat--flip">
+            <div class="ax-feat__copy">
+                <span class="ax-label ax-label--indigo">{% trans "Example Workflow" %}</span>
+                <h2 class="ax-h2">{% trans "From Customer Request to Completed Operation" %}</h2>
+                <p class="ax-feat__lead">{% trans "A single request, carried through the layers above until the work is genuinely finished and visible." %}</p>
+                <div class="ax-feat__items">
+                    <div class="ax-feat__item">
+                        <div class="ax-feat__icon"><i class="fas fa-inbox" aria-hidden="true"></i></div>
+                        <div><h3>{% trans "Customer Request" %}</h3><p>{% trans "A request enters the system." %}</p></div>
                     </div>
-                    <div class="bwa-step">
-                        <div class="bwa-step__num">2</div>
-                        <div>
-                            <h5>{% trans "Data Validation" %}</h5>
-                            <p>{% trans "Information is checked against business rules." %}</p>
-                        </div>
+                    <div class="ax-feat__item">
+                        <div class="ax-feat__icon"><i class="fas fa-check-double" aria-hidden="true"></i></div>
+                        <div><h3>{% trans "Data Validation" %}</h3><p>{% trans "Information is checked against business rules." %}</p></div>
                     </div>
-                    <div class="bwa-step bwa-step--on">
-                        <div class="bwa-step__num"><i class="fas fa-mouse-pointer"></i></div>
-                        <div>
-                            <h5>{% trans "Browser Automation" %}</h5>
-                            <p>{% trans "A web portal is opened and the required information is entered." %}</p>
-                        </div>
+                    <div class="ax-feat__item">
+                        <div class="ax-feat__icon" style="background:linear-gradient(135deg,rgba(124,58,237,.22),rgba(124,58,237,.08))"><i class="fas fa-mouse-pointer" aria-hidden="true"></i></div>
+                        <div><h3>{% trans "Browser Automation" %}</h3><p>{% trans "A web portal is opened and the required information is entered." %}</p></div>
                     </div>
-                    <div class="bwa-step">
-                        <div class="bwa-step__num">4</div>
-                        <div>
-                            <h5>{% trans "Document Processing" %}</h5>
-                            <p>{% trans "Documents are uploaded or retrieved." %}</p>
-                        </div>
+                    <div class="ax-feat__item">
+                        <div class="ax-feat__icon"><i class="fas fa-file-lines" aria-hidden="true"></i></div>
+                        <div><h3>{% trans "Document Processing" %}</h3><p>{% trans "Documents are uploaded or retrieved." %}</p></div>
                     </div>
-                    <div class="bwa-step">
-                        <div class="bwa-step__num">5</div>
-                        <div>
-                            <h5>{% trans "System Update" %}</h5>
-                            <p>{% trans "Results are synchronized with the relevant business systems." %}</p>
-                        </div>
+                    <div class="ax-feat__item">
+                        <div class="ax-feat__icon"><i class="fas fa-arrows-rotate" aria-hidden="true"></i></div>
+                        <div><h3>{% trans "System Update" %}</h3><p>{% trans "Results are synchronized with the relevant business systems." %}</p></div>
                     </div>
-                    <div class="bwa-step">
-                        <div class="bwa-step__num">6</div>
-                        <div>
-                            <h5>{% trans "Notification" %}</h5>
-                            <p>{% trans "The appropriate team receives an update." %}</p>
-                        </div>
+                    <div class="ax-feat__item">
+                        <div class="ax-feat__icon"><i class="fas fa-bell" aria-hidden="true"></i></div>
+                        <div><h3>{% trans "Notification" %}</h3><p>{% trans "The appropriate team receives an update." %}</p></div>
                     </div>
-                    <div class="bwa-step">
-                        <div class="bwa-step__num">7</div>
-                        <div>
-                            <h5>{% trans "Reporting" %}</h5>
-                            <p>{% trans "The complete operation becomes visible through dashboards and monitoring." %}</p>
-                        </div>
+                    <div class="ax-feat__item">
+                        <div class="ax-feat__icon"><i class="fas fa-chart-line" aria-hidden="true"></i></div>
+                        <div><h3>{% trans "Reporting" %}</h3><p>{% trans "The complete operation becomes visible through dashboards and monitoring." %}</p></div>
                     </div>
                 </div>
+            </div>
+            <div class="ax-feat__media">
+                <img src="{% static 'img/entreprise.png' %}" alt="{% trans 'Professional interacting with enterprise automation dashboards' %}" loading="lazy">
             </div>
         </div>
     </div>
 </section>
 
 <!-- BUILT FOR REAL BUSINESS PROCESSES -->
-<section class="bwa-section bwa-section--alt">
-    <div class="bwa-container">
-        <div class="bwa-center mb-5 bwa-reveal">
-            <div class="bwa-eyebrow">{% trans "Built for Real Business Processes" %}</div>
-            <h2 class="bwa-h2">{% trans "Automate the Interfaces Your Business Already Depends On" %}</h2>
-            <p class="bwa-lede">{% trans "Browser automation can support workflows involving:" %}</p>
+<section class="ax-sec ax-sec--soft">
+    <div class="wrap">
+        <div class="ax-center">
+            <span class="ax-label ax-label--indigo">{% trans "Built for Real Business Processes" %}</span>
+            <h2 class="ax-h2">{% trans "Automate the Interfaces Your Business Already Depends On" %}</h2>
+            <p class="ax-lead">{% trans "Browser automation can support workflows involving:" %}</p>
         </div>
-        <div class="row g-4">
-            <div class="col-lg-4 col-md-6">
-                <div class="bwa-card bwa-reveal" style="--dc:#4f46e5;--dc-soft:rgba(79,70,229,.1)">
-                    <div class="bwa-icon"><i class="fas fa-building-shield"></i></div>
-                    <h3 class="bwa-h3">{% trans "Internal Portals" %}</h3>
-                    <p>{% trans "Automate repetitive operations inside company web applications." %}</p>
-                </div>
+        <div class="ax-grid ax-grid--3">
+            <div class="ax-card">
+                <div class="ax-card__icon ax-card__icon--violet"><i class="fas fa-building-shield" aria-hidden="true"></i></div>
+                <h3 class="ax-card__title">{% trans "Internal Portals" %}</h3>
+                <p class="ax-card__body">{% trans "Automate repetitive operations inside company web applications." %}</p>
             </div>
-            <div class="col-lg-4 col-md-6">
-                <div class="bwa-card bwa-reveal" style="--dc:#0ea5e9;--dc-soft:rgba(14,165,233,.1)">
-                    <div class="bwa-icon"><i class="fas fa-archive"></i></div>
-                    <h3 class="bwa-h3">{% trans "Legacy Systems" %}</h3>
-                    <p>{% trans "Connect older systems that lack modern integration capabilities." %}</p>
-                </div>
+            <div class="ax-card">
+                <div class="ax-card__icon ax-card__icon--indigo"><i class="fas fa-archive" aria-hidden="true"></i></div>
+                <h3 class="ax-card__title">{% trans "Legacy Systems" %}</h3>
+                <p class="ax-card__body">{% trans "Connect older systems that lack modern integration capabilities." %}</p>
             </div>
-            <div class="col-lg-4 col-md-6">
-                <div class="bwa-card bwa-reveal" style="--dc:#22c55e;--dc-soft:rgba(34,197,94,.1)">
-                    <div class="bwa-icon"><i class="fas fa-clipboard-check"></i></div>
-                    <h3 class="bwa-h3">{% trans "Administrative Work" %}</h3>
-                    <p>{% trans "Reduce repetitive data entry, form completion, and document handling." %}</p>
-                </div>
+            <div class="ax-card">
+                <div class="ax-card__icon ax-card__icon--blue"><i class="fas fa-clipboard-check" aria-hidden="true"></i></div>
+                <h3 class="ax-card__title">{% trans "Administrative Work" %}</h3>
+                <p class="ax-card__body">{% trans "Reduce repetitive data entry, form completion, and document handling." %}</p>
             </div>
-            <div class="col-lg-4 col-md-6">
-                <div class="bwa-card bwa-reveal" style="--dc:#f59e0b;--dc-soft:rgba(245,158,11,.1)">
-                    <div class="bwa-icon"><i class="fas fa-gears"></i></div>
-                    <h3 class="bwa-h3">{% trans "Operations" %}</h3>
-                    <p>{% trans "Execute recurring browser-based procedures according to predefined rules." %}</p>
-                </div>
+            <div class="ax-card">
+                <div class="ax-card__icon ax-card__icon--gold"><i class="fas fa-gears" aria-hidden="true"></i></div>
+                <h3 class="ax-card__title">{% trans "Operations" %}</h3>
+                <p class="ax-card__body">{% trans "Execute recurring browser-based procedures according to predefined rules." %}</p>
             </div>
-            <div class="col-lg-4 col-md-6">
-                <div class="bwa-card bwa-reveal" style="--dc:#8b5cf6;--dc-soft:rgba(139,92,246,.1)">
-                    <div class="bwa-icon"><i class="fas fa-table-list"></i></div>
-                    <h3 class="bwa-h3">{% trans "Data Collection" %}</h3>
-                    <p>{% trans "Retrieve structured information from web interfaces and feed it into business workflows." %}</p>
-                </div>
+            <div class="ax-card">
+                <div class="ax-card__icon ax-card__icon--violet"><i class="fas fa-table-list" aria-hidden="true"></i></div>
+                <h3 class="ax-card__title">{% trans "Data Collection" %}</h3>
+                <p class="ax-card__body">{% trans "Retrieve structured information from web interfaces and feed it into business workflows." %}</p>
+            </div>
+            <div class="ax-card">
+                <div class="ax-card__icon ax-card__icon--indigo"><i class="fas fa-globe" aria-hidden="true"></i></div>
+                <h3 class="ax-card__title">{% trans "Third-Party Platforms" %}</h3>
+                <p class="ax-card__body">{% trans "Work with supplier, customer and partner platforms that offer no direct integration." %}</p>
             </div>
         </div>
     </div>
 </section>
 
 <!-- AUTOMATION WITH CONTROL -->
-<section class="bwa-section bwa-section--dark">
-    <div class="bwa-container">
-        <div class="row g-5 align-items-start">
-            <div class="col-lg-5">
-                <div class="bwa-eyebrow bwa-eyebrow--light bwa-reveal">{% trans "Automation With Control" %}</div>
-                <h2 class="bwa-h2 bwa-reveal">{% trans "Designed to Run as Part of a Controlled Workflow" %}</h2>
-                <p class="bwa-lede bwa-lede--light bwa-reveal">{% trans "OnWebApp doesn't treat automation as a simple browser script. Browser interactions can be connected to business rules, validation, monitoring, and reporting." %}</p>
+<section class="ax-sec ax-sec--dark">
+    <div class="wrap">
+        <div class="ax-center">
+            <span class="ax-label">{% trans "Automation With Control" %}</span>
+            <h2 class="ax-h2 ax-h2--light">{% trans "Designed to Run as Part of a Controlled Workflow" %}</h2>
+            <p class="ax-lead ax-lead--dark">{% trans "OnWebApp doesn't treat automation as a simple browser script. Browser interactions can be connected to business rules, validation, monitoring, and reporting." %}</p>
+        </div>
+        <div class="ax-dark-grid">
+            <div class="ax-dark-item">
+                <i class="fas fa-filter" aria-hidden="true"></i>
+                <div><h3>{% trans "Conditional execution" %}</h3><p>{% trans "Run actions only when predefined conditions are met." %}</p></div>
             </div>
-            <div class="col-lg-7">
-                <ul class="bwa-list bwa-reveal" style="font-size:.94rem">
-                    <li>
-                        <i class="fas fa-check"></i>
-                        <div><strong>{% trans "Conditional execution" %}</strong><br>{% trans "Run actions only when predefined conditions are met." %}</div>
-                    </li>
-                    <li>
-                        <i class="fas fa-check"></i>
-                        <div><strong>{% trans "Validation" %}</strong><br>{% trans "Check information before submitting actions." %}</div>
-                    </li>
-                    <li>
-                        <i class="fas fa-check"></i>
-                        <div><strong>{% trans "Monitoring" %}</strong><br>{% trans "Track workflow execution and operational status." %}</div>
-                    </li>
-                    <li>
-                        <i class="fas fa-check"></i>
-                        <div><strong>{% trans "Error handling" %}</strong><br>{% trans "Detect failures and prevent incomplete workflows from silently passing through." %}</div>
-                    </li>
-                    <li>
-                        <i class="fas fa-check"></i>
-                        <div><strong>{% trans "Auditability" %}</strong><br>{% trans "Keep operational events connected to the broader workflow." %}</div>
-                    </li>
-                </ul>
+            <div class="ax-dark-item">
+                <i class="fas fa-check-double" aria-hidden="true"></i>
+                <div><h3>{% trans "Validation" %}</h3><p>{% trans "Check information before submitting actions." %}</p></div>
+            </div>
+            <div class="ax-dark-item">
+                <i class="fas fa-chart-line" aria-hidden="true"></i>
+                <div><h3>{% trans "Monitoring" %}</h3><p>{% trans "Track workflow execution and operational status." %}</p></div>
+            </div>
+            <div class="ax-dark-item">
+                <i class="fas fa-triangle-exclamation" aria-hidden="true"></i>
+                <div><h3>{% trans "Error handling" %}</h3><p>{% trans "Detect failures and prevent incomplete workflows from silently passing through." %}</p></div>
+            </div>
+            <div class="ax-dark-item ax-dark-item--wide">
+                <i class="fas fa-clock-rotate-left" aria-hidden="true"></i>
+                <div><h3>{% trans "Auditability" %}</h3><p>{% trans "Keep operational events connected to the broader workflow." %}</p></div>
             </div>
         </div>
     </div>
 </section>
 
 <!-- WHY IT MATTERS -->
-<section class="bwa-section">
-    <div class="bwa-container">
-        <div class="bwa-center mb-5 bwa-reveal">
-            <div class="bwa-eyebrow">{% trans "Why It Matters" %}</div>
-            <h2 class="bwa-h2">{% trans "Less Repetitive Work. More Connected Operations." %}</h2>
-            <p class="bwa-lede">{% trans "Browser automation helps remove manual steps that slow down otherwise automated processes." %}</p>
+<section class="ax-sec">
+    <div class="wrap">
+        <div class="ax-center">
+            <span class="ax-label">{% trans "Why It Matters" %}</span>
+            <h2 class="ax-h2">{% trans "Less Repetitive Work. More Connected Operations." %}</h2>
+            <p class="ax-lead">{% trans "Browser automation helps remove manual steps that slow down otherwise automated processes." %}</p>
         </div>
-        <div class="row g-4">
-            <div class="col-lg-3 col-md-6">
-                <div class="bwa-card bwa-reveal" style="--dc:#4f46e5;--dc-soft:rgba(79,70,229,.1)">
-                    <div class="bwa-icon"><i class="fas fa-repeat"></i></div>
-                    <h3 class="bwa-h3">{% trans "Reduce repetitive tasks" %}</h3>
-                    <p>{% trans "Let automated workflows handle routine browser interactions." %}</p>
-                </div>
+        <div class="ax-grid ax-grid--4">
+            <div class="ax-card">
+                <div class="ax-card__icon ax-card__icon--violet"><i class="fas fa-repeat" aria-hidden="true"></i></div>
+                <h3 class="ax-card__title">{% trans "Reduce repetitive tasks" %}</h3>
+                <p class="ax-card__body">{% trans "Let automated workflows handle routine browser interactions." %}</p>
             </div>
-            <div class="col-lg-3 col-md-6">
-                <div class="bwa-card bwa-reveal" style="--dc:#0ea5e9;--dc-soft:rgba(14,165,233,.1)">
-                    <div class="bwa-icon"><i class="fas fa-link"></i></div>
-                    <h3 class="bwa-h3">{% trans "Bridge disconnected systems" %}</h3>
-                    <p>{% trans "Connect applications that cannot communicate directly." %}</p>
-                </div>
+            <div class="ax-card">
+                <div class="ax-card__icon ax-card__icon--indigo"><i class="fas fa-link" aria-hidden="true"></i></div>
+                <h3 class="ax-card__title">{% trans "Bridge disconnected systems" %}</h3>
+                <p class="ax-card__body">{% trans "Connect applications that cannot communicate directly." %}</p>
             </div>
-            <div class="col-lg-3 col-md-6">
-                <div class="bwa-card bwa-reveal" style="--dc:#22c55e;--dc-soft:rgba(34,197,94,.1)">
-                    <div class="bwa-icon"><i class="fas fa-expand"></i></div>
-                    <h3 class="bwa-h3">{% trans "Extend automation coverage" %}</h3>
-                    <p>{% trans "Automate processes beyond what traditional APIs can reach." %}</p>
-                </div>
+            <div class="ax-card">
+                <div class="ax-card__icon ax-card__icon--blue"><i class="fas fa-expand" aria-hidden="true"></i></div>
+                <h3 class="ax-card__title">{% trans "Extend automation coverage" %}</h3>
+                <p class="ax-card__body">{% trans "Automate processes beyond what traditional APIs can reach." %}</p>
             </div>
-            <div class="col-lg-3 col-md-6">
-                <div class="bwa-card bwa-reveal" style="--dc:#8b5cf6;--dc-soft:rgba(139,92,246,.1)">
-                    <div class="bwa-icon"><i class="fas fa-sitemap"></i></div>
-                    <h3 class="bwa-h3">{% trans "Create end-to-end workflows" %}</h3>
-                    <p>{% trans "Combine browser actions with APIs, databases, AI, documents, and business logic." %}</p>
-                </div>
+            <div class="ax-card">
+                <div class="ax-card__icon ax-card__icon--gold"><i class="fas fa-sitemap" aria-hidden="true"></i></div>
+                <h3 class="ax-card__title">{% trans "Create end-to-end workflows" %}</h3>
+                <p class="ax-card__body">{% trans "Combine browser actions with APIs, databases, AI, documents, and business logic." %}</p>
             </div>
         </div>
     </div>
 </section>
 
 <!-- TECHNOLOGY -->
-<section class="bwa-section bwa-section--alt">
-    <div class="bwa-container">
-        <div class="bwa-center mb-4 bwa-reveal">
-            <div class="bwa-eyebrow">{% trans "Technology" %}</div>
-            <h2 class="bwa-h2">{% trans "A Practical Layer Inside the Automation Stack" %}</h2>
-            <p class="bwa-lede">{% trans "OnWebApp combines browser automation with:" %}</p>
+<section class="ax-sec ax-sec--soft">
+    <div class="wrap">
+        <div class="ax-center">
+            <span class="ax-label ax-label--indigo">{% trans "Technology" %}</span>
+            <h2 class="ax-h2">{% trans "A Practical Layer Inside the Automation Stack" %}</h2>
+            <p class="ax-lead">{% trans "OnWebApp combines browser automation with:" %}</p>
         </div>
-        <div class="bwa-industries bwa-reveal">
-            <span class="bwa-ind"><i class="fas fa-sitemap" style="color:#4f46e5"></i>{% trans "Workflow orchestration" %}</span>
-            <span class="bwa-ind"><i class="fas fa-plug" style="color:#0ea5e9"></i>{% trans "API integrations" %}</span>
-            <span class="bwa-ind"><i class="fas fa-database" style="color:#22c55e"></i>{% trans "Data processing" %}</span>
-            <span class="bwa-ind"><i class="fas fa-brain" style="color:#8b5cf6"></i>{% trans "AI-powered decision logic" %}</span>
-            <span class="bwa-ind"><i class="fas fa-file-lines" style="color:#f59e0b"></i>{% trans "Document processing" %}</span>
-            <span class="bwa-ind"><i class="fas fa-robot" style="color:#ec4899"></i>{% trans "RPA" %}</span>
-            <span class="bwa-ind"><i class="fas fa-wave-square" style="color:#4F46E5"></i>{% trans "Monitoring" %}</span>
-            <span class="bwa-ind"><i class="fas fa-chart-line" style="color:#6366f1"></i>{% trans "Business dashboards" %}</span>
-            <span class="bwa-ind"><i class="fas fa-bell" style="color:#eab308"></i>{% trans "Notifications" %}</span>
-            <span class="bwa-ind"><i class="fas fa-file-chart-column" style="color:#f43f5e"></i>{% trans "Reporting" %}</span>
+        <div class="ax-chips">
+            <span class="ax-chip ax-chip--violet"><i class="fas fa-sitemap" aria-hidden="true"></i>{% trans "Workflow orchestration" %}</span>
+            <span class="ax-chip ax-chip--indigo"><i class="fas fa-plug" aria-hidden="true"></i>{% trans "API integrations" %}</span>
+            <span class="ax-chip ax-chip--blue"><i class="fas fa-database" aria-hidden="true"></i>{% trans "Data processing" %}</span>
+            <span class="ax-chip ax-chip--violet"><i class="fas fa-brain" aria-hidden="true"></i>{% trans "AI-powered decision logic" %}</span>
+            <span class="ax-chip ax-chip--indigo"><i class="fas fa-file-lines" aria-hidden="true"></i>{% trans "Document processing" %}</span>
+            <span class="ax-chip ax-chip--blue"><i class="fas fa-robot" aria-hidden="true"></i>{% trans "RPA" %}</span>
+            <span class="ax-chip ax-chip--violet"><i class="fas fa-wave-square" aria-hidden="true"></i>{% trans "Monitoring" %}</span>
+            <span class="ax-chip ax-chip--indigo"><i class="fas fa-chart-line" aria-hidden="true"></i>{% trans "Business dashboards" %}</span>
+            <span class="ax-chip ax-chip--blue"><i class="fas fa-bell" aria-hidden="true"></i>{% trans "Notifications" %}</span>
+            <span class="ax-chip ax-chip--violet"><i class="fas fa-file-chart-column" aria-hidden="true"></i>{% trans "Reporting" %}</span>
         </div>
-        <p class="bwa-center mt-5 bwa-reveal" style="font-size:1.02rem;font-weight:600;color:var(--text-primary)">
-            {% trans "The result is not simply an automated browser session—it is a connected business process." %}
-        </p>
+        <p class="ax-note">{% trans "The result is not simply an automated browser session—it is a connected business process." %}</p>
     </div>
 </section>
 
 <!-- CTA -->
-<section class="bwa-section">
-    <div class="bwa-container">
-        <div class="bwa-cta bwa-reveal">
-            <h2>{% trans "Your Process Shouldn't Depend on Manual Clicking" %}</h2>
-            <p>{% trans "If a critical workflow still requires people to repeatedly navigate the same screens, enter the same information, or move data between systems, OnWebApp can incorporate browser automation into a broader automated workflow." %}</p>
-            <div class="d-flex flex-wrap justify-content-center gap-2">
-                <a href="{% url 'home:automation_home' %}" class="btn btn-lg rounded-pill px-5 fw-800" style="background:#fff;color:var(--primary-600);border:none;">
-                    {% trans "Explore Automation" %}
-                </a>
-                <a href="{% url 'contact:contact' %}" class="btn btn-lg rounded-pill px-5 fw-700" style="background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);color:#fff;">
-                    {% trans "Talk to Our Team" %}
-                </a>
-            </div>
+<section class="ax-sec ax-sec--dark">
+    <div class="wrap ax-center">
+        <h2 class="ax-h2 ax-h2--light">{% trans "Your Process Shouldn't Depend on Manual Clicking" %}</h2>
+        <p class="ax-lead ax-lead--dark">{% trans "If a critical workflow still requires people to repeatedly navigate the same screens, enter the same information, or move data between systems, OnWebApp can incorporate browser automation into a broader automated workflow." %}</p>
+        <div class="ax-hero__actions ax-hero__actions--center">
+            <a href="{% url 'home:automation_home' %}" class="ax-btn ax-btn--primary">{% trans "Explore Automation" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+            <a href="{% url 'contact:contact' %}" class="ax-btn ax-btn--dark-ghost">{% trans "Talk to Our Team" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
         </div>
     </div>
 </section>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    /* ── Scroll reveal ───────────────────────────────────────── */
-    var revealEls = document.querySelectorAll('.bwa-reveal');
-    if ('IntersectionObserver' in window) {
-        var revealObserver = new IntersectionObserver(function (entries) {
-            entries.forEach(function (entry) {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('is-visible');
-                    revealObserver.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
-        revealEls.forEach(function (el) { revealObserver.observe(el); });
-    } else {
-        revealEls.forEach(function (el) { el.classList.add('is-visible'); });
-    }
-
-});
-</script>
 {% endblock %}

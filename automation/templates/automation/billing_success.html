@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}Payment received{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="card shadow-sm border-0 rounded-4 p-4">
+    <h1 class="h3">Payment received</h1>
+    <p class="mb-2">
+      Your provider is confirming the subscription. Access is activated only after a
+      signature-verified billing webhook is processed, not from this redirect.
+    </p>
+    {% if subscription %}
+      <p class="mb-0">Current status: <strong>{{ subscription.get_status_display }}</strong></p>
+    {% endif %}
+    <a class="btn btn-outline-primary mt-3" href="{% url 'automation:billing_dashboard' %}">Back to billing</a>
+  </div>
+</div>
+{% endblock %}

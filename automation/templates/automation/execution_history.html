@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Execution history{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <h1 class="mb-4">Execution history: {{ workflow.title }}</h1>
+  {% if executions %}
+    <div class="list-group">
+      {% for execution in executions %}
+        <div class="list-group-item">
+          <div class="d-flex justify-content-between">
+            <strong>#{{ execution.pk }} &middot; {{ execution.get_status_display }}</strong>
+            <span class="text-muted">{{ execution.created_at }}</span>
+          </div>
+          <div class="small text-muted">
+            attempts: {{ execution.attempt_count }}
+            {% if execution.failure_code %}&middot; {{ execution.failure_code }}{% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-muted">No executions yet.</p>
+  {% endif %}
+  <a class="btn btn-outline-primary mt-3" href="{% url 'automation:automation_detail' workflow.pk %}">Back to workflow</a>
+</div>
+{% endblock %}

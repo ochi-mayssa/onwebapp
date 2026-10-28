@@ -46,6 +46,7 @@ PAGE_SOURCES = (
     ('home:about', 'About Us', PUBLIC),
     ('home:automation_home', 'Website Automation', PUBLIC),
     ('home:rpa_bpa', 'RPA & BPA', PUBLIC),
+    ('home:rpa_solutions', 'RPA Solutions', PUBLIC),
     ('home:ux_design', 'UX Design', PUBLIC),
     ('home:ui_design', 'UI Design', PUBLIC),
     ('home:software_home', 'Software Development', PUBLIC),

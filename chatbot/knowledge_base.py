@@ -257,6 +257,22 @@ KNOWLEDGE_BASE = {
             },
         ],
     },
+    "rpa_solutions": {
+        "title": "RPA Solutions",
+        "url": "home:rpa_solutions",
+        "sections": [
+            {
+                "topic": ["rpa solutions", "robotic process automation services", "rpa service", "hire rpa", "rpa pricing", "rpa quote", "rpa consultation", "rpa cost"],
+                "answer": "OnWebApp offers RPA (Robotic Process Automation) solutions for small and medium businesses: software bots that handle repetitive processes across the applications you already use. Typical work includes invoice and document processing, data entry and synchronization, CRM and customer operations, ERP and back-office tasks, browser-based automation, and recurring reporting. Engagements are scoped per process and quoted per project — Starter covers a single defined workflow, Business covers multi-step automation with validation and exception handling, and Enterprise covers multiple workflows with integration architecture and access controls. Recurring fees can apply for hosting, execution capacity, monitoring, maintenance and support. Tell us about one process that takes too much time and we will assess its automation potential.",
+                "url": "home:rpa_solutions",
+            },
+            {
+                "topic": ["rpa or api", "rpa vs api", "rpa or integration", "which automation", "bot or api"],
+                "answer": "Not every process needs a software bot. We use APIs when direct integration is practical — they are stable, versioned, and the first choice whenever a system exposes one. RPA is used when a process depends on user-interface actions or on systems that are difficult to integrate directly, such as legacy tools and private portals. Many workflows end up using both: an API where one exists, and a bot for the steps that have none.",
+                "url": "home:rpa_solutions",
+            },
+        ],
+    },
     "services": {
         "title": "Services",
         "url": "services:index",
@@ -449,6 +465,7 @@ PAGE_TITLES = {
     "home:design_system": "Design System",
     "home:automation_home": "Website Automation",
     "home:rpa_bpa": "RPA & BPA",
+    "home:rpa_solutions": "RPA Solutions",
     "services:index": "Services",
     "services:iot_integration": "IoT Integration",
     "services:industrial_automation": "Industrial Automation",

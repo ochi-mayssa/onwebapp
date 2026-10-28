@@ -167,10 +167,21 @@ PAGE_CONTEXTS = {
             'I need to automate a repetitive process.',
         ],
     },
+    'home:rpa_solutions': {
+        'title': 'RPA Solutions',
+        'category': 'Automation',
+        'service': 'automation',
+        'page_intro': 'This page covers Robotic Process Automation solutions for repetitive business processes, including use cases, engagement options, and the consultation request form.',
+        'suggestions': [
+            'What processes can be automated?',
+            'What does an RPA engagement cost?',
+            'Should we use RPA or an API integration?',
+            'I need to automate a repetitive process.',
+        ],
+    },
     'home:browser_web_automation': {
         # A capability used inside automation and web projects, not a service
-        # the visitor can buy on its own — the questions reflect that.
-        'title': 'Browser & Web Automation',
+        # the visitor can buy on its own — the questions reflect that.        'title': 'Browser & Web Automation',
         'category': 'Automation',
         'service': 'browser_automation',
         'page_intro': 'This page explains browser and web automation — a capability we apply inside projects rather than sell alone.',

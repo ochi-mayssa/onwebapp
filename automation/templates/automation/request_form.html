@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}Automation request{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow-sm border-0 rounded-4 p-4">
+        <h1 class="mb-4">Request a managed automation</h1>
+        <form method="post">
+          {% csrf_token %}
+          {{ form.non_field_errors }}
+          <div class="mb-3">{{ form.title.label_tag }} {{ form.title }}</div>
+          <div class="mb-3">{{ form.description.label_tag }} {{ form.description }}</div>
+          <div class="mb-3">{{ form.requirement_notes.label_tag }} {{ form.requirement_notes }}</div>
+          <button type="submit" class="btn btn-primary">Submit request</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
