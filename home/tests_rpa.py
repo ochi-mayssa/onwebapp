@@ -57,10 +57,7 @@ class RPASolutionsPageTests(TestCase):
             'From Manual Process to Automated Workflow',  # Section D
             'The Right Automation for the Right Task',    # Section E
             'Automation That Fits Your Business',        # Section F
-            'Start Small. Automate More Over Time.',     # Section G
             'What If Your Team Could Stop Doing the Same Task Every Day?',  # Section I
-            'Custom quote',
-            'Based on scope',
         ):
             with self.subTest(marker=marker):
                 self.assertContains(response, marker)

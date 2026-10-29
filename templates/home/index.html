@@ -231,6 +231,50 @@
 @media(max-width:768px){.oh-process-grid{grid-template-columns:1fr 1fr!important}.oh-process-line{display:none!important}.oh-stats-grid{grid-template-columns:1fr 1fr!important;gap:1rem!important}.oh-seo-grid{grid-template-columns:1fr!important;gap:2rem!important}.oh-seo-cards{grid-template-columns:1fr!important}.oh-seo-pills{justify-content:center!important}.oh-cta-section{padding:4rem 0!important}.oh-cta-buttons{flex-direction:column!important;align-items:center!important}.oh-cta-buttons a{width:100%!important;justify-content:center!important}.oh-sh-photo-mini strong{font-size:.9rem!important}}
 @media(max-width:575px){.oh-process-grid{grid-template-columns:1fr!important}.oh-stats-grid{grid-template-columns:1fr 1fr!important}.oh-hero-badges{flex-wrap:wrap!important}.oh-hero-badges .oh-badge{font-size:.7rem!important;padding:.3rem .7rem!important}.oh-cta-buttons{flex-direction:column!important;align-items:center!important}.oh-cta-buttons a{width:100%!important;justify-content:center!important}}
 </style>
+<style>
+/* ===== HOMEPAGE ADDITIONS: testimonials / industries / faq. Prefix: hm- ===== */
+.hm-grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+
+.hm-testi{background:#fff;border:1px solid rgba(15,23,42,.06);border-radius:16px;margin:0;padding:2rem;height:100%;display:flex;flex-direction:column;transition:transform .3s ease,box-shadow .3s ease}
+.hm-testi:hover{transform:translateY(-4px);box-shadow:0 14px 34px rgba(15,23,42,.08)}
+.hm-testi__icon{color:#D9A441;font-size:1rem;margin-bottom:.9rem}
+.hm-testi__quote{font-size:.95rem;font-style:normal;color:#5B6478;line-height:1.75;margin:0 0 1.5rem;flex:1}
+.hm-testi__who{display:flex;align-items:center;gap:.8rem;padding-top:1.25rem;border-top:1px solid rgba(15,23,42,.07)}
+.hm-testi__av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff}
+.hm-testi__av i{font-size:.8rem}
+.hm-testi__name{display:block;font-weight:700;color:#0F172A;font-size:.9rem;line-height:1.35}
+.hm-testi__org{display:block;font-size:.8rem;color:#5B6478}
+.hm-more{display:inline-flex;align-items:center;gap:.5rem;margin-top:2.25rem;font-family:'Manrope',system-ui,sans-serif;font-weight:700;font-size:.92rem;color:#2563eb;text-decoration:none;transition:color .25s,gap .25s}
+.hm-more:hover{color:#7c3aed;gap:.75rem}
+.hm-more i{font-size:.8rem}
+
+.hm-grid-ind{display:grid;grid-template-columns:repeat(4,1fr);gap:1.1rem}
+.hm-ind{background:#fff;border:1px solid rgba(15,23,42,.06);border-radius:14px;padding:1.5rem 1.35rem;display:flex;flex-direction:column;gap:.55rem;transition:transform .3s ease,border-color .3s ease,box-shadow .3s ease}
+.hm-ind:hover{transform:translateY(-4px);border-color:rgba(37,99,235,.28);box-shadow:0 14px 32px rgba(15,23,42,.07)}
+.hm-ind__icon{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1rem;background:linear-gradient(135deg,rgba(79,70,229,.12),rgba(79,70,229,.04));color:#4F46E5}
+.hm-ind__icon--gold{background:linear-gradient(135deg,rgba(217,164,65,.16),rgba(217,164,65,.05));color:#A5760D}
+.hm-ind__icon--blue{background:linear-gradient(135deg,rgba(37,99,235,.12),rgba(37,99,235,.04));color:#2563eb}
+.hm-ind h3{font-family:'Manrope',system-ui,sans-serif;font-size:.95rem;font-weight:700;color:#0F172A;margin:0;line-height:1.35}
+.hm-ind p{font-size:.83rem;color:#5B6478;margin:0;line-height:1.6}
+
+.hm-faq__item{background:#fff;border:1px solid rgba(15,23,42,.06);border-radius:14px;margin-bottom:.7rem;overflow:hidden;transition:border-color .25s}
+.hm-faq__item[open]{border-color:rgba(37,99,235,.3)}
+.hm-faq__item summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1.15rem 1.35rem;font-family:'Manrope',system-ui,sans-serif;font-weight:700;font-size:.95rem;color:#0F172A}
+.hm-faq__item summary::-webkit-details-marker{display:none}
+.hm-faq__item summary i{transition:transform .25s;flex:0 0 auto;color:#2563eb;font-size:.8rem}
+.hm-faq__item[open] summary i{transform:rotate(180deg)}
+.hm-faq__item summary:focus-visible{outline:2px solid #2563eb;outline-offset:-2px}
+.hm-faq__a{padding:0 1.35rem 1.25rem;color:#5B6478;font-size:.9rem;line-height:1.75;margin:0}
+
+@media(max-width:991px){.hm-grid3{grid-template-columns:1fr 1fr}.hm-grid-ind{grid-template-columns:1fr 1fr}}
+@media(max-width:767px){.hm-grid3{grid-template-columns:1fr}}
+@media(max-width:575px){.hm-grid-ind{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){
+    .hm-testi:hover,.hm-ind:hover{transform:none}
+    .hm-faq__item summary i{transition:none}
+    .hm-more:hover{gap:.5rem}
+}
+</style>
 {% endblock %}
 
 {% block content %}
@@ -739,6 +783,147 @@
                 <button type="button" class="oh-svc-dot" data-goto="2" aria-label="Branding"></button>
                 <button type="button" class="oh-svc-dot" data-goto="3" aria-label="Automation"></button>
             </div>
+        </div>
+    </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="oh-section" style="background:#F4F6FB">
+    <div class="wrap">
+        <div class="section-head" style="max-width:680px;margin-bottom:3rem">
+            <span class="kicker">In their words</span>
+            <h2>What changed for the teams we work with.</h2>
+            <p>Every engagement is measured against a baseline agreed before we start, so the outcome is verifiable rather than anecdotal.</p>
+        </div>
+        <div class="hm-grid3">
+            <figure class="hm-testi">
+                <i class="fas fa-star hm-testi__icon" aria-hidden="true"></i>
+                <blockquote class="hm-testi__quote">We needed a storefront that could talk to an ERP we were not allowed to replace. The integration layer handled that, and we launched in a single quarter without touching the legacy system.</blockquote>
+                <figcaption class="hm-testi__who">
+                    <span class="hm-testi__av" style="background:linear-gradient(135deg,#f472b6,#ec4899)" aria-hidden="true"><i class="fas fa-user"></i></span>
+                    <span>
+                        <span class="hm-testi__name">Ecommerce Manager</span>
+                        <span class="hm-testi__org">Specialty Retail</span>
+                    </span>
+                </figcaption>
+            </figure>
+            <figure class="hm-testi">
+                <i class="fas fa-star hm-testi__icon" aria-hidden="true"></i>
+                <blockquote class="hm-testi__quote">The first project was a proof of concept. Six months later the same integration runs our nightly jobs across three facilities without anyone maintaining it by hand.</blockquote>
+                <figcaption class="hm-testi__who">
+                    <span class="hm-testi__av" style="background:linear-gradient(135deg,#D9A441,#A5760D)" aria-hidden="true"><i class="fas fa-user"></i></span>
+                    <span>
+                        <span class="hm-testi__name">Plant Systems Engineer</span>
+                        <span class="hm-testi__org">Automotive Components</span>
+                    </span>
+                </figcaption>
+            </figure>
+            <figure class="hm-testi">
+                <i class="fas fa-star hm-testi__icon" aria-hidden="true"></i>
+                <blockquote class="hm-testi__quote">The dashboard replaced four spreadsheets and a weekly manual report. Leadership sees the same numbers now, which ended a recurring argument about whose figures were right.</blockquote>
+                <figcaption class="hm-testi__who">
+                    <span class="hm-testi__av" style="background:linear-gradient(135deg,#2563eb,#60a5fa)" aria-hidden="true"><i class="fas fa-user"></i></span>
+                    <span>
+                        <span class="hm-testi__name">Finance Business Partner</span>
+                        <span class="hm-testi__org">Banking &amp; Financial Services</span>
+                    </span>
+                </figcaption>
+            </figure>
+        </div>
+        <div style="text-align:center">
+            <a class="hm-more" href="{% url 'home:testimonials' %}">Read more client stories <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+        </div>
+    </div>
+</section>
+
+<!-- INDUSTRIES -->
+<section class="oh-section" style="background:#fff">
+    <div class="wrap">
+        <div class="section-head" style="max-width:680px;margin-bottom:3rem">
+            <span class="kicker">Industries we serve</span>
+            <h2>Built for the way your sector actually works.</h2>
+            <p>Catalogs, compliance, field operations, finance — each industry carries its own constraints, and the shape of the system follows them.</p>
+        </div>
+        <ul class="hm-grid-ind" style="list-style:none;padding:0;margin:0">
+            <li class="hm-ind">
+                <span class="hm-ind__icon" aria-hidden="true"><i class="fas fa-heartbeat"></i></span>
+                <h3>Healthcare</h3>
+                <p>Patient portals, scheduling, and operational systems where accuracy and access both matter.</p>
+            </li>
+            <li class="hm-ind">
+                <span class="hm-ind__icon hm-ind__icon--gold" aria-hidden="true"><i class="fas fa-store"></i></span>
+                <h3>Retail &amp; E-Commerce</h3>
+                <p>Storefronts, inventory, and order flows that stay consistent across every channel.</p>
+            </li>
+            <li class="hm-ind">
+                <span class="hm-ind__icon hm-ind__icon--blue" aria-hidden="true"><i class="fas fa-landmark"></i></span>
+                <h3>Financial Services</h3>
+                <p>Reporting, reconciliation, and audit trails that need to hold up to scrutiny.</p>
+            </li>
+            <li class="hm-ind">
+                <span class="hm-ind__icon" aria-hidden="true"><i class="fas fa-industry"></i></span>
+                <h3>Manufacturing &amp; Industrial</h3>
+                <p>Production data, maintenance schedules, and plant reporting connected end to end.</p>
+            </li>
+            <li class="hm-ind">
+                <span class="hm-ind__icon hm-ind__icon--blue" aria-hidden="true"><i class="fas fa-truck-fast"></i></span>
+                <h3>Logistics &amp; Wholesale</h3>
+                <p>Stock, dispatch, and delivery updates moving between systems without re-keying.</p>
+            </li>
+            <li class="hm-ind">
+                <span class="hm-ind__icon hm-ind__icon--gold" aria-hidden="true"><i class="fas fa-utensils"></i></span>
+                <h3>Food &amp; Beverage</h3>
+                <p>Menus, orders, and supplier catalogs kept current across locations and channels.</p>
+            </li>
+            <li class="hm-ind">
+                <span class="hm-ind__icon hm-ind__icon--blue" aria-hidden="true"><i class="fas fa-graduation-cap"></i></span>
+                <h3>Education</h3>
+                <p>Enrollment, content, and administration built for the people who run them daily.</p>
+            </li>
+            <li class="hm-ind">
+                <span class="hm-ind__icon" aria-hidden="true"><i class="fas fa-building-columns"></i></span>
+                <h3>Government &amp; Civic</h3>
+                <p>Public-facing services and internal workflows designed for accessibility and trust.</p>
+            </li>
+        </ul>
+        <div style="text-align:center;margin-top:2.5rem">
+            <a class="hm-more" href="{% url 'contact:contact' %}">Discuss your project <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ -->
+<section class="oh-section" style="background:#f8fafc">
+    <div class="wrap">
+        <div class="section-head" style="max-width:680px;margin-bottom:3rem">
+            <span class="kicker">Questions, answered</span>
+            <h2>What teams usually ask before the first call.</h2>
+        </div>
+        <div style="max-width:840px">
+            <details class="hm-faq__item">
+                <summary>What does OnWebApp actually build? <i class="fas fa-chevron-down" aria-hidden="true"></i></summary>
+                <p class="hm-faq__a">Websites, web and mobile applications, and the integrations and automations that connect them to the systems you already run. Projects range from a single marketing site to an operations platform that spans several departments.</p>
+            </details>
+            <details class="hm-faq__item">
+                <summary>Can you work with the systems we already have? <i class="fas fa-chevron-down" aria-hidden="true"></i></summary>
+                <p class="hm-faq__a">Yes. Most of our work starts with an existing landscape — an ERP, a CRM, spreadsheets, or software a team has outgrown. We integrate with what is in place rather than assuming a greenfield rebuild.</p>
+            </details>
+            <details class="hm-faq__item">
+                <summary>Do we have to replace our current platform to get value from it? <i class="fas fa-chevron-down" aria-hidden="true"></i></summary>
+                <p class="hm-faq__a">No. Integration and automation layers are designed to sit around the platform you already use, so the first improvements show up in day-to-day work without a migration project.</p>
+            </details>
+            <details class="hm-faq__item">
+                <summary>What comes built in with every OnWebApp site? <i class="fas fa-chevron-down" aria-hidden="true"></i></summary>
+                <p class="hm-faq__a">The built-in stack described above — content, integration, automation, and AI — ships as part of the foundation rather than being added on request later. A site can connect to other systems and run processes on its own from day one.</p>
+            </details>
+            <details class="hm-faq__item">
+                <summary>How does a project usually start? <i class="fas fa-chevron-down" aria-hidden="true"></i></summary>
+                <p class="hm-faq__a">With a conversation about the process that needs to change. We document how the work happens today, agree a baseline before anything is built, and scope the first release around an outcome that can be measured against it.</p>
+            </details>
+            <details class="hm-faq__item">
+                <summary>How do we get started? <i class="fas fa-chevron-down" aria-hidden="true"></i></summary>
+                <p class="hm-faq__a">Send us a note through the <a href="{% url 'contact:contact' %}" style="color:#2563eb;font-weight:700">contact page</a> describing what you are trying to build or fix. We will come back with the questions we need answered and a suggested first step.</p>
+            </details>
         </div>
     </div>
 </section>

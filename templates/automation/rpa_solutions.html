@@ -152,26 +152,6 @@
 .rp-root .rp-table tbody th{font-weight:700;color:var(--rp-ink);background:#FBFBFE;width:26%}
 .rp-root .rp-table td{color:var(--rp-body)}
 .rp-root .rp-table tbody tr:last-child th,.rp-root .rp-table tbody tr:last-child td{border-bottom:0}
-/* ── Pricing ────────────────────────────────────────────────────────── */
-.rp-root .rp-price{
-    display:flex;flex-direction:column;background:var(--rp-white);
-    border:1px solid var(--rp-border);border-radius:18px;padding:2rem 1.8rem;
-    transition:border-color .2s,box-shadow .2s;
-}
-.rp-root .rp-price:hover{border-color:rgba(124,58,237,.4);box-shadow:0 14px 34px rgba(15,23,42,.08)}
-.rp-root .rp-price--featured{border-color:var(--rp-violet);position:relative;box-shadow:0 18px 44px rgba(124,58,237,.13)}
-.rp-root .rp-price__tag{
-    position:absolute;top:-13px;left:1.8rem;
-    background:var(--rp-violet);color:#fff;font-size:.68rem;font-weight:800;
-    letter-spacing:.1em;text-transform:uppercase;padding:.35rem .8rem;border-radius:999px;
-}
-.rp-root .rp-price__name{font-family:var(--font-display);font-size:1.12rem;font-weight:800;color:var(--rp-ink);margin:0 0 .25rem}
-.rp-root .rp-price__sub{font-size:.83rem;color:var(--rp-body);margin:0 0 1.2rem}
-.rp-root .rp-price__amount{font-family:var(--font-display);font-size:1.45rem;font-weight:800;color:var(--rp-ink);margin:0 0 1.3rem;padding-bottom:1.2rem;border-bottom:1px solid var(--rp-border)}
-.rp-root .rp-price__list{list-style:none;padding:0;margin:0 0 1.6rem;display:grid;gap:.65rem}
-.rp-root .rp-price__list li{display:flex;gap:.6rem;align-items:flex-start;font-size:.87rem;color:var(--rp-body);line-height:1.6}
-.rp-root .rp-price__list i{color:var(--rp-violet);margin-top:.28rem;font-size:.74rem}
-.rp-root .rp-price .rp-btn{margin-top:auto;width:100%}
 /* ── Form ───────────────────────────────────────────────────────────── */
 .rp-root .rp-form-grid{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:3.5rem;align-items:start}
 .rp-root .rp-points{list-style:none;padding:0;margin:1.75rem 0 0;display:grid;gap:.85rem}
@@ -242,6 +222,21 @@
     font-size:.8rem;font-weight:700;color:var(--rp-body);text-decoration:none;transition:.2s;
 }
 .rp-root .rp-related a:hover{border-color:var(--rp-violet);color:var(--rp-violet-ink)}
+/* ── Why OnWebApp illustration (rp.png) ──────────────────────────────── */
+/* rp.png's canvas is #FEFEFE; the section matches it so the illustration
+   reads as part of the page rather than a framed image. */
+.rp-root .rp-sec--canvas{background:#FEFEFE}
+.rp-root .rp-why__img{
+    display:block;width:100%;max-width:880px;height:auto;
+    margin:2.5rem auto 0;
+}
+.rp-root .rp-why__grid{display:none}
+/* Below 768px the baked-in text in the illustration gets too small to read,
+   so the original text cards take over there. */
+@media(max-width:767px){
+    .rp-root .rp-why__img{display:none}
+    .rp-root .rp-why__grid{display:grid}
+}
 /* ── Responsive ─────────────────────────────────────────────────────── */
 @media(max-width:991px){
     .rp-root .rp-sec{padding:4.5rem 0}
@@ -263,7 +258,7 @@
 }
 @media(prefers-reduced-motion:reduce){
     .rp-root .rp-flow__path{animation:none}
-    .rp-root .rp-card,.rp-root .rp-use,.rp-root .rp-price,
+    .rp-root .rp-card,.rp-root .rp-use,
     .rp-root .rp-btn,.rp-root .rp-submit{transition:none}
     .rp-root .rp-card:hover,.rp-root .rp-use:hover,
     .rp-root .rp-btn--primary:hover,.rp-root .rp-submit:hover{transform:none}
@@ -527,13 +522,15 @@
 </section>
 
 <!-- F — WHY ONWEBAPP -->
-<section class="rp-sec">
+<section class="rp-sec rp-sec--canvas">
     <div class="wrap">
         <div class="rp-center">
             <span class="rp-eyebrow">{% trans "Why OnWebApp?" %}</span>
             <h2 class="rp-h2">{% trans "Automation That Fits Your Business" %}</h2>
         </div>
-        <div class="rp-grid rp-grid--2">
+        <img class="rp-why__img" src="{% static 'img/rp.png' %}" width="1536" height="1024" loading="lazy" decoding="async"
+             alt="{% trans 'Four reasons teams choose OnWebApp automation: built around your workflow — tailored automations based on real business processes; works with existing tools — designed to complement current applications and systems; controlled and traceable — access controls, execution logs, validation, and exception handling; designed to scale — start with one repetitive task and expand as automation needs grow.' %}">
+        <div class="rp-grid rp-grid--2 rp-why__grid">
             <div class="rp-card">
                 <div class="rp-card__icon"><i class="fas fa-diagram-project" aria-hidden="true"></i></div>
                 <h3 class="rp-h3">{% trans "Built Around Your Workflow" %}</h3>
@@ -558,56 +555,6 @@
     </div>
 </section>
 
-<!-- G — PRICING AND ENGAGEMENT -->
-<section class="rp-sec rp-sec--soft">
-    <div class="wrap">
-        <div class="rp-center">
-            <span class="rp-eyebrow">{% trans "Pricing and Engagement" %}</span>
-            <h2 class="rp-h2">{% trans "Start Small. Automate More Over Time." %}</h2>
-            <p class="rp-lede">{% trans "Each engagement is scoped to your process, so pricing is quoted per project rather than sold as an unlimited package." %}</p>
-        </div>
-        <div class="rp-grid rp-grid--3">
-            <div class="rp-price">
-                <h3 class="rp-price__name">{% trans "Starter" %}</h3>
-                <p class="rp-price__sub">{% trans "Single-Process Automation" %}</p>
-                <p class="rp-price__amount">{% trans "Custom quote" %}</p>
-                <ul class="rp-price__list">
-                    <li><i class="fas fa-check" aria-hidden="true"></i>{% trans "One defined workflow" %}</li>
-                    <li><i class="fas fa-check" aria-hidden="true"></i>{% trans "Process assessment" %}</li>
-                    <li><i class="fas fa-check" aria-hidden="true"></i>{% trans "Development and testing" %}</li>
-                    <li><i class="fas fa-check" aria-hidden="true"></i>{% trans "Deployment documentation" %}</li>
-                </ul>
-                <a href="#consultation" class="rp-btn rp-btn--ghost rp-btn--sm">{% trans "Request a quote" %}</a>
-            </div>
-            <div class="rp-price rp-price--featured">
-                <span class="rp-price__tag">{% trans "Most chosen" %}</span>
-                <h3 class="rp-price__name">{% trans "Business" %}</h3>
-                <p class="rp-price__sub">{% trans "Multi-Step Automation" %}</p>
-                <p class="rp-price__amount">{% trans "Custom quote" %}</p>
-                <ul class="rp-price__list">
-                    <li><i class="fas fa-check" aria-hidden="true"></i>{% trans "More complex workflow design" %}</li>
-                    <li><i class="fas fa-check" aria-hidden="true"></i>{% trans "Multiple process steps or integrations" %}</li>
-                    <li><i class="fas fa-check" aria-hidden="true"></i>{% trans "Validation and exception handling" %}</li>
-                    <li><i class="fas fa-check" aria-hidden="true"></i>{% trans "Optional monitoring and support" %}</li>
-                </ul>
-                <a href="#consultation" class="rp-btn rp-btn--primary rp-btn--sm">{% trans "Request a quote" %}</a>
-            </div>
-            <div class="rp-price">
-                <h3 class="rp-price__name">{% trans "Enterprise" %}</h3>
-                <p class="rp-price__sub">{% trans "Automation Across Operations" %}</p>
-                <p class="rp-price__amount">{% trans "Based on scope" %}</p>
-                <ul class="rp-price__list">
-                    <li><i class="fas fa-check" aria-hidden="true"></i>{% trans "Multiple automation workflows" %}</li>
-                    <li><i class="fas fa-check" aria-hidden="true"></i>{% trans "Integration architecture" %}</li>
-                    <li><i class="fas fa-check" aria-hidden="true"></i>{% trans "Access and execution controls" %}</li>
-                    <li><i class="fas fa-check" aria-hidden="true"></i>{% trans "Tailored support and maintenance" %}</li>
-                </ul>
-                <a href="#consultation" class="rp-btn rp-btn--ghost rp-btn--sm">{% trans "Request a quote" %}</a>
-            </div>
-        </div>
-        <p class="rp-note">{% trans "Recurring fees may apply for hosting, execution capacity, monitoring, maintenance, and support. They are agreed separately from the build cost, and each project is scoped to the processes it covers." %}</p>
-    </div>
-</section>
 
 <!-- H — CONSULTATION FORM -->
 <section class="rp-sec" id="consultation">
