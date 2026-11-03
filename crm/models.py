@@ -39,7 +39,23 @@ class Customer(models.Model):
     company_name = models.CharField(max_length=255, blank=True, help_text="For individuals representing a company")
     industry = models.CharField(max_length=100, blank=True)
     website = models.URLField(blank=True)
-    
+
+    # Mirror of the centralized UserProfile (kept in sync by the profile service)
+    job_title = models.CharField(max_length=150, blank=True)
+    country = models.CharField(max_length=100, blank=True)
+    city = models.CharField(max_length=100, blank=True)
+    business_address = models.CharField(max_length=255, blank=True)
+    business_description = models.TextField(blank=True)
+    company_size = models.CharField(max_length=50, blank=True)
+
+    # Centralized profile <-> CRM synchronization tracking
+    profile_last_synced_at = models.DateTimeField(null=True, blank=True)
+    profile_sync_status = models.CharField(max_length=20, default='PENDING', choices=[
+        ('PENDING', 'Pending Sync'),
+        ('SYNCED', 'Synced'),
+        ('NOT_LINKED', 'Not Linked'),
+    ])
+
     # Tracking
     source = models.CharField(max_length=100, blank=True, help_text="Where did this customer come from?")
     notes = models.TextField(blank=True)

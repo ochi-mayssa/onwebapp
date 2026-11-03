@@ -3,6 +3,7 @@ from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
 
+from users.models import UserProfile
 from .models import APIRequest, APIRequestStatusLog
 
 User = get_user_model()
@@ -63,10 +64,21 @@ class APIRequestPageTests(TestCase):
 
     def test_authenticated_user_is_attached_and_prefilled(self):
         user = User.objects.create_user('ada', 'ada@example.com', 'pass1234')
+        UserProfile.objects.create(
+            user=user,
+            display_name='Ada Lovelace',
+            company_name='Analytical Engines',
+            phone_number='+1 555 000 2222',
+            country='United Kingdom',
+            city='London',
+            job_title='Founder',
+        )
         self.client.login(username='ada', password='pass1234')
 
         response = self.client.get(reverse('home:request_api'))
+        self.assertEqual(response.context['form'].initial['full_name'], 'Ada Lovelace')
         self.assertEqual(response.context['form'].initial['business_email'], 'ada@example.com')
+        self.assertEqual(response.context['form'].initial['company_name'], 'Analytical Engines')
 
         self.client.post(reverse('home:request_api'), _payload())
         self.assertEqual(APIRequest.objects.get().user, user)

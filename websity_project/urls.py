@@ -71,7 +71,15 @@ urlpatterns = [
 
     path('accounts/', include('django.contrib.auth.urls')),
     path('robots.txt', TemplateView.as_view(template_name='robots.txt', content_type='text/plain'), name='robots_txt'),
-    path('sitemap.xml', sitemap, {'sitemaps': {'static': StaticViewSitemap(), 'projects': ProjectSitemap() if ProjectSitemap else None}}, name='sitemap'),
+]
+# Build the sitemap section map defensively: a missing sitemap class (e.g.
+# ProjectSitemap when the projects app is unavailable) must be omitted rather
+# than passed as None, which would crash the sitemap view.
+_sitemaps = {'static': StaticViewSitemap()}
+if ProjectSitemap is not None:
+    _sitemaps['projects'] = ProjectSitemap()
+urlpatterns += [
+    path('sitemap.xml', sitemap, {'sitemaps': _sitemaps}, name='sitemap'),
 ]
 
 if settings.DEBUG:

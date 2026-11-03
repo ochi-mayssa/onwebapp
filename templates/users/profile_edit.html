@@ -41,6 +41,29 @@
 
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
+                            <label class="form-label small fw-medium text-secondary mb-1">Job title</label>
+                            <input type="text" class="form-control form-control-sm" name="job_title" value="{{ profile.job_title|default:'' }}" placeholder="e.g. Founder, Marketing Lead">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-medium text-secondary mb-1">Phone number</label>
+                            <input type="tel" class="form-control form-control-sm" name="phone_number" value="{{ profile.phone_number|default:'' }}" placeholder="+1 555 000 0000">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-medium text-secondary mb-1">City</label>
+                            <input type="text" class="form-control form-control-sm" name="city" value="{{ profile.city|default:'' }}" placeholder="City">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-medium text-secondary mb-1">Website</label>
+                            <input type="url" class="form-control form-control-sm" name="website" value="{{ profile.website|default:'' }}" placeholder="https://your-website.com">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small fw-medium text-secondary mb-1">Business address</label>
+                            <input type="text" class="form-control form-control-sm" name="business_address" value="{{ profile.business_address|default:'' }}" placeholder="Street, building, suite">
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
                             <label class="form-label small fw-medium text-secondary mb-1">Organization name</label>
                             <input type="text" class="form-control form-control-sm" name="company_name" value="{{ profile.company_name|default:'' }}" placeholder="Acme Corp">
                         </div>

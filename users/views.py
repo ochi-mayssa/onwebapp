@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import logout as auth_logout
 from django.utils import timezone
 from .models import ActivityLog, UserProfile, UserSubscription, ServiceUsage, UserApiKey
+from .services.profile_service import update_profile, apply_profile_prefill
 from projects.models import Invoice
 from payments.models import PaymentPlan, UserPaymentSelection
 from django.contrib.auth.decorators import login_required
@@ -576,20 +577,60 @@ def verify_email(request, uidb64, token):
     })
 
 
-def _get_community_redirect(profile):
-    """Helper to determine community redirect URL based on needs."""
-    return redirect('community:home')
+# Fields grouped by the wizard step that renders them. Used to reopen the
+# correct step when the server rejects a submission.
+_ONBOARDING_STEP_FIELDS = {
+    1: {
+        'service_type', 'display_name', 'phone_number', 'company_name',
+        'job_title', 'country', 'city', 'website', 'industry',
+        'company_size', 'business_address',
+    },
+    2: {'community_needs_selection'},
+    3: {'project_description'},
+    4: {'start_timeline'},
+}
+
+
+def _initial_onboarding_step(form):
+    """Return the first wizard step that contains a validation error."""
+    if not getattr(form, 'errors', None):
+        return 1
+    error_fields = set(form.errors)
+    for step in (1, 2, 3, 4):
+        if _ONBOARDING_STEP_FIELDS[step] & error_fields:
+            return step
+    return 1
+
+
+def _onboarding_summary(profile):
+    """Labels used by the onboarding confirmation screen."""
+    return {
+        'path': profile.get_service_type_display() if profile.service_type else '',
+        'services': profile.community_needs_labels,
+        'goal': profile.get_project_description_display() if profile.project_description else '',
+        'timeline': profile.get_start_timeline_display() if profile.start_timeline else '',
+    }
+
+
+def _sync_onboarding_customer(user, profile):
+    """Compatibility wrapper around the centralized CRM sync service."""
+    if not user or not getattr(user, 'email', None):
+        return
+    try:
+        from crm.services.sync_service import sync_customer_for_user
+        sync_customer_for_user(user, profile=profile, source='Onboarding')
+    except Exception:
+        logger.exception('Could not sync onboarding profile to CRM for user %s', getattr(user, 'id', None))
 
 
 @login_required
 def onboarding(request):
-    """Handle user onboarding and service selection."""
-    profile, created = UserProfile.objects.get_or_create(user=request.user)
-    
-    # If service type is already selected, redirect to appropriate dashboard
+    """Handle first-run onboarding and save the client profile."""
+    profile, _ = UserProfile.objects.get_or_create(user=request.user)
+
+    # Onboarding is complete: the confirmation screen is only rendered once,
+    # immediately after a successful POST. Refreshing lands on the dashboard.
     if profile.service_type:
-        if profile.service_type == 'community':
-            return _get_community_redirect(profile)
         return redirect('users:dashboard')
 
     if request.method == 'POST':
@@ -598,26 +639,33 @@ def onboarding(request):
             profile = form.save()
             # Log the onboarding action
             ActivityLog.objects.create(
-                user=request.user, 
-                action='onboarding_completed', 
+                user=request.user,
+                action='onboarding_completed',
                 ip_address=_get_client_ip(request),
                 metadata={
                     'service_type': profile.service_type,
                     'community_needs': profile.community_needs,
-                    'project_desc': profile.project_description
-                }
+                    'project_desc': profile.project_description,
+                    'timeline': profile.start_timeline,
+                    'company_name': profile.company_name,
+                    'industry': profile.industry,
+                },
             )
-            
-            if profile.service_type == 'community':
-                messages.success(request, 'Welcome to Community Services!')
-                return _get_community_redirect(profile)
-            
-            messages.success(request, 'Welcome to the Full Platform!')
-            return redirect('home:home')
+            _sync_onboarding_customer(request.user, profile)
+            messages.success(request, "You're all set! Your preferences have been saved.")
+            return render(request, 'registration/onboarding.html', {
+                'completed': True,
+                'profile': profile,
+                'onboarding_summary': _onboarding_summary(profile),
+                'next_url': reverse('users:dashboard'),
+            })
     else:
         form = OnboardingForm(instance=profile)
-    
-    return render(request, 'registration/onboarding.html', {'form': form})
+
+    return render(request, 'registration/onboarding.html', {
+        'form': form,
+        'initial_step': _initial_onboarding_step(form),
+    })
 
 
 @login_required
@@ -699,22 +747,17 @@ def profile_edit(request):
     user = request.user
     profile, _ = UserProfile.objects.get_or_create(user=user)
     if request.method == 'POST':
-        display_name = request.POST.get('display_name', '')
-        bio = request.POST.get('bio', '')
-        avatar = request.POST.get('avatar', '')
-        company_name = request.POST.get('company_name', '')
-        industry = request.POST.get('industry', '')
-        company_size = request.POST.get('company_size', '')
-        country = request.POST.get('country', '')
-        profile.display_name = display_name
-        profile.bio = bio
-        profile.avatar = avatar
-        profile.company_name = company_name
-        profile.industry = industry
-        profile.company_size = company_size
-        profile.country = country
-        profile.save()
-        ActivityLog.objects.create(user=user, action='profile_update', ip_address=_get_client_ip(request))
+        profile, changed = update_profile(user, request.POST, commit=False)
+        if profile is not None:
+            profile.save()
+            from crm.services.sync_service import sync_customer_for_user
+            sync_customer_for_user(user, profile=profile, source='Profile Update', changed_fields=changed)
+        ActivityLog.objects.create(
+            user=user,
+            action='profile_update',
+            ip_address=_get_client_ip(request),
+            metadata={'changed_fields': changed},
+        )
         messages.success(request, 'Profile updated')
         return redirect('users:profile_dashboard')
     return render(request, 'users/profile_edit.html', {'profile': profile})

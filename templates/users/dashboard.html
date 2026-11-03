@@ -75,6 +75,103 @@
     </div>
 </div>
 
+<!-- Personalized plan (from onboarding) -->
+{% if profile.service_type %}
+<div class="card border-0 shadow-sm mb-4 ow-plan">
+    <div class="card-body p-4">
+        <div class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-4">
+            <div>
+                <span class="ow-plan__badge mb-2 d-inline-block">{% trans "Personalized for you" %}</span>
+                <h5 class="mb-1 fw-800">{% trans "Your OnWebApp Plan" %}</h5>
+                <p class="text-secondary small mb-0">{% trans "Based on the preferences you shared during setup. You can update these at any time." %}</p>
+            </div>
+            <a href="{% url 'users:profile_edit' %}" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                <i data-lucide="settings-2" class="me-1" style="width: 14px; height: 14px;"></i>
+                {% trans "Update preferences" %}
+            </a>
+        </div>
+        <div class="row g-3">
+            <div class="col-sm-6 col-xl-3">
+                <div class="ow-plan__item">
+                    <span class="ow-plan__label">{% trans "Your path" %}</span>
+                    <span class="ow-plan__value">{{ profile.get_service_type_display|default:"—" }}</span>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="ow-plan__item">
+                    <span class="ow-plan__label">{% trans "Your needs" %}</span>
+                    <span class="ow-plan__value">
+                        {% for service in profile.community_needs_labels %}{{ service }}{% if not forloop.last %}, {% endif %}{% empty %}—{% endfor %}
+                    </span>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="ow-plan__item">
+                    <span class="ow-plan__label">{% trans "Your goal" %}</span>
+                    <span class="ow-plan__value">{{ profile.get_project_description_display|default:"—" }}</span>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="ow-plan__item">
+                    <span class="ow-plan__label">{% trans "Your timeline" %}</span>
+                    <span class="ow-plan__value">{{ profile.get_start_timeline_display|default:"—" }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="ow-plan__next d-flex flex-wrap align-items-center gap-3 mt-4 pt-3">
+            <span class="small fw-800 text-secondary text-uppercase">{% trans "Next steps" %}</span>
+            <a href="{% url 'users:profile_edit' %}" class="ow-plan__link">{% trans "Complete your business profile" %}</a>
+            <a href="{% url 'home:build_website' %}" class="ow-plan__link">{% trans "Start a project" %}</a>
+            <a href="{% url 'contact:contact' %}" class="ow-plan__link">{% trans "Talk to our team" %}</a>
+        </div>
+    </div>
+</div>
+<style>
+    .ow-plan__badge {
+        padding: .3rem .7rem;
+        border-radius: 999px;
+        background: rgba(var(--bs-primary-rgb), .08);
+        color: var(--bs-primary);
+        font-size: .72rem;
+        font-weight: 700;
+        letter-spacing: .02em;
+    }
+    .ow-plan__item {
+        height: 100%;
+        padding: .9rem 1rem;
+        border: 1px solid rgba(15, 23, 42, .08);
+        border-radius: .85rem;
+        background: #fbfcfe;
+    }
+    .ow-plan__label {
+        display: block;
+        color: var(--bs-secondary-color);
+        font-size: .74rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        margin-bottom: .3rem;
+    }
+    .ow-plan__value {
+        display: block;
+        color: var(--bs-body-color);
+        font-weight: 600;
+        font-size: .92rem;
+        line-height: 1.5;
+    }
+    .ow-plan__next {
+        border-top: 1px solid rgba(15, 23, 42, .07);
+    }
+    .ow-plan__link {
+        color: var(--bs-primary);
+        font-size: .85rem;
+        font-weight: 600;
+        text-decoration: none;
+    }
+    .ow-plan__link:hover { text-decoration: underline; }
+</style>
+{% endif %}
+
 <!-- Main Grid -->
 <div class="row g-4">
     <!-- Projects Section -->

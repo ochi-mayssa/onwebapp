@@ -1,0 +1,468 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans "Website Automation Services for Businesses" %} | OnWebApp{% endblock %}
+
+{% block meta_description %}{% trans "Automate website tasks with OnWebApp. Streamline browser interactions, web data extraction, form processing, website monitoring, and business workflows." %}{% endblock %}
+
+{% block og_title %}{% trans "Website Automation Services for Businesses" %} | OnWebApp{% endblock %}
+
+{% block og_description %}{% trans "Automate website tasks with OnWebApp. Streamline browser interactions, web data extraction, form processing, website monitoring, and business workflows." %}{% endblock %}
+
+{% block content %}
+<!-- HERO -->
+<section class="ax-hero">
+    <div class="ax-hero__shade"></div>
+    <div class="ax-hero__fade"></div>
+    <div class="wrap ax-hero__inner">
+        <a href="{% url 'home:automation_home' %}" class="ax-hero__eyebrow" aria-label="Website Automation Services | OnWebApp">{% trans "Website Automation Services" %}</a>
+        <h1 class="ax-hero__title">{% trans "Automate Your Website. Simplify Every Operation." %}</h1>
+        <p class="ax-hero__sub">{% trans "Transform repetitive website tasks into automated workflows. OnWebApp helps businesses automate browser interactions, web data extraction, form submissions, website monitoring, and everyday online operations." %}</p>
+        <p class="ax-hero__sub wa-hero__line">{% trans "Spend less time on manual tasks and more time growing your business." %}</p>
+        <div class="ax-hero__actions">
+            <a href="{% url 'contact:contact' %}" class="ax-btn ax-btn--primary">{% trans "Get Started" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+            <a href="{% url 'home:automation_home' %}" class="ax-btn ax-btn--ghost">{% trans "Explore Automation Solutions" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+        </div>
+    </div>
+</section>
+
+<!-- INTRODUCTION -->
+<section class="ax-sec">
+    <div class="wrap">
+        <div class="ax-center">
+            <span class="ax-label">{% trans "Website Automation Services" %}</span>
+            <h2 class="ax-h2">{% trans "Make Your Website Work Smarter" %}</h2>
+            <p class="ax-lead ax-lead--wide">{% trans "Managing website operations manually can consume valuable time and introduce unnecessary errors. From collecting information and processing online forms to monitoring website activity, repetitive tasks can slow down your business." %}</p>
+            <p class="ax-lead ax-lead--wide wa-lead-gap">{% trans "OnWebApp delivers tailored website automation solutions that streamline these operations, connect your existing tools, and help your team work more efficiently." %}</p>
+        </div>
+        <ul class="ax-n-list wa-intro-list">
+            <li>{% trans "Reduce repetitive manual tasks." %}</li>
+            <li>{% trans "Improve operational accuracy and consistency." %}</li>
+            <li>{% trans "Automate browser-based activities." %}</li>
+            <li>{% trans "Collect and organize website data." %}</li>
+            <li>{% trans "Monitor website activity and performance." %}</li>
+            <li>{% trans "Integrate automation into existing workflows." %}</li>
+        </ul>
+    </div>
+</section>
+
+<!-- WEBSITE AUTOMATION SOLUTIONS -->
+<section class="ax-sec ax-sec--soft" id="solutions">
+    <div class="wrap">
+        <div class="ax-center">
+            <span class="ax-label ax-label--indigo">{% trans "Website Automation Solutions" %}</span>
+            <h2 class="ax-h2">{% trans "Everything Your Website Needs to Run Automatically" %}</h2>
+            <p class="ax-lead ax-lead--wide">{% trans "Discover practical automation solutions designed to simplify website management and online business operations." %}</p>
+        </div>
+        <div class="ax-grid ax-grid--3">
+            <div class="ax-card">
+                <span class="wa-num" aria-hidden="true">01</span>
+                <h3 class="ax-card__title">{% trans "Browser &amp; Front-End Automation" %}</h3>
+                <p class="ax-card__body">{% trans "Automate repetitive browser interactions, navigation, clicks, form submissions, and other front-end activities across your website and web applications." %}</p>
+            </div>
+            <div class="ax-card">
+                <span class="wa-num" aria-hidden="true">02</span>
+                <h3 class="ax-card__title">{% trans "Web Data Extraction" %}</h3>
+                <p class="ax-card__body">{% trans "Collect, extract, and organize relevant information from websites automatically. Turn unstructured web content into useful data for reporting, research, and business operations." %}</p>
+            </div>
+            <div class="ax-card">
+                <span class="wa-num" aria-hidden="true">03</span>
+                <h3 class="ax-card__title">{% trans "Website Monitoring" %}</h3>
+                <p class="ax-card__body">{% trans "Monitor website availability, page changes, important elements, and operational events. Receive automated notifications when defined conditions or issues are detected." %}</p>
+            </div>
+            <div class="ax-card">
+                <span class="wa-num" aria-hidden="true">04</span>
+                <h3 class="ax-card__title">{% trans "Form &amp; Data Entry Automation" %}</h3>
+                <p class="ax-card__body">{% trans "Automate repetitive form submissions, data entry, information transfers, and validation tasks to reduce manual processing and improve consistency." %}</p>
+            </div>
+            <div class="ax-card">
+                <span class="wa-num" aria-hidden="true">05</span>
+                <h3 class="ax-card__title">{% trans "Website Integration &amp; Workflow Automation" %}</h3>
+                <p class="ax-card__body">{% trans "Connect website activities with your business applications, APIs, CRM, and other systems. Automatically move information between platforms and coordinate business processes." %}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- BENEFITS -->
+<section class="ax-sec">
+    <div class="wrap">
+        <div class="ax-center">
+            <span class="ax-label">{% trans "Benefits" %}</span>
+            <h2 class="ax-h2">{% trans "Less Manual Work. More Business Productivity." %}</h2>
+            <p class="ax-lead ax-lead--wide">{% trans "Website automation helps your business operate more efficiently by turning repetitive online activities into reliable, repeatable processes." %}</p>
+        </div>
+        <div class="ax-grid ax-grid--4">
+            <div class="ax-card">
+                <div class="ax-card__icon ax-card__icon--violet"><i class="fas fa-clock" aria-hidden="true"></i></div>
+                <h3 class="ax-card__title">{% trans "Save Time" %}</h3>
+                <p class="ax-card__body">{% trans "Automate repetitive website operations and free your team to focus on higher-value activities." %}</p>
+            </div>
+            <div class="ax-card">
+                <div class="ax-card__icon ax-card__icon--indigo"><i class="fas fa-check-double" aria-hidden="true"></i></div>
+                <h3 class="ax-card__title">{% trans "Improve Accuracy" %}</h3>
+                <p class="ax-card__body">{% trans "Reduce manual input errors through consistent automated processes and validation." %}</p>
+            </div>
+            <div class="ax-card">
+                <div class="ax-card__icon ax-card__icon--blue"><i class="fas fa-plug" aria-hidden="true"></i></div>
+                <h3 class="ax-card__title">{% trans "Connect Your Tools" %}</h3>
+                <p class="ax-card__body">{% trans "Integrate website activities with the applications and systems your business already uses." %}</p>
+            </div>
+            <div class="ax-card">
+                <div class="ax-card__icon ax-card__icon--gold"><i class="fas fa-arrow-trend-up" aria-hidden="true"></i></div>
+                <h3 class="ax-card__title">{% trans "Scale Operations" %}</h3>
+                <p class="ax-card__body">{% trans "Expand automation as your website, workload, and business requirements grow." %}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="ax-sec ax-sec--soft" id="how-it-works">
+    <div class="wrap">
+        <div class="ax-center">
+            <span class="ax-label ax-label--indigo">{% trans "How It Works" %}</span>
+            <h2 class="ax-h2">{% trans "From Repetitive Tasks to Automated Workflows" %}</h2>
+            <p class="ax-lead ax-lead--wide">{% trans "A structured approach to building website automation around your actual business requirements." %}</p>
+        </div>
+        <ol class="ax-steps">
+            <li class="ax-step">
+                <span class="ax-step__n" aria-hidden="true">01</span>
+                <h3>{% trans "Discover Your Requirements" %}</h3>
+                <p>{% trans "We identify repetitive website activities, operational challenges, and opportunities for automation." %}</p>
+            </li>
+            <li class="ax-step">
+                <span class="ax-step__n" aria-hidden="true">02</span>
+                <h3>{% trans "Design the Automation" %}</h3>
+                <p>{% trans "We define the workflow, triggers, conditions, data requirements, and expected outcomes." %}</p>
+            </li>
+            <li class="ax-step">
+                <span class="ax-step__n" aria-hidden="true">03</span>
+                <h3>{% trans "Build &amp; Integrate" %}</h3>
+                <p>{% trans "We develop and configure the automation, connecting your website with the necessary tools and systems." %}</p>
+            </li>
+            <li class="ax-step">
+                <span class="ax-step__n" aria-hidden="true">04</span>
+                <h3>{% trans "Test &amp; Deploy" %}</h3>
+                <p>{% trans "We validate the workflow, handle exceptions, and deploy the automation into your operational environment." %}</p>
+            </li>
+            <li class="ax-step">
+                <span class="ax-step__n" aria-hidden="true">05</span>
+                <h3>{% trans "Monitor &amp; Improve" %}</h3>
+                <p>{% trans "We monitor execution, identify issues, and improve workflows as your requirements evolve." %}</p>
+            </li>
+        </ol>
+    </div>
+</section>
+
+<!-- USE CASES -->
+<section class="ax-sec">
+    <div class="wrap">
+        <div class="ax-center">
+            <span class="ax-label">{% trans "Use Cases" %}</span>
+            <h2 class="ax-h2">{% trans "What Can You Automate on Your Website?" %}</h2>
+            <p class="ax-lead ax-lead--wide">{% trans "Website automation can support different business activities, from simple browser interactions to more complex operational workflows." %}</p>
+        </div>
+        <div class="wa-table-wrap">
+            <table class="wa-table">
+                <thead>
+                    <tr>
+                        <th scope="col">{% trans "Business activity" %}</th>
+                        <th scope="col">{% trans "Automation example" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td data-label="{% trans 'Business activity' %}">{% trans "Lead management" %}</td>
+                        <td data-label="{% trans 'Automation example' %}">{% trans "Collect website inquiries and transfer them to your CRM" %}</td>
+                    </tr>
+                    <tr>
+                        <td data-label="{% trans 'Business activity' %}">{% trans "E-commerce" %}</td>
+                        <td data-label="{% trans 'Automation example' %}">{% trans "Automate product information updates" %}</td>
+                    </tr>
+                    <tr>
+                        <td data-label="{% trans 'Business activity' %}">{% trans "Data collection" %}</td>
+                        <td data-label="{% trans 'Automation example' %}">{% trans "Extract and organize publicly available website data" %}</td>
+                    </tr>
+                    <tr>
+                        <td data-label="{% trans 'Business activity' %}">{% trans "Website operations" %}</td>
+                        <td data-label="{% trans 'Automation example' %}">{% trans "Monitor page availability and changes" %}</td>
+                    </tr>
+                    <tr>
+                        <td data-label="{% trans 'Business activity' %}">{% trans "Customer operations" %}</td>
+                        <td data-label="{% trans 'Automation example' %}">{% trans "Automate repetitive form processing" %}</td>
+                    </tr>
+                    <tr>
+                        <td data-label="{% trans 'Business activity' %}">{% trans "Reporting" %}</td>
+                        <td data-label="{% trans 'Automation example' %}">{% trans "Collect website information and generate reports" %}</td>
+                    </tr>
+                    <tr>
+                        <td data-label="{% trans 'Business activity' %}">{% trans "Administration" %}</td>
+                        <td data-label="{% trans 'Automation example' %}">{% trans "Synchronize website data with internal systems" %}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- WHY ONWEBAPP -->
+<section class="ax-sec ax-sec--soft">
+    <div class="wrap">
+        <div class="ax-center">
+            <span class="ax-label ax-label--indigo">{% trans "Why OnWebApp?" %}</span>
+            <h2 class="ax-h2">{% trans "Website Automation Built Around Your Business" %}</h2>
+            <p class="ax-lead ax-lead--wide">{% trans "Every business has different workflows, tools, and operational requirements. OnWebApp develops automation solutions based on how your website and business actually operate." %}</p>
+        </div>
+        <div class="ax-grid ax-grid--4">
+            <div class="ax-card">
+                <div class="ax-card__icon ax-card__icon--violet"><i class="fas fa-sliders" aria-hidden="true"></i></div>
+                <h3 class="ax-card__title">{% trans "Tailored Workflows" %}</h3>
+                <p class="ax-card__body">{% trans "Automation designed around your specific tasks and processes." %}</p>
+            </div>
+            <div class="ax-card">
+                <div class="ax-card__icon ax-card__icon--indigo"><i class="fas fa-link" aria-hidden="true"></i></div>
+                <h3 class="ax-card__title">{% trans "Existing Integrations" %}</h3>
+                <p class="ax-card__body">{% trans "Works with your current website, APIs, and business applications." %}</p>
+            </div>
+            <div class="ax-card">
+                <div class="ax-card__icon ax-card__icon--blue"><i class="fas fa-shield-halved" aria-hidden="true"></i></div>
+                <h3 class="ax-card__title">{% trans "Controlled Execution" %}</h3>
+                <p class="ax-card__body">{% trans "Structured workflows with validation, execution logs, and exception handling." %}</p>
+            </div>
+            <div class="ax-card">
+                <div class="ax-card__icon ax-card__icon--gold"><i class="fas fa-layer-group" aria-hidden="true"></i></div>
+                <h3 class="ax-card__title">{% trans "Scalable Solutions" %}</h3>
+                <p class="ax-card__body">{% trans "Start with individual tasks and expand as your automation needs grow." %}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ -->
+<section class="ax-sec">
+    <div class="wrap wrap--narrow">
+        <div class="ax-center">
+            <span class="ax-label">{% trans "FAQ" %}</span>
+            <h2 class="ax-h2">{% trans "Frequently Asked Questions About Website Automation" %}</h2>
+        </div>
+        <div class="wa-faq">
+            <details class="wa-faq__item">
+                <summary>{% trans "What is website automation?" %} <i class="fas fa-chevron-down" aria-hidden="true"></i></summary>
+                <p class="wa-faq__a">{% trans "Website automation is the process of using software to perform repetitive website-related tasks automatically. It includes browser interactions, form submissions, data extraction, website monitoring, and workflow integration." %}</p>
+            </details>
+            <details class="wa-faq__item">
+                <summary>{% trans "What tasks can be automated on a website?" %} <i class="fas fa-chevron-down" aria-hidden="true"></i></summary>
+                <p class="wa-faq__a">{% trans "Common examples include form processing, data collection, browser navigation, website monitoring, information synchronization, and repetitive administrative operations." %}</p>
+            </details>
+            <details class="wa-faq__item">
+                <summary>{% trans "Can website automation work with my existing website?" %} <i class="fas fa-chevron-down" aria-hidden="true"></i></summary>
+                <p class="wa-faq__a">{% trans "Yes. Automation can be designed to work with existing websites and web applications, depending on their technical structure, available integrations, and access permissions." %}</p>
+            </details>
+            <details class="wa-faq__item">
+                <summary>{% trans "Is website automation suitable for small businesses?" %} <i class="fas fa-chevron-down" aria-hidden="true"></i></summary>
+                <p class="wa-faq__a">{% trans "Yes. Small businesses can automate individual repetitive tasks without implementing a complex enterprise system. Automation can expand as operational needs increase." %}</p>
+            </details>
+            <details class="wa-faq__item">
+                <summary>{% trans "Can website automation connect with CRM and ERP systems?" %} <i class="fas fa-chevron-down" aria-hidden="true"></i></summary>
+                <p class="wa-faq__a">{% trans "Yes. Through APIs and integrations, website automation can exchange information with CRM, ERP, databases, and other business applications." %}</p>
+            </details>
+            <details class="wa-faq__item">
+                <summary>{% trans "What is the difference between website automation and RPA?" %} <i class="fas fa-chevron-down" aria-hidden="true"></i></summary>
+                <p class="wa-faq__a">{% trans "Website automation focuses on automating activities performed through websites and web applications. RPA (Robotic Process Automation) has a broader scope and can automate tasks across multiple applications, desktop software, and business systems." %}</p>
+            </details>
+        </div>
+    </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="ax-sec ax-sec--dark">
+    <div class="wrap ax-center">
+        <span class="ax-label ax-label--light">{% trans "Start Automating" %}</span>
+        <h2 class="ax-h2 ax-h2--light">{% trans "Your Website Can Do More. Let It Work for You." %}</h2>
+        <p class="ax-lead ax-lead--dark">{% trans "Tell us which website tasks slow down your business. We'll help you identify the right automation approach and build a solution around your workflow." %}</p>
+        <p class="ax-lead ax-lead--dark wa-cta-line">{% trans "Have a specific workflow in mind? Let's discuss it." %}</p>
+        <div class="ax-hero__actions ax-hero__actions--center">
+            <a href="{% url 'contact:contact' %}" class="ax-btn ax-btn--primary">{% trans "Get Started" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+            <a href="{% url 'home:automation_home' %}" class="ax-btn ax-btn--dark-ghost">{% trans "Explore Automation Solutions" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+{% include 'automation/_ax_styles.html' %}
+<style>
+    /* ---- Light hero restyle for this page only ----
+       Automatisation.png is a light illustration with built-in whitespace on
+       the left for the copy, so the shared dark hero treatment (white text +
+       dark shade) is inverted here: near-white shade over the artwork, dark
+       ink text, dark ghost button. Shared styles untouched. */
+    .ax-hero{
+        color:var(--ax-ink);
+        background:#f6f4ff url('{% static "img/Automatisation.png" %}') right center/cover no-repeat;
+    }
+    .ax-hero__shade{
+        background:linear-gradient(90deg,rgba(246,244,255,.97) 0%,rgba(246,244,255,.94) 40%,rgba(246,244,255,.86) 56%,rgba(246,244,255,.74) 72%,rgba(246,244,255,.42) 82%,rgba(246,244,255,.12) 91%,rgba(246,244,255,0) 100%);
+    }
+    .ax-hero__eyebrow{color:var(--ax-violet)}
+    .ax-hero__title{color:var(--ax-ink)}
+    .ax-hero__sub{color:var(--ax-body)}
+    .ax-btn--ghost{border-color:rgba(15,23,42,.28);color:var(--ax-ink)}
+    .ax-btn--ghost:hover{background:rgba(15,23,42,.05)}
+    @media(max-width:767px){
+        .ax-hero{background-position:center}
+        .ax-hero__shade{background:linear-gradient(180deg,rgba(246,244,255,.96) 0%,rgba(246,244,255,.88) 55%,rgba(246,244,255,.7) 100%)}
+    }
+    /* ---- Page-scoped additions for the Website Automation landing page ---- */
+    /* Hero emphasis line */
+    .wa-hero__line{margin-top:-.5rem;color:rgba(15,23,42,.75);font-weight:600}
+    /* Second lead paragraph spacing */
+    .wa-lead-gap{margin-top:1rem}
+    /* Intro bullet list: two columns on wider screens */
+    .wa-intro-list{max-width:820px;margin:0 auto;gap:.7rem .25rem}
+    @media(min-width:768px){
+        .wa-intro-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:2rem}
+    }
+    /* Plain bullet lists inside cards */
+    .ax-n-list{list-style:none;padding:0;margin:.85rem 0 0;display:flex;flex-direction:column;gap:.5rem}
+    .ax-n-list li{position:relative;padding-left:1.15rem;font-size:.85rem;color:var(--ax-body);line-height:1.6}
+    .ax-n-list li::before{content:"";position:absolute;left:0;top:.55em;width:6px;height:6px;border-radius:50%;background:var(--ax-violet)}
+    /* Numbered solution cards */
+    .wa-num{
+        display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;
+        border-radius:50%;background:linear-gradient(135deg,var(--ax-violet),var(--ax-violet-2));
+        color:#fff;font-weight:700;font-size:.85rem;margin-bottom:.9rem;font-variant-numeric:tabular-nums;
+    }
+    /* Numbered process steps */
+    .ax-steps{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1rem}
+    .ax-step{position:relative;background:#fff;border:1px solid rgba(15,23,42,.06);border-radius:14px;padding:1.5rem 1.25rem 1.35rem}
+    .ax-step__n{
+        display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;
+        border-radius:50%;background:linear-gradient(135deg,var(--ax-violet),var(--ax-violet-2));
+        color:#fff;font-weight:700;font-size:.9rem;margin-bottom:.9rem;font-variant-numeric:tabular-nums;
+    }
+    .ax-step h3{margin:0 0 .35rem;font-size:.95rem;color:var(--ax-ink);font-weight:700;line-height:1.3}
+    .ax-step p{margin:0;font-size:.83rem;color:var(--ax-body);line-height:1.6}
+    /* Use-cases table */
+    .wa-table-wrap{max-width:860px;margin:0 auto}
+    .wa-table{width:100%;border-collapse:collapse;background:#fff;border:1px solid rgba(15,23,42,.07);border-radius:14px;overflow:hidden}
+    .wa-table th{
+        text-align:left;padding:.9rem 1.4rem;font-size:.78rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+        color:var(--ax-violet);background:linear-gradient(135deg,rgba(124,58,237,.07),rgba(124,58,237,.02));
+        border-bottom:1px solid rgba(15,23,42,.07);
+    }
+    .wa-table td{padding:.85rem 1.4rem;font-size:.88rem;color:var(--ax-body);border-bottom:1px solid rgba(15,23,42,.05);line-height:1.55}
+    .wa-table tbody tr:last-child td{border-bottom:0}
+    .wa-table tbody tr:nth-child(even){background:rgba(15,23,42,.015)}
+    .wa-table td:first-child{font-weight:700;color:var(--ax-ink);white-space:nowrap}
+    /* FAQ accordions */
+    .wrap--narrow{max-width:820px}
+    .wa-faq{margin-top:.5rem}
+    .wa-faq__item{background:#fff;border:1px solid rgba(15,23,42,.06);border-radius:14px;margin-bottom:.7rem;overflow:hidden;transition:border-color .25s}
+    .wa-faq__item[open]{border-color:rgba(124,58,237,.32)}
+    .wa-faq__item summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1.15rem 1.35rem;font-weight:700;font-size:.95rem;color:var(--ax-ink)}
+    .wa-faq__item summary::-webkit-details-marker{display:none}
+    .wa-faq__item summary i{transition:transform .25s;flex:0 0 auto;color:var(--ax-violet);font-size:.8rem}
+    .wa-faq__item[open] summary i{transform:rotate(180deg)}
+    .wa-faq__item summary:focus-visible{outline:2px solid var(--ax-violet);outline-offset:-2px}
+    .wa-faq__a{padding:0 1.35rem 1.25rem;color:var(--ax-body);font-size:.9rem;line-height:1.75;margin:0}
+    /* Final CTA support line */
+    .wa-cta-line{margin-top:1rem;color:rgba(255,255,255,.88);font-weight:600}
+    /* Light label on the dark final CTA */
+    .ax-label--light{color:#C4B5FD}
+    /* Responsive */
+    @media(max-width:991px){
+        .ax-steps{grid-template-columns:repeat(2,minmax(0,1fr))}
+    }
+    @media(max-width:767px){
+        .wa-table td:first-child{white-space:normal}
+    }
+    @media(max-width:575px){
+        .ax-steps{grid-template-columns:1fr}
+        /* Use-cases table becomes stacked cards */
+        .wa-table-wrap{padding:0 .25rem}
+        .wa-table{border:0;background:transparent;border-radius:0}
+        .wa-table thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+        .wa-table tbody tr{display:block;background:#fff;border:1px solid rgba(15,23,42,.07);border-radius:12px;margin-bottom:.7rem;padding:.3rem 0}
+        .wa-table td{display:flex;justify-content:space-between;gap:1rem;border-bottom:0;padding:.45rem 1.1rem;white-space:normal}
+        .wa-table td::before{content:attr(data-label);font-weight:700;color:var(--ax-ink);font-size:.8rem;flex:0 0 42%}
+    }
+    /* ---- Reveal-on-scroll (page-scoped). Classes are added by JS at the end of
+       the body; without JS the elements keep no hidden state and simply show.
+       The global IntersectionObserver in base.html toggles .is-visible. ---- */
+    .animate-on-scroll{
+        opacity:0;transform:translateY(26px);
+        transition:opacity .75s cubic-bezier(.22,1,.36,1),transform .75s cubic-bezier(.22,1,.36,1);
+    }
+    .animate-on-scroll.is-visible{opacity:1;transform:none}
+    /* Stagger steps (declared in ascending order so the highest wins) */
+    .ax-a-d1{transition-delay:.06s}
+    .ax-a-d2{transition-delay:.12s}
+    .ax-a-d3{transition-delay:.18s}
+    .ax-a-d4{transition-delay:.24s}
+    .ax-a-d5{transition-delay:.30s}
+    .ax-a-d6{transition-delay:.36s}
+    /* Reduced motion: show everything immediately, no movement */
+    @media(prefers-reduced-motion:reduce){
+        .animate-on-scroll{opacity:1!important;transform:none!important;transition:none!important}
+        .wa-faq__item summary i{transition:none}
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function(){
+    /* Respect the user's motion preference: reveal nothing, keep all content static. */
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    function add(el, mods){
+        if (!el) return;
+        el.classList.add('animate-on-scroll');
+        (mods || []).forEach(function(m){ if (m) el.classList.add(m); });
+    }
+    function stagger(box){
+        Array.prototype.forEach.call(box.children, function(child, i){
+            add(child, ['ax-a-d' + Math.min(i + 1, 6)]);
+        });
+    }
+    /* Hero + every centered section header: cascade the label / heading / lead. */
+    document.querySelectorAll('.ax-hero__inner, .ax-center').forEach(stagger);
+    /* Stagger the children of each card grid / step list. */
+    ['.ax-grid', '.ax-steps'].forEach(function(sel){
+        document.querySelectorAll(sel).forEach(stagger);
+    });
+    /* Standalone blocks. */
+    document.querySelectorAll('.wa-table-wrap, .ax-cta-center').forEach(function(el){ add(el); });
+    document.querySelectorAll('.wa-faq__item').forEach(function(el, i){ add(el, ['ax-a-d' + Math.min(i + 1, 6)]); });
+
+    /* Page-local reveal (no rAF dependency): in-viewport elements are revealed
+       synchronously so first paint is never blank; IntersectionObserver handles
+       below-fold content with scroll/resize/timer fallbacks. */
+    var marked = document.querySelectorAll('.animate-on-scroll');
+    function revealNow(el){ el.classList.add('is-visible'); }
+    function revealInViewport(){
+        Array.prototype.forEach.call(marked, function(el){
+            if (el.classList.contains('is-visible')) return;
+            var r = el.getBoundingClientRect();
+            if (r.top < window.innerHeight && r.bottom > 0) revealNow(el);
+        });
+    }
+    if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function(entries){
+            entries.forEach(function(entry){
+                if (entry.isIntersecting) {
+                    revealNow(entry.target);
+                    io.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0, rootMargin: '0px 0px -5% 0px' });
+        Array.prototype.forEach.call(marked, function(el){ io.observe(el); });
+    }
+    revealInViewport();
+    window.addEventListener('scroll', revealInViewport, { passive: true });
+    window.addEventListener('resize', revealInViewport);
+    setTimeout(revealInViewport, 2000);
+})();
+</script>
+{% endblock %}

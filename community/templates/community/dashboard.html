@@ -105,6 +105,41 @@
             </div>
         </div>
 
+        <!-- Onboarding preferences -->
+        {% if profile.service_type %}
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                    <div>
+                        <h6 class="fw-800 mb-1">{% trans "Your OnWebApp Preferences" %}</h6>
+                        <p class="text-secondary small mb-0">{% trans "Chosen during setup — you can update them at any time." %}</p>
+                    </div>
+                    <a href="{% url 'users:profile_edit' %}" class="btn btn-light btn-sm rounded-pill px-3 fw-800">{% trans "Update" %}</a>
+                </div>
+                <div class="row g-3 small">
+                    <div class="col-6 col-md-3">
+                        <span class="text-secondary d-block mb-1">{% trans "Path" %}</span>
+                        <strong>{{ profile.get_service_type_display|default:"—" }}</strong>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <span class="text-secondary d-block mb-1">{% trans "Needs" %}</span>
+                        <strong>
+                            {% for service in profile.community_needs_labels %}{{ service }}{% if not forloop.last %}, {% endif %}{% empty %}—{% endfor %}
+                        </strong>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <span class="text-secondary d-block mb-1">{% trans "Goal" %}</span>
+                        <strong>{{ profile.get_project_description_display|default:"—" }}</strong>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <span class="text-secondary d-block mb-1">{% trans "Timeline" %}</span>
+                        <strong>{{ profile.get_start_timeline_display|default:"—" }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
         <!-- Active Onboarding Session -->
         {% if active_session %}
         <div class="card border-0 shadow-sm mb-4">

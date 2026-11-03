@@ -14,6 +14,16 @@ from .automation import calculate_health_score, get_business_insights
 def is_admin_or_staff(user):
     return user.is_authenticated and (user.is_superuser or user.is_staff)
 
+
+def visible_customer_qs():
+    """Return only customer records, excluding staff/superuser accounts while
+    preserving deleted-account customer records that still need CRM visibility."""
+    return Customer.objects.filter(
+        Q(user__isnull=True) | Q(user__is_staff=False)
+    ).filter(
+        Q(user__isnull=True) | Q(user__is_superuser=False)
+    )
+
 @login_required
 @user_passes_test(is_admin_or_staff)
 def crm_dashboard(request):
@@ -25,13 +35,15 @@ def crm_dashboard(request):
     thirty_days_ago = now - timedelta(days=30)
 
     # --- 1. Role-Awareness & Scope ---
-    # If superuser, show Global view. If staff, show My Portfolio.
-    if request.user.is_superuser:
-        all_customers = Customer.objects.all()
-        view_scope = "Global View"
+    # Staff users should be able to see the full customer portfolio. We keep the
+    # linked user and assignment fields nullable so records remain visible even
+    # after a client account is deleted or a rep assignment is cleared.
+    if request.user.is_superuser or request.user.is_staff:
+        all_customers = visible_customer_qs()
+        view_scope = "Global View" if request.user.is_superuser else "Staff Portfolio"
     else:
-        all_customers = Customer.objects.filter(assigned_to=request.user)
-        view_scope = "My Portfolio"
+        all_customers = Customer.objects.none()
+        view_scope = "Restricted View"
 
     total_clients = all_customers.count()
     
@@ -244,10 +256,10 @@ def crm_dashboard(request):
 @login_required
 @user_passes_test(is_admin_or_staff)
 def customer_list(request):
-    if request.user.is_superuser:
-        customers = Customer.objects.all().order_by('-created_at')
+    if request.user.is_superuser or request.user.is_staff:
+        customers = visible_customer_qs().order_by('-created_at')
     else:
-        customers = Customer.objects.filter(assigned_to=request.user).order_by('-created_at')
+        customers = Customer.objects.none()
     return render(request, 'crm/customer_list.html', {'customers': customers})
 
 @login_required
@@ -255,8 +267,10 @@ def customer_list(request):
 def customer_detail(request, customer_id):
     customer = get_object_or_404(Customer, id=customer_id)
     
-    # Access Control for Staff
-    if not request.user.is_superuser and customer.assigned_to != request.user:
+    # Access Control for Staff. Staff users need visibility into the whole CRM
+    # portfolio, including records whose linked user was deleted or which are no
+    # longer assigned to an active rep.
+    if not request.user.is_staff and not request.user.is_superuser:
         messages.error(request, "You do not have permission to view this customer.")
         return redirect('crm:dashboard')
 

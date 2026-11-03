@@ -92,6 +92,34 @@
                                 <label class="text-secondary small fw-800 mb-1 d-block text-uppercase tracking-wider">Industry</label>
                                 <div class="fw-700 text-primary-hover">{{ profile.industry|default:"—" }}</div>
                             </div>
+                            <div class="col-md-6">
+                                <label class="text-secondary small fw-800 mb-1 d-block text-uppercase tracking-wider">Job Title</label>
+                                <div class="fw-700 text-primary-hover">{{ profile.job_title|default:"—" }}</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="text-secondary small fw-800 mb-1 d-block text-uppercase tracking-wider">Phone</label>
+                                <div class="fw-700 text-primary-hover">{{ profile.phone_number|default:"—" }}</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="text-secondary small fw-800 mb-1 d-block text-uppercase tracking-wider">Location</label>
+                                <div class="fw-700 text-primary-hover">
+                                    {% if profile.city or profile.country %}
+                                        {{ profile.city }}{% if profile.city and profile.country %}, {% endif %}{{ profile.country }}
+                                    {% else %}—{% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="text-secondary small fw-800 mb-1 d-block text-uppercase tracking-wider">Website</label>
+                                <div class="fw-700 text-primary-hover">
+                                    {% if profile.website %}
+                                        <a href="{{ profile.website }}" target="_blank" rel="noopener noreferrer">{{ profile.website }}</a>
+                                    {% else %}—{% endif %}
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <label class="text-secondary small fw-800 mb-1 d-block text-uppercase tracking-wider">Business Address</label>
+                                <div class="fw-700 text-primary-hover">{{ profile.business_address|default:"—" }}</div>
+                            </div>
                         </div>
                     </div>
                 </div>

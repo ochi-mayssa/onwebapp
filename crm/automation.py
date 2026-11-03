@@ -35,6 +35,7 @@ def calculate_health_score(customer):
             issues.append("Critically inactive")
     else:
         score -= 10 # No interactions
+        issues.append('No interactions')
         
     # 3. Project Health
     if customer.user:

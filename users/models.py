@@ -14,7 +14,7 @@ class UserProfile(models.Model):
     email_verified = models.BooleanField(default=False)
     
     SERVICE_TYPE_CHOICES = [
-        ('full_platform', 'Full Platform Services'),
+        ('full_platform', 'Full Digital Platform'),
         ('community', 'Community Services'),
     ]
     service_type = models.CharField(
@@ -26,23 +26,34 @@ class UserProfile(models.Model):
     )
     
     # Community Needs (JSON list of selected needs)
+    COMMUNITY_NEED_CHOICES = [
+        ('website', 'Website Development'),
+        ('branding', 'Brand Identity & Design'),
+        ('social', 'Social Media Presence'),
+        ('content', 'Content Development'),
+    ]
     community_needs = models.JSONField(default=list, blank=True)
+
+    @property
+    def community_needs_labels(self):
+        """Human-readable labels for the stored community need values."""
+        labels = dict(self.COMMUNITY_NEED_CHOICES)
+        return [labels.get(value, value) for value in (self.community_needs or [])]
     
     # Project Description
     PROJECT_DESC_CHOICES = [
-        ('personal', 'Personal project'),
-        ('business', 'Business / Startup'),
-        ('community', 'Community / Non-profit'),
-        ('other', 'Other'),
+        ('personal', 'Launch a New Project'),
+        ('business', 'Grow an Existing Business'),
+        ('community', 'Transform Your Operations'),
     ]
     project_description = models.CharField(max_length=50, choices=PROJECT_DESC_CHOICES, blank=True)
     
     # Timeline
     TIMELINE_CHOICES = [
-        ('immediately', 'Immediately'),
-        ('1_month', 'Within 1 month'),
-        ('3_months', 'Within 3 months'),
-        ('exploring', 'Just exploring'),
+        ('immediately', 'Ready to Start'),
+        ('1_month', 'Within a Month'),
+        ('3_months', 'Within Three Months'),
+        ('exploring', 'Just Exploring'),
     ]
     start_timeline = models.CharField(max_length=20, choices=TIMELINE_CHOICES, blank=True)
     
@@ -66,6 +77,13 @@ class UserProfile(models.Model):
         ('500+', '500+ employees')
     ])
     country = models.CharField(max_length=100, blank=True)
+
+    # Additional business contact details (collected during onboarding)
+    job_title = models.CharField(max_length=150, blank=True)
+    city = models.CharField(max_length=100, blank=True)
+    website = models.URLField(blank=True)
+    business_address = models.CharField(max_length=255, blank=True)
+    business_description = models.TextField(blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

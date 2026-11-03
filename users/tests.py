@@ -428,3 +428,220 @@ class MandatoryVerificationTests(TestCase):
             follow=True,
         )
         self.assertContains(second, 'Too many resend requests')
+
+
+class OnboardingFlowTests(TestCase):
+    """First-run onboarding: rendering, validation, persistence and CRM sync."""
+
+    def setUp(self):
+        self.user = User.objects.create_user(
+            'ada', 'ada@example.com', 'correct-pass',
+            first_name='Ada', last_name='Lovelace',
+        )
+        self.client.force_login(self.user)
+        self.url = reverse('users:onboarding')
+
+    def _payload(self, **overrides):
+        data = {
+            'service_type': 'full_platform',
+            'community_needs_selection': ['website', 'branding'],
+            'project_description': 'business',
+            'start_timeline': '1_month',
+            'display_name': 'Ada Lovelace',
+            'phone_number': '+1 555 000 1111',
+            'company_name': 'Analytical Engines',
+            'job_title': 'Founder',
+            'country': 'United Kingdom',
+            'city': 'London',
+            'website': 'https://example.com',
+            'industry': 'Technology',
+            'company_size': '11-50',
+            'business_address': '1 Main Street',
+        }
+        data.update(overrides)
+        return data
+
+    def test_get_renders_all_four_steps(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['initial_step'], 1)
+        for heading in (
+            'Choose Your Path',
+            'What Do You Need?',
+            'What Are You Looking to Achieve?',
+            'When Are You Planning to Get Started?',
+        ):
+            self.assertContains(response, heading)
+
+        form = response.context['form']
+        self.assertEqual([w.data['value'] for w in form['service_type']], ['full_platform', 'community'])
+        self.assertEqual(len(list(form['community_needs_selection'])), 4)
+        self.assertEqual([w.data['value'] for w in form['project_description']], ['personal', 'business', 'community'])
+        self.assertEqual([w.data['value'] for w in form['start_timeline']], ['immediately', '1_month', '3_months', 'exploring'])
+
+    def test_successful_submission_saves_profile_and_shows_completion(self):
+        response = self.client.post(self.url, self._payload())
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.context['completed'])
+        self.assertContains(response, 'All Set!')
+        self.assertContains(response, 'Full Digital Platform')
+        self.assertContains(response, 'Website Development')
+        self.assertContains(response, 'Brand Identity &amp; Design')
+        self.assertContains(response, 'Grow an Existing Business')
+        self.assertContains(response, 'Within a Month')
+        self.assertContains(response, 'Go to My Dashboard')
+        self.assertContains(response, 'id="redirectNote"')
+        self.assertContains(response, 'data-url="{}"'.format(reverse('users:dashboard')))
+
+        profile = self.user.profile
+        self.assertEqual(profile.service_type, 'full_platform')
+        self.assertEqual(profile.community_needs, ['website', 'branding'])
+        self.assertEqual(profile.project_description, 'business')
+        self.assertEqual(profile.start_timeline, '1_month')
+        self.assertEqual(profile.display_name, 'Ada Lovelace')
+        self.assertEqual(profile.phone_number, '+1 555 000 1111')
+        self.assertEqual(profile.company_name, 'Analytical Engines')
+        self.assertEqual(profile.job_title, 'Founder')
+        self.assertEqual(profile.country, 'United Kingdom')
+        self.assertEqual(profile.city, 'London')
+        self.assertEqual(profile.website, 'https://example.com')
+        self.assertEqual(profile.industry, 'Technology')
+        self.assertEqual(profile.company_size, '11-50')
+        self.assertEqual(profile.business_address, '1 Main Street')
+        self.assertEqual(
+            profile.community_needs_labels,
+            ['Website Development', 'Brand Identity & Design'],
+        )
+
+    def test_timeline_is_optional(self):
+        payload = self._payload()
+        payload.pop('start_timeline')
+        response = self.client.post(self.url, payload)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.context['completed'])
+        self.assertEqual(self.user.profile.start_timeline, '')
+
+    def test_missing_services_reopens_step_two(self):
+        payload = self._payload()
+        payload.pop('community_needs_selection')
+        response = self.client.post(self.url, payload)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.context.get('completed', False))
+        self.assertEqual(response.context['initial_step'], 2)
+        self.assertContains(response, 'Select at least one service to continue.')
+        self.assertIsNone(self.user.profile.service_type)
+
+    def test_missing_path_reopens_step_one(self):
+        payload = self._payload()
+        payload.pop('service_type')
+        response = self.client.post(self.url, payload)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['initial_step'], 1)
+        self.assertIsNone(self.user.profile.service_type)
+
+    def test_missing_goal_reopens_step_three(self):
+        payload = self._payload()
+        payload.pop('project_description')
+        response = self.client.post(self.url, payload)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['initial_step'], 3)
+        self.assertIsNone(self.user.profile.service_type)
+
+    def test_completed_onboarding_redirects_away(self):
+        self.client.post(self.url, self._payload())
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse('users:dashboard'))
+
+    def test_crm_customer_is_created(self):
+        self.client.post(self.url, self._payload())
+        from crm.models import Customer
+        customer = Customer.objects.get(user=self.user)
+        self.assertEqual(customer.email, 'ada@example.com')
+        self.assertEqual(customer.name, 'Analytical Engines')
+        self.assertEqual(customer.company_name, 'Analytical Engines')
+        self.assertEqual(customer.industry, 'Technology')
+        self.assertEqual(customer.website, 'https://example.com')
+        self.assertEqual(customer.phone, '+1 555 000 1111')
+        self.assertEqual(customer.customer_type, 'COMPANY')
+        self.assertEqual(customer.source, 'Onboarding')
+
+    def test_crm_sync_preserves_existing_values(self):
+        from crm.models import Customer
+        Customer.objects.create(
+            user=self.user, email='ada@example.com',
+            name='Curated Name', company_name='Curated Co',
+            industry='Finance', source='Sales team',
+        )
+        self.client.post(self.url, self._payload())
+        customer = Customer.objects.get(user=self.user)
+        self.assertEqual(customer.name, 'Curated Name')
+        self.assertEqual(customer.company_name, 'Curated Co')
+        self.assertEqual(customer.industry, 'Finance')
+        self.assertEqual(customer.source, 'Sales team')
+        # Blank fields are filled from onboarding.
+        self.assertEqual(customer.phone, '+1 555 000 1111')
+        self.assertEqual(customer.website, 'https://example.com')
+
+    def test_dashboard_shows_personalized_plan(self):
+        self.client.post(self.url, self._payload())
+        response = self.client.get(reverse('users:dashboard'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Your OnWebApp Plan')
+        self.assertContains(response, 'Full Digital Platform')
+        self.assertContains(response, 'Website Development')
+        self.assertContains(response, 'Grow an Existing Business')
+        self.assertContains(response, 'Within a Month')
+
+    def test_profile_edit_persists_onboarding_details(self):
+        self.client.post(self.url, self._payload())
+        response = self.client.post(reverse('users:profile_edit'), {
+            'display_name': 'Ada L.',
+            'bio': 'Mathematician',
+            'avatar': '',
+            'company_name': 'Analytical Engines Ltd',
+            'industry': 'Computing',
+            'company_size': '51-200',
+            'country': 'United Kingdom',
+            'phone_number': '+44 20 0000 0000',
+            'job_title': 'Chief Scientist',
+            'city': 'Manchester',
+            'website': 'https://ada.example.com',
+            'business_address': '2 Engine Road',
+        })
+        self.assertEqual(response.status_code, 302)
+        profile = self.user.profile
+        self.assertEqual(profile.phone_number, '+44 20 0000 0000')
+        self.assertEqual(profile.job_title, 'Chief Scientist')
+        self.assertEqual(profile.city, 'Manchester')
+        self.assertEqual(profile.website, 'https://ada.example.com')
+        self.assertEqual(profile.business_address, '2 Engine Road')
+
+    def test_profile_edit_syncs_customer_record(self):
+        self.client.post(self.url, self._payload())
+        self.client.post(reverse('users:profile_edit'), {
+            'display_name': 'Ada L.',
+            'bio': 'Mathematician',
+            'avatar': '',
+            'company_name': 'Analytical Engines Ltd',
+            'industry': 'Computing',
+            'company_size': '51-200',
+            'country': 'United Kingdom',
+            'phone_number': '+44 20 0000 0000',
+            'job_title': 'Chief Scientist',
+            'city': 'Manchester',
+            'website': 'https://ada.example.com',
+            'business_address': '2 Engine Road',
+        })
+
+        from crm.models import Customer
+        customer = Customer.objects.get(user=self.user)
+        self.assertEqual(customer.name, 'Analytical Engines Ltd')
+        self.assertEqual(customer.phone, '+44 20 0000 0000')
+        self.assertEqual(customer.company_name, 'Analytical Engines Ltd')
+        self.assertEqual(customer.industry, 'Computing')
+        self.assertEqual(customer.city, 'Manchester')
+        self.assertEqual(customer.website, 'https://ada.example.com')
+        self.assertEqual(customer.profile_sync_status, 'SYNCED')
+
+

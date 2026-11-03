@@ -25,256 +25,307 @@
 {% endblock %}
 
 {% block dashboard_content %}
-<!-- Strategic Insights Row -->
-{% if insights %}
-<div class="row g-4 mb-5">
-    {% for insight in insights|slice:":3" %}
-    <div class="col-md-4">
-        <div class="card border-0 shadow-sm h-100" style="background-color: {% if insight.type == 'danger' %}#FEF2F2{% elif insight.type == 'success' %}#F0FDF4{% else %}#F0F9FF{% endif %};">
-            <div class="card-body p-4">
-                <div class="d-flex align-items-start gap-3">
-                    <div class="rounded-circle p-2 d-flex align-items-center justify-content-center" style="background-color: #fff; color: {% if insight.type == 'danger' %}#DC2626{% elif insight.type == 'success' %}#16A34A{% else %}#0284C7{% endif %}; width: 40px; height: 40px;">
-                        <i data-lucide="{% if insight.icon == 'exclamation-triangle' %}alert-triangle{% elif insight.icon == 'chart-line' %}trending-up{% else %}lightbulb{% endif %}" style="width: 20px;"></i>
+<style>
+    .crm-dashboard-shell {
+        position: relative;
+        padding: 14px;
+        border-radius: 30px;
+        background: linear-gradient(180deg, rgba(248,250,252,0.96) 0%, rgba(255,255,255,0.92) 100%);
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        box-shadow: 0 22px 50px rgba(15, 23, 42, 0.06);
+    }
+
+    .crm-dashboard-shell .card {
+        border-radius: 22px !important;
+    }
+
+    .crm-dashboard-shell .table > :not(caption) > * > * {
+        border-color: rgba(148, 163, 184, 0.12);
+    }
+
+    .crm-dashboard-shell .text-slate-900 { color: #0f172a !important; }
+    .crm-dashboard-shell .text-slate-700 { color: #334155 !important; }
+    .crm-dashboard-shell .text-slate-600 { color: #475569 !important; }
+    .crm-dashboard-shell .text-secondary { color: #64748b !important; }
+
+    @media (max-width: 768px) {
+        .crm-dashboard-shell {
+            padding: 8px;
+            border-radius: 22px;
+        }
+    }
+</style>
+
+<div class="crm-dashboard-shell">
+    {% if insights %}
+    <div class="row g-4 mb-5">
+        {% for insight in insights|slice:":3" %}
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, {% if insight.type == 'danger' %}#fff1f2 0%, #fef2f2 100%{% elif insight.type == 'success' %}#f0fdf4 0%, #ecfdf5 100%{% else %}#eff6ff 0%, #f8fbff 100%{% endif %}; border-radius: 20px; border: 1px solid rgba(148, 163, 184, 0.18);">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-start gap-3">
+                        <div class="rounded-4 d-flex align-items-center justify-content-center" style="background: rgba(255,255,255,0.9); color: {% if insight.type == 'danger' %}#DC2626{% elif insight.type == 'success' %}#16A34A{% else %}#0284C7{% endif %}; width: 46px; height: 46px; box-shadow: 0 12px 22px rgba(15, 23, 42, 0.08);">
+                            <i data-lucide="{% if insight.icon == 'exclamation-triangle' %}alert-triangle{% elif insight.icon == 'chart-line' %}trending-up{% else %}lightbulb{% endif %}" style="width: 20px;"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <p class="mb-2 fw-800 text-slate-900 lh-base">{{ insight.text }}</p>
+                            <a href="{{ insight.action_url }}" class="text-decoration-none small fw-700 d-inline-flex align-items-center gap-1" style="color: {% if insight.type == 'danger' %}#DC2626{% elif insight.type == 'success' %}#16A34A{% else %}#0284C7{% endif %};">
+                                <span>Take Action</span>
+                                <i data-lucide="chevron-right" style="width: 14px;"></i>
+                            </a>
+                        </div>
                     </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="row g-4 mb-5">
+        <div class="col-md-4 col-lg-2">
+            <div class="card kpi-card border-0 h-100" style="background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(255,255,255,0.95));">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <span class="kpi-label">Total Clients</span>
+                    <div class="rounded-3 p-2" style="background: rgba(99,102,241,0.12); color: #4F46E5;"><i data-lucide="users" style="width: 18px;"></i></div>
+                </div>
+                <div class="kpi-value">{{ total_clients }}</div>
+            </div>
+        </div>
+        <div class="col-md-4 col-lg-2">
+            <div class="card kpi-card border-0 h-100" style="background: linear-gradient(135deg, rgba(16,185,129,0.08), rgba(255,255,255,0.95));">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <span class="kpi-label">Active</span>
+                    <div class="rounded-3 p-2" style="background: rgba(16,185,129,0.12); color: #16A34A;"><i data-lucide="activity" style="width: 18px;"></i></div>
+                </div>
+                <div class="kpi-value text-success">{{ active_clients }}</div>
+            </div>
+        </div>
+        <div class="col-md-4 col-lg-2">
+            <div class="card kpi-card border-0 h-100" style="background: linear-gradient(135deg, rgba(59,130,246,0.08), rgba(255,255,255,0.95));">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <span class="kpi-label">New Leads</span>
+                    <div class="rounded-3 p-2" style="background: rgba(59,130,246,0.12); color: #2563EB;"><i data-lucide="sparkles" style="width: 18px;"></i></div>
+                </div>
+                <div class="kpi-value text-primary">{{ new_leads_30d }}</div>
+            </div>
+        </div>
+        <div class="col-md-4 col-lg-2">
+            <div class="card kpi-card border-0 h-100" style="background: linear-gradient(135deg, rgba(239,68,68,0.08), rgba(255,255,255,0.95));">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <span class="kpi-label">At Risk</span>
+                    <div class="rounded-3 p-2" style="background: rgba(239,68,68,0.12); color: #DC2626;"><i data-lucide="shield-alert" style="width: 18px;"></i></div>
+                </div>
+                <div class="kpi-value text-danger">{{ clients_at_risk }}</div>
+            </div>
+        </div>
+        <div class="col-md-4 col-lg-2">
+            <div class="card kpi-card border-0 h-100" style="background: linear-gradient(135deg, rgba(168,85,247,0.08), rgba(255,255,255,0.95));">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <span class="kpi-label">Revenue (30d)</span>
+                    <div class="rounded-3 p-2" style="background: rgba(168,85,247,0.12); color: #7C3AED;"><i data-lucide="wallet" style="width: 18px;"></i></div>
+                </div>
+                <div class="kpi-value">${{ mrr|floatformat:0|intcomma }}</div>
+            </div>
+        </div>
+        <div class="col-md-4 col-lg-2">
+            <div class="card kpi-card border-0 h-100" style="background: linear-gradient(135deg, rgba(148,163,184,0.08), rgba(255,255,255,0.95));">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <span class="kpi-label">Churn Rate</span>
+                    <div class="rounded-3 p-2" style="background: rgba(148,163,184,0.12); color: #475569;"><i data-lucide="percent" style="width: 18px;"></i></div>
+                </div>
+                <div class="kpi-value text-muted">{{ churn_rate }}%</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-5">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm mb-5" style="border-radius: 22px; overflow: hidden; background: rgba(255,255,255,0.65); backdrop-filter: blur(8px);">
+                <div class="card-header bg-transparent border-bottom p-4 d-flex flex-wrap align-items-center justify-content-between gap-3">
                     <div>
-                        <p class="mb-1 fw-bold text-slate-900">{{ insight.text }}</p>
-                        <a href="{{ insight.action_url }}" class="text-decoration-none small fw-bold" style="color: {% if insight.type == 'danger' %}#DC2626{% elif insight.type == 'success' %}#16A34A{% else %}#0284C7{% endif %};">Take Action <i data-lucide="chevron-right" style="width: 14px; vertical-align: middle;"></i></a>
+                        <h5 class="mb-1 fw-800 text-slate-900">Client Health Matrix</h5>
+                        <p class="small text-secondary mb-0">Portfolio coverage and engagement quality</p>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2">
+                        <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">{{ health_stats.healthy }} Healthy</span>
+                        <span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-2">{{ health_stats.attention }} Attention</span>
+                        <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-2">{{ health_stats.risk }} Risk</span>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-    {% endfor %}
-</div>
-{% endif %}
-
-<!-- KPI Row -->
-<div class="row g-4 mb-5">
-    <div class="col-md-4 col-lg-2">
-        <div class="card kpi-card">
-            <span class="kpi-label">Total Clients</span>
-            <div class="kpi-value mt-2">{{ total_clients }}</div>
-        </div>
-    </div>
-    <div class="col-md-4 col-lg-2">
-        <div class="card kpi-card">
-            <span class="kpi-label">Active</span>
-            <div class="kpi-value text-success mt-2">{{ active_clients }}</div>
-        </div>
-    </div>
-    <div class="col-md-4 col-lg-2">
-        <div class="card kpi-card">
-            <span class="kpi-label">New Leads</span>
-            <div class="kpi-value text-primary mt-2">{{ new_leads_30d }}</div>
-        </div>
-    </div>
-    <div class="col-md-4 col-lg-2">
-        <div class="card kpi-card">
-            <span class="kpi-label">At Risk</span>
-            <div class="kpi-value text-danger mt-2">{{ clients_at_risk }}</div>
-        </div>
-    </div>
-    <div class="col-md-4 col-lg-2">
-        <div class="card kpi-card">
-            <span class="kpi-label">Revenue (30d)</span>
-            <div class="kpi-value mt-2">${{ mrr|floatformat:0|intcomma }}</div>
-        </div>
-    </div>
-    <div class="col-md-4 col-lg-2">
-        <div class="card kpi-card">
-            <span class="kpi-label">Churn Rate</span>
-            <div class="kpi-value text-muted mt-2">{{ churn_rate }}%</div>
-        </div>
-    </div>
-</div>
-
-<div class="row g-5">
-    <div class="col-lg-8">
-        <!-- Health Matrix -->
-        <div class="card mb-5">
-            <div class="card-header bg-white p-4 border-bottom d-flex align-items-center justify-content-between">
-                <h5 class="mb-0 fw-bold">Client Health Matrix</h5>
-                <div class="d-flex gap-2">
-                    <span class="badge bg-success-subtle text-success">{{ health_stats.healthy }} Healthy</span>
-                    <span class="badge bg-warning-subtle text-warning">{{ health_stats.attention }} Attention</span>
-                    <span class="badge bg-danger-subtle text-danger">{{ health_stats.risk }} Risk</span>
-                </div>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Customer</th>
-                                <th>Health Score</th>
-                                <th>Status</th>
-                                <th class="text-end">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in client_health_list %}
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="user-avatar" style="background-color: var(--slate-100); color: var(--slate-600);">
-                                            {{ item.customer.name|slice:":1"|upper }}
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="px-4 py-3">Customer</th>
+                                    <th class="px-4 py-3">Health Score</th>
+                                    <th class="px-4 py-3">Status</th>
+                                    <th class="px-4 py-3 text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in client_health_list %}
+                                <tr>
+                                    <td class="px-4 py-3">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="user-avatar" style="background: linear-gradient(135deg, #eef2ff 0%, #e2e8f0 100%); color: #475569; width: 42px; height: 42px; border-radius: 14px; font-size: 0.9rem; font-weight: 700;">
+                                                {{ item.customer.name|slice:":1"|upper }}
+                                            </div>
+                                            <div>
+                                                <a href="{% url 'crm:customer_detail' item.customer.id %}" class="text-decoration-none fw-700 text-slate-900 d-block">{{ item.customer.name }}</a>
+                                                <span class="text-muted small">{{ item.customer.email }}</span>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <a href="{% url 'crm:customer_detail' item.customer.id %}" class="text-decoration-none fw-bold text-slate-900 d-block">{{ item.customer.name }}</a>
-                                            <span class="text-muted small">{{ item.customer.email }}</span>
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <div class="d-flex align-items-center gap-3" style="min-width: 180px;">
+                                            <div class="progress flex-grow-1" style="height: 8px; border-radius: 999px; background-color: rgba(148,163,184,0.18);">
+                                                <div class="progress-bar {% if item.score < 50 %}bg-danger{% elif item.score < 75 %}bg-warning{% else %}bg-success{% endif %}" style="width: {{ item.score }}%; border-radius: 999px;"></div>
+                                            </div>
+                                            <span class="fw-800 small">{{ item.score }}</span>
+                                            {% if item.trend == 'UP' %}
+                                                <i data-lucide="trending-up" class="text-success" style="width: 14px;"></i>
+                                            {% elif item.trend == 'DOWN' %}
+                                                <i data-lucide="trending-down" class="text-danger" style="width: 14px;"></i>
+                                            {% endif %}
                                         </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="d-flex align-items-center gap-3" style="width: 160px;">
-                                        <div class="progress flex-grow-1" style="height: 6px; background-color: var(--slate-100);">
-                                            <div class="progress-bar {% if item.score < 50 %}bg-danger{% elif item.score < 75 %}bg-warning{% else %}bg-success{% endif %}" style="width: {{ item.score }}%"></div>
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <span class="badge {% if item.score < 50 %}bg-danger-subtle text-danger{% elif item.score < 75 %}bg-warning-subtle text-warning{% else %}bg-success-subtle text-success{% endif %} rounded-pill px-3 py-2">
+                                            {{ item.status }}
+                                        </span>
+                                    </td>
+                                    <td class="px-4 py-3 text-end">
+                                        <div class="dropdown">
+                                            <button class="btn btn-outline-secondary btn-sm p-1 px-2 rounded-3" data-bs-toggle="dropdown">
+                                                <i data-lucide="more-horizontal" style="width: 16px;"></i>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 p-2 rounded-3">
+                                                <li><a class="dropdown-item rounded-2" href="{% url 'crm:customer_detail' item.customer.id %}">View Details</a></li>
+                                                <li><a class="dropdown-item rounded-2" href="#">Log Interaction</a></li>
+                                                <li><hr class="dropdown-divider"></li>
+                                                <li><a class="dropdown-item rounded-2 text-danger" href="#">Archive</a></li>
+                                            </ul>
                                         </div>
-                                        <span class="fw-bold small">{{ item.score }}</span>
-                                        {% if item.trend == 'UP' %}
-                                            <i data-lucide="trending-up" class="text-success" style="width: 14px;"></i>
-                                        {% elif item.trend == 'DOWN' %}
-                                            <i data-lucide="trending-down" class="text-danger" style="width: 14px;"></i>
-                                        {% endif %}
-                                    </div>
-                                </td>
-                                <td>
-                                    <span class="badge {% if item.score < 50 %}bg-danger-subtle text-danger{% elif item.score < 75 %}bg-warning-subtle text-warning{% else %}bg-success-subtle text-success{% endif %}">
-                                        {{ item.status }}
-                                    </span>
-                                </td>
-                                <td class="text-end">
-                                    <div class="dropdown">
-                                        <button class="btn btn-outline-secondary btn-sm p-1 px-2" data-bs-toggle="dropdown">
-                                            <i data-lucide="more-horizontal" style="width: 16px;"></i>
-                                        </button>
-                                        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 p-2 rounded-3">
-                                            <li><a class="dropdown-item rounded-2" href="{% url 'crm:customer_detail' item.customer.id %}">View Details</a></li>
-                                            <li><a class="dropdown-item rounded-2" href="#">Log Interaction</a></li>
-                                            <li><hr class="dropdown-divider"></li>
-                                            <li><a class="dropdown-item rounded-2 text-danger" href="#">Archive</a></li>
-                                        </ul>
-                                    </div>
-                                </td>
-                            </tr>
-                            {% empty %}
-                            <tr><td colspan="4" class="text-center py-5 text-muted">No client data available.</td></tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="4" class="text-center py-5 text-muted">No client data available.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm" style="border-radius: 22px; overflow: hidden; background: rgba(255,255,255,0.65); backdrop-filter: blur(8px);">
+                <div class="card-header bg-transparent border-bottom p-4">
+                    <h5 class="mb-0 fw-800 text-slate-900">Live Engagement Feed</h5>
+                </div>
+                <div class="card-body p-0">
+                    {% for event in timeline %}
+                    <div class="p-4 border-bottom d-flex gap-4 align-items-start">
+                        <div class="d-flex align-items-center justify-content-center rounded-4" style="width: 42px; height: 42px; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); color: #475569; flex-shrink: 0;">
+                            <i data-lucide="{% if event.type == 'INTERACTION' %}message-square{% else %}activity{% endif %}" style="width: 18px;"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-start gap-3 mb-1">
+                                <h6 class="fw-700 text-slate-900 mb-0">{{ event.customer_name }}</h6>
+                                <span class="text-slate-400 small">{{ event.date|naturaltime }}</span>
+                            </div>
+                            <p class="text-secondary small mb-0">{{ event.desc }}</p>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="p-5 text-center text-muted">
+                        <p class="small mb-0">No recent activity found.</p>
+                    </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
 
-        <!-- Activity Timeline -->
-        <div class="card">
-            <div class="card-header bg-white p-4 border-bottom">
-                <h5 class="mb-0 fw-bold">Live Engagement Feed</h5>
-            </div>
-            <div class="card-body p-0">
-                {% for event in timeline %}
-                <div class="p-4 border-bottom d-flex gap-4">
-                    <div class="rounded-4 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; background-color: var(--slate-50); color: var(--slate-500); flex-shrink: 0;">
-                        <i data-lucide="{% if event.type == 'INTERACTION' %}message-square{% else %}activity{% endif %}" style="width: 20px;"></i>
-                    </div>
-                    <div class="flex-grow-1">
-                        <div class="d-flex justify-content-between align-items-start mb-1">
-                            <h6 class="fw-bold text-slate-900 mb-0">{{ event.customer_name }}</h6>
-                            <span class="text-slate-400 small">{{ event.date|naturaltime }}</span>
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm mb-5" style="border-radius: 22px; overflow: hidden; background: rgba(255,255,255,0.7); backdrop-filter: blur(8px);">
+                <div class="card-header bg-transparent border-bottom p-4">
+                    <h5 class="mb-0 fw-800 text-slate-900">Sales Pipeline</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="small fw-700 text-slate-600">Leads</span>
+                            <span class="small fw-800 text-slate-900">{{ funnel_data.leads.count }}</span>
                         </div>
-                        <p class="text-muted small mb-0">{{ event.desc }}</p>
-                    </div>
-                </div>
-                {% empty %}
-                <div class="p-5 text-center text-muted">
-                    <p class="small">No recent activity found.</p>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-    </div>
-
-    <div class="col-lg-4">
-        <!-- Lifecycle Funnel -->
-        <div class="card mb-5">
-            <div class="card-header bg-white p-4 border-bottom">
-                <h5 class="mb-0 fw-bold">Sales Pipeline</h5>
-            </div>
-            <div class="card-body p-4">
-                <div class="mb-4">
-                    <div class="d-flex justify-content-between mb-2">
-                        <span class="small fw-600 text-slate-600">Leads</span>
-                        <span class="small fw-bold">{{ funnel_data.leads.count }}</span>
-                    </div>
-                    <div class="progress" style="height: 8px; background-color: var(--slate-100);">
-                        <div class="progress-bar" style="width: {{ funnel_data.leads.pct }}%; background-color: var(--secondary);"></div>
-                    </div>
-                </div>
-
-                <div class="mb-4">
-                    <div class="d-flex justify-content-between mb-2">
-                        <span class="small fw-600 text-slate-600">Qualified</span>
-                        <span class="small fw-bold">{{ funnel_data.qualified.count }}</span>
-                    </div>
-                    <div class="progress" style="height: 8px; background-color: var(--slate-100);">
-                        <div class="progress-bar" style="width: {{ funnel_data.qualified.pct }}%; background-color: var(--primary);"></div>
-                    </div>
-                </div>
-
-                <div class="mb-4">
-                    <div class="d-flex justify-content-between mb-2">
-                        <span class="small fw-600 text-slate-600">Active Clients</span>
-                        <span class="small fw-bold">{{ funnel_data.active.count }}</span>
-                    </div>
-                    <div class="progress" style="height: 8px; background-color: var(--slate-100);">
-                        <div class="progress-bar" style="width: {{ funnel_data.active.pct }}%; background-color: #10B981;"></div>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span class="small fw-600 text-slate-500">Churned</span>
-                        <span class="small fw-bold text-slate-500">{{ funnel_data.churned.count }}</span>
-                    </div>
-                    <div class="progress" style="height: 8px; background-color: var(--slate-100);">
-                        <div class="progress-bar" style="width: {{ funnel_data.churned.pct }}%; background-color: var(--slate-300);"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Operational Status -->
-        <div class="card">
-            <div class="card-header bg-white p-4 border-bottom">
-                <h5 class="mb-0 fw-bold">Operational Pulse</h5>
-            </div>
-            <div class="card-body p-0">
-                <div class="p-4 border-bottom d-flex justify-content-between align-items-center">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="p-2 rounded-3 bg-slate-50 text-slate-500">
-                            <i data-lucide="layers" style="width: 18px;"></i>
+                        <div class="progress" style="height: 9px; border-radius: 999px; background-color: rgba(148,163,184,0.18);">
+                            <div class="progress-bar" style="width: {{ funnel_data.leads.pct }}%; background: linear-gradient(90deg, #8b5cf6 0%, #a78bfa 100%); border-radius: 999px;"></div>
                         </div>
-                        <span class="small fw-600">Active Projects</span>
                     </div>
-                    <span class="badge bg-slate-100 text-slate-900">{{ projects_active }}</span>
-                </div>
-                <div class="p-4 border-bottom d-flex justify-content-between align-items-center">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="p-2 rounded-3 bg-warning-subtle text-warning">
-                            <i data-lucide="clock" style="width: 18px;"></i>
+
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="small fw-700 text-slate-600">Qualified</span>
+                            <span class="small fw-800 text-slate-900">{{ funnel_data.qualified.count }}</span>
                         </div>
-                        <span class="small fw-600">Delayed</span>
-                    </div>
-                    <span class="badge bg-warning-subtle text-warning">{{ projects_delayed }}</span>
-                </div>
-                <div class="p-4 d-flex justify-content-between align-items-center">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="p-2 rounded-3 bg-danger-subtle text-danger">
-                            <i data-lucide="file-warning" style="width: 18px;"></i>
+                        <div class="progress" style="height: 9px; border-radius: 999px; background-color: rgba(148,163,184,0.18);">
+                            <div class="progress-bar" style="width: {{ funnel_data.qualified.pct }}%; background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%); border-radius: 999px;"></div>
                         </div>
-                        <span class="small fw-600">Overdue Invoices</span>
                     </div>
-                    <span class="badge bg-danger-subtle text-danger">{{ overdue_invoices_count }}</span>
+
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="small fw-700 text-slate-600">Active Clients</span>
+                            <span class="small fw-800 text-slate-900">{{ funnel_data.active.count }}</span>
+                        </div>
+                        <div class="progress" style="height: 9px; border-radius: 999px; background-color: rgba(148,163,184,0.18);">
+                            <div class="progress-bar" style="width: {{ funnel_data.active.pct }}%; background: linear-gradient(90deg, #10b981 0%, #34d399 100%); border-radius: 999px;"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="small fw-700 text-slate-500">Churned</span>
+                            <span class="small fw-800 text-slate-500">{{ funnel_data.churned.count }}</span>
+                        </div>
+                        <div class="progress" style="height: 9px; border-radius: 999px; background-color: rgba(148,163,184,0.18);">
+                            <div class="progress-bar" style="width: {{ funnel_data.churned.pct }}%; background: linear-gradient(90deg, #94a3b8 0%, #cbd5e1 100%); border-radius: 999px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm" style="border-radius: 22px; overflow: hidden; background: rgba(255,255,255,0.7); backdrop-filter: blur(8px);">
+                <div class="card-header bg-transparent border-bottom p-4">
+                    <h5 class="mb-0 fw-800 text-slate-900">Operational Pulse</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="p-4 border-bottom d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="p-2 rounded-3 bg-slate-50 text-slate-500">
+                                <i data-lucide="layers" style="width: 18px;"></i>
+                            </div>
+                            <span class="small fw-700 text-slate-700">Active Projects</span>
+                        </div>
+                        <span class="badge bg-slate-100 text-slate-900 rounded-pill px-2 py-2">{{ projects_active }}</span>
+                    </div>
+                    <div class="p-4 border-bottom d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="p-2 rounded-3 bg-warning-subtle text-warning">
+                                <i data-lucide="clock" style="width: 18px;"></i>
+                            </div>
+                            <span class="small fw-700 text-slate-700">Delayed</span>
+                        </div>
+                        <span class="badge bg-warning-subtle text-warning rounded-pill px-2 py-2">{{ projects_delayed }}</span>
+                    </div>
+                    <div class="p-4 d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="p-2 rounded-3 bg-danger-subtle text-danger">
+                                <i data-lucide="file-warning" style="width: 18px;"></i>
+                            </div>
+                            <span class="small fw-700 text-slate-700">Overdue Invoices</span>
+                        </div>
+                        <span class="badge bg-danger-subtle text-danger rounded-pill px-2 py-2">{{ overdue_invoices_count }}</span>
+                    </div>
                 </div>
             </div>
         </div>

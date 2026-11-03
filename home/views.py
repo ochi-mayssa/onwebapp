@@ -6,6 +6,8 @@ from django.urls import reverse
 from django.utils import timezone
 from datetime import timedelta
 
+from users.services.profile_service import apply_profile_prefill
+
 from .forms import (
     ConsultationForm, WebsiteBuildForm, APIRequestForm, APIRequestAdminActionForm,
     RPAConsultationForm,
@@ -27,16 +29,9 @@ def index(request):
             consultation.save()
             return render(request, 'home/index.html', {'form': ConsultationForm(), 'consultation_success': True})
     else:
-        initial = {}
+        form = ConsultationForm()
         if request.user.is_authenticated:
-            user = request.user
-            full_name = user.get_full_name().strip() if user.get_full_name() else ''
-            initial['name'] = full_name or user.username
-            initial['email'] = user.email
-            profile = getattr(user, 'profile', None)
-            if profile and profile.company_name:
-                initial['company'] = profile.company_name
-        form = ConsultationForm(initial=initial)
+            apply_profile_prefill(form, request.user)
     return render(request, 'home/index.html', {'form': form})
 
 
@@ -113,15 +108,7 @@ def rpa_solutions(request):
         reference = request.session.pop('rpa_reference', '')
         form = RPAConsultationForm()
         if request.user.is_authenticated:
-            user = request.user
-            full_name = user.get_full_name().strip() if user.get_full_name() else ''
-            if full_name or user.username:
-                form.fields['full_name'].initial = full_name or user.username
-            if user.email:
-                form.fields['business_email'].initial = user.email
-            profile = getattr(user, 'profile', None)
-            if profile and getattr(profile, 'company_name', ''):
-                form.fields['company_name'].initial = profile.company_name
+            apply_profile_prefill(form, request.user)
 
     return render(request, 'automation/rpa_solutions.html', {
         'form': form,
@@ -182,6 +169,8 @@ def build_website(request):
             return render(request, 'home/index.html', {'submitted': True})
     else:
         form = WebsiteBuildForm()
+        if request.user.is_authenticated:
+            apply_profile_prefill(form, request.user)
     return render(request, 'home/build_request.html', {
         'form': form,
         'features_list': features_list
@@ -241,6 +230,16 @@ def browser_web_automation(request):
     return render(request, 'software/browser_web_automation.html')
 
 
+def website_automation(request):
+    """Website automation landing page."""
+    return render(request, 'automation/websiteautomation.html')
+
+
+def enterprise_automation(request):
+    """Enterprise automation landing page."""
+    return render(request, 'automation/enterpriseautomation.html')
+
+
 def erp_service(request):
     """ERP integration and implementation services page."""
     return render(request, 'services/erp-service.html')
@@ -290,16 +289,9 @@ def request_api(request):
                 request.session['api_request_reference'] = api_request.reference
                 return redirect('home:request_api_success')
     else:
-        initial = {}
+        form = APIRequestForm()
         if request.user.is_authenticated:
-            user = request.user
-            full_name = user.get_full_name().strip() if user.get_full_name() else ''
-            initial['full_name'] = full_name or user.username
-            initial['business_email'] = user.email
-            profile = getattr(user, 'profile', None)
-            if profile and getattr(profile, 'company_name', ''):
-                initial['company_name'] = profile.company_name
-        form = APIRequestForm(initial=initial)
+            apply_profile_prefill(form, request.user)
 
     return render(request, 'services/api_request.html', {'form': form})
 

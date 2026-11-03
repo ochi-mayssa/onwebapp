@@ -1,664 +1,1056 @@
 {% extends "base.html" %}
 {% load i18n static %}
 
-{% block extra_head %}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-{% endblock %}
+{% block title %}{% trans "Set Up Your OnWebApp Experience" %} | OnWebApp{% endblock %}
 
 {% block navbar %}{% endblock %}
 
 {% block content %}
-<div class="container py-4 py-lg-5">
-    <div class="row justify-content-center">
-        <div class="col-12 col-md-10 col-lg-8 col-xl-7">
-            <!-- Progress Indicator -->
-            <div class="mb-4 mb-md-5">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h1 class="h3 fw-bold text-body mb-0">{% trans "Welcome to OnWebApp! Let's build your vision." %}</h1>
-                    <span class="badge bg-primary-soft text-primary fs-6 px-3 py-2">
-                        <span id="currentStepNum">1</span>/<span id="totalStepsNum">4</span>
-                    </span>
+<div class="onb">
+    <div class="container py-4 py-lg-5">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-11 col-lg-9 col-xl-8">
+
+                {% if completed %}
+                {# ------------------------- Completion screen ------------------------- #}
+                <div class="onb-done text-center">
+                    <div class="onb-done__icon" aria-hidden="true"><i class="fas fa-check"></i></div>
+                    <h1 class="onb-done__title">{% trans "You're All Set!" %}</h1>
+                    <p class="onb-done__text">
+                        {% trans "Thank you for sharing your goals with us. Your preferences will help us personalize your OnWebApp experience and connect you with the most relevant solutions." %}
+                    </p>
+
+                    <div class="onb-summary text-start">
+                        <div class="onb-summary__row">
+                            <span>{% trans "Your path" %}</span>
+                            <strong>{{ onboarding_summary.path|default:"—" }}</strong>
+                        </div>
+                        <div class="onb-summary__row">
+                            <span>{% trans "Services" %}</span>
+                            <strong>
+                                {% for service in onboarding_summary.services %}{{ service }}{% if not forloop.last %}, {% endif %}{% empty %}—{% endfor %}
+                            </strong>
+                        </div>
+                        <div class="onb-summary__row">
+                            <span>{% trans "Goal" %}</span>
+                            <strong>{{ onboarding_summary.goal|default:"—" }}</strong>
+                        </div>
+                        <div class="onb-summary__row">
+                            <span>{% trans "Timeline" %}</span>
+                            <strong>{{ onboarding_summary.timeline|default:"—" }}</strong>
+                        </div>
+                    </div>
+
+                    <a href="{{ next_url }}" class="btn btn-primary rounded-pill px-5 py-2 mt-4" id="dashboardBtn">
+                        {% trans "Go to My Dashboard" %}
+                        <i class="fas fa-arrow-right ms-2" aria-hidden="true"></i>
+                    </a>
+
+                    <p class="onb-redirect small text-muted mt-3 mb-0" id="redirectNote" data-url="{{ next_url }}" hidden>
+                        {% trans "Redirecting to your dashboard in" %} <span id="redirectCount">12</span>s…
+                    </p>
                 </div>
-                <p class="text-muted mb-3">{% trans "Answer a few questions to unlock your tailored experience." %}</p>
-                
-                <div class="progress" style="height: 8px;">
-                    <div class="progress-bar bg-primary rounded-pill transition-all" role="progressbar" 
-                         style="width: 0%" id="progressBar">
-                        <div class="progress-dot"></div>
+
+                {% else %}
+                {# ------------------------- Onboarding wizard ------------------------- #}
+                <noscript>
+                    <div class="alert alert-info border-0 rounded-3 mb-4" role="status">
+                        <i class="fas fa-info-circle me-2" aria-hidden="true"></i>
+                        {% trans "JavaScript is disabled. All steps are shown below so you can still complete your setup." %}
+                    </div>
+                    <style>
+                        .step-container.d-none { display: block !important; }
+                        .onb-progress, .step-indicators, #prevBtn, #nextBtn, #skipBtn { display: none !important; }
+                        #submitBtn.d-none { display: inline-flex !important; }
+                    </style>
+                </noscript>
+                <div class="onb-progress mb-4">
+                    <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                        <div>
+                            <h1 class="onb-title">{% trans "Welcome to OnWebApp" %}</h1>
+                            <p class="onb-subtitle mb-0">{% trans "A few quick questions to personalize your experience." %}</p>
+                        </div>
+                        <span class="onb-counter" aria-live="polite">
+                            <span id="currentStepNum">1</span><span class="onb-counter__sep">/</span><span id="totalStepsNum">4</span>
+                        </span>
+                    </div>
+
+                    <div class="progress onb-progress__track" role="progressbar"
+                         aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"
+                         aria-label="{% trans 'Onboarding progress' %}">
+                        <div class="progress-bar onb-progress__bar" id="progressBar" style="width: 0%"></div>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-2" aria-hidden="true">
+                        {% for i in "1234" %}
+                        <small class="onb-steplabel step-label" data-step="{{ forloop.counter }}">
+                            {% if forloop.counter == 1 %}{% trans "Your Path" %}
+                            {% elif forloop.counter == 2 %}{% trans "Your Needs" %}
+                            {% elif forloop.counter == 3 %}{% trans "Your Goals" %}
+                            {% else %}{% trans "Your Timeline" %}
+                            {% endif %}
+                        </small>
+                        {% endfor %}
                     </div>
                 </div>
-                
-                <div class="d-flex justify-content-between mt-2">
-                    {% for i in "1234" %}
-                    <small class="text-muted step-label" data-step="{{ forloop.counter }}">
-                        {% if forloop.counter == 1 %}{% trans "Your Path" %}
-                        {% elif forloop.counter == 2 %}{% trans "Toolkit" %}
-                        {% elif forloop.counter == 3 %}{% trans "Goals" %}
-                        {% elif forloop.counter == 4 %}{% trans "Timeline" %}
+
+                <div class="card onb-card border-0 shadow-sm rounded-4 overflow-hidden">
+                    <div class="card-body p-4 p-md-5">
+
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger rounded-3 mb-4" role="alert">
+                            {% for error in form.non_field_errors %}<div>{{ error }}</div>{% endfor %}
+                        </div>
                         {% endif %}
-                    </small>
-                    {% endfor %}
-                </div>
-            </div>
 
-            <!-- Main Card -->
-            <div class="card border-0 shadow-lg rounded-4 overflow-hidden animate__animated animate__fadeIn">
-                <div class="card-body p-4 p-md-5">
-                    {% if form.non_field_errors %}
-                    <div class="alert alert-danger alert-dismissible fade show rounded-3 mb-4" role="alert">
-                        {{ form.non_field_errors }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                    {% endif %}
+                        <form method="post" id="onboardingForm" novalidate>
+                            {% csrf_token %}
 
-                    <form method="post" id="onboardingForm" class="needs-validation" novalidate>
-                        {% csrf_token %}
-                        
-                        <!-- Step 1: Service Type -->
-                        <div class="step-container animate__animated" data-step="1">
-                            <div class="text-center mb-5">
-                                <div class="icon-wrapper bg-primary-soft text-primary rounded-3 p-3 d-inline-block mb-3">
-                                    <i class="fas fa-rocket fa-2x"></i>
+                            {# ----------------------------- Step 1 ----------------------------- #}
+                            <div class="step-container" data-step="1">
+                                <div class="onb-step-head text-center">
+                                    <span class="onb-step-icon onb-step-icon--primary" aria-hidden="true"><i class="fas fa-compass"></i></span>
+                                    <h2 class="onb-step-title" tabindex="-1">{% trans "Choose Your Path" %}</h2>
+                                    <p class="onb-step-sub">
+                                        {% trans "Tell us what brings you to OnWebApp. We'll help you find the right solutions for your business and digital goals." %}
+                                    </p>
                                 </div>
-                                <h2 class="h3 fw-bold mb-2">{% trans "Choose Your Path" %}</h2>
-                                <p class="text-muted mb-4">{% trans "Select the service that best aligns with your objectives." %}</p>
-                            </div>
-                            
-                            <div class="row g-4">
-                                {% for radio in form.service_type %}
-                                <div class="col-12">
-                                    <div class="service-option position-relative">
-                                        <input type="radio" name="{{ radio.data.name }}" value="{{ radio.data.value }}" 
-                                               class="btn-check visually-hidden" id="{{ radio.id_for_label }}"
-                                               {% if radio.data.selected %}checked{% endif %} required>
-                                        <label class="card h-100 border-2 rounded-4 cursor-pointer hover-lift p-4 transition-all bg-surface" 
-                                               for="{{ radio.id_for_label }}">
-                                            <div class="row g-3 align-items-center">
-                                                <div class="col-auto">
-                                                    <div class="icon-circle bg-primary-soft text-primary rounded-circle p-3">
+
+                                <div class="row g-3 mb-4" role="radiogroup" aria-label="{% trans 'Choose your path' %}">
+                                    {% for radio in form.service_type %}
+                                    {% if radio.data.value %}
+                                    <div class="col-12">
+                                        <div class="onb-option-wrap">
+                                            <input type="radio" name="{{ radio.data.name }}" value="{{ radio.data.value }}"
+                                                   class="btn-check onb-input" id="{{ radio.id_for_label }}"
+                                                   {% if radio.data.selected %}checked{% endif %} required>
+                                            <label class="onb-option" for="{{ radio.id_for_label }}">
+                                                <span class="onb-option__icon {% if radio.data.value == 'full_platform' %}onb-option__icon--primary{% else %}onb-option__icon--success{% endif %}" aria-hidden="true">
+                                                    <i class="fas {% if radio.data.value == 'full_platform' %}fa-layer-group{% else %}fa-users{% endif %}"></i>
+                                                </span>
+                                                <span class="onb-option__body">
+                                                    <span class="onb-option__title">
+                                                        {% if radio.data.value == 'full_platform' %}{% trans "Full Digital Platform" %}{% else %}{% trans "Community Services" %}{% endif %}
+                                                    </span>
+                                                    <span class="onb-option__text">
                                                         {% if radio.data.value == 'full_platform' %}
-                                                        <i class="fas fa-layer-group fa-lg"></i>
-                                                        {% elif radio.data.value == 'community' %}
-                                                        <i class="fas fa-users fa-lg"></i>
+                                                        {% trans "Build and manage your digital operations through one connected ecosystem." %}
                                                         {% else %}
-                                                        <i class="fas fa-star fa-lg"></i>
+                                                        {% trans "Establish and strengthen your digital presence." %}
                                                         {% endif %}
-                                                    </div>
-                                                </div>
-                                                <div class="col">
-                                                    <h4 class="h5 mb-2">
+                                                    </span>
+                                                    <span class="onb-option__note">
                                                         {% if radio.data.value == 'full_platform' %}
-                                                        <span class="text-primary">{% trans "Full Digital Platform" %}</span>
-                                                        {% elif radio.data.value == 'community' %}
-                                                        <span class="text-success">{% trans "Community Services" %}</span>
+                                                        {% trans "For businesses looking for professional websites, business systems, CRM, workflow automation, and integrated digital solutions." %}
                                                         {% else %}
-                                                        {{ radio.choice_label }}
+                                                        {% trans "For individuals, creators, and communities looking for professional websites and distinctive brand identities." %}
                                                         {% endif %}
-                                                    </h4>
-                                                    <p class="text-muted small mb-0">
-                                                        {% if radio.data.value == 'full_platform' %}
-                                                        {% trans "End-to-end digital transformation. Ideal for businesses needing a complete ecosystem (CRM, RPA, Website, Social)." %}
-                                                        {% elif radio.data.value == 'community' %}
-                                                        {% trans "Focus on growth and engagement. Perfect for creators and communities needing a website and brand identity." %}
-                                                        {% endif %}
-                                                    </p>
-                                                </div>
-                                                <div class="col-auto">
-                                                    <div class="check-circle bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 24px; height: 24px;">
-                                                        <i class="fas fa-check fa-xs"></i>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </label>
-                                    </div>
-                                </div>
-                                {% endfor %}
-                            </div>
-                            <div class="alert alert-warning border-0 bg-warning-soft mt-4 d-none" id="error-step-1">
-                                <i class="fas fa-exclamation-circle me-2"></i>
-                                {% trans "Please select an option to continue" %}
-                            </div>
-                        </div>
-
-                        <!-- Step 2: Community Needs -->
-                        <div class="step-container d-none animate__animated" data-step="2">
-                            <div class="text-center mb-5">
-                                <div class="icon-wrapper bg-success-soft text-success rounded-3 p-3 d-inline-block mb-3">
-                                    <i class="fas fa-hands-helping fa-2x"></i>
-                                </div>
-                                <h2 class="h3 fw-bold mb-2">{% trans "Customize Your Toolkit" %}</h2>
-                                <p class="text-muted mb-4">{% trans "Select the tools you need to accelerate your growth." %}</p>
-                            </div>
-                            
-                            <div class="row g-3">
-                                {% for checkbox in form.community_needs_selection %}
-                                <div class="col-md-6">
-                                    <div class="community-option position-relative h-100">
-                                        <input type="checkbox" name="{{ checkbox.data.name }}" value="{{ checkbox.data.value }}" 
-                                               class="btn-check visually-hidden" id="{{ checkbox.id_for_label }}"
-                                               {% if checkbox.data.selected %}checked{% endif %}>
-                                        <label class="card h-100 border-2 rounded-4 cursor-pointer hover-lift p-4 transition-all bg-surface" 
-                                               for="{{ checkbox.id_for_label }}">
-                                            <div class="d-flex align-items-start">
-                                                <div class="flex-grow-1">
-                                                    <h5 class="h6 mb-2">{{ checkbox.choice_label }}</h5>
-                                                    <small class="text-muted d-block">
-                                                        {% if checkbox.data.value == 'website' %}
-                                                        {% trans "High-performance websites designed to convert." %}
-                                                        {% elif checkbox.data.value == 'branding' %}
-                                                        {% trans "Memorable visual identity that stands out." %}
-                                                        {% elif checkbox.data.value == 'social' %}
-                                                        {% trans "Strategic growth on key platforms." %}
-                                                        {% elif checkbox.data.value == 'content' %}
-                                                        {% trans "Engaging content that tells your story." %}
-                                                        {% endif %}
-                                                    </small>
-                                                </div>
-                                                <div class="check-square bg-success text-white rounded-3 d-flex align-items-center justify-content-center ms-3" style="width: 28px; height: 28px;">
-                                                    <i class="fas fa-check fa-sm"></i>
-                                                </div>
-                                            </div>
-                                        </label>
-                                    </div>
-                                </div>
-                                {% endfor %}
-                            </div>
-                            <div class="alert alert-warning border-0 bg-warning-soft mt-4 d-none" id="error-step-2">
-                                <i class="fas fa-exclamation-circle me-2"></i>
-                                {% trans "Please select at least one option" %}
-                            </div>
-                        </div>
-
-                        <!-- Step 3: Project Description -->
-                        <div class="step-container d-none animate__animated" data-step="3">
-                            <div class="text-center mb-5">
-                                <div class="icon-wrapper bg-info-soft text-info rounded-3 p-3 d-inline-block mb-3">
-                                    <i class="fas fa-bullseye fa-2x"></i>
-                                </div>
-                                <h2 class="h3 fw-bold mb-2">{% trans "Define Your Success" %}</h2>
-                                <p class="text-muted mb-4">{% trans "Tell us what you want to achieve." %}</p>
-                            </div>
-                            
-                            <div class="vstack gap-3">
-                                {% for radio in form.project_description %}
-                                <div class="project-option">
-                                    <input type="radio" name="{{ radio.data.name }}" value="{{ radio.data.value }}" 
-                                           class="btn-check visually-hidden" id="{{ radio.id_for_label }}"
-                                           {% if radio.data.selected %}checked{% endif %} required>
-                                    <label class="card border-2 rounded-4 cursor-pointer hover-lift p-4 transition-all bg-surface" 
-                                           for="{{ radio.id_for_label }}">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <h5 class="h6 mb-1">{{ radio.choice_label }}</h5>
-                                                <small class="text-muted">
-                                                    {% if radio.data.value == 'launch' %}
-                                                    {% trans "Bring a new idea to life." %}
-                                                    {% elif radio.data.value == 'grow' %}
-                                                    {% trans "Scale an existing business." %}
-                                                    {% elif radio.data.value == 'transform' %}
-                                                    {% trans "Modernize your digital presence." %}
-                                                    {% endif %}
-                                                </small>
-                                            </div>
-                                            <i class="fas fa-chevron-right text-primary ms-3"></i>
+                                                    </span>
+                                                </span>
+                                                <span class="onb-option__check" aria-hidden="true"><i class="fas fa-check"></i></span>
+                                            </label>
                                         </div>
-                                    </label>
+                                    </div>
+                                    {% endif %}
+                                    {% endfor %}
                                 </div>
-                                {% endfor %}
-                            </div>
-                            <div class="alert alert-warning border-0 bg-warning-soft mt-4 d-none" id="error-step-3">
-                                <i class="fas fa-exclamation-circle me-2"></i>
-                                {% trans "Please select an option to continue" %}
-                            </div>
-                        </div>
 
-                        <!-- Step 4: Timeline -->
-                        <div class="step-container d-none animate__animated" data-step="4">
-                            <div class="text-center mb-5">
-                                <div class="icon-wrapper bg-purple-soft text-purple rounded-3 p-3 d-inline-block mb-3">
-                                    <i class="fas fa-calendar-alt fa-2x"></i>
-                                </div>
-                                <h2 class="h3 fw-bold mb-2">{% trans "Set Your Pace" %}</h2>
-                                <p class="text-muted mb-4">{% trans "When do you want to kick off this project?" %}</p>
-                            </div>
-                            
-                            <div class="row g-3">
-                                {% for radio in form.start_timeline %}
-                                <div class="col-6 col-md-3">
-                                    <div class="timeline-option h-100">
-                                        <input type="radio" name="{{ radio.data.name }}" value="{{ radio.data.value }}" 
-                                               class="btn-check visually-hidden" id="{{ radio.id_for_label }}"
-                                               {% if radio.data.selected %}checked{% endif %}>
-                                        <label class="card h-100 border-2 rounded-4 cursor-pointer hover-lift p-3 text-center transition-all bg-surface" 
-                                               for="{{ radio.id_for_label }}">
-                                            <div class="timeline-icon mb-3">
-                                                {% if radio.data.value == 'immediately' %}
-                                                <i class="fas fa-bolt fa-2x text-warning"></i>
-                                                {% elif radio.data.value == '1_month' %}
-                                                <i class="fas fa-rocket fa-2x text-primary"></i>
-                                                {% elif radio.data.value == '3_months' %}
-                                                <i class="fas fa-calendar fa-2x text-info"></i>
-                                                {% elif radio.data.value == 'just_browsing' %}
-                                                <i class="fas fa-binoculars fa-2x text-secondary"></i>
-                                                {% endif %}
+                                <details class="onb-details" {% if form.errors %}open{% endif %}>
+                                    <summary class="onb-details__summary">
+                                        <span>
+                                            <i class="fas fa-building me-2" aria-hidden="true"></i>
+                                            {% trans "Add business details" %}
+                                            <span class="onb-details__optional">{% trans "(optional)" %}</span>
+                                        </span>
+                                        <i class="fas fa-chevron-down onb-details__chevron" aria-hidden="true"></i>
+                                    </summary>
+                                    <div class="onb-details__body">
+                                        <p class="onb-hint mb-3">
+                                            {% trans "This helps us tailor your experience. You can update these details at any time from your profile." %}
+                                        </p>
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label" for="{{ form.display_name.id_for_label }}">{{ form.display_name.label }}</label>
+                                                {{ form.display_name }}
+                                                {% for error in form.display_name.errors %}<div class="onb-field-error">{{ error }}</div>{% endfor %}
                                             </div>
-                                            <h6 class="mb-2">{{ radio.choice_label }}</h6>
-                                            {% if radio.data.value == 'immediately' %}
-                                            <small class="text-muted d-block">{% trans "I'm ready to start today." %}</small>
-                                            {% elif radio.data.value == '1_month' %}
-                                            <small class="text-muted d-block">{% trans "Planning for next month." %}</small>
-                                            {% elif radio.data.value == '3_months' %}
-                                            <small class="text-muted d-block">{% trans "Researching for future." %}</small>
-                                            {% elif radio.data.value == 'just_browsing' %}
-                                            <small class="text-muted d-block">{% trans "Just exploring options." %}</small>
-                                            {% endif %}
+                                            <div class="col-md-6">
+                                                <label class="form-label" for="{{ form.phone_number.id_for_label }}">{{ form.phone_number.label }}</label>
+                                                {{ form.phone_number }}
+                                                {% for error in form.phone_number.errors %}<div class="onb-field-error">{{ error }}</div>{% endfor %}
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label" for="{{ form.company_name.id_for_label }}">{{ form.company_name.label }}</label>
+                                                {{ form.company_name }}
+                                                {% for error in form.company_name.errors %}<div class="onb-field-error">{{ error }}</div>{% endfor %}
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label" for="{{ form.job_title.id_for_label }}">{{ form.job_title.label }}</label>
+                                                {{ form.job_title }}
+                                                {% for error in form.job_title.errors %}<div class="onb-field-error">{{ error }}</div>{% endfor %}
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label" for="{{ form.country.id_for_label }}">{{ form.country.label }}</label>
+                                                {{ form.country }}
+                                                {% for error in form.country.errors %}<div class="onb-field-error">{{ error }}</div>{% endfor %}
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label" for="{{ form.city.id_for_label }}">{{ form.city.label }}</label>
+                                                {{ form.city }}
+                                                {% for error in form.city.errors %}<div class="onb-field-error">{{ error }}</div>{% endfor %}
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label" for="{{ form.industry.id_for_label }}">{{ form.industry.label }}</label>
+                                                {{ form.industry }}
+                                                {% for error in form.industry.errors %}<div class="onb-field-error">{{ error }}</div>{% endfor %}
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label" for="{{ form.company_size.id_for_label }}">{{ form.company_size.label }}</label>
+                                                {{ form.company_size }}
+                                                {% for error in form.company_size.errors %}<div class="onb-field-error">{{ error }}</div>{% endfor %}
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label" for="{{ form.website.id_for_label }}">{{ form.website.label }}</label>
+                                                {{ form.website }}
+                                                {% for error in form.website.errors %}<div class="onb-field-error">{{ error }}</div>{% endfor %}
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label" for="{{ form.business_address.id_for_label }}">{{ form.business_address.label }}</label>
+                                                {{ form.business_address }}
+                                                {% for error in form.business_address.errors %}<div class="onb-field-error">{{ error }}</div>{% endfor %}
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label" for="onbEmail">{% trans "Email" %}</label>
+                                                <input type="email" class="form-control" id="onbEmail" value="{{ request.user.email }}" readonly aria-readonly="true">
+                                                <div class="form-text">{% trans "From your account — no need to enter it again." %}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </details>
+
+                                <div class="alert alert-warning border-0 rounded-3 mt-4 d-none" id="error-step-1" role="alert" aria-live="polite" tabindex="-1">
+                                    <i class="fas fa-exclamation-circle me-2" aria-hidden="true"></i>
+                                    {% trans "Select how you'd like to work with OnWebApp to continue." %}
+                                </div>
+                                {% if form.service_type.errors %}
+                                <div class="alert alert-danger border-0 rounded-3 mt-4" role="alert">
+                                    {% for error in form.service_type.errors %}<div>{{ error }}</div>{% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            {# ----------------------------- Step 2 ----------------------------- #}
+                            <div class="step-container d-none" data-step="2">
+                                <div class="onb-step-head text-center">
+                                    <span class="onb-step-icon onb-step-icon--info" aria-hidden="true"><i class="fas fa-layer-group"></i></span>
+                                    <h2 class="onb-step-title" tabindex="-1">{% trans "What Do You Need?" %}</h2>
+                                    <p class="onb-step-sub">
+                                        {% trans "Select the services that match your current priorities. We'll use your selections to understand your requirements and recommend relevant solutions." %}
+                                    </p>
+                                </div>
+
+                                <p class="onb-hint text-center mb-4" id="needHint" aria-live="polite" hidden></p>
+                                <span id="hintFull" class="d-none">{% trans "For your Full Digital Platform, we'll focus on the systems and services that support your operations." %}</span>
+                                <span id="hintCommunity" class="d-none">{% trans "For Community Services, we'll focus on your website, brand identity, and digital presence." %}</span>
+
+                                <div class="row g-3" role="group" aria-label="{% trans 'Select the services you need' %}">
+                                    {% for checkbox in form.community_needs_selection %}
+                                    {% if checkbox.data.value %}
+                                    <div class="col-md-6">
+                                        <div class="onb-option-wrap h-100">
+                                            <input type="checkbox" name="{{ checkbox.data.name }}" value="{{ checkbox.data.value }}"
+                                                   class="btn-check onb-input" id="{{ checkbox.id_for_label }}"
+                                                   {% if checkbox.data.selected %}checked{% endif %}>
+                                            <label class="onb-option onb-option--compact h-100" for="{{ checkbox.id_for_label }}">
+                                                <span class="onb-option__icon" aria-hidden="true">
+                                                    <i class="fas {% if checkbox.data.value == 'website' %}fa-globe{% elif checkbox.data.value == 'branding' %}fa-palette{% elif checkbox.data.value == 'social' %}fa-share-nodes{% else %}fa-pen-nib{% endif %}"></i>
+                                                </span>
+                                                <span class="onb-option__body">
+                                                    <span class="onb-option__title">{{ checkbox.choice_label }}</span>
+                                                    <span class="onb-option__note">
+                                                        {% if checkbox.data.value == 'website' %}
+                                                        {% trans "Professional, responsive websites designed around your business and objectives." %}
+                                                        {% elif checkbox.data.value == 'branding' %}
+                                                        {% trans "Build a distinctive visual identity that communicates your brand's value." %}
+                                                        {% elif checkbox.data.value == 'social' %}
+                                                        {% trans "Strengthen your digital presence across relevant social platforms." %}
+                                                        {% else %}
+                                                        {% trans "Develop meaningful content that communicates your message and engages your audience." %}
+                                                        {% endif %}
+                                                    </span>
+                                                </span>
+                                                <span class="onb-option__check" aria-hidden="true"><i class="fas fa-check"></i></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    {% endfor %}
+                                </div>
+
+                                <div class="alert alert-warning border-0 rounded-3 mt-4 d-none" id="error-step-2" role="alert" aria-live="polite" tabindex="-1">
+                                    <i class="fas fa-exclamation-circle me-2" aria-hidden="true"></i>
+                                    {% trans "Select at least one service to continue." %}
+                                </div>
+                                {% if form.community_needs_selection.errors %}
+                                <div class="alert alert-danger border-0 rounded-3 mt-4" role="alert">
+                                    {% for error in form.community_needs_selection.errors %}<div>{{ error }}</div>{% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            {# ----------------------------- Step 3 ----------------------------- #}
+                            <div class="step-container d-none" data-step="3">
+                                <div class="onb-step-head text-center">
+                                    <span class="onb-step-icon onb-step-icon--warning" aria-hidden="true"><i class="fas fa-bullseye"></i></span>
+                                    <h2 class="onb-step-title" tabindex="-1">{% trans "What Are You Looking to Achieve?" %}</h2>
+                                    <p class="onb-step-sub">
+                                        {% trans "Understanding your objectives helps us recommend the most relevant solutions and plan the right approach." %}
+                                    </p>
+                                </div>
+
+                                <div class="vstack gap-3" role="radiogroup" aria-label="{% trans 'Choose your goal' %}">
+                                    {% for radio in form.project_description %}
+                                    {% if radio.data.value %}
+                                    <div class="onb-option-wrap">
+                                        <input type="radio" name="{{ radio.data.name }}" value="{{ radio.data.value }}"
+                                               class="btn-check onb-input" id="{{ radio.id_for_label }}"
+                                               {% if radio.data.selected %}checked{% endif %} required>
+                                        <label class="onb-option onb-option--row" for="{{ radio.id_for_label }}">
+                                            <span class="onb-option__body">
+                                                <span class="onb-option__title">{{ radio.choice_label }}</span>
+                                                <span class="onb-option__note">
+                                                    {% if radio.data.value == 'personal' %}
+                                                    {% trans "Turn a new idea into a professional digital product or business presence." %}
+                                                    {% elif radio.data.value == 'business' %}
+                                                    {% trans "Strengthen your digital presence, reach new customers, and support sustainable business growth." %}
+                                                    {% else %}
+                                                    {% trans "Modernize existing systems, connect business tools, and improve operational efficiency." %}
+                                                    {% endif %}
+                                                </span>
+                                            </span>
+                                            <span class="onb-option__chevron" aria-hidden="true"><i class="fas fa-chevron-right"></i></span>
                                         </label>
                                     </div>
+                                    {% endif %}
+                                    {% endfor %}
                                 </div>
-                                {% endfor %}
-                            </div>
-                            <div class="alert alert-info border-0 bg-info-soft mt-4">
-                                <i class="fas fa-info-circle me-2"></i>
-                                {% trans "This step is optional. You can always adjust your timeline later." %}
-                            </div>
-                        </div>
 
-                        <!-- Navigation -->
-                        <div class="d-flex justify-content-between align-items-center mt-5 pt-4 border-top">
-                            <button type="button" class="btn btn-outline-secondary px-4 py-2 rounded-pill" id="prevBtn">
-                                <i class="fas fa-arrow-left me-2"></i>
-                                <span class="d-none d-md-inline">{% trans "Go Back" %}</span>
-                            </button>
-                            
-                            <div class="step-indicators d-none d-md-flex">
-                                {% for i in "1234" %}
-                                <div class="step-dot mx-1 {% if forloop.first %}active{% endif %}" data-step="{{ forloop.counter }}"></div>
-                                {% endfor %}
+                                <div class="alert alert-warning border-0 rounded-3 mt-4 d-none" id="error-step-3" role="alert" aria-live="polite" tabindex="-1">
+                                    <i class="fas fa-exclamation-circle me-2" aria-hidden="true"></i>
+                                    {% trans "Choose the goal that best describes what you're looking to achieve." %}
+                                </div>
+                                {% if form.project_description.errors %}
+                                <div class="alert alert-danger border-0 rounded-3 mt-4" role="alert">
+                                    {% for error in form.project_description.errors %}<div>{{ error }}</div>{% endfor %}
+                                </div>
+                                {% endif %}
                             </div>
-                            
-                            <div>
-                                <button type="button" class="btn btn-primary px-5 py-2 rounded-pill" id="nextBtn">
-                                    <span class="me-2">{% trans "Continue" %}</span>
-                                    <i class="fas fa-arrow-right"></i>
-                                </button>
-                                <button type="submit" class="btn btn-success px-5 py-2 rounded-pill d-none" id="submitBtn">
-                                    <span class="me-2">{% trans "Complete Setup" %}</span>
-                                    <i class="fas fa-check"></i>
-                                </button>
+
+                            {# ----------------------------- Step 4 ----------------------------- #}
+                            <div class="step-container d-none" data-step="4">
+                                <div class="onb-step-head text-center">
+                                    <span class="onb-step-icon onb-step-icon--success" aria-hidden="true"><i class="fas fa-calendar-alt"></i></span>
+                                    <h2 class="onb-step-title" tabindex="-1">{% trans "When Are You Planning to Get Started?" %}</h2>
+                                    <p class="onb-step-sub">
+                                        {% trans "Help us understand your priorities and project readiness so we can prepare the appropriate next steps." %}
+                                    </p>
+                                </div>
+
+                                <div class="row g-3" role="radiogroup" aria-label="{% trans 'Choose your timeline' %}">
+                                    {% for radio in form.start_timeline %}
+                                    {% if radio.data.value %}
+                                    <div class="col-6 col-md-3">
+                                        <div class="onb-option-wrap h-100">
+                                            <input type="radio" name="{{ radio.data.name }}" value="{{ radio.data.value }}"
+                                                   class="btn-check onb-input" id="{{ radio.id_for_label }}"
+                                                   {% if radio.data.selected %}checked{% endif %}>
+                                            <label class="onb-option onb-option--tile h-100" for="{{ radio.id_for_label }}">
+                                                <span class="onb-option__icon onb-option__icon--plain" aria-hidden="true">
+                                                    <i class="fas {% if radio.data.value == 'immediately' %}fa-bolt{% elif radio.data.value == '1_month' %}fa-rocket{% elif radio.data.value == '3_months' %}fa-calendar{% else %}fa-binoculars{% endif %}"></i>
+                                                </span>
+                                                <span class="onb-option__body">
+                                                    <span class="onb-option__title">{{ radio.choice_label }}</span>
+                                                    <span class="onb-option__note">
+                                                        {% if radio.data.value == 'immediately' %}
+                                                        {% trans "I'm ready to discuss my project and move forward." %}
+                                                        {% elif radio.data.value == '1_month' %}
+                                                        {% trans "I'm planning to get started soon." %}
+                                                        {% elif radio.data.value == '3_months' %}
+                                                        {% trans "I'm preparing and evaluating my options." %}
+                                                        {% else %}
+                                                        {% trans "I'm learning about available solutions before making a decision." %}
+                                                        {% endif %}
+                                                    </span>
+                                                </span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    {% endfor %}
+                                </div>
+
+                                <div class="onb-note mt-4">
+                                    <i class="fas fa-circle-info me-2" aria-hidden="true"></i>
+                                    {% trans "This step is optional, and you can update your timeline at any time from your dashboard." %}
+                                </div>
+                                {% if form.start_timeline.errors %}
+                                <div class="alert alert-danger border-0 rounded-3 mt-4" role="alert">
+                                    {% for error in form.start_timeline.errors %}<div>{{ error }}</div>{% endfor %}
+                                </div>
+                                {% endif %}
                             </div>
-                        </div>
-                    </form>
+
+                            {# ---------------------------- Navigation ---------------------------- #}
+                            <div class="onb-nav d-flex justify-content-between align-items-center mt-4 pt-4 gap-3">
+                                <button type="button" class="btn btn-outline-secondary rounded-pill px-4" id="prevBtn">
+                                    <i class="fas fa-arrow-left me-2" aria-hidden="true"></i>
+                                    <span>{% trans "Back" %}</span>
+                                </button>
+
+                                <div class="step-indicators d-none d-md-flex" aria-hidden="true">
+                                    {% for i in "1234" %}
+                                    <div class="step-dot mx-1 {% if forloop.first %}active{% endif %}" data-step="{{ forloop.counter }}"></div>
+                                    {% endfor %}
+                                </div>
+
+                                <div class="d-flex align-items-center gap-2">
+                                    <button type="button" class="btn btn-primary rounded-pill px-4 px-md-5" id="nextBtn">
+                                        <span class="me-2">{% trans "Continue" %}</span>
+                                        <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                                    </button>
+                                    <button type="submit" class="btn btn-primary rounded-pill px-4 px-md-5 d-none"
+                                            id="submitBtn" data-loading="{% trans 'Setting up…' %}">
+                                        <span class="me-2">{% trans "Complete Setup" %}</span>
+                                        <i class="fas fa-check" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="card-footer onb-card__footer border-0 py-3 px-4 text-center">
+                        <small class="text-muted">
+                            <i class="fas fa-question-circle me-1" aria-hidden="true"></i>
+                            {% trans "Need help deciding?" %}
+                            <a href="{% url 'contact:contact' %}" class="onb-link ms-1">{% trans "Contact our team" %}</a>
+                        </small>
+                    </div>
                 </div>
-                
-                <!-- Help Footer -->
-                <div class="card-footer bg-light border-0 py-3 px-4 text-center">
-                    <small class="text-muted">
-                        <i class="fas fa-question-circle me-1"></i>
-                        {% trans "Need help deciding?" %}
-                        <a href="#" class="text-decoration-none ms-1">{% trans "Contact our team" %}</a>
-                    </small>
+
+                <div class="text-center mt-4">
+                    <button type="button" class="btn btn-link onb-skip" id="skipBtn"
+                            data-confirm="{% trans 'Skip onboarding? You can complete it later from your dashboard.' %}">
+                        <small>
+                            <i class="fas fa-forward me-1" aria-hidden="true"></i>
+                            {% trans "Skip for now" %}
+                        </small>
+                    </button>
                 </div>
-            </div>
-            
-            <!-- Skip Option -->
-            <div class="text-center mt-4">
-                <button type="button" class="btn btn-link text-muted" id="skipBtn">
-                    <small>
-                        <i class="fas fa-forward me-1"></i>
-                        {% trans "Skip setup for now" %}
-                    </small>
-                </button>
+                {% endif %}
             </div>
         </div>
     </div>
 </div>
 
 <style>
-:root {
-    --primary-soft: rgba(13, 110, 253, 0.1);
-    --success-soft: rgba(25, 135, 84, 0.1);
-    --warning-soft: rgba(255, 193, 7, 0.1);
-    --info-soft: rgba(13, 202, 240, 0.1);
-    --purple-soft: rgba(111, 66, 193, 0.1);
-}
+    /* ============================================================
+       Onboarding — page-scoped styles (no global overrides)
+       ============================================================ */
+    .onb {
+        background: linear-gradient(180deg, #f7f8fc 0%, #ffffff 62%);
+        min-height: 78vh;
+    }
 
-.transition-all {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
+    /* Progress header */
+    .onb-title {
+        font-size: clamp(1.45rem, 2.6vw, 1.9rem);
+        font-weight: 800;
+        letter-spacing: -.02em;
+        color: var(--bs-body-color);
+        margin-bottom: .25rem;
+    }
+    .onb-subtitle {
+        color: var(--bs-secondary-color);
+        font-size: .95rem;
+    }
+    .onb-counter {
+        display: inline-flex;
+        align-items: baseline;
+        gap: .15rem;
+        padding: .45rem .85rem;
+        border-radius: 999px;
+        background: rgba(var(--bs-primary-rgb), .08);
+        color: var(--bs-primary);
+        font-weight: 700;
+        font-size: .95rem;
+        white-space: nowrap;
+    }
+    .onb-counter__sep {
+        opacity: .45;
+        font-weight: 500;
+    }
+    .onb-progress__track {
+        height: 6px;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, .08);
+        overflow: hidden;
+    }
+    .onb-progress__bar {
+        background: var(--bs-primary);
+        border-radius: 999px;
+        transition: width .45s cubic-bezier(.4, 0, .2, 1);
+    }
+    .onb-steplabel {
+        font-size: .78rem;
+        font-weight: 500;
+        color: var(--bs-secondary-color);
+        transition: color .2s ease;
+    }
+    .onb-steplabel.active {
+        color: var(--bs-primary);
+        font-weight: 700;
+    }
 
-.hover-lift:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.1) !important;
-}
+    /* Card */
+    .onb-card {
+        border: 1px solid rgba(15, 23, 42, .07) !important;
+        background: #fff;
+    }
+    .onb-card__footer {
+        background: #fbfcfe;
+        border-top: 1px solid rgba(15, 23, 42, .06) !important;
+    }
+    .onb-link {
+        color: var(--bs-primary);
+        text-decoration: none;
+        font-weight: 600;
+    }
+    .onb-link:hover {
+        text-decoration: underline;
+    }
 
-.bg-primary-soft { background-color: var(--primary-soft); }
-.bg-success-soft { background-color: var(--success-soft); }
-.bg-warning-soft { background-color: var(--warning-soft); }
-.bg-info-soft { background-color: var(--info-soft); }
-.bg-purple-soft { background-color: var(--purple-soft); }
+    /* Step header */
+    .onb-step-head {
+        margin-bottom: 1.75rem;
+    }
+    .onb-step-icon {
+        display: inline-grid;
+        place-items: center;
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+        font-size: 1.15rem;
+        margin-bottom: 1rem;
+    }
+    .onb-step-icon--primary { background: rgba(var(--bs-primary-rgb), .10); color: var(--bs-primary); }
+    .onb-step-icon--info { background: rgba(13, 202, 240, .12); color: #0aa2c0; }
+    .onb-step-icon--warning { background: rgba(255, 193, 7, .14); color: #b58100; }
+    .onb-step-icon--success { background: rgba(25, 135, 84, .12); color: #198754; }
+    .onb-step-title {
+        font-size: clamp(1.3rem, 2.2vw, 1.65rem);
+        font-weight: 800;
+        letter-spacing: -.015em;
+        margin-bottom: .55rem;
+        outline: none;
+    }
+    .onb-step-sub {
+        color: var(--bs-secondary-color);
+        font-size: .95rem;
+        line-height: 1.65;
+        max-width: 560px;
+        margin: 0 auto;
+    }
+    .onb-hint {
+        color: var(--bs-primary);
+        background: rgba(var(--bs-primary-rgb), .06);
+        border-radius: .75rem;
+        padding: .6rem .9rem;
+        font-size: .88rem;
+        font-weight: 500;
+        max-width: 620px;
+        margin-left: auto;
+        margin-right: auto;
+    }
 
-/* Progress Bar */
-.progress {
-    overflow: visible;
-}
-.progress-bar {
-    position: relative;
-    transition: width 0.6s ease;
-}
-.progress-dot {
-    position: absolute;
-    right: -6px;
-    top: -4px;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background-color: var(--bs-primary);
-    border: 3px solid white;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-}
+    /* Selectable options */
+    .onb-option-wrap {
+        position: relative;
+        height: 100%;
+    }
+    .onb-option {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 1.05rem 1.1rem;
+        border: 1.5px solid rgba(15, 23, 42, .12);
+        border-radius: 1rem;
+        background: #fff;
+        cursor: pointer;
+        text-align: left;
+        transition: border-color .18s ease, box-shadow .18s ease, background-color .18s ease;
+    }
+    .onb-option:hover {
+        border-color: rgba(var(--bs-primary-rgb), .45);
+        box-shadow: 0 8px 24px rgba(15, 23, 42, .06);
+    }
+    .onb-option:focus-within {
+        outline: 2px solid rgba(var(--bs-primary-rgb), .45);
+        outline-offset: 2px;
+    }
+    .btn-check:checked + .onb-option {
+        border-color: var(--bs-primary);
+        background: rgba(var(--bs-primary-rgb), .045);
+        box-shadow: 0 0 0 3px rgba(var(--bs-primary-rgb), .10);
+    }
+    .onb-option__icon {
+        flex: 0 0 auto;
+        display: grid;
+        place-items: center;
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: rgba(var(--bs-primary-rgb), .08);
+        color: var(--bs-primary);
+        font-size: 1rem;
+    }
+    .onb-option__icon--primary { background: rgba(var(--bs-primary-rgb), .10); color: var(--bs-primary); }
+    .onb-option__icon--success { background: rgba(25, 135, 84, .10); color: #198754; }
+    .onb-option__icon--plain {
+        background: transparent;
+        width: auto;
+        height: auto;
+        font-size: 1.35rem;
+        margin-bottom: .35rem;
+    }
+    .onb-option__body {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+    .onb-option__title {
+        display: block;
+        font-weight: 700;
+        font-size: 1rem;
+        color: var(--bs-body-color);
+        margin-bottom: .2rem;
+    }
+    .onb-option__text {
+        display: block;
+        font-size: .92rem;
+        color: var(--bs-body-color);
+        line-height: 1.55;
+        margin-bottom: .2rem;
+    }
+    .onb-option__note {
+        display: block;
+        font-size: .84rem;
+        color: var(--bs-secondary-color);
+        line-height: 1.55;
+    }
+    .onb-option__check {
+        flex: 0 0 auto;
+        display: grid;
+        place-items: center;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        border: 1.5px solid rgba(15, 23, 42, .18);
+        background: #fff;
+        color: transparent;
+        font-size: .6rem;
+        transition: background-color .18s ease, border-color .18s ease, color .18s ease;
+    }
+    .btn-check:checked + .onb-option .onb-option__check {
+        background: var(--bs-primary);
+        border-color: var(--bs-primary);
+        color: #fff;
+    }
+    .onb-option__chevron {
+        flex: 0 0 auto;
+        align-self: center;
+        color: rgba(var(--bs-primary-rgb), .55);
+        font-size: .8rem;
+    }
+    .onb-option--row {
+        align-items: center;
+        padding: .95rem 1.15rem;
+    }
+    .onb-option--compact {
+        padding: .95rem 1rem;
+    }
+    .onb-option--tile {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 1.1rem .75rem;
+    }
+    .onb-option--tile .onb-option__body { text-align: center; }
+    .onb-option--tile .onb-option__title { font-size: .92rem; }
+    .onb-option--tile .onb-option__note { font-size: .78rem; }
 
-/* Step Labels */
-.step-label.active {
-    color: var(--bs-primary);
-    font-weight: 600;
-}
+    /* Optional details block */
+    .onb-details {
+        border: 1px dashed rgba(15, 23, 42, .16);
+        border-radius: 1rem;
+        background: #fbfcfe;
+        padding: 0 1rem;
+    }
+    .onb-details[open] {
+        padding-bottom: 1.1rem;
+    }
+    .onb-details__summary {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: .9rem 0;
+        cursor: pointer;
+        font-weight: 600;
+        color: var(--bs-body-color);
+        list-style: none;
+    }
+    .onb-details__summary::-webkit-details-marker { display: none; }
+    .onb-details__optional {
+        color: var(--bs-secondary-color);
+        font-weight: 400;
+    }
+    .onb-details__chevron {
+        color: var(--bs-secondary-color);
+        font-size: .8rem;
+        transition: transform .2s ease;
+    }
+    .onb-details[open] .onb-details__chevron { transform: rotate(180deg); }
+    .onb-details__body {
+        border-top: 1px solid rgba(15, 23, 42, .07);
+        padding-top: 1rem;
+    }
+    .onb-field-error {
+        color: var(--bs-danger);
+        font-size: .8rem;
+        margin-top: .35rem;
+    }
 
-/* Check Circles */
-.check-circle {
-    opacity: 0;
-    transform: scale(0);
-    transition: all 0.3s ease;
-}
-.btn-check:checked + label .check-circle {
-    opacity: 1;
-    transform: scale(1);
-}
+    /* Navigation */
+    .onb-nav {
+        border-top: 1px solid rgba(15, 23, 42, .08);
+    }
+    .step-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: rgba(15, 23, 42, .16);
+        transition: background-color .2s ease, transform .2s ease;
+    }
+    .step-dot.active {
+        background: var(--bs-primary);
+        transform: scale(1.3);
+    }
+    .onb-note {
+        color: var(--bs-secondary-color);
+        background: #f8f9fc;
+        border: 1px solid rgba(15, 23, 42, .06);
+        border-radius: .75rem;
+        padding: .75rem 1rem;
+        font-size: .86rem;
+    }
+    .onb-skip {
+        color: var(--bs-secondary-color);
+        text-decoration: none;
+    }
+    .onb-skip:hover { color: var(--bs-primary); }
 
-/* Check Squares */
-.check-square {
-    opacity: 0;
-    transform: scale(0.8);
-    transition: all 0.3s ease;
-}
-.btn-check:checked + label .check-square {
-    opacity: 1;
-    transform: scale(1);
-}
+    /* Step enter animation (JS adds the class; content is visible without it) */
+    .step-container.onb-enter {
+        animation: onbStepIn .28s cubic-bezier(.4, 0, .2, 1) both;
+    }
+    @keyframes onbStepIn {
+        from { opacity: 0; transform: translateY(6px); }
+        to { opacity: 1; transform: none; }
+    }
 
-/* Step Dots */
-.step-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background-color: var(--bs-gray-300);
-    transition: all 0.3s ease;
-}
-.step-dot.active {
-    background-color: var(--bs-primary);
-    transform: scale(1.2);
-}
+    /* Completion screen */
+    .onb-done {
+        max-width: 640px;
+        margin: 0 auto;
+        padding: 2rem 0 1rem;
+    }
+    .onb-done__icon {
+        display: grid;
+        place-items: center;
+        width: 76px;
+        height: 76px;
+        margin: 0 auto 1.5rem;
+        border-radius: 50%;
+        background: #198754;
+        color: #fff;
+        font-size: 1.7rem;
+        box-shadow: 0 12px 32px rgba(25, 135, 84, .24);
+    }
+    .onb-done__title {
+        font-size: clamp(1.8rem, 3.2vw, 2.35rem);
+        font-weight: 800;
+        letter-spacing: -.02em;
+        margin-bottom: .75rem;
+    }
+    .onb-done__text {
+        color: var(--bs-secondary-color);
+        line-height: 1.7;
+        max-width: 540px;
+        margin: 0 auto 2rem;
+    }
+    .onb-summary {
+        background: #fff;
+        border: 1px solid rgba(15, 23, 42, .08);
+        border-radius: 1rem;
+        padding: .35rem 1.25rem;
+        max-width: 540px;
+        margin: 0 auto;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, .05);
+    }
+    .onb-summary__row {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 1.25rem;
+        padding: .85rem 0;
+        border-bottom: 1px solid rgba(15, 23, 42, .06);
+        font-size: .92rem;
+    }
+    .onb-summary__row:last-child { border-bottom: 0; }
+    .onb-summary__row span { color: var(--bs-secondary-color); }
+    .onb-summary__row strong { text-align: right; }
 
-/* Selected States */
-.btn-check:checked + label {
-    border-color: var(--bs-primary) !important;
-    background-color: rgba(var(--bs-primary-rgb), 0.05);
-}
-.btn-check:checked + label.border-success {
-    border-color: var(--bs-success) !important;
-    background-color: rgba(var(--bs-success-rgb), 0.05);
-}
+    @media (max-width: 575.98px) {
+        .onb-option { padding: .95rem; gap: .8rem; }
+        .onb-option__icon { width: 40px; height: 40px; }
+        .onb-option--tile { padding: .9rem .6rem; }
+        .onb-nav { flex-wrap: wrap; }
+        .onb-done { padding-top: 1rem; }
+    }
 
-/* Animation Classes */
-.step-container {
-    animation-duration: 0.5s;
-}
-.fade-out {
-    animation: fadeOut 0.3s forwards;
-}
-@keyframes fadeOut {
-    to { opacity: 0; transform: translateX(-20px); }
-}
+    /* Respect reduced motion: no movement, instant state changes */
+    @media (prefers-reduced-motion: reduce) {
+        .step-container.onb-enter,
+        .onb-progress__bar,
+        .onb-option,
+        .onb-option__check,
+        .onb-details__chevron,
+        .onb-steplabel,
+        .step-dot {
+            animation: none !important;
+            transition: none !important;
+        }
+        .onb-option:hover { box-shadow: none; }
+    }
 </style>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const config = {
-        currentStep: 1,
-        totalSteps: 4,
-        animationSpeed: 300
+document.addEventListener('DOMContentLoaded', function () {
+    'use strict';
+
+    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* Completion screen: offer a manual CTA and auto-redirect after a pause. */
+    var redirectNote = document.getElementById('redirectNote');
+    if (redirectNote) {
+        var target = redirectNote.getAttribute('data-url');
+        var countEl = document.getElementById('redirectCount');
+        var seconds = parseInt(countEl ? countEl.textContent : '12', 10) || 12;
+        redirectNote.hidden = false;
+        var timer = window.setInterval(function () {
+            seconds -= 1;
+            if (countEl) { countEl.textContent = String(Math.max(seconds, 0)); }
+            if (seconds <= 0) {
+                window.clearInterval(timer);
+                window.location.href = target;
+            }
+        }, 1000);
+        return;
+    }
+
+    var form = document.getElementById('onboardingForm');
+    if (!form) { return; }
+
+    var config = {
+        currentStep: parseInt('{{ initial_step|default:1 }}', 10) || 1,
+        totalSteps: 4
     };
 
-    const elements = {
+    var elements = {
         prevBtn: document.getElementById('prevBtn'),
         nextBtn: document.getElementById('nextBtn'),
         submitBtn: document.getElementById('submitBtn'),
         skipBtn: document.getElementById('skipBtn'),
         progressBar: document.getElementById('progressBar'),
+        progressTrack: document.querySelector('.onb-progress__track'),
         currentStepNum: document.getElementById('currentStepNum'),
         totalStepsNum: document.getElementById('totalStepsNum'),
-        stepLabels: document.querySelectorAll('.step-label'),
-        stepDots: document.querySelectorAll('.step-dot'),
-        form: document.getElementById('onboardingForm')
+        stepLabels: Array.prototype.slice.call(document.querySelectorAll('.step-label')),
+        stepDots: Array.prototype.slice.call(document.querySelectorAll('.step-dot')),
+        needHint: document.getElementById('needHint'),
+        hintFull: document.getElementById('hintFull'),
+        hintCommunity: document.getElementById('hintCommunity')
     };
 
-    function animateStepOut() {
-        const currentContainer = document.querySelector(`.step-container[data-step="${config.currentStep}"]`);
-        if (currentContainer) {
-            currentContainer.classList.add('animate__fadeOutLeft');
-            setTimeout(() => {
-                currentContainer.classList.remove('animate__fadeOutLeft');
-            }, config.animationSpeed);
-        }
+    function scrollCardIntoView() {
+        var body = document.querySelector('.onb-card .card-body');
+        if (!body) { return; }
+        body.scrollIntoView({
+            behavior: reduceMotion ? 'auto' : 'smooth',
+            block: 'start'
+        });
     }
 
-    function animateStepIn() {
-        const currentContainer = document.querySelector(`.step-container[data-step="${config.currentStep}"]`);
-        if (currentContainer) {
-            currentContainer.classList.add('animate__fadeInRight');
-            setTimeout(() => {
-                currentContainer.classList.remove('animate__fadeInRight');
-            }, config.animationSpeed);
+    function showStep(step, focusHeading) {
+        Array.prototype.forEach.call(document.querySelectorAll('.step-container'), function (el) {
+            el.classList.add('d-none');
+            el.classList.remove('onb-enter');
+        });
+
+        var container = document.querySelector('.step-container[data-step="' + step + '"]');
+        if (!container) { return; }
+
+        container.classList.remove('d-none');
+        if (!reduceMotion) {
+            void container.offsetWidth;
+            container.classList.add('onb-enter');
+        }
+
+        updateProgress();
+        updateButtons();
+
+        if (focusHeading) {
+            var heading = container.querySelector('.onb-step-title');
+            if (heading) { heading.focus({ preventScroll: true }); }
         }
     }
 
     function updateProgress() {
-        const progress = ((config.currentStep - 1) / (config.totalSteps - 1)) * 100;
-        elements.progressBar.style.width = `${progress}%`;
-        
-        // Update step labels
-        elements.stepLabels.forEach((label, index) => {
-            label.classList.toggle('active', index + 1 <= config.currentStep);
-        });
-        
-        // Update step dots
-        elements.stepDots.forEach((dot, index) => {
-            dot.classList.toggle('active', index + 1 === config.currentStep);
-        });
-        
-        // Update counters
-        const serviceType = document.querySelector('input[name="service_type"]:checked');
-        const isFullPlatform = serviceType && serviceType.value === 'full_platform';
-        
-        let displayTotal = isFullPlatform ? 3 : config.totalSteps;
-        let displayCurrent = config.currentStep;
-        
-        if (isFullPlatform && config.currentStep > 2) {
-            displayCurrent = config.currentStep - 1;
+        var percent = (config.currentStep / config.totalSteps) * 100;
+        if (elements.progressBar) {
+            elements.progressBar.style.width = percent + '%';
         }
-        
-        elements.currentStepNum.textContent = displayCurrent;
-        elements.totalStepsNum.textContent = displayTotal;
+        if (elements.progressTrack) {
+            elements.progressTrack.setAttribute('aria-valuenow', String(Math.round(percent)));
+        }
+
+        elements.stepLabels.forEach(function (label) {
+            label.classList.toggle('active', parseInt(label.getAttribute('data-step'), 10) <= config.currentStep);
+        });
+        elements.stepDots.forEach(function (dot) {
+            dot.classList.toggle('active', parseInt(dot.getAttribute('data-step'), 10) === config.currentStep);
+        });
+
+        if (elements.currentStepNum) { elements.currentStepNum.textContent = String(config.currentStep); }
+        if (elements.totalStepsNum) { elements.totalStepsNum.textContent = String(config.totalSteps); }
     }
 
     function updateButtons() {
         elements.prevBtn.style.visibility = config.currentStep > 1 ? 'visible' : 'hidden';
-        
-        if (config.currentStep === config.totalSteps) {
-            elements.nextBtn.classList.add('d-none');
-            elements.submitBtn.classList.remove('d-none');
-        } else {
-            elements.nextBtn.classList.remove('d-none');
-            elements.submitBtn.classList.add('d-none');
-        }
-    }
 
-    function showStep(step) {
-        // Hide all steps
-        document.querySelectorAll('.step-container').forEach(el => {
-            el.classList.add('d-none');
-            el.classList.remove('animate__fadeInRight', 'animate__fadeOutLeft');
-        });
-        
-        // Show current step
-        const currentContainer = document.querySelector(`.step-container[data-step="${step}"]`);
-        if (currentContainer) {
-            currentContainer.classList.remove('d-none');
-        }
-        
-        updateProgress();
-        updateButtons();
+        var onLastStep = config.currentStep === config.totalSteps;
+        elements.nextBtn.classList.toggle('d-none', onLastStep);
+        elements.submitBtn.classList.toggle('d-none', !onLastStep);
     }
 
     function validateStep(step) {
-        const container = document.querySelector(`.step-container[data-step="${step}"]`);
-        const errorMsg = container.querySelector('.alert-warning');
-        let isValid = true;
-        
-        // Hide previous errors
-        if (errorMsg) errorMsg.classList.add('d-none');
-        
-        switch(step) {
-            case 1:
-                const serviceSelected = container.querySelector('input[name="service_type"]:checked');
-                if (!serviceSelected) {
-                    isValid = false;
-                }
-                break;
-                
-            case 2:
-                // Only validate if step is visible (not skipped)
-                const isSkipped = document.querySelector('input[name="service_type"][value="full_platform"]:checked');
-                if (!isSkipped) {
-                    const needsSelected = container.querySelectorAll('input[type="checkbox"]:checked');
-                    if (needsSelected.length === 0) {
-                        isValid = false;
-                    }
-                }
-                break;
-                
-            case 3:
-                const goalSelected = container.querySelector('input[name="project_description"]:checked');
-                if (!goalSelected) {
-                    isValid = false;
-                }
-                break;
-                
-            case 4:
-                // Timeline is optional
-                break;
+        var container = document.querySelector('.step-container[data-step="' + step + '"]');
+        if (!container) { return true; }
+
+        var errorMsg = container.querySelector('.alert-warning');
+        if (errorMsg) { errorMsg.classList.add('d-none'); }
+
+        var valid = true;
+        if (step === 1) {
+            valid = !!document.querySelector('input[name="service_type"]:checked');
+        } else if (step === 2) {
+            valid = !!document.querySelector('input[name="community_needs_selection"]:checked');
+        } else if (step === 3) {
+            valid = !!document.querySelector('input[name="project_description"]:checked');
         }
-        
-        if (!isValid && errorMsg) {
+
+        if (!valid && errorMsg) {
             errorMsg.classList.remove('d-none');
-            errorMsg.classList.add('animate__shakeX');
-            setTimeout(() => errorMsg.classList.remove('animate__shakeX'), 1000);
+            errorMsg.focus();
         }
-        
-        return isValid;
+        return valid;
     }
 
-    function goToNextStep() {
-        if (!validateStep(config.currentStep)) return;
-        
-        animateStepOut();
-        
-        setTimeout(() => {
-            let nextStep = config.currentStep + 1;
-            
-            // Skip step 2 if full platform selected
-            if (config.currentStep === 1) {
-                const isFullPlatform = document.querySelector('input[name="service_type"][value="full_platform"]:checked');
-                if (isFullPlatform) {
-                    nextStep = 3;
-                }
-            }
-            
-            if (nextStep <= config.totalSteps) {
-                config.currentStep = nextStep;
-                showStep(config.currentStep);
-                animateStepIn();
-                
-                // Scroll to top of card
-                document.querySelector('.card-body').scrollIntoView({ 
-                    behavior: 'smooth', 
-                    block: 'start' 
-                });
-            }
-        }, config.animationSpeed);
+    function updateNeedHint() {
+        if (!elements.needHint) { return; }
+        var selected = document.querySelector('input[name="service_type"]:checked');
+        if (!selected) {
+            elements.needHint.hidden = true;
+            return;
+        }
+        var source = selected.value === 'full_platform' ? elements.hintFull : elements.hintCommunity;
+        if (source) {
+            elements.needHint.textContent = source.textContent;
+            elements.needHint.hidden = false;
+        }
     }
 
-    function goToPrevStep() {
-        animateStepOut();
-        
-        setTimeout(() => {
-            let prevStep = config.currentStep - 1;
-            
-            // Skip back over step 2 if full platform selected
-            if (config.currentStep === 3) {
-                const isFullPlatform = document.querySelector('input[name="service_type"][value="full_platform"]:checked');
-                if (isFullPlatform) {
-                    prevStep = 1;
-                }
-            }
-            
-            if (prevStep >= 1) {
-                config.currentStep = prevStep;
-                showStep(config.currentStep);
-                animateStepIn();
-            }
-        }, config.animationSpeed);
-    }
+    elements.nextBtn.addEventListener('click', function () {
+        if (!validateStep(config.currentStep)) { return; }
+        if (config.currentStep < config.totalSteps) {
+            config.currentStep += 1;
+            showStep(config.currentStep, true);
+            scrollCardIntoView();
+        }
+    });
 
-    // Auto-advance for radios (with delay for visual feedback)
-    document.querySelectorAll('input[type="radio"]').forEach(radio => {
-        radio.addEventListener('change', function() {
-            if (this.name === 'start_timeline') {
-                // For timeline (last step), don't auto-advance
-                return;
-            }
-            
-            setTimeout(() => {
-                if (config.currentStep < config.totalSteps) {
-                    goToNextStep();
-                }
-            }, 600);
+    elements.prevBtn.addEventListener('click', function () {
+        if (config.currentStep > 1) {
+            config.currentStep -= 1;
+            showStep(config.currentStep, true);
+            scrollCardIntoView();
+        }
+    });
+
+    Array.prototype.forEach.call(document.querySelectorAll('input[name="service_type"]'), function (input) {
+        input.addEventListener('change', function () {
+            updateNeedHint();
+            updateProgress();
         });
     });
 
-    // Event Listeners
-    elements.nextBtn.addEventListener('click', goToNextStep);
-    elements.prevBtn.addEventListener('click', goToPrevStep);
-    
-    elements.skipBtn.addEventListener('click', function() {
-        if (confirm('{% trans "Skip onboarding? You can complete it later from your dashboard." %}')) {
-            window.location.href = '/';
-        }
+    // Clear a step's validation message as soon as the user makes a choice.
+    Array.prototype.forEach.call(document.querySelectorAll('.step-container'), function (container) {
+        container.addEventListener('change', function () {
+            if (!container.querySelector('input:checked')) { return; }
+            var errorMsg = container.querySelector('.alert-warning');
+            if (errorMsg) { errorMsg.classList.add('d-none'); }
+        });
     });
 
-    // Form submission
-    elements.form.addEventListener('submit', function(e) {
+    if (elements.skipBtn) {
+        elements.skipBtn.addEventListener('click', function () {
+            var message = elements.skipBtn.getAttribute('data-confirm');
+            if (!message || window.confirm(message)) {
+                window.location.href = '{% url "home:home" %}';
+            }
+        });
+    }
+
+    form.addEventListener('submit', function (event) {
         if (!validateStep(config.currentStep)) {
-            e.preventDefault();
+            event.preventDefault();
             return;
         }
-        
-        // Add loading state
-        elements.submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> {% trans "Setting up..." %}';
+        if (elements.submitBtn.disabled) {
+            event.preventDefault();
+            return;
+        }
+        var loadingText = elements.submitBtn.getAttribute('data-loading') || '…';
+        elements.submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>' + loadingText;
         elements.submitBtn.disabled = true;
     });
 
-    // Initialize
-    showStep(config.currentStep);
+    updateNeedHint();
+    showStep(config.currentStep, false);
 });
 </script>
 {% endblock %}

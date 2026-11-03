@@ -1,0 +1,562 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans "Enterprise Automation Solutions & Services" %} | OnWebApp{% endblock %}
+
+{% block meta_description %}{% trans "Streamline business operations with OnWebApp enterprise automation solutions. Connect ERP, CRM, APIs, and enterprise systems through automated workflows." %}{% endblock %}
+
+{% block og_title %}{% trans "Enterprise Automation Solutions & Services" %} | OnWebApp{% endblock %}
+
+{% block og_description %}{% trans "Streamline business operations with OnWebApp enterprise automation solutions. Connect ERP, CRM, APIs, and enterprise systems through automated workflows." %}{% endblock %}
+
+{% block meta_keywords %}{% trans "Enterprise Automation, Enterprise Automation Solutions, Business Process Automation, Robotic Process Automation (RPA) Solutions, Enterprise Workflow Automation, System Integration, ERP and CRM Integration, Workload Automation, Intelligent Process Automation, Digital Process Automation" %}{% endblock %}
+
+{% block content %}
+<!-- HERO -->
+<section class="ax-hero">
+    <div class="ax-hero__shade"></div>
+    <div class="ax-hero__fade"></div>
+    <div class="wrap ax-hero__inner">
+        <a href="{% url 'home:automation_home' %}" class="ax-hero__eyebrow" aria-label="Enterprise Automation Solutions | OnWebApp">{% trans "Enterprise Automation Solutions" %}</a>
+        <h1 class="ax-hero__title">{% trans "Enterprise Automation Solutions That Connect Your Entire Business" %}</h1>
+        <p class="ax-hero__sub">{% trans "OnWebApp brings your business applications, enterprise systems, and operational processes together through intelligent automation ,From individual business processes to complex cross-system operations, we help you build a more connected, efficient, and scalable enterprise." %}</p>
+        <div class="ax-hero__actions">
+            <a href="{% url 'contact:contact' %}" class="ax-btn ax-btn--primary">{% trans "Discuss Your Automation Project" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+            <a href="#solutions" class="ax-btn ax-btn--ghost">{% trans "Explore Our Solutions" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+        </div>
+    </div>
+</section>
+
+<!-- INTRODUCTION -->
+<section class="ax-sec">
+    <div class="wrap">
+        <div class="ea-split">
+            <div class="ax-center ea-split__copy">
+                <span class="ax-label">{% trans "Introduction" %}</span>
+                <h2 class="ax-h2">{% trans "Transform Disconnected Systems Into Connected Operations" %}</h2>
+                <p class="ax-lead ax-lead--wide">{% trans "Modern businesses depend on multiple applications, platforms, and enterprise systems to manage their daily operations. When these systems operate separately, employees spend valuable time transferring information, coordinating tasks, and handling repetitive processes manually." %}</p>
+                <p class="ax-lead ax-lead--wide ea-lead-gap">{% trans "OnWebApp helps organizations overcome these challenges through enterprise automation and system integration." %}</p>
+                <p class="ax-lead ax-lead--wide ea-lead-gap">{% trans "We connect existing technologies, automate workflows across departments, and build structured processes that allow business operations to run more consistently." %}</p>
+            </div>
+            <div class="ea-panel">
+                <div class="ea-panel__head">
+                    <i class="fas fa-bullseye" aria-hidden="true"></i>
+                    <h3 class="ea-sub-head">{% trans "What we help you achieve:" %}</h3>
+                </div>
+                <ul class="ea-list">
+                    <li>{% trans "Connect ERP, CRM, databases, APIs, and business applications." %}</li>
+                    <li>{% trans "Automate repetitive tasks across multiple systems." %}</li>
+                    <li>{% trans "Reduce manual data entry and operational bottlenecks." %}</li>
+                    <li>{% trans "Coordinate workflows across departments." %}</li>
+                    <li>{% trans "Improve process visibility and execution tracking." %}</li>
+                    <li>{% trans "Build automation that adapts to growing business requirements." %}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ENTERPRISE AUTOMATION SOLUTIONS -->
+<section class="ax-sec ax-sec--soft" id="solutions">
+    <div class="wrap">
+        <div class="ax-center">
+            <span class="ax-label ax-label--indigo">{% trans "Enterprise Automation Solutions" %}</span>
+            <h2 class="ax-h2">{% trans "One Automation Strategy. Multiple Business Processes." %}</h2>
+            <p class="ax-lead ax-lead--wide">{% trans "Every enterprise has different operational requirements. OnWebApp combines multiple automation approaches to help organizations automate tasks, coordinate processes, and integrate their technology infrastructure." %}</p>
+        </div>
+        <div class="ax-grid ax-grid--3">
+            <div class="ax-card">
+                <div class="ax-card__icon ax-card__icon--violet"><i class="fas fa-robot" aria-hidden="true"></i></div>
+                <h3 class="ax-card__title">{% trans "Robotic Process Automation (RPA)" %}</h3>
+                <span class="ea-use"><span class="ea-sr">{% trans "Use case: " %}</span>{% trans "Data entry &amp; documents" %}</span>
+                <p class="ax-card__body">{% trans "Automate repetitive, rule-based work such as data entry, document processing, and information transfers across business applications." %}</p>
+            </div>
+            <div class="ax-card">
+                <div class="ax-card__icon ax-card__icon--indigo"><i class="fas fa-diagram-project" aria-hidden="true"></i></div>
+                <h3 class="ax-card__title">{% trans "Business Process Automation (BPA)" %}</h3>
+                <span class="ea-use"><span class="ea-sr">{% trans "Use case: " %}</span>{% trans "Approvals &amp; workflows" %}</span>
+                <p class="ax-card__body">{% trans "Connect tasks, people, departments, and applications to streamline approvals, request management, and operational procedures." %}</p>
+            </div>
+            <div class="ax-card">
+                <div class="ax-card__icon ax-card__icon--blue"><i class="fas fa-brain" aria-hidden="true"></i></div>
+                <h3 class="ax-card__title">{% trans "Intelligent Process Automation (IPA)" %}</h3>
+                <span class="ea-use"><span class="ea-sr">{% trans "Use case: " %}</span>{% trans "Documents &amp; classification" %}</span>
+                <p class="ax-card__body">{% trans "Add intelligent data processing, document understanding, and classification to workflows that require interpreting business information." %}</p>
+            </div>
+            <div class="ax-card">
+                <div class="ax-card__icon ax-card__icon--violet"><i class="fas fa-share-nodes" aria-hidden="true"></i></div>
+                <h3 class="ax-card__title">{% trans "Digital Process Automation (DPA)" %}</h3>
+                <span class="ea-use"><span class="ea-sr">{% trans "Use case: " %}</span>{% trans "Cross-platform workflows" %}</span>
+                <p class="ax-card__body">{% trans "Digitize processes across digital platforms, connecting employees, customers, applications, and data through structured workflows." %}</p>
+            </div>
+            <div class="ax-card">
+                <div class="ax-card__icon ax-card__icon--indigo"><i class="fas fa-plug" aria-hidden="true"></i></div>
+                <h3 class="ax-card__title">{% trans "Enterprise System Integration" %}</h3>
+                <span class="ea-use"><span class="ea-sr">{% trans "Use case: " %}</span>{% trans "ERP, CRM &amp; API connectivity" %}</span>
+                <p class="ax-card__body">{% trans "Connect ERP, CRM, databases, APIs, and third-party applications into one unified environment with synchronized business information." %}</p>
+            </div>
+            <div class="ax-card">
+                <div class="ax-card__icon ax-card__icon--blue"><i class="fas fa-server" aria-hidden="true"></i></div>
+                <h3 class="ax-card__title">{% trans "Workload &amp; Infrastructure Automation" %}</h3>
+                <span class="ea-use"><span class="ea-sr">{% trans "Use case: " %}</span>{% trans "Scheduled jobs &amp; data transfers" %}</span>
+                <p class="ax-card__body">{% trans "Automate scheduled jobs, background processes, and data transfers with monitoring, scheduling, and execution tracking." %}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- BUSINESS OPERATIONS -->
+<section class="ax-sec" id="operations">
+    <div class="wrap">
+        <div class="ax-center">
+            <span class="ax-label">{% trans "Business Operations" %}</span>
+            <h2 class="ax-h2">{% trans "Connect Your Business Systems. Automate End-to-End." %}</h2>
+            <p class="ax-lead ax-lead--wide">{% trans "Integrate ERP, CRM, databases, and business applications into connected workflows." %}</p>
+        </div>
+        <div class="ea-rows">
+            <div class="ea-row">
+                <div class="ax-card__icon ax-card__icon--blue"><i class="fas fa-database" aria-hidden="true"></i></div>
+                <h3 class="ea-row__title">{% trans "ERP &amp; Resource Management" %}</h3>
+                <p class="ea-row__body">{% trans "Automate data synchronization, inventory updates, purchasing processes, and operational reporting across enterprise resource planning systems." %}</p>
+            </div>
+            <div class="ea-row">
+                <div class="ax-card__icon ax-card__icon--gold"><i class="fas fa-handshake" aria-hidden="true"></i></div>
+                <h3 class="ea-row__title">{% trans "CRM &amp; Customer Operations" %}</h3>
+                <p class="ea-row__body">{% trans "Coordinate lead management, customer records, follow-ups, and information transfers between customer management platforms." %}</p>
+            </div>
+            <div class="ea-row">
+                <div class="ax-card__icon ax-card__icon--violet"><i class="fas fa-dollar-sign" aria-hidden="true"></i></div>
+                <h3 class="ea-row__title">{% trans "Finance &amp; Administration" %}</h3>
+                <p class="ea-row__body">{% trans "Streamline invoice processing, document handling, financial data transfers, and administrative approvals." %}</p>
+            </div>
+            <div class="ea-row">
+                <div class="ax-card__icon ax-card__icon--indigo"><i class="fas fa-users" aria-hidden="true"></i></div>
+                <h3 class="ea-row__title">{% trans "Human Resources" %}</h3>
+                <p class="ea-row__body">{% trans "Automate employee onboarding, internal requests, document workflows, and routine HR processes." %}</p>
+            </div>
+            <div class="ea-row">
+                <div class="ax-card__icon ax-card__icon--blue"><i class="fas fa-industry" aria-hidden="true"></i></div>
+                <h3 class="ea-row__title">{% trans "Operations &amp; Manufacturing" %}</h3>
+                <p class="ea-row__body">{% trans "Coordinate production-related workflows, operational data transfers, scheduled processes, and reporting activities." %}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ENTERPRISE INTEGRATION -->
+<section class="ax-sec ax-sec--soft" id="integration">
+    <div class="wrap">
+        <div class="ea-split">
+            <div class="ax-center ea-split__copy">
+                <span class="ax-label ax-label--indigo">{% trans "Enterprise Integration" %}</span>
+                <h2 class="ax-h2">{% trans "Your Existing Systems. Working Together." %}</h2>
+                <p class="ax-lead ax-lead--wide">{% trans "Enterprise automation should not require replacing the systems your organization already depends on." %}</p>
+                <p class="ax-lead ax-lead--wide ea-lead-gap">{% trans "OnWebApp builds integration solutions that connect your existing technology stack, allowing information and workflows to move between applications through APIs, automated processes, and secure data exchanges." %}</p>
+            </div>
+            <div class="ea-panel">
+                <div class="ea-panel__head">
+                    <i class="fas fa-diagram-project" aria-hidden="true"></i>
+                    <h3 class="ea-sub-head">{% trans "Integration capabilities:" %}</h3>
+                </div>
+                <ul class="ea-cols">
+                    <li>{% trans "ERP and CRM platforms." %}</li>
+                    <li>{% trans "REST APIs and third-party services." %}</li>
+                    <li>{% trans "SQL databases and business data sources." %}</li>
+                    <li>{% trans "Cloud-based applications." %}</li>
+                    <li>{% trans "Internal enterprise software." %}</li>
+                    <li>{% trans "Web applications and operational platforms." %}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- BENEFITS -->
+<section class="ax-sec" id="benefits">
+    <div class="wrap">
+        <div class="ax-center">
+            <span class="ax-label">{% trans "Benefits" %}</span>
+            <h2 class="ax-h2">{% trans "Make Every Business Process Work Smarter" %}</h2>
+            <p class="ax-lead ax-lead--wide">{% trans "Move beyond disconnected tools and manual operations. Connect your systems, streamline workflows, and build a more controlled, efficient business operation." %}</p>
+        </div>
+        <div class="ea-rows">
+            <div class="ea-row">
+                <div class="ax-card__icon ax-card__icon--violet"><i class="fas fa-bolt" aria-hidden="true"></i></div>
+                <h3 class="ea-row__title">{% trans "Higher Operational Efficiency" %}</h3>
+                <p class="ea-row__body">{% trans "Eliminate repetitive manual tasks and accelerate processes across departments." %}</p>
+            </div>
+            <div class="ea-row">
+                <div class="ax-card__icon ax-card__icon--indigo"><i class="fas fa-check-double" aria-hidden="true"></i></div>
+                <h3 class="ea-row__title">{% trans "Reliable Business Data" %}</h3>
+                <p class="ea-row__body">{% trans "Keep information accurate, consistent, and synchronized across connected systems." %}</p>
+            </div>
+            <div class="ea-row">
+                <div class="ax-card__icon ax-card__icon--blue"><i class="fas fa-link" aria-hidden="true"></i></div>
+                <h3 class="ea-row__title">{% trans "Seamless System Integration" %}</h3>
+                <p class="ea-row__body">{% trans "Connect ERP, CRM, databases, and business applications without disrupting existing operations." %}</p>
+            </div>
+            <div class="ea-row">
+                <div class="ax-card__icon ax-card__icon--gold"><i class="fas fa-eye" aria-hidden="true"></i></div>
+                <h3 class="ea-row__title">{% trans "Complete Process Visibility" %}</h3>
+                <p class="ea-row__body">{% trans "Monitor workflow activity, track execution, and identify operational bottlenecks." %}</p>
+            </div>
+            <div class="ea-row">
+                <div class="ax-card__icon ax-card__icon--violet"><i class="fas fa-shield-halved" aria-hidden="true"></i></div>
+                <h3 class="ea-row__title">{% trans "Greater Operational Control" %}</h3>
+                <p class="ea-row__body">{% trans "Manage permissions, validate actions, track execution logs, and handle exceptions." %}</p>
+            </div>
+            <div class="ea-row">
+                <div class="ax-card__icon ax-card__icon--indigo"><i class="fas fa-expand-arrows-alt" aria-hidden="true"></i></div>
+                <h3 class="ea-row__title">{% trans "Automation That Scales" %}</h3>
+                <p class="ea-row__body">{% trans "Expand workflows across teams, systems, and departments as your business grows." %}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="ax-sec ax-sec--soft" id="how-it-works">
+    <div class="wrap">
+        <div class="ax-center">
+            <span class="ax-label ax-label--indigo">{% trans "How It Works" %}</span>
+            <h2 class="ax-h2">{% trans "From Business Challenges to Enterprise Automation" %}</h2>
+            <p class="ax-lead ax-lead--wide">{% trans "We follow a structured implementation process to ensure every automation solution aligns with your organization's systems, workflows, and operational objectives." %}</p>
+        </div>
+        <ol class="ax-steps">
+            <li class="ax-step">
+                <span class="ax-step__n" aria-hidden="true">01</span>
+                <h3>{% trans "Business &amp; Process Assessment" %}</h3>
+                <p>{% trans "Analyze existing processes, identify manual tasks, evaluate systems, and define automation opportunities." %}</p>
+            </li>
+            <li class="ax-step">
+                <span class="ax-step__n" aria-hidden="true">02</span>
+                <h3>{% trans "Automation Architecture" %}</h3>
+                <p>{% trans "Design the workflow architecture, integration strategy, execution logic, and technical requirements." %}</p>
+            </li>
+            <li class="ax-step">
+                <span class="ax-step__n" aria-hidden="true">03</span>
+                <h3>{% trans "Development &amp; Integration" %}</h3>
+                <p>{% trans "Build automation workflows, configure integrations, and connect the required enterprise applications." %}</p>
+            </li>
+            <li class="ax-step">
+                <span class="ax-step__n" aria-hidden="true">04</span>
+                <h3>{% trans "Testing &amp; Deployment" %}</h3>
+                <p>{% trans "Validate workflow execution, permissions, data exchanges, error handling, and operational reliability." %}</p>
+            </li>
+            <li class="ax-step">
+                <span class="ax-step__n" aria-hidden="true">05</span>
+                <h3>{% trans "Monitoring &amp; Optimization" %}</h3>
+                <p>{% trans "Monitor automated processes, review execution logs, resolve exceptions, and improve performance over time." %}</p>
+            </li>
+        </ol>
+    </div>
+</section>
+
+<!-- WHY ONWEBAPP -->
+<section class="ax-sec">
+    <div class="wrap">
+        <div class="ax-center">
+            <span class="ax-label">{% trans "Why OnWebApp?" %}</span>
+            <h2 class="ax-h2">{% trans "Enterprise Automation Designed Around Your Infrastructure" %}</h2>
+            <p class="ax-lead ax-lead--wide">{% trans "We understand that enterprise environments are complex. Our approach focuses on integrating with your existing systems and creating automation that supports real operational requirements." %}</p>
+        </div>
+        <div class="ax-grid ax-grid--4">
+            <div class="ax-card">
+                <div class="ax-card__icon ax-card__icon--violet"><i class="fas fa-diagram-project" aria-hidden="true"></i></div>
+                <h3 class="ax-card__title">{% trans "End-to-End Workflows" %}</h3>
+                <p class="ax-card__body">{% trans "Automate complete business processes rather than isolated tasks." %}</p>
+            </div>
+            <div class="ax-card">
+                <div class="ax-card__icon ax-card__icon--indigo"><i class="fas fa-plug" aria-hidden="true"></i></div>
+                <h3 class="ax-card__title">{% trans "Flexible Integration" %}</h3>
+                <p class="ax-card__body">{% trans "Connect existing software, APIs, and enterprise platforms." %}</p>
+            </div>
+            <div class="ax-card">
+                <div class="ax-card__icon ax-card__icon--blue"><i class="fas fa-chart-bar" aria-hidden="true"></i></div>
+                <h3 class="ax-card__title">{% trans "Execution Monitoring" %}</h3>
+                <p class="ax-card__body">{% trans "Maintain visibility into workflow activity, execution history, and exceptions." %}</p>
+            </div>
+            <div class="ax-card">
+                <div class="ax-card__icon ax-card__icon--gold"><i class="fas fa-layer-group" aria-hidden="true"></i></div>
+                <h3 class="ax-card__title">{% trans "Scalable Architecture" %}</h3>
+                <p class="ax-card__body">{% trans "Build automation that can evolve with your organization's needs." %}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ -->
+<section class="ax-sec ax-sec--soft">
+    <div class="wrap wrap--narrow">
+        <div class="ax-center">
+            <span class="ax-label ax-label--indigo">{% trans "FAQ" %}</span>
+            <h2 class="ax-h2">{% trans "Frequently Asked Questions About Enterprise Automation" %}</h2>
+        </div>
+        <div class="ea-faq">
+            <details class="ea-faq__item">
+                <summary>{% trans "What is enterprise automation?" %} <i class="fas fa-chevron-down" aria-hidden="true"></i></summary>
+                <p class="ea-faq__a">{% trans "Enterprise automation uses software, integrations, and automated workflows to streamline business operations across an organization. It can include RPA, business process automation, system integration, workload automation, and intelligent process automation." %}</p>
+            </details>
+            <details class="ea-faq__item">
+                <summary>{% trans "What is the difference between RPA and enterprise automation?" %} <i class="fas fa-chevron-down" aria-hidden="true"></i></summary>
+                <p class="ea-faq__a">{% trans "RPA is one technology within enterprise automation. It focuses on automating repetitive tasks through software interactions, while enterprise automation covers broader processes involving multiple systems, departments, and technologies." %}</p>
+            </details>
+            <details class="ea-faq__item">
+                <summary>{% trans "Can enterprise automation integrate with existing ERP and CRM systems?" %} <i class="fas fa-chevron-down" aria-hidden="true"></i></summary>
+                <p class="ea-faq__a">{% trans "Yes. Enterprise automation can connect ERP, CRM, databases, and other applications through APIs, integration services, and automated workflows, depending on the technical capabilities of each platform." %}</p>
+            </details>
+            <details class="ea-faq__item">
+                <summary>{% trans "Is enterprise automation suitable for small and medium-sized businesses?" %} <i class="fas fa-chevron-down" aria-hidden="true"></i></summary>
+                <p class="ea-faq__a">{% trans "Yes. Businesses can start by automating a specific process and gradually extend automation to additional departments and systems as their requirements grow." %}</p>
+            </details>
+            <details class="ea-faq__item">
+                <summary>{% trans "Can OnWebApp develop custom enterprise automation solutions?" %} <i class="fas fa-chevron-down" aria-hidden="true"></i></summary>
+                <p class="ea-faq__a">{% trans "Yes. OnWebApp designs and implements tailored automation solutions based on business requirements, existing infrastructure, integration needs, and operational objectives." %}</p>
+            </details>
+            <details class="ea-faq__item">
+                <summary>{% trans "How are automated enterprise workflows monitored?" %} <i class="fas fa-chevron-down" aria-hidden="true"></i></summary>
+                <p class="ea-faq__a">{% trans "Workflows can be monitored through execution logs, status tracking, error reporting, validation rules, and notifications, depending on the automation architecture." %}</p>
+            </details>
+            <details class="ea-faq__item">
+                <summary>{% trans "Does enterprise automation replace employees or existing software?" %} <i class="fas fa-chevron-down" aria-hidden="true"></i></summary>
+                <p class="ea-faq__a">{% trans "Enterprise automation is designed to support employees and improve existing processes. It reduces repetitive manual activities while allowing teams to focus on work requiring human judgment and expertise." %}</p>
+            </details>
+        </div>
+    </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="ax-sec ax-sec--dark">
+    <div class="wrap ax-center">
+        <span class="ax-label ax-label--light">{% trans "Enterprise Solutions" %}</span>
+        <h2 class="ax-h2 ax-h2--light">{% trans "Connect Your Systems. Transform Your Operations." %}</h2>
+        <p class="ax-lead ax-lead--dark">{% trans "Whether you need to automate a single business process or coordinate operations across multiple enterprise systems, OnWebApp can help you design the right solution." %}</p>
+        <div class="ax-hero__actions ax-hero__actions--center">
+            <a href="{% url 'contact:contact' %}" class="ax-btn ax-btn--primary">{% trans "Discuss Your Enterprise Project" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+        </div>
+        <p class="ax-lead ax-lead--dark ea-cta-line">{% trans "Tell us about your systems, workflows, and automation objectives." %}</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+{% include 'automation/_ax_styles.html' %}
+<style>
+    /* ---- Light hero restyle for this page only ----
+       Automatisation_d’entreprise.png is a light illustration with built-in
+       whitespace on the left for the copy, so the shared dark hero treatment
+       (white text + dark shade) is inverted here: near-white shade over the
+       artwork, dark ink text, dark ghost button. Shared styles untouched. */
+    .ax-hero{
+        color:var(--ax-ink);
+        background:#f6f4ff url('{% static "img/Automatisation_d’entreprise.png" %}') right center/cover no-repeat;
+    }
+    .ax-hero__shade{
+        background:linear-gradient(90deg,rgba(246,244,255,.97) 0%,rgba(246,244,255,.94) 40%,rgba(246,244,255,.86) 56%,rgba(246,244,255,.74) 72%,rgba(246,244,255,.42) 82%,rgba(246,244,255,.12) 91%,rgba(246,244,255,0) 100%);
+    }
+    .ax-hero__eyebrow{color:var(--ax-violet);font-size:.98rem}
+    .ax-hero__title{color:var(--ax-ink);font-size:clamp(2.05rem,4vw,2.95rem)}
+    .ax-hero__sub{color:var(--ax-body);font-size:1.02rem}
+    .ax-btn--ghost{border-color:rgba(15,23,42,.28);color:var(--ax-ink)}
+    .ax-btn--ghost:hover{background:rgba(15,23,42,.05)}
+    @media(max-width:767px){
+        .ax-hero{background-position:center}
+        .ax-hero__shade{background:linear-gradient(180deg,rgba(246,244,255,.96) 0%,rgba(246,244,255,.88) 55%,rgba(246,244,255,.7) 100%)}
+    }
+    /* ---- Page-scoped additions for the Enterprise Automation page ---- */
+    /* Extra lead paragraph spacing */
+    .ea-lead-gap{margin-top:1rem}
+    /* Two-column introduction: copy on the left, achievement panel on the right.
+       .ax-center is overridden to left-align inside this split only. */
+    .ea-split{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(1.75rem,4vw,3.25rem);align-items:center}
+    .ea-split__copy{text-align:left;max-width:none;margin:0}
+    .ea-split__copy .ax-lead{max-width:none;margin-left:0}
+    .ea-split>.ea-panel{margin:0}
+    /* Narrower column: stack the check-cards instead of two cramped columns */
+    .ea-split .ea-list,.ea-split .ea-cols{grid-template-columns:1fr;gap:.6rem}
+    /* Highlight panels wrapping "What we help you achieve" / "Integration
+       capabilities": tinted container, icon-chip heading, white check-cards. */
+    .ea-panel{
+        max-width:880px;margin:0 auto;
+        padding:1.75rem clamp(1.1rem,4vw,2.25rem) 1.9rem;
+        background:linear-gradient(180deg,rgba(124,58,237,.055),rgba(124,58,237,.015));
+        border:1px solid rgba(124,58,237,.16);
+        border-radius:18px;
+    }
+    .ea-panel__head{display:flex;align-items:center;gap:.7rem;margin-bottom:1.25rem}
+    .ea-panel__head i{
+        flex:0 0 auto;width:34px;height:34px;border-radius:10px;
+        background:linear-gradient(135deg,var(--ax-violet),var(--ax-violet-2));
+        color:#fff;font-size:.85rem;display:flex;align-items:center;justify-content:center;
+        box-shadow:0 8px 18px -8px rgba(124,58,237,.55);
+    }
+    .ea-sub-head{margin:0;font-weight:700;font-size:1.02rem;color:var(--ax-ink);letter-spacing:.01em;text-align:left}
+    .ea-list,.ea-cols{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem}
+    .ea-list li,.ea-cols li{
+        position:relative;background:#fff;border:1px solid rgba(15,23,42,.07);
+        border-radius:11px;padding:.78rem .95rem .78rem 2.45rem;
+        font-size:.88rem;font-weight:500;color:var(--ax-ink);line-height:1.55;
+        box-shadow:0 2px 6px rgba(15,23,42,.03);
+    }
+    .ea-list li::before,.ea-cols li::before{
+        content:"\f00c";font-family:"Font Awesome 6 Free";font-weight:900;color:var(--ax-violet);
+        position:absolute;left:.95rem;top:50%;transform:translateY(-50%);
+        width:1.2rem;height:1.2rem;border-radius:50%;
+        background:rgba(124,58,237,.1);
+        font-size:.6rem;display:flex;align-items:center;justify-content:center;
+    }
+    /* Use-case label under each solution-card title */
+    .ea-use{
+        display:inline-block;font-size:.66rem;font-weight:700;letter-spacing:.05em;
+        text-transform:uppercase;color:var(--ax-violet);
+        background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.16);
+        border-radius:999px;padding:.3rem .7rem;margin:-.15rem 0 .85rem;
+    }
+    /* Visually hidden: exposes "Use case:" to screen readers only */
+    .ea-sr{
+        position:absolute;width:1px;height:1px;padding:0;margin:-1px;
+        overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;
+    }
+    /* Business Operations: bordered capability rows instead of cards.
+       Hairline dividers replace card chrome, so an odd item count (5) leaves
+       no empty grid slot. Icon | title | description per row. */
+    .ea-rows{
+        max-width:920px;margin:0 auto;
+        border-top:1px solid rgba(15,23,42,.09);
+    }
+    .ea-row{
+        display:grid;
+        grid-template-columns:44px minmax(180px,240px) minmax(0,1fr);
+        gap:1.4rem;align-items:center;
+        padding:1.4rem .5rem;
+        border-bottom:1px solid rgba(15,23,42,.09);
+        transition:background .25s ease;
+    }
+    .ea-row:hover{background:linear-gradient(90deg,rgba(124,58,237,.05),rgba(124,58,237,0) 75%)}
+    .ea-row .ax-card__icon{margin-bottom:0}
+    .ea-row__title{margin:0;font-size:.98rem;font-weight:700;color:var(--ax-ink);line-height:1.35}
+    .ea-row__body{margin:0;font-size:.87rem;color:var(--ax-body);line-height:1.65}
+    .ea-row:focus-within{background:rgba(124,58,237,.05)}
+    /* Numbered process steps */
+    .ax-steps{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1rem}
+    .ax-step{position:relative;background:#fff;border:1px solid rgba(15,23,42,.06);border-radius:14px;padding:1.5rem 1.25rem 1.35rem}
+    .ax-step__n{
+        display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;
+        border-radius:50%;background:linear-gradient(135deg,var(--ax-violet),var(--ax-violet-2));
+        color:#fff;font-weight:700;font-size:.85rem;margin-bottom:.9rem;font-variant-numeric:tabular-nums;
+    }
+    .ax-step h3{margin:0 0 .35rem;font-size:.95rem;color:var(--ax-ink);font-weight:700;line-height:1.3}
+    .ax-step p{margin:0;font-size:.83rem;color:var(--ax-body);line-height:1.6}
+    /* FAQ accordions */
+    .wrap--narrow{max-width:820px}
+    .ea-faq{margin-top:.5rem}
+    .ea-faq__item{background:#fff;border:1px solid rgba(15,23,42,.06);border-radius:14px;margin-bottom:.7rem;overflow:hidden;transition:border-color .25s}
+    .ea-faq__item[open]{border-color:rgba(124,58,237,.32)}
+    .ea-faq__item summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1.15rem 1.35rem;font-weight:700;font-size:.95rem;color:var(--ax-ink)}
+    .ea-faq__item summary::-webkit-details-marker{display:none}
+    .ea-faq__item summary i{transition:transform .25s;flex:0 0 auto;color:var(--ax-violet);font-size:.8rem}
+    .ea-faq__item[open] summary i{transform:rotate(180deg)}
+    .ea-faq__item summary:focus-visible{outline:2px solid var(--ax-violet);outline-offset:-2px}
+    .ea-faq__a{padding:0 1.35rem 1.25rem;color:var(--ax-body);font-size:.9rem;line-height:1.75;margin:0}
+    /* Final CTA support line */
+    .ea-cta-line{margin-top:1rem;color:rgba(255,255,255,.88);font-weight:600}
+    /* Light label on the dark final CTA */
+    .ax-label--light{color:#C4B5FD}
+    /* Responsive */
+    @media(max-width:991px){
+        .ax-steps{grid-template-columns:repeat(2,minmax(0,1fr))}
+    }
+    @media(max-width:767px){
+        .ea-list,.ea-cols{grid-template-columns:1fr}
+        .ea-split{grid-template-columns:1fr}
+        .ea-split__copy{text-align:center}
+        .ea-split__copy .ax-lead{margin-left:auto;margin-right:auto}
+        .ea-split>.ea-panel{margin-top:.25rem}
+        /* Rows: icon + title on one line, description below it */
+        .ea-row{grid-template-columns:44px minmax(0,1fr);gap:.3rem 1rem;padding:1.25rem .35rem}
+        .ea-row__body{grid-column:2}
+    }
+    @media(max-width:575px){
+        .ax-steps{grid-template-columns:1fr}
+        .ea-row{grid-template-columns:40px minmax(0,1fr);gap:.25rem .85rem;padding:1.15rem .2rem}
+    }
+    /* ---- Reveal-on-scroll (page-scoped). Classes are added by JS at the end of
+       the body; without JS the elements keep no hidden state and simply show.
+       The global IntersectionObserver in base.html toggles .is-visible. ---- */
+    .animate-on-scroll{
+        opacity:0;transform:translateY(26px);
+        transition:opacity .75s cubic-bezier(.22,1,.36,1),transform .75s cubic-bezier(.22,1,.36,1);
+    }
+    .animate-on-scroll.is-visible{opacity:1;transform:none}
+    /* Stagger steps (declared in ascending order so the highest wins) */
+    .ax-a-d1{transition-delay:.06s}
+    .ax-a-d2{transition-delay:.12s}
+    .ax-a-d3{transition-delay:.18s}
+    .ax-a-d4{transition-delay:.24s}
+    .ax-a-d5{transition-delay:.30s}
+    .ax-a-d6{transition-delay:.36s}
+    /* Reduced motion: show everything immediately, no movement */
+    @media(prefers-reduced-motion:reduce){
+        .animate-on-scroll{opacity:1!important;transform:none!important;transition:none!important}
+        .ea-faq__item summary i{transition:none}
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function(){
+    /* Respect the user's motion preference: reveal nothing, keep all content static. */
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    function add(el, mods){
+        if (!el) return;
+        el.classList.add('animate-on-scroll');
+        (mods || []).forEach(function(m){ if (m) el.classList.add(m); });
+    }
+    function stagger(box){
+        Array.prototype.forEach.call(box.children, function(child, i){
+            add(child, ['ax-a-d' + Math.min(i + 1, 6)]);
+        });
+    }
+    /* Hero + every centered section header: cascade the label / heading / lead. */
+    document.querySelectorAll('.ax-hero__inner, .ax-center').forEach(stagger);
+    /* Stagger the children of each card grid / step list / capability rows. */
+    ['.ax-grid', '.ax-steps', '.ea-rows'].forEach(function(sel){
+        document.querySelectorAll(sel).forEach(stagger);
+    });
+    /* Standalone blocks: highlight panels, supporting lines. */
+    document.querySelectorAll('.ea-panel').forEach(function(el){ add(el); });
+    document.querySelectorAll('.ea-faq__item').forEach(function(el, i){ add(el, ['ax-a-d' + Math.min(i + 1, 6)]); });
+
+    /* Page-local reveal: observe every marked element here instead of relying
+       solely on the global observer. No rAF dependency — first paint is never
+       blank because in-viewport elements are revealed synchronously, with a
+       IntersectionObserver for below-fold content and scroll/resize/timer
+       fallbacks in case frames or the observer are unavailable. */
+    var marked = document.querySelectorAll('.animate-on-scroll');
+    function revealNow(el){ el.classList.add('is-visible'); }
+    function revealInViewport(){
+        Array.prototype.forEach.call(marked, function(el){
+            if (el.classList.contains('is-visible')) return;
+            var r = el.getBoundingClientRect();
+            if (r.top < window.innerHeight && r.bottom > 0) revealNow(el);
+        });
+    }
+    if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function(entries){
+            entries.forEach(function(entry){
+                if (entry.isIntersecting) {
+                    revealNow(entry.target);
+                    io.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0, rootMargin: '0px 0px -5% 0px' });
+        Array.prototype.forEach.call(marked, function(el){ io.observe(el); });
+    }
+    revealInViewport();
+    window.addEventListener('scroll', revealInViewport, { passive: true });
+    window.addEventListener('resize', revealInViewport);
+    setTimeout(revealInViewport, 2000);
+})();
+</script>
+{% endblock %}

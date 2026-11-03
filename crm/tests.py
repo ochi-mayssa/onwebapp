@@ -1,5 +1,8 @@
+from types import SimpleNamespace
 from django.test import TestCase
+from django.contrib import admin
 from django.contrib.auth import get_user_model
+from django.urls import reverse
 from django.utils import timezone
 from .models import Customer, Interaction
 from .automation import calculate_health_score
@@ -69,3 +72,42 @@ class InteractionModelTest(TestCase):
             summary="Follow up email"
         )
         self.assertEqual(str(interaction), f"Email - Acme Corp - {interaction.date.strftime('%Y-%m-%d')}")
+
+
+class CRMDashboardAccessTest(TestCase):
+    def test_staff_admin_sees_unassigned_customers(self):
+        staff = User.objects.create_user(username='staffadmin', password='password123', is_staff=True)
+        customer = Customer.objects.create(name='New Client', email='new-client@example.com')
+
+        self.client.force_login(staff)
+        response = self.client.get(reverse('crm:dashboard'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['total_clients'], 1)
+        self.assertIn('New Client', [item['customer'].name for item in response.context['client_health_list']])
+
+    def test_customer_admin_is_visible_to_staff(self):
+        staff = User.objects.create_user(username='crmadmin', password='password123', is_staff=True)
+        customer_admin = admin.site._registry[Customer]
+        request = SimpleNamespace(user=staff)
+
+        self.assertTrue(customer_admin.has_module_permission(request))
+        self.assertTrue(customer_admin.has_view_permission(request))
+
+    def test_staff_dashboard_shows_all_customer_records(self):
+        staff = User.objects.create_user(username='staffadmin2', password='password123', is_staff=True)
+        other_manager = User.objects.create_user(username='manager2', password='password123', is_staff=True)
+        customer_a = Customer.objects.create(name='Customer A', email='customer-a@example.com', assigned_to=other_manager)
+        customer_b = Customer.objects.create(name='Customer B', email='customer-b@example.com')
+        customer_c = Customer.objects.create(name='Customer C', email='customer-c@example.com', user=User.objects.create_user(username='client-ghost', password='password123'))
+        customer_c.user.delete()
+
+        self.client.force_login(staff)
+        response = self.client.get(reverse('crm:dashboard'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['total_clients'], 3)
+        self.assertCountEqual(
+            [item['customer'].name for item in response.context['client_health_list']],
+            ['Customer A', 'Customer B', 'Customer C']
+        )
