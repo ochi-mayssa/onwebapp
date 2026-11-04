@@ -16,11 +16,16 @@ import threading
 User = get_user_model()
 
 
-def _send_welcome_email_async(username, email, site_url, default_from_email):
-    msg = f"Welcome to OnWebApp, {username}! We're excited to start working with you."
+def _welcome_display_name(user):
+    """Full name (first + last) for greetings, falling back to username."""
+    return (user.get_full_name() or '').strip() or user.username
+
+
+def _send_welcome_email_async(display_name, email, site_url, default_from_email):
+    msg = f"Welcome to OnWebApp, {display_name}! We're excited to start working with you."
     send_mail(
         subject="Welcome to OnWebApp!",
-        message=f"Hi {username},\n\n{msg}\n\nAccess your dashboard here: {site_url}/projects/workflow/dashboard/\n\nBest regards,\nThe OnWebApp Team",
+        message=f"Hi {display_name},\n\n{msg}\n\nAccess your dashboard here: {site_url}/projects/workflow/dashboard/\n\nBest regards,\nThe OnWebApp Team",
         from_email=default_from_email,
         recipient_list=[email],
         fail_silently=True,
@@ -34,7 +39,8 @@ def automated_welcome_message(sender, instance, created, **kwargs):
     Action: Send welcome message via WorkflowNotification and Email (non-blocking).
     """
     if created and not instance.is_staff and not instance.is_superuser:
-        msg = f"Welcome to OnWebApp, {instance.username}! We're excited to start working with you."
+        display_name = _welcome_display_name(instance)
+        msg = f"Welcome to OnWebApp, {display_name}! We're excited to start working with you."
         WorkflowNotification.objects.create(
             recipient=instance,
             notification_type='STATUS',
@@ -44,7 +50,7 @@ def automated_welcome_message(sender, instance, created, **kwargs):
         if instance.email:
             threading.Thread(
                 target=_send_welcome_email_async,
-                args=(instance.username, instance.email, settings.SITE_URL, settings.DEFAULT_FROM_EMAIL),
+                args=(display_name, instance.email, settings.SITE_URL, settings.DEFAULT_FROM_EMAIL),
                 daemon=True,
             ).start()
 

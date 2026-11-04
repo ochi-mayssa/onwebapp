@@ -119,6 +119,8 @@
 
 /* ── Form fields ──────────────────────────────────────────────── */
 .lp-field { margin-bottom: 1.1rem; }
+.lp-name-row { display: flex; gap: .75rem; }
+.lp-name-row .lp-field { flex: 1 1 0; min-width: 0; }
 .lp-field label {
     display: block; font-size: .82rem; font-weight: 600;
     color: var(--lp-ink); margin-bottom: .45rem; letter-spacing: -.01em;
@@ -341,6 +343,30 @@
             <!-- ══ SIGNUP FORM ══ -->
             <form method="post" action="{% url 'users:signup' %}" novalidate>
                 {% csrf_token %}
+
+                <div class="lp-name-row">
+                    <div class="lp-field">
+                        <label for="signup-first-name">{% trans "First name" %}</label>
+                        <div class="lp-input-wrap">
+                            <i data-lucide="user"></i>
+                            <input type="text" id="signup-first-name" name="first_name" class="lp-input {% if signup_form.first_name.errors %}is-invalid{% endif %}"
+                                   placeholder="{% trans 'First name' %}" autocomplete="given-name"
+                                   value="{% if signup_form.first_name.value %}{{ signup_form.first_name.value }}{% endif %}">
+                        </div>
+                        {% for error in signup_form.first_name.errors %}<span class="lp-error">{{ error }}</span>{% endfor %}
+                    </div>
+
+                    <div class="lp-field">
+                        <label for="signup-last-name">{% trans "Last name" %}</label>
+                        <div class="lp-input-wrap">
+                            <i data-lucide="user"></i>
+                            <input type="text" id="signup-last-name" name="last_name" class="lp-input {% if signup_form.last_name.errors %}is-invalid{% endif %}"
+                                   placeholder="{% trans 'Last name' %}" autocomplete="family-name"
+                                   value="{% if signup_form.last_name.value %}{{ signup_form.last_name.value }}{% endif %}">
+                        </div>
+                        {% for error in signup_form.last_name.errors %}<span class="lp-error">{{ error }}</span>{% endfor %}
+                    </div>
+                </div>
 
                 <div class="lp-field">
                     <label for="signup-username">{% trans "Username" %}</label>

@@ -7,7 +7,27 @@ from .models import UserProfile
 
 
 class SignUpForm(UserCreationForm):
-    """Extended user creation form with email field."""
+    """Extended user creation form with email and full-name fields."""
+    first_name = forms.CharField(
+        max_length=150,
+        required=False,
+        label=_('First name'),
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': _('First name'),
+            'autocomplete': 'given-name',
+        })
+    )
+    last_name = forms.CharField(
+        max_length=150,
+        required=False,
+        label=_('Last name'),
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': _('Last name'),
+            'autocomplete': 'family-name',
+        })
+    )
     email = forms.EmailField(
         max_length=254,
         required=True,
@@ -41,7 +61,7 @@ class SignUpForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ('username', 'email', 'password1', 'password2')
+        fields = ('first_name', 'last_name', 'username', 'email', 'password1', 'password2')
 
     def clean_email(self):
         """Validate that email is unique."""
@@ -58,9 +78,11 @@ class SignUpForm(UserCreationForm):
         return username
 
     def save(self, commit=True):
-        """Save user with email."""
+        """Save user with email and full name."""
         user = super().save(commit=False)
         user.email = self.cleaned_data['email']
+        user.first_name = (self.cleaned_data.get('first_name') or '').strip()
+        user.last_name = (self.cleaned_data.get('last_name') or '').strip()
         if commit:
             user.save()
         return user

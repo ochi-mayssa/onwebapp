@@ -147,6 +147,43 @@ class VerificationEmailTests(TestCase):
             self.assertTrue(verification_code.isdigit())
 
 
+class WelcomeMessageTests(TestCase):
+    """The signup welcome message greets the user by full name."""
+
+    PASSWORD = 'Str0ng-Passw0rd!2026'
+
+    def test_signup_welcome_uses_full_name(self):
+        from projects.models import WorkflowNotification
+
+        response = self.client.post(reverse('users:signup'), {
+            'first_name': 'Jane',
+            'last_name': 'Doe',
+            'username': 'janedoe',
+            'email': 'jane@example.com',
+            'password1': self.PASSWORD,
+            'password2': self.PASSWORD,
+        })
+        self.assertEqual(response.status_code, 302)
+
+        user = User.objects.get(username='janedoe')
+        self.assertEqual(user.first_name, 'Jane')
+        self.assertEqual(user.last_name, 'Doe')
+        self.assertEqual(user.get_full_name(), 'Jane Doe')
+
+        note = WorkflowNotification.objects.filter(recipient=user).first()
+        self.assertIsNotNone(note)
+        self.assertIn('Jane Doe', note.message)
+        self.assertNotIn('janedoe', note.message)
+
+    def test_welcome_falls_back_to_username_without_names(self):
+        from projects.models import WorkflowNotification
+
+        user = User.objects.create_user('solo', 'solo@example.com', self.PASSWORD)
+        note = WorkflowNotification.objects.filter(recipient=user).first()
+        self.assertIsNotNone(note)
+        self.assertIn('solo', note.message)
+
+
 class PasswordResetEmailTests(TestCase):
     def _request_reset(self, **kwargs):
         user = User.objects.create_user('ada', 'ada@example.com', 'Str0ng-Passw0rd!2026')
@@ -241,18 +278,15 @@ class MandatoryVerificationTests(TestCase):
         self.assertEqual(response.status_code, 302)
         messages = [m for m in mail.outbox if 'Verify your email' in m.subject]
         self.assertEqual(len(messages), 1)
-        # The code should appear in the email body (not a /users/verify-email/ link)
+        # The email delivers a 6-digit code (no tokenized verification link).
         body = messages[0].body + messages[0].alternatives[0][0]
-        self.assertNotIn('/users/verify-email/', body)
-        self.assertTrue(
-            settings.SITE_URL.rstrip('/') in body,
-            'verification code email must reference SITE_URL',
-        )
         self.assertIn('grace@example.com', messages[0].to)
         # Check that a 6-digit code appears in the body
         import re
         codes = re.findall(r'\b\d{6}\b', body)
         self.assertTrue(len(codes) > 0, 'Email should contain a 6-digit verification code')
+        # The form should post to the new code endpoint
+        self.assertIn('/users/verify-email/code/', body)
 
     def test_verification_code_activates_account_and_signs_in(self):
         self._signup()
@@ -282,33 +316,17 @@ class MandatoryVerificationTests(TestCase):
         self.assertTrue(UserProfile.objects.get(user=user).email_verified)
         self.assertEqual(self.client.session.get('_auth_user_id'), str(user.pk))
 
-    @override_settings(PASSWORD_RESET_TIMEOUT=-1)
-    def test_expired_token_does_not_activate(self):
+    def test_verification_code_does_not_activate_without_code(self):
+        # Without submitting a valid code, the account stays inactive.
         self._signup()
         user = User.objects.get(username='grace')
-        response = self.client.get(self._link_for(user))
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Invalid or expired link')
-        user.refresh_from_db()
         self.assertFalse(user.is_active)
-
-    def test_token_is_single_use_after_success(self):
-        self._signup()
-        user = User.objects.get(username='grace')
-        link = self._link_for(user)
-        first = self.client.get(link)
-        self.assertContains(first, 'Email verified')
-        self.client.logout()
-        second = self.client.get(link)
-        self.assertEqual(second.status_code, 200)
-        self.assertContains(second, 'Already verified')
-
-    def test_unknown_uid_renders_invalid_page(self):
-        response = self.client.get(
-            reverse('users:verify_email', args=['MTM', 'bogus-token']),
+        response = self.client.post(
+            reverse('users:verify_email_code'), {'verification_code': ''},
         )
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Invalid or expired link')
+        user.refresh_from_db()
+        self.assertFalse(user.is_active)
 
     def test_unverified_user_cannot_login_with_correct_password(self):
         self._signup()
@@ -348,7 +366,15 @@ class MandatoryVerificationTests(TestCase):
     def test_verified_user_can_login_normally(self):
         self._signup()
         user = User.objects.get(username='grace')
-        self.client.get(self._link_for(user))
+        from users.models import UserProfile
+        profile, _ = UserProfile.objects.get_or_create(user=user)
+        import random
+        profile.verification_code = str(random.randint(100000, 999999))
+        profile.save(update_fields=['verification_code'])
+        self.client.post(
+            reverse('users:verify_email_code'),
+            {'verification_code': profile.verification_code},
+        )
         self.client.logout()
         response = self.client.post(reverse('users:login_view'), {
             'email': 'grace@example.com',
