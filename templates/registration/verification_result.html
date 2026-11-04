@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% block title %}
-{% if state == 'success' %}{% trans 'Email Verified' %}{% elif state == 'already' %}{% trans 'Already Verified' %}{% else %}{% trans 'Invalid Link' %}{% endif %} | OnWebApp
+{% if state == 'success' %}{% trans 'Email Verified' %}{% elif state == 'already' %}{% trans 'Already Verified' %}{% else %}{% trans 'Invalid Code' %}{% endif %} | OnWebApp
 {% endblock %}
 
 {% block navbar %}{% endblock %}
@@ -68,12 +68,12 @@
         <a class="vf-btn" href="{% url 'users:login_view' %}">{% trans "Sign in" %}</a>
 
         {% else %}
-        <div class="vf-icon vf-icon--bad"><i data-lucide="link-2-off"></i></div>
-        <h1 class="vf-title">{% trans "Invalid or expired link" %}</h1>
-        <p class="vf-text">{% trans "This verification link is invalid, has expired, or was already used. Request a new one from the page below, then check your inbox again." %}</p>
-        <a class="vf-btn" href="{% url 'users:check_email' %}">{% trans "Get a new link" %}</a>
+        <div class="vf-icon vf-icon--bad"><i data-lucide="shield-x"></i></div>
+        <h1 class="vf-title">{% trans "Invalid or expired code" %}</h1>
+        <p class="vf-text">{% trans "This verification code is invalid, has expired, or was already used. Request a new code, then check your inbox again." %}</p>
+        <a class="vf-btn" href="{% url 'users:verify_email_code' %}">{% trans "Enter a code" %}</a>
         <p class="vf-foot">
-            <a class="vf-link" href="{% url 'users:login_view' %}">{% trans "Back to sign in" %}</a>
+            <a class="vf-link" href="{% url 'users:check_email' %}">{% trans "Request a new code" %}</a>
         </p>
         {% endif %}
     </div>

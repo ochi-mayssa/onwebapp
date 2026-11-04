@@ -513,38 +513,38 @@ def _get_client_ip(request):
 
 @require_http_methods(["GET", "POST"])
 def verify_email_code(request):
-    """Activate an account after entering a 6-digit verification code.
+    """Show the verification-code form and activate an account for a valid code.
 
-    The user receives a code via email and submits it here for verification.
+    The user receives a 6-digit code by email and types it into the on-site
+    form. GET without a code (or with a bad code) simply shows the form again.
     """
-    from django.contrib.auth.tokens import default_token_generator
-
-    user = None
-    code = None
-
+    code = ''
     if request.method == 'POST':
-        code = request.POST.get('verification_code', '').strip()
+        code = (request.POST.get('verification_code') or '').strip()
     else:
-        code = request.GET.get('code', '').strip()
+        code = (request.GET.get('code') or '').strip()
 
-    if code:
-        try:
-            user = User.objects.get(is_active=False, profile__verification_code=code)
-        except User.DoesNotExist:
-            user = None
+    # No code supplied yet: show the entry interface.
+    if not code:
+        return render(request, 'registration/verify_code.html')
+
+    user = (
+        User.objects.filter(is_active=False, profile__verification_code=code)
+        .order_by('-date_joined')
+        .first()
+    )
 
     if not user:
-        return render(request, 'registration/verification_result.html', {
-            'state': 'invalid',
+        messages.error(
+            request,
+            'That verification code is invalid or has expired. '
+            'Please check the code and try again.',
+        )
+        return render(request, 'registration/verify_code.html', {
+            'entered_code': code,
         })
 
     profile, _ = UserProfile.objects.get_or_create(user=user)
-    already_verified = profile.email_verified and user.is_active
-
-    if already_verified:
-        return render(request, 'registration/verification_result.html', {
-            'state': 'already',
-        })
 
     with transaction.atomic():
         user.is_active = True

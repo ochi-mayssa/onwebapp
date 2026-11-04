@@ -11,9 +11,9 @@ urlpatterns = [
     path('onboarding/', views.onboarding, name='onboarding'),
     path('login/', views.login_view, name='login_view'),
     path('logout/', views.logout_view, name='logout'),
+    # Code-based email verification. The old token-based verification URL was
+    # removed; see verify_email_code and /users/verify-email/code/.
     path('verify-email/code/', views.verify_email_code, name='verify_email_code'),
-    # Old token-based verification URL removed - code-based verification
-# is now used instead. See verify_email_code view and /users/verify-email/code/ path.
     path('dashboard/', views.dashboard, name='dashboard'),
     path('profile/', views.profile_dashboard, name='profile_dashboard'),
     path('profile/edit/', views.profile_edit, name='profile_edit'),

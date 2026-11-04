@@ -228,6 +228,46 @@ class PasswordResetEmailTests(TestCase):
 class VerifyEmailViewTests(TestCase):
     """Tests for the code-based verification view."""
 
+    def test_verification_page_renders_code_form(self):
+        response = self.client.get(reverse('users:verify_email_code'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'name="verification_code"')
+        self.assertContains(response, 'Verify email')
+
+    def test_check_email_page_renders_code_form(self):
+        response = self.client.get(reverse('users:check_email'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'name="verification_code"')
+        self.assertContains(response, 'verification code')
+
+    def test_invalid_code_rerenders_form_with_error(self):
+        response = self.client.post(
+            reverse('users:verify_email_code'),
+            {'verification_code': '000000'},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'name="verification_code"')
+        self.assertContains(response, 'invalid or has expired')
+
+    def test_get_with_valid_code_activates_account(self):
+        from users.models import UserProfile
+        import random
+
+        user = User.objects.create_user(
+            'linkuser', 'link@example.com', 'Str0ng-Passw0rd!2026',
+        )
+        profile, _ = UserProfile.objects.get_or_create(user=user)
+        code = str(random.randint(100000, 999999))
+        profile.verification_code = code
+        profile.save(update_fields=['verification_code'])
+
+        response = self.client.get(
+            reverse('users:verify_email_code'), {'code': code},
+        )
+        self.assertEqual(response.status_code, 200)
+        user.refresh_from_db()
+        self.assertTrue(user.is_active)
+
     def test_code_verification_activates_account(self):
         from users.models import UserProfile
         import random

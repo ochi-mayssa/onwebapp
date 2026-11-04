@@ -14,19 +14,31 @@ from home.emails import send_notification_email
 @shared_task
 def send_verification_email(user_id, verification_code):
     """Send the email-verification message (Celery task; also called directly)."""
+    from django.urls import reverse
+
     try:
         user = User.objects.get(id=user_id)
     except User.DoesNotExist:
         logger.error('send_verification_email: user %s does not exist', user_id)
         return 'Unknown user'
+
+    verify_page_url = (
+        f'{settings.SITE_URL.rstrip("/")}{reverse("users:verify_email_code")}'
+    )
     ok = send_notification_email(
         subject='Verify your email for OnWebApp',
         recipients=[user.email],
         template_name='emails/verify_email.html',
-        context={'user': user, 'verification_code': verification_code},
+        context={
+            'user': user,
+            'verification_code': verification_code,
+            'verify_page_url': verify_page_url,
+        },
         text_body=(
             f'Hello {user.get_short_name() or user.username},\n\n'
             f'Your 6-digit verification code is: {verification_code}\n\n'
+            f'Enter it here to activate your account:\n'
+            f'{verify_page_url}\n\n'
             f'If you did not create this account, you can ignore this message.\n\n'
             f'OnWebApp\n'
         ),

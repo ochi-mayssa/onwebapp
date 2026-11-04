@@ -20,13 +20,15 @@ emails that do not appear in the Resend dashboard.
    protected, throttled to one attempt per address per 60 seconds).
    - Every response is **generic** ("If an account exists for this
    address...") so the endpoint cannot be used to discover accounts.
-3. **Enter verification code**
-   - The email displays a 6-digit code and a form to submit it.
-   - The form posts to `/users/verify-email/code/` with the code as a
-   field.
+3. **Enter verification code** (`/users/verify-email/code/`)
+   - The email displays a 6-digit code and links to the verification page.
+   - The on-site page (`registration/verify_code.html`) has a form where the
+     user types the code. The same form is also shown on the check-email page.
+   - The form posts the code to `/users/verify-email/code/`.
    - On success: activates the account, sets `profile.email_verified`,
    logs the activity, signs the user in, and renders the success page.
    The code is single-use (cleared from the profile after verification).
+   - An invalid/expired code re-renders the form with an error message.
 4. **Sign in** (`/users/login/`)
    - Inactive accounts are rejected by Django's `ModelBackend` server-side
    (correct password + inactive = "pending verification" hint; wrong
