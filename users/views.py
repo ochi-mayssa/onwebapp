@@ -306,18 +306,20 @@ def api_requests_list(request):
 
 
 def _verification_url(user):
-    """Absolute, SITE_URL-based (HTTPS in production) verification link."""
-    from django.utils.http import urlsafe_base64_encode
-    from django.utils.encoding import force_bytes
-    from django.contrib.auth.tokens import default_token_generator
-    uid = urlsafe_base64_encode(force_bytes(user.pk))
-    token = default_token_generator.make_token(user)
-    path = reverse('users:verify_email', args=[uid, token])
-    return f'{settings.SITE_URL.rstrip("/")}{path}'
+    """Generate a 6-digit verification code and store it in the user profile.
+
+    Returns the code so it can be included in the email body.
+    """
+    from django.utils.crypto import get_random_string
+    code = get_random_string(length=6, allowed_chars='0123456789')
+    profile, _ = UserProfile.objects.get_or_create(user=user)
+    profile.verification_code = code
+    profile.save(update_fields=['verification_code'])
+    return code
 
 
-def _send_verification_now(user, verify_url):
-    """Send the verification email synchronously and report the true outcome.
+def _send_verification_now(user, verification_code):
+    """Send the verification email with the 6-digit code and report the true outcome.
 
     The current deployment has no Celery worker; sending in-process keeps the
     result visible to the registration/resend responses (failures are logged
@@ -325,7 +327,7 @@ def _send_verification_now(user, verify_url):
     """
     from .tasks import send_verification_email
     try:
-        result = send_verification_email(user.id, verify_url)
+        result = send_verification_email(user.id, verification_code)
     except Exception:
         logger.exception('Verification email failed for user %s', user.id)
         return False
@@ -368,12 +370,11 @@ def signup(request):
                 logger.exception('Could not dispatch ERP provisioning for user %s', user.id)
 
             if settings.EMAIL_VERIFICATION_REQUIRED:
-                verify_url = _verification_url(user)
-                if _send_verification_now(user, verify_url):
+                verification_code = _verification_url(user)
+                if _send_verification_now(user, verification_code):
                     messages.success(
                         request,
-                        'Almost there! Check your inbox for a verification link '
-                        'to activate your account.',
+                        'Check your inbox for a verification code to activate your account.',
                     )
                 else:
                     messages.error(
@@ -440,8 +441,8 @@ def resend_verification(request):
     if user:
         profile, _ = UserProfile.objects.get_or_create(user=user)
         if not profile.email_verified:
-            verify_url = _verification_url(user)
-            if not _send_verification_now(user, verify_url):
+            verification_code = _verification_url(user)
+            if not _send_verification_now(user, verification_code):
                 logger.error(
                     'Resend verification email failed for user %s', user.id,
                 )
@@ -510,27 +511,27 @@ def _get_client_ip(request):
     return request.META.get('REMOTE_ADDR')
 
 
-@require_http_methods(["GET"])
-def verify_email(request, uidb64, token):
-    """Activate an account after secure token validation.
+@require_http_methods(["GET", "POST"])
+def verify_email_code(request):
+    """Activate an account after entering a 6-digit verification code.
 
-    The token (Django's default generator) is time-limited and binds to the
-    user's password + last login: logging the user in here invalidates it, so
-    a link cannot be used twice. A user id alone never activates anything.
+    The user receives a code via email and submits it here for verification.
     """
-    from django.utils.http import urlsafe_base64_decode
-    from django.utils.encoding import force_str
     from django.contrib.auth.tokens import default_token_generator
 
     user = None
-    try:
-        uid = force_str(urlsafe_base64_decode(uidb64))
-        if uid.isdigit():
-            user = User.objects.filter(pk=uid).first()
-    except Exception:
-        user = None
+    code = None
 
-    token_valid = bool(user and default_token_generator.check_token(user, token))
+    if request.method == 'POST':
+        code = request.POST.get('verification_code', '').strip()
+    else:
+        code = request.GET.get('code', '').strip()
+
+    if code:
+        try:
+            user = User.objects.get(is_active=False, profile__verification_code=code)
+        except User.DoesNotExist:
+            user = None
 
     if not user:
         return render(request, 'registration/verification_result.html', {
@@ -539,15 +540,6 @@ def verify_email(request, uidb64, token):
 
     profile, _ = UserProfile.objects.get_or_create(user=user)
     already_verified = profile.email_verified and user.is_active
-
-    if not token_valid:
-        if already_verified:
-            return render(request, 'registration/verification_result.html', {
-                'state': 'already',
-            })
-        return render(request, 'registration/verification_result.html', {
-            'state': 'invalid',
-        })
 
     if already_verified:
         return render(request, 'registration/verification_result.html', {
@@ -558,7 +550,8 @@ def verify_email(request, uidb64, token):
         user.is_active = True
         user.save(update_fields=['is_active'])
         profile.email_verified = True
-        profile.save(update_fields=['email_verified'])
+        profile.verification_code = None
+        profile.save(update_fields=['email_verified', 'verification_code'])
 
     ActivityLog.objects.create(
         user=user, action='email_verified',
@@ -575,6 +568,10 @@ def verify_email(request, uidb64, token):
         'state': 'success',
         'next_url': next_url,
     })
+
+
+# The old verify_email view has been replaced by verify_email_code for
+# code-based verification. The urlpattern for it has also been removed.
 
 
 # Fields grouped by the wizard step that renders them. Used to reopen the

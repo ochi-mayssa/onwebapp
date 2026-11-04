@@ -12,7 +12,7 @@ from django.conf import settings
 from home.emails import send_notification_email
 
 @shared_task
-def send_verification_email(user_id, verify_url):
+def send_verification_email(user_id, verification_code):
     """Send the email-verification message (Celery task; also called directly)."""
     try:
         user = User.objects.get(id=user_id)
@@ -23,11 +23,10 @@ def send_verification_email(user_id, verify_url):
         subject='Verify your email for OnWebApp',
         recipients=[user.email],
         template_name='emails/verify_email.html',
-        context={'user': user, 'verify_url': verify_url},
+        context={'user': user, 'verification_code': verification_code},
         text_body=(
             f'Hello {user.get_short_name() or user.username},\n\n'
-            f'Please verify your email address by opening the link below:\n'
-            f'{verify_url}\n\n'
+            f'Your 6-digit verification code is: {verification_code}\n\n'
             f'If you did not create this account, you can ignore this message.\n\n'
             f'OnWebApp\n'
         ),

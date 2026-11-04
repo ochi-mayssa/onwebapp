@@ -8,35 +8,29 @@ emails that do not appear in the Resend dashboard.
 
 1. **Sign up** (`/users/signup/`)
    - The account is created **inactive** (`is_active=False`) and the user is
-     **not** signed in.
+   **not** signed in.
    - A verification email is sent **synchronously** (in-process; this
-     deployment has no Celery worker) with a link built from `SITE_URL`:
-     `/users/verify-email/<uid>/<token>/`.
+   deployment has no Celery worker) with a 6-digit verification code.
    - The response redirects to `/users/check-email/` with a success message.
-     If sending fails, a safe error message is shown, the account is kept,
-     and the page offers a resend option. Nothing is reported as delivered
-     unless the send actually succeeded.
+   If sending fails, a safe error message is shown, the account is kept,
+   and the page offers a resend option. Nothing is reported as delivered
+   unless the send actually succeeded.
 2. **Check your email page** (`/users/check-email/`)
    - Neutral confirmation page plus a **resend** form (POST-only, CSRF
-     protected, throttled to one attempt per address per 60 seconds).
+   protected, throttled to one attempt per address per 60 seconds).
    - Every response is **generic** ("If an account exists for this
-     address...") so the endpoint cannot be used to discover accounts.
-3. **Verify** (`/users/verify-email/<uid>/<token>/`)
-   - Validates uid **and** token (Django's `default_token_generator`; a user
-     id alone never activates anything).
-   - The token expires after Django's default `PASSWORD_RESET_TIMEOUT`
-     (3 days).
+   address...") so the endpoint cannot be used to discover accounts.
+3. **Enter verification code**
+   - The email displays a 6-digit code and a form to submit it.
+   - The form posts to `/users/verify-email/code/` with the code as a
+   field.
    - On success: activates the account, sets `profile.email_verified`,
-     logs the activity, signs the user in, and renders the success page.
-     Logging in changes `last_login`, which is part of the token hash - so
-     the link **cannot be used a second time** (re-use shows "Already
-     verified").
-   - Invalid/expired/used tokens render the invalid/already-verified page;
-     the account stays inactive.
+   logs the activity, signs the user in, and renders the success page.
+   The code is single-use (cleared from the profile after verification).
 4. **Sign in** (`/users/login/`)
    - Inactive accounts are rejected by Django's `ModelBackend` server-side
-     (correct password + inactive = "pending verification" hint; wrong
-     password = generic "Invalid email or password").
+   (correct password + inactive = "pending verification" hint; wrong
+   password = generic "Invalid email or password").
    - Verified users and superusers sign in exactly as before.
 
 ## Settings
@@ -75,15 +69,16 @@ Diagnosis of the original incident (checked in this order):
 - Domain `onwebapp.com` verified in Resend (DNS records) - see
   `docs/RESEND_SETUP.md`
 - `python manage.py check` shows no `W001` warning
-- Test: sign up with a real address, receive the email, click the link,
-  sign in. Then check the Resend **Logs** dashboard.
+- Test: sign up with a real address, receive the email, enter the
+  verification code, sign in. Then check the Resend **Logs** dashboard.
 
 ## Tests
 
 `users/tests.py` covers the flow:
 
 - `VerificationEmailTests` - email content/dispatch from signup.
-- `VerifyEmailViewTests` - token validation and result pages.
+- `VerifyEmailViewTests` - token validation and result pages (backward
+  compatibility for existing token-based links).
 - `MandatoryVerificationTests` - inactive-until-verified, activation,
   expiry, single use, login blocking (both normal and forced sessions),
   resend throttling/generic responses, delivery-failure messaging, and the

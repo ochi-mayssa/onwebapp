@@ -107,7 +107,8 @@ class VerificationEmailTests(TestCase):
 
         user = User.objects.create_user('grace', 'grace@example.com', self.PASSWORD)
         mail.outbox.clear()
-        result = send_verification_email(user.id, 'http://testserver/users/verify-email/uid/token/')
+        code = '123456'
+        result = send_verification_email(user.id, code)
         self.assertEqual(result, 'Email sent')
 
         messages = [m for m in mail.outbox if 'Verify your email' in m.subject]
@@ -115,17 +116,17 @@ class VerificationEmailTests(TestCase):
         message = messages[0]
         self.assertEqual(message.subject, 'Verify your email for OnWebApp')
         self.assertIn('grace@example.com', message.to)
-        self.assertIn('/users/verify-email/', message.body)
+        self.assertIn(code, message.body)
         self.assertTrue(message.alternatives)
         self.assertEqual(message.alternatives[0][1], 'text/html')
-        self.assertIn('/users/verify-email/', message.alternatives[0][0])
+        self.assertIn(code, message.alternatives[0][0])
         self.assertNotIn('AutomationIQ', message.subject)
         self.assertNotIn('AutomationIQ', message.alternatives[0][0])
 
     def test_send_verification_email_unknown_user(self):
         from .tasks import send_verification_email
 
-        self.assertEqual(send_verification_email(999999, 'http://x/'), 'Unknown user')
+        self.assertEqual(send_verification_email(999999, '123456'), 'Unknown user')
 
     def test_signup_sends_verification_email_synchronously(self):
         with mock.patch('users.tasks.send_verification_email') as task:
@@ -140,10 +141,10 @@ class VerificationEmailTests(TestCase):
             self.assertEqual(response.url, reverse('users:check_email'))
             # Sent in-process (no Celery worker) — available immediately.
             self.assertTrue(task.called, 'verification task was not dispatched')
-            user_id, verify_url = task.call_args[0]
+            user_id, verification_code = task.call_args[0]
             self.assertEqual(user_id, User.objects.get(username='grace').pk)
-            self.assertIn('/users/verify-email/', verify_url)
-            self.assertTrue(verify_url.startswith(settings.SITE_URL))
+            self.assertEqual(len(verification_code), 6)
+            self.assertTrue(verification_code.isdigit())
 
 
 class PasswordResetEmailTests(TestCase):
@@ -188,34 +189,26 @@ class PasswordResetEmailTests(TestCase):
 
 
 class VerifyEmailViewTests(TestCase):
-    """verify-email validates uid+token and renders the result page (namespaced URLs)."""
+    """Tests for the code-based verification view."""
 
-    def _link_for(self, user):
-        from django.contrib.auth.tokens import default_token_generator
-        from django.utils.http import urlsafe_base64_encode
-        from django.utils.encoding import force_bytes
+    def test_code_verification_activates_account(self):
+        from users.models import UserProfile
+        import random
 
-        uid = urlsafe_base64_encode(force_bytes(user.pk))
-        token = default_token_generator.make_token(user)
-        return reverse('users:verify_email', args=[uid, token])
+        user = User.objects.create_user('testuser', 'test@example.com', 'Str0ng-Passw0rd!2026')
+        profile, _ = UserProfile.objects.get_or_create(user=user)
+        code = str(random.randint(100000, 999999))
+        profile.verification_code = code
+        profile.save(update_fields=['verification_code'])
 
-    def test_invalid_token_renders_invalid_page_without_error(self):
-        response = self.client.get(
-            reverse('users:verify_email', args=['MTM', 'bogus-token']),
+        # Submit the code
+        response = self.client.post(
+            reverse('users:verify_email_code'),
+            {'verification_code': code}
         )
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Invalid or expired link')
-
-    def test_valid_token_verifies_and_renders_success(self):
-        user = User.objects.create_user('ada', 'ada@example.com', 'Str0ng-Passw0rd!2026')
-        response = self.client.get(self._link_for(user))
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Email verified')
-        self.assertEqual(response.context['next_url'], reverse('users:onboarding'))
-        from users.models import UserProfile
-        self.assertTrue(UserProfile.objects.get(user=user).email_verified)
-        # Verified and signed in automatically.
-        self.assertEqual(self.client.session.get('_auth_user_id'), str(user.pk))
+        user.refresh_from_db()
+        self.assertTrue(user.is_active)
 
 
 class MandatoryVerificationTests(TestCase):
@@ -234,15 +227,6 @@ class MandatoryVerificationTests(TestCase):
             'password2': self.PASSWORD,
         })
 
-    def _link_for(self, user):
-        from django.contrib.auth.tokens import default_token_generator
-        from django.utils.http import urlsafe_base64_encode
-        from django.utils.encoding import force_bytes
-
-        uid = urlsafe_base64_encode(force_bytes(user.pk))
-        token = default_token_generator.make_token(user)
-        return reverse('users:verify_email', args=[uid, token])
-
     def test_signup_creates_pending_inactive_account_without_login(self):
         response = self._signup()
         self.assertEqual(response.status_code, 302)
@@ -251,24 +235,45 @@ class MandatoryVerificationTests(TestCase):
         self.assertFalse(user.is_active)
         self.assertNotIn('_auth_user_id', self.client.session)
 
-    def test_signup_sends_verification_email_with_site_url_link(self):
+    def test_signup_sends_verification_email_with_site_url_code(self):
         mail.outbox.clear()
         response = self._signup()
         self.assertEqual(response.status_code, 302)
         messages = [m for m in mail.outbox if 'Verify your email' in m.subject]
         self.assertEqual(len(messages), 1)
+        # The code should appear in the email body (not a /users/verify-email/ link)
         body = messages[0].body + messages[0].alternatives[0][0]
-        self.assertIn('/users/verify-email/', body)
+        self.assertNotIn('/users/verify-email/', body)
         self.assertTrue(
             settings.SITE_URL.rstrip('/') in body,
-            'verification link must be built from SITE_URL',
+            'verification code email must reference SITE_URL',
         )
         self.assertIn('grace@example.com', messages[0].to)
+        # Check that a 6-digit code appears in the body
+        import re
+        codes = re.findall(r'\b\d{6}\b', body)
+        self.assertTrue(len(codes) > 0, 'Email should contain a 6-digit verification code')
 
-    def test_verification_link_activates_account_and_signs_in(self):
+    def test_verification_code_activates_account_and_signs_in(self):
         self._signup()
         user = User.objects.get(username='grace')
-        response = self.client.get(self._link_for(user))
+        # Generate and store a verification code
+        from users.models import UserProfile
+        profile, _ = UserProfile.objects.get_or_create(user=user)
+        import random
+        code = str(random.randint(100000, 999999))
+        profile.verification_code = code
+        profile.save(update_fields=['verification_code'])
+        # Submit the code via POST to the new verification code endpoint
+        response = self.client.post(
+            reverse('users:verify_email_code'),
+            {'verification_code': code}
+        )
+        self.assertEqual(response.status_code, 200)
+        # Check the user is now active and logged in
+        user.refresh_from_db()
+        self.assertTrue(user.is_active)
+        self.assertEqual(self.client.session.get('_auth_user_id'), str(user.pk))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Email verified')
         user.refresh_from_db()
