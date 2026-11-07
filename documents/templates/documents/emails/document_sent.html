@@ -1,0 +1,160 @@
+{% load humanize %}<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <title>{{ document.doc_type.name }} {{ document.reference }}</title>
+    <style>
+        body { margin: 0; padding: 0; background: #EEF2F7; font-family: Helvetica, Arial, sans-serif; color: #0F172A; -webkit-font-smoothing: antialiased; }
+        table { border-collapse: collapse; }
+        a { color: #4F46E5; }
+        .wrapper { width: 100%; background: #EEF2F7; padding: 28px 12px; }
+        .card { max-width: 640px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 12px 40px rgba(15,23,42,.10); }
+        .accent { height: 6px; background: {{ company.accent_color|default:'#4F46E5' }}; }
+        .pad { padding: 30px 34px; }
+        .brand { font-size: 20px; font-weight: 800; letter-spacing: -.01em; }
+        .brand small { display: block; font-size: 11px; font-weight: 400; color: #64748B; margin-top: 2px; }
+        .kicker { font-size: 11px; letter-spacing: .09em; text-transform: uppercase; color: #94A3B8; font-weight: 700; }
+        h1 { font-size: 22px; line-height: 1.25; margin: 6px 0 10px; font-weight: 800; }
+        p { font-size: 14px; line-height: 1.65; color: #475569; margin: 0 0 14px; }
+        .summary { width: 100%; margin: 18px 0 22px; border: 1px solid #E2E8F0; border-radius: 10px; overflow: hidden; }
+        .summary td { padding: 11px 14px; font-size: 13px; border-bottom: 1px solid #E2E8F0; vertical-align: top; }
+        .summary tr:last-child td { border-bottom: 0; }
+        .summary td.label { color: #64748B; width: 42%; }
+        .summary td.value { color: #0F172A; font-weight: 700; text-align: right; }
+        .summary tr.total td { background: #F8FAFC; font-size: 15px; }
+        .btn { display: inline-block; background: {{ company.accent_color|default:'#4F46E5' }}; color: #ffffff !important; text-decoration: none; font-weight: 700; font-size: 14px; padding: 13px 26px; border-radius: 9px; }
+        .btn-wrap { text-align: center; margin: 24px 0; }
+        .link-box { background: #F8FAFC; border: 1px dashed #CBD5E1; border-radius: 9px; padding: 12px 14px; margin: 0 0 18px; word-break: break-all; font-size: 12px; color: #475569; }
+        .notice { background: #EFF6FF; border-left: 3px solid {{ company.accent_color|default:'#4F46E5' }}; border-radius: 4px; padding: 12px 14px; font-size: 12.5px; line-height: 1.6; color: #334155; margin: 0 0 18px; }
+        .terms { font-size: 12.5px; line-height: 1.7; color: #475569; background: #F8FAFC; border-radius: 9px; padding: 14px 16px; margin: 0 0 18px; }
+        .signature { border-top: 1px solid #E2E8F0; margin-top: 26px; padding-top: 20px; }
+        .signature img.sig { max-height: 58px; max-width: 220px; display: block; margin-bottom: 8px; }
+        .signature img.stamp { max-height: 84px; max-width: 84px; }
+        .signature .name { font-weight: 700; font-size: 14px; color: #0F172A; }
+        .signature .role { font-size: 12px; color: #64748B; }
+        .footer { max-width: 640px; margin: 18px auto 0; text-align: center; font-size: 11px; line-height: 1.6; color: #94A3B8; padding: 0 12px; }
+        .footer a { color: #94A3B8; }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <div class="card">
+        <div class="accent"></div>
+        <div class="pad">
+            <table width="100%" role="presentation">
+                <tr>
+                    <td>
+                        <div class="brand">{{ company.company_name|default:'OnWebApp' }}<small>{{ company.company_legal_name|default:company.company_website|default:'' }}</small></div>
+                    </td>
+                    <td align="right">
+                        <div class="kicker">{{ document.doc_type.name }}</div>
+                        <div style="font-size:13px;font-weight:700;color:{{ company.accent_color|default:'#4F46E5' }};">{{ document.reference }}</div>
+                    </td>
+                </tr>
+            </table>
+
+            <h1>{% if requires_signature %}Please review and sign {{ document.doc_type.name|lower }} {{ document.reference }}{% elif is_quote %}Your {{ document.doc_type.name|lower }} {{ document.reference }} is ready{% else %}{{ document.doc_type.name }} {{ document.reference }} from {{ company.company_name|default:'OnWebApp' }}{% endif %}</h1>
+            <p>Dear {{ client_name }},</p>
+            <p>
+                Please find your {{ document.doc_type.name|lower }} attached to this email as a PDF.
+                {% if document.due_date %}It is due on <strong>{{ document.due_date|date:"d M Y" }}</strong>.{% endif %}
+            </p>
+
+            <table class="summary" role="presentation">
+                <tr>
+                    <td class="label">Reference</td>
+                    <td class="value">{{ document.reference }}</td>
+                </tr>
+                <tr>
+                    <td class="label">Issue date</td>
+                    <td class="value">{{ document.issue_date|date:"d M Y" }}</td>
+                </tr>
+                {% if document.due_date %}
+                <tr>
+                    <td class="label">Due date</td>
+                    <td class="value">{{ document.due_date|date:"d M Y" }}</td>
+                </tr>
+                {% endif %}
+                {% if document.valid_until %}
+                <tr>
+                    <td class="label">Valid until</td>
+                    <td class="value">{{ document.valid_until|date:"d M Y" }}</td>
+                </tr>
+                {% endif %}
+                <tr class="total">
+                    <td class="label">Total</td>
+                    <td class="value">{{ amount }}</td>
+                </tr>
+            </table>
+
+            <div class="btn-wrap">
+                <a class="btn" href="{{ link }}">View &amp; download document</a>
+            </div>
+            <div class="link-box">{{ link }}</div>
+
+            {% if requires_signature %}
+            <div class="notice">
+                <strong>Electronic signature required.</strong>
+                This contract is not executed until you sign it. Open the link above, review the document,
+                then sign electronically. Your name, email, IP address, the document version and a timestamp
+                are recorded in the audit trail.
+            </div>
+            {% elif is_quote %}
+            <div class="notice">
+                <strong>Your decision.</strong>
+                You can accept or reject this {{ document.doc_type.name|lower }} directly from the link above.
+                Your response is recorded with a timestamp.
+            </div>
+            {% endif %}
+
+            {% if company.default_payment_terms %}
+            <div class="terms">
+                <strong style="color:#0F172A;">Payment terms</strong><br>
+                {{ company.default_payment_terms|linebreaksbr }}
+                {% if company.bank_details %}<br><br><strong style="color:#0F172A;">Payment details</strong><br>{{ company.bank_details|linebreaksbr }}{% endif %}
+            </div>
+            {% elif company.bank_details %}
+            <div class="terms">
+                <strong style="color:#0F172A;">Payment details</strong><br>
+                {{ company.bank_details|linebreaksbr }}
+            </div>
+            {% endif %}
+
+            <p>If you have any questions about this document, simply reply to this email.</p>
+
+            <div class="signature">
+                <table width="100%" role="presentation">
+                    <tr>
+                        <td valign="bottom" style="width:62%;">
+                            {% if has_signature %}<img class="sig" src="cid:document-signature" alt="Company signature">{% endif %}
+                            <div class="name">{{ company.signatory_name|default:company.company_name|default:'OnWebApp' }}</div>
+                            <div class="role">{{ company.signatory_position|default:'' }}</div>
+                            <div class="role">{{ company.company_name|default:'OnWebApp' }}</div>
+                        </td>
+                        <td valign="bottom" align="right" style="width:38%;">
+                            {% if has_stamp %}<img class="stamp" src="cid:document-stamp" alt="Company stamp">{% endif %}
+                        </td>
+                    </tr>
+                </table>
+                <p style="font-size:10.5px;line-height:1.6;color:#94A3B8;margin:16px 0 0;">
+                    The company signature and stamp shown above are authorized company assets applied by an
+                    administrator. They are not a client electronic signature and do not by themselves execute
+                    a contract.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        {{ company.company_name|default:'OnWebApp' }}
+        {% if company.company_address %} &middot; {{ company.company_address|linebreaksbr }}{% endif %}
+        {% if company.company_email %} &middot; {{ company.company_email }}{% endif %}
+        {% if company.company_phone %} &middot; {{ company.company_phone }}{% endif %}
+        {% if company.company_website %}<br><a href="{{ company.company_website }}">{{ company.company_website }}</a>{% endif %}
+        <br>This link is private and expires automatically. If you were not expecting this email, you can ignore it.
+    </div>
+</div>
+</body>
+</html>

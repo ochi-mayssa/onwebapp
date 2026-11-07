@@ -47,7 +47,7 @@
 </section>
 
 <!-- WHAT CAN YOU DO -->
-<section class="ax-sec ax-sec--soft">
+<section class="ax-sec ax-sec--soft" id="capabilities">
     <div class="wrap">
         <div class="ax-center">
             <span class="ax-label ax-label--indigo">{% trans "Capabilities" %}</span>
@@ -59,6 +59,7 @@
                 <div class="ax-card__media">
                     <img src="{% static 'img/websiteautomation.png' %}" alt="{% trans 'Operator monitoring automation dashboards across multiple screens' %}" loading="lazy">
                     <div class="ax-card__media-shade"></div>
+                    <span class="cap-card__num">01</span>
                     <h3 class="ax-card__media-title">{% trans "Website Automation" %}</h3>
                 </div>
                 <ul class="ax-list ax-list--media">
@@ -73,6 +74,7 @@
                 <div class="ax-card__media">
                     <img src="{% static 'img/entreprise.png' %}" alt="{% trans 'Professional interacting with holographic enterprise dashboards' %}" loading="lazy">
                     <div class="ax-card__media-shade"></div>
+                    <span class="cap-card__num">02</span>
                     <h3 class="ax-card__media-title">{% trans "Enterprise Automation" %}</h3>
                 </div>
                 <ul class="ax-list ax-list--media">
@@ -95,53 +97,77 @@
             <p class="ax-lead ax-lead--wide">{% trans "Automate repetitive activities performed through web browsers and website interfaces." %}</p>
         </div>
         <div class="ax-grid ax-grid--2">
-            <div class="ax-card">
-                <div class="ax-card__media"><img src="{% static 'img/front.png' %}" alt="{% trans 'Front-end and UI automation illustration' %}" loading="lazy"></div>
-                <h3 class="ax-card__title">{% trans "Front-End and UI Automation" %}</h3>
-                <ul class="ax-n-list">
-                    <li>{% trans "Simulate mouse and keyboard interactions." %}</li>
-                    <li>{% trans "Automate repetitive tasks in browser-based applications." %}</li>
-                    <li>{% trans "Execute predefined customer journeys." %}</li>
-                    <li>{% trans "Run workflows that follow specific business rules." %}</li>
-                </ul>
-                <div class="ax-ex"><strong>{% trans "Practical example:" %}</strong> {% trans "Automatically log into a portal, enter information, and submit a form according to a predefined workflow." %}</div>
-            </div>
-            <div class="ax-card">
-                <div class="ax-card__media"><img src="{% static 'img/ext.png' %}" alt="{% trans 'Web data extraction illustration' %}" loading="lazy"></div>
-                <h3 class="ax-card__title">{% trans "Web Data Extraction" %}</h3>
-                <p class="ax-card__body">{% trans "Collect information from websites and transform it into structured data for analysis." %}</p>
-                <ul class="ax-n-list">
-                    <li>{% trans "Competitor price monitoring." %}</li>
-                    <li>{% trans "Market and product research." %}</li>
-                    <li>{% trans "Review and listing collection." %}</li>
-                    <li>{% trans "News aggregation and data consolidation." %}</li>
-                </ul>
-                <div class="ax-ex"><strong>{% trans "Practical example:" %}</strong> {% trans "Collect competitor product prices from several websites and consolidate the results into a business dashboard." %}</div>
-            </div>
-            <div class="ax-card">
-                <div class="ax-card__media"><img src="{% static 'img/websitemo.png' %}" alt="{% trans 'Website monitoring illustration' %}" loading="lazy"></div>
-                <h3 class="ax-card__title">{% trans "Website Monitoring" %}</h3>
-                <p class="ax-card__body">{% trans "Monitor website health and identify issues without relying entirely on manual checks." %}</p>
-                <ul class="ax-n-list">
-                    <li>{% trans "Website uptime monitoring." %}</li>
-                    <li>{% trans "Page speed and performance checks." %}</li>
-                    <li>{% trans "Content changes and missing pages." %}</li>
-                    <li>{% trans "Broken and outdated link detection." %}</li>
-                    <li>{% trans "Automated alerts when issues arise." %}</li>
-                </ul>
-                <div class="ax-ex"><strong>{% trans "Practical example:" %}</strong> {% trans "Run a checkout test every hour and alert the support team if the checkout process fails or becomes unusually slow." %}</div>
-            </div>
-            <div class="ax-card">
-                <div class="ax-card__media"><img src="{% static 'img/testt.png' %}" alt="{% trans 'Website testing automation illustration' %}" loading="lazy"></div>
-                <h3 class="ax-card__title">{% trans "Website Testing Automation" %}</h3>
-                <p class="ax-card__body">{% trans "Automate repeatable website checks to help identify functional problems and regressions." %}</p>
-                <ul class="ax-n-list">
-                    <li>{% trans "Test essential user journeys." %}</li>
-                    <li>{% trans "Validate forms and navigation." %}</li>
-                    <li>{% trans "Check critical website functionality." %}</li>
-                    <li>{% trans "Schedule recurring tests and report failures." %}</li>
-                </ul>
-            </div>
+            <article class="ax-card ax-card--media wa-card">
+                <div class="ax-card__media">
+                    <img src="{% static 'img/front.png' %}" alt="{% trans 'Front-end and UI automation illustration' %}" loading="lazy">
+                    <div class="ax-card__media-shade"></div>
+                    <span class="wa-card__num">01</span>
+                    <h3 class="ax-card__media-title">{% trans "Front-End and UI Automation" %}</h3>
+                </div>
+                <div class="wa-card__body">
+                    <ul class="ax-n-list">
+                        <li>{% trans "Simulate mouse and keyboard interactions." %}</li>
+                        <li>{% trans "Automate repetitive tasks in browser-based applications." %}</li>
+                        <li>{% trans "Execute predefined customer journeys." %}</li>
+                        <li>{% trans "Run workflows that follow specific business rules." %}</li>
+                    </ul>
+                    <div class="ax-ex"><strong>{% trans "Practical example:" %}</strong> {% trans "Automatically log into a portal, enter information, and submit a form according to a predefined workflow." %}</div>
+                </div>
+            </article>
+            <article class="ax-card ax-card--media wa-card">
+                <div class="ax-card__media">
+                    <img src="{% static 'img/ext.png' %}" alt="{% trans 'Web data extraction illustration' %}" loading="lazy">
+                    <div class="ax-card__media-shade"></div>
+                    <span class="wa-card__num">02</span>
+                    <h3 class="ax-card__media-title">{% trans "Web Data Extraction" %}</h3>
+                </div>
+                <div class="wa-card__body">
+                    <p class="ax-card__body">{% trans "Collect information from websites and transform it into structured data for analysis." %}</p>
+                    <ul class="ax-n-list">
+                        <li>{% trans "Competitor price monitoring." %}</li>
+                        <li>{% trans "Market and product research." %}</li>
+                        <li>{% trans "Review and listing collection." %}</li>
+                        <li>{% trans "News aggregation and data consolidation." %}</li>
+                    </ul>
+                    <div class="ax-ex"><strong>{% trans "Practical example:" %}</strong> {% trans "Collect competitor product prices from several websites and consolidate the results into a business dashboard." %}</div>
+                </div>
+            </article>
+            <article class="ax-card ax-card--media wa-card">
+                <div class="ax-card__media">
+                    <img src="{% static 'img/websitemo.png' %}" alt="{% trans 'Website monitoring illustration' %}" loading="lazy">
+                    <div class="ax-card__media-shade"></div>
+                    <span class="wa-card__num">03</span>
+                    <h3 class="ax-card__media-title">{% trans "Website Monitoring" %}</h3>
+                </div>
+                <div class="wa-card__body">
+                    <p class="ax-card__body">{% trans "Monitor website health and identify issues without relying entirely on manual checks." %}</p>
+                    <ul class="ax-n-list">
+                        <li>{% trans "Website uptime monitoring." %}</li>
+                        <li>{% trans "Page speed and performance checks." %}</li>
+                        <li>{% trans "Content changes and missing pages." %}</li>
+                        <li>{% trans "Broken and outdated link detection." %}</li>
+                        <li>{% trans "Automated alerts when issues arise." %}</li>
+                    </ul>
+                    <div class="ax-ex"><strong>{% trans "Practical example:" %}</strong> {% trans "Run a checkout test every hour and alert the support team if the checkout process fails or becomes unusually slow." %}</div>
+                </div>
+            </article>
+            <article class="ax-card ax-card--media wa-card">
+                <div class="ax-card__media">
+                    <img src="{% static 'img/testt.png' %}" alt="{% trans 'Website testing automation illustration' %}" loading="lazy">
+                    <div class="ax-card__media-shade"></div>
+                    <span class="wa-card__num">04</span>
+                    <h3 class="ax-card__media-title">{% trans "Website Testing Automation" %}</h3>
+                </div>
+                <div class="wa-card__body">
+                    <p class="ax-card__body">{% trans "Automate repeatable website checks to help identify functional problems and regressions." %}</p>
+                    <ul class="ax-n-list">
+                        <li>{% trans "Test essential user journeys." %}</li>
+                        <li>{% trans "Validate forms and navigation." %}</li>
+                        <li>{% trans "Check critical website functionality." %}</li>
+                        <li>{% trans "Schedule recurring tests and report failures." %}</li>
+                    </ul>
+                </div>
+            </article>
         </div>
         <div class="ax-cta-center">
             <a href="{% url 'home:website_automation' %}" class="ax-btn ax-btn--outline">{% trans "Explore Website Automation" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
@@ -557,9 +583,59 @@
         .ax-chal-h{margin-top:2.25rem}
     }
 
-    /* ---- Design: #website-automation (ax-grid--2 cards) + #enterprise-automation (ax-feat card grid) ---- */
-    /* Browser cards: shared 200px media, full-bleed at the card top */
-    #website-automation .ax-card__media{margin:-1.75rem -1.75rem 1.15rem;border-radius:14px 14px 0 0}
+    /* ---- Design: #website-automation (editorial capability cards) + #enterprise-automation (ax-feat card grid) ---- */
+    /* Website Automation: crisp white cards on the tinted canvas */
+    #website-automation .ax-grid--2{gap:1.5rem}
+    #website-automation .ax-card.ax-card--media{
+        background:#fff;border:1px solid rgba(15,23,42,.07);border-radius:18px;
+        box-shadow:0 12px 32px rgba(15,23,42,.06);
+    }
+    #website-automation .ax-card.ax-card--media:hover{
+        border-color:rgba(124,58,237,.3);
+        box-shadow:0 24px 52px rgba(15,23,42,.14);
+    }
+    /* Compact media banner with a numbered chip */
+    #website-automation .ax-card__media{height:185px;margin:0;border-radius:0}
+    #website-automation .ax-card__media-shade{background:linear-gradient(to top,rgba(15,23,42,.82) 0%,rgba(15,23,42,.2) 58%,rgba(15,23,42,.02) 100%)}
+    #website-automation .ax-card__media-title{left:1.4rem;right:1.4rem;bottom:1.1rem;font-size:1.18rem}
+    #website-automation .wa-card__num{
+        position:absolute;top:1rem;left:1.4rem;z-index:2;
+        display:inline-flex;align-items:center;justify-content:center;
+        min-width:36px;height:36px;padding:0 .6rem;border-radius:50px;
+        background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.38);
+        -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+        font-family:'Fraunces',Georgia,serif;font-size:.85rem;font-weight:600;color:#fff;letter-spacing:.04em;
+    }
+    /* Evenly padded, bottom-aligned card body */
+    #website-automation .wa-card__body{padding:1.5rem 1.6rem 1.7rem;display:flex;flex-direction:column;flex:1}
+    #website-automation .wa-card__body .ax-card__body{margin:0 0 .9rem}
+    #website-automation .wa-card__body .ax-n-list{margin-top:0}
+    #website-automation .wa-card__body .ax-ex{margin-top:auto}
+
+    /* ---- Design: #capabilities (same white editorial cards as Website Automation) ---- */
+    #capabilities .ax-grid--2{gap:1.5rem}
+    #capabilities .ax-card.ax-card--media{
+        background:#fff;border:1px solid rgba(15,23,42,.07);border-radius:18px;
+        box-shadow:0 12px 32px rgba(15,23,42,.06);
+    }
+    #capabilities .ax-card.ax-card--media:hover{
+        border-color:rgba(124,58,237,.3);
+        box-shadow:0 24px 52px rgba(15,23,42,.14);
+    }
+    #capabilities .ax-card__media{height:185px}
+    #capabilities .ax-card__media-shade{background:linear-gradient(to top,rgba(15,23,42,.82) 0%,rgba(15,23,42,.2) 58%,rgba(15,23,42,.02) 100%)}
+    #capabilities .ax-card__media-title{left:1.4rem;right:1.4rem;bottom:1.1rem;font-size:1.18rem}
+    #capabilities .cap-card__num{
+        position:absolute;top:1rem;left:1.4rem;z-index:2;
+        display:inline-flex;align-items:center;justify-content:center;
+        min-width:36px;height:36px;padding:0 .6rem;border-radius:50px;
+        background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.38);
+        -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+        font-family:'Fraunces',Georgia,serif;font-size:.85rem;font-weight:600;color:#fff;letter-spacing:.04em;
+    }
+    #capabilities .ax-list--media{padding:1.5rem 1.6rem .85rem}
+    #capabilities .ax-card__more{padding:1rem 1.6rem 1.3rem}
+
     /* Enterprise capabilities become a card grid on the section canvas */
     #enterprise-automation .ax-feat__items{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
     #enterprise-automation .ax-feat__item{

@@ -628,10 +628,18 @@
                                 <span class="service-icon"><i class="fas fa-tasks"></i></span>
                                 My Assignments
                             </a></li>
+                            <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'documents:admin_list' %}">
+                                <span class="service-icon"><i class="fas fa-file-signature"></i></span>
+                                {% trans 'Documents' %}
+                            </a></li>
                         {% elif '/projects/admin/' not in request.path %}
                             <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'crm:client_tracking_portal' %}">
                                 <span class="service-icon"><i class="fas fa-th-large"></i></span>
                                 {% trans 'Client Dashboard' %}
+                            </a></li>
+                            <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'documents:client_list' %}">
+                                <span class="service-icon"><i class="fas fa-file-signature"></i></span>
+                                {% trans 'My Documents' %}
                             </a></li>
                             <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'users:profile_dashboard' %}">
                                 <span class="service-icon"><i class="fas fa-user-circle"></i></span>
@@ -657,6 +665,10 @@
                             <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'crm:dashboard' %}">
                                 <span class="service-icon"><i class="fas fa-users"></i></span>
                                 CRM Center
+                            </a></li>
+                            <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'documents:admin_list' %}">
+                                <span class="service-icon"><i class="fas fa-file-signature"></i></span>
+                                Documents &amp; E-Signature
                             </a></li>
                             <li><a class="dropdown-item rounded-2 py-2 px-3" href="{% url 'admin:home_apirequest_changelist' %}">
                                 <span class="service-icon"><i class="fas fa-code"></i></span>

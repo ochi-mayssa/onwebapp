@@ -1,47 +1,70 @@
 {% extends "base.html" %}
 {% load i18n static %}
 
-{% block title %}{% trans "Website Automation Services for Businesses" %} | OnWebApp{% endblock %}
+{% block title %}{% trans "Website Automation | Connected Digital Workflows" %} | OnWebApp{% endblock %}
 
-{% block meta_description %}{% trans "Automate website tasks with OnWebApp. Streamline browser interactions, web data extraction, form processing, website monitoring, and business workflows." %}{% endblock %}
+{% block meta_description %}{% trans "Connect your website, applications, APIs, and business data through tailored website automation. Streamline digital workflows with OnWebApp." %}{% endblock %}
 
-{% block og_title %}{% trans "Website Automation Services for Businesses" %} | OnWebApp{% endblock %}
+{% block og_title %}{% trans "Website Automation | Connected Digital Workflows" %} | OnWebApp{% endblock %}
 
-{% block og_description %}{% trans "Automate website tasks with OnWebApp. Streamline browser interactions, web data extraction, form processing, website monitoring, and business workflows." %}{% endblock %}
+{% block og_description %}{% trans "Connect your website, applications, APIs, and business data through tailored website automation. Streamline digital workflows with OnWebApp." %}{% endblock %}
 
 {% block content %}
+<!-- BREADCRUMBS -->
+<nav class="wa-crumbs" aria-label="{% trans 'Breadcrumb' %}">
+    <div class="wrap">
+        <ol>
+            <li><a href="{% url 'home:index' %}">{% trans "Home" %}</a></li>
+            <li><a href="{% url 'home:automation_home' %}">{% trans "Automation" %}</a></li>
+            <li aria-current="page">{% trans "Website Automation" %}</li>
+        </ol>
+    </div>
+</nav>
+
 <!-- HERO -->
 <section class="ax-hero">
     <div class="ax-hero__shade"></div>
     <div class="ax-hero__fade"></div>
     <div class="wrap ax-hero__inner">
-        <a href="{% url 'home:automation_home' %}" class="ax-hero__eyebrow" aria-label="Website Automation Services | OnWebApp">{% trans "Website Automation Services" %}</a>
-        <h1 class="ax-hero__title">{% trans "Automate Your Website. Simplify Every Operation." %}</h1>
-        <p class="ax-hero__sub">{% trans "Transform repetitive website tasks into automated workflows. OnWebApp helps businesses automate browser interactions, web data extraction, form submissions, website monitoring, and everyday online operations." %}</p>
-        <p class="ax-hero__sub wa-hero__line">{% trans "Spend less time on manual tasks and more time growing your business." %}</p>
+        <a href="{% url 'home:automation_home' %}" class="ax-hero__eyebrow" aria-label="{% trans 'Website Automation Services | OnWebApp' %}">{% trans "Website Automation Services" %}</a>
+        <h1 class="ax-hero__title">{% trans "Website Automation That Connects Your Digital Business" %}</h1>
+        <p class="ax-hero__sub">{% trans "Transform your website into a connected business environment. Automate processes, integrate essential applications, and bring your digital operations together through workflows designed around the way your business works." %}</p>
+        <p class="ax-hero__sub wa-hero__line">{% trans "Connect digital experiences, business applications, and operational data in one coordinated environment." %}</p>
         <div class="ax-hero__actions">
-            <a href="{% url 'contact:contact' %}" class="ax-btn ax-btn--primary">{% trans "Get Started" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
-            <a href="{% url 'home:automation_home' %}" class="ax-btn ax-btn--ghost">{% trans "Explore Automation Solutions" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+            <a href="{% url 'contact:contact' %}" class="ax-btn ax-btn--primary">{% trans "Discuss Your Automation Needs" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+            <a href="#how-it-works" class="ax-btn ax-btn--ghost">{% trans "See how it works" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+        </div>
+        <div class="wa-hero-points" aria-label="Website automation benefits">
+            <span><i class="fas fa-link" aria-hidden="true"></i> {% trans "Connected systems" %}</span>
+            <span><i class="fas fa-arrows-rotate" aria-hidden="true"></i> {% trans "Coordinated workflows" %}</span>
+            <span><i class="fas fa-chart-line" aria-hidden="true"></i> {% trans "Clear visibility" %}</span>
         </div>
     </div>
 </section>
 
-<!-- INTRODUCTION -->
+<!-- PROBLEM -->
 <section class="ax-sec">
     <div class="wrap">
-        <div class="ax-center">
-            <span class="ax-label">{% trans "Website Automation Services" %}</span>
-            <h2 class="ax-h2">{% trans "Make Your Website Work Smarter" %}</h2>
-            <p class="ax-lead ax-lead--wide">{% trans "Managing website operations manually can consume valuable time and introduce unnecessary errors. From collecting information and processing online forms to monitoring website activity, repetitive tasks can slow down your business." %}</p>
-            <p class="ax-lead ax-lead--wide wa-lead-gap">{% trans "OnWebApp delivers tailored website automation solutions that streamline these operations, connect your existing tools, and help your team work more efficiently." %}</p>
+        <div class="ax-split">
+            <div class="ax-split__head">
+                <span class="ax-label">{% trans "The Problem" %}</span>
+                <h2 class="ax-h2">{% trans "Your Website Should Do More Than Display Information" %}</h2>
+            </div>
+            <div class="ax-split__body">
+                <p>{% trans "A website often sits at the center of customer interactions, requests, transactions, and business information. When it operates separately from the tools behind your business, teams end up transferring data manually, repeating actions, and managing disconnected processes." %}</p>
+                <p>{% trans "Website automation connects these activities with the applications and data that support your operations. Information can move between systems, actions can follow defined rules, and teams gain a more consistent way to manage digital work." %}</p>
+                <div class="ax-callout">
+                    <p><strong>{% trans "A connected website becomes part of your business operations." %}</strong> {% trans "With the right integrations and workflows, website interactions can trigger useful actions instead of creating more manual work." %}</p>
+                </div>
+            </div>
         </div>
         <ul class="ax-n-list wa-intro-list">
-            <li>{% trans "Reduce repetitive manual tasks." %}</li>
-            <li>{% trans "Improve operational accuracy and consistency." %}</li>
-            <li>{% trans "Automate browser-based activities." %}</li>
-            <li>{% trans "Collect and organize website data." %}</li>
-            <li>{% trans "Monitor website activity and performance." %}</li>
-            <li>{% trans "Integrate automation into existing workflows." %}</li>
+            <li>{% trans "Moving information manually between your website and business applications." %}</li>
+            <li>{% trans "Managing customer requests across disconnected tools." %}</li>
+            <li>{% trans "Repeating the same steps whenever a website request is submitted." %}</li>
+            <li>{% trans "Keeping website information aligned with connected business data." %}</li>
+            <li>{% trans "Lacking a clear view of activity across digital processes." %}</li>
+            <li>{% trans "Preparing operational updates from information stored in separate systems." %}</li>
         </ul>
     </div>
 </section>
@@ -51,69 +74,235 @@
     <div class="wrap">
         <div class="ax-center">
             <span class="ax-label ax-label--indigo">{% trans "Website Automation Solutions" %}</span>
-            <h2 class="ax-h2">{% trans "Everything Your Website Needs to Run Automatically" %}</h2>
-            <p class="ax-lead ax-lead--wide">{% trans "Discover practical automation solutions designed to simplify website management and online business operations." %}</p>
+            <h2 class="ax-h2">{% trans "Connect the Functions Behind Your Website" %}</h2>
+            <p class="ax-lead ax-lead--wide">{% trans "Website automation brings your website, applications, data, and business workflows together. Build a more connected digital environment around the way your organization operates." %}</p>
         </div>
-        <div class="ax-grid ax-grid--3">
-            <div class="ax-card">
-                <span class="wa-num" aria-hidden="true">01</span>
-                <h3 class="ax-card__title">{% trans "Browser &amp; Front-End Automation" %}</h3>
-                <p class="ax-card__body">{% trans "Automate repetitive browser interactions, navigation, clicks, form submissions, and other front-end activities across your website and web applications." %}</p>
-            </div>
-            <div class="ax-card">
-                <span class="wa-num" aria-hidden="true">02</span>
-                <h3 class="ax-card__title">{% trans "Web Data Extraction" %}</h3>
-                <p class="ax-card__body">{% trans "Collect, extract, and organize relevant information from websites automatically. Turn unstructured web content into useful data for reporting, research, and business operations." %}</p>
-            </div>
-            <div class="ax-card">
-                <span class="wa-num" aria-hidden="true">03</span>
-                <h3 class="ax-card__title">{% trans "Website Monitoring" %}</h3>
-                <p class="ax-card__body">{% trans "Monitor website availability, page changes, important elements, and operational events. Receive automated notifications when defined conditions or issues are detected." %}</p>
-            </div>
-            <div class="ax-card">
-                <span class="wa-num" aria-hidden="true">04</span>
-                <h3 class="ax-card__title">{% trans "Form &amp; Data Entry Automation" %}</h3>
-                <p class="ax-card__body">{% trans "Automate repetitive form submissions, data entry, information transfers, and validation tasks to reduce manual processing and improve consistency." %}</p>
-            </div>
-            <div class="ax-card">
-                <span class="wa-num" aria-hidden="true">05</span>
-                <h3 class="ax-card__title">{% trans "Website Integration &amp; Workflow Automation" %}</h3>
-                <p class="ax-card__body">{% trans "Connect website activities with your business applications, APIs, CRM, and other systems. Automatically move information between platforms and coordinate business processes." %}</p>
-            </div>
+        <div class="wa-solutions-editorial">
+            <article class="wa-solution-row">
+                <span class="wa-solution-index" aria-hidden="true">01</span>
+                <h3 class="ax-card__title">{% trans "Connected Website Experiences" %}</h3>
+                <p class="ax-card__body">{% trans "Connect website forms, customer interactions, and digital features with the processes that manage requests, records, and follow-up activities." %}</p>
+                <div class="wa-ex"><strong>{% trans "Practical example:" %}</strong> {% trans "A website enquiry is captured, validated, and routed to the appropriate business process." %}</div>
+            </article>
+            <article class="wa-solution-row">
+                <span class="wa-solution-index" aria-hidden="true">02</span>
+                <h3 class="ax-card__title">{% trans "API-Powered System Integration" %}</h3>
+                <p class="ax-card__body">{% trans "Connect your website with external applications and services so information can move between systems accurately and consistently." %}</p>
+                <div class="wa-ex"><strong>{% trans "Practical example:" %}</strong> {% trans "A new customer request updates connected systems and triggers the next step without duplicate data entry." %}</div>
+            </article>
+            <article class="wa-solution-row">
+                <span class="wa-solution-index" aria-hidden="true">03</span>
+                <h3 class="ax-card__title">{% trans "Centralized Data &amp; Visibility" %}</h3>
+                <p class="ax-card__body">{% trans "Bring information from connected digital operations into a structured view that helps teams follow activity, understand performance, and make informed decisions." %}</p>
+                <div class="wa-ex"><strong>{% trans "Practical example:" %}</strong> {% trans "Relevant website and application data is organized into a shared operational view for easier monitoring." %}</div>
+            </article>
+            <article class="wa-solution-row">
+                <span class="wa-solution-index" aria-hidden="true">04</span>
+                <h3 class="ax-card__title">{% trans "Automated Business Workflows" %}</h3>
+                <p class="ax-card__body">{% trans "Turn recurring website activities into structured workflows with clear triggers, validation rules, and coordinated actions." %}</p>
+                <div class="wa-ex"><strong>{% trans "Practical example:" %}</strong> {% trans "A submitted request can trigger internal tasks, confirmations, and updates across the systems involved." %}</div>
+            </article>
+            <article class="wa-solution-row">
+                <span class="wa-solution-index" aria-hidden="true">05</span>
+                <h3 class="ax-card__title">{% trans "Connected Applications &amp; Services" %}</h3>
+                <p class="ax-card__body">{% trans "Create a connected digital foundation where your website works alongside the applications, services, and business tools your team already relies on." %}</p>
+                <div class="wa-ex"><strong>{% trans "Practical example:" %}</strong> {% trans "Customer, order, and service information stays coordinated across the relevant business applications." %}</div>
+            </article>
+            <article class="wa-solution-row">
+                <span class="wa-solution-index" aria-hidden="true">06</span>
+                <h3 class="ax-card__title">{% trans "Coordinated Digital Operations" %}</h3>
+                <p class="ax-card__body">{% trans "Coordinate information and actions across connected workflows, giving teams a clearer and more consistent way to manage digital operations." %}</p>
+                <div class="wa-ex"><strong>{% trans "Practical example:" %}</strong> {% trans "Teams can follow key workflow activity and access organized information when they need it." %}</div>
+            </article>
         </div>
     </div>
 </section>
 
-<!-- BENEFITS -->
-<section class="ax-sec">
+<!-- VISUAL WORKFLOW -->
+<section class="wa-flow-section" aria-labelledby="wa-flow-title">
+    <div class="wrap wa-flow-layout">
+        <div class="wa-flow-copy">
+            <span class="ax-label ax-label--indigo">{% trans "One Connected Workflow" %}</span>
+            <h2 id="wa-flow-title" class="ax-h2">{% trans "From the First Website Interaction to the Right Business Action" %}</h2>
+            <p>{% trans "A website request can become the starting point for a connected sequence: information is captured, systems are updated, and teams gain visibility into what happens next." %}</p>
+            <a href="{% url 'contact:contact' %}" class="wa-text-link">{% trans "Explore what can be connected" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+        </div>
+        <div class="wa-flow-art" role="img" aria-label="Website request connected to applications and business dashboard">
+            <div class="wa-flow-glow"></div>
+            <div class="wa-flow-node wa-flow-node--web"><span class="wa-flow-node__icon"><i class="fas fa-globe" aria-hidden="true"></i></span><strong>{% trans "Website" %}</strong><small>{% trans "New request" %}</small><span class="wa-flow-node__status"></span></div>
+            <div class="wa-flow-connector wa-flow-connector--one"><span></span></div>
+            <div class="wa-flow-node wa-flow-node--api"><span class="wa-flow-node__icon"><i class="fas fa-code-branch" aria-hidden="true"></i></span><strong>{% trans "Integration" %}</strong><small>{% trans "Data &amp; actions" %}</small><span class="wa-flow-node__status"></span></div>
+            <div class="wa-flow-connector wa-flow-connector--two"><span></span></div>
+            <div class="wa-flow-node wa-flow-node--data"><span class="wa-flow-node__icon"><i class="fas fa-chart-pie" aria-hidden="true"></i></span><strong>{% trans "Business view" %}</strong><small>{% trans "Visibility" %}</small><span class="wa-flow-node__status"></span></div>
+            <div class="wa-flow-caption"><i class="fas fa-circle-check" aria-hidden="true"></i> {% trans "Connected. Coordinated. Visible." %}</div>
+        </div>
+    </div>
+</section>
+
+<!-- CONNECTED DIGITAL FOUNDATION: indirect presentation of supporting capabilities -->
+<section class="ax-sec" id="connected-foundation">
     <div class="wrap">
         <div class="ax-center">
-            <span class="ax-label">{% trans "Benefits" %}</span>
-            <h2 class="ax-h2">{% trans "Less Manual Work. More Business Productivity." %}</h2>
-            <p class="ax-lead ax-lead--wide">{% trans "Website automation helps your business operate more efficiently by turning repetitive online activities into reliable, repeatable processes." %}</p>
+            <span class="ax-label">{% trans "A Connected Digital Foundation" %}</span>
+            <h2 class="ax-h2">{% trans "The Right Building Blocks Make Automation Work" %}</h2>
+            <p class="ax-lead ax-lead--wide">{% trans "Effective website automation depends on more than workflows. It brings together a well-structured digital experience, reliable system connections, and clear access to business information." %}</p>
         </div>
-        <div class="ax-grid ax-grid--4">
-            <div class="ax-card">
-                <div class="ax-card__icon ax-card__icon--violet"><i class="fas fa-clock" aria-hidden="true"></i></div>
-                <h3 class="ax-card__title">{% trans "Save Time" %}</h3>
-                <p class="ax-card__body">{% trans "Automate repetitive website operations and free your team to focus on higher-value activities." %}</p>
+        <div class="wa-foundation-editorial">
+            <article class="wa-foundation-item">
+                <div class="wa-visual wa-visual--website" role="img" aria-label="Website interface illustration">
+                    <svg viewBox="0 0 420 230" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <defs><linearGradient id="waSiteGrad" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#8B5CF6"/><stop offset="1" stop-color="#C4B5FD"/></linearGradient></defs>
+                        <circle cx="338" cy="48" r="34" fill="#DDD6FE" opacity=".65"/><circle cx="70" cy="183" r="28" fill="#EDE9FE"/>
+                        <rect x="72" y="28" width="276" height="174" rx="13" fill="#fff" stroke="#DDD6FE" stroke-width="2"/>
+                        <path d="M72 43a15 15 0 0 1 15-15h246a15 15 0 0 1 15 15v16H72z" fill="#F5F3FF"/>
+                        <circle cx="91" cy="43" r="4" fill="#A78BFA"/><circle cx="105" cy="43" r="4" fill="#C4B5FD"/><circle cx="119" cy="43" r="4" fill="#DDD6FE"/>
+                        <rect x="91" y="76" width="104" height="10" rx="5" fill="#1E1B4B"/><rect x="91" y="94" width="133" height="6" rx="3" fill="#C4B5FD"/>
+                        <rect x="91" y="112" width="68" height="23" rx="7" fill="url(#waSiteGrad)"/>
+                        <rect x="239" y="75" width="83" height="76" rx="9" fill="#F5F3FF"/><rect x="253" y="89" width="55" height="7" rx="3.5" fill="#A78BFA"/><rect x="253" y="103" width="42" height="5" rx="2.5" fill="#DDD6FE"/><rect x="253" y="115" width="49" height="5" rx="2.5" fill="#DDD6FE"/>
+                        <rect x="91" y="159" width="231" height="8" rx="4" fill="#F1F0F8"/><rect x="91" y="175" width="166" height="6" rx="3" fill="#E9E5F5"/>
+                        <circle cx="336" cy="177" r="17" fill="#7C3AED"/><path d="m329 177 5 5 9-11" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <h3 class="ax-card__title">{% trans "A Website Built for Integration" %}</h3>
+                <p class="ax-card__body">{% trans "A clear, functional website creates the starting point for connected customer journeys, structured requests, and digital services that can grow with your business." %}</p>
+            </article>
+            <article class="wa-foundation-item">
+                <div class="wa-visual wa-visual--integration" role="img" aria-label="Connected applications illustration">
+                    <svg viewBox="0 0 420 230" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <defs><linearGradient id="waApiGrad" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#6366F1"/><stop offset="1" stop-color="#A78BFA"/></linearGradient></defs>
+                        <circle cx="210" cy="113" r="78" fill="#EEF2FF"/><path d="M115 115h190M210 42v142" stroke="#C7D2FE" stroke-width="2" stroke-dasharray="5 6"/>
+                        <path d="M135 82 188 108M285 82l-53 26M135 151l53-26M285 151l-53-26" stroke="url(#waApiGrad)" stroke-width="4" stroke-linecap="round"/>
+                        <rect x="34" y="53" width="102" height="58" rx="12" fill="#fff" stroke="#C7D2FE" stroke-width="2"/><rect x="49" y="68" width="27" height="27" rx="7" fill="#EDE9FE"/><path d="M56 81h13m-6-6v12" stroke="#7C3AED" stroke-width="2" stroke-linecap="round"/><rect x="83" y="71" width="39" height="5" rx="2.5" fill="#A5B4FC"/><rect x="83" y="82" width="29" height="5" rx="2.5" fill="#E0E7FF"/>
+                        <rect x="284" y="53" width="102" height="58" rx="12" fill="#fff" stroke="#C7D2FE" stroke-width="2"/><rect x="299" y="68" width="27" height="27" rx="7" fill="#E0E7FF"/><path d="M306 75h13v13h-13z" fill="none" stroke="#6366F1" stroke-width="2"/><rect x="333" y="71" width="39" height="5" rx="2.5" fill="#A5B4FC"/><rect x="333" y="82" width="29" height="5" rx="2.5" fill="#E0E7FF"/>
+                        <rect x="34" y="137" width="102" height="58" rx="12" fill="#fff" stroke="#C7D2FE" stroke-width="2"/><rect x="49" y="152" width="27" height="27" rx="7" fill="#EDE9FE"/><path d="M55 166h15m-7-7v14" stroke="#7C3AED" stroke-width="2" stroke-linecap="round"/><rect x="83" y="155" width="39" height="5" rx="2.5" fill="#A5B4FC"/><rect x="83" y="166" width="29" height="5" rx="2.5" fill="#E0E7FF"/>
+                        <rect x="284" y="137" width="102" height="58" rx="12" fill="#fff" stroke="#C7D2FE" stroke-width="2"/><rect x="299" y="152" width="27" height="27" rx="7" fill="#E0E7FF"/><path d="m305 166 5 5 10-12" fill="none" stroke="#6366F1" stroke-width="2" stroke-linecap="round"/><rect x="333" y="155" width="39" height="5" rx="2.5" fill="#A5B4FC"/><rect x="333" y="166" width="29" height="5" rx="2.5" fill="#E0E7FF"/>
+                        <circle cx="210" cy="115" r="37" fill="url(#waApiGrad)"/><path d="M194 114h32m-8-9 9 9-9 9" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <h3 class="ax-card__title">{% trans "Reliable Connections Between Systems" %}</h3>
+                <p class="ax-card__body">{% trans "Integration interfaces allow your website and business applications to exchange information, coordinate actions, and reduce disconnected processes." %}</p>
+            </article>
+            <article class="wa-foundation-item">
+                <div class="wa-visual wa-visual--dashboard" role="img" aria-label="Business dashboard illustration">
+                    <svg viewBox="0 0 420 230" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <defs><linearGradient id="waDashGrad" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#7C3AED"/><stop offset="1" stop-color="#4F46E5"/></linearGradient></defs>
+                        <circle cx="337" cy="48" r="35" fill="#EDE9FE"/><rect x="52" y="25" width="316" height="180" rx="14" fill="#fff" stroke="#DDD6FE" stroke-width="2"/>
+                        <rect x="52" y="25" width="70" height="180" rx="14" fill="#F5F3FF"/><rect x="69" y="47" width="36" height="7" rx="3.5" fill="#A78BFA"/><rect x="68" y="72" width="39" height="5" rx="2.5" fill="#DDD6FE"/><rect x="68" y="88" width="31" height="5" rx="2.5" fill="#DDD6FE"/><rect x="68" y="104" width="36" height="5" rx="2.5" fill="#DDD6FE"/>
+                        <rect x="142" y="46" width="91" height="42" rx="8" fill="#F5F3FF"/><rect x="153" y="57" width="28" height="5" rx="2.5" fill="#A78BFA"/><rect x="153" y="69" width="58" height="9" rx="4.5" fill="#4F46E5"/>
+                        <rect x="245" y="46" width="103" height="42" rx="8" fill="#EEF2FF"/><rect x="257" y="57" width="35" height="5" rx="2.5" fill="#A5B4FC"/><rect x="257" y="69" width="65" height="9" rx="4.5" fill="#6366F1"/>
+                        <rect x="142" y="101" width="206" height="83" rx="9" fill="#FAF9FF" stroke="#EEEAF8"/>
+                        <path d="M159 163 190 143l27 9 29-28 29 11 29-24 27 7" fill="none" stroke="url(#waDashGrad)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M159 163 190 143l27 9 29-28 29 11 29-24 27 7v24H159z" fill="#C4B5FD" opacity=".18"/>
+                        <path d="M159 173h172" stroke="#E9E5F5" stroke-width="2" stroke-dasharray="3 5"/>
+                    </svg>
+                </div>
+                <h3 class="ax-card__title">{% trans "Clear Visibility Into Operations" %}</h3>
+                <p class="ax-card__body">{% trans "Organized business data and operational views help teams follow activity, understand results, and make decisions using information from connected systems." %}</p>
+            </article>
+        </div>
+    </div>
+</section>
+
+
+<!-- WEBSITE OPERATIONS VISUAL -->
+<section class="wa-operations-section" aria-labelledby="wa-operations-title">
+    <div class="wrap wa-operations-layout">
+        <div class="wa-operations-art" role="img" aria-label="Illustration of website orders moving through connected business systems">
+            <div class="wa-orbit wa-orbit--one"></div><div class="wa-orbit wa-orbit--two"></div>
+            <svg viewBox="0 0 640 430" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <defs>
+                    <linearGradient id="waOpsPurple" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#8B5CF6"/><stop offset="1" stop-color="#4F46E5"/></linearGradient>
+                    <linearGradient id="waOpsPanel" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FFFFFF"/><stop offset="1" stop-color="#F4F1FF"/></linearGradient>
+                    <filter id="waOpsShadow" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="14" stdDeviation="13" flood-color="#24164D" flood-opacity=".12"/></filter>
+                </defs>
+                <path class="wa-ops-path" d="M170 205 C245 205 250 105 320 105 S390 205 465 205" fill="none" stroke="#B7A4F7" stroke-width="4" stroke-linecap="round" stroke-dasharray="8 10"/>
+                <path class="wa-ops-path wa-ops-path--second" d="M320 105 C320 180 320 230 320 300" fill="none" stroke="#B7A4F7" stroke-width="4" stroke-linecap="round" stroke-dasharray="8 10"/>
+                <g filter="url(#waOpsShadow)">
+                    <rect x="35" y="145" width="180" height="142" rx="18" fill="url(#waOpsPanel)" stroke="#E4DDFB" stroke-width="2"/>
+                    <rect x="35" y="145" width="180" height="32" rx="18" fill="#F1EDFF"/><circle cx="54" cy="161" r="4" fill="#A78BFA"/><circle cx="68" cy="161" r="4" fill="#C4B5FD"/>
+                    <rect x="57" y="197" width="64" height="9" rx="4.5" fill="#31245C"/><rect x="57" y="216" width="112" height="6" rx="3" fill="#D7CFF2"/><rect x="57" y="232" width="88" height="6" rx="3" fill="#E6E0F6"/><rect x="57" y="252" width="72" height="20" rx="7" fill="url(#waOpsPurple)"/>
+                    <rect x="250" y="34" width="140" height="140" rx="25" fill="url(#waOpsPurple)"/><path d="M290 82h60M290 102h60M290 122h38" stroke="#fff" stroke-width="6" stroke-linecap="round" opacity=".9"/><circle cx="360" cy="137" r="13" fill="#34D399"/><path d="m354 137 4 4 8-9" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <rect x="425" y="145" width="180" height="142" rx="18" fill="url(#waOpsPanel)" stroke="#E4DDFB" stroke-width="2"/><rect x="448" y="169" width="54" height="8" rx="4" fill="#31245C"/><rect x="448" y="188" width="112" height="6" rx="3" fill="#D7CFF2"/><rect x="448" y="207" width="134" height="54" rx="9" fill="#F0ECFC"/><path d="M461 247l22-17 20 8 21-23 20 11 22-18" fill="none" stroke="#7C3AED" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="546" cy="208" r="5" fill="#34D399"/>
+                    <rect x="242" y="275" width="156" height="112" rx="16" fill="#fff" stroke="#E4DDFB" stroke-width="2"/><rect x="263" y="296" width="80" height="8" rx="4" fill="#31245C"/><rect x="263" y="315" width="112" height="6" rx="3" fill="#D7CFF2"/><circle cx="276" cy="353" r="13" fill="#EDE9FE"/><path d="m270 353 4 4 8-9" fill="none" stroke="#7C3AED" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><rect x="298" y="348" width="73" height="9" rx="4.5" fill="#C4B5FD"/>
+                </g>
+                <circle class="wa-ops-pulse" cx="320" cy="105" r="10" fill="#34D399" stroke="#fff" stroke-width="5"/>
+                <circle class="wa-ops-pulse wa-ops-pulse--delay" cx="465" cy="205" r="8" fill="#8B5CF6" stroke="#fff" stroke-width="4"/>
+            </svg>
+            <span class="wa-ops-float wa-ops-float--top"><i class="fas fa-bolt" aria-hidden="true"></i> {% trans "Workflow triggered" %}</span>
+            <span class="wa-ops-float wa-ops-float--bottom"><i class="fas fa-check-circle" aria-hidden="true"></i> {% trans "Data synchronized" %}</span>
+        </div>
+        <div class="wa-operations-copy">
+            <span class="ax-label ax-label--indigo">{% trans "Beyond the Website" %}</span>
+            <h2 id="wa-operations-title" class="ax-h2">{% trans "Every Interaction Can Move Your Business Forward" %}</h2>
+            <p>{% trans "A customer submits a request, an order is placed, or a record changes. Instead of leaving that activity isolated, connected workflows can carry the information to the right systems and make the next action easier to manage." %}</p>
+            <ul class="wa-check-list">
+                <li><i class="fas fa-check" aria-hidden="true"></i> {% trans "Capture and validate incoming information" %}</li>
+                <li><i class="fas fa-check" aria-hidden="true"></i> {% trans "Synchronize records across connected applications" %}</li>
+                <li><i class="fas fa-check" aria-hidden="true"></i> {% trans "Notify the right people and trigger next steps" %}</li>
+                <li><i class="fas fa-check" aria-hidden="true"></i> {% trans "Follow activity through a clear operational view" %}</li>
+            </ul>
+            <a href="{% url 'contact:contact' %}" class="wa-text-link wa-text-link--light">{% trans "Plan a connected workflow" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+        </div>
+    </div>
+</section>
+
+<!-- PROOF -->
+<section class="ax-sec" id="results">
+    <div class="wrap">
+        <div class="ax-center">
+            <span class="ax-label">{% trans "Proof" %}</span>
+            <h2 class="ax-h2">{% trans "Measure the Work Before You Automate It" %}</h2>
+            <p class="ax-lead ax-lead--wide">{% trans "We record how long a process takes today, then track the same measure after launch, so the value is visible rather than assumed." %}</p>
+        </div>
+
+        <!-- TODO(content): replace the placeholder figures below with verified
+             client results before launch. Do not publish invented numbers. -->
+        <div class="wa-stats">
+            <div class="wa-stat">
+                <span class="wa-stat__value">&mdash;</span>
+                <span class="wa-stat__label">{% trans "Hours saved per month" %}</span>
             </div>
-            <div class="ax-card">
-                <div class="ax-card__icon ax-card__icon--indigo"><i class="fas fa-check-double" aria-hidden="true"></i></div>
-                <h3 class="ax-card__title">{% trans "Improve Accuracy" %}</h3>
-                <p class="ax-card__body">{% trans "Reduce manual input errors through consistent automated processes and validation." %}</p>
+            <div class="wa-stat">
+                <span class="wa-stat__value">&mdash;</span>
+                <span class="wa-stat__label">{% trans "Manual steps removed" %}</span>
             </div>
-            <div class="ax-card">
-                <div class="ax-card__icon ax-card__icon--blue"><i class="fas fa-plug" aria-hidden="true"></i></div>
-                <h3 class="ax-card__title">{% trans "Connect Your Tools" %}</h3>
-                <p class="ax-card__body">{% trans "Integrate website activities with the applications and systems your business already uses." %}</p>
+            <div class="wa-stat">
+                <span class="wa-stat__value">&mdash;</span>
+                <span class="wa-stat__label">{% trans "Reduction in entry errors" %}</span>
             </div>
-            <div class="ax-card">
-                <div class="ax-card__icon ax-card__icon--gold"><i class="fas fa-arrow-trend-up" aria-hidden="true"></i></div>
-                <h3 class="ax-card__title">{% trans "Scale Operations" %}</h3>
-                <p class="ax-card__body">{% trans "Expand automation as your website, workload, and business requirements grow." %}</p>
+            <div class="wa-stat">
+                <span class="wa-stat__value">&mdash;</span>
+                <span class="wa-stat__label">{% trans "Time to first working pilot" %}</span>
             </div>
         </div>
+
+        <div class="wa-scenarios">
+            <article class="wa-scenario">
+                <span class="wa-scenario__tag">{% trans "Illustrative scenario" %}</span>
+                <h3>{% trans "Supplier invoices" %}</h3>
+                <div class="wa-scenario__row">
+                    <span class="wa-scenario__label">{% trans "Before" %}</span>
+                    <p>{% trans "Invoice information arrives through different channels and must be checked, organized, and entered into finance records." %}</p>
+                </div>
+                <div class="wa-scenario__row">
+                    <span class="wa-scenario__label wa-scenario__label--after">{% trans "After" %}</span>
+                    <p>{% trans "A connected workflow organizes incoming invoice information, updates the relevant records, and makes the status easier for the finance team to follow." %}</p>
+                </div>
+            </article>
+            <article class="wa-scenario">
+                <span class="wa-scenario__tag">{% trans "Illustrative scenario" %}</span>
+                <h3>{% trans "Inbound leads" %}</h3>
+                <div class="wa-scenario__row">
+                    <span class="wa-scenario__label">{% trans "Before" %}</span>
+                    <p>{% trans "Enquiries are checked manually, copied into the CRM, and assigned by email. Some wait until the end of the day." %}</p>
+                </div>
+                <div class="wa-scenario__row">
+                    <span class="wa-scenario__label wa-scenario__label--after">{% trans "After" %}</span>
+                    <p>{% trans "Each enquiry is validated, enriched, routed to the right owner, and logged, with an alert if anything fails." %}</p>
+                </div>
+            </article>
+        </div>
+        <p class="wa-note">{% trans "Scenarios illustrate common automation patterns, not specific client results." %} <a class="vf-link-inline" href="{% url 'home:testimonials' %}">{% trans "Read client stories" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a></p>
     </div>
 </section>
 
@@ -122,36 +311,56 @@
     <div class="wrap">
         <div class="ax-center">
             <span class="ax-label ax-label--indigo">{% trans "How It Works" %}</span>
-            <h2 class="ax-h2">{% trans "From Repetitive Tasks to Automated Workflows" %}</h2>
-            <p class="ax-lead ax-lead--wide">{% trans "A structured approach to building website automation around your actual business requirements." %}</p>
+            <h2 class="ax-h2">{% trans "From Website Interactions to Connected Workflows" %}</h2>
+            <p class="ax-lead ax-lead--wide">{% trans "We look at your website, the systems behind it, and the information your business needs to move between them." %}</p>
         </div>
         <ol class="ax-steps">
             <li class="ax-step">
                 <span class="ax-step__n" aria-hidden="true">01</span>
-                <h3>{% trans "Discover Your Requirements" %}</h3>
-                <p>{% trans "We identify repetitive website activities, operational challenges, and opportunities for automation." %}</p>
+                <h3>{% trans "Understand Your Digital Environment" %}</h3>
+                <p>{% trans "We review your website functions, business requirements, existing applications, and disconnected processes." %}</p>
             </li>
             <li class="ax-step">
                 <span class="ax-step__n" aria-hidden="true">02</span>
-                <h3>{% trans "Design the Automation" %}</h3>
-                <p>{% trans "We define the workflow, triggers, conditions, data requirements, and expected outcomes." %}</p>
+                <h3>{% trans "Map the Connections" %}</h3>
+                <p>{% trans "We define how information should move between your website, applications, services, and business data." %}</p>
             </li>
             <li class="ax-step">
                 <span class="ax-step__n" aria-hidden="true">03</span>
-                <h3>{% trans "Build &amp; Integrate" %}</h3>
-                <p>{% trans "We develop and configure the automation, connecting your website with the necessary tools and systems." %}</p>
+                <h3>{% trans "Build the Integration" %}</h3>
+                <p>{% trans "We implement the required workflows and connections using suitable website and integration technologies." %}</p>
             </li>
             <li class="ax-step">
                 <span class="ax-step__n" aria-hidden="true">04</span>
-                <h3>{% trans "Test &amp; Deploy" %}</h3>
-                <p>{% trans "We validate the workflow, handle exceptions, and deploy the automation into your operational environment." %}</p>
+                <h3>{% trans "Validate &amp; Launch" %}</h3>
+                <p>{% trans "We test data flows, workflow conditions, and expected outcomes before deployment." %}</p>
             </li>
             <li class="ax-step">
                 <span class="ax-step__n" aria-hidden="true">05</span>
-                <h3>{% trans "Monitor &amp; Improve" %}</h3>
-                <p>{% trans "We monitor execution, identify issues, and improve workflows as your requirements evolve." %}</p>
+                <h3>{% trans "Monitor &amp; Evolve" %}</h3>
+                <p>{% trans "We review workflow performance and identify opportunities to improve or extend your connected environment." %}</p>
             </li>
         </ol>
+
+        <h3 class="wa-sub-h">{% trans "What Happens Next" %}</h3>
+        <div class="wa-next">
+            <div class="wa-next__item">
+                <span class="wa-num" aria-hidden="true">1</span>
+                <h4>{% trans "Book a 30-minute call" %}</h4>
+                <p>{% trans "Tell us which task slows the team down. No preparation or technical brief needed." %}</p>
+            </div>
+            <div class="wa-next__item">
+                <span class="wa-num" aria-hidden="true">2</span>
+                <h4>{% trans "Get an audit and a fixed-scope proposal" %}</h4>
+                <p>{% trans "We map the current process, confirm feasibility, and outline effort, risks, and cost." %}</p>
+            </div>
+            <div class="wa-next__item">
+                <span class="wa-num" aria-hidden="true">3</span>
+                <h4>{% trans "Start with one workflow" %}</h4>
+                <p>{% trans "We prove the result on a single process, then expand to the next one." %}</p>
+            </div>
+        </div>
+        <p class="wa-note">{% trans "Most engagements start with one workflow, not a company-wide programme." %}</p>
     </div>
 </section>
 
@@ -160,8 +369,8 @@
     <div class="wrap">
         <div class="ax-center">
             <span class="ax-label">{% trans "Use Cases" %}</span>
-            <h2 class="ax-h2">{% trans "What Can You Automate on Your Website?" %}</h2>
-            <p class="ax-lead ax-lead--wide">{% trans "Website automation can support different business activities, from simple browser interactions to more complex operational workflows." %}</p>
+            <h2 class="ax-h2">{% trans "Where Can Website Automation Make a Difference?" %}</h2>
+            <p class="ax-lead ax-lead--wide">{% trans "Website automation can connect customer-facing experiences with the information and operations that support them." %}</p>
         </div>
         <div class="wa-table-wrap">
             <table class="wa-table">
@@ -169,36 +378,44 @@
                     <tr>
                         <th scope="col">{% trans "Business activity" %}</th>
                         <th scope="col">{% trans "Automation example" %}</th>
+                        <th scope="col">{% trans "Outcome" %}</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
                         <td data-label="{% trans 'Business activity' %}">{% trans "Lead management" %}</td>
-                        <td data-label="{% trans 'Automation example' %}">{% trans "Collect website inquiries and transfer them to your CRM" %}</td>
+                        <td data-label="{% trans 'Automation example' %}">{% trans "Collect website enquiries and route them to your CRM" %}</td>
+                        <td data-label="{% trans 'Outcome' %}">{% trans "Every enquiry reaches the right owner in minutes" %}</td>
                     </tr>
                     <tr>
                         <td data-label="{% trans 'Business activity' %}">{% trans "E-commerce" %}</td>
-                        <td data-label="{% trans 'Automation example' %}">{% trans "Automate product information updates" %}</td>
+                        <td data-label="{% trans 'Automation example' %}">{% trans "Sync product, price, and stock data across marketplaces" %}</td>
+                        <td data-label="{% trans 'Outcome' %}">{% trans "One source of truth with fewer manual updates" %}</td>
+                    </tr>
+                    <tr>
+                        <td data-label="{% trans 'Business activity' %}">{% trans "Finance &amp; admin" %}</td>
+                        <td data-label="{% trans 'Automation example' %}">{% trans "Connect invoice submissions with finance records and approval steps" %}</td>
+                        <td data-label="{% trans 'Outcome' %}">{% trans "More consistent records and a clearer approval process" %}</td>
                     </tr>
                     <tr>
                         <td data-label="{% trans 'Business activity' %}">{% trans "Data collection" %}</td>
-                        <td data-label="{% trans 'Automation example' %}">{% trans "Extract and organize publicly available website data" %}</td>
+                        <td data-label="{% trans 'Automation example' %}">{% trans "Bring information from connected sources into structured business data" %}</td>
+                        <td data-label="{% trans 'Outcome' %}">{% trans "Organized information ready for analysis and reporting" %}</td>
                     </tr>
                     <tr>
                         <td data-label="{% trans 'Business activity' %}">{% trans "Website operations" %}</td>
-                        <td data-label="{% trans 'Automation example' %}">{% trans "Monitor page availability and changes" %}</td>
+                        <td data-label="{% trans 'Automation example' %}">{% trans "Monitor uptime, page content, and key elements" %}</td>
+                        <td data-label="{% trans 'Outcome' %}">{% trans "Problems found before customers report them" %}</td>
                     </tr>
                     <tr>
                         <td data-label="{% trans 'Business activity' %}">{% trans "Customer operations" %}</td>
-                        <td data-label="{% trans 'Automation example' %}">{% trans "Automate repetitive form processing" %}</td>
+                        <td data-label="{% trans 'Automation example' %}">{% trans "Process repetitive requests and confirmations" %}</td>
+                        <td data-label="{% trans 'Outcome' %}">{% trans "Faster responses with consistent data" %}</td>
                     </tr>
                     <tr>
                         <td data-label="{% trans 'Business activity' %}">{% trans "Reporting" %}</td>
-                        <td data-label="{% trans 'Automation example' %}">{% trans "Collect website information and generate reports" %}</td>
-                    </tr>
-                    <tr>
-                        <td data-label="{% trans 'Business activity' %}">{% trans "Administration" %}</td>
-                        <td data-label="{% trans 'Automation example' %}">{% trans "Synchronize website data with internal systems" %}</td>
+                        <td data-label="{% trans 'Automation example' %}">{% trans "Bring operational indicators together in scheduled business reports" %}</td>
+                        <td data-label="{% trans 'Outcome' %}">{% trans "A clearer view of activity and performance across operations" %}</td>
                     </tr>
                 </tbody>
             </table>
@@ -206,41 +423,88 @@
     </div>
 </section>
 
-<!-- WHY ONWEBAPP -->
+<!-- WHY ONWEBAPP + OBJECTIONS -->
 <section class="ax-sec ax-sec--soft">
     <div class="wrap">
         <div class="ax-center">
             <span class="ax-label ax-label--indigo">{% trans "Why OnWebApp?" %}</span>
             <h2 class="ax-h2">{% trans "Website Automation Built Around Your Business" %}</h2>
-            <p class="ax-lead ax-lead--wide">{% trans "Every business has different workflows, tools, and operational requirements. OnWebApp develops automation solutions based on how your website and business actually operate." %}</p>
+            <p class="ax-lead ax-lead--wide">{% trans "Every business has different digital touchpoints and operational needs. We design connected workflows around your website, applications, and the way your team works." %}</p>
         </div>
         <div class="ax-grid ax-grid--4">
             <div class="ax-card">
                 <div class="ax-card__icon ax-card__icon--violet"><i class="fas fa-sliders" aria-hidden="true"></i></div>
                 <h3 class="ax-card__title">{% trans "Tailored Workflows" %}</h3>
-                <p class="ax-card__body">{% trans "Automation designed around your specific tasks and processes." %}</p>
+                <p class="ax-card__body">{% trans "Automation designed around your specific tasks, exceptions, and approval steps." %}</p>
             </div>
             <div class="ax-card">
                 <div class="ax-card__icon ax-card__icon--indigo"><i class="fas fa-link" aria-hidden="true"></i></div>
-                <h3 class="ax-card__title">{% trans "Existing Integrations" %}</h3>
-                <p class="ax-card__body">{% trans "Works with your current website, APIs, and business applications." %}</p>
+                <h3 class="ax-card__title">{% trans "Existing Tools" %}</h3>
+                <p class="ax-card__body">{% trans "Connects your existing website with the applications and business services your organization depends on." %}</p>
             </div>
             <div class="ax-card">
                 <div class="ax-card__icon ax-card__icon--blue"><i class="fas fa-shield-halved" aria-hidden="true"></i></div>
                 <h3 class="ax-card__title">{% trans "Controlled Execution" %}</h3>
-                <p class="ax-card__body">{% trans "Structured workflows with validation, execution logs, and exception handling." %}</p>
+                <p class="ax-card__body">{% trans "Validation, execution logs, and exception handling so failures are visible." %}</p>
             </div>
             <div class="ax-card">
                 <div class="ax-card__icon ax-card__icon--gold"><i class="fas fa-layer-group" aria-hidden="true"></i></div>
-                <h3 class="ax-card__title">{% trans "Scalable Solutions" %}</h3>
-                <p class="ax-card__body">{% trans "Start with individual tasks and expand as your automation needs grow." %}</p>
+                <h3 class="ax-card__title">{% trans "Designed to Expand" %}</h3>
+                <p class="ax-card__body">{% trans "Start with one task and add workflows as the results prove themselves." %}</p>
+            </div>
+        </div>
+
+        <h3 class="wa-sub-h">{% trans "Before You Ask" %}</h3>
+        <div class="ax-grid ax-grid--2 wa-obj-grid">
+            <div class="ax-card">
+                <h4 class="wa-obj__q"><i class="fas fa-lock" aria-hidden="true"></i> {% trans "Is our access safe?" %}</h4>
+                <p class="ax-card__body">{% trans "Automation runs with scoped accounts and permissions you control. Credentials are stored securely, and every run is recorded." %}</p>
+            </div>
+            <div class="ax-card">
+                <h4 class="wa-obj__q"><i class="fas fa-code-branch" aria-hidden="true"></i> {% trans "What if our digital needs change?" %}</h4>
+                <p class="ax-card__body">{% trans "The connected environment can be reviewed as your website, applications, or business processes evolve. Integrations and workflows can be adjusted to support new requirements." %}</p>
+            </div>
+            <div class="ax-card">
+                <h4 class="wa-obj__q"><i class="fas fa-plug" aria-hidden="true"></i> {% trans "Can we keep our existing website and applications?" %}</h4>
+                <p class="ax-card__body">{% trans "In many cases, yes. We assess your current website, applications, and available integration options before recommending changes or new connections." %}</p>
+            </div>
+            <div class="ax-card">
+                <h4 class="wa-obj__q"><i class="fas fa-screwdriver-wrench" aria-hidden="true"></i> {% trans "Who maintains it?" %}</h4>
+                <p class="ax-card__body">{% trans "You own the workflow and its documentation. We can monitor and maintain it as part of an ongoing support agreement." %}</p>
             </div>
         </div>
     </div>
 </section>
 
+<!-- RELATED SOLUTIONS -->
+<section class="ax-sec ax-sec--soft">
+    <div class="wrap">
+        <div class="ax-center">
+            <span class="ax-label ax-label--indigo">{% trans "Related Solutions" %}</span>
+            <h2 class="ax-h2">{% trans "Explore the Wider Automation Stack" %}</h2>
+        </div>
+        <div class="wa-links">
+            <a class="wa-link" href="{% url 'home:rpa_solutions' %}">
+                <i class="fas fa-robot" aria-hidden="true"></i>
+                <strong>{% trans "RPA Solutions" %}</strong>
+                <span>{% trans "Automate repetitive tasks across applications." %}</span>
+            </a>
+            <a class="wa-link" href="{% url 'home:enterprise_automation' %}">
+                <i class="fas fa-building" aria-hidden="true"></i>
+                <strong>{% trans "Enterprise Automation" %}</strong>
+                <span>{% trans "Connect ERP, CRM, finance, and operations." %}</span>
+            </a>
+            <a class="wa-link" href="{% url 'home:testimonials' %}">
+                <i class="fas fa-quote-left" aria-hidden="true"></i>
+                <strong>{% trans "Client Stories" %}</strong>
+                <span>{% trans "See how teams measure the results." %}</span>
+            </a>
+        </div>
+    </div>
+</section>
+
 <!-- FAQ -->
-<section class="ax-sec">
+<section class="ax-sec" id="faq">
     <div class="wrap wrap--narrow">
         <div class="ax-center">
             <span class="ax-label">{% trans "FAQ" %}</span>
@@ -249,11 +513,11 @@
         <div class="wa-faq">
             <details class="wa-faq__item">
                 <summary>{% trans "What is website automation?" %} <i class="fas fa-chevron-down" aria-hidden="true"></i></summary>
-                <p class="wa-faq__a">{% trans "Website automation is the process of using software to perform repetitive website-related tasks automatically. It includes browser interactions, form submissions, data extraction, website monitoring, and workflow integration." %}</p>
+                <p class="wa-faq__a">{% trans "Website automation connects website functions with applications, data, and business workflows to streamline digital operations and reduce manual processes." %}</p>
             </details>
             <details class="wa-faq__item">
                 <summary>{% trans "What tasks can be automated on a website?" %} <i class="fas fa-chevron-down" aria-hidden="true"></i></summary>
-                <p class="wa-faq__a">{% trans "Common examples include form processing, data collection, browser navigation, website monitoring, information synchronization, and repetitive administrative operations." %}</p>
+                <p class="wa-faq__a">{% trans "Common examples include automated form processing, API integrations, information synchronization, customer request workflows, operational monitoring, and connected reporting." %}</p>
             </details>
             <details class="wa-faq__item">
                 <summary>{% trans "Can website automation work with my existing website?" %} <i class="fas fa-chevron-down" aria-hidden="true"></i></summary>
@@ -269,7 +533,15 @@
             </details>
             <details class="wa-faq__item">
                 <summary>{% trans "What is the difference between website automation and RPA?" %} <i class="fas fa-chevron-down" aria-hidden="true"></i></summary>
-                <p class="wa-faq__a">{% trans "Website automation focuses on automating activities performed through websites and web applications. RPA (Robotic Process Automation) has a broader scope and can automate tasks across multiple applications, desktop software, and business systems." %}</p>
+                <p class="wa-faq__a">{% trans "Website automation focuses on connecting website functions, applications, data, and related workflows. RPA can have a broader scope across multiple applications and business systems." %}</p>
+            </details>
+            <details class="wa-faq__item">
+                <summary>{% trans "How do you handle access and security?" %} <i class="fas fa-chevron-down" aria-hidden="true"></i></summary>
+                <p class="wa-faq__a">{% trans "Automation runs with scoped accounts and permissions agreed with your team. Credentials are stored securely, access can be revoked at any time, and every execution is logged." %}</p>
+            </details>
+            <details class="wa-faq__item">
+                <summary>{% trans "What happens if a website changes after launch?" %} <i class="fas fa-chevron-down" aria-hidden="true"></i></summary>
+                <p class="wa-faq__a">{% trans "Workflows are monitored, so a changed page or form produces a visible failure rather than bad data. The workflow is then updated, either by your team or under a support agreement." %}</p>
             </details>
         </div>
     </div>
@@ -279,15 +551,68 @@
 <section class="ax-sec ax-sec--dark">
     <div class="wrap ax-center">
         <span class="ax-label ax-label--light">{% trans "Start Automating" %}</span>
-        <h2 class="ax-h2 ax-h2--light">{% trans "Your Website Can Do More. Let It Work for You." %}</h2>
-        <p class="ax-lead ax-lead--dark">{% trans "Tell us which website tasks slow down your business. We'll help you identify the right automation approach and build a solution around your workflow." %}</p>
-        <p class="ax-lead ax-lead--dark wa-cta-line">{% trans "Have a specific workflow in mind? Let's discuss it." %}</p>
+        <h2 class="ax-h2 ax-h2--light">{% trans "Ready to Build a More Connected Digital Operation?" %}</h2>
+        <p class="ax-lead ax-lead--dark">{% trans "Tell us how your website and business systems work today. We will help identify the right connections and workflows to make your digital operations more efficient." %}</p>
+        <ul class="wa-cta-list">
+            <li><i class="fas fa-check" aria-hidden="true"></i> {% trans "Your website and the processes you want to improve" %}</li>
+            <li><i class="fas fa-check" aria-hidden="true"></i> {% trans "The applications and data your business relies on" %}</li>
+            <li><i class="fas fa-check" aria-hidden="true"></i> {% trans "The outcomes you want from a connected workflow" %}</li>
+        </ul>
         <div class="ax-hero__actions ax-hero__actions--center">
-            <a href="{% url 'contact:contact' %}" class="ax-btn ax-btn--primary">{% trans "Get Started" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
-            <a href="{% url 'home:automation_home' %}" class="ax-btn ax-btn--dark-ghost">{% trans "Explore Automation Solutions" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+            <a href="{% url 'contact:contact' %}" class="ax-btn ax-btn--primary">{% trans "Discuss Your Automation Needs" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+            <a href="#how-it-works" class="ax-btn ax-btn--dark-ghost">{% trans "See how it works" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
         </div>
+        <p class="wa-promise">{% trans "We reply within one business day." %}</p>
     </div>
 </section>
+
+<!-- Structured data: breadcrumbs + FAQ -->
+{% trans "Home" as crumb_home %}
+{% trans "Automation" as crumb_automation %}
+{% trans "Website Automation" as crumb_website %}
+{% trans "What is website automation?" as faq_q1 %}
+{% trans "Website automation connects website functions with applications, data, and business workflows to streamline digital operations and reduce manual processes." as faq_a1 %}
+{% trans "What tasks can be automated on a website?" as faq_q2 %}
+{% trans "Common examples include automated form processing, API integrations, information synchronization, customer request workflows, operational monitoring, and connected reporting." as faq_a2 %}
+{% trans "Can website automation work with my existing website?" as faq_q3 %}
+{% trans "Yes. Automation can be designed to work with existing websites and web applications, depending on their technical structure, available integrations, and access permissions." as faq_a3 %}
+{% trans "Is website automation suitable for small businesses?" as faq_q4 %}
+{% trans "Yes. Small businesses can automate individual repetitive tasks without implementing a complex enterprise system. Automation can expand as operational needs increase." as faq_a4 %}
+{% trans "Can website automation connect with CRM and ERP systems?" as faq_q5 %}
+{% trans "Yes. Through APIs and integrations, website automation can exchange information with CRM, ERP, databases, and other business applications." as faq_a5 %}
+{% trans "What is the difference between website automation and RPA?" as faq_q6 %}
+{% trans "Website automation connects website functions with the applications, information, and workflows that support digital operations. RPA can extend automation across multiple applications and business systems." as faq_a6 %}
+{% trans "How do you handle access and security?" as faq_q7 %}
+{% trans "Automation runs with scoped accounts and permissions agreed with your team. Credentials are stored securely, access can be revoked at any time, and every execution is logged." as faq_a7 %}
+{% trans "What happens if a website changes after launch?" as faq_q8 %}
+{% trans "Workflows are monitored, so a changed page or form produces a visible failure rather than bad data. The workflow is then updated, either by your team or under a support agreement." as faq_a8 %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "{{ crumb_home|escapejs }}", "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'home:index' %}"},
+        {"@type": "ListItem", "position": 2, "name": "{{ crumb_automation|escapejs }}", "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'home:automation_home' %}"},
+        {"@type": "ListItem", "position": 3, "name": "{{ crumb_website|escapejs }}", "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'home:website_automation' %}"}
+    ]
+}
+</script>
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+        {"@type": "Question", "name": "{{ faq_q1|escapejs }}", "acceptedAnswer": {"@type": "Answer", "text": "{{ faq_a1|escapejs }}"}},
+        {"@type": "Question", "name": "{{ faq_q2|escapejs }}", "acceptedAnswer": {"@type": "Answer", "text": "{{ faq_a2|escapejs }}"}},
+        {"@type": "Question", "name": "{{ faq_q3|escapejs }}", "acceptedAnswer": {"@type": "Answer", "text": "{{ faq_a3|escapejs }}"}},
+        {"@type": "Question", "name": "{{ faq_q4|escapejs }}", "acceptedAnswer": {"@type": "Answer", "text": "{{ faq_a4|escapejs }}"}},
+        {"@type": "Question", "name": "{{ faq_q5|escapejs }}", "acceptedAnswer": {"@type": "Answer", "text": "{{ faq_a5|escapejs }}"}},
+        {"@type": "Question", "name": "{{ faq_q6|escapejs }}", "acceptedAnswer": {"@type": "Answer", "text": "{{ faq_a6|escapejs }}"}},
+        {"@type": "Question", "name": "{{ faq_q7|escapejs }}", "acceptedAnswer": {"@type": "Answer", "text": "{{ faq_a7|escapejs }}"}},
+        {"@type": "Question", "name": "{{ faq_q8|escapejs }}", "acceptedAnswer": {"@type": "Answer", "text": "{{ faq_a8|escapejs }}"}}
+    ]
+}
+</script>
 {% endblock %}
 
 {% block extra_css %}
@@ -314,27 +639,68 @@
         .ax-hero{background-position:center}
         .ax-hero__shade{background:linear-gradient(180deg,rgba(246,244,255,.96) 0%,rgba(246,244,255,.88) 55%,rgba(246,244,255,.7) 100%)}
     }
+
+    /* ---- Breadcrumbs ---- */
+    .wa-crumbs{background:#F8FAFC;border-bottom:1px solid rgba(15,23,42,.06);padding:.7rem 0}
+    .wa-crumbs ol{list-style:none;display:flex;flex-wrap:wrap;align-items:center;gap:.45rem;margin:0;padding:0;font-size:.8rem;color:var(--ax-body)}
+    .wa-crumbs li{display:flex;align-items:center;gap:.45rem}
+    .wa-crumbs li + li::before{content:"/";color:rgba(15,23,42,.3)}
+    .wa-crumbs a{color:var(--ax-body);text-decoration:none;font-weight:600}
+    .wa-crumbs a:hover{color:var(--ax-violet);text-decoration:underline;text-underline-offset:3px}
+    .wa-crumbs [aria-current]{color:var(--ax-ink);font-weight:700}
+
     /* ---- Page-scoped additions for the Website Automation landing page ---- */
     /* Hero emphasis line */
     .wa-hero__line{margin-top:-.5rem;color:rgba(15,23,42,.75);font-weight:600}
-    /* Second lead paragraph spacing */
-    .wa-lead-gap{margin-top:1rem}
-    /* Intro bullet list: two columns on wider screens */
-    .wa-intro-list{max-width:820px;margin:0 auto;gap:.7rem .25rem}
-    @media(min-width:768px){
-        .wa-intro-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:2rem}
-    }
-    /* Plain bullet lists inside cards */
+    /* Inline link used outside the hero */
+    .vf-link-inline{color:var(--ax-violet);font-weight:700;text-decoration:none;white-space:nowrap}
+    .vf-link-inline:hover{text-decoration:underline;text-underline-offset:3px}
+    .vf-link-inline i{font-size:.7rem}
+    /* Plain bullet lists inside cards / sections */
     .ax-n-list{list-style:none;padding:0;margin:.85rem 0 0;display:flex;flex-direction:column;gap:.5rem}
     .ax-n-list li{position:relative;padding-left:1.15rem;font-size:.85rem;color:var(--ax-body);line-height:1.6}
     .ax-n-list li::before{content:"";position:absolute;left:0;top:.55em;width:6px;height:6px;border-radius:50%;background:var(--ax-violet)}
-    /* Numbered solution cards */
+    /* Intro/list layout: two columns on wider screens */
+    .wa-intro-list{max-width:820px;margin:1.75rem auto 0;gap:.7rem .25rem}
+    @media(min-width:768px){
+        .wa-intro-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:2rem}
+    }
+    /* Numbered cards / steps */
     .wa-num{
         display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;
         border-radius:50%;background:linear-gradient(135deg,var(--ax-violet),var(--ax-violet-2));
         color:#fff;font-weight:700;font-size:.85rem;margin-bottom:.9rem;font-variant-numeric:tabular-nums;
     }
-    /* Numbered process steps */
+    /* Practical example block inside a solution card */
+    .wa-ex{
+        margin-top:1rem;padding:.8rem .95rem;border-left:3px solid rgba(124,58,237,.35);
+        background:rgba(124,58,237,.05);border-radius:0 10px 10px 0;
+        font-size:.82rem;line-height:1.6;color:var(--ax-body);
+    }
+    .wa-ex strong{color:var(--ax-ink)}
+    /* Proof stats */
+    .wa-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem;margin:0 auto;max-width:900px}
+    .wa-stat{background:#fff;border:1px solid rgba(15,23,42,.07);border-radius:14px;padding:1.35rem 1rem;text-align:center}
+    .wa-stat__value{display:block;font-family:'Fraunces',Georgia,serif;font-size:1.9rem;font-weight:600;color:var(--ax-violet);line-height:1.1}
+    .wa-stat__label{display:block;margin-top:.35rem;font-size:.78rem;color:var(--ax-body);font-weight:600;line-height:1.4}
+    .wa-note{text-align:center;max-width:720px;margin:1.4rem auto 0;font-size:.86rem;color:var(--ax-body);line-height:1.7}
+    /* Before/after scenarios */
+    .wa-scenarios{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.25rem;margin-top:2.25rem}
+    .wa-scenario{background:#fff;border:1px solid rgba(15,23,42,.07);border-radius:14px;padding:1.5rem}
+    .wa-scenario__tag{display:inline-block;font-size:.66rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ax-violet);margin-bottom:.55rem}
+    .wa-scenario h3{margin:0 0 .9rem;font-size:1.05rem;font-weight:700;color:var(--ax-ink)}
+    .wa-scenario__row{display:grid;grid-template-columns:64px 1fr;gap:.75rem;align-items:start;padding:.55rem 0;border-top:1px solid rgba(15,23,42,.06)}
+    .wa-scenario__row p{margin:0;font-size:.85rem;color:var(--ax-body);line-height:1.6}
+    .wa-scenario__label{font-size:.68rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#B91C1C;padding-top:.15rem}
+    .wa-scenario__label--after{color:#15803D}
+    /* Section sub-heading */
+    .wa-sub-h{margin:3rem 0 1.25rem;text-align:center;font-size:.78rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ax-violet)}
+    /* "What happens next" strip */
+    .wa-next{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}
+    .wa-next__item{background:#fff;border:1px solid rgba(15,23,42,.06);border-radius:14px;padding:1.5rem 1.35rem}
+    .wa-next__item h4{margin:0 0 .35rem;font-size:.95rem;font-weight:700;color:var(--ax-ink);line-height:1.35}
+    .wa-next__item p{margin:0;font-size:.83rem;color:var(--ax-body);line-height:1.6}
+    /* Numbered process steps (shared by the 5-step list) */
     .ax-steps{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1rem}
     .ax-step{position:relative;background:#fff;border:1px solid rgba(15,23,42,.06);border-radius:14px;padding:1.5rem 1.25rem 1.35rem}
     .ax-step__n{
@@ -345,17 +711,32 @@
     .ax-step h3{margin:0 0 .35rem;font-size:.95rem;color:var(--ax-ink);font-weight:700;line-height:1.3}
     .ax-step p{margin:0;font-size:.83rem;color:var(--ax-body);line-height:1.6}
     /* Use-cases table */
-    .wa-table-wrap{max-width:860px;margin:0 auto}
+    .wa-table-wrap{max-width:980px;margin:0 auto}
     .wa-table{width:100%;border-collapse:collapse;background:#fff;border:1px solid rgba(15,23,42,.07);border-radius:14px;overflow:hidden}
     .wa-table th{
         text-align:left;padding:.9rem 1.4rem;font-size:.78rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
         color:var(--ax-violet);background:linear-gradient(135deg,rgba(124,58,237,.07),rgba(124,58,237,.02));
         border-bottom:1px solid rgba(15,23,42,.07);
     }
-    .wa-table td{padding:.85rem 1.4rem;font-size:.88rem;color:var(--ax-body);border-bottom:1px solid rgba(15,23,42,.05);line-height:1.55}
+    .wa-table td{padding:.85rem 1.4rem;font-size:.86rem;color:var(--ax-body);border-bottom:1px solid rgba(15,23,42,.05);line-height:1.55}
     .wa-table tbody tr:last-child td{border-bottom:0}
     .wa-table tbody tr:nth-child(even){background:rgba(15,23,42,.015)}
-    .wa-table td:first-child{font-weight:700;color:var(--ax-ink);white-space:nowrap}
+    .wa-table td:first-child{font-weight:700;color:var(--ax-ink)}
+    .wa-table td:last-child{color:#15803D;font-weight:600}
+    /* Objection cards */
+    .wa-obj__q{margin:0 0 .4rem;font-size:.9rem;font-weight:700;color:var(--ax-ink);line-height:1.4}
+    .wa-obj__q i{color:var(--ax-violet);margin-right:.35rem;font-size:.82rem}
+    /* Related solution links */
+    .wa-links{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem}
+    .wa-link{
+        display:flex;flex-direction:column;gap:.35rem;background:#fff;
+        border:1px solid rgba(15,23,42,.07);border-radius:14px;padding:1.35rem 1.25rem;
+        text-decoration:none;color:inherit;transition:transform .25s,border-color .25s,box-shadow .25s;
+    }
+    .wa-link:hover{transform:translateY(-3px);border-color:rgba(124,58,237,.3);box-shadow:0 14px 30px rgba(15,23,42,.08)}
+    .wa-link i{color:var(--ax-violet);font-size:1rem;margin-bottom:.35rem}
+    .wa-link strong{font-size:.92rem;font-weight:700;color:var(--ax-ink);line-height:1.35}
+    .wa-link span{font-size:.8rem;color:var(--ax-body);line-height:1.55}
     /* FAQ accordions */
     .wrap--narrow{max-width:820px}
     .wa-faq{margin-top:.5rem}
@@ -367,27 +748,121 @@
     .wa-faq__item[open] summary i{transform:rotate(180deg)}
     .wa-faq__item summary:focus-visible{outline:2px solid var(--ax-violet);outline-offset:-2px}
     .wa-faq__a{padding:0 1.35rem 1.25rem;color:var(--ax-body);font-size:.9rem;line-height:1.75;margin:0}
-    /* Final CTA support line */
-    .wa-cta-line{margin-top:1rem;color:rgba(255,255,255,.88);font-weight:600}
+    /* Final CTA checklist + promise */
+    .wa-cta-list{list-style:none;padding:0;margin:0 auto 1.75rem;max-width:480px;display:flex;flex-direction:column;gap:.55rem;text-align:left}
+    .wa-cta-list li{display:flex;align-items:flex-start;gap:.6rem;color:rgba(255,255,255,.78);font-size:.9rem;line-height:1.5}
+    .wa-cta-list i{color:var(--ax-violet-2);font-size:.75rem;margin-top:.3rem;flex:0 0 auto}
+    .wa-promise{margin:1.25rem 0 0;font-size:.82rem;color:rgba(255,255,255,.6);font-weight:600}
     /* Light label on the dark final CTA */
     .ax-label--light{color:#C4B5FD}
     /* Responsive */
     @media(max-width:991px){
         .ax-steps{grid-template-columns:repeat(2,minmax(0,1fr))}
+        .wa-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+        .wa-links{grid-template-columns:repeat(2,minmax(0,1fr))}
     }
     @media(max-width:767px){
-        .wa-table td:first-child{white-space:normal}
+        .wa-scenarios{grid-template-columns:1fr}
+        .wa-next{grid-template-columns:1fr}
     }
     @media(max-width:575px){
         .ax-steps{grid-template-columns:1fr}
+        .wa-stats{grid-template-columns:1fr 1fr;gap:.75rem}
+        .wa-links{grid-template-columns:1fr}
         /* Use-cases table becomes stacked cards */
         .wa-table-wrap{padding:0 .25rem}
         .wa-table{border:0;background:transparent;border-radius:0}
         .wa-table thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
         .wa-table tbody tr{display:block;background:#fff;border:1px solid rgba(15,23,42,.07);border-radius:12px;margin-bottom:.7rem;padding:.3rem 0}
-        .wa-table td{display:flex;justify-content:space-between;gap:1rem;border-bottom:0;padding:.45rem 1.1rem;white-space:normal}
-        .wa-table td::before{content:attr(data-label);font-weight:700;color:var(--ax-ink);font-size:.8rem;flex:0 0 42%}
+        .wa-table td{display:flex;justify-content:space-between;gap:1rem;border-bottom:0;padding:.45rem 1.1rem}
+        .wa-table td::before{content:attr(data-label);font-weight:700;color:var(--ax-ink);font-size:.78rem;flex:0 0 40%}
+        .wa-scenario__row{grid-template-columns:1fr;gap:.15rem}
     }
+    /* ---- Visual refresh: editorial layout, illustrations and refined cards ---- */
+    .ax-hero{min-height:650px;display:flex;align-items:center;position:relative;overflow:hidden}
+    .ax-hero__inner{max-width:1180px;padding-top:5.5rem;padding-bottom:5.5rem}
+    .ax-hero__title{max-width:760px;letter-spacing:-.045em;line-height:1.04;font-size:clamp(2.65rem,5vw,4.65rem)}
+    .ax-hero__sub{max-width:650px;font-size:1.05rem;line-height:1.8}
+    .ax-hero__actions{gap:.85rem;margin-top:1.7rem}
+    .ax-btn{border-radius:10px;min-height:50px;padding:.85rem 1.25rem;transition:transform .2s ease,box-shadow .2s ease,background .2s ease}
+    .ax-btn:hover{transform:translateY(-2px);box-shadow:0 12px 26px rgba(76,29,149,.14)}
+    .wa-hero-points{display:flex;flex-wrap:wrap;gap:.8rem 1.35rem;margin-top:2rem;color:#51466F;font-size:.78rem;font-weight:700}
+    .wa-hero-points span{display:inline-flex;align-items:center;gap:.48rem}
+    .wa-hero-points i{color:var(--ax-violet)}
+    .ax-sec{padding-top:5.5rem;padding-bottom:5.5rem}
+    .ax-sec--soft{background:linear-gradient(180deg,#F8F7FF 0%,#F5F4FC 100%)}
+    .ax-center{max-width:850px;margin-left:auto;margin-right:auto;margin-bottom:2.5rem}
+    .ax-h2{letter-spacing:-.035em;line-height:1.15}
+    .ax-lead{line-height:1.8}
+    .ax-grid{gap:1.15rem}
+    .ax-card{border:1px solid rgba(91,63,155,.10);border-radius:18px;background:rgba(255,255,255,.94);padding:1.65rem;box-shadow:0 8px 24px rgba(37,24,74,.035);transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease}
+    .ax-card:hover{transform:translateY(-5px);border-color:rgba(124,58,237,.25);box-shadow:0 18px 38px rgba(37,24,74,.09)}
+    .ax-card__title{letter-spacing:-.018em;line-height:1.3}
+    .ax-card__body{line-height:1.75}
+    .wa-ex{border-radius:0 10px 10px 0;background:linear-gradient(100deg,rgba(124,58,237,.07),rgba(124,58,237,.025))}
+    .wa-flow-section{position:relative;overflow:hidden;padding:5.25rem 0;background:#11102B;color:#fff}
+    .wa-flow-section:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 78% 48%,rgba(124,58,237,.28),transparent 34%),radial-gradient(circle at 12% 10%,rgba(99,102,241,.14),transparent 28%);pointer-events:none}
+    .wa-flow-layout{position:relative;display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);align-items:center;gap:3.5rem}
+    .wa-flow-copy .ax-h2{color:#fff;font-size:clamp(2rem,3.5vw,3.2rem);margin:.8rem 0 1rem}
+    .wa-flow-copy p{max-width:500px;color:rgba(255,255,255,.7);line-height:1.85;font-size:.98rem}
+    .wa-flow-copy .ax-label{color:#C4B5FD}
+    .wa-text-link{display:inline-flex;align-items:center;gap:.65rem;margin-top:1rem;color:#DDD6FE;font-weight:700;text-decoration:none;font-size:.9rem}
+    .wa-text-link:hover{color:#fff}
+    .wa-flow-art{position:relative;min-height:330px;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:2rem 1.2rem;border:1px solid rgba(196,181,253,.18);border-radius:24px;background:linear-gradient(145deg,rgba(255,255,255,.08),rgba(255,255,255,.025));box-shadow:0 24px 70px rgba(0,0,0,.2);isolation:isolate}
+    .wa-flow-glow{position:absolute;width:260px;height:260px;border-radius:50%;background:rgba(139,92,246,.2);filter:blur(65px);z-index:-1;left:35%;top:12%}
+    .wa-flow-node{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.45rem;width:29%;min-height:145px;padding:1rem .6rem;border:1px solid rgba(221,214,254,.2);border-radius:16px;background:rgba(24,22,55,.92);box-shadow:0 12px 30px rgba(0,0,0,.18);text-align:center}
+    .wa-flow-node__icon{display:grid;place-items:center;width:44px;height:44px;border-radius:13px;background:linear-gradient(135deg,#7C3AED,#6366F1);color:#fff;font-size:1.05rem;margin-bottom:.2rem}
+    .wa-flow-node strong{font-size:.87rem;color:#fff}
+    .wa-flow-node small{font-size:.7rem;color:#B9B3D3}
+    .wa-flow-node__status{position:absolute;right:12px;top:12px;width:7px;height:7px;border-radius:50%;background:#34D399;box-shadow:0 0 0 4px rgba(52,211,153,.12)}
+    .wa-flow-connector{position:relative;flex:1;height:2px;background:linear-gradient(90deg,rgba(167,139,250,.35),#A78BFA,rgba(167,139,250,.35));min-width:14px}
+    .wa-flow-connector:after{content:"";position:absolute;right:0;top:50%;width:7px;height:7px;border-top:2px solid #C4B5FD;border-right:2px solid #C4B5FD;transform:translateY(-50%) rotate(45deg)}
+    .wa-flow-connector span{position:absolute;left:20%;top:50%;width:6px;height:6px;border-radius:50%;background:#fff;box-shadow:0 0 12px #C4B5FD;transform:translateY(-50%)}
+    .wa-flow-caption{position:absolute;bottom:15px;left:0;right:0;text-align:center;color:#C4B5FD;font-size:.72rem;font-weight:700;letter-spacing:.04em}
+    .wa-flow-caption i{color:#6EE7B7;margin-right:.35rem}
+    .wa-foundation-card{padding:1rem 1rem 1.65rem;overflow:hidden}
+    .wa-visual{height:190px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:13px;margin-bottom:1.35rem;background:linear-gradient(145deg,#F5F3FF,#EEF2FF)}
+    .wa-visual svg{display:block;width:100%;height:100%;max-width:390px}
+    .wa-visual--integration{background:linear-gradient(145deg,#F0F3FF,#F5F3FF)}
+    .wa-visual--dashboard{background:linear-gradient(145deg,#F4F0FF,#EEF2FF)}
+    .wa-foundation-card .ax-card__title,.wa-foundation-card .ax-card__body{margin-left:.55rem;margin-right:.55rem}
+    .wa-stats{gap:1rem}
+    .wa-stat{border-radius:16px;box-shadow:0 8px 24px rgba(37,24,74,.035)}
+    .wa-scenario{border-radius:18px;box-shadow:0 8px 24px rgba(37,24,74,.035)}
+    .ax-step{border-radius:16px;box-shadow:0 8px 22px rgba(37,24,74,.035)}
+    .wa-next__item{border-radius:16px;box-shadow:0 8px 22px rgba(37,24,74,.035)}
+    .wa-faq__item{border-radius:13px}
+    .wa-faq__item[open]{box-shadow:0 10px 25px rgba(76,29,149,.06)}
+    .ax-sec--dark{background:radial-gradient(circle at 80% 20%,rgba(124,58,237,.22),transparent 30%),#11102B}
+    .wa-cta-list{max-width:540px}
+    @media(max-width:991px){
+        .wa-flow-layout{grid-template-columns:1fr;gap:2rem}
+        .wa-flow-copy{max-width:720px}
+        .wa-flow-art{max-width:760px;width:100%;margin:0 auto}
+    }
+    @media(max-width:767px){
+        .ax-hero{min-height:620px;background-position:58% center}
+        .ax-hero__inner{padding-top:4.5rem;padding-bottom:4rem}
+        .ax-hero__title{font-size:clamp(2.35rem,10vw,3.3rem)}
+        .ax-hero__sub{font-size:.96rem}
+        .wa-hero-points{gap:.7rem 1rem;font-size:.72rem}
+        .ax-sec{padding-top:4rem;padding-bottom:4rem}
+        .wa-flow-section{padding:4rem 0}
+        .wa-flow-art{min-height:290px;padding:1.2rem .7rem;gap:.45rem}
+        .wa-flow-node{min-height:125px;padding:.8rem .35rem;width:30%}
+        .wa-flow-node strong{font-size:.75rem}
+        .wa-flow-node small{font-size:.62rem}
+        .wa-flow-connector{min-width:7px}
+        .wa-visual{height:170px}
+    }
+    @media(max-width:420px){
+        .wa-flow-art{padding:1rem .45rem}
+        .wa-flow-node{min-height:112px}
+        .wa-flow-node__icon{width:36px;height:36px;font-size:.9rem}
+        .wa-flow-caption{font-size:.62rem}
+        .wa-hero-points{display:grid;grid-template-columns:1fr 1fr}
+    }
+
     /* ---- Reveal-on-scroll (page-scoped). Classes are added by JS at the end of
        the body; without JS the elements keep no hidden state and simply show.
        The global IntersectionObserver in base.html toggles .is-visible. ---- */
@@ -403,10 +878,65 @@
     .ax-a-d4{transition-delay:.24s}
     .ax-a-d5{transition-delay:.30s}
     .ax-a-d6{transition-delay:.36s}
+
+    /* ---- Image-rich editorial refresh: fewer boxes, more visual storytelling ---- */
+    .wa-solutions-editorial{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:3.2rem;row-gap:0;margin-top:1.8rem;border-top:1px solid #E4DDF3}
+    .wa-solution-row{position:relative;display:grid;grid-template-columns:48px 1fr;gap:1rem;padding:1.65rem .2rem 1.75rem;border-bottom:1px solid #E4DDF3;background:transparent;min-width:0}
+    .wa-solution-index{font-size:.78rem;font-weight:800;letter-spacing:.08em;color:#8B5CF6;padding-top:.25rem}
+    .wa-solution-row .ax-card__title{grid-column:2;font-size:1.15rem;margin:0 0 .55rem;color:#20183B}
+    .wa-solution-row .ax-card__body{grid-column:2;margin:0;color:#665F78;line-height:1.75}
+    .wa-solution-row .wa-ex{grid-column:2;margin-top:.7rem;padding:.7rem .9rem;font-size:.82rem;color:#51466F;border-left:2px solid #A78BFA;border-radius:0;background:rgba(124,58,237,.045)}
+    .wa-solution-row:hover .wa-solution-index{color:#4F46E5;transform:translateX(3px)}
+    .wa-solution-index{transition:transform .25s ease,color .25s ease}
+    .wa-foundation-editorial{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2.5rem;margin-top:1rem}
+    .wa-foundation-item{min-width:0;padding:0;background:transparent;border:0;box-shadow:none}
+    .wa-foundation-item:hover{transform:none;box-shadow:none}
+    .wa-foundation-item .wa-visual{height:220px;border-radius:18px;margin-bottom:1.5rem;transition:transform .45s cubic-bezier(.2,.8,.2,1),filter .45s ease}
+    .wa-foundation-item:hover .wa-visual{transform:translateY(-5px) scale(1.015);filter:saturate(1.08)}
+    .wa-foundation-item .ax-card__title,.wa-foundation-item .ax-card__body{margin-left:0;margin-right:0}
+    .wa-operations-section{position:relative;overflow:hidden;padding:6rem 0;background:linear-gradient(180deg,#F8F7FF 0%,#fff 100%)}
+    .wa-operations-layout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:4rem;align-items:center}
+    .wa-operations-art{position:relative;min-height:440px;display:grid;place-items:center;isolation:isolate}
+    .wa-operations-art:before{content:"";position:absolute;width:76%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(196,181,253,.48),rgba(237,233,254,.2) 55%,transparent 72%);z-index:-2}
+    .wa-operations-art svg{width:100%;max-width:650px;overflow:visible;filter:drop-shadow(0 18px 26px rgba(50,30,100,.06))}
+    .wa-orbit{position:absolute;border:1px solid rgba(139,92,246,.18);border-radius:50%;pointer-events:none}
+    .wa-orbit--one{width:88%;height:68%;transform:rotate(-18deg)}
+    .wa-orbit--two{width:70%;height:92%;transform:rotate(24deg)}
+    .wa-ops-path{stroke-dasharray:8 10;animation:waPathFlow 14s linear infinite}
+    .wa-ops-path--second{animation-duration:10s;animation-direction:reverse}
+    .wa-ops-pulse{transform-box:fill-box;transform-origin:center;animation:waPulse 2.5s ease-in-out infinite}
+    .wa-ops-pulse--delay{animation-delay:1.1s}
+    .wa-ops-float{position:absolute;display:inline-flex;align-items:center;gap:.55rem;padding:.75rem 1rem;border:1px solid rgba(124,58,237,.12);border-radius:999px;background:rgba(255,255,255,.92);box-shadow:0 12px 34px rgba(37,24,74,.1);font-size:.76rem;font-weight:750;color:#35265D;backdrop-filter:blur(10px);animation:waFloat 5s ease-in-out infinite}
+    .wa-ops-float i{color:#7C3AED}
+    .wa-ops-float--top{top:5%;right:7%}
+    .wa-ops-float--bottom{bottom:7%;left:4%;animation-delay:-2.4s}
+    .wa-operations-copy .ax-h2{font-size:clamp(2rem,3.3vw,3.1rem);margin:.75rem 0 1rem}
+    .wa-operations-copy>p{color:#665F78;line-height:1.85}
+    .wa-check-list{list-style:none;padding:0;margin:1.5rem 0 1rem;display:grid;gap:.85rem}
+    .wa-check-list li{display:flex;align-items:flex-start;gap:.7rem;color:#40365C;font-size:.92rem;line-height:1.55}
+    .wa-check-list i{color:#7C3AED;margin-top:.2rem;font-size:.8rem}
+    .wa-text-link--light{color:#6D28D9}
+    .wa-text-link--light:hover{color:#4C1D95}
+    @keyframes waPathFlow{to{stroke-dashoffset:-180}}
+    @keyframes waPulse{0%,100%{opacity:.75;transform:scale(.85)}50%{opacity:1;transform:scale(1.22)}}
+    @keyframes waFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+    .wa-flow-connector span{animation:waConnectorTravel 2.8s ease-in-out infinite alternate}
+    .wa-flow-connector--two span{animation-delay:1.1s}
+    @keyframes waConnectorTravel{from{left:12%}to{left:82%}}
+    .wa-visual svg{overflow:visible}
+    .wa-visual--website svg{animation:waVisualDrift 7s ease-in-out infinite}
+    .wa-visual--integration svg{animation:waVisualDrift 8s ease-in-out infinite reverse}
+    .wa-visual--dashboard svg{animation:waVisualDrift 7.5s ease-in-out infinite}
+    @keyframes waVisualDrift{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+    @media(max-width:991px){.wa-operations-layout{grid-template-columns:1fr;gap:2rem}.wa-operations-art{min-height:380px;order:2}.wa-operations-copy{order:1}.wa-foundation-editorial{gap:1.5rem}}
+    @media(max-width:767px){.wa-solutions-editorial{grid-template-columns:1fr}.wa-foundation-editorial{grid-template-columns:1fr;gap:2.5rem}.wa-foundation-item .wa-visual{height:210px}.wa-operations-section{padding:4rem 0}.wa-operations-art{min-height:280px}.wa-ops-float{font-size:.65rem;padding:.55rem .75rem}.wa-ops-float--top{right:0}.wa-ops-float--bottom{left:0}}
+    @media(prefers-reduced-motion:reduce){.wa-ops-path,.wa-ops-pulse,.wa-ops-float,.wa-flow-connector span,.wa-visual svg{animation:none!important}}
+
     /* Reduced motion: show everything immediately, no movement */
     @media(prefers-reduced-motion:reduce){
         .animate-on-scroll{opacity:1!important;transform:none!important;transition:none!important}
         .wa-faq__item summary i{transition:none}
+        .wa-link:hover{transform:none}
     }
 </style>
 {% endblock %}
@@ -428,12 +958,12 @@
     }
     /* Hero + every centered section header: cascade the label / heading / lead. */
     document.querySelectorAll('.ax-hero__inner, .ax-center').forEach(stagger);
-    /* Stagger the children of each card grid / step list. */
-    ['.ax-grid', '.ax-steps'].forEach(function(sel){
+    /* Stagger the children of each card grid / step list / strip. */
+    ['.ax-grid', '.ax-steps', '.wa-next', '.wa-links'].forEach(function(sel){
         document.querySelectorAll(sel).forEach(stagger);
     });
     /* Standalone blocks. */
-    document.querySelectorAll('.wa-table-wrap, .ax-cta-center').forEach(function(el){ add(el); });
+    document.querySelectorAll('.wa-table-wrap, .wa-stats, .wa-scenarios, .wa-flow-art, .wa-operations-art, .wa-operations-copy').forEach(function(el){ add(el); });
     document.querySelectorAll('.wa-faq__item').forEach(function(el, i){ add(el, ['ax-a-d' + Math.min(i + 1, 6)]); });
 
     /* Page-local reveal (no rAF dependency): in-viewport elements are revealed

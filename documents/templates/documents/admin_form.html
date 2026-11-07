@@ -1,0 +1,226 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if is_create %}New document{% else %}Edit {{ document.reference }}{% endif %} | OnWebApp{% endblock %}
+
+{% block meta %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    {% include 'documents/_messages.html' %}
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <h1 class="h3 fw-bold mb-1">{% if is_create %}New document{% else %}Edit {{ document.reference }}{% endif %}</h1>
+            <p class="text-muted mb-0">The client details are copied from the CRM profile when you save.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'documents:admin_list' %}" class="btn btn-outline-secondary">Cancel</a>
+            {% if not is_create %}
+                <a href="{% url 'documents:admin_preview' document.pk %}" class="btn btn-outline-primary">Preview</a>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if not is_create and not can_edit %}
+    <div class="alert alert-warning">
+        <i class="fas fa-lock me-2"></i>This document can no longer be edited because it is
+        <strong>{{ document.get_status_display }}</strong>.
+    </div>
+    {% endif %}
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white py-3"><h6 class="fw-bold mb-0">Document</h6></div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" for="{{ form.doc_type.id_for_label }}">Document type</label>
+                                {{ form.doc_type }}
+                                {{ form.doc_type.errors }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" for="{{ form.customer.id_for_label }}">Client (CRM)</label>
+                                {{ form.customer }}
+                                {% if form.customer.help_text %}<div class="form-text">{{ form.customer.help_text }}</div>{% endif %}
+                                {{ form.customer.errors }}
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold" for="{{ form.title.id_for_label }}">Title <span class="text-muted fw-normal">(optional)</span></label>
+                                {{ form.title }}
+                                {{ form.title.errors }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold" for="{{ form.issue_date.id_for_label }}">Issue date</label>
+                                {{ form.issue_date }}
+                                {{ form.issue_date.errors }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold" for="{{ form.due_date.id_for_label }}">Due date</label>
+                                {{ form.due_date }}
+                                {{ form.due_date.errors }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold" for="{{ form.valid_until.id_for_label }}">Valid until</label>
+                                {{ form.valid_until }}
+                                {{ form.valid_until.errors }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold" for="{{ form.project.id_for_label }}">Project <span class="text-muted fw-normal">(optional)</span></label>
+                                {{ form.project }}
+                                {{ form.project.errors }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold" for="{{ form.source_invoice.id_for_label }}">Internal invoice <span class="text-muted fw-normal">(optional)</span></label>
+                                {{ form.source_invoice }}
+                                {{ form.source_invoice.errors }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold" for="{{ form.currency.id_for_label }}">Currency</label>
+                                {{ form.currency }}
+                                {{ form.currency.errors }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                        <h6 class="fw-bold mb-0">Line items</h6>
+                        <button type="button" class="btn btn-sm btn-outline-primary" id="add-item">
+                            <i class="fas fa-plus me-1"></i>Add row
+                        </button>
+                    </div>
+                    <div class="card-body p-0">
+                        {{ formset.management_form }}
+                        {% if formset.non_form_errors %}
+                        <div class="alert alert-danger m-3">{{ formset.non_form_errors }}</div>
+                        {% endif %}
+                        <div class="table-responsive">
+                            <table class="table align-middle mb-0">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th class="ps-3" style="min-width:200px;">Description</th>
+                                        <th style="min-width:140px;">Details</th>
+                                        <th style="width:100px;">Qty</th>
+                                        <th style="width:130px;">Unit price</th>
+                                        <th style="width:70px;" class="text-center">Remove</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="items-body">
+                                    {% for f in formset %}
+                                    <tr>
+                                        <td class="ps-3">
+                                            {{ f.id }}
+                                            {{ f.description }}
+                                            {{ f.description.errors }}
+                                        </td>
+                                        <td>{{ f.details }}{{ f.details.errors }}</td>
+                                        <td>{{ f.quantity }}{{ f.quantity.errors }}</td>
+                                        <td>{{ f.unit_price }}{{ f.unit_price.errors }}</td>
+                                        <td class="text-center">{{ f.DELETE }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white py-3"><h6 class="fw-bold mb-0">Notes &amp; terms</h6></div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold" for="{{ form.notes.id_for_label }}">Notes for the client</label>
+                            {{ form.notes }}
+                            {{ form.notes.errors }}
+                        </div>
+                        <div>
+                            <label class="form-label fw-semibold" for="{{ form.terms.id_for_label }}">Payment terms &amp; conditions</label>
+                            {{ form.terms }}
+                            {{ form.terms.errors }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white py-3"><h6 class="fw-bold mb-0">Totals</h6></div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold" for="{{ form.discount_amount.id_for_label }}">Discount amount</label>
+                            {{ form.discount_amount }}
+                            {{ form.discount_amount.errors }}
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-7">
+                                <label class="form-label fw-semibold" for="{{ form.tax_label.id_for_label }}">Tax label</label>
+                                {{ form.tax_label }}
+                                {{ form.tax_label.errors }}
+                            </div>
+                            <div class="col-5">
+                                <label class="form-label fw-semibold" for="{{ form.tax_rate.id_for_label }}">Rate %</label>
+                                {{ form.tax_rate }}
+                                {{ form.tax_rate.errors }}
+                            </div>
+                        </div>
+                        <p class="text-muted small mt-3 mb-0">
+                            Subtotal, tax and total are recalculated from the line items every time you save.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-save me-2"></i>
+                            {% if is_create %}Create document{% else %}Save changes{% endif %}
+                        </button>
+                        {% if not is_create %}
+                        <p class="text-muted small mt-2 mb-0">
+                            Editing a document that was already sent creates a new version and requires resending it.
+                        </p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<template id="empty-item-row">
+    <tr>
+        <td class="ps-3">{{ formset.empty_form.id }}{{ formset.empty_form.description }}</td>
+        <td>{{ formset.empty_form.details }}</td>
+        <td>{{ formset.empty_form.quantity }}</td>
+        <td>{{ formset.empty_form.unit_price }}</td>
+        <td class="text-center">{{ formset.empty_form.DELETE }}</td>
+    </tr>
+</template>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+    var button = document.getElementById('add-item');
+    var body = document.getElementById('items-body');
+    var template = document.getElementById('empty-item-row');
+    var total = document.getElementById('id_{{ formset.prefix }}-TOTAL_FORMS');
+    if (!button || !body || !template || !total) return;
+    button.addEventListener('click', function () {
+        var index = parseInt(total.value, 10) || 0;
+        body.insertAdjacentHTML('beforeend', template.innerHTML.replace(/__prefix__/g, index));
+        total.value = index + 1;
+    });
+})();
+</script>
+{% endblock %}

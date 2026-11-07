@@ -47,6 +47,7 @@ urlpatterns = [
     path('operations/', include('operations.urls')),
     path('rpa/', include('rpa_dashboard.urls')),
     path('crm/', include('crm.urls')),
+    path('documents/', include('documents.urls', namespace='documents')),
     path('i18n/', include('django.conf.urls.i18n')),
     path('users/', include('users.urls', namespace='users')),
     path('community/', include('community.urls')),

@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% load static humanize %}
+
+{% block title %}Sign {{ document.reference }} | OnWebApp{% endblock %}
+
+{% block meta %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    {% include 'documents/_messages.html' %}
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+                <div>
+                    <h1 class="h3 fw-bold mb-1">Sign {{ document.reference }}</h1>
+                    <p class="text-muted mb-0">{{ document.doc_type.name }}{% if document.title %} &middot; {{ document.title }}{% endif %}</p>
+                </div>
+                {% if is_public %}
+                    <a href="{% url 'documents:public_view' token %}" class="btn btn-outline-secondary">Back to document</a>
+                {% else %}
+                    <a href="{% url 'documents:client_detail' document.pk %}" class="btn btn-outline-secondary">Back to document</a>
+                {% endif %}
+            </div>
+
+            <div class="alert alert-info small">
+                <i class="fas fa-shield-halved me-2"></i>
+                Your electronic signature, the document version, your IP address and a timestamp are recorded
+                as an audit trail. The company signature already shown on the PDF is an authorized company asset,
+                not your signature.
+            </div>
+
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="fw-bold mb-0">Document summary</h6>
+                    <span class="badge bg-light text-dark border">v{{ document.version }}</span>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <div class="text-muted small text-uppercase fw-bold">Total</div>
+                            <div class="fw-bold fs-5">{{ amount }}</div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="text-muted small text-uppercase fw-bold">Issue date</div>
+                            <div>{{ document.issue_date|date:"M d, Y" }}</div>
+                        </div>
+                        <div class="col-12">
+                            <a href="{% if is_public %}{% url 'documents:public_download' token %}{% else %}{% url 'documents:client_download' document.pk %}{% endif %}"
+                               class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-download me-2"></i>Download and review the full PDF
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <form method="post" enctype="multipart/form-data" novalidate
+                  action="{% if is_public %}{% url 'documents:public_sign' token %}{% else %}{% url 'documents:client_sign' document.pk %}{% endif %}">
+                {% csrf_token %}
+                {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white py-3"><h6 class="fw-bold mb-0">Your signature</h6></div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" for="{{ form.signer_name.id_for_label }}">Full legal name</label>
+                                {{ form.signer_name }}{{ form.signer_name.errors }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" for="{{ form.signer_email.id_for_label }}">Email</label>
+                                {{ form.signer_email }}{{ form.signer_email.errors }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" for="{{ form.signer_role.id_for_label }}">Role / position <span class="text-muted fw-normal">(optional)</span></label>
+                                {{ form.signer_role }}{{ form.signer_role.errors }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" for="{{ form.typed_signature.id_for_label }}">Typed signature <span class="text-muted fw-normal">(optional)</span></label>
+                                {{ form.typed_signature }}{{ form.typed_signature.errors }}
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold" for="{{ form.signature_image.id_for_label }}">Upload signature image <span class="text-muted fw-normal">(optional PNG)</span></label>
+                                {{ form.signature_image }}
+                                <div class="form-text">Type your name or upload a PNG of your signature — at least one is required.</div>
+                                {{ form.signature_image.errors }}
+                            </div>
+                            <div class="col-12">
+                                <div class="form-check">
+                                    {{ form.consent }}
+                                    <label class="form-check-label small" for="{{ form.consent.id_for_label }}">{{ form.consent.label }}</label>
+                                </div>
+                                {{ form.consent.errors }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-signature me-2"></i>Sign document
+                    </button>
+                    {% if is_public %}
+                        <a href="{% url 'documents:public_view' token %}" class="btn btn-outline-secondary">Cancel</a>
+                    {% else %}
+                        <a href="{% url 'documents:client_detail' document.pk %}" class="btn btn-outline-secondary">Cancel</a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

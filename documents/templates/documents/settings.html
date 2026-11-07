@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Signature &amp; Stamp Settings | OnWebApp{% endblock %}
+
+{% block meta %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    {% include 'documents/_messages.html' %}
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <h1 class="h3 fw-bold mb-1">Signature &amp; stamp</h1>
+            <p class="text-muted mb-0">
+                These assets are applied to every official document. They are authorized company assets,
+                not a client e-signature.
+            </p>
+        </div>
+        <a href="{% url 'documents:admin_list' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Documents
+        </a>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <form method="post" enctype="multipart/form-data" novalidate>
+                {% csrf_token %}
+                {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white py-3"><h6 class="fw-bold mb-0">Company identity</h6></div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" for="{{ form.company_name.id_for_label }}">Trading name</label>
+                                {{ form.company_name }}{{ form.company_name.errors }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" for="{{ form.company_legal_name.id_for_label }}">Legal name</label>
+                                {{ form.company_legal_name }}{{ form.company_legal_name.errors }}
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold" for="{{ form.company_address.id_for_label }}">Address</label>
+                                {{ form.company_address }}{{ form.company_address.errors }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold" for="{{ form.company_email.id_for_label }}">Email</label>
+                                {{ form.company_email }}{{ form.company_email.errors }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold" for="{{ form.company_phone.id_for_label }}">Phone</label>
+                                {{ form.company_phone }}{{ form.company_phone.errors }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold" for="{{ form.company_website.id_for_label }}">Website</label>
+                                {{ form.company_website }}{{ form.company_website.errors }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" for="{{ form.company_tax_id.id_for_label }}">Tax / registration ID</label>
+                                {{ form.company_tax_id }}{{ form.company_tax_id.errors }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" for="{{ form.registration_note.id_for_label }}">Registration note</label>
+                                {{ form.registration_note }}{{ form.registration_note.errors }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white py-3"><h6 class="fw-bold mb-0">Authorized signatory</h6></div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" for="{{ form.signatory_name.id_for_label }}">Signatory name</label>
+                                {{ form.signatory_name }}{{ form.signatory_name.errors }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" for="{{ form.signatory_position.id_for_label }}">Position</label>
+                                {{ form.signatory_position }}{{ form.signatory_position.errors }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" for="{{ form.signature_image.id_for_label }}">Signature image (PNG)</label>
+                                {{ form.signature_image }}
+                                <div class="form-text">Transparent PNG, max 2 MB. Applied above the signatory name.</div>
+                                <img id="signature-upload-preview" alt="Selected signature preview" class="img-fluid mt-2 d-none" style="max-height:90px;">
+                                {{ form.signature_image.errors }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" for="{{ form.stamp_image.id_for_label }}">Company stamp (PNG)</label>
+                                {{ form.stamp_image }}
+                                <div class="form-text">Transparent PNG, max 2 MB. Applied beside the signature.</div>
+                                <img id="stamp-upload-preview" alt="Selected stamp preview" class="img-fluid mt-2 d-none" style="max-height:90px;">
+                                {{ form.stamp_image.errors }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white py-3"><h6 class="fw-bold mb-0">Document defaults</h6></div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold" for="{{ form.accent_color.id_for_label }}">Accent colour</label>
+                                {{ form.accent_color }}{{ form.accent_color.errors }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold" for="{{ form.default_validity_days.id_for_label }}">Quotation validity (days)</label>
+                                {{ form.default_validity_days }}{{ form.default_validity_days.errors }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold" for="{{ form.footer_note.id_for_label }}">Footer note</label>
+                                {{ form.footer_note }}{{ form.footer_note.errors }}
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold" for="{{ form.default_payment_terms.id_for_label }}">Default payment terms</label>
+                                {{ form.default_payment_terms }}{{ form.default_payment_terms.errors }}
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold" for="{{ form.bank_details.id_for_label }}">Bank / payment details</label>
+                                {{ form.bank_details }}{{ form.bank_details.errors }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-2"></i>Save settings
+                </button>
+            </form>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3"><h6 class="fw-bold mb-0">Preview</h6></div>
+                <div class="card-body">
+                    <div class="text-muted small text-uppercase fw-bold mb-2">Signature</div>
+                    {% if settings.signature_image %}
+                        <img src="{{ settings.signature_image.url }}" alt="Company signature" class="img-fluid mb-3" style="max-height:110px;">
+                    {% else %}
+                        <div class="border rounded p-4 text-center text-muted small mb-3">No signature uploaded</div>
+                    {% endif %}
+                    <div class="text-muted small text-uppercase fw-bold mb-2">Stamp</div>
+                    {% if settings.stamp_image %}
+                        <img src="{{ settings.stamp_image.url }}" alt="Company stamp" class="img-fluid mb-3" style="max-height:110px;">
+                    {% else %}
+                        <div class="border rounded p-4 text-center text-muted small mb-3">No stamp uploaded</div>
+                    {% endif %}
+                    <hr>
+                    <div class="small">
+                        <div class="fw-bold">{{ settings.signatory_name|default:'Signatory name not set' }}</div>
+                        <div class="text-muted">{{ settings.signatory_position|default:'Position not set' }}</div>
+                        <div class="text-muted">{{ settings.company_name }}</div>
+                    </div>
+                    <div class="mt-3">
+                        <span class="d-inline-block rounded border" style="width:100%;height:14px;background:{{ settings.accent_color }};"></span>
+                    </div>
+                </div>
+            </div>
+
+            {% if settings.signature_image or settings.stamp_image %}
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3"><h6 class="fw-bold mb-0">Remove an asset</h6></div>
+                <div class="card-body d-grid gap-2">
+                    {% if settings.signature_image %}
+                    <form method="post" onsubmit="return confirm('Remove the company signature?');">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="remove_signature">
+                        <button type="submit" class="btn btn-outline-danger w-100 btn-sm">Remove signature</button>
+                    </form>
+                    {% endif %}
+                    {% if settings.stamp_image %}
+                    <form method="post" onsubmit="return confirm('Remove the company stamp?');">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="remove_stamp">
+                        <button type="submit" class="btn btn-outline-danger w-100 btn-sm">Remove stamp</button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="alert alert-info small">
+                <i class="fas fa-shield-halved me-2"></i>
+                Uploaded assets are treated as authorized company property. Every document records who generated
+                the PDF and when. Client signatures are stored separately with their own audit trail.
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+    function bind(inputId, previewId) {
+        var input = document.getElementById(inputId);
+        var preview = document.getElementById(previewId);
+        if (!input || !preview) return;
+        input.addEventListener('change', function () {
+            var file = input.files && input.files[0];
+            if (!file) {
+                preview.classList.add('d-none');
+                preview.removeAttribute('src');
+                return;
+            }
+            preview.src = URL.createObjectURL(file);
+            preview.classList.remove('d-none');
+        });
+    }
+    bind('id_signature_image', 'signature-upload-preview');
+    bind('id_stamp_image', 'stamp-upload-preview');
+})();
+</script>
+{% endblock %}

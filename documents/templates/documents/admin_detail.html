@@ -1,0 +1,296 @@
+{% extends 'base.html' %}
+{% load static humanize %}
+
+{% block title %}{{ document.reference }} | Documents | OnWebApp{% endblock %}
+
+{% block meta %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    {% include 'documents/_messages.html' %}
+
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <h1 class="h3 fw-bold mb-0">{{ document.reference }}</h1>
+                <span class="badge bg-{{ document.display_status_tone }}">{{ document.display_status_label }}</span>
+                <span class="badge bg-light text-dark border">v{{ document.version }}</span>
+            </div>
+            <p class="text-muted mb-0">
+                {{ document.doc_type.name }}{% if document.title %} &middot; {{ document.title }}{% endif %}
+                &middot; for {{ document.client_display_name }}
+            </p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <a href="{% url 'documents:admin_list' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>All documents
+            </a>
+            <a href="{% url 'documents:admin_preview' document.pk %}" class="btn btn-outline-primary">
+                <i class="fas fa-eye me-2"></i>Preview
+            </a>
+            <a href="{% url 'documents:admin_edit' document.pk %}" class="btn btn-outline-primary">
+                <i class="fas fa-pen me-2"></i>Edit
+            </a>
+            <a href="{% url 'documents:admin_download' document.pk %}" class="btn btn-primary">
+                <i class="fas fa-download me-2"></i>Download PDF
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <div class="text-muted small text-uppercase fw-bold">Client</div>
+                            <div class="fw-semibold">{{ document.client_display_name }}</div>
+                            {% if document.client_company and document.client_company != document.client_name %}
+                                <div class="text-muted small">{{ document.client_name }}</div>
+                            {% endif %}
+                            <div class="text-muted small">{{ document.client_email }}</div>
+                            {% if document.client_address %}<div class="text-muted small mt-1" style="white-space:pre-line;">{{ document.client_address }}</div>{% endif %}
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="text-muted small text-uppercase fw-bold">Issued</div>
+                                    <div>{{ document.issue_date|date:"M d, Y" }}</div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="text-muted small text-uppercase fw-bold">Due</div>
+                                    <div>{% if document.due_date %}{{ document.due_date|date:"M d, Y" }}{% else %}&mdash;{% endif %}</div>
+                                </div>
+                                {% if document.valid_until %}
+                                <div class="col-6 mt-2">
+                                    <div class="text-muted small text-uppercase fw-bold">Valid until</div>
+                                    <div>{{ document.valid_until|date:"M d, Y" }}</div>
+                                </div>
+                                {% endif %}
+                                <div class="col-6 mt-2">
+                                    <div class="text-muted small text-uppercase fw-bold">Total</div>
+                                    <div class="fw-bold fs-5">{{ document.total|floatformat:2|intcomma }} {{ document.currency }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3"><h6 class="fw-bold mb-0">Line items</h6></div>
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4">Description</th>
+                                <th class="text-end">Qty</th>
+                                <th class="text-end">Unit price</th>
+                                <th class="text-end pe-4">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in items %}
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="fw-semibold">{{ item.description }}</div>
+                                    {% if item.details %}<div class="text-muted small">{{ item.details }}</div>{% endif %}
+                                </td>
+                                <td class="text-end">{{ item.quantity|floatformat:2 }}</td>
+                                <td class="text-end">{{ item.unit_price|floatformat:2|intcomma }}</td>
+                                <td class="text-end pe-4 fw-semibold">{{ item.line_total|floatformat:2|intcomma }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="4" class="text-center text-muted py-4">No line items.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot class="bg-light">
+                            <tr>
+                                <td colspan="3" class="text-end">Subtotal</td>
+                                <td class="text-end pe-4">{{ document.subtotal|floatformat:2|intcomma }} {{ document.currency }}</td>
+                            </tr>
+                            {% if document.discount_amount %}
+                            <tr>
+                                <td colspan="3" class="text-end">Discount</td>
+                                <td class="text-end pe-4">-{{ document.discount_amount|floatformat:2|intcomma }} {{ document.currency }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if document.tax_rate %}
+                            <tr>
+                                <td colspan="3" class="text-end">{{ document.tax_label }} ({{ document.tax_rate }}%)</td>
+                                <td class="text-end pe-4">{{ document.tax_amount|floatformat:2|intcomma }} {{ document.currency }}</td>
+                            </tr>
+                            {% endif %}
+                            <tr>
+                                <td colspan="3" class="text-end fw-bold fs-6">Total</td>
+                                <td class="text-end pe-4 fw-bold fs-6">{{ document.total|floatformat:2|intcomma }} {{ document.currency }}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="fw-bold mb-0">Email delivery history</h6>
+                    <span class="text-muted small">{{ document.emails.count }} attempt{{ document.emails.count|pluralize }}</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4">Sent at</th>
+                                <th>To</th>
+                                <th>Status</th>
+                                <th>By</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for email in emails %}
+                            <tr>
+                                <td class="ps-4">{{ email.created_at|date:"M d, Y H:i" }}</td>
+                                <td>{{ email.to_email }}</td>
+                                <td>
+                                    <span class="badge bg-{% if email.status == 'sent' %}success{% else %}danger{% endif %}">{{ email.get_status_display }}</span>
+                                    {% if email.is_resend %}<span class="badge bg-light text-dark border">Resend</span>{% endif %}
+                                </td>
+                                <td>{% if email.sent_by %}{{ email.sent_by.get_username }}{% else %}&mdash;{% endif %}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="4" class="text-center text-muted py-4">Nothing has been sent yet.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3"><h6 class="fw-bold mb-0">Audit trail</h6></div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        {% for event in events %}
+                        <li class="d-flex gap-3 py-2 {% if not forloop.last %}border-bottom{% endif %}">
+                            <div class="text-muted small text-nowrap" style="min-width:130px;">{{ event.created_at|date:"M d, Y H:i" }}</div>
+                            <div>
+                                <div class="fw-semibold">{{ event.get_event_display }}</div>
+                                {% if event.note %}<div class="text-muted small">{{ event.note }}</div>{% endif %}
+                                <div class="text-muted small">
+                                    {% if event.actor_email %}{{ event.actor_email }}{% elif event.actor %}{{ event.actor.get_username }}{% else %}System{% endif %}
+                                    {% if event.ip_address %} &middot; {{ event.ip_address }}{% endif %}
+                                </div>
+                            </div>
+                        </li>
+                        {% empty %}
+                        <li class="text-muted">No events recorded.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3"><h6 class="fw-bold mb-0">Actions</h6></div>
+                <div class="card-body d-grid gap-2">
+                    <form method="post" action="{% url 'documents:admin_send' document.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-paper-plane me-2"></i>{% if document.sent_at %}Resend to client{% else %}Send to client{% endif %}
+                        </button>
+                    </form>
+                    <form method="post" action="{% url 'documents:admin_regenerate' document.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-secondary w-100">
+                            <i class="fas fa-rotate me-2"></i>Regenerate PDF
+                        </button>
+                    </form>
+                    {% if document.status != 'PAID' and document.status != 'CANCELLED' %}
+                    <form method="post" action="{% url 'documents:admin_mark_paid' document.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-success w-100">
+                            <i class="fas fa-check-circle me-2"></i>Mark as paid
+                        </button>
+                    </form>
+                    {% endif %}
+                    {% if document.status != 'CANCELLED' %}
+                    <form method="post" action="{% url 'documents:admin_cancel' document.pk %}"
+                          onsubmit="return confirm('Cancel {{ document.reference }}? The client will still see the history.');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-danger w-100">
+                            <i class="fas fa-ban me-2"></i>Cancel document
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+                {% if document.sent_at %}
+                <div class="card-footer bg-white">
+                    <div class="text-muted small text-uppercase fw-bold mb-1">Sent</div>
+                    <div class="small">{{ document.sent_at|date:"M d, Y H:i" }}</div>
+                    {% if document.viewed_at %}
+                    <div class="text-muted small text-uppercase fw-bold mt-2 mb-1">First viewed</div>
+                    <div class="small">{{ document.viewed_at|date:"M d, Y H:i" }}</div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3"><h6 class="fw-bold mb-0">Company signature &amp; stamp</h6></div>
+                <div class="card-body">
+                    <div class="row g-3 text-center">
+                        <div class="col-6">
+                            <div class="text-muted small text-uppercase fw-bold mb-2">Signature</div>
+                            {% if settings.signature_image %}
+                                <img src="{{ settings.signature_image.url }}" alt="Company signature" class="img-fluid" style="max-height:70px;">
+                            {% else %}
+                                <div class="text-muted small border rounded p-3">Not configured</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-6">
+                            <div class="text-muted small text-uppercase fw-bold mb-2">Stamp</div>
+                            {% if settings.stamp_image %}
+                                <img src="{{ settings.stamp_image.url }}" alt="Company stamp" class="img-fluid" style="max-height:70px;">
+                            {% else %}
+                                <div class="text-muted small border rounded p-3">Not configured</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% if settings.signatory_name %}
+                    <hr>
+                    <div class="small"><strong>{{ settings.signatory_name }}</strong>{% if settings.signatory_position %}, {{ settings.signatory_position }}{% endif %}</div>
+                    {% endif %}
+                    <a href="{% url 'documents:settings' %}" class="btn btn-sm btn-outline-secondary mt-3 w-100">Manage assets</a>
+                </div>
+            </div>
+
+            {% if document.latest_signature %}
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3"><h6 class="fw-bold mb-0">Client e-signature</h6></div>
+                <div class="card-body">
+                    <div class="fw-semibold">{{ document.latest_signature.signer_name }}</div>
+                    <div class="text-muted small">{{ document.latest_signature.signer_email }}</div>
+                    <div class="text-muted small">Signed {{ document.latest_signature.signed_at|date:"M d, Y H:i" }}</div>
+                    <div class="text-muted small">Version {{ document.latest_signature.document_version }}</div>
+                    <div class="text-muted small mt-2 text-break">SHA-256: {{ document.latest_signature.pdf_sha256 }}</div>
+                </div>
+            </div>
+            {% elif document.doc_type.requires_signature %}
+            <div class="alert alert-warning small">
+                <i class="fas fa-signature me-2"></i>This document type requires a client signature.
+                The company signature and stamp alone do not execute the contract.
+            </div>
+            {% endif %}
+
+            {% if public_link %}
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3"><h6 class="fw-bold mb-0">Secure client link</h6></div>
+                <div class="card-body">
+                    <p class="text-muted small mb-2">Expires automatically and is tied to version {{ document.version }}.</p>
+                    <input type="text" class="form-control form-control-sm" value="{{ public_link }}" readonly onclick="this.select();">
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

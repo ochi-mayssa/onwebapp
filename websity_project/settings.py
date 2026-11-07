@@ -30,6 +30,9 @@ if os.path.exists(GTK_PATH):
 # SITE_URL for email links and absolute URIs
 SITE_URL = os.environ.get('SITE_URL', 'http://127.0.0.1:8000')
 
+# How long a document link sent by email stays valid (seconds). Default 60 days.
+DOCUMENT_LINK_MAX_AGE = int(os.environ.get('DOCUMENT_LINK_MAX_AGE', 60 * 24 * 60 * 60))
+
 # SECURITY WARNING: keep the secret key used in production secret!
 # Read from environment; fallback to insecure key only in development
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-bhg@b&btr99*q&4cs+2lb2*0@4)jf35(z_2q-b36ah1i-!gchb')
@@ -75,6 +78,7 @@ INSTALLED_APPS = [
     'operations',
     'rpa_dashboard',
     'crm',
+    'documents',
     'community',
     # Third-party
     'rest_framework',
@@ -280,6 +284,9 @@ STORAGES = {
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# Generated PDFs and client signatures are private: never served from MEDIA_URL.
+PRIVATE_MEDIA_ROOT = BASE_DIR / 'private_media'
 
 # Design upload validation
 MAX_DESIGN_FILE_SIZE = 50 * 1024 * 1024  # 50 MB

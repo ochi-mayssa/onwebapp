@@ -7,6 +7,7 @@ development). The function never raises: callers keep their own domain logic
 (e.g. saving an inquiry) independent of email delivery.
 """
 import logging
+from email.mime.image import MIMEImage
 from email.utils import parseaddr
 
 from django.conf import settings
@@ -52,8 +53,15 @@ def valid_recipients(addresses):
 def send_notification_email(*, subject, recipients, text_body=None,
                             template_name=None, context=None, cc=None,
                             bcc=None, from_email=None, reply_to=None,
+                            attachments=None, inline_images=None,
                             label='notification'):
     """Send one transactional email (optionally multipart HTML + text).
+
+    ``attachments`` is an iterable of ``(filename, content, mimetype)`` tuples
+    (``content`` may be bytes or an open binary file). ``inline_images`` is an
+    iterable of ``{'path': ..., 'cid': ..., 'filename': ...}`` dicts; the
+    images are attached with a ``Content-ID`` so templates can reference them
+    as ``cid:...`` (this keeps signature/stamp assets out of public URLs).
 
     Returns ``True`` when Django reports at least one delivered message,
     ``False`` otherwise. Never raises; failures are logged with tracebacks.
@@ -84,6 +92,29 @@ def send_notification_email(*, subject, recipients, text_body=None,
     )
     if html_body:
         message.attach_alternative(html_body, 'text/html')
+
+    for attachment in attachments or []:
+        try:
+            filename, content, mimetype = attachment
+            message.attach(filename, content, mimetype)
+        except Exception:
+            logger.exception('Unable to attach %r to %s email', attachment, label)
+
+    for image in inline_images or []:
+        try:
+            path = image.get('path')
+            cid = image.get('cid')
+            if not path or not cid:
+                continue
+            with open(path, 'rb') as handle:
+                data = handle.read()
+            part = MIMEImage(data)
+            part.add_header('Content-ID', f'<{cid}>')
+            part.add_header('Content-Disposition', 'inline', filename=image.get('filename') or 'image.png')
+            message.attach(part)
+        except Exception:
+            logger.exception('Unable to inline image %r in %s email', image, label)
+
     try:
         sent = message.send(fail_silently=False)
     except Exception:

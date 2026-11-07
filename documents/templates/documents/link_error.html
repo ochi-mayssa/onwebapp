@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}Document link unavailable | OnWebApp{% endblock %}
+
+{% block meta %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm text-center">
+                <div class="card-body p-5">
+                    <div class="display-5 text-muted mb-3"><i class="fas fa-link-slash"></i></div>
+                    <h1 class="h3 fw-bold mb-2">This link cannot be used</h1>
+                    <p class="text-muted mb-4">{{ message }}</p>
+                    <p class="text-muted small mb-4">
+                        If you were expecting this document, please reply to the email you received or contact
+                        {{ settings.company_name|default:'OnWebApp' }}{% if settings.company_email %} at {{ settings.company_email }}{% endif %}.
+                    </p>
+                    <a href="{% url 'home:home' %}" class="btn btn-primary">Go to OnWebApp</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

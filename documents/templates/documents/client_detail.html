@@ -1,0 +1,223 @@
+{% extends 'base.html' %}
+{% load static humanize %}
+
+{% block title %}{{ document.reference }} | Your Documents | OnWebApp{% endblock %}
+
+{% block meta %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    {% include 'documents/_messages.html' %}
+
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <h1 class="h3 fw-bold mb-0">{{ document.reference }}</h1>
+                <span class="badge bg-{{ document.display_status_tone }}">{{ document.display_status_label }}</span>
+            </div>
+            <p class="text-muted mb-0">
+                {{ document.doc_type.name }}{% if document.title %} &middot; {{ document.title }}{% endif %}
+            </p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <a href="{% url 'documents:client_list' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>All documents
+            </a>
+            <a href="{% url 'documents:client_download' document.pk %}" class="btn btn-primary">
+                <i class="fas fa-download me-2"></i>Download PDF
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <div class="text-muted small text-uppercase fw-bold">Issued by</div>
+                            <div class="fw-semibold">{{ settings.company_name|default:'OnWebApp' }}</div>
+                            {% if settings.company_email %}<div class="text-muted small">{{ settings.company_email }}</div>{% endif %}
+                            {% if settings.company_phone %}<div class="text-muted small">{{ settings.company_phone }}</div>{% endif %}
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="text-muted small text-uppercase fw-bold">Issued</div>
+                                    <div>{{ document.issue_date|date:"M d, Y" }}</div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="text-muted small text-uppercase fw-bold">Due</div>
+                                    <div>{% if document.due_date %}{{ document.due_date|date:"M d, Y" }}{% else %}&mdash;{% endif %}</div>
+                                </div>
+                                {% if document.valid_until %}
+                                <div class="col-6 mt-2">
+                                    <div class="text-muted small text-uppercase fw-bold">Valid until</div>
+                                    <div>{{ document.valid_until|date:"M d, Y" }}</div>
+                                </div>
+                                {% endif %}
+                                <div class="col-6 mt-2">
+                                    <div class="text-muted small text-uppercase fw-bold">Total</div>
+                                    <div class="fw-bold fs-5">{{ amount }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3"><h6 class="fw-bold mb-0">Line items</h6></div>
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4">Description</th>
+                                <th class="text-end">Qty</th>
+                                <th class="text-end">Unit price</th>
+                                <th class="text-end pe-4">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in items %}
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="fw-semibold">{{ item.description }}</div>
+                                    {% if item.details %}<div class="text-muted small">{{ item.details }}</div>{% endif %}
+                                </td>
+                                <td class="text-end">{{ item.quantity|floatformat:2 }}</td>
+                                <td class="text-end">{{ item.unit_price|floatformat:2|intcomma }}</td>
+                                <td class="text-end pe-4 fw-semibold">{{ item.line_total|floatformat:2|intcomma }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="4" class="text-center text-muted py-4">No line items.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot class="bg-light">
+                            <tr>
+                                <td colspan="3" class="text-end">Subtotal</td>
+                                <td class="text-end pe-4">{{ document.subtotal|floatformat:2|intcomma }} {{ document.currency }}</td>
+                            </tr>
+                            {% if document.discount_amount %}
+                            <tr>
+                                <td colspan="3" class="text-end">Discount</td>
+                                <td class="text-end pe-4">-{{ document.discount_amount|floatformat:2|intcomma }} {{ document.currency }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if document.tax_rate %}
+                            <tr>
+                                <td colspan="3" class="text-end">{{ document.tax_label }} ({{ document.tax_rate }}%)</td>
+                                <td class="text-end pe-4">{{ document.tax_amount|floatformat:2|intcomma }} {{ document.currency }}</td>
+                            </tr>
+                            {% endif %}
+                            <tr>
+                                <td colspan="3" class="text-end fw-bold fs-6">Total</td>
+                                <td class="text-end pe-4 fw-bold fs-6">{{ document.total|floatformat:2|intcomma }} {{ document.currency }}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            {% if document.notes or document.terms or settings.default_payment_terms %}
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3"><h6 class="fw-bold mb-0">Notes &amp; terms</h6></div>
+                <div class="card-body">
+                    {% if document.notes %}
+                        <div class="text-muted small text-uppercase fw-bold mb-1">Notes</div>
+                        <p class="mb-3" style="white-space:pre-line;">{{ document.notes }}</p>
+                    {% endif %}
+                    <div class="text-muted small text-uppercase fw-bold mb-1">Payment terms</div>
+                    <p class="mb-0" style="white-space:pre-line;">{{ document.terms|default:settings.default_payment_terms }}</p>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3"><h6 class="fw-bold mb-0">History</h6></div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        {% for event in events %}
+                        <li class="d-flex gap-3 py-2 {% if not forloop.last %}border-bottom{% endif %}">
+                            <div class="text-muted small text-nowrap" style="min-width:130px;">{{ event.created_at|date:"M d, Y H:i" }}</div>
+                            <div>
+                                <div class="fw-semibold">{{ event.get_event_display }}</div>
+                                {% if event.note %}<div class="text-muted small">{{ event.note }}</div>{% endif %}
+                            </div>
+                        </li>
+                        {% empty %}
+                        <li class="text-muted">No history yet.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            {% if can_respond %}
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3"><h6 class="fw-bold mb-0">Your decision</h6></div>
+                <div class="card-body">
+                    <p class="text-muted small">Accept or reject this {{ document.doc_type.name|lower }}. Your response is recorded with a timestamp.</p>
+                    <form method="post" action="{% url 'documents:client_accept' document.pk %}" class="d-grid mb-2">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-check me-2"></i>Accept
+                        </button>
+                    </form>
+                    <form method="post" action="{% url 'documents:client_reject' document.pk %}">
+                        {% csrf_token %}
+                        <div class="mb-2">
+                            <label class="form-label small fw-bold" for="reason">Reason for rejection (optional)</label>
+                            <textarea class="form-control" id="reason" name="reason" rows="2"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-outline-danger w-100">
+                            <i class="fas fa-xmark me-2"></i>Reject
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if can_sign %}
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3"><h6 class="fw-bold mb-0">Signature required</h6></div>
+                <div class="card-body">
+                    <p class="text-muted small">This contract is not executed until you sign it electronically.</p>
+                    <a href="{% url 'documents:client_sign' document.pk %}" class="btn btn-primary w-100">
+                        <i class="fas fa-signature me-2"></i>Review &amp; sign
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if signature %}
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3"><h6 class="fw-bold mb-0">Signed</h6></div>
+                <div class="card-body">
+                    <div class="fw-semibold">{{ signature.signer_name }}</div>
+                    <div class="text-muted small">{{ signature.signer_email }}</div>
+                    <div class="text-muted small">Signed {{ signature.signed_at|date:"M d, Y H:i" }}</div>
+                    <div class="text-muted small">Version {{ signature.document_version }}</div>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3"><h6 class="fw-bold mb-0">Issued by</h6></div>
+                <div class="card-body text-center">
+                    {% if settings.signature_image %}
+                        <img src="{{ settings.signature_image.url }}" alt="Company signature" class="img-fluid mb-2" style="max-height:70px;">
+                    {% endif %}
+                    <div class="fw-semibold">{{ settings.signatory_name|default:'Authorized signatory' }}</div>
+                    <div class="text-muted small">{{ settings.signatory_position }}</div>
+                    <div class="text-muted small">{{ settings.company_name }}</div>
+                    {% if settings.stamp_image %}
+                        <img src="{{ settings.stamp_image.url }}" alt="Company stamp" class="img-fluid mt-3" style="max-height:90px;">
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

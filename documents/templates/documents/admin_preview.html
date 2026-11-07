@@ -1,0 +1,211 @@
+{% load static humanize %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Preview {{ document.reference }} | OnWebApp</title>
+    <style>
+        :root { --doc-accent: {{ settings.accent_color|default:'#4F46E5' }}; }
+        * { box-sizing: border-box; }
+        body { background: #EEF2F7; font-family: Helvetica, Arial, sans-serif; color: #0F172A; margin: 0; padding: 24px 12px 60px; }
+        .preview-bar { max-width: 820px; margin: 0 auto 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+        .preview-bar .meta { font-size: .82rem; color: #64748B; }
+        .btn { display: inline-block; padding: .5rem .9rem; border-radius: 8px; font-size: .82rem; font-weight: 700; text-decoration: none; border: 1px solid transparent; cursor: pointer; }
+        .btn-primary { background: var(--doc-accent); color: #fff; }
+        .btn-outline { background: #fff; border-color: #CBD5E1; color: #0F172A; }
+        .sheet { position: relative; background: #fff; max-width: 820px; margin: 0 auto; padding: 34px 40px 44px; border-radius: 6px; box-shadow: 0 12px 40px rgba(15,23,42,.12); overflow: hidden; }
+        .sheet__bar { height: 7px; background: var(--doc-accent); margin: -34px -40px 26px; }
+        .brand { display: flex; justify-content: space-between; gap: 24px; align-items: flex-start; }
+        .brand__name { font-size: 1.35rem; font-weight: 800; }
+        .brand__meta, .brand__contact { font-size: .72rem; color: #64748B; line-height: 1.55; }
+        .brand__contact { text-align: right; }
+        .rule { border: 0; border-top: 1px solid #E2E8F0; margin: 20px 0; }
+        .doc-head { display: flex; justify-content: space-between; gap: 24px; }
+        .doc-title { font-size: 1.85rem; font-weight: 800; margin: 0; text-transform: uppercase; }
+        .doc-ref { color: var(--doc-accent); font-weight: 800; font-size: .85rem; }
+        .label { font-size: .62rem; letter-spacing: .08em; text-transform: uppercase; color: #94A3B8; font-weight: 800; }
+        .client-name { font-size: 1.02rem; font-weight: 700; }
+        .muted { color: #64748B; font-size: .8rem; line-height: 1.55; }
+        table.items { width: 100%; border-collapse: collapse; margin-top: 24px; }
+        table.items th { background: var(--doc-accent); color: #fff; font-size: .66rem; letter-spacing: .05em; text-transform: uppercase; text-align: left; padding: 10px 10px; }
+        table.items th.num, table.items td.num { text-align: right; }
+        table.items td { padding: 10px; border-bottom: 1px solid #E2E8F0; font-size: .82rem; vertical-align: top; }
+        table.items tbody tr:nth-child(even) td { background: #F8FAFC; }
+        .totals { width: 300px; margin-left: auto; margin-top: 14px; font-size: .82rem; }
+        .totals td { padding: 5px 8px; }
+        .totals td.num { text-align: right; }
+        .totals tr.grand td { border-top: 1.5px solid var(--doc-accent); border-bottom: 1.5px solid var(--doc-accent); font-weight: 800; font-size: .95rem; }
+        .sign { display: flex; justify-content: space-between; gap: 30px; margin-top: 46px; align-items: flex-end; }
+        .sign__sig { flex: 1; max-width: 340px; }
+        .sign__sig img { max-height: 64px; max-width: 240px; display: block; margin-bottom: 6px; }
+        .sign__line { border-top: 1px solid #94A3B8; padding-top: 6px; }
+        .sign__name { font-weight: 700; font-size: .85rem; }
+        .sign__role { color: #64748B; font-size: .74rem; }
+        .sign__stamp { text-align: right; }
+        .sign__stamp img { max-height: 105px; max-width: 105px; }
+        .sign__stamp .label { display: block; margin-top: 4px; }
+        .watermark { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 8rem; font-weight: 800; color: rgba(15,23,42,.06); transform: rotate(-35deg); pointer-events: none; }
+        .legal { margin-top: 32px; font-size: .62rem; color: #94A3B8; line-height: 1.5; }
+        .draft-note { background: #FEF3C7; color: #92400E; padding: .55rem .8rem; border-radius: 8px; font-size: .78rem; margin-bottom: 18px; }
+        @media print {
+            body { background: #fff; padding: 0; }
+            .preview-bar, .draft-note { display: none !important; }
+            .sheet { box-shadow: none; border-radius: 0; max-width: none; padding: 24px 28px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="preview-bar">
+        <div class="meta"><strong>Preview</strong> &middot; {{ document.reference }} &middot; v{{ document.version }} &middot; {{ document.get_status_display }}</div>
+        <div>
+            <a class="btn btn-outline" href="{% url 'documents:admin_detail' document.pk %}">Close</a>
+            <button class="btn btn-primary" type="button" onclick="window.print()">Print / Save as PDF</button>
+        </div>
+    </div>
+
+    <div class="sheet">
+        {% if document.status == 'DRAFT' %}<div class="watermark">DRAFT</div>{% endif %}
+        <div class="sheet__bar"></div>
+
+        {% if document.status == 'DRAFT' %}
+        <div class="draft-note">Draft preview &mdash; not yet sent to the client.</div>
+        {% endif %}
+
+        <div class="brand">
+            <div>
+                <div class="brand__name">{{ settings.company_name|default:'OnWebApp' }}</div>
+                <div class="brand__meta">
+                    {% if settings.company_legal_name %}{{ settings.company_legal_name }}<br>{% endif %}
+                    {% if settings.company_email %}{{ settings.company_email }}<br>{% endif %}
+                    {% if settings.company_phone %}{{ settings.company_phone }}<br>{% endif %}
+                    {% if settings.company_tax_id %}Tax ID: {{ settings.company_tax_id }}{% endif %}
+                </div>
+            </div>
+            <div class="brand__contact">
+                {% if settings.company_address %}{{ settings.company_address|linebreaksbr }}<br>{% endif %}
+                {% if settings.company_website %}{{ settings.company_website }}{% endif %}
+            </div>
+        </div>
+
+        <hr class="rule">
+
+        <div class="doc-head">
+            <div style="max-width:52%;">
+                <div class="label">{% if document.doc_type.code == 'invoice' or document.doc_type.code == 'receipt' %}Bill to{% else %}Prepared for{% endif %}</div>
+                <div class="client-name">{{ document.client_display_name }}</div>
+                {% if document.client_company and document.client_company != document.client_name %}<div class="muted">{{ document.client_name }}</div>{% endif %}
+                {% if document.client_address %}<div class="muted">{{ document.client_address|linebreaksbr }}</div>{% endif %}
+                {% if document.client_email %}<div class="muted">{{ document.client_email }}</div>{% endif %}
+            </div>
+            <div style="text-align:right;">
+                <h1 class="doc-title">{{ document.doc_type.name }}</h1>
+                <div class="doc-ref">Reference {{ document.reference }}</div>
+                <div class="muted">
+                    Issue date: {{ document.issue_date|date:"M d, Y" }}<br>
+                    {% if document.due_date %}Due date: {{ document.due_date|date:"M d, Y" }}<br>{% endif %}
+                    {% if document.valid_until %}Valid until: {{ document.valid_until|date:"M d, Y" }}{% endif %}
+                </div>
+            </div>
+        </div>
+
+        <table class="items">
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th class="num">Qty</th>
+                    <th class="num">Unit price</th>
+                    <th class="num">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>
+                        <strong>{{ item.description }}</strong>
+                        {% if item.details %}<div class="muted">{{ item.details }}</div>{% endif %}
+                    </td>
+                    <td class="num">{{ item.quantity|floatformat:2 }}</td>
+                    <td class="num">{{ item.unit_price|floatformat:2|intcomma }}</td>
+                    <td class="num">{{ item.line_total|floatformat:2|intcomma }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="muted">No line items recorded.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <table class="totals">
+            <tr><td>Subtotal</td><td class="num">{{ document.subtotal|floatformat:2|intcomma }} {{ document.currency }}</td></tr>
+            {% if document.discount_amount %}
+            <tr><td>Discount</td><td class="num">-{{ document.discount_amount|floatformat:2|intcomma }} {{ document.currency }}</td></tr>
+            {% endif %}
+            {% if document.tax_rate %}
+            <tr><td>{{ document.tax_label }} ({{ document.tax_rate }}%)</td><td class="num">{{ document.tax_amount|floatformat:2|intcomma }} {{ document.currency }}</td></tr>
+            {% endif %}
+            <tr class="grand"><td>Total</td><td class="num">{{ document.total|floatformat:2|intcomma }} {{ document.currency }}</td></tr>
+        </table>
+
+        {% if document.notes %}
+        <div style="margin-top:24px;">
+            <div class="label">Notes</div>
+            <div class="muted">{{ document.notes|linebreaksbr }}</div>
+        </div>
+        {% endif %}
+
+        {% if document.terms or settings.default_payment_terms or settings.bank_details %}
+        <div style="margin-top:20px;">
+            <div class="label">Payment terms &amp; conditions</div>
+            <div class="muted">{{ document.terms|default:settings.default_payment_terms|linebreaksbr }}</div>
+            {% if settings.bank_details %}
+                <div class="label" style="margin-top:10px;">Payment details</div>
+                <div class="muted">{{ settings.bank_details|linebreaksbr }}</div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <div class="sign">
+            <div class="sign__sig">
+                {% if settings.signature_image %}<img src="{{ settings.signature_image.url }}" alt="Company signature">{% endif %}
+                <div class="sign__line">
+                    <div class="sign__name">{{ settings.signatory_name|default:'Authorized signatory' }}</div>
+                    <div class="sign__role">{{ settings.signatory_position|default:'On behalf of the company' }}</div>
+                    <div class="sign__role">{{ settings.company_name|default:'OnWebApp' }}</div>
+                </div>
+            </div>
+            <div class="sign__stamp">
+                {% if settings.stamp_image %}<img src="{{ settings.stamp_image.url }}" alt="Company stamp">{% endif %}
+                <span class="label">Company stamp</span>
+            </div>
+        </div>
+
+        {% if document.latest_signature %}
+        <div class="sign">
+            <div class="sign__sig">
+                <div class="sign__line">
+                    <div class="sign__name">{{ document.latest_signature.signer_name }}</div>
+                    <div class="sign__role">{{ document.latest_signature.signer_role|default:'Client' }} &middot; {{ document.latest_signature.signer_email }}</div>
+                    <div class="sign__role">Signed electronically {{ document.latest_signature.signed_at|date:"M d, Y H:i" }}</div>
+                </div>
+            </div>
+        </div>
+        {% elif document.doc_type.requires_signature %}
+        <div class="sign">
+            <div class="sign__sig">
+                <div class="sign__line">
+                    <div class="sign__name">Client signature</div>
+                    <div class="sign__role">Not signed yet &mdash; this contract is not executed until the client signs.</div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="legal">
+            Issued electronically by {{ settings.company_name|default:'OnWebApp' }}. The company signature and stamp are
+            authorized company assets applied by an administrator. They do not constitute a client electronic signature.
+            {% if document.pdf_sha256 %}Document hash: {{ document.pdf_sha256 }}{% endif %}
+        </div>
+    </div>
+</body>
+</html>
