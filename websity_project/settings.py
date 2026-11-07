@@ -18,6 +18,16 @@ import dj_database_url
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Load local development overrides from .env (git-ignored). In production,
+# platform environment variables (Coolify, Docker, etc.) take precedence
+# because load_dotenv never overrides variables that are already set.
+try:
+    from dotenv import load_dotenv
+except ImportError:  # pragma: no cover - python-dotenv is in requirements.txt
+    pass
+else:
+    load_dotenv(BASE_DIR / '.env')
+
 # WeasyPrint / GTK+ path setup for Windows
 GTK_PATH = r'C:\Program Files\GTK3-Runtime Win64\bin'
 if os.path.exists(GTK_PATH):

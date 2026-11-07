@@ -56,7 +56,28 @@ development the console backend prints emails to the terminal.
 This project never modifies DNS records automatically - all DNS changes are
 made by you in your DNS provider's panel.
 
-## 3. Configure Coolify environment variables
+## 3. Configure environment variables
+
+`websity_project/settings.py` loads a project-local `.env` file automatically
+(via `python-dotenv`) and never overrides variables that are already set by the
+platform. That means you can use `.env` for local testing and Coolify/Docker
+environment variables in production.
+
+For local testing, create `.env` in the project root (it is git-ignored) with:
+
+```env
+EMAIL_HOST=smtp.resend.com
+EMAIL_PORT=587
+EMAIL_HOST_USER=resend
+RESEND_API_KEY=re_your_key_here
+EMAIL_USE_TLS=True
+EMAIL_USE_SSL=False
+DEFAULT_FROM_EMAIL=OnWebApp <notifications@onwebapp.com>
+SITE_URL=http://127.0.0.1:8000
+```
+
+`DEFAULT_FROM_EMAIL` must use a domain verified in Resend. Restart
+`runserver` after changing `.env`.
 
 In your Coolify service, set (values in angle brackets are yours):
 
