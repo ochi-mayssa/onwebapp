@@ -4,21 +4,27 @@ Keeping this logic out of the views means the same rules apply whether an
 action is triggered from the admin dashboard, the client dashboard or a
 tokenised email link.
 """
+import calendar
 import hashlib
 import logging
+from datetime import timedelta
+from decimal import Decimal
 
 from django.conf import settings as django_settings
 from django.core.files.base import ContentFile
-from django.db import transaction
+from django.db import IntegrityError, transaction
+from django.db.models import Q
 from django.urls import reverse
 from django.utils import timezone
 
 from home.emails import send_notification_email
 
 from .models import (
+    BillingProfile,
     Document,
     DocumentEmail,
     DocumentEvent,
+    DocumentLineItem,
     DocumentSettings,
     DocumentSignature,
 )
@@ -370,3 +376,339 @@ def document_email_context(document, request=None):
         'site_url': _site_url(request),
         'amount': money(document.total, document.currency),
     }
+
+
+# ---------------------------------------------------------- invoice automation
+def resolve_customer_for_project(project):
+    """Return the CRM customer behind a project's client account, if any."""
+    if project is None:
+        return None
+
+    from crm.models import Customer
+
+    if project.client_id:
+        customer = Customer.objects.filter(user_id=project.client_id).first()
+        if customer:
+            return customer
+
+        client = getattr(project, 'client', None)
+        email = (getattr(client, 'email', '') or '').strip()
+        if email:
+            return Customer.objects.filter(email__iexact=email).first()
+    return None
+
+
+def _add_months(day, months):
+    """Add calendar months to a date, clamping to the last valid day."""
+    month_index = day.month - 1 + months
+    year = day.year + month_index // 12
+    month = month_index % 12 + 1
+    last_day = calendar.monthrange(year, month)[1]
+    return day.replace(year=year, month=month, day=min(day.day, last_day))
+
+
+def advance_billing_date(start, frequency):
+    """Return the next period start for a recurring billing frequency."""
+    if frequency == BillingProfile.FREQUENCY_MONTHLY:
+        return _add_months(start, 1)
+    if frequency == BillingProfile.FREQUENCY_QUARTERLY:
+        return _add_months(start, 3)
+    if frequency == BillingProfile.FREQUENCY_YEARLY:
+        return _add_months(start, 12)
+    return start
+
+
+def billing_period_bounds(start, frequency):
+    """Return ``(period_start, period_end)`` for the period starting at ``start``."""
+    next_start = advance_billing_date(start, frequency)
+    return start, next_start - timedelta(days=1)
+
+
+def _format_billing_title(profile, project, customer, period_start, period_end):
+    template = profile.title_template or 'Invoice for {project}'
+    values = {
+        'project': project.title if project else 'services',
+        'customer': customer.name if customer else 'customer',
+        'profile': profile.name,
+        'period_start': period_start.isoformat() if period_start else '',
+        'period_end': period_end.isoformat() if period_end else '',
+    }
+    try:
+        title = template.format(**values)
+    except (KeyError, IndexError, ValueError):
+        logger.warning('Invalid billing title template on profile %s', profile.pk)
+        title = template
+    return title[:200]
+
+
+def profiles_for_project(project, trigger, *, phase_type=None):
+    """Active billing profiles that apply to ``project`` for a trigger."""
+    customer = resolve_customer_for_project(project)
+    if customer is None:
+        return []
+
+    profiles = BillingProfile.objects.filter(
+        is_active=True,
+        trigger=trigger,
+        customer=customer,
+    ).filter(Q(project__isnull=True) | Q(project=project))
+    if phase_type is not None:
+        profiles = profiles.filter(Q(phase_type='') | Q(phase_type=phase_type))
+    return list(profiles.select_related('doc_type', 'customer', 'project'))
+
+
+def _copy_line_items(profile, document):
+    created = 0
+    source_items = list(profile.line_items.all())
+    if source_items:
+        for index, source in enumerate(source_items, start=1):
+            DocumentLineItem.objects.create(
+                document=document,
+                description=source.description,
+                details=source.details,
+                quantity=source.quantity,
+                unit_price=source.unit_price,
+                ordering=source.ordering or index,
+            )
+            created += 1
+    if not created and (profile.default_amount or Decimal('0.00')) > Decimal('0.00'):
+        DocumentLineItem.objects.create(
+            document=document,
+            description=profile.default_description or 'Professional services',
+            quantity=Decimal('1.00'),
+            unit_price=profile.default_amount,
+            ordering=1,
+        )
+        created = 1
+    return created
+
+
+def create_invoice_from_profile(
+    profile,
+    *,
+    project=None,
+    customer=None,
+    actor=None,
+    request=None,
+    period_start=None,
+    period_end=None,
+    automation_key=None,
+    source='manual',
+):
+    """Create a draft document from a billing profile.
+
+    Returns ``(document, created)``. ``created`` is ``False`` when an existing
+    document with the same idempotency key is returned. The caller can safely
+    run this repeatedly for the same trigger.
+    """
+    customer = customer or profile.customer
+    project = project if project is not None else profile.project
+
+    if profile.project_id and project is not None and profile.project_id != project.pk:
+        return None, False
+    if customer is None:
+        logger.warning('Billing profile %s has no customer; skipped.', profile.pk)
+        return None, False
+    if not (customer.email or '').strip():
+        logger.warning('Customer %s has no email; invoice skipped.', customer.pk)
+        return None, False
+
+    if automation_key:
+        existing = Document.objects.filter(automation_key=automation_key).first()
+        if existing is not None:
+            return existing, False
+
+    cfg = DocumentSettings.load()
+    issue_date = timezone.localdate()
+    if period_start is None and profile.trigger == BillingProfile.TRIGGER_RECURRING:
+        period_start = profile.next_invoice_date or issue_date
+    if project is not None and profile.trigger == BillingProfile.TRIGGER_PROJECT_COMPLETED:
+        project_end = getattr(project, 'updated_at', None)
+        if period_end is None and project_end is not None:
+            period_end = project_end.date()
+
+    document = Document(
+        doc_type=profile.doc_type,
+        customer=customer,
+        project=project,
+        billing_profile=profile,
+        billing_period_start=period_start,
+        billing_period_end=period_end,
+        automation_key=automation_key or None,
+        title=_format_billing_title(profile, project, customer, period_start, period_end),
+        issue_date=issue_date,
+        due_date=issue_date + timedelta(days=profile.due_days) if profile.due_days else None,
+        currency=(profile.currency or 'USD').upper(),
+        discount_amount=profile.discount_amount,
+        tax_rate=profile.tax_rate,
+        tax_label=profile.tax_label,
+        notes=profile.notes,
+        terms=profile.terms or cfg.default_payment_terms,
+        created_by=actor if getattr(actor, 'is_authenticated', False) else None,
+        status=Document.STATUS_DRAFT,
+    )
+    document.apply_client_snapshot()
+
+    try:
+        document.save()
+    except IntegrityError:
+        # A concurrent run may have created the same idempotent invoice.
+        existing = Document.objects.filter(automation_key=automation_key).first() if automation_key else None
+        if existing is not None:
+            return existing, False
+        raise
+
+    _copy_line_items(profile, document)
+    document.recalculate()
+
+    DocumentEvent.log(
+        document,
+        DocumentEvent.EVENT_CREATED,
+        actor=document.created_by,
+        request=request,
+        note=f'Generated automatically from billing profile "{profile.name}".',
+        metadata={
+            'billing_profile_id': profile.pk,
+            'source': source,
+            'automation_key': automation_key or '',
+            'billing_period_start': period_start.isoformat() if period_start else '',
+            'billing_period_end': period_end.isoformat() if period_end else '',
+        },
+    )
+
+    # A reviewable PDF is ready as soon as the draft exists. A rendering error
+    # must not lose the invoice itself.
+    try:
+        generate_document_pdf(document, actor=document.created_by)
+    except Exception:
+        logger.exception('Could not generate PDF for automated document %s', document.reference)
+
+    if profile.auto_send and document.total > Decimal('0.00'):
+        try:
+            send_document(document, actor=document.created_by, request=request)
+        except Exception:
+            logger.exception('Could not auto-send automated document %s', document.reference)
+
+    BillingProfile.objects.filter(pk=profile.pk).update(
+        last_invoiced_at=timezone.now(),
+        last_document=document,
+    )
+    return document, True
+
+
+def _run_project_trigger(project, trigger, key_prefix, actor=None, request=None):
+    documents = []
+    for profile in profiles_for_project(project, trigger):
+        key = f'{key_prefix}:{project.pk}:{profile.pk}'
+        document, _created = create_invoice_from_profile(
+            profile,
+            project=project,
+            actor=actor,
+            request=request,
+            automation_key=key,
+            source=trigger.lower(),
+        )
+        if document is not None:
+            documents.append(document)
+    return documents
+
+
+def trigger_project_created(project, *, actor=None, request=None):
+    """Create invoices for active ``PROJECT_CREATED`` billing profiles."""
+    return _run_project_trigger(
+        project, BillingProfile.TRIGGER_PROJECT_CREATED,
+        'project-created', actor=actor, request=request,
+    )
+
+
+def trigger_project_completed(project, *, actor=None, request=None):
+    """Create invoices for active ``PROJECT_COMPLETED`` billing profiles."""
+    return _run_project_trigger(
+        project, BillingProfile.TRIGGER_PROJECT_COMPLETED,
+        'project-completed', actor=actor, request=request,
+    )
+
+
+def trigger_phase_completed(phase, *, actor=None, request=None):
+    """Create invoices for matching ``PHASE_COMPLETED`` billing profiles."""
+    project = phase.project
+    documents = []
+    for profile in profiles_for_project(
+        project, BillingProfile.TRIGGER_PHASE_COMPLETED, phase_type=phase.phase_type,
+    ):
+        key = f'phase-completed:{phase.pk}:{profile.pk}'
+        period_start = getattr(phase, 'start_date', None)
+        period_end = getattr(phase, 'end_date', None)
+        document, _created = create_invoice_from_profile(
+            profile,
+            project=project,
+            actor=actor,
+            request=request,
+            period_start=period_start,
+            period_end=period_end,
+            automation_key=key,
+            source='phase_completed',
+        )
+        if document is not None:
+            documents.append(document)
+    return documents
+
+
+def run_due_billing_profiles(today=None, *, actor=None):
+    """Generate invoices for every recurring profile due on or before today.
+
+    Returns a summary dict. Each profile is processed independently so one bad
+    rule cannot stop the others. The next invoice date is advanced even when a
+    period is skipped, preventing a permanently stuck schedule.
+    """
+    today = today or timezone.localdate()
+    summary = {'created': 0, 'skipped': 0, 'failed': 0, 'documents': []}
+
+    profiles = BillingProfile.objects.filter(
+        is_active=True,
+        trigger=BillingProfile.TRIGGER_RECURRING,
+        next_invoice_date__lte=today,
+        frequency__in=[
+            BillingProfile.FREQUENCY_MONTHLY,
+            BillingProfile.FREQUENCY_QUARTERLY,
+            BillingProfile.FREQUENCY_YEARLY,
+        ],
+    ).select_related('customer', 'project', 'doc_type').order_by('next_invoice_date', 'pk')
+
+    for profile in profiles:
+        start = profile.next_invoice_date or today
+        period_start, period_end = billing_period_bounds(start, profile.frequency)
+        key = f'recurring:{profile.pk}:{period_start.isoformat()}'
+        next_date = advance_billing_date(start, profile.frequency)
+        document = None
+        try:
+            document, created = create_invoice_from_profile(
+                profile,
+                period_start=period_start,
+                period_end=period_end,
+                actor=actor,
+                automation_key=key,
+                source='recurring',
+            )
+            if document is None:
+                summary['failed'] += 1
+            elif created:
+                summary['created'] += 1
+                summary['documents'].append(document.reference)
+            else:
+                summary['skipped'] += 1
+        except Exception:
+            logger.exception('Recurring billing failed for profile %s', profile.pk)
+            summary['failed'] += 1
+            document = None
+        finally:
+            update_values = {
+                'next_invoice_date': next_date,
+                'updated_at': timezone.now(),
+            }
+            if document is not None:
+                update_values['last_invoiced_at'] = timezone.now()
+                update_values['last_document'] = document
+            BillingProfile.objects.filter(pk=profile.pk).update(**update_values)
+
+    return summary

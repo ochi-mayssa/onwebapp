@@ -10,6 +10,14 @@ urlpatterns = [
     path('new/', views.admin_create, name='admin_create'),
     path('settings/', views.settings_view, name='settings'),
 
+    # Billing automation (staff only)
+    path('billing/', views.billing_list, name='billing_list'),
+    path('billing/new/', views.billing_create, name='billing_create'),
+    path('billing/run-due/', views.billing_run_due, name='billing_run_due'),
+    path('billing/<int:pk>/edit/', views.billing_edit, name='billing_edit'),
+    path('billing/<int:pk>/toggle/', views.billing_toggle, name='billing_toggle'),
+    path('billing/<int:pk>/generate/', views.billing_generate, name='billing_generate'),
+
     # Client dashboard (authenticated)
     path('mine/', views.client_list, name='client_list'),
     path('mine/<int:pk>/', views.client_detail, name='client_detail'),

@@ -1,0 +1,238 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if is_create %}New billing rule{% else %}Edit {{ profile.name }}{% endif %} | OnWebApp{% endblock %}
+
+{% block meta %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    {% include 'documents/_messages.html' %}
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <h1 class="h3 fw-bold mb-1">{% if is_create %}New billing rule{% else %}Edit {{ profile.name }}{% endif %}</h1>
+            <p class="text-muted mb-0">Define when an invoice is generated and what it contains.</p>
+        </div>
+        <a href="{% url 'documents:billing_list' %}" class="btn btn-outline-secondary">Back to automation</a>
+    </div>
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white py-3"><h6 class="fw-bold mb-0">Rule</h6></div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" for="{{ form.name.id_for_label }}">Rule name</label>
+                                {{ form.name }}
+                                {{ form.name.errors }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" for="{{ form.doc_type.id_for_label }}">Document type</label>
+                                {{ form.doc_type }}
+                                {{ form.doc_type.errors }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" for="{{ form.customer.id_for_label }}">CRM customer</label>
+                                {{ form.customer }}
+                                {{ form.customer.errors }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" for="{{ form.project.id_for_label }}">Project <span class="text-muted fw-normal">(optional)</span></label>
+                                {{ form.project }}
+                                <div class="form-text">Leave blank to apply to every project for this customer.</div>
+                                {{ form.project.errors }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white py-3"><h6 class="fw-bold mb-0">Trigger</h6></div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold" for="{{ form.trigger.id_for_label }}">When</label>
+                                {{ form.trigger }}
+                                {{ form.trigger.errors }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold" for="{{ form.frequency.id_for_label }}">Frequency</label>
+                                {{ form.frequency }}
+                                <div class="form-text">Required for recurring rules.</div>
+                                {{ form.frequency.errors }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold" for="{{ form.phase_type.id_for_label }}">Phase <span class="text-muted fw-normal">(optional)</span></label>
+                                {{ form.phase_type }}
+                                <div class="form-text">Only for phase-completed rules. Blank means any phase.</div>
+                                {{ form.phase_type.errors }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white py-3"><h6 class="fw-bold mb-0">Pricing</h6></div>
+                    <div class="card-body">
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold" for="{{ form.pricing_mode.id_for_label }}">Pricing mode</label>
+                                {{ form.pricing_mode }}
+                                {{ form.pricing_mode.errors }}
+                            </div>
+                            <div class="col-md-5">
+                                <label class="form-label fw-semibold" for="{{ form.default_description.id_for_label }}">Fixed line description</label>
+                                {{ form.default_description }}
+                                {{ form.default_description.errors }}
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold" for="{{ form.default_amount.id_for_label }}">Fixed amount</label>
+                                {{ form.default_amount }}
+                                {{ form.default_amount.errors }}
+                            </div>
+                        </div>
+                        <div class="alert alert-light border small mb-0">
+                            Use <strong>Single fixed line</strong> for a flat fee. Use <strong>Itemized line items</strong>
+                            to copy the rows below. A fixed line is used as fallback when no itemized rows exist.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                        <h6 class="fw-bold mb-0">Itemized line items</h6>
+                        <span class="text-muted small">Copied to every generated invoice</span>
+                    </div>
+                    <div class="card-body p-0">
+                        {{ formset.management_form }}
+                        {% if formset.non_form_errors %}
+                        <div class="alert alert-danger m-3">{{ formset.non_form_errors }}</div>
+                        {% endif %}
+                        <div class="table-responsive">
+                            <table class="table align-middle mb-0">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th class="ps-3" style="min-width:200px;">Description</th>
+                                        <th style="min-width:140px;">Details</th>
+                                        <th style="width:100px;">Qty</th>
+                                        <th style="width:130px;">Unit price</th>
+                                        <th style="width:70px;" class="text-center">Remove</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for f in formset %}
+                                    <tr>
+                                        <td class="ps-3">
+                                            {{ f.id }}
+                                            {{ f.description }}
+                                            {{ f.description.errors }}
+                                        </td>
+                                        <td>{{ f.details }}{{ f.details.errors }}</td>
+                                        <td>{{ f.quantity }}{{ f.quantity.errors }}</td>
+                                        <td>{{ f.unit_price }}{{ f.unit_price.errors }}</td>
+                                        <td class="text-center">{{ f.DELETE }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white py-3"><h6 class="fw-bold mb-0">Invoice details</h6></div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold" for="{{ form.title_template.id_for_label }}">Title template</label>
+                            {{ form.title_template }}
+                            <div class="form-text">Placeholders: {project}, {customer}, {profile}, {period_start}, {period_end}</div>
+                            {{ form.title_template.errors }}
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold" for="{{ form.currency.id_for_label }}">Currency</label>
+                                {{ form.currency }}
+                                {{ form.currency.errors }}
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold" for="{{ form.discount_amount.id_for_label }}">Discount</label>
+                                {{ form.discount_amount }}
+                                {{ form.discount_amount.errors }}
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold" for="{{ form.tax_label.id_for_label }}">Tax label</label>
+                                {{ form.tax_label }}
+                                {{ form.tax_label.errors }}
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold" for="{{ form.tax_rate.id_for_label }}">Tax rate %</label>
+                                {{ form.tax_rate }}
+                                {{ form.tax_rate.errors }}
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold" for="{{ form.due_days.id_for_label }}">Due in days</label>
+                                {{ form.due_days }}
+                                {{ form.due_days.errors }}
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <label class="form-label fw-semibold" for="{{ form.notes.id_for_label }}">Notes for the client</label>
+                            {{ form.notes }}
+                            {{ form.notes.errors }}
+                        </div>
+                        <div class="mt-3">
+                            <label class="form-label fw-semibold" for="{{ form.terms.id_for_label }}">Payment terms</label>
+                            {{ form.terms }}
+                            {{ form.terms.errors }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white py-3"><h6 class="fw-bold mb-0">Automation</h6></div>
+                    <div class="card-body">
+                        <div class="form-check form-switch mb-3">
+                            {{ form.is_active }}
+                            <label class="form-check-label fw-semibold" for="{{ form.is_active.id_for_label }}">Rule is active</label>
+                        </div>
+                        <div class="form-check form-switch mb-3">
+                            {{ form.auto_send }}
+                            <label class="form-check-label fw-semibold" for="{{ form.auto_send.id_for_label }}">Send automatically</label>
+                            {% if form.auto_send.help_text %}<div class="form-text">{{ form.auto_send.help_text }}</div>{% endif %}
+                        </div>
+                        <div class="mb-0">
+                            <label class="form-label fw-semibold" for="{{ form.next_invoice_date.id_for_label }}">Next invoice date</label>
+                            {{ form.next_invoice_date }}
+                            <div class="form-text">Used by recurring rules. Advanced automatically after each run.</div>
+                            {{ form.next_invoice_date.errors }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-save me-2"></i>{% if is_create %}Create rule{% else %}Save changes{% endif %}
+                        </button>
+                        <p class="text-muted small mt-3 mb-0">
+                            Generated invoices stay as drafts for review. Enable auto-send only for
+                            rules you trust completely.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

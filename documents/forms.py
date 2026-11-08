@@ -7,7 +7,15 @@ from decimal import Decimal
 
 from crm.models import Customer
 
-from .models import Document, DocumentLineItem, DocumentSettings, DocumentSignature
+from .models import (
+    BillingProfile,
+    BillingProfileLineItem,
+    Document,
+    DocumentLineItem,
+    DocumentSettings,
+    DocumentSignature,
+    DocumentType,
+)
 
 TEXT_INPUT = {'class': 'form-control'}
 SELECT = {'class': 'form-select'}
@@ -190,3 +198,115 @@ class ClientSignatureForm(forms.Form):
         if not cleaned.get('typed_signature') and not cleaned.get('signature_image'):
             raise ValidationError('Type your name or upload a signature image to sign.')
         return cleaned
+
+
+class BillingProfileForm(forms.ModelForm):
+    class Meta:
+        model = BillingProfile
+        fields = [
+            'name', 'customer', 'project', 'doc_type',
+            'trigger', 'frequency', 'phase_type',
+            'pricing_mode', 'default_description', 'default_amount',
+            'title_template', 'currency', 'discount_amount', 'tax_rate',
+            'tax_label', 'due_days', 'notes', 'terms',
+            'auto_send', 'is_active', 'next_invoice_date',
+        ]
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'customer': forms.Select(attrs=SELECT),
+            'project': forms.Select(attrs=SELECT),
+            'doc_type': forms.Select(attrs=SELECT),
+            'trigger': forms.Select(attrs=SELECT),
+            'frequency': forms.Select(attrs=SELECT),
+            'phase_type': forms.Select(attrs=SELECT),
+            'pricing_mode': forms.Select(attrs=SELECT),
+            'default_description': forms.TextInput(attrs={'class': 'form-control'}),
+            'default_amount': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0'}),
+            'title_template': forms.TextInput(attrs={'class': 'form-control'}),
+            'currency': forms.TextInput(attrs={'class': 'form-control', 'maxlength': 3}),
+            'discount_amount': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0'}),
+            'tax_rate': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0'}),
+            'tax_label': forms.TextInput(attrs={'class': 'form-control'}),
+            'due_days': forms.NumberInput(attrs={'class': 'form-control', 'min': '0'}),
+            'notes': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
+            'terms': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
+            'auto_send': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'next_invoice_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        from crm.models import Customer
+
+        self.fields['customer'].queryset = Customer.objects.order_by('name')
+        self.fields['customer'].empty_label = 'Select a CRM customer'
+        self.fields['project'].required = False
+        self.fields['project'].queryset = self.fields['project'].queryset.select_related('client').order_by('title')
+        self.fields['doc_type'].queryset = DocumentType.objects.filter(is_active=True).order_by('ordering', 'name')
+        self.fields['phase_type'].required = False
+        self.fields['next_invoice_date'].required = False
+        self.fields['discount_amount'].required = False
+        self.fields['tax_rate'].required = False
+        self.fields['default_amount'].required = False
+        self.fields['title_template'].required = False
+        self.fields['default_description'].required = False
+        self.fields['auto_send'].help_text = (
+            'Off by default: invoices stay as drafts until an administrator reviews and sends them.'
+        )
+
+        if not self.instance.pk:
+            invoice_type = DocumentType.objects.filter(code='invoice').first()
+            if invoice_type and not self.initial.get('doc_type'):
+                self.initial['doc_type'] = invoice_type
+            if not self.initial.get('next_invoice_date'):
+                self.initial['next_invoice_date'] = timezone.localdate()
+
+    def clean(self):
+        cleaned = super().clean()
+        trigger = cleaned.get('trigger')
+        frequency = cleaned.get('frequency')
+
+        if trigger == BillingProfile.TRIGGER_RECURRING:
+            if frequency == BillingProfile.FREQUENCY_ONE_OFF:
+                self.add_error(
+                    'frequency',
+                    'Choose monthly, quarterly or yearly for a recurring rule.',
+                )
+        else:
+            cleaned['frequency'] = BillingProfile.FREQUENCY_ONE_OFF
+
+        if trigger != BillingProfile.TRIGGER_PHASE_COMPLETED:
+            cleaned['phase_type'] = ''
+
+        currency = (cleaned.get('currency') or '').upper()
+        if currency:
+            cleaned['currency'] = currency
+
+        for field in ('discount_amount', 'tax_rate', 'default_amount'):
+            if cleaned.get(field) is None:
+                cleaned[field] = Decimal('0.00')
+        return cleaned
+
+
+class BillingProfileLineItemForm(forms.ModelForm):
+    class Meta:
+        model = BillingProfileLineItem
+        fields = ['description', 'details', 'quantity', 'unit_price']
+        widgets = {
+            'description': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Service or product'}),
+            'details': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Optional detail'}),
+            'quantity': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0'}),
+            'unit_price': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0'}),
+        }
+
+
+BillingProfileLineItemFormSet = inlineformset_factory(
+    BillingProfile,
+    BillingProfileLineItem,
+    form=BillingProfileLineItemForm,
+    extra=2,
+    can_delete=True,
+    min_num=0,
+    validate_min=False,
+)

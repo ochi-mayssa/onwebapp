@@ -1,6 +1,8 @@
 from django.contrib import admin
 
 from .models import (
+    BillingProfile,
+    BillingProfileLineItem,
     Document,
     DocumentEmail,
     DocumentEvent,
@@ -14,6 +16,40 @@ from .models import (
 class DocumentLineItemInline(admin.TabularInline):
     model = DocumentLineItem
     extra = 1
+
+
+class BillingProfileLineItemInline(admin.TabularInline):
+    model = BillingProfileLineItem
+    extra = 1
+
+
+@admin.register(BillingProfile)
+class BillingProfileAdmin(admin.ModelAdmin):
+    list_display = (
+        'name', 'customer', 'trigger', 'frequency', 'next_invoice_date',
+        'auto_send', 'is_active', 'last_invoiced_at',
+    )
+    list_filter = ('trigger', 'frequency', 'auto_send', 'is_active')
+    search_fields = ('name', 'customer__name', 'customer__email', 'project__title')
+    readonly_fields = ('last_invoiced_at', 'last_document', 'created_at', 'updated_at')
+    inlines = [BillingProfileLineItemInline]
+    fieldsets = (
+        ('Rule', {
+            'fields': ('name', 'customer', 'project', 'doc_type', 'trigger',
+                       'frequency', 'phase_type', 'is_active'),
+        }),
+        ('Pricing', {
+            'fields': ('pricing_mode', 'default_description', 'default_amount',
+                       'currency', 'discount_amount', 'tax_label', 'tax_rate', 'due_days'),
+        }),
+        ('Invoice content', {
+            'fields': ('title_template', 'notes', 'terms'),
+        }),
+        ('Automation', {
+            'fields': ('auto_send', 'next_invoice_date', 'last_invoiced_at',
+                       'last_document', 'created_by', 'created_at', 'updated_at'),
+        }),
+    )
 
 
 @admin.register(DocumentType)

@@ -2,16 +2,21 @@
 import shutil
 import os
 import tempfile
+from datetime import date
 from decimal import Decimal
 
 from django.contrib.auth import get_user_model
 from django.core import mail
+from django.core.management import call_command
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from crm.models import Customer
+from projects.models import Invoice as LegacyInvoice, Project, ProjectPhase
 
 from .models import (
+    BillingProfile,
+    BillingProfileLineItem,
     Document,
     DocumentEmail,
     DocumentEvent,
@@ -22,9 +27,12 @@ from .models import (
 )
 from .services import (
     accept_document,
+    advance_billing_date,
     apply_client_signature,
+    create_invoice_from_profile,
     generate_document_pdf,
     reject_document,
+    run_due_billing_profiles,
     send_document,
 )
 from .tokens import TokenExpired, TokenInvalid, make_token, read_token
@@ -400,3 +408,269 @@ class TokenTests(DocumentTestBase):
         document.save(update_fields=['version'])
         with self.assertRaises(TokenInvalid):
             read_token(token)
+
+
+class InvoiceAutomationTests(DocumentTestBase):
+    def make_profile(self, **overrides):
+        invoice_type = DocumentType.objects.get(code='invoice')
+        values = {
+            'name': 'Standard billing',
+            'customer': self.customer,
+            'doc_type': invoice_type,
+            'trigger': BillingProfile.TRIGGER_PROJECT_CREATED,
+            'frequency': BillingProfile.FREQUENCY_ONE_OFF,
+            'pricing_mode': BillingProfile.PRICING_FIXED,
+            'default_description': 'Professional services',
+            'default_amount': Decimal('500.00'),
+            'currency': 'USD',
+            'due_days': 14,
+        }
+        values.update(overrides)
+        return BillingProfile.objects.create(**values)
+
+    def make_project(self, title='Website build'):
+        return Project.objects.create(
+            client=self.client_user,
+            title=title,
+            description='Build a website',
+        )
+
+    def make_phase(self, project, phase_type='DESIGN', status='NOT_STARTED'):
+        return ProjectPhase.objects.create(
+            project=project,
+            phase_type=phase_type,
+            status=status,
+            approval_status='NOT_REQUIRED',
+        )
+
+    def test_create_invoice_from_profile_is_idempotent(self):
+        profile = self.make_profile(trigger=BillingProfile.TRIGGER_RECURRING)
+        BillingProfileLineItem.objects.create(
+            profile=profile,
+            description='Hosting',
+            quantity=Decimal('2'),
+            unit_price=Decimal('25.00'),
+        )
+
+        document, created = create_invoice_from_profile(
+            profile, automation_key='test-key-1',
+        )
+        duplicate, created_again = create_invoice_from_profile(
+            profile, automation_key='test-key-1',
+        )
+
+        self.assertTrue(created)
+        self.assertFalse(created_again)
+        self.assertEqual(document.pk, duplicate.pk)
+        self.assertEqual(document.status, Document.STATUS_DRAFT)
+        self.assertEqual(document.subtotal, Decimal('50.00'))
+        self.assertEqual(document.total, Decimal('50.00'))
+        self.assertEqual(document.items.count(), 1)
+        self.assertEqual(document.billing_profile, profile)
+        self.assertTrue(
+            document.events.filter(event=DocumentEvent.EVENT_CREATED).exists()
+        )
+        profile.refresh_from_db()
+        self.assertEqual(profile.last_document_id, document.pk)
+
+    def test_advance_billing_date_clamps_month_end(self):
+        self.assertEqual(advance_billing_date(date(2026, 1, 31), 'MONTHLY'), date(2026, 2, 28))
+        self.assertEqual(advance_billing_date(date(2026, 1, 31), 'QUARTERLY'), date(2026, 4, 30))
+        self.assertEqual(advance_billing_date(date(2024, 2, 29), 'YEARLY'), date(2025, 2, 28))
+
+    def test_project_created_signal_creates_one_draft(self):
+        profile = self.make_profile()
+        with self.captureOnCommitCallbacks(execute=True):
+            project = self.make_project()
+
+        document = Document.objects.get(billing_profile=profile)
+        self.assertEqual(document.status, Document.STATUS_DRAFT)
+        self.assertEqual(document.project_id, project.pk)
+        self.assertEqual(document.total, Decimal('500.00'))
+        self.assertEqual(document.automation_key, f'project-created:{project.pk}:{profile.pk}')
+        self.assertIn(project.title, document.title)
+
+        # A second save of the same project must not create another invoice.
+        with self.captureOnCommitCallbacks(execute=True):
+            project.title = 'Website build (renamed)'
+            project.save(update_fields=['title'])
+        self.assertEqual(Document.objects.filter(billing_profile=profile).count(), 1)
+
+    def test_project_completed_signal_triggers_once(self):
+        profile = self.make_profile(trigger=BillingProfile.TRIGGER_PROJECT_COMPLETED)
+        with self.captureOnCommitCallbacks(execute=True):
+            project = self.make_project()
+        self.assertFalse(Document.objects.filter(billing_profile=profile).exists())
+
+        with self.captureOnCommitCallbacks(execute=True):
+            project.current_status = 'COMPLETED'
+            project.save(update_fields=['current_status'])
+
+        document = Document.objects.get(billing_profile=profile)
+        self.assertEqual(document.project_id, project.pk)
+        self.assertEqual(document.automation_key, f'project-completed:{project.pk}:{profile.pk}')
+
+        with self.captureOnCommitCallbacks(execute=True):
+            project.current_status = 'COMPLETED'
+            project.save(update_fields=['current_status'])
+        self.assertEqual(Document.objects.filter(billing_profile=profile).count(), 1)
+
+    def test_phase_completed_signal_respects_phase_type(self):
+        profile = self.make_profile(
+            trigger=BillingProfile.TRIGGER_PHASE_COMPLETED,
+            phase_type='DESIGN',
+        )
+        with self.captureOnCommitCallbacks(execute=True):
+            project = self.make_project()
+            other_phase = self.make_phase(project, phase_type='DEVELOPMENT')
+        self.assertFalse(Document.objects.filter(billing_profile=profile).exists())
+
+        with self.captureOnCommitCallbacks(execute=True):
+            other_phase.status = 'COMPLETED'
+            other_phase.save(update_fields=['status'])
+        self.assertFalse(Document.objects.filter(billing_profile=profile).exists())
+
+        with self.captureOnCommitCallbacks(execute=True):
+            design_phase = self.make_phase(project, phase_type='DESIGN', status='COMPLETED')
+        self.assertTrue(Document.objects.filter(billing_profile=profile).exists())
+
+        with self.captureOnCommitCallbacks(execute=True):
+            design_phase.approval_status = 'APPROVED'
+            design_phase.save(update_fields=['approval_status'])
+        self.assertEqual(Document.objects.filter(billing_profile=profile).count(), 1)
+
+    def test_recurring_run_creates_and_advances(self):
+        profile = self.make_profile(
+            trigger=BillingProfile.TRIGGER_RECURRING,
+            frequency=BillingProfile.FREQUENCY_MONTHLY,
+            next_invoice_date=date(2026, 1, 1),
+        )
+
+        summary = run_due_billing_profiles(today=date(2026, 1, 15))
+        self.assertEqual(summary['created'], 1)
+        document = Document.objects.get(billing_profile=profile)
+        self.assertEqual(document.billing_period_start, date(2026, 1, 1))
+        self.assertEqual(document.billing_period_end, date(2026, 1, 31))
+        self.assertEqual(document.automation_key, f'recurring:{profile.pk}:2026-01-01')
+
+        profile.refresh_from_db()
+        self.assertEqual(profile.next_invoice_date, date(2026, 2, 1))
+
+        # Running again before the next period is due is a no-op.
+        summary = run_due_billing_profiles(today=date(2026, 1, 20))
+        self.assertEqual(summary['created'], 0)
+        self.assertEqual(Document.objects.filter(billing_profile=profile).count(), 1)
+
+        # The next period creates a second invoice with its own key.
+        summary = run_due_billing_profiles(today=date(2026, 2, 2))
+        self.assertEqual(summary['created'], 1)
+        self.assertEqual(Document.objects.filter(billing_profile=profile).count(), 2)
+
+    def test_recurring_skips_customer_without_email_and_advances(self):
+        profile = self.make_profile(
+            trigger=BillingProfile.TRIGGER_RECURRING,
+            frequency=BillingProfile.FREQUENCY_MONTHLY,
+            next_invoice_date=date(2026, 1, 1),
+        )
+        self.customer.email = ''
+        self.customer.save(update_fields=['email'])
+
+        summary = run_due_billing_profiles(today=date(2026, 1, 5))
+
+        self.assertEqual(summary['failed'], 1)
+        self.assertFalse(Document.objects.filter(billing_profile=profile).exists())
+        profile.refresh_from_db()
+        self.assertEqual(profile.next_invoice_date, date(2026, 2, 1))
+
+    @override_settings(EMAIL_BACKEND=LOCMEM_EMAIL)
+    def test_auto_send_emails_invoice(self):
+        profile = self.make_profile(auto_send=True)
+
+        document, created = create_invoice_from_profile(profile)
+
+        self.assertTrue(created)
+        document.refresh_from_db()
+        self.assertEqual(document.status, Document.STATUS_SENT)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].to, ['client@example.com'])
+        self.assertEqual(document.emails.get().status, DocumentEmail.STATUS_SENT)
+
+    def test_legacy_project_invoice_signal_is_disabled(self):
+        with self.captureOnCommitCallbacks(execute=True):
+            self.make_project()
+
+        self.assertFalse(LegacyInvoice.objects.exists())
+
+    def test_billing_ui_permissions_and_manual_generation(self):
+        profile = self.make_profile()
+
+        self.client.force_login(self.client_user)
+        response = self.client.get(reverse('documents:billing_list'))
+        self.assertEqual(response.status_code, 403)
+        self.client.logout()
+
+        self.client.force_login(self.admin)
+        response = self.client.get(reverse('documents:billing_list'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Invoice automation')
+        response = self.client.get(reverse('documents:billing_create'))
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.post(reverse('documents:billing_generate', args=[profile.pk]))
+        self.assertEqual(response.status_code, 302)
+        document = Document.objects.get(billing_profile=profile)
+        self.assertEqual(document.status, Document.STATUS_DRAFT)
+
+    def test_billing_rule_created_through_form(self):
+        self.client.force_login(self.admin)
+        invoice_type = DocumentType.objects.get(code='invoice')
+        data = {
+            'name': 'Monthly retainer',
+            'customer': self.customer.pk,
+            'project': '',
+            'doc_type': invoice_type.pk,
+            'trigger': BillingProfile.TRIGGER_RECURRING,
+            'frequency': BillingProfile.FREQUENCY_MONTHLY,
+            'phase_type': '',
+            'pricing_mode': BillingProfile.PRICING_ITEMIZED,
+            'default_description': 'Retainer',
+            'default_amount': '0.00',
+            'title_template': 'Invoice for {project}',
+            'currency': 'usd',
+            'discount_amount': '0.00',
+            'tax_rate': '0.00',
+            'tax_label': 'VAT',
+            'due_days': '14',
+            'notes': '',
+            'terms': '',
+            'is_active': 'on',
+            'next_invoice_date': '2026-01-01',
+            'line_items-TOTAL_FORMS': '1',
+            'line_items-INITIAL_FORMS': '0',
+            'line_items-MIN_NUM_FORMS': '0',
+            'line_items-MAX_NUM_FORMS': '1000',
+            'line_items-0-description': 'Retainer',
+            'line_items-0-details': '',
+            'line_items-0-quantity': '1',
+            'line_items-0-unit_price': '750.00',
+        }
+        response = self.client.post(reverse('documents:billing_create'), data)
+        self.assertEqual(response.status_code, 302)
+
+        profile = BillingProfile.objects.get(name='Monthly retainer')
+        self.assertEqual(profile.currency, 'USD')
+        self.assertEqual(profile.line_items.count(), 1)
+        self.assertEqual(profile.next_invoice_date, date(2026, 1, 1))
+
+    def test_management_command_creates_due_invoice(self):
+        profile = self.make_profile(
+            trigger=BillingProfile.TRIGGER_RECURRING,
+            frequency=BillingProfile.FREQUENCY_MONTHLY,
+            next_invoice_date=date(2026, 1, 1),
+        )
+
+        call_command('generate_due_invoices', date='2026-01-15', verbosity=0)
+
+        self.assertTrue(Document.objects.filter(billing_profile=profile).exists())
+        profile.refresh_from_db()
+        self.assertEqual(profile.next_invoice_date, date(2026, 2, 1))

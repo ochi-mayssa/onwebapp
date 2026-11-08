@@ -43,6 +43,12 @@ SITE_URL = os.environ.get('SITE_URL', 'http://127.0.0.1:8000')
 # How long a document link sent by email stays valid (seconds). Default 60 days.
 DOCUMENT_LINK_MAX_AGE = int(os.environ.get('DOCUMENT_LINK_MAX_AGE', 60 * 24 * 60 * 60))
 
+# The legacy projects.Invoice auto-generation signal (WeasyPrint) is replaced by
+# documents.BillingProfile rules. Keep it off unless explicitly requested.
+LEGACY_PROJECT_AUTO_INVOICE = os.environ.get(
+    'LEGACY_PROJECT_AUTO_INVOICE', 'False'
+).lower() in ('1', 'true', 'yes', 'on')
+
 # SECURITY WARNING: keep the secret key used in production secret!
 # Read from environment; fallback to insecure key only in development
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-bhg@b&btr99*q&4cs+2lb2*0@4)jf35(z_2q-b36ah1i-!gchb')
@@ -413,6 +419,10 @@ CELERY_BEAT_SCHEDULE = {
     },
     'cleanup-expired-exports-daily': {
         'task': 'branding.tasks.cleanup_expired_exports',
+        'schedule': 86400.0,  # Every 24 hours
+    },
+    'generate-due-invoices-daily': {
+        'task': 'documents.tasks.generate_due_invoices',
         'schedule': 86400.0,  # Every 24 hours
     },
 }

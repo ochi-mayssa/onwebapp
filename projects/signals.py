@@ -81,7 +81,14 @@ def automated_invoice_generation(sender, instance, created, **kwargs):
     """
     Trigger: New project started.
     Action: Generate draft Invoice, PDF, and Email.
+
+    Disabled by default. The documents app now owns invoice automation through
+    configurable BillingProfile rules. Set LEGACY_PROJECT_AUTO_INVOICE=True only
+    if you deliberately need the old projects.Invoice/WeasyPrint flow.
     """
+    if not getattr(settings, 'LEGACY_PROJECT_AUTO_INVOICE', False):
+        return
+
     if created:
         # Determine amount based on project type
         price_map = {

@@ -13,12 +13,15 @@ from django.urls import reverse
 from django.utils import timezone
 
 from .forms import (
+    BillingProfileForm,
+    BillingProfileLineItemFormSet,
     ClientSignatureForm,
     DocumentForm,
     DocumentLineItemFormSet,
     DocumentSettingsForm,
 )
 from .models import (
+    BillingProfile,
     Document,
     DocumentEvent,
     DocumentSettings,
@@ -29,12 +32,14 @@ from .services import (
     accept_document,
     apply_client_signature,
     cancel_document,
+    create_invoice_from_profile,
     ensure_pdf,
     generate_document_pdf,
     mark_paid,
     refresh_overdue_documents,
     reject_document,
     revise_document,
+    run_due_billing_profiles,
     send_document,
 )
 from .tokens import TokenError, make_token, read_token
@@ -343,6 +348,134 @@ def settings_view(request):
         'form': form,
         'settings': cfg,
     })
+
+
+# --------------------------------------------------------- billing automation
+@admin_required
+def billing_list(request):
+    profiles = (
+        BillingProfile.objects
+        .select_related('customer', 'project', 'doc_type', 'last_document')
+        .order_by('name')
+    )
+    today = timezone.localdate()
+    summary = {
+        'total': profiles.count(),
+        'active': profiles.filter(is_active=True).count(),
+        'recurring': profiles.filter(
+            is_active=True, trigger=BillingProfile.TRIGGER_RECURRING,
+        ).count(),
+        'due': profiles.filter(
+            is_active=True,
+            trigger=BillingProfile.TRIGGER_RECURRING,
+            next_invoice_date__lte=today,
+        ).count(),
+        'drafts': Document.objects.filter(
+            billing_profile__isnull=False,
+            status=Document.STATUS_DRAFT,
+        ).count(),
+    }
+    return render(request, 'documents/billing_list.html', {
+        'profiles': profiles,
+        'summary': summary,
+        'today': today,
+        'settings': DocumentSettings.load(),
+    })
+
+
+def _billing_form_context(request, form, formset, profile=None):
+    return render(request, 'documents/billing_form.html', {
+        'form': form,
+        'formset': formset,
+        'profile': profile,
+        'is_create': profile is None,
+        'settings': DocumentSettings.load(),
+    })
+
+
+@admin_required
+def billing_create(request):
+    if request.method == 'POST':
+        form = BillingProfileForm(request.POST)
+        formset = BillingProfileLineItemFormSet(request.POST)
+        if form.is_valid() and formset.is_valid():
+            profile = form.save(commit=False)
+            profile.created_by = request.user
+            profile.save()
+            formset.instance = profile
+            formset.save()
+            messages.success(request, f'Billing rule "{profile.name}" created.')
+            return redirect('documents:billing_list')
+        messages.error(request, 'Please correct the errors below.')
+    else:
+        form = BillingProfileForm()
+        formset = BillingProfileLineItemFormSet()
+    return _billing_form_context(request, form, formset)
+
+
+@admin_required
+def billing_edit(request, pk):
+    profile = get_object_or_404(BillingProfile, pk=pk)
+    if request.method == 'POST':
+        form = BillingProfileForm(request.POST, instance=profile)
+        formset = BillingProfileLineItemFormSet(request.POST, instance=profile)
+        if form.is_valid() and formset.is_valid():
+            profile = form.save()
+            formset.instance = profile
+            formset.save()
+            messages.success(request, f'Billing rule "{profile.name}" updated.')
+            return redirect('documents:billing_list')
+        messages.error(request, 'Please correct the errors below.')
+    else:
+        form = BillingProfileForm(instance=profile)
+        formset = BillingProfileLineItemFormSet(instance=profile)
+    return _billing_form_context(request, form, formset, profile=profile)
+
+
+@admin_required
+def billing_toggle(request, pk):
+    profile = get_object_or_404(BillingProfile, pk=pk)
+    if request.method == 'POST':
+        profile.is_active = not profile.is_active
+        profile.save(update_fields=['is_active', 'updated_at'])
+        state = 'activated' if profile.is_active else 'paused'
+        messages.success(request, f'Billing rule "{profile.name}" {state}.')
+    return redirect('documents:billing_list')
+
+
+@admin_required
+def billing_generate(request, pk):
+    profile = get_object_or_404(BillingProfile, pk=pk)
+    if request.method != 'POST':
+        return redirect('documents:billing_list')
+
+    document, created = create_invoice_from_profile(
+        profile, actor=request.user, request=request, source='manual',
+    )
+    if document is None:
+        messages.error(
+            request,
+            'No invoice was created. Check that the CRM customer has an email address.',
+        )
+        return redirect('documents:billing_list')
+
+    if created:
+        messages.success(request, f'Draft {document.reference} generated for review.')
+    else:
+        messages.info(request, f'Existing invoice {document.reference} was reused.')
+    return redirect('documents:admin_detail', pk=document.pk)
+
+
+@admin_required
+def billing_run_due(request):
+    if request.method == 'POST':
+        summary = run_due_billing_profiles(actor=request.user)
+        messages.success(
+            request,
+            f"Recurring run finished: {summary['created']} created, "
+            f"{summary['skipped']} skipped, {summary['failed']} failed.",
+        )
+    return redirect('documents:billing_list')
 
 
 # -------------------------------------------------------------------- client

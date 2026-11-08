@@ -74,6 +74,21 @@
                             </div>
                         </div>
                     </div>
+                    {% if document.billing_profile or document.automation_key %}
+                    <div class="alert alert-light border small mt-3 mb-0">
+                        <i class="fas fa-robot me-1"></i>
+                        Generated automatically
+                        {% if document.billing_profile %}
+                            by rule
+                            <a href="{% url 'documents:billing_edit' document.billing_profile.pk %}" class="fw-semibold">{{ document.billing_profile.name }}</a>
+                        {% endif %}
+                        {% if document.billing_period_start or document.billing_period_end %}
+                            &middot;
+                            {% if document.billing_period_start %}{{ document.billing_period_start|date:"M d, Y" }}{% endif %}
+                            {% if document.billing_period_end %}&ndash; {{ document.billing_period_end|date:"M d, Y" }}{% endif %}
+                        {% endif %}
+                    </div>
+                    {% endif %}
                 </div>
             </div>
 

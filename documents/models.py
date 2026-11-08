@@ -200,6 +200,16 @@ class Document(models.Model):
         'projects.Invoice', on_delete=models.SET_NULL, null=True, blank=True,
         related_name='documents', help_text=_('Optional internal invoice this document was generated from.'),
     )
+    billing_profile = models.ForeignKey(
+        'BillingProfile', on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='documents', help_text=_('Automation profile that generated this document.'),
+    )
+    billing_period_start = models.DateField(null=True, blank=True)
+    billing_period_end = models.DateField(null=True, blank=True)
+    automation_key = models.CharField(
+        max_length=180, unique=True, null=True, blank=True,
+        help_text=_('Idempotency key for automatically generated documents.'),
+    )
 
     # Snapshot of the client details at issue time: the document must remain
     # accurate even if the CRM profile changes later.
@@ -394,6 +404,147 @@ class DocumentLineItem(models.Model):
         ordering = ('ordering', 'pk')
         verbose_name = _('Line item')
         verbose_name_plural = _('Line items')
+
+    def __str__(self):
+        return self.description
+
+    def save(self, *args, **kwargs):
+        self.line_total = (self.quantity * self.unit_price).quantize(MONEY, rounding=ROUND_HALF_UP)
+        super().save(*args, **kwargs)
+
+
+class BillingProfile(models.Model):
+    """Configurable rule for automatically generating invoice documents.
+
+    Drafts are created by default. An administrator reviews the generated PDF
+    and sends it manually. ``auto_send`` is opt-in for fully automatic flows.
+    """
+
+    TRIGGER_PROJECT_CREATED = 'PROJECT_CREATED'
+    TRIGGER_PROJECT_COMPLETED = 'PROJECT_COMPLETED'
+    TRIGGER_PHASE_COMPLETED = 'PHASE_COMPLETED'
+    TRIGGER_RECURRING = 'RECURRING'
+    TRIGGER_CHOICES = [
+        (TRIGGER_PROJECT_CREATED, _('When a project is created')),
+        (TRIGGER_PROJECT_COMPLETED, _('When a project is completed')),
+        (TRIGGER_PHASE_COMPLETED, _('When a project phase is completed')),
+        (TRIGGER_RECURRING, _('On a recurring schedule')),
+    ]
+
+    FREQUENCY_ONE_OFF = 'ONE_OFF'
+    FREQUENCY_MONTHLY = 'MONTHLY'
+    FREQUENCY_QUARTERLY = 'QUARTERLY'
+    FREQUENCY_YEARLY = 'YEARLY'
+    FREQUENCY_CHOICES = [
+        (FREQUENCY_ONE_OFF, _('One-off')),
+        (FREQUENCY_MONTHLY, _('Monthly')),
+        (FREQUENCY_QUARTERLY, _('Quarterly')),
+        (FREQUENCY_YEARLY, _('Yearly')),
+    ]
+
+    PRICING_FIXED = 'FIXED'
+    PRICING_ITEMIZED = 'ITEMIZED'
+    PRICING_CHOICES = [
+        (PRICING_FIXED, _('Single fixed line')),
+        (PRICING_ITEMIZED, _('Itemized line items')),
+    ]
+
+    PHASE_TYPE_CHOICES = [
+        ('PLANNING', _('Planning & Requirements')),
+        ('DESIGN', _('Design Drafts')),
+        ('DEVELOPMENT', _('Development')),
+        ('TESTING', _('Testing & QA')),
+        ('LAUNCH', _('Launch')),
+    ]
+
+    name = models.CharField(max_length=120)
+    customer = models.ForeignKey(
+        'crm.Customer', on_delete=models.PROTECT, related_name='billing_profiles',
+    )
+    project = models.ForeignKey(
+        'projects.Project', on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='billing_profiles',
+        help_text=_('Leave blank to apply this rule to every project for the customer.'),
+    )
+    doc_type = models.ForeignKey(
+        DocumentType, on_delete=models.PROTECT, related_name='billing_profiles',
+        help_text=_('Usually Invoice.'),
+    )
+
+    trigger = models.CharField(max_length=30, choices=TRIGGER_CHOICES, default=TRIGGER_PROJECT_CREATED)
+    frequency = models.CharField(max_length=20, choices=FREQUENCY_CHOICES, default=FREQUENCY_ONE_OFF)
+    phase_type = models.CharField(
+        max_length=20, choices=PHASE_TYPE_CHOICES, blank=True,
+        help_text=_('Only for phase-completed rules. Leave blank to trigger on any phase.'),
+    )
+
+    pricing_mode = models.CharField(max_length=20, choices=PRICING_CHOICES, default=PRICING_FIXED)
+    default_description = models.CharField(max_length=255, blank=True, default='Professional services')
+    default_amount = models.DecimalField(max_digits=12, decimal_places=2, default=ZERO)
+
+    title_template = models.CharField(
+        max_length=200, blank=True, default='Invoice for {project}',
+        help_text=_('Placeholders: {project}, {customer}, {profile}, {period_start}, {period_end}.'),
+    )
+    currency = models.CharField(max_length=3, default='USD')
+    discount_amount = models.DecimalField(max_digits=12, decimal_places=2, default=ZERO)
+    tax_rate = models.DecimalField(max_digits=6, decimal_places=2, default=ZERO, help_text=_('Percentage.'))
+    tax_label = models.CharField(max_length=30, default='VAT')
+    due_days = models.PositiveIntegerField(default=14)
+    notes = models.TextField(blank=True)
+    terms = models.TextField(blank=True)
+
+    auto_send = models.BooleanField(
+        default=False,
+        help_text=_('If enabled, the generated PDF is emailed immediately instead of staying a draft.'),
+    )
+    is_active = models.BooleanField(default=True)
+    next_invoice_date = models.DateField(null=True, blank=True)
+    last_invoiced_at = models.DateTimeField(null=True, blank=True)
+    last_document = models.ForeignKey(
+        Document, on_delete=models.SET_NULL, null=True, blank=True, related_name='+',
+    )
+
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='created_billing_profiles',
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ('name', 'pk')
+        verbose_name = _('Billing profile')
+        verbose_name_plural = _('Billing profiles')
+        indexes = [
+            models.Index(fields=['trigger', 'is_active']),
+            models.Index(fields=['next_invoice_date']),
+        ]
+
+    def __str__(self):
+        return f'{self.name} ({self.customer})'
+
+    def save(self, *args, **kwargs):
+        if self.trigger == self.TRIGGER_RECURRING and not self.next_invoice_date:
+            self.next_invoice_date = timezone.localdate()
+        super().save(*args, **kwargs)
+
+
+class BillingProfileLineItem(models.Model):
+    profile = models.ForeignKey(
+        BillingProfile, on_delete=models.CASCADE, related_name='line_items',
+    )
+    description = models.CharField(max_length=255)
+    details = models.CharField(max_length=255, blank=True)
+    quantity = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('1.00'))
+    unit_price = models.DecimalField(max_digits=12, decimal_places=2, default=ZERO)
+    line_total = models.DecimalField(max_digits=12, decimal_places=2, default=ZERO)
+    ordering = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ('ordering', 'pk')
+        verbose_name = _('Billing line item')
+        verbose_name_plural = _('Billing line items')
 
     def __str__(self):
         return self.description
