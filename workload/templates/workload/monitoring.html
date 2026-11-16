@@ -1,0 +1,266 @@
+{% extends 'workload/base_workload.html' %}
+{% load humanize workload_tags %}
+
+{% block wl_page_title %}Monitoring{% endblock %}
+{% block wl_title %}Workload monitoring{% endblock %}
+{% block wl_subtitle %}
+    Live overload, under-utilisation, deadline, blocked-work and team-capacity signals computed from the database.
+{% endblock %}
+
+{% block wl_actions %}
+    <form method="post" action="{% url 'workload:refresh_monitoring' %}" class="d-inline">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-dark"><i class="fas fa-rotate me-2"></i>Refresh alerts</button>
+    </form>
+    <form method="post" action="{% url 'workload:sync_integrations' %}" class="d-inline">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline-secondary"><i class="fas fa-arrows-rotate me-2"></i>Sync integrations</button>
+    </form>
+{% endblock %}
+
+{% block wl_content %}
+<div class="card mb-3">
+    <div class="card-body py-2">
+        <form method="get" class="d-flex flex-wrap gap-2 align-items-center">
+            <label class="small fw-semibold mb-0">Team filter</label>
+            <select name="team" class="form-select form-select-sm" style="max-width:260px;">
+                <option value="">All teams</option>
+                {% for team in teams %}
+                <option value="{{ team.pk }}" {% if selected_team and selected_team.pk == team.pk %}selected{% endif %}>{{ team.name }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-sm btn-outline-secondary">Apply</button>
+        </form>
+    </div>
+</div>
+
+<div class="row g-3 mb-3">
+    <div class="col-6 col-lg-3">
+        <div class="wl-stat is-alert"><div class="wl-stat-label">Overloaded</div><div class="wl-stat-value">{{ snapshot.overloaded_resources|length }}</div><div class="wl-stat-meta">Above {{ policy.high_max }}%</div></div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="wl-stat is-warn"><div class="wl-stat-label">Underutilised</div><div class="wl-stat-value">{{ snapshot.underutilized_resources|length }}</div><div class="wl-stat-meta">Below {{ policy.available_below }}%</div></div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="wl-stat is-alert"><div class="wl-stat-label">Overdue / blocked</div><div class="wl-stat-value">{{ snapshot.overdue_items|length }} / {{ snapshot.blocked_items|length }}</div><div class="wl-stat-meta">Open items</div></div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="wl-stat is-warn"><div class="wl-stat-label">Unassigned</div><div class="wl-stat-value">{{ snapshot.unassigned_items|length }}</div><div class="wl-stat-meta">Waiting for an owner</div></div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-6">
+        <div class="card mb-3">
+            <div class="card-header">Overloaded resources</div>
+            <div class="wl-table-wrap">
+                <table class="table align-middle">
+                    <thead><tr><th>Person</th><th>Load</th><th>State</th></tr></thead>
+                    <tbody>
+                        {% for row in snapshot.overloaded_resources %}
+                        <tr>
+                            <td><div class="fw-semibold">{{ row.resource.display_owner }}</div><div class="small text-muted">{{ row.assigned_hours }}h / {{ row.available_hours }}h</div></td>
+                            <td>{{ row.utilization_display }}</td>
+                            <td><span class="wl-badge level-{{ row.level }}">{{ row.level_label }}</span></td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="3"><div class="wl-empty py-3"><i class="fas fa-circle-check d-block"></i>No overloaded resources.</div></td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card mb-3">
+            <div class="card-header">Underutilised resources</div>
+            <div class="wl-table-wrap">
+                <table class="table align-middle">
+                    <thead><tr><th>Person</th><th>Load</th><th>State</th></tr></thead>
+                    <tbody>
+                        {% for row in snapshot.underutilized_resources %}
+                        <tr>
+                            <td><div class="fw-semibold">{{ row.resource.display_owner }}</div><div class="small text-muted">{{ row.assigned_hours }}h / {{ row.available_hours }}h</div></td>
+                            <td>{{ row.utilization_display }}</td>
+                            <td><span class="wl-badge level-{{ row.level }}">{{ row.level_label }}</span></td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="3"><div class="wl-empty py-3"><i class="fas fa-circle-check d-block"></i>No underutilised resources.</div></td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header">Overdue work</div>
+    <div class="wl-table-wrap">
+        <table class="table table-hover align-middle">
+            <thead><tr><th>Work item</th><th>Owner</th><th>Due</th><th>Priority</th></tr></thead>
+            <tbody>
+                {% for item in snapshot.overdue_items %}
+                <tr>
+                    <td><a href="{% url 'workload:work_item_detail' item.pk %}" class="fw-semibold text-decoration-none">{{ item.title }}</a></td>
+                    <td>{% if item.assignee %}{{ item.assignee.get_full_name|default:item.assignee.username }}{% elif item.team %}{{ item.team.name }}{% else %}Unassigned{% endif %}</td>
+                    <td class="text-danger fw-semibold">{{ item.due_date|date:"M j, Y" }}</td>
+                    <td>{% include 'workload/_priority_badge.html' with priority=item.priority label=item.get_priority_display %}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4"><div class="wl-empty py-3"><i class="fas fa-circle-check d-block"></i>No overdue work.</div></td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-6">
+        <div class="card mb-3">
+            <div class="card-header">Approaching deadlines</div>
+            <div class="wl-table-wrap">
+                <table class="table align-middle">
+                    <thead><tr><th>Work item</th><th>Due</th><th>Owner</th></tr></thead>
+                    <tbody>
+                        {% for item in snapshot.deadline_items %}
+                        <tr>
+                            <td><a href="{% url 'workload:work_item_detail' item.pk %}" class="text-decoration-none">{{ item.title }}</a></td>
+                            <td>{{ item.due_date|date:"M j" }}</td>
+                            <td>{% if item.assignee %}{{ item.assignee.get_full_name|default:item.assignee.username }}{% elif item.team %}{{ item.team.name }}{% else %}—{% endif %}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="3"><div class="wl-empty py-3"><i class="fas fa-circle-check d-block"></i>Nothing due soon.</div></td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card mb-3">
+            <div class="card-header">Blocked work</div>
+            <div class="wl-table-wrap">
+                <table class="table align-middle">
+                    <thead><tr><th>Work item</th><th>Reason</th><th>Owner</th></tr></thead>
+                    <tbody>
+                        {% for item in snapshot.blocked_items %}
+                        <tr>
+                            <td><a href="{% url 'workload:work_item_detail' item.pk %}" class="text-decoration-none">{{ item.title }}</a></td>
+                            <td class="small text-muted">{{ item.blocked_reason|default:"—" }}</td>
+                            <td>{% if item.assignee %}{{ item.assignee.get_full_name|default:item.assignee.username }}{% elif item.team %}{{ item.team.name }}{% else %}—{% endif %}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="3"><div class="wl-empty py-3"><i class="fas fa-circle-check d-block"></i>No blocked work.</div></td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-6">
+        <div class="card mb-3">
+            <div class="card-header">Unassigned work</div>
+            <div class="wl-table-wrap">
+                <table class="table align-middle">
+                    <thead><tr><th>Work item</th><th>Priority</th><th>Created</th></tr></thead>
+                    <tbody>
+                        {% for item in snapshot.unassigned_items %}
+                        <tr>
+                            <td><a href="{% url 'workload:work_item_detail' item.pk %}" class="text-decoration-none">{{ item.title }}</a></td>
+                            <td>{% include 'workload/_priority_badge.html' with priority=item.priority label=item.get_priority_display %}</td>
+                            <td class="small text-muted">{{ item.created_at|naturaltime }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="3"><div class="wl-empty py-3"><i class="fas fa-circle-check d-block"></i>No unassigned work.</div></td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card mb-3">
+            <div class="card-header">Team capacity issues</div>
+            <div class="wl-table-wrap">
+                <table class="table align-middle">
+                    <thead><tr><th>Team</th><th>Load</th><th>State</th></tr></thead>
+                    <tbody>
+                        {% for row in snapshot.team_capacity_issues %}
+                        <tr>
+                            <td><div class="fw-semibold">{{ row.team.name }}</div><div class="small text-muted">{{ row.member_count }} members</div></td>
+                            <td>{{ row.utilization_display }}</td>
+                            <td><span class="wl-badge level-{{ row.level }}">{{ row.level_label }}</span></td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="3"><div class="wl-empty py-3"><i class="fas fa-circle-check d-block"></i>No team capacity warnings.</div></td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Stored alerts</span>
+        <a href="{% url 'workload:alert_list' %}" class="small text-decoration-none" style="color:var(--wl-teal-dark);">Alert log</a>
+    </div>
+    <div class="wl-table-wrap">
+        <table class="table align-middle">
+            <thead><tr><th>Alert</th><th>Severity</th><th>Status</th><th>Recipient</th><th></th></tr></thead>
+            <tbody>
+                {% for alert in stored_alerts %}
+                <tr>
+                    <td><div class="fw-semibold">{{ alert.message }}</div><div class="small text-muted">{{ alert.get_alert_type_display }} · {{ alert.created_at|naturaltime }}</div></td>
+                    <td>{% include 'workload/_severity_badge.html' with severity=alert.severity label=alert.get_severity_display %}</td>
+                    <td><span class="wl-badge" style="background:#f1f5f9;color:#475569;">{{ alert.get_status_display }}</span></td>
+                    <td class="small text-muted">{% firstof alert.recipient.get_full_name alert.recipient.username "—" %}</td>
+                    <td class="text-end">
+                        <div class="d-flex gap-1 justify-content-end">
+                            {% if alert.status == 'OPEN' %}
+                            <form method="post" action="{% url 'workload:alert_action' alert.pk 'acknowledge' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-secondary">Ack</button>
+                            </form>
+                            {% endif %}
+                            <form method="post" action="{% url 'workload:alert_action' alert.pk 'resolve' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-success">Resolve</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5"><div class="wl-empty py-3"><i class="fas fa-bell-slash d-block"></i>No stored alerts. Use “Refresh alerts” to scan live data.</div></td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">Automation candidates</div>
+    <div class="wl-table-wrap">
+        <table class="table align-middle">
+            <thead><tr><th>Work item</th><th>Owner</th><th>Estimate</th><th>Priority</th></tr></thead>
+            <tbody>
+                {% for item in snapshot.automation_candidates %}
+                <tr>
+                    <td><a href="{% url 'workload:work_item_detail' item.pk %}" class="text-decoration-none">{{ item.title }}</a></td>
+                    <td>{% if item.assignee %}{{ item.assignee.get_full_name|default:item.assignee.username }}{% elif item.team %}{{ item.team.name }}{% else %}—{% endif %}</td>
+                    <td>{{ item.estimated_hours }}h</td>
+                    <td>{% include 'workload/_priority_badge.html' with priority=item.priority label=item.get_priority_display %}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4"><div class="wl-empty py-3"><i class="fas fa-robot d-block"></i>No automation candidates flagged yet.</div></td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

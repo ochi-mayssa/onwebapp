@@ -96,6 +96,7 @@ INSTALLED_APPS = [
     'crm',
     'documents',
     'community',
+    'workload',
     # Third-party
     'rest_framework',
     'rest_framework_simplejwt',
@@ -425,6 +426,18 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'documents.tasks.generate_due_invoices',
         'schedule': 86400.0,  # Every 24 hours
     },
+    'refresh-workload-alerts-hourly': {
+        'task': 'workload.tasks.refresh_workload_alerts',
+        'schedule': 3600.0,  # Every hour
+    },
+    'capture-workload-metrics-daily': {
+        'task': 'workload.tasks.capture_workload_metrics',
+        'schedule': 86400.0,  # Every 24 hours
+    },
+    'sync-workload-integrations-hourly': {
+        'task': 'workload.tasks.sync_workload_integrations',
+        'schedule': 3600.0,  # Every hour
+    },
 }
 
 # Worker safety: a single automation task has an internal bounded retry loop, so
@@ -439,6 +452,13 @@ CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_ACCEPT_CONTENT = ['json']
+
+# ===== WORKLOAD MANAGEMENT =====
+# Live project-task / CRM-service-request mirroring. Set to False on a busy
+# deployment to rely on `manage.py sync_workload_integrations` instead.
+WORKLOAD_SYNC_SIGNALS = os.environ.get(
+    'WORKLOAD_SYNC_SIGNALS', 'True',
+).strip().lower() in ('1', 'true', 'yes', 'on')
 
 # ===== AUTOMATION EXECUTION SECURITY =====
 # A dedicated Fernet key (urlsafe base64, 32 bytes) is preferred. See

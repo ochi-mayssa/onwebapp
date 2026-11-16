@@ -1,0 +1,27 @@
+<nav class="wl-nav" aria-label="Workload sections">
+    <a href="{% url 'workload:dashboard' %}" class="{% if workload_nav == 'dashboard' %}active{% endif %}">
+        <i class="fas fa-gauge-high"></i> Dashboard
+    </a>
+    <a href="{% url 'workload:work_item_list' %}" class="{% if workload_nav == 'items' %}active{% endif %}">
+        <i class="fas fa-list-check"></i> Work items
+    </a>
+    {% if can_manage_workload %}
+        <a href="{% url 'workload:resource_list' %}" class="{% if workload_nav == 'resources' %}active{% endif %}">
+            <i class="fas fa-users"></i> Resources
+        </a>
+        <a href="{% url 'workload:team_list' %}" class="{% if workload_nav == 'teams' %}active{% endif %}">
+            <i class="fas fa-people-group"></i> Teams
+        </a>
+        <a href="{% url 'workload:monitoring' %}" class="{% if workload_nav == 'monitoring' %}active{% endif %}">
+            <i class="fas fa-triangle-exclamation"></i> Monitoring
+        </a>
+        <a href="{% url 'workload:alert_list' %}" class="{% if workload_nav == 'alerts' %}active{% endif %}">
+            <i class="fas fa-bell"></i> Alerts
+        </a>
+    {% endif %}
+    {% if can_configure_workload %}
+        <a href="{% url 'workload:policy_list' %}" class="{% if workload_nav == 'policies' %}active{% endif %}">
+            <i class="fas fa-sliders"></i> Policies
+        </a>
+    {% endif %}
+</nav>

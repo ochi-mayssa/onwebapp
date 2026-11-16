@@ -1,0 +1,63 @@
+{% extends 'workload/base_workload.html' %}
+{% load workload_tags %}
+
+{% block wl_page_title %}Teams{% endblock %}
+{% block wl_title %}Teams and departments{% endblock %}
+{% block wl_subtitle %}
+    Aggregate capacity for teams, including member counts and open work.
+{% endblock %}
+
+{% block wl_actions %}
+    <a href="{% url 'workload:team_create' %}" class="btn btn-primary" style="background: var(--wl-teal); border-color: var(--wl-teal);">
+        <i class="fas fa-plus me-2"></i>New team
+    </a>
+{% endblock %}
+
+{% block wl_content %}
+<div class="card">
+    <div class="wl-table-wrap">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Team</th>
+                    <th>Lead</th>
+                    <th>Members</th>
+                    <th>Open work</th>
+                    <th>Assigned</th>
+                    <th>Available</th>
+                    <th style="min-width:160px;">Utilisation</th>
+                    <th>State</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                <tr>
+                    <td>
+                        <div class="fw-semibold">{{ row.team.name }}</div>
+                        <div class="text-muted small">{{ row.team.department|default:"No department" }}{% if row.team.code %} · {{ row.team.code }}{% endif %}</div>
+                    </td>
+                    <td>{% if row.team.lead %}{{ row.team.lead.get_full_name|default:row.team.lead.username }}{% else %}<span class="text-muted">—</span>{% endif %}</td>
+                    <td>{{ row.member_count }}</td>
+                    <td>{{ row.open_items }}</td>
+                    <td>{{ row.assigned_hours }}h</td>
+                    <td>{{ row.available_hours }}h</td>
+                    <td>
+                        <div class="wl-progress level-{{ row.level }}">
+                            <span style="width:{{ row.utilization|clamp_percent }}%"></span>
+                        </div>
+                        <div class="small text-muted mt-1">{{ row.utilization_display }}</div>
+                    </td>
+                    <td><span class="wl-badge level-{{ row.level }}">{{ row.level_label }}</span></td>
+                    <td class="text-end">
+                        <a href="{% url 'workload:team_edit' row.team.pk %}" class="btn btn-sm btn-outline-secondary" title="Edit"><i class="fas fa-pen"></i></a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="9"><div class="wl-empty"><i class="fas fa-people-group d-block"></i>No teams yet. Create a team to group capacity and reporting.</div></td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

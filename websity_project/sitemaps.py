@@ -23,6 +23,7 @@ class StaticViewSitemap(Sitemap):
         'home:rpa_solutions',
         'home:website_automation',
         'home:enterprise_automation',
+        'home:workflow_vs_workload_automation',
         'home:ux_design',
         'home:ui_design',
         'home:software_home',

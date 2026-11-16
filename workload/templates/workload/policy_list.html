@@ -1,0 +1,59 @@
+{% extends 'workload/base_workload.html' %}
+
+{% block wl_page_title %}Policies{% endblock %}
+{% block wl_title %}Workload policies{% endblock %}
+{% block wl_subtitle %}
+    Thresholds for utilisation bands, deadline warnings and assignment scoring. Defaults: Available below 60%, Balanced 60–85%, High 86–100%, Overloaded above 100%.
+{% endblock %}
+
+{% block wl_actions %}
+    {% if can_configure_workload %}
+    <a href="{% url 'workload:policy_create' %}" class="btn btn-primary" style="background: var(--wl-teal); border-color: var(--wl-teal);">
+        <i class="fas fa-plus me-2"></i>New policy
+    </a>
+    {% endif %}
+{% endblock %}
+
+{% block wl_content %}
+<div class="card">
+    <div class="wl-table-wrap">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Policy</th>
+                    <th>Available &lt;</th>
+                    <th>Balanced up to</th>
+                    <th>High up to</th>
+                    <th>Default hours</th>
+                    <th>Auto assign</th>
+                    <th>Critical reassign</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for policy in policies %}
+                <tr>
+                    <td>
+                        <div class="fw-semibold">{{ policy.name }}</div>
+                        <div class="small text-muted">{% if policy.is_default %}<span class="wl-badge" style="background:#ecfdf9;color:#0f9d90;">Default</span>{% endif %} {% if policy.tenant %}{{ policy.tenant.username }}{% else %}Organisation-wide{% endif %}</div>
+                    </td>
+                    <td>{{ policy.available_below }}%</td>
+                    <td>{{ policy.balanced_max }}%</td>
+                    <td>{{ policy.high_max }}%</td>
+                    <td>{{ policy.default_weekly_hours }}h</td>
+                    <td>{% if policy.auto_assign_enabled %}<span class="text-success">Enabled</span>{% else %}<span class="text-muted">Off</span>{% endif %}</td>
+                    <td>{% if policy.auto_reassign_critical %}<span class="text-danger">Allowed</span>{% else %}<span class="text-muted">Blocked</span>{% endif %}</td>
+                    <td class="text-end">
+                        {% if can_configure_workload %}
+                        <a href="{% url 'workload:policy_edit' policy.pk %}" class="btn btn-sm btn-outline-secondary"><i class="fas fa-pen"></i></a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="8"><div class="wl-empty"><i class="fas fa-sliders d-block"></i>No policies yet. A default policy is created automatically when workload is first used.</div></td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

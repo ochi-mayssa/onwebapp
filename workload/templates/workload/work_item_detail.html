@@ -1,0 +1,235 @@
+{% extends 'workload/base_workload.html' %}
+{% load humanize %}
+
+{% block wl_page_title %}{{ item.title }}{% endblock %}
+{% block wl_title %}{{ item.title }}{% endblock %}
+{% block wl_subtitle %}
+    {{ item.get_category_display }} work{% if item.project %} · {{ item.project.title }}{% endif %}{% if item.client %} · {{ item.client.name }}{% endif %}
+{% endblock %}
+
+{% block wl_actions %}
+    <a href="{% url 'workload:work_item_list' %}" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-2"></i>Back</a>
+    {% if can_manage_workload %}
+    <a href="{% url 'workload:work_item_edit' item.pk %}" class="btn btn-dark"><i class="fas fa-pen me-2"></i>Edit</a>
+    <form method="post" action="{% url 'workload:work_item_delete' item.pk %}" onsubmit="return confirm('Delete this work item and its history?');">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline-danger"><i class="fas fa-trash me-2"></i>Delete</button>
+    </form>
+    {% endif %}
+{% endblock %}
+
+{% block wl_content %}
+<div class="row g-3">
+    <div class="col-lg-8">
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    <span class="wl-badge" style="background:#f8fafc;color:#475569;">{{ item.get_status_display }}</span>
+                    {% include 'workload/_priority_badge.html' with priority=item.priority label=item.get_priority_display %}
+                    {% if item.is_overdue %}<span class="wl-badge" style="background:#fef2f2;color:#dc2626;">Overdue</span>{% endif %}
+                    {% if item.automation_eligible %}<span class="wl-badge" style="background:#eff6ff;color:#2563eb;">Automation candidate</span>{% endif %}
+                    {% if item.is_client_visible %}<span class="wl-badge" style="background:#ecfdf9;color:#0f9d90;">Client visible</span>{% endif %}
+                </div>
+                <div class="mb-3" style="white-space:pre-line;color:#334155;">{% if item.description %}{{ item.description }}{% else %}<span class="text-muted">No description provided.</span>{% endif %}</div>
+
+                {% if item.required_skills.all %}
+                <div class="mb-2">
+                    <span class="text-muted small fw-semibold text-uppercase">Required skills</span><br>
+                    {% for skill in item.required_skills.all %}<span class="wl-skill">{{ skill.name }}</span>{% endfor %}
+                </div>
+                {% endif %}
+
+                {% if item.blocked_reason %}
+                <div class="alert alert-warning py-2 mb-0"><strong>Blocked:</strong> {{ item.blocked_reason }}</div>
+                {% endif %}
+            </div>
+            <div class="card-footer bg-white">
+                <dl class="row wl-meta-list mb-0">
+                    <div class="col-6 col-md-3"><dt>Owner</dt><dd>{% if item.assignee %}{{ item.assignee.get_full_name|default:item.assignee.username }}{% elif item.team %}{{ item.team.name }}{% else %}<span class="text-muted">Unassigned</span>{% endif %}</dd></div>
+                    <div class="col-6 col-md-3"><dt>Client</dt><dd>{% if item.client %}{{ item.client.name }}{% else %}—{% endif %}</dd></div>
+                    <div class="col-6 col-md-3"><dt>Project</dt><dd>{% if item.project %}{{ item.project.title }}{% else %}—{% endif %}</dd></div>
+                    <div class="col-6 col-md-3"><dt>Source</dt><dd>{{ item.get_source_module_display }}</dd></div>
+                    <div class="col-6 col-md-3"><dt>Start</dt><dd>{{ item.start_date|date:"M j, Y"|default:"—" }}</dd></div>
+                    <div class="col-6 col-md-3"><dt>Due</dt><dd class="{% if item.is_overdue %}text-danger fw-semibold{% endif %}">{{ item.due_date|date:"M j, Y"|default:"—" }}</dd></div>
+                    <div class="col-6 col-md-3"><dt>Estimated</dt><dd>{{ item.estimated_hours }}h</dd></div>
+                    <div class="col-6 col-md-3"><dt>Actual</dt><dd>{{ item.actual_hours }}h</dd></div>
+                    <div class="col-6 col-md-3"><dt>Remaining</dt><dd>{{ item.remaining_hours }}h</dd></div>
+                    <div class="col-6 col-md-3"><dt>Created by</dt><dd>{% firstof item.created_by.get_full_name item.created_by.username "—" %}</dd></div>
+                    <div class="col-6 col-md-3"><dt>Created</dt><dd>{{ item.created_at|naturaltime }}</dd></div>
+                    <div class="col-6 col-md-3"><dt>Reference</dt><dd>{{ item.external_reference|default:"—" }}</dd></div>
+                </dl>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>Assignments</span>
+                <span class="text-muted small">{{ assignments|length }} record{{ assignments|length|pluralize }}</span>
+            </div>
+            <div class="wl-table-wrap">
+                <table class="table align-middle">
+                    <thead><tr><th>Resource</th><th>Role</th><th>Hours</th><th>Status</th><th>Assigned by</th></tr></thead>
+                    <tbody>
+                        {% for assignment in assignments %}
+                        <tr>
+                            <td class="fw-semibold">{{ assignment.resource.display_owner }}</td>
+                            <td>{{ assignment.role|default:"—" }}</td>
+                            <td>{{ assignment.effective_hours }}h</td>
+                            <td>
+                                <span class="wl-badge" style="background:{% if assignment.status == 'ACTIVE' %}#ecfdf9;color:#0f9d90{% elif assignment.status == 'RECOMMENDED' %}#eff6ff;color:#2563eb{% elif assignment.status == 'REJECTED' %}#fef2f2;color:#dc2626{% else %}#f1f5f9;color:#64748b{% endif %};">
+                                    {{ assignment.get_status_display }}
+                                </span>
+                            </td>
+                            <td class="text-muted small">{% firstof assignment.assigned_by.get_full_name assignment.assigned_by.username "System" %}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="5"><div class="wl-empty py-3"><i class="fas fa-user-plus d-block"></i>No assignment yet.</div></td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header">Attachments</div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-3">
+                    {% for attachment in attachments %}
+                    <li class="d-flex justify-content-between align-items-center border-bottom py-2">
+                        <div class="text-truncate">
+                            <i class="fas fa-paperclip me-2 text-muted"></i>
+                            <a href="{% url 'workload:attachment_download' attachment.pk %}" class="text-decoration-none">{{ attachment.original_name|default:attachment.file.name }}</a>
+                            <span class="text-muted small ms-2">{{ attachment.created_at|naturaltime }}</span>
+                        </div>
+                    </li>
+                    {% empty %}
+                    <li class="text-muted small">No files attached.</li>
+                    {% endfor %}
+                </ul>
+                {% if can_edit %}
+                <form method="post" action="{% url 'workload:attachment_upload' item.pk %}" enctype="multipart/form-data" class="d-flex flex-wrap gap-2 align-items-center">
+                    {% csrf_token %}
+                    {{ attachment_form.file }}
+                    <button type="submit" class="btn btn-sm btn-outline-secondary"><i class="fas fa-upload me-1"></i>Upload</button>
+                    <span class="form-text mb-0">Maximum 10 MB per file.</span>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">Audit trail</div>
+            <div class="card-body">
+                <div class="wl-history">
+                    {% for entry in history %}
+                    <div class="wl-history-item">
+                        <div class="fw-semibold">{{ entry.get_action_display }}{% if entry.field_name %} · {{ entry.field_name }}{% endif %}</div>
+                        <div class="text-muted small">
+                            {% firstof entry.actor.get_full_name entry.actor.username "System" %} · {{ entry.created_at|naturaltime }}
+                        </div>
+                        {% if entry.old_value or entry.new_value %}
+                        <div class="small mt-1">{{ entry.old_value|default:"—" }} → {{ entry.new_value|default:"—" }}</div>
+                        {% endif %}
+                        {% if entry.note %}<div class="small text-muted mt-1">{{ entry.note }}</div>{% endif %}
+                    </div>
+                    {% empty %}
+                    <div class="text-muted small">No history recorded.</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        {% if can_change_status %}
+        <div class="card mb-3">
+            <div class="card-header">Update status</div>
+            <div class="card-body">
+                <form method="post" action="{% url 'workload:work_item_status' item.pk %}">
+                    {% csrf_token %}
+                    {% include 'workload/_field.html' with field=status_form.status %}
+                    {% include 'workload/_field.html' with field=status_form.actual_hours %}
+                    {% include 'workload/_field.html' with field=status_form.note %}
+                    {% include 'workload/_field.html' with field=status_form.blocked_reason %}
+                    <button type="submit" class="btn btn-primary w-100" style="background: var(--wl-teal); border-color: var(--wl-teal);">Save status</button>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if assign_form %}
+        <div class="card mb-3">
+            <div class="card-header">Assign work</div>
+            <div class="card-body">
+                <form method="post" action="{% url 'workload:work_item_assign' item.pk %}">
+                    {% csrf_token %}
+                    {% include 'workload/_field.html' with field=assign_form.assignee %}
+                    {% include 'workload/_field.html' with field=assign_form.team %}
+                    {% include 'workload/_field.html' with field=assign_form.resource %}
+                    {% include 'workload/_field.html' with field=assign_form.allocated_hours %}
+                    {% include 'workload/_field.html' with field=assign_form.role %}
+                    {% include 'workload/_field.html' with field=assign_form.notes %}
+                    <button type="submit" class="btn btn-dark w-100"><i class="fas fa-user-check me-2"></i>Assign</button>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if can_manage_workload %}
+        <div class="card mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>Recommended assignees</span>
+                <form method="post" action="{% url 'workload:work_item_recommend' item.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-outline-secondary"><i class="fas fa-wand-magic-sparkles me-1"></i>Refresh</button>
+                </form>
+            </div>
+            <div class="card-body">
+                {% if pending_recommendations %}
+                <div class="mb-3">
+                    <div class="text-muted small fw-semibold text-uppercase mb-2">Awaiting review</div>
+                    {% for assignment in pending_recommendations %}
+                    <div class="border rounded-3 p-2 mb-2">
+                        <div class="fw-semibold">{{ assignment.resource.display_owner }}</div>
+                        <div class="small text-muted">{{ assignment.notes|default:"Recommended" }}</div>
+                        <div class="d-flex gap-2 mt-2">
+                            <form method="post" action="{% url 'workload:recommendation_action' assignment.pk 'approve' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-primary" style="background: var(--wl-teal); border-color: var(--wl-teal);">Approve</button>
+                            </form>
+                            <form method="post" action="{% url 'workload:recommendation_action' assignment.pk 'reject' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Reject</button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {% for row in recommendations %}
+                <div class="border rounded-3 p-2 mb-2 {% if row.is_current %}border-success{% endif %}">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="fw-semibold">{{ row.resource.display_owner }}{% if row.is_current %} <span class="badge bg-success">Current</span>{% endif %}</div>
+                            <div class="small text-muted">
+                                {{ row.utilization|default:"—" }}% now → {{ row.utilization_after|default:"—" }}% after
+                            </div>
+                        </div>
+                        <span class="wl-score fw-bold">{{ row.score_percent }}%</span>
+                    </div>
+                    {% if row.matched_skills %}
+                    <div class="mt-1">{% for skill in row.matched_skills %}<span class="wl-skill">{{ skill }}</span>{% endfor %}</div>
+                    {% endif %}
+                    {% if row.would_overload %}<div class="small text-danger mt-1">Would exceed target utilisation</div>{% endif %}
+                    <div class="small text-muted mt-1">{{ row.reasons|join:" · " }}</div>
+                </div>
+                {% empty %}
+                <div class="text-muted small">No recommendation available. Add active resources with capacity first.</div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

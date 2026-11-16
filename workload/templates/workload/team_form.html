@@ -1,0 +1,45 @@
+{% extends 'workload/base_workload.html' %}
+
+{% block wl_page_title %}{% if is_create %}New team{% else %}Edit {{ team.name }}{% endif %}{% endblock %}
+{% block wl_title %}{% if is_create %}New team{% else %}Edit team{% endif %}{% endblock %}
+{% block wl_subtitle %}
+    Teams group people for capacity reporting and assignment recommendations.
+{% endblock %}
+
+{% block wl_actions %}
+    <a href="{% url 'workload:team_list' %}" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-2"></i>Back to teams</a>
+{% endblock %}
+
+{% block wl_content %}
+<form method="post" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+    <div class="row g-3">
+        <div class="col-lg-7">
+            <div class="card">
+                <div class="card-header">Team details</div>
+                <div class="card-body">
+                    {% include 'workload/_field.html' with field=form.name %}
+                    {% include 'workload/_field.html' with field=form.code %}
+                    {% include 'workload/_field.html' with field=form.department %}
+                    {% include 'workload/_field.html' with field=form.description %}
+                    {% include 'workload/_field.html' with field=form.lead %}
+                    {% include 'workload/_field.html' with field=form.members %}
+                    <div class="form-check">
+                        {{ form.is_active }}
+                        <label class="form-check-label small" for="{{ form.is_active.id_for_label }}">Active</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary" style="background: var(--wl-teal); border-color: var(--wl-teal);">
+                    <i class="fas fa-check me-2"></i>{% if is_create %}Create team{% else %}Save changes{% endif %}
+                </button>
+                <a href="{% url 'workload:team_list' %}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}

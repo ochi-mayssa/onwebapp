@@ -1,0 +1,94 @@
+{% extends 'workload/base_workload.html' %}
+{% load humanize workload_tags %}
+
+{% block wl_page_title %}Alerts{% endblock %}
+{% block wl_title %}Alert log{% endblock %}
+{% block wl_subtitle %}
+    Persisted alerts raised by the monitoring scan, with acknowledgement and resolution.
+{% endblock %}
+
+{% block wl_actions %}
+    <a href="{% url 'workload:monitoring' %}" class="btn btn-outline-secondary"><i class="fas fa-heart-pulse me-2"></i>Monitoring</a>
+{% endblock %}
+
+{% block wl_content %}
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-6 col-md-3">
+                <label class="form-label small fw-semibold mb-1">Status</label>
+                <select name="status" class="form-select">
+                    <option value="">Any status</option>
+                    {% for value, label in status_choices %}
+                    <option value="{{ value }}" {% if filters.status == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-6 col-md-4">
+                <label class="form-label small fw-semibold mb-1">Type</label>
+                <select name="type" class="form-select">
+                    <option value="">Any type</option>
+                    {% for value, label in type_choices %}
+                    <option value="{{ value }}" {% if filters.type == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-12 col-md-3 d-flex gap-2">
+                <button type="submit" class="btn btn-dark flex-grow-1"><i class="fas fa-filter me-1"></i>Filter</button>
+                <a href="{% url 'workload:alert_list' %}" class="btn btn-outline-secondary"><i class="fas fa-rotate-left"></i></a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="wl-table-wrap">
+        <table class="table table-hover align-middle">
+            <thead><tr><th>Alert</th><th>Type</th><th>Severity</th><th>Status</th><th>When</th><th></th></tr></thead>
+            <tbody>
+                {% for alert in alerts %}
+                <tr>
+                    <td>
+                        <div class="fw-semibold">{{ alert.message }}</div>
+                        {% if alert.work_item_id %}<a href="{% url 'workload:work_item_detail' alert.work_item_id %}" class="small text-decoration-none">Open work item</a>{% endif %}
+                        {% if alert.team_id %}<span class="small text-muted">{{ alert.team.name }}</span>{% endif %}
+                    </td>
+                    <td class="small">{{ alert.get_alert_type_display }}</td>
+                    <td>{% include 'workload/_severity_badge.html' with severity=alert.severity label=alert.get_severity_display %}</td>
+                    <td><span class="wl-badge" style="background:#f1f5f9;color:#475569;">{{ alert.get_status_display }}</span></td>
+                    <td class="small text-muted">{{ alert.created_at|naturaltime }}</td>
+                    <td class="text-end">
+                        <div class="d-flex gap-1 justify-content-end">
+                            {% if alert.status == 'OPEN' %}
+                            <form method="post" action="{% url 'workload:alert_action' alert.pk 'acknowledge' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-secondary">Acknowledge</button>
+                            </form>
+                            {% endif %}
+                            {% if alert.status != 'RESOLVED' %}
+                            <form method="post" action="{% url 'workload:alert_action' alert.pk 'resolve' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-success">Resolve</button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6"><div class="wl-empty"><i class="fas fa-bell-slash d-block"></i>No alerts match these filters.</div></td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% if page_obj.has_other_pages %}
+<nav class="d-flex justify-content-between align-items-center mt-3">
+    <div class="text-muted small">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</div>
+    <div class="btn-group">
+        {% if page_obj.has_previous %}<a class="btn btn-sm btn-outline-secondary" href="?{% query_replace page=page_obj.previous_page_number %}">Previous</a>{% endif %}
+        {% if page_obj.has_next %}<a class="btn btn-sm btn-outline-secondary" href="?{% query_replace page=page_obj.next_page_number %}">Next</a>{% endif %}
+    </div>
+</nav>
+{% endif %}
+{% endblock %}

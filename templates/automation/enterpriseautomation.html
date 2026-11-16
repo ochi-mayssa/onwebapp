@@ -2,10 +2,10 @@
 {% load i18n static %}
 
 {% block title %}{% trans "Enterprise Automation Solutions" %} | OnWebApp{% endblock %}
-{% block meta_description %}{% trans "Connect business processes, coordinate workflows and improve operational visibility with tailored enterprise automation from OnWebApp." %}{% endblock %}
+{% block meta_description %}{% trans "Enterprise automation solutions from OnWebApp: business workflow automation, system integration and the OnWebApp Workload Management System for visible, balanced and better-coordinated operations." %}{% endblock %}
 {% block og_title %}{% trans "Enterprise Automation Solutions" %} | OnWebApp{% endblock %}
-{% block og_description %}{% trans "A holistic approach to enterprise automation: more connected processes, clearer operations and scalable business performance." %}{% endblock %}
-{% block meta_keywords %}{% trans "Enterprise Automation, Business Process Automation, Intelligent Workflows, Workflow Orchestration, Operational Visibility, Digital Transformation, OnWebApp" %}{% endblock %}
+{% block og_description %}{% trans "A holistic approach to enterprise automation: workflow automation, workload management and more connected, scalable business performance." %}{% endblock %}
+{% block meta_keywords %}{% trans "Enterprise Automation Solutions, Workflow Automation, Workload Automation, Workload Management System, Business Process Automation, Business Workflow Automation, Task Management, Workload Distribution, System Integration, OnWebApp" %}{% endblock %}
 
 {% block content %}
 <main class="ea-page">
@@ -256,13 +256,121 @@
 
         <div class="ea-workload-note">
             <strong>{% trans "The bigger picture" %}</strong>
-            <p>
-                {% trans "Workload management and workflow orchestration complement one another: workload management determines how work is organized and distributed, while workflow orchestration coordinates how that work progresses from one stage to the next." %}
-            </p>
+            <div>
+                <p>
+                    {% trans "Workload management and workflow orchestration complement one another: workload management determines how work is organized and distributed, while workflow orchestration coordinates how that work progresses from one stage to the next." %}
+                </p>
+                <a class="ea-inline-link" href="{% url 'home:workflow_vs_workload_automation' %}">{% trans "Understand the Difference Between Workflow Automation and Workload Automation" %}<span aria-hidden="true">→</span></a>
+            </div>
         </div>
 
     </div>
 </section>
+
+    <!-- ONWEBAPP WORKLOAD MANAGEMENT SYSTEM (PRODUCT SHOWCASE) -->
+    <section class="ea-wms ea-section" id="ea-workload-system" aria-labelledby="ea-wms-title">
+        <div class="ea-shell">
+            <div class="ea-wms__head">
+                <p class="ea-kicker">{% trans "OnWebApp product" %}</p>
+                <h2 id="ea-wms-title">{% trans "Manage Work. Balance Capacity. Improve Performance." %}</h2>
+                <p class="ea-wms__lead">
+                    {% trans "The OnWebApp Workload Management System is a centralized solution for organizing operational activities, coordinating projects, managing responsibilities and monitoring how work is distributed. It brings tasks, assignments, priorities and deadlines into one place, so it is clear what is happening, who is responsible and where capacity is under pressure." %}
+                </p>
+            </div>
+
+            <div class="ea-wms__grid">
+                <div class="ea-wms__copy">
+                    <h3>{% trans "One place to plan, assign and monitor work." %}</h3>
+                    <p>
+                        {% trans "Instead of tracking tasks across scattered tools and spreadsheets, the Workload Management System organizes incoming work, connects it to projects and responsibilities, and keeps progress visible. Managers gain a clearer view of workload distribution, deadlines and available capacity, while teams know what to focus on next." %}
+                    </p>
+
+                    <div class="ea-wms__capabilities">
+                        <div class="ea-wms__capability">
+                            <span>01</span>
+                            <h4>{% trans "Task & project coordination" %}</h4>
+                            <p>{% trans "Organize tasks and projects, track progress and deadlines, and connect everyday work to wider project objectives." %}</p>
+                        </div>
+                        <div class="ea-wms__capability">
+                            <span>02</span>
+                            <h4>{% trans "Workload organization" %}</h4>
+                            <p>{% trans "Structure incoming work, assign responsibilities and keep visibility over ongoing activities." %}</p>
+                        </div>
+                        <div class="ea-wms__capability">
+                            <span>03</span>
+                            <h4>{% trans "Workload visibility" %}</h4>
+                            <p>{% trans "Monitor task status and progress, identify overloaded or delayed work, and understand how work is distributed." %}</p>
+                        </div>
+                        <div class="ea-wms__capability">
+                            <span>04</span>
+                            <h4>{% trans "Capacity & performance monitoring" %}</h4>
+                            <p>{% trans "See available capacity, follow workload trends and support more informed operational decisions." %}</p>
+                        </div>
+                    </div>
+
+                    <div class="ea-actions ea-wms__actions">
+                        <a class="ea-button ea-button--primary" href="{% url 'workload:dashboard' %}">{% trans "Explore Workload Management" %}<span aria-hidden="true">↗</span></a>
+                        <a class="ea-text-link" href="{% url 'home:workflow_vs_workload_automation' %}">{% trans "Workflow vs workload automation" %}<span aria-hidden="true">→</span></a>
+                    </div>
+                </div>
+
+                <figure class="ea-wms__visual">
+                    <div class="ea-wms__mock" aria-hidden="true">
+                        <div class="ea-wms__mock-top">
+                            <span class="ea-wms__mock-dots"><i></i><i></i><i></i></span>
+                            <span class="ea-wms__mock-title">{% trans "Workload dashboard" %}</span>
+                            <span class="ea-wms__mock-tag">{% trans "Live" %}</span>
+                        </div>
+
+                        <div class="ea-wms__kpis">
+                            <div class="ea-wms__kpi"><span>{% trans "Total work" %}</span><strong>128</strong><small>{% trans "94 active" %}</small></div>
+                            <div class="ea-wms__kpi ea-wms__kpi--good"><span>{% trans "Completed" %}</span><strong>34</strong><small>{% trans "29 on time" %}</small></div>
+                            <div class="ea-wms__kpi ea-wms__kpi--warn"><span>{% trans "Overdue" %}</span><strong>7</strong><small>{% trans "Past due, still open" %}</small></div>
+                            <div class="ea-wms__kpi ea-wms__kpi--alert"><span>{% trans "Utilisation" %}</span><strong>82%</strong><small>1,180h / 1,440h</small></div>
+                        </div>
+
+                        <div class="ea-wms__mock-panel">
+                            <div class="ea-wms__mock-panel-head"><span>{% trans "Employee utilisation" %}</span><span>{% trans "View" %}</span></div>
+                            <div class="ea-wms__row">
+                                <span class="ea-wms__row-name">A. Bennet</span>
+                                <span class="ea-wms__bar"><i style="width:96%"></i></span>
+                                <span class="ea-wms__badge ea-wms__badge--over">{% trans "Overloaded" %}</span>
+                            </div>
+                            <div class="ea-wms__row">
+                                <span class="ea-wms__row-name">L. Haddad</span>
+                                <span class="ea-wms__bar"><i style="width:74%"></i></span>
+                                <span class="ea-wms__badge ea-wms__badge--ok">{% trans "Balanced" %}</span>
+                            </div>
+                            <div class="ea-wms__row">
+                                <span class="ea-wms__row-name">M. Rossi</span>
+                                <span class="ea-wms__bar"><i style="width:41%"></i></span>
+                                <span class="ea-wms__badge ea-wms__badge--low">{% trans "Available" %}</span>
+                            </div>
+                        </div>
+
+                        <div class="ea-wms__mock-panel">
+                            <div class="ea-wms__mock-panel-head"><span>{% trans "Team capacity" %}</span><span>{% trans "This week" %}</span></div>
+                            <div class="ea-wms__row">
+                                <span class="ea-wms__row-name">{% trans "Operations" %}</span>
+                                <span class="ea-wms__bar"><i style="width:88%"></i></span>
+                                <span class="ea-wms__badge ea-wms__badge--ok">76%</span>
+                            </div>
+                            <div class="ea-wms__row">
+                                <span class="ea-wms__row-name">{% trans "Support" %}</span>
+                                <span class="ea-wms__bar"><i style="width:58%"></i></span>
+                                <span class="ea-wms__badge ea-wms__badge--low">52%</span>
+                            </div>
+                        </div>
+
+                        <div class="ea-wms__mock-alert">
+                            <span class="ea-wms__mock-alert-dot"></span>{% trans "3 items need attention — overdue, blocked and unassigned work" %}
+                        </div>
+                    </div>
+                    <figcaption class="ea-wms__caption">{% trans "Illustrative preview of the Workload Management System dashboard." %}</figcaption>
+                </figure>
+            </div>
+        </div>
+    </section>
 
     <!-- USE CASES -->
     <section class="ea-usecases ea-section" aria-labelledby="ea-usecases-title">
@@ -671,6 +779,333 @@
         grid-template-columns: 1fr;
         gap: 10px;
         padding: 22px;
+    }
+}
+
+/* WORKLOAD MANAGEMENT SYSTEM (PRODUCT SHOWCASE) */
+.ea-wms {
+    background: linear-gradient(180deg, #f8f6fc 0%, #f3edfb 100%);
+}
+
+.ea-wms__head {
+    max-width: 760px;
+}
+
+.ea-wms__head h2 {
+    max-width: 640px;
+    margin: 0;
+    font-size: clamp(2.15rem, 3.6vw, 3.55rem);
+    line-height: 1.08;
+    letter-spacing: -.05em;
+    font-weight: 620;
+}
+
+.ea-wms__lead {
+    max-width: 660px;
+    margin: 22px 0 0;
+    color: var(--ea-muted);
+    font-size: .98rem;
+    line-height: 1.9;
+}
+
+.ea-wms__grid {
+    display: grid;
+    grid-template-columns: .92fr 1.08fr;
+    gap: 6%;
+    align-items: start;
+    margin-top: 56px;
+}
+
+.ea-wms__copy h3 {
+    margin: 0 0 14px;
+    font-size: clamp(1.4rem, 2.2vw, 1.9rem);
+    line-height: 1.2;
+    letter-spacing: -.035em;
+}
+
+.ea-wms__copy > p {
+    max-width: 520px;
+    margin: 0;
+    color: var(--ea-muted);
+    font-size: .92rem;
+    line-height: 1.85;
+}
+
+.ea-wms__capabilities {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 34px;
+    margin-top: 30px;
+}
+
+.ea-wms__capability {
+    padding: 22px 0;
+    border-top: 1px solid #e2d9ef;
+}
+
+.ea-wms__capability span {
+    display: block;
+    margin-bottom: 10px;
+    color: #8b5bc9;
+    font-size: .7rem;
+    font-weight: 800;
+    letter-spacing: .12em;
+}
+
+.ea-wms__capability h4 {
+    margin: 0 0 7px;
+    font-size: .98rem;
+    font-weight: 700;
+    letter-spacing: -.01em;
+}
+
+.ea-wms__capability p {
+    margin: 0;
+    color: var(--ea-muted);
+    font-size: .82rem;
+    line-height: 1.7;
+}
+
+.ea-wms__actions {
+    margin-top: 34px;
+}
+
+.ea-wms__visual {
+    margin: 0;
+}
+
+.ea-wms__mock {
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid #e6ddf1;
+    border-radius: 14px;
+    box-shadow: 0 30px 70px rgba(45, 25, 74, .14);
+}
+
+.ea-wms__mock-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    background: #fbf9fe;
+    border-bottom: 1px solid #eee7f8;
+}
+
+.ea-wms__mock-dots {
+    display: inline-flex;
+    gap: 5px;
+}
+
+.ea-wms__mock-dots i {
+    display: block;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #e0d5f0;
+}
+
+.ea-wms__mock-title {
+    color: #3a2e4f;
+    font-size: .8rem;
+    font-weight: 800;
+}
+
+.ea-wms__mock-tag {
+    margin-left: auto;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: #eee7f8;
+    color: var(--ea-violet);
+    font-size: .6rem;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.ea-wms__kpis {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: #eee7f8;
+}
+
+.ea-wms__kpi {
+    padding: 15px 14px;
+    background: #fff;
+}
+
+.ea-wms__kpi span {
+    display: block;
+    color: #857b9a;
+    font-size: .6rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+}
+
+.ea-wms__kpi strong {
+    display: block;
+    margin: 7px 0 3px;
+    color: #2c2340;
+    font-size: 1.3rem;
+    font-weight: 800;
+    letter-spacing: -.02em;
+}
+
+.ea-wms__kpi small {
+    color: #9a91ab;
+    font-size: .65rem;
+}
+
+.ea-wms__kpi--good strong {
+    color: #2f7d63;
+}
+
+.ea-wms__kpi--warn strong {
+    color: #c47d12;
+}
+
+.ea-wms__kpi--alert strong {
+    color: var(--ea-violet);
+}
+
+.ea-wms__mock-panel {
+    padding: 14px 18px;
+    border-top: 1px solid #eee7f8;
+}
+
+.ea-wms__mock-panel-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 11px;
+    color: #4a4160;
+    font-size: .72rem;
+    font-weight: 800;
+}
+
+.ea-wms__mock-panel-head span:last-child {
+    color: #8b5bc9;
+    font-weight: 700;
+}
+
+.ea-wms__row {
+    display: grid;
+    grid-template-columns: 96px 1fr auto;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 0;
+}
+
+.ea-wms__row-name {
+    color: #40374f;
+    font-size: .72rem;
+    font-weight: 600;
+}
+
+.ea-wms__bar {
+    display: block;
+    height: 7px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: #efe9f8;
+}
+
+.ea-wms__bar i {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+    background: var(--ea-violet);
+}
+
+.ea-wms__badge {
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: .58rem;
+    font-weight: 800;
+    letter-spacing: .04em;
+    white-space: nowrap;
+}
+
+.ea-wms__badge--over {
+    background: #f6e3ef;
+    color: #a83d7a;
+}
+
+.ea-wms__badge--ok {
+    background: #e6f2ee;
+    color: #2f7d63;
+}
+
+.ea-wms__badge--low {
+    background: #eee7f8;
+    color: var(--ea-violet);
+}
+
+.ea-wms__mock-alert {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 13px 18px;
+    background: #fbf3ea;
+    border-top: 1px solid #f0e2d0;
+    color: #7a5a2e;
+    font-size: .7rem;
+    font-weight: 600;
+}
+
+.ea-wms__mock-alert-dot {
+    flex: 0 0 7px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #d9931f;
+}
+
+.ea-wms__caption {
+    margin-top: 14px;
+    color: #857b9a;
+    font-size: .7rem;
+    text-align: center;
+}
+
+@media (max-width: 1000px) {
+    .ea-wms__grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+
+    .ea-wms__copy > p {
+        max-width: 680px;
+    }
+}
+
+@media (max-width: 650px) {
+    .ea-wms__grid {
+        margin-top: 40px;
+    }
+
+    .ea-wms__capabilities {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .ea-wms__kpis {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .ea-wms__row {
+        grid-template-columns: 84px 1fr auto;
+    }
+}
+
+@media (max-width: 420px) {
+    .ea-wms__row {
+        grid-template-columns: 1fr auto;
+    }
+
+    .ea-wms__row .ea-wms__bar {
+        display: none;
     }
 }
 

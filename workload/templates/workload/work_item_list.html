@@ -1,0 +1,294 @@
+{% extends 'workload/base_workload.html' %}
+{% load humanize workload_tags %}
+
+{% block wl_page_title %}Work items{% endblock %}
+{% block wl_title %}Work items{% endblock %}
+{% block wl_subtitle %}
+    Every unit of human and business work, whether it was created here, in CRM, or from a project task.
+{% endblock %}
+
+{% block wl_actions %}
+    <a href="{% url 'workload:work_item_create' %}" class="btn btn-primary" style="background: var(--wl-teal); border-color: var(--wl-teal);">
+        <i class="fas fa-plus me-2"></i>New work item
+    </a>
+{% endblock %}
+
+{% block wl_content %}
+<div class="row g-3 mb-3">
+    <div class="col-6 col-lg-3">
+        <div class="wl-stat"><div class="wl-stat-label">Total</div><div class="wl-stat-value">{{ summary.total|intcomma }}</div></div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="wl-stat is-good"><div class="wl-stat-label">Active</div><div class="wl-stat-value">{{ summary.active|intcomma }}</div></div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="wl-stat is-alert"><div class="wl-stat-label">Overdue</div><div class="wl-stat-value">{{ summary.overdue|intcomma }}</div></div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="wl-stat is-warn"><div class="wl-stat-label">Unassigned</div><div class="wl-stat-value">{{ summary.unassigned|intcomma }}</div></div>
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-12 col-lg-3">
+                <label class="form-label small fw-semibold mb-1">Search</label>
+                <input type="search" name="q" value="{{ filters.q }}" class="form-control" placeholder="Title, reference, client, assignee">
+            </div>
+            <div class="col-6 col-md-3 col-lg-2">
+                <label class="form-label small fw-semibold mb-1">Status</label>
+                <select name="status" class="form-select">
+                    <option value="">Any status</option>
+                    {% for value, label in status_choices %}
+                    <option value="{{ value }}" {% if filters.status == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-6 col-md-3 col-lg-2">
+                <label class="form-label small fw-semibold mb-1">Priority</label>
+                <select name="priority" class="form-select">
+                    <option value="">Any priority</option>
+                    {% for value, label in priority_choices %}
+                    <option value="{{ value }}" {% if filters.priority == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-6 col-md-3 col-lg-2">
+                <label class="form-label small fw-semibold mb-1">Category</label>
+                <select name="category" class="form-select">
+                    <option value="">Any category</option>
+                    {% for value, label in category_choices %}
+                    <option value="{{ value }}" {% if filters.category == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-6 col-md-3 col-lg-2">
+                <label class="form-label small fw-semibold mb-1">Team</label>
+                <select name="team" class="form-select">
+                    <option value="">Any team</option>
+                    {% for team in teams %}
+                    <option value="{{ team.pk }}" {% if filters.team == team.pk|stringformat:"s" %}selected{% endif %}>{{ team.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-6 col-md-3 col-lg-2">
+                <label class="form-label small fw-semibold mb-1">Assignee</label>
+                <select name="assignee" class="form-select">
+                    <option value="">Anyone</option>
+                    <option value="unassigned" {% if filters.assignee == 'unassigned' %}selected{% endif %}>Unassigned</option>
+                    {% if assignable_users %}
+                        {% for person in assignable_users %}
+                        <option value="{{ person.pk }}" {% if filters.assignee == person.pk|stringformat:"s" %}selected{% endif %}>{{ person.get_full_name|default:person.username }}</option>
+                        {% endfor %}
+                    {% endif %}
+                </select>
+            </div>
+            <div class="col-6 col-md-3 col-lg-2">
+                <label class="form-label small fw-semibold mb-1">Source</label>
+                <select name="source" class="form-select">
+                    <option value="">Any source</option>
+                    {% for value, label in source_choices %}
+                    <option value="{{ value }}" {% if filters.source == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-6 col-md-3 col-lg-2">
+                <label class="form-label small fw-semibold mb-1">Sort</label>
+                <select name="sort" class="form-select">
+                    {% for value, label in sort_options %}
+                    <option value="{{ value }}" {% if filters.sort == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-12 col-lg-4">
+                <div class="d-flex flex-wrap gap-3 pt-1">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="overdue" value="1" id="f-overdue" {% if filters.overdue %}checked{% endif %}>
+                        <label class="form-check-label small" for="f-overdue">Overdue</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="blocked" value="1" id="f-blocked" {% if filters.blocked %}checked{% endif %}>
+                        <label class="form-check-label small" for="f-blocked">Blocked</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="unassigned" value="1" id="f-unassigned" {% if filters.unassigned %}checked{% endif %}>
+                        <label class="form-check-label small" for="f-unassigned">Unassigned</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="automation" value="1" id="f-automation" {% if filters.automation %}checked{% endif %}>
+                        <label class="form-check-label small" for="f-automation">Automation candidates</label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-lg-2 d-flex gap-2">
+                <button type="submit" class="btn btn-dark flex-grow-1"><i class="fas fa-filter me-1"></i>Filter</button>
+                <a href="{% url 'workload:work_item_list' %}" class="btn btn-outline-secondary" title="Clear filters"><i class="fas fa-rotate-left"></i></a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if can_manage_workload %}
+<form method="post" action="{% url 'workload:work_item_bulk' %}" id="bulkForm">
+    {% csrf_token %}
+    <div class="card mb-2">
+        <div class="card-body py-2">
+            <div class="row g-2 align-items-end">
+                <div class="col-6 col-md-2">
+                    <label class="form-label small fw-semibold mb-1">Bulk action</label>
+                    <select name="action" class="form-select form-select-sm">
+                        <option value="status">Update status</option>
+                        <option value="assign">Assign</option>
+                        <option value="cancel">Cancel work</option>
+                    </select>
+                </div>
+                <div class="col-6 col-md-2">
+                    <label class="form-label small fw-semibold mb-1">Status</label>
+                    <select name="status" class="form-select form-select-sm">
+                        <option value="">—</option>
+                        {% for value, label in status_choices %}
+                        <option value="{{ value }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-6 col-md-2">
+                    <label class="form-label small fw-semibold mb-1">Assignee</label>
+                    <select name="assignee" class="form-select form-select-sm">
+                        <option value="">—</option>
+                        {% for person in assignable_users %}
+                        <option value="{{ person.pk }}">{{ person.get_full_name|default:person.username }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-6 col-md-2">
+                    <label class="form-label small fw-semibold mb-1">Team</label>
+                    <select name="team" class="form-select form-select-sm">
+                        <option value="">—</option>
+                        {% for team in teams %}
+                        <option value="{{ team.pk }}">{{ team.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-12 col-md-2">
+                    <label class="form-label small fw-semibold mb-1">Note</label>
+                    <input type="text" name="note" class="form-control form-control-sm" maxlength="255" placeholder="Optional audit note">
+                </div>
+                <div class="col-12 col-md-2">
+                    <button type="submit" class="btn btn-sm btn-primary w-100" style="background: var(--wl-teal); border-color: var(--wl-teal);" onclick="return confirm('Apply this bulk action to the selected items?');">
+                        Apply to selected
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+<div class="card">
+    <div class="wl-table-wrap">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    {% if can_manage_workload %}
+                    <th style="width:36px;">
+                        <input type="checkbox" class="form-check-input wl-checkbox" id="selectAll" aria-label="Select all work items">
+                    </th>
+                    {% endif %}
+                    <th>Work item</th>
+                    <th>Status</th>
+                    <th>Priority</th>
+                    <th>Owner</th>
+                    <th>Due</th>
+                    <th>Estimate</th>
+                    <th>Source</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    {% if can_manage_workload %}
+                    <td><input type="checkbox" class="form-check-input wl-checkbox row-check" name="ids" value="{{ item.pk }}" aria-label="Select {{ item.title }}"></td>
+                    {% endif %}
+                    <td>
+                        <a href="{% url 'workload:work_item_detail' item.pk %}" class="fw-semibold text-decoration-none" style="color:var(--wl-navy);">{{ item.title }}</a>
+                        <div class="small text-muted">
+                            {{ item.get_category_display }}
+                            {% if item.project %} · {{ item.project.title }}{% endif %}
+                            {% if item.client %} · {{ item.client.name }}{% endif %}
+                        </div>
+                        {% if item.required_skills.all %}
+                        <div class="mt-1">
+                            {% for skill in item.required_skills.all %}<span class="wl-skill">{{ skill.name }}</span>{% endfor %}
+                        </div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="wl-badge" style="background:
+                            {% if item.status == 'COMPLETED' %}#ecfdf9;color:#0f9d90{% elif item.status == 'BLOCKED' %}#fef2f2;color:#dc2626{% elif item.status == 'IN_PROGRESS' %}#eff6ff;color:#2563eb{% elif item.status == 'CANCELLED' %}#f1f5f9;color:#64748b{% else %}#f8fafc;color:#475569{% endif %};">
+                            {{ item.get_status_display }}
+                        </span>
+                    </td>
+                    <td>{% include 'workload/_priority_badge.html' with priority=item.priority label=item.get_priority_display %}</td>
+                    <td>
+                        {% if item.assignee %}
+                            {{ item.assignee.get_full_name|default:item.assignee.username }}
+                        {% elif item.team %}
+                            <span class="text-muted">{{ item.team.name }}</span>
+                        {% else %}
+                            <span class="text-muted">Unassigned</span>
+                        {% endif %}
+                    </td>
+                    <td class="{% if item.is_overdue %}text-danger fw-semibold{% endif %}">
+                        {% if item.due_date %}{{ item.due_date|date:"M j, Y" }}{% else %}<span class="text-muted">—</span>{% endif %}
+                    </td>
+                    <td>{{ item.estimated_hours }}h</td>
+                    <td><span class="small text-muted">{{ item.get_source_module_display }}</span></td>
+                    <td class="text-end">
+                        <a href="{% url 'workload:work_item_detail' item.pk %}" class="btn btn-sm btn-outline-secondary" title="Open"><i class="fas fa-arrow-right"></i></a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="{% if can_manage_workload %}9{% else %}8{% endif %}">
+                        <div class="wl-empty">
+                            <i class="fas fa-clipboard-list d-block"></i>
+                            No work items match these filters.
+                            <div class="mt-2"><a href="{% url 'workload:work_item_create' %}" class="btn btn-sm btn-outline-secondary">Create the first item</a></div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% if can_manage_workload %}</form>{% endif %}
+
+{% if page_obj.has_other_pages %}
+<nav class="d-flex justify-content-between align-items-center mt-3" aria-label="Work item pages">
+    <div class="text-muted small">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }} · {{ page_obj.paginator.count }} item{{ page_obj.paginator.count|pluralize }}</div>
+    <div class="btn-group">
+        {% if page_obj.has_previous %}
+        <a class="btn btn-sm btn-outline-secondary" href="?{% query_replace page=page_obj.previous_page_number %}">Previous</a>
+        {% endif %}
+        {% if page_obj.has_next %}
+        <a class="btn btn-sm btn-outline-secondary" href="?{% query_replace page=page_obj.next_page_number %}">Next</a>
+        {% endif %}
+    </div>
+</nav>
+{% endif %}
+{% endblock %}
+
+{% block wl_extra_js %}
+<script>
+(function () {
+    var master = document.getElementById('selectAll');
+    if (!master) { return; }
+    var boxes = Array.prototype.slice.call(document.querySelectorAll('.row-check'));
+    master.addEventListener('change', function () {
+        boxes.forEach(function (box) { box.checked = master.checked; });
+    });
+})();
+</script>
+{% endblock %}

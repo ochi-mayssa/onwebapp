@@ -1,0 +1,87 @@
+{% extends 'workload/base_workload.html' %}
+
+{% block wl_page_title %}{% if is_create %}New policy{% else %}Edit {{ policy.name }}{% endif %}{% endblock %}
+{% block wl_title %}{% if is_create %}New workload policy{% else %}Edit workload policy{% endif %}{% endblock %}
+{% block wl_subtitle %}
+    Thresholds must satisfy: available below &lt; balanced max ≤ high max. Assignment weights should sum to 1.
+{% endblock %}
+
+{% block wl_actions %}
+    <a href="{% url 'workload:policy_list' %}" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-2"></i>Back to policies</a>
+{% endblock %}
+
+{% block wl_content %}
+<form method="post" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+
+    <div class="row g-3">
+        <div class="col-lg-7">
+            <div class="card mb-3">
+                <div class="card-header">Thresholds</div>
+                <div class="card-body">
+                    {% include 'workload/_field.html' with field=form.name %}
+                    <div class="row">
+                        <div class="col-md-4">{% include 'workload/_field.html' with field=form.available_below %}</div>
+                        <div class="col-md-4">{% include 'workload/_field.html' with field=form.balanced_max %}</div>
+                        <div class="col-md-4">{% include 'workload/_field.html' with field=form.high_max %}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">{% include 'workload/_field.html' with field=form.deadline_warning_days %}</div>
+                        <div class="col-md-6">{% include 'workload/_field.html' with field=form.team_capacity_warning_percent %}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">{% include 'workload/_field.html' with field=form.bottleneck_threshold %}</div>
+                        <div class="col-md-6">{% include 'workload/_field.html' with field=form.default_weekly_hours %}</div>
+                    </div>
+                    <div class="form-check">
+                        {{ form.is_default }}
+                        <label class="form-check-label small" for="{{ form.is_default.id_for_label }}">Use as the default policy</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">Assignment weights</div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">{% include 'workload/_field.html' with field=form.weight_skills %}</div>
+                        <div class="col-md-6">{% include 'workload/_field.html' with field=form.weight_capacity %}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">{% include 'workload/_field.html' with field=form.weight_team %}</div>
+                        <div class="col-md-6">{% include 'workload/_field.html' with field=form.weight_deadline %}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card mb-3">
+                <div class="card-header">Automation safety</div>
+                <div class="card-body">
+                    <div class="form-check mb-2">
+                        {{ form.auto_assign_enabled }}
+                        <label class="form-check-label small" for="{{ form.auto_assign_enabled.id_for_label }}">Enable automatic assignment</label>
+                    </div>
+                    <div class="form-check mb-2">
+                        {{ form.auto_reassign_critical }}
+                        <label class="form-check-label small" for="{{ form.auto_reassign_critical.id_for_label }}">Allow automatic reassignment of critical work</label>
+                    </div>
+                    <div class="form-check">
+                        {{ form.require_approval_for_critical }}
+                        <label class="form-check-label small" for="{{ form.require_approval_for_critical.id_for_label }}">Require manager approval for critical work</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary" style="background: var(--wl-teal); border-color: var(--wl-teal);">
+                    <i class="fas fa-check me-2"></i>{% if is_create %}Create policy{% else %}Save changes{% endif %}
+                </button>
+                <a href="{% url 'workload:policy_list' %}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}

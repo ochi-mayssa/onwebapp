@@ -1,0 +1,92 @@
+{% extends 'workload/base_workload.html' %}
+
+{% block wl_page_title %}{% if is_create %}New work item{% else %}Edit {{ item.title }}{% endif %}{% endblock %}
+{% block wl_title %}{% if is_create %}New work item{% else %}Edit work item{% endif %}{% endblock %}
+{% block wl_subtitle %}
+    {% if is_create %}Describe the work, its owner and the hours it will reserve.{% else %}Update the work details. Changes are recorded in the audit trail.{% endif %}
+{% endblock %}
+
+{% block wl_actions %}
+    {% if item %}
+    <a href="{% url 'workload:work_item_detail' item.pk %}" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-2"></i>Back to item</a>
+    {% else %}
+    <a href="{% url 'workload:work_item_list' %}" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-2"></i>Back to list</a>
+    {% endif %}
+{% endblock %}
+
+{% block wl_content %}
+<form method="post" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+    {% endif %}
+
+    <div class="row g-3">
+        <div class="col-lg-8">
+            <div class="card mb-3">
+                <div class="card-header">Work details</div>
+                <div class="card-body">
+                    {% include 'workload/_field.html' with field=form.title %}
+                    {% include 'workload/_field.html' with field=form.description %}
+                    <div class="row">
+                        <div class="col-md-6">{% include 'workload/_field.html' with field=form.category %}</div>
+                        <div class="col-md-6">{% include 'workload/_field.html' with field=form.priority %}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">{% include 'workload/_field.html' with field=form.status %}</div>
+                        <div class="col-md-6">{% include 'workload/_field.html' with field=form.source_module %}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">{% include 'workload/_field.html' with field=form.start_date %}</div>
+                        <div class="col-md-6">{% include 'workload/_field.html' with field=form.due_date %}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">{% include 'workload/_field.html' with field=form.estimated_hours %}</div>
+                        <div class="col-md-6">{% include 'workload/_field.html' with field=form.actual_hours %}</div>
+                    </div>
+                    {% include 'workload/_field.html' with field=form.required_skills %}
+                    {% include 'workload/_field.html' with field=form.blocked_reason %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card mb-3">
+                <div class="card-header">Ownership and links</div>
+                <div class="card-body">
+                    {% include 'workload/_field.html' with field=form.assignee %}
+                    {% include 'workload/_field.html' with field=form.team %}
+                    {% include 'workload/_field.html' with field=form.client %}
+                    {% include 'workload/_field.html' with field=form.project %}
+                    {% include 'workload/_field.html' with field=form.automation_workflow %}
+                    {% include 'workload/_field.html' with field=form.external_reference %}
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header">Visibility and automation</div>
+                <div class="card-body">
+                    <div class="form-check mb-2">
+                        {{ form.is_client_visible }}
+                        <label class="form-check-label small" for="{{ form.is_client_visible.id_for_label }}">Visible to the linked client</label>
+                    </div>
+                    <div class="form-check mb-2">
+                        {{ form.automation_eligible }}
+                        <label class="form-check-label small" for="{{ form.automation_eligible.id_for_label }}">Automation candidate</label>
+                    </div>
+                    <div class="form-text">
+                        Client-visible items are the only records a client tenant can read.
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary" style="background: var(--wl-teal); border-color: var(--wl-teal);">
+                    <i class="fas fa-check me-2"></i>{% if is_create %}Create work item{% else %}Save changes{% endif %}
+                </button>
+                <a href="{% if item %}{% url 'workload:work_item_detail' item.pk %}{% else %}{% url 'workload:work_item_list' %}{% endif %}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}

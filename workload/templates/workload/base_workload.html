@@ -1,0 +1,274 @@
+{% extends 'base.html' %}
+{% load static humanize %}
+
+{% block title %}{% block wl_page_title %}Workload{% endblock %} | OnWebApp{% endblock %}
+
+{% block meta %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+
+{% block extra_css %}
+<style>
+    .wl-shell {
+        --wl-teal: #14B8A6;
+        --wl-teal-dark: #0f9d90;
+        --wl-teal-soft: #ecfdf9;
+        --wl-navy: #0F172A;
+        --wl-navy-soft: #1e293b;
+        --wl-bg: #f8fafc;
+        --wl-line: #e2e8f0;
+        --wl-muted: #64748b;
+        --wl-red: #dc2626;
+        --wl-red-soft: #fef2f2;
+        --wl-amber: #d97706;
+        --wl-amber-soft: #fffbeb;
+        --wl-blue: #2563eb;
+        --wl-blue-soft: #eff6ff;
+        color: var(--wl-navy);
+    }
+
+    .wl-shell .wl-header {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1rem;
+        margin-bottom: 1.25rem;
+    }
+    .wl-shell .wl-header h1 {
+        font-size: 1.5rem;
+        font-weight: 800;
+        letter-spacing: -0.01em;
+        margin-bottom: .25rem;
+        color: var(--wl-navy);
+    }
+    .wl-shell .wl-subtitle {
+        color: var(--wl-muted);
+        margin-bottom: 0;
+        max-width: 62ch;
+    }
+
+    .wl-shell .wl-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .25rem;
+        padding: .35rem;
+        background: #fff;
+        border: 1px solid var(--wl-line);
+        border-radius: 14px;
+        margin-bottom: 1.5rem;
+    }
+    .wl-shell .wl-nav a {
+        display: inline-flex;
+        align-items: center;
+        gap: .45rem;
+        padding: .5rem .85rem;
+        border-radius: 10px;
+        font-size: .86rem;
+        font-weight: 600;
+        color: #475569;
+        text-decoration: none;
+        transition: background .15s ease, color .15s ease;
+    }
+    .wl-shell .wl-nav a:hover { background: var(--wl-teal-soft); color: var(--wl-teal-dark); }
+    .wl-shell .wl-nav a.active { background: var(--wl-navy); color: #fff; }
+
+    .wl-shell .card {
+        border: 1px solid var(--wl-line);
+        border-radius: 16px;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, .04);
+        background: #fff;
+    }
+    .wl-shell .card-header {
+        background: #fff;
+        border-bottom: 1px solid var(--wl-line);
+        font-weight: 700;
+        color: var(--wl-navy);
+    }
+
+    .wl-shell .wl-stat {
+        background: #fff;
+        border: 1px solid var(--wl-line);
+        border-radius: 16px;
+        padding: 1rem 1.1rem;
+        height: 100%;
+    }
+    .wl-shell .wl-stat .wl-stat-label {
+        font-size: .72rem;
+        font-weight: 700;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+        color: var(--wl-muted);
+        margin-bottom: .35rem;
+    }
+    .wl-shell .wl-stat .wl-stat-value {
+        font-size: 1.6rem;
+        font-weight: 800;
+        line-height: 1.1;
+        color: var(--wl-navy);
+    }
+    .wl-shell .wl-stat .wl-stat-meta {
+        font-size: .76rem;
+        color: var(--wl-muted);
+        margin-top: .3rem;
+    }
+    .wl-shell .wl-stat.is-alert { border-left: 4px solid var(--wl-red); }
+    .wl-shell .wl-stat.is-warn { border-left: 4px solid var(--wl-amber); }
+    .wl-shell .wl-stat.is-good { border-left: 4px solid var(--wl-teal); }
+
+    .wl-shell .wl-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: .18rem .55rem;
+        border-radius: 999px;
+        font-size: .72rem;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+    .wl-shell .wl-badge.level-available { background: var(--wl-blue-soft); color: var(--wl-blue); }
+    .wl-shell .wl-badge.level-balanced { background: var(--wl-teal-soft); color: var(--wl-teal-dark); }
+    .wl-shell .wl-badge.level-high { background: var(--wl-amber-soft); color: var(--wl-amber); }
+    .wl-shell .wl-badge.level-overloaded { background: var(--wl-red-soft); color: var(--wl-red); }
+    .wl-shell .wl-badge.level-unavailable { background: #f1f5f9; color: var(--wl-muted); }
+
+    .wl-shell .wl-progress {
+        height: 8px;
+        border-radius: 999px;
+        background: #eef2f6;
+        overflow: hidden;
+    }
+    .wl-shell .wl-progress > span { display: block; height: 100%; border-radius: 999px; }
+    .wl-shell .wl-progress.level-available > span { background: var(--wl-blue); }
+    .wl-shell .wl-progress.level-balanced > span { background: var(--wl-teal); }
+    .wl-shell .wl-progress.level-high > span { background: var(--wl-amber); }
+    .wl-shell .wl-progress.level-overloaded > span { background: var(--wl-red); }
+    .wl-shell .wl-progress.level-unavailable > span { background: #94a3b8; }
+
+    .wl-shell .table { margin-bottom: 0; }
+    .wl-shell .table th {
+        font-size: .72rem;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        color: var(--wl-muted);
+        font-weight: 700;
+        border-bottom-width: 1px;
+        white-space: nowrap;
+    }
+    .wl-shell .table td { vertical-align: middle; color: #334155; }
+    .wl-shell .table-hover tbody tr:hover { background: #f8fafc; }
+
+    .wl-shell .wl-empty {
+        text-align: center;
+        padding: 2.5rem 1rem;
+        color: var(--wl-muted);
+    }
+    .wl-shell .wl-empty i { font-size: 1.8rem; color: #cbd5e1; margin-bottom: .75rem; }
+
+    .wl-shell .wl-skill {
+        display: inline-block;
+        background: #f1f5f9;
+        color: #475569;
+        border-radius: 999px;
+        padding: .12rem .5rem;
+        font-size: .7rem;
+        font-weight: 600;
+        margin: 0 .2rem .2rem 0;
+    }
+
+    .wl-shell .wl-dist-row + .wl-dist-row { margin-top: .7rem; }
+    .wl-shell .wl-dist-label {
+        display: flex;
+        justify-content: space-between;
+        font-size: .8rem;
+        margin-bottom: .25rem;
+        color: #334155;
+    }
+
+    .wl-shell .wl-trend {
+        display: flex;
+        align-items: flex-end;
+        gap: .55rem;
+        height: 150px;
+        padding-top: .5rem;
+    }
+    .wl-shell .wl-trend .wl-trend-col { flex: 1; text-align: center; }
+    .wl-shell .wl-trend .wl-trend-bars {
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        gap: 3px;
+        height: 120px;
+    }
+    .wl-shell .wl-trend .wl-trend-bar {
+        width: 9px;
+        border-radius: 4px 4px 0 0;
+        min-height: 2px;
+    }
+    .wl-shell .wl-trend .wl-trend-bar.created { background: var(--wl-teal); }
+    .wl-shell .wl-trend .wl-trend-bar.completed { background: var(--wl-navy); }
+    .wl-shell .wl-trend .wl-trend-label {
+        font-size: .64rem;
+        color: var(--wl-muted);
+        margin-top: .35rem;
+        white-space: nowrap;
+    }
+    .wl-shell .wl-trend-legend { font-size: .72rem; color: var(--wl-muted); }
+    .wl-shell .wl-trend-legend .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: .3rem; }
+
+    .wl-shell .wl-meta-list { font-size: .84rem; }
+    .wl-shell .wl-meta-list dt { color: var(--wl-muted); font-weight: 600; font-size: .72rem; text-transform: uppercase; letter-spacing: .04em; }
+    .wl-shell .wl-meta-list dd { margin-bottom: .8rem; color: #1e293b; }
+
+    .wl-shell .wl-history { position: relative; padding-left: 1.25rem; }
+    .wl-shell .wl-history::before {
+        content: '';
+        position: absolute;
+        left: .3rem;
+        top: .2rem;
+        bottom: .2rem;
+        width: 2px;
+        background: var(--wl-line);
+    }
+    .wl-shell .wl-history-item { position: relative; padding-bottom: .9rem; font-size: .84rem; }
+    .wl-shell .wl-history-item::before {
+        content: '';
+        position: absolute;
+        left: -1.02rem;
+        top: .35rem;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--wl-teal);
+        border: 2px solid #fff;
+    }
+
+    .wl-shell .wl-score { font-variant-numeric: tabular-nums; }
+    .wl-shell .wl-table-wrap { overflow-x: auto; }
+    .wl-shell .wl-checkbox { width: 1rem; height: 1rem; }
+
+    @media (max-width: 767.98px) {
+        .wl-shell .wl-header h1 { font-size: 1.25rem; }
+        .wl-shell .wl-nav { overflow-x: auto; flex-wrap: nowrap; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4 wl-shell">
+    {% include 'workload/_messages.html' %}
+
+    <div class="wl-header">
+        <div>
+            <h1>{% block wl_title %}Workload{% endblock %}</h1>
+            <p class="wl-subtitle">{% block wl_subtitle %}{% endblock %}</p>
+        </div>
+        <div class="d-flex flex-wrap gap-2 align-items-center">
+            {% block wl_actions %}{% endblock %}
+        </div>
+    </div>
+
+    {% include 'workload/_nav.html' %}
+
+    {% block wl_content %}{% endblock %}
+</div>
+{% endblock %}
+
+{% block extra_js %}{% block wl_extra_js %}{% endblock %}{% endblock %}

@@ -1,0 +1,64 @@
+{% extends 'workload/base_workload.html' %}
+
+{% block wl_page_title %}{% if is_create %}New resource{% else %}Edit resource{% endif %}{% endblock %}
+{% block wl_title %}{% if is_create %}New resource{% else %}Edit {{ resource.display_owner }}{% endif %}{% endblock %}
+{% block wl_subtitle %}
+    Link an employee or team to a capacity record so utilisation and assignment stay accurate.
+{% endblock %}
+
+{% block wl_actions %}
+    <a href="{% url 'workload:resource_list' %}" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-2"></i>Back to resources</a>
+{% endblock %}
+
+{% block wl_content %}
+<form method="post" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+    {% if capacity_form.non_field_errors %}<div class="alert alert-danger">{{ capacity_form.non_field_errors }}</div>{% endif %}
+
+    <div class="row g-3">
+        <div class="col-lg-7">
+            <div class="card mb-3">
+                <div class="card-header">Resource</div>
+                <div class="card-body">
+                    {% include 'workload/_field.html' with field=form.kind %}
+                    {% include 'workload/_field.html' with field=form.user %}
+                    {% include 'workload/_field.html' with field=form.team %}
+                    {% include 'workload/_field.html' with field=form.system_label %}
+                    {% include 'workload/_field.html' with field=form.name %}
+                    {% include 'workload/_field.html' with field=form.skills %}
+                    {% include 'workload/_field.html' with field=form.availability_status %}
+                    {% include 'workload/_field.html' with field=form.notes %}
+                    <div class="form-check">
+                        {{ form.is_active }}
+                        <label class="form-check-label small" for="{{ form.is_active.id_for_label }}">Active</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card mb-3">
+                <div class="card-header">Capacity</div>
+                <div class="card-body">
+                    {% include 'workload/_field.html' with field=capacity_form.weekly_hours %}
+                    {% include 'workload/_field.html' with field=capacity_form.availability_percent %}
+                    {% include 'workload/_field.html' with field=capacity_form.time_off_hours %}
+                    {% include 'workload/_field.html' with field=capacity_form.notes %}
+                    <div class="form-text">
+                        Utilisation = assigned hours ÷ available hours × 100, where available hours are
+                        weekly hours × availability % − planned time off.
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary" style="background: var(--wl-teal); border-color: var(--wl-teal);">
+                    <i class="fas fa-check me-2"></i>{% if is_create %}Create resource{% else %}Save changes{% endif %}
+                </button>
+                <a href="{% url 'workload:resource_list' %}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}

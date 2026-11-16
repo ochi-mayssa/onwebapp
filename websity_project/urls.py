@@ -48,6 +48,7 @@ urlpatterns = [
     path('rpa/', include('rpa_dashboard.urls')),
     path('crm/', include('crm.urls')),
     path('documents/', include('documents.urls', namespace='documents')),
+    path('workload/', include('workload.urls', namespace='workload')),
     path('i18n/', include('django.conf.urls.i18n')),
     path('users/', include('users.urls', namespace='users')),
     path('community/', include('community.urls')),
@@ -59,6 +60,9 @@ urlpatterns = [
     path('integration/', include('integration.urls', namespace='integration')),
     path('software/quote/', include('dashboard_inquiry.urls', namespace='dashboard_inquiry')),
     path('campaigns/', include('campaigns.urls', namespace='campaigns')),
+
+    # Workload REST API
+    path('api/workload/', include('workload.api_urls', namespace='workload-api')),
 
     # Branding REST API
     path('api/branding/', include('branding.api.urls', namespace='branding-api')),

@@ -12,6 +12,7 @@ urlpatterns = [
     path('automation/', views.automation_home, name='automation_home'),
     path('automation/website-automation/', views.website_automation, name='website_automation'),
     path('enterprise-automation/', views.enterprise_automation, name='enterprise_automation'),
+    path('workflow-automation-vs-workload-automation/', views.workflow_vs_workload_automation, name='workflow_vs_workload_automation'),
     path('automation/rpa-bpa/', views.rpa_bpa, name='rpa_bpa'),
     path('automation/rpa-solutions/', views.rpa_solutions, name='rpa_solutions'),
     path('privacy/', views.privacy, name='privacy'),

@@ -1,0 +1,487 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans "Workflow Automation vs Workload Automation: Key Differences" %} | OnWebApp{% endblock %}
+{% block meta_description %}{% trans "Workflow automation vs workload automation explained: what each one does, how they differ from workload management, a clear comparison table and practical business examples." %}{% endblock %}
+{% block og_title %}{% trans "Workflow Automation vs Workload Automation: Key Differences" %} | OnWebApp{% endblock %}
+{% block og_description %}{% trans "A practical guide to telling workflow automation, workload automation and workload management apart — and choosing the right approach for your business." %}{% endblock %}
+{% block meta_keywords %}{% trans "Workflow Automation, Workload Automation, Workload Management System, Business Process Automation, Business Workflow Automation, Task Management, Workload Distribution, Workload Planning, System Integration, OnWebApp" %}{% endblock %}
+
+{% block content %}
+<main class="wva-page">
+    <!-- HERO -->
+    <section class="wva-hero" aria-labelledby="wva-title">
+        <div class="wva-shell wva-hero__grid">
+            <div class="wva-hero__copy">
+                <p class="wva-kicker">{% trans "Automation explained" %}</p>
+                <h1 id="wva-title">{% trans "Workflow Automation vs Workload Automation: Key Differences" %}</h1>
+                <p class="wva-hero__lead">{% trans "The two terms sound alike and are often used interchangeably, but they describe different kinds of automation. One automates business processes; the other automates the execution of technical jobs. Knowing which is which helps you choose the right approach — and see where workload management fits." %}</p>
+                <div class="wva-actions">
+                    <a class="wva-button" href="#wva-table">{% trans "Jump to the comparison" %}</a>
+                    <a class="wva-text-link" href="{% url 'home:enterprise_automation' %}">{% trans "Explore enterprise automation" %}<span aria-hidden="true">→</span></a>
+                </div>
+            </div>
+
+            <div class="wva-hero__visual" aria-hidden="true">
+                <div class="wva-concept">
+                    <span class="wva-concept__num">01</span>
+                    <div>
+                        <strong>{% trans "Workflow Automation" %}</strong>
+                        <small>{% trans "Business processes, approvals, handoffs and notifications." %}</small>
+                    </div>
+                </div>
+                <div class="wva-concept">
+                    <span class="wva-concept__num">02</span>
+                    <div>
+                        <strong>{% trans "Workload Automation" %}</strong>
+                        <small>{% trans "Jobs, schedules, dependencies and execution monitoring." %}</small>
+                    </div>
+                </div>
+                <div class="wva-concept wva-concept--accent">
+                    <span class="wva-concept__num">03</span>
+                    <div>
+                        <strong>{% trans "Workload Management" %}</strong>
+                        <small>{% trans "Tasks, projects, responsibilities and available capacity." %}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 1: WORKFLOW AUTOMATION -->
+    <section class="wva-section" aria-labelledby="wva-workflow-title">
+        <div class="wva-shell">
+            <p class="wva-kicker">{% trans "Concept 1" %}</p>
+            <h2 class="wva-h2" id="wva-workflow-title">{% trans "What Is Workflow Automation?" %}</h2>
+
+            <div class="wva-split">
+                <div class="wva-prose">
+                    <p>{% trans "Workflow automation focuses on business processes. It coordinates a sequence of tasks and activities so that work moves from one step to the next with less manual chasing. When a step is completed, the workflow can request an approval, send a notification, apply a condition or pass the work to another team." %}</p>
+                    <p>{% trans "It is centred on how people and business applications interact: forms, decisions, approvals and handovers. The goal is to make everyday processes more consistent, reduce waiting time and keep information aligned across the departments involved." %}</p>
+                </div>
+
+                <div class="wva-panel">
+                    <p class="wva-panel__title">{% trans "What it typically involves" %}</p>
+                    <ul class="wva-list">
+                        <li>{% trans "Business process automation" %}</li>
+                        <li>{% trans "Sequential tasks and activities" %}</li>
+                        <li>{% trans "Approvals and notifications" %}</li>
+                        <li>{% trans "Conditional logic (if this, then that)" %}</li>
+                        <li>{% trans "Handoffs between teams or departments" %}</li>
+                        <li>{% trans "Integration between business applications" %}</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="wva-examples">
+                <p class="wva-examples__title">{% trans "Practical examples" %}</p>
+                <ul class="wva-chips">
+                    <li class="wva-chip">{% trans "Customer onboarding" %}</li>
+                    <li class="wva-chip">{% trans "Invoice approval" %}</li>
+                    <li class="wva-chip">{% trans "Lead management" %}</li>
+                    <li class="wva-chip">{% trans "Employee onboarding" %}</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 2: WORKLOAD AUTOMATION -->
+    <section class="wva-section wva-section--soft" aria-labelledby="wva-workload-automation-title">
+        <div class="wva-shell">
+            <p class="wva-kicker">{% trans "Concept 2" %}</p>
+            <h2 class="wva-h2" id="wva-workload-automation-title">{% trans "What Is Workload Automation?" %}</h2>
+
+            <div class="wva-split">
+                <div class="wva-prose">
+                    <p>{% trans "Workload automation is about executing technical jobs and workloads automatically. It schedules and orchestrates jobs across systems, respects dependencies between them and monitors whether each run succeeds. If something fails, it can retry, alert an operator or follow a defined recovery path." %}</p>
+                    <p>{% trans "It is centred on computers rather than people: servers, databases, applications and data pipelines. The goal is to make recurring technical processing dependable, timely and observable." %}</p>
+                </div>
+
+                <div class="wva-panel">
+                    <p class="wva-panel__title">{% trans "What it typically involves" %}</p>
+                    <ul class="wva-list">
+                        <li>{% trans "Automated execution of technical jobs and workloads" %}</li>
+                        <li>{% trans "Scheduling and orchestration" %}</li>
+                        <li>{% trans "Job dependencies" %}</li>
+                        <li>{% trans "Execution monitoring" %}</li>
+                        <li>{% trans "Error handling and retry mechanisms" %}</li>
+                        <li>{% trans "Coordination of automated workloads across systems" %}</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="wva-examples">
+                <p class="wva-examples__title">{% trans "Practical examples" %}</p>
+                <ul class="wva-chips">
+                    <li class="wva-chip">{% trans "Scheduled data processing" %}</li>
+                    <li class="wva-chip">{% trans "Database backups" %}</li>
+                    <li class="wva-chip">{% trans "ETL pipelines" %}</li>
+                    <li class="wva-chip">{% trans "Automated reporting jobs" %}</li>
+                    <li class="wva-chip">{% trans "Batch processing" %}</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 3: WORKLOAD MANAGEMENT -->
+    <section class="wva-section" aria-labelledby="wva-management-title">
+        <div class="wva-shell">
+            <p class="wva-kicker">{% trans "Concept 3" %}</p>
+            <h2 class="wva-h2" id="wva-management-title">{% trans "What Is Workload Management?" %}</h2>
+
+            <div class="wva-split">
+                <div class="wva-prose">
+                    <p>{% trans "Workload management is different again. It is not about automating a process or a job — it is about planning, assigning, distributing and monitoring work. It answers the human and organisational questions: what needs to be done, who is responsible, how much capacity is available and how work is progressing." %}</p>
+                    <p>{% trans "Where workload automation runs jobs on a schedule, workload management organises tasks, projects and responsibilities. It helps teams avoid overload, balance distribution and keep priorities visible across projects and departments." %}</p>
+                </div>
+
+                <div class="wva-panel">
+                    <p class="wva-panel__title">{% trans "What it focuses on" %}</p>
+                    <ul class="wva-list">
+                        <li>{% trans "Planning work" %}</li>
+                        <li>{% trans "Assigning tasks and responsibilities" %}</li>
+                        <li>{% trans "Organizing projects" %}</li>
+                        <li>{% trans "Balancing team workloads" %}</li>
+                        <li>{% trans "Monitoring progress" %}</li>
+                        <li>{% trans "Managing capacity and priorities" %}</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="wva-callout">
+                <div>
+                    <p class="wva-callout__kicker">{% trans "OnWebApp Workload Management System" %}</p>
+                    <h3>{% trans "A centralized way to plan, assign and monitor work." %}</h3>
+                    <p>{% trans "OnWebApp provides a Workload Management System: a centralized solution for organizing operational activities, coordinating projects, managing responsibilities and monitoring how work is distributed. It helps teams see what is happening, who is responsible and where capacity is under pressure. It manages work — it does not function as a technical job scheduler." %}</p>
+                    <a class="wva-text-link" href="{% url 'home:enterprise_automation' %}#ea-workload-system">{% trans "See the Workload Management System" %}<span aria-hidden="true">→</span></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 4: COMPARISON TABLE -->
+    <section class="wva-section wva-section--soft" id="wva-table" aria-labelledby="wva-table-title">
+        <div class="wva-shell">
+            <p class="wva-kicker">{% trans "At a glance" %}</p>
+            <h2 class="wva-h2" id="wva-table-title">{% trans "How the three concepts compare" %}</h2>
+
+            <div class="wva-table-wrap">
+                <table class="wva-table">
+                    <caption class="wva-visually-hidden">{% trans "Comparison of workflow automation, workload automation and workload management" %}</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">{% trans "Aspect" %}</th>
+                            <th scope="col">{% trans "Workflow Automation" %}</th>
+                            <th scope="col">{% trans "Workload Automation" %}</th>
+                            <th scope="col">{% trans "Workload Management" %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row">{% trans "Main purpose" %}</th>
+                            <td>{% trans "Automate business processes" %}</td>
+                            <td>{% trans "Automate technical job execution" %}</td>
+                            <td>{% trans "Organize and manage work" %}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">{% trans "Focus" %}</th>
+                            <td>{% trans "Processes and task sequences" %}</td>
+                            <td>{% trans "Jobs, schedules and dependencies" %}</td>
+                            <td>{% trans "Tasks, projects and capacity" %}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">{% trans "Typical users" %}</th>
+                            <td>{% trans "Business teams" %}</td>
+                            <td>{% trans "IT and operations teams" %}</td>
+                            <td>{% trans "Managers and project teams" %}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">{% trans "Main activities" %}</th>
+                            <td>{% trans "Approvals, handoffs, notifications" %}</td>
+                            <td>{% trans "Scheduling, execution, monitoring" %}</td>
+                            <td>{% trans "Planning, assignment, tracking" %}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">{% trans "Example" %}</th>
+                            <td>{% trans "Invoice approval" %}</td>
+                            <td>{% trans "Scheduled database backup" %}</td>
+                            <td>{% trans "Distributing project tasks" %}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 5: HOW THEY WORK TOGETHER -->
+    <section class="wva-section" aria-labelledby="wva-together-title">
+        <div class="wva-shell">
+            <p class="wva-kicker">{% trans "Better together" %}</p>
+            <h2 class="wva-h2" id="wva-together-title">{% trans "How They Work Together" %}</h2>
+            <p class="wva-lead">{% trans "These three disciplines are not competitors. In a modern business environment they support different parts of the same operation and often reinforce each other." %}</p>
+
+            <div class="wva-together">
+                <article>
+                    <span>01</span>
+                    <h3>{% trans "Workflow automation moves business work forward" %}</h3>
+                    <p>{% trans "It coordinates the human and business steps of a process — approvals, handovers and notifications — so requests and decisions do not stall between teams." %}</p>
+                </article>
+                <article>
+                    <span>02</span>
+                    <h3>{% trans "Workload automation keeps technical jobs running" %}</h3>
+                    <p>{% trans "It schedules and monitors the background jobs and data processing that those processes depend on, such as backups, synchronisations and reports." %}</p>
+                </article>
+                <article>
+                    <span>03</span>
+                    <h3>{% trans "Workload management keeps the work balanced" %}</h3>
+                    <p>{% trans "It organises the tasks, projects and responsibilities that result from all of this, so the right people have the right amount of work." %}</p>
+                </article>
+            </div>
+
+            <p class="wva-note">{% trans "Used together, they give an organisation both reliable execution and a clear view of the work that depends on it." %}</p>
+        </div>
+    </section>
+
+    <!-- SECTION 6: HOW ONWEBAPP HELPS -->
+    <section class="wva-section wva-section--soft" aria-labelledby="wva-help-title">
+        <div class="wva-shell">
+            <p class="wva-kicker">{% trans "Where OnWebApp fits" %}</p>
+            <h2 class="wva-h2" id="wva-help-title">{% trans "How OnWebApp Helps" %}</h2>
+            <p class="wva-lead">{% trans "OnWebApp offers related services and a dedicated product. The services are tailored engagements; the Workload Management System is a product you can use to organise and monitor work across teams." %}</p>
+
+            <div class="wva-help">
+                <a class="wva-help__card" href="{% url 'home:automation_home' %}">
+                    <span class="wva-help__tag wva-help__tag--service">{% trans "Service" %}</span>
+                    <h3>{% trans "Business workflow automation" %}</h3>
+                    <p>{% trans "Designing and connecting business processes so approvals, handovers and notifications move work forward with fewer manual steps." %}</p>
+                    <span class="wva-help__link">{% trans "Explore automation" %}<span aria-hidden="true">→</span></span>
+                </a>
+
+                <a class="wva-help__card" href="{% url 'integration:system_integration' %}">
+                    <span class="wva-help__tag wva-help__tag--service">{% trans "Service" %}</span>
+                    <h3>{% trans "System integration" %}</h3>
+                    <p>{% trans "Connecting applications and services so business information can flow between the systems your teams already use." %}</p>
+                    <span class="wva-help__link">{% trans "See system integration" %}<span aria-hidden="true">→</span></span>
+                </a>
+
+                <a class="wva-help__card" href="{% url 'home:api_solutions' %}">
+                    <span class="wva-help__tag wva-help__tag--service">{% trans "Service" %}</span>
+                    <h3>{% trans "Custom API development" %}</h3>
+                    <p>{% trans "Building tailored APIs so your platforms, tools and data sources can exchange information reliably." %}</p>
+                    <span class="wva-help__link">{% trans "Explore API solutions" %}<span aria-hidden="true">→</span></span>
+                </a>
+
+                <a class="wva-help__card" href="{% url 'home:enterprise_automation' %}#ea-workload-system">
+                    <span class="wva-help__tag wva-help__tag--product">{% trans "Product" %}</span>
+                    <h3>{% trans "Workload Management System" %}</h3>
+                    <p>{% trans "An OnWebApp product for organizing tasks and projects, assigning responsibilities and monitoring workload distribution, capacity and progress." %}</p>
+                    <span class="wva-help__link">{% trans "Explore the product" %}<span aria-hidden="true">→</span></span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 7: FAQ -->
+    <section class="wva-section" id="wva-faq" aria-labelledby="wva-faq-title">
+        <div class="wva-shell wva-faq">
+            <div class="wva-faq__intro">
+                <p class="wva-kicker">{% trans "Frequently asked questions" %}</p>
+                <h2 class="wva-h2" id="wva-faq-title">{% trans "Common questions, answered" %}</h2>
+                <p class="wva-lead">{% trans "The terms are easy to mix up. Here are the questions people ask most often." %}</p>
+            </div>
+
+            <div class="wva-faq__items">
+                <details>
+                    <summary>{% trans "Is workflow automation the same as workload automation?" %}<span aria-hidden="true">+</span></summary>
+                    <p>{% trans "No. Workflow automation automates business processes — sequences of tasks, approvals, notifications and handovers between people and applications. Workload automation automates the execution of technical jobs and workloads, such as scheduled processing, backups and ETL pipelines. They address different parts of an operation." %}</p>
+                </details>
+                <details>
+                    <summary>{% trans "What is the difference between workload management and workload automation?" %}<span aria-hidden="true">+</span></summary>
+                    <p>{% trans "Workload automation runs technical jobs automatically according to schedules and dependencies. Workload management organises people and work: planning tasks, assigning responsibilities, organising projects, balancing capacity and monitoring progress. One executes jobs; the other manages work." %}</p>
+                </details>
+                <details>
+                    <summary>{% trans "Can workflow automation and workload automation work together?" %}<span aria-hidden="true">+</span></summary>
+                    <p>{% trans "Yes. They are often complementary. A business workflow may depend on background jobs that workload automation runs and monitors, and the outcome of a job can feed back into a workflow as the next step or trigger." %}</p>
+                </details>
+                <details>
+                    <summary>{% trans "Which solution does a business need?" %}<span aria-hidden="true">+</span></summary>
+                    <p>{% trans "It depends on the problem. If the challenge is a business process with approvals and handovers, workflow automation is usually the starting point. If the challenge is recurring technical processing, workload automation is more relevant. If the challenge is organising people, tasks and capacity, workload management is the right focus — and the three are frequently combined." %}</p>
+                </details>
+                <details>
+                    <summary>{% trans "What does a Workload Management System do?" %}<span aria-hidden="true">+</span></summary>
+                    <p>{% trans "A Workload Management System helps organisations organise tasks and projects, assign responsibilities, monitor progress and understand how work and capacity are distributed. The OnWebApp Workload Management System brings tasks, assignments, priorities and deadlines together so teams can see what is happening and where capacity is under pressure." %}</p>
+                </details>
+            </div>
+        </div>
+    </section>
+
+    <!-- FINAL CTA -->
+    <section class="wva-cta" aria-labelledby="wva-cta-title">
+        <div class="wva-shell wva-cta__inner">
+            <p class="wva-kicker wva-kicker--light">{% trans "Automation and workload management by OnWebApp" %}</p>
+            <h2 id="wva-cta-title">{% trans "Not sure which approach fits your business?" %}</h2>
+            <p>{% trans "Explore OnWebApp's automation solutions, or tell us about your processes and workloads and we will help you find a practical starting point." %}</p>
+            <div class="wva-cta__actions">
+                <a class="wva-button wva-button--light" href="{% url 'home:enterprise_automation' %}">{% trans "Explore enterprise automation" %}<span aria-hidden="true">↗</span></a>
+                <a class="wva-text-link wva-cta__link" href="{% url 'contact:contact' %}">{% trans "Contact our team" %}<span aria-hidden="true">→</span></a>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.wva-page {
+    --wva-ink: #211b35;
+    --wva-muted: #68627a;
+    --wva-line: #e5e0ef;
+    --wva-paper: #fff;
+    --wva-soft: #f8f6fc;
+    --wva-violet: #6d35bd;
+    --wva-violet-dark: #3f206f;
+    --wva-lavender: #eee7f8;
+    --wva-deep: #24143d;
+    color: var(--wva-ink);
+    background: var(--wva-paper);
+    font-family: inherit;
+}
+.wva-page * { box-sizing: border-box; }
+.wva-shell { width: min(1180px, calc(100% - 64px)); margin-inline: auto; }
+.wva-section { padding: 108px 0; }
+.wva-section--soft { background: var(--wva-soft); }
+.wva-kicker { margin: 0 0 18px; color: var(--wva-violet); font-size: .72rem; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
+.wva-kicker--light { color: #d6c1f0; }
+.wva-h2 { max-width: 720px; margin: 0; font-size: clamp(2rem, 3.4vw, 3.2rem); font-weight: 620; line-height: 1.1; letter-spacing: -.05em; }
+.wva-lead { max-width: 680px; margin: 22px 0 0; color: var(--wva-muted); font-size: .98rem; line-height: 1.85; }
+.wva-visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+/* Hero */
+.wva-hero { position: relative; overflow: hidden; background: #f6f2fb; border-bottom: 1px solid var(--wva-line); }
+.wva-hero__grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(320px, .85fr); gap: 5vw; align-items: center; padding: 96px 0 92px; }
+.wva-hero h1 { max-width: 740px; margin: 0; color: var(--wva-deep); font-size: clamp(2.6rem, 5vw, 4.6rem); font-weight: 620; line-height: 1.02; letter-spacing: -.06em; }
+.wva-hero__lead { max-width: 600px; margin: 26px 0 0; color: var(--wva-muted); font-size: 1.03rem; line-height: 1.85; }
+.wva-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 26px; margin-top: 34px; }
+.wva-button { display: inline-flex; align-items: center; gap: 12px; min-height: 52px; padding: 0 22px; background: var(--wva-violet); color: #fff; text-decoration: none; font-size: .86rem; font-weight: 700; box-shadow: 0 12px 28px rgba(109, 53, 189, .2); transition: background .2s ease, transform .2s ease; }
+.wva-button:hover { background: var(--wva-violet-dark); transform: translateY(-2px); }
+.wva-button span { font-size: 1.15rem; }
+.wva-text-link { display: inline-flex; align-items: center; gap: 12px; color: var(--wva-ink); font-size: .86rem; font-weight: 700; text-decoration: none; }
+.wva-text-link:hover { color: var(--wva-violet); }
+.wva-text-link span { font-size: 1.15rem; }
+.wva-hero__visual { display: grid; gap: 12px; }
+.wva-concept { display: flex; align-items: flex-start; gap: 15px; padding: 17px 19px; background: #fff; border: 1px solid #e6ddf1; box-shadow: 0 14px 34px rgba(45, 25, 74, .06); }
+.wva-concept__num { flex: 0 0 30px; width: 30px; height: 30px; display: grid; place-items: center; background: var(--wva-lavender); color: var(--wva-violet); font-size: .72rem; font-weight: 800; }
+.wva-concept strong { display: block; font-size: .92rem; }
+.wva-concept small { display: block; margin-top: 5px; color: var(--wva-muted); font-size: .76rem; line-height: 1.55; }
+.wva-concept--accent { background: linear-gradient(140deg, #f3ecfb, #fff); border-color: #dccdee; }
+
+/* Split sections */
+.wva-split { display: grid; grid-template-columns: 1fr .82fr; gap: 8%; align-items: start; margin-top: 44px; }
+.wva-prose p { max-width: 600px; margin: 0 0 18px; color: var(--wva-muted); font-size: .96rem; line-height: 1.9; }
+.wva-prose p:last-child { margin-bottom: 0; }
+.wva-panel { padding: 26px 28px; background: var(--wva-soft); border: 1px solid #e8e0f1; }
+.wva-section--soft .wva-panel { background: #fff; border-color: #e6ddf1; }
+.wva-panel__title { margin: 0 0 16px; color: var(--wva-violet); font-size: .72rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+.wva-list { display: grid; gap: 11px; margin: 0; padding: 0; list-style: none; }
+.wva-list li { position: relative; padding-left: 22px; color: #4b4359; font-size: .86rem; line-height: 1.65; }
+.wva-list li:before { content: ''; position: absolute; left: 0; top: .5em; width: 8px; height: 8px; border-radius: 50%; background: var(--wva-lavender); border: 1px solid #c9b4e6; }
+
+/* Examples */
+.wva-examples { margin-top: 36px; }
+.wva-examples__title { margin: 0 0 14px; color: #8b5bc9; font-size: .72rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+.wva-chips { display: flex; flex-wrap: wrap; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.wva-chip { padding: 9px 15px; background: #fff; border: 1px solid #e2d9ef; color: #453c55; font-size: .8rem; font-weight: 600; }
+
+/* Callout (section 3) */
+.wva-callout { margin-top: 52px; padding: 32px 34px; background: linear-gradient(135deg, #f3ecfb, #faf8fd); border: 1px solid #e2d5f2; border-left: 3px solid var(--wva-violet); }
+.wva-callout__kicker { margin: 0 0 12px; color: var(--wva-violet); font-size: .7rem; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; }
+.wva-callout h3 { margin: 0 0 12px; font-size: clamp(1.3rem, 2.2vw, 1.8rem); line-height: 1.2; letter-spacing: -.035em; }
+.wva-callout p { max-width: 820px; margin: 0 0 16px; color: var(--wva-muted); font-size: .92rem; line-height: 1.85; }
+
+/* Comparison table */
+.wva-table-wrap { margin-top: 40px; overflow-x: auto; background: #fff; border: 1px solid var(--wva-line); -webkit-overflow-scrolling: touch; }
+.wva-table { width: 100%; min-width: 760px; border-collapse: collapse; }
+.wva-table th, .wva-table td { padding: 16px 20px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--wva-line); font-size: .86rem; }
+.wva-table thead th { background: #f3edfb; color: #39205d; font-size: .7rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; border-bottom: 1px solid #e0d2f0; }
+.wva-table tbody th { width: 180px; background: #fbf9fe; color: var(--wva-ink); font-weight: 700; }
+.wva-table tbody td { color: var(--wva-muted); line-height: 1.6; }
+.wva-table tbody tr:last-child th, .wva-table tbody tr:last-child td { border-bottom: 0; }
+
+/* Together */
+.wva-together { display: grid; grid-template-columns: repeat(3, 1fr); margin-top: 46px; border-top: 1px solid var(--wva-line); }
+.wva-together article { padding: 28px 26px 0 0; }
+.wva-together article + article { padding-left: 26px; border-left: 1px solid var(--wva-line); }
+.wva-together span { display: block; margin-bottom: 16px; color: #8b5bc9; font-size: .72rem; font-weight: 800; letter-spacing: .12em; }
+.wva-together h3 { margin: 0 0 9px; font-size: 1.05rem; font-weight: 700; line-height: 1.25; }
+.wva-together p { margin: 0; color: var(--wva-muted); font-size: .85rem; line-height: 1.75; }
+.wva-note { margin: 34px 0 0; color: #80778f; font-size: .86rem; line-height: 1.75; }
+
+/* How OnWebApp helps */
+.wva-help { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-top: 44px; }
+.wva-help__card { display: block; padding: 28px; background: #fff; border: 1px solid #e6ddf1; color: inherit; text-decoration: none; transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
+.wva-help__card:hover { transform: translateY(-3px); border-color: #cfbbe9; box-shadow: 0 20px 44px rgba(45, 25, 74, .1); }
+.wva-help__tag { display: inline-block; margin-bottom: 14px; padding: 3px 10px; border-radius: 999px; font-size: .58rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.wva-help__tag--service { background: #eee7f8; color: var(--wva-violet); }
+.wva-help__tag--product { background: #e2f0ec; color: #2f7d63; }
+.wva-help__card h3 { margin: 0 0 9px; font-size: 1.08rem; font-weight: 700; }
+.wva-help__card p { margin: 0; color: var(--wva-muted); font-size: .86rem; line-height: 1.75; }
+.wva-help__link { display: inline-flex; align-items: center; gap: 8px; margin-top: 16px; color: var(--wva-violet); font-size: .8rem; font-weight: 700; }
+.wva-help__link span { font-size: 1rem; }
+
+/* FAQ */
+.wva-faq { display: grid; grid-template-columns: .7fr 1.1fr; gap: 12%; align-items: start; }
+.wva-faq__items { border-top: 1px solid var(--wva-line); }
+.wva-faq__items details { border-bottom: 1px solid var(--wva-line); }
+.wva-faq__items summary { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 22px 0; cursor: pointer; list-style: none; font-size: .96rem; font-weight: 700; }
+.wva-faq__items summary::-webkit-details-marker { display: none; }
+.wva-faq__items summary span { color: #8b5bc9; font-size: 1.35rem; font-weight: 400; transition: transform .2s; }
+.wva-faq__items details[open] summary span { transform: rotate(45deg); }
+.wva-faq__items details p { max-width: 660px; margin: -3px 0 22px; color: var(--wva-muted); font-size: .88rem; line-height: 1.85; }
+
+/* CTA */
+.wva-cta { position: relative; overflow: hidden; padding: 100px 0; background: linear-gradient(115deg, #2c1748, #4b2678 58%, #38205e); color: #fff; }
+.wva-cta:after { content: ''; position: absolute; width: 520px; height: 520px; right: -140px; top: -250px; border: 1px solid rgba(255, 255, 255, .18); border-radius: 50%; box-shadow: 0 0 0 55px rgba(255, 255, 255, .045), 0 0 0 110px rgba(255, 255, 255, .035); }
+.wva-cta__inner { position: relative; z-index: 1; max-width: 860px; }
+.wva-cta h2 { max-width: 720px; margin: 0; font-size: clamp(2.2rem, 4.4vw, 3.8rem); font-weight: 600; line-height: 1.03; letter-spacing: -.05em; }
+.wva-cta p { max-width: 560px; margin: 22px 0 30px; color: rgba(255, 255, 255, .76); font-size: .98rem; line-height: 1.8; }
+.wva-cta__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 26px; }
+.wva-button--light { background: #fff; color: #39205d; }
+.wva-button--light:hover { background: #eee6f8; }
+.wva-cta__link { color: #fff; }
+.wva-cta__link:hover { color: #d6c1f0; }
+
+/* Responsive */
+@media (max-width: 1000px) {
+    .wva-hero__grid { grid-template-columns: 1fr; gap: 44px; padding: 80px 0; }
+    .wva-split { grid-template-columns: 1fr; gap: 34px; }
+    .wva-together { grid-template-columns: 1fr; }
+    .wva-together article, .wva-together article + article { padding: 26px 0; border-left: 0; border-top: 1px solid var(--wva-line); }
+    .wva-help { grid-template-columns: 1fr; }
+    .wva-faq { grid-template-columns: 1fr; gap: 30px; }
+}
+@media (max-width: 650px) {
+    .wva-shell { width: calc(100% - 40px); }
+    .wva-section { padding: 76px 0; }
+    .wva-hero h1 { font-size: clamp(2.3rem, 10vw, 3.4rem); }
+    .wva-actions { flex-direction: column; align-items: flex-start; gap: 18px; }
+    .wva-cta { padding: 76px 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .wva-page * { scroll-behavior: auto !important; transition: none !important; }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var items = document.querySelectorAll('.wva-faq__items details');
+    items.forEach(function (item) {
+        item.addEventListener('toggle', function () {
+            if (!item.open) return;
+            items.forEach(function (other) { if (other !== item) other.open = false; });
+        });
+    });
+});
+</script>
+{% endblock %}

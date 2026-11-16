@@ -1,0 +1,102 @@
+{% extends 'workload/base_workload.html' %}
+{% load humanize workload_tags %}
+
+{% block wl_page_title %}Resources{% endblock %}
+{% block wl_title %}Resource capacity{% endblock %}
+{% block wl_subtitle %}
+    Working hours, availability and live utilisation per employee, team or system resource.
+{% endblock %}
+
+{% block wl_actions %}
+    <a href="{% url 'workload:resource_create' %}" class="btn btn-primary" style="background: var(--wl-teal); border-color: var(--wl-teal);">
+        <i class="fas fa-plus me-2"></i>New resource
+    </a>
+{% endblock %}
+
+{% block wl_content %}
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-12 col-md-5">
+                <label class="form-label small fw-semibold mb-1">Search</label>
+                <input type="search" name="q" value="{{ filters.q }}" class="form-control" placeholder="Name, username or team">
+            </div>
+            <div class="col-6 col-md-3">
+                <label class="form-label small fw-semibold mb-1">Kind</label>
+                <select name="kind" class="form-select">
+                    <option value="">All kinds</option>
+                    {% for value, label in kind_choices %}
+                    <option value="{{ value }}" {% if filters.kind == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-6 col-md-2 d-flex gap-2">
+                <button type="submit" class="btn btn-dark flex-grow-1"><i class="fas fa-filter me-1"></i>Filter</button>
+                <a href="{% url 'workload:resource_list' %}" class="btn btn-outline-secondary"><i class="fas fa-rotate-left"></i></a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="wl-table-wrap">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Resource</th>
+                    <th>Kind</th>
+                    <th>Skills</th>
+                    <th>Assigned</th>
+                    <th>Available</th>
+                    <th style="min-width:160px;">Utilisation</th>
+                    <th>State</th>
+                    <th>Availability</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                <tr>
+                    <td>
+                        <div class="fw-semibold">{{ row.resource.display_owner }}</div>
+                        <div class="text-muted small">{{ row.active_assignments }} active assignment{{ row.active_assignments|pluralize }}</div>
+                    </td>
+                    <td><span class="small">{{ row.resource.get_kind_display }}</span></td>
+                    <td>
+                        {% for skill in row.skills %}<span class="wl-skill">{{ skill }}</span>{% empty %}<span class="text-muted small">—</span>{% endfor %}
+                    </td>
+                    <td>{{ row.assigned_hours }}h</td>
+                    <td>
+                        {{ row.available_hours }}h
+                        {% if row.is_assumed_capacity %}<span class="text-muted small" title="No capacity record — using policy default">*</span>{% endif %}
+                    </td>
+                    <td>
+                        <div class="wl-progress level-{{ row.level }}">
+                            <span style="width:{{ row.utilization|clamp_percent }}%"></span>
+                        </div>
+                        <div class="small text-muted mt-1">{{ row.utilization_display }}</div>
+                    </td>
+                    <td><span class="wl-badge level-{{ row.level }}">{{ row.level_label }}</span></td>
+                    <td><span class="small">{{ row.resource.get_availability_status_display }}</span></td>
+                    <td class="text-end">
+                        <a href="{% url 'workload:resource_edit' row.resource.pk %}" class="btn btn-sm btn-outline-secondary" title="Edit"><i class="fas fa-pen"></i></a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="9"><div class="wl-empty"><i class="fas fa-users d-block"></i>No resources yet. Add employees or teams to start tracking capacity.</div></td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mt-3">
+    <div class="text-muted small">* Capacity fallback uses the policy default ({{ policy.default_weekly_hours }}h/week).</div>
+    {% if page_obj.has_other_pages %}
+    <div class="btn-group">
+        {% if page_obj.has_previous %}<a class="btn btn-sm btn-outline-secondary" href="?{% query_replace page=page_obj.previous_page_number %}">Previous</a>{% endif %}
+        {% if page_obj.has_next %}<a class="btn btn-sm btn-outline-secondary" href="?{% query_replace page=page_obj.next_page_number %}">Next</a>{% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

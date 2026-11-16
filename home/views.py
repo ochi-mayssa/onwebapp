@@ -240,6 +240,11 @@ def enterprise_automation(request):
     return render(request, 'automation/enterpriseautomation.html')
 
 
+def workflow_vs_workload_automation(request):
+    """Educational page: workflow automation vs workload automation."""
+    return render(request, 'automation/workflow-vs-workload-automation.html')
+
+
 def erp_service(request):
     """ERP integration and implementation services page."""
     return render(request, 'services/erp-service.html')

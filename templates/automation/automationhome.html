@@ -1,528 +1,840 @@
+
 {% extends 'base.html' %}
 {% load i18n static %}
 
 {% block title %}{% trans "Automation by OnWebApp" %} | OnWebApp{% endblock %}
 
 {% block content %}
+
 <!-- HERO -->
-<section class="ax-hero">
-    <div class="ax-hero__shade"></div>
-    <div class="ax-hero__fade"></div>
-    <div class="wrap ax-hero__inner">
-        <a href="{% url 'home:automation_home' %}" class="ax-hero__eyebrow" aria-label="Automation by OnWebApp | OnWebApp">{% trans "Automation by OnWebApp" %}</a>
-        <h1 class="ax-hero__title">{% trans "Move from chaos to control." %}</h1>
-        <p class="ax-hero__sub">{% trans "Harness the power of automation to streamline website interactions through user interfaces (UI) and optimize enterprise workflows through APIs." %}</p>
-        <div class="ax-hero__actions">
-            <a href="{% url 'home:video_explainer' %}" class="ax-btn ax-btn--primary">{% trans "View a demo" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
-            <a href="#pricing" class="ax-btn ax-btn--ghost">{% trans "See pricing plans" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
-            <a href="{% url 'contact:contact' %}" class="ax-btn ax-btn--ghost">{% trans "Chat with our team" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
-        </div>
-    </div>
-</section>
+<section class="oa-hero">
+    <div class="oa-hero__visual"></div>
+    <div class="wrap oa-hero__inner">
+        <a href="{% url 'home:automation_home' %}" class="oa-eyebrow">
+            {% trans "Automation by OnWebApp" %}
+        </a>
 
-<!-- WHY AUTOMATION, WHY NOW -->
-<section class="ax-sec">
-    <div class="wrap">
-        <div class="ax-split">
-            <div class="ax-split__head">
-                <span class="ax-label">{% trans "Why Automation, Why Now" %}</span>
-                <h2 class="ax-h2">{% trans "Turn Complex Processes Into Connected Workflows" %}</h2>
-            </div>
-            <div class="ax-split__body">
-                <p>{% trans "As businesses grow, disconnected tools, repetitive manual tasks, and temporary fixes create unnecessary costs and operational bottlenecks. These challenges make it harder to maintain consistent service quality, meet Service Level Agreements (SLAs), and scale operations efficiently." %}</p>
-                <div class="ax-callout">
-                    <p><strong>{% trans "OnWebApp helps businesses connect their websites, applications, and enterprise systems through tailored automation solutions." %}</strong> {% trans "From automating routine tasks to coordinating complex workflows, we help reduce manual effort, improve process consistency, and give teams greater visibility and control over daily operations." %}</p>
-                </div>
-            </div>
-        </div>
-        <h3 class="ax-chal-h">{% trans "Built for the Challenges of Modern Business" %}</h3>
-        <ul class="ax-chal">
-            <li><i class="fas fa-check" aria-hidden="true"></i><span><strong>{% trans "Hybrid Cloud Integration" %}</strong> — {% trans "Connect systems and applications across different environments to reduce silos and improve operational continuity." %}</span></li>
-            <li><i class="fas fa-check" aria-hidden="true"></i><span><strong>{% trans "Self-Service Automation" %}</strong> — {% trans "Simplify routine processes and empower teams to complete tasks with less manual intervention." %}</span></li>
-            <li><i class="fas fa-check" aria-hidden="true"></i><span><strong>{% trans "Faster, More Efficient Operations" %}</strong> — {% trans "Reduce repetitive work, minimize delays, and free your team to focus on higher-value activities." %}</span></li>
-            <li><i class="fas fa-check" aria-hidden="true"></i><span><strong>{% trans "Standards-Based Integration" %}</strong> — {% trans "Connect existing tools and business systems using established technologies, APIs, and integration standards." %}</span></li>
-            <li><i class="fas fa-check" aria-hidden="true"></i><span><strong>{% trans "Security, Governance &amp; Compliance" %}</strong> — {% trans "Support controlled access, traceable workflows, execution monitoring, and consistent process management." %}</span></li>
-        </ul>
-    </div>
-</section>
+        <h1>{% trans "Move from chaos to control." %}</h1>
 
-<!-- WHAT CAN YOU DO -->
-<section class="ax-sec ax-sec--soft" id="capabilities">
-    <div class="wrap">
-        <div class="ax-center">
-            <span class="ax-label ax-label--indigo">{% trans "Capabilities" %}</span>
-            <h2 class="ax-h2">{% trans "What Can You Do with OnWebApp Automate?" %}</h2>
-            <p class="ax-lead">{% trans "Automate workflows and workloads intelligently, from the simplest to the most complex. Create content-focused automation processes." %}</p>
-        </div>
-        <div class="ax-grid ax-grid--2 ax-grid--narrow">
-            <a class="ax-card ax-card--media" href="#website-automation">
-                <div class="ax-card__media">
-                    <img src="{% static 'img/websiteautomation.png' %}" alt="{% trans 'Operator monitoring automation dashboards across multiple screens' %}" loading="lazy">
-                    <div class="ax-card__media-shade"></div>
-                    <span class="cap-card__num">01</span>
-                    <h3 class="ax-card__media-title">{% trans "Website Automation" %}</h3>
-                </div>
-                <ul class="ax-list ax-list--media">
-                    <li><i class="fas fa-check" aria-hidden="true"></i>{% trans "Browser Automation" %}</li>
-                    <li><i class="fas fa-check" aria-hidden="true"></i>{% trans "Headless Browsers" %}</li>
-                    <li><i class="fas fa-check" aria-hidden="true"></i>{% trans "Workflow Automation" %}</li>
-                    <li><i class="fas fa-check" aria-hidden="true"></i>{% trans "Workload Automation" %}</li>
-                </ul>
-                <span class="ax-card__more">{% trans "Learn more" %} <i class="fas fa-arrow-down" aria-hidden="true"></i></span>
+        <p class="oa-hero__lead">
+            {% trans "Harness the power of automation to streamline website interactions through user interfaces (UI) and optimize enterprise workflows through APIs." %}
+        </p>
+
+        <div class="oa-actions">
+            <a href="{% url 'home:video_explainer' %}" class="oa-btn oa-btn--primary">
+                {% trans "View a demo" %} <i class="fas fa-arrow-right"></i>
             </a>
-            <a class="ax-card ax-card--media" href="#enterprise-automation">
-                <div class="ax-card__media">
-                    <img src="{% static 'img/entreprise.png' %}" alt="{% trans 'Professional interacting with holographic enterprise dashboards' %}" loading="lazy">
-                    <div class="ax-card__media-shade"></div>
-                    <span class="cap-card__num">02</span>
-                    <h3 class="ax-card__media-title">{% trans "Enterprise Automation" %}</h3>
-                </div>
-                <ul class="ax-list ax-list--media">
-                    <li><i class="fas fa-check" aria-hidden="true"></i>{% trans "Industrial Automation" %}</li>
-                    <li><i class="fas fa-check" aria-hidden="true"></i>{% trans "Integrated Systems Automation (iPaaS) &amp; ERP" %}</li>
-                    <li><i class="fas fa-check" aria-hidden="true"></i>{% trans "Workload Automation" %}</li>
-                </ul>
-                <span class="ax-card__more">{% trans "Learn more" %} <i class="fas fa-arrow-down" aria-hidden="true"></i></span>
+            <a href="#pricing" class="oa-btn oa-btn--light">
+                {% trans "See pricing plans" %}
+            </a>
+            <a href="{% url 'contact:contact' %}" class="oa-text-link oa-text-link--light">
+                {% trans "Chat with our team" %}
+                <i class="fas fa-arrow-up-right-from-square"></i>
             </a>
         </div>
+
+        <div class="oa-hero__foot">
+            <span>{% trans "Website automation" %}</span>
+            <span>{% trans "Enterprise integration" %}</span>
+            <span>{% trans "Connected workflows" %}</span>
+        </div>
     </div>
 </section>
 
-<!-- BROWSER & WEBSITE AUTOMATION -->
-<section class="ax-sec ax-sec--tint" id="website-automation">
+<!-- WHY AUTOMATION -->
+<section class="oa-section oa-section--white">
     <div class="wrap">
-        <div class="ax-center">
-            <span class="ax-label">{% trans "Website Automation" %}</span>
-            <h2 class="ax-h2">{% trans "Browser &amp; Website Automation" %}</h2>
-            <p class="ax-lead ax-lead--wide">{% trans "Automate repetitive activities performed through web browsers and website interfaces." %}</p>
+
+        <div class="oa-intro-grid">
+            <div>
+                <span class="oa-kicker">{% trans "Why Automation, Why Now" %}</span>
+                <h2 class="oa-heading">
+                    {% trans "Turn complex processes into connected workflows." %}
+                </h2>
+            </div>
+
+            <div class="oa-intro-copy">
+                <p>
+                    {% trans "As businesses grow, disconnected tools, repetitive manual tasks, and temporary fixes create unnecessary costs and operational bottlenecks. These challenges make it harder to maintain consistent service quality, meet Service Level Agreements (SLAs), and scale operations efficiently." %}
+                </p>
+
+                <p class="oa-emphasis">
+                    {% trans "OnWebApp helps businesses connect their websites, applications, and enterprise systems through tailored automation solutions." %}
+                </p>
+
+                <p>
+                    {% trans "From automating routine tasks to coordinating complex workflows, we help reduce manual effort, improve process consistency, and give teams greater visibility and control over daily operations." %}
+                </p>
+            </div>
         </div>
-        <div class="ax-grid ax-grid--2">
-            <article class="ax-card ax-card--media wa-card">
-                <div class="ax-card__media">
-                    <img src="{% static 'img/front.png' %}" alt="{% trans 'Front-end and UI automation illustration' %}" loading="lazy">
-                    <div class="ax-card__media-shade"></div>
-                    <span class="wa-card__num">01</span>
-                    <h3 class="ax-card__media-title">{% trans "Front-End and UI Automation" %}</h3>
+
+        <div class="oa-challenges">
+            <h3>{% trans "Built for the challenges of modern business" %}</h3>
+
+            <div class="oa-challenge-grid">
+                <div>
+                    <span>01</span>
+                    <p>
+                        <strong>{% trans "Hybrid Cloud Integration" %}</strong>
+                        {% trans "Connect systems and applications across different environments to reduce silos and improve operational continuity." %}
+                    </p>
                 </div>
-                <div class="wa-card__body">
-                    <ul class="ax-n-list">
-                        <li>{% trans "Simulate mouse and keyboard interactions." %}</li>
-                        <li>{% trans "Automate repetitive tasks in browser-based applications." %}</li>
-                        <li>{% trans "Execute predefined customer journeys." %}</li>
-                        <li>{% trans "Run workflows that follow specific business rules." %}</li>
-                    </ul>
-                    <div class="ax-ex"><strong>{% trans "Practical example:" %}</strong> {% trans "Automatically log into a portal, enter information, and submit a form according to a predefined workflow." %}</div>
+
+                <div>
+                    <span>02</span>
+                    <p>
+                        <strong>{% trans "Self-Service Automation" %}</strong>
+                        {% trans "Simplify routine processes and empower teams to complete tasks with less manual intervention." %}
+                    </p>
                 </div>
-            </article>
-            <article class="ax-card ax-card--media wa-card">
-                <div class="ax-card__media">
-                    <img src="{% static 'img/ext.png' %}" alt="{% trans 'Web data extraction illustration' %}" loading="lazy">
-                    <div class="ax-card__media-shade"></div>
-                    <span class="wa-card__num">02</span>
-                    <h3 class="ax-card__media-title">{% trans "Web Data Extraction" %}</h3>
+
+                <div>
+                    <span>03</span>
+                    <p>
+                        <strong>{% trans "Faster, More Efficient Operations" %}</strong>
+                        {% trans "Reduce repetitive work, minimize delays, and free your team to focus on higher-value activities." %}
+                    </p>
                 </div>
-                <div class="wa-card__body">
-                    <p class="ax-card__body">{% trans "Collect information from websites and transform it into structured data for analysis." %}</p>
-                    <ul class="ax-n-list">
-                        <li>{% trans "Competitor price monitoring." %}</li>
-                        <li>{% trans "Market and product research." %}</li>
-                        <li>{% trans "Review and listing collection." %}</li>
-                        <li>{% trans "News aggregation and data consolidation." %}</li>
-                    </ul>
-                    <div class="ax-ex"><strong>{% trans "Practical example:" %}</strong> {% trans "Collect competitor product prices from several websites and consolidate the results into a business dashboard." %}</div>
+
+                <div>
+                    <span>04</span>
+                    <p>
+                        <strong>{% trans "Standards-Based Integration" %}</strong>
+                        {% trans "Connect existing tools and business systems using established technologies, APIs, and integration standards." %}
+                    </p>
                 </div>
-            </article>
-            <article class="ax-card ax-card--media wa-card">
-                <div class="ax-card__media">
-                    <img src="{% static 'img/websitemo.png' %}" alt="{% trans 'Website monitoring illustration' %}" loading="lazy">
-                    <div class="ax-card__media-shade"></div>
-                    <span class="wa-card__num">03</span>
-                    <h3 class="ax-card__media-title">{% trans "Website Monitoring" %}</h3>
+
+                <div>
+                    <span>05</span>
+                    <p>
+                        <strong>{% trans "Security, Governance &amp; Compliance" %}</strong>
+                        {% trans "Support controlled access, traceable workflows, execution monitoring, and consistent process management." %}
+                    </p>
                 </div>
-                <div class="wa-card__body">
-                    <p class="ax-card__body">{% trans "Monitor website health and identify issues without relying entirely on manual checks." %}</p>
-                    <ul class="ax-n-list">
-                        <li>{% trans "Website uptime monitoring." %}</li>
-                        <li>{% trans "Page speed and performance checks." %}</li>
-                        <li>{% trans "Content changes and missing pages." %}</li>
-                        <li>{% trans "Broken and outdated link detection." %}</li>
-                        <li>{% trans "Automated alerts when issues arise." %}</li>
-                    </ul>
-                    <div class="ax-ex"><strong>{% trans "Practical example:" %}</strong> {% trans "Run a checkout test every hour and alert the support team if the checkout process fails or becomes unusually slow." %}</div>
-                </div>
-            </article>
-            <article class="ax-card ax-card--media wa-card">
-                <div class="ax-card__media">
-                    <img src="{% static 'img/testt.png' %}" alt="{% trans 'Website testing automation illustration' %}" loading="lazy">
-                    <div class="ax-card__media-shade"></div>
-                    <span class="wa-card__num">04</span>
-                    <h3 class="ax-card__media-title">{% trans "Website Testing Automation" %}</h3>
-                </div>
-                <div class="wa-card__body">
-                    <p class="ax-card__body">{% trans "Automate repeatable website checks to help identify functional problems and regressions." %}</p>
-                    <ul class="ax-n-list">
-                        <li>{% trans "Test essential user journeys." %}</li>
-                        <li>{% trans "Validate forms and navigation." %}</li>
-                        <li>{% trans "Check critical website functionality." %}</li>
-                        <li>{% trans "Schedule recurring tests and report failures." %}</li>
-                    </ul>
-                </div>
-            </article>
+            </div>
         </div>
-        <div class="ax-cta-center">
-            <a href="{% url 'home:website_automation' %}" class="ax-btn ax-btn--outline">{% trans "Explore Website Automation" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+    </div>
+</section>
+
+<!-- CAPABILITIES -->
+<section class="oa-section oa-section--mist" id="capabilities">
+    <div class="wrap">
+        <div class="oa-section-head">
+            <span class="oa-kicker">{% trans "Capabilities" %}</span>
+            <h2 class="oa-heading">
+                {% trans "What can you do with OnWebApp Automate?" %}
+            </h2>
+            <p>
+                {% trans "Automate workflows and workloads intelligently, from the simplest to the most complex. Create content-focused automation processes." %}
+            </p>
+        </div>
+
+        <div class="oa-capability-feature">
+            <a href="#website-automation" class="oa-capability">
+                <img src="{% static 'img/websiteautomation.png' %}"
+                     alt="{% trans 'Website automation' %}" loading="lazy">
+
+                <div class="oa-capability__overlay">
+                    <span>01 / {% trans "Website automation" %}</span>
+                    <h3>{% trans "Automate the work happening across your websites." %}</h3>
+                    <span class="oa-arrow">
+                        {% trans "Explore capabilities" %}
+                        <i class="fas fa-arrow-right"></i>
+                    </span>
+                </div>
+            </a>
+
+            <a href="#enterprise-automation" class="oa-capability">
+                <img src="{% static 'img/entreprise.png' %}"
+                     alt="{% trans 'Enterprise automation' %}" loading="lazy">
+
+                <div class="oa-capability__overlay">
+                    <span>02 / {% trans "Enterprise automation" %}</span>
+                    <h3>{% trans "Connect the systems that keep your business moving." %}</h3>
+                    <span class="oa-arrow">
+                        {% trans "Explore capabilities" %}
+                        <i class="fas fa-arrow-right"></i>
+                    </span>
+                </div>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- WEBSITE AUTOMATION -->
+<section class="oa-section oa-section--white" id="website-automation">
+    <div class="wrap">
+        <div class="oa-section-head oa-section-head--left">
+            <span class="oa-kicker">{% trans "Website Automation" %}</span>
+            <h2 class="oa-heading">{% trans "Browser and website automation." %}</h2>
+            <p>
+                {% trans "Automate repetitive activities performed through web browsers and website interfaces." %}
+            </p>
+        </div>
+
+        <div class="oa-editorial-list">
+
+            <article class="oa-editorial-row">
+                <div class="oa-editorial-row__visual">
+                    <img src="{% static 'img/front.png' %}"
+                         alt="{% trans 'Front-end and UI automation' %}" loading="lazy">
+                </div>
+
+                <div class="oa-editorial-row__content">
+                    <span class="oa-index">01</span>
+                    <h3>{% trans "Front-End and UI Automation" %}</h3>
+                    <p>
+                        {% trans "Simulate mouse and keyboard interactions, automate repetitive tasks in browser-based applications, execute predefined customer journeys, and run workflows that follow specific business rules." %}
+                    </p>
+                    <p class="oa-example">
+                        <strong>{% trans "Practical example" %}</strong> —
+                        {% trans "Automatically log into a portal, enter information, and submit a form according to a predefined workflow." %}
+                    </p>
+                </div>
+            </article>
+
+            <article class="oa-editorial-row">
+                <div class="oa-editorial-row__visual">
+                    <img src="{% static 'img/ext.png' %}"
+                         alt="{% trans 'Web data extraction' %}" loading="lazy">
+                </div>
+
+                <div class="oa-editorial-row__content">
+                    <span class="oa-index">02</span>
+                    <h3>{% trans "Web Data Extraction" %}</h3>
+                    <p>
+                        {% trans "Collect information from websites and transform it into structured data for analysis." %}
+                    </p>
+                    <ul>
+                        <li>{% trans "Competitor price monitoring" %}</li>
+                        <li>{% trans "Market and product research" %}</li>
+                        <li>{% trans "Review and listing collection" %}</li>
+                        <li>{% trans "News aggregation and data consolidation" %}</li>
+                    </ul>
+                    <p class="oa-example">
+                        <strong>{% trans "Practical example" %}</strong> —
+                        {% trans "Collect competitor product prices from several websites and consolidate the results into a business dashboard." %}
+                    </p>
+                </div>
+            </article>
+
+            <article class="oa-editorial-row">
+                <div class="oa-editorial-row__visual">
+                    <img src="{% static 'img/websitemo.png' %}"
+                         alt="{% trans 'Website monitoring' %}" loading="lazy">
+                </div>
+
+                <div class="oa-editorial-row__content">
+                    <span class="oa-index">03</span>
+                    <h3>{% trans "Website Monitoring" %}</h3>
+                    <p>
+                        {% trans "Monitor website health and identify issues without relying entirely on manual checks." %}
+                    </p>
+                    <ul>
+                        <li>{% trans "Website uptime and page speed checks" %}</li>
+                        <li>{% trans "Content changes and missing pages" %}</li>
+                        <li>{% trans "Broken and outdated link detection" %}</li>
+                        <li>{% trans "Automated alerts when issues arise" %}</li>
+                    </ul>
+                    <p class="oa-example">
+                        <strong>{% trans "Practical example" %}</strong> —
+                        {% trans "Run a checkout test every hour and alert the support team if the checkout process fails or becomes unusually slow." %}
+                    </p>
+                </div>
+            </article>
+
+            <article class="oa-editorial-row">
+                <div class="oa-editorial-row__visual">
+                    <img src="{% static 'img/testt.png' %}"
+                         alt="{% trans 'Website testing automation' %}" loading="lazy">
+                </div>
+
+                <div class="oa-editorial-row__content">
+                    <span class="oa-index">04</span>
+                    <h3>{% trans "Website Testing Automation" %}</h3>
+                    <p>
+                        {% trans "Automate repeatable website checks to help identify functional problems and regressions." %}
+                    </p>
+                    <ul>
+                        <li>{% trans "Test essential user journeys" %}</li>
+                        <li>{% trans "Validate forms and navigation" %}</li>
+                        <li>{% trans "Check critical website functionality" %}</li>
+                        <li>{% trans "Schedule recurring tests and report failures" %}</li>
+                    </ul>
+                </div>
+            </article>
+
+        </div>
+
+        <div class="oa-inline-cta">
+            <a href="{% url 'home:website_automation' %}" class="oa-text-link">
+                {% trans "Explore Website Automation" %}
+                <i class="fas fa-arrow-right"></i>
+            </a>
         </div>
     </div>
 </section>
 
 <!-- ENTERPRISE AUTOMATION -->
-<section class="ax-sec ax-sec--soft" id="enterprise-automation">
+<section class="oa-section oa-section--lavender" id="enterprise-automation">
     <div class="wrap">
-        <div class="ax-center">
-            <span class="ax-label ax-label--indigo">{% trans "Enterprise Automation" %}</span>
-            <h2 class="ax-h2">{% trans "Connect Your Systems. Simplify Your Operations." %}</h2>
-            <p class="ax-feat__lead">{% trans "Bring your business applications, enterprise systems, and operational processes together through connected automation. OnWebApp helps reduce manual data handling, coordinate tasks across platforms, and improve visibility into the processes that keep your business running." %}</p>
+        <div class="oa-enterprise-intro">
+            <div>
+                <span class="oa-kicker">{% trans "Enterprise Automation" %}</span>
+                <h2 class="oa-heading">
+                    {% trans "Connect your systems. Simplify your operations." %}
+                </h2>
+            </div>
+
+            <p>
+                {% trans "Bring your business applications, enterprise systems, and operational processes together through connected automation. OnWebApp helps reduce manual data handling, coordinate tasks across platforms, and improve visibility into the processes that keep your business running." %}
+            </p>
         </div>
-        <div class="ax-feat__items">
-            <div class="ax-feat__item">
-                <div class="ax-feat__icon"><i class="fas fa-industry" aria-hidden="true"></i></div>
+
+        <div class="oa-enterprise-list">
+            <article>
+                <span>01</span>
                 <div>
                     <h3>{% trans "Industrial Automation" %}</h3>
-                    <p>{% trans "Streamline industrial and operational workflows with process monitoring, status tracking, and alerts that help teams identify issues and respond faster." %}</p>
+                    <p>
+                        {% trans "Streamline industrial and operational workflows with process monitoring, status tracking, and alerts that help teams identify issues and respond faster." %}
+                    </p>
                 </div>
-            </div>
-            <div class="ax-feat__item">
-                <div class="ax-feat__icon"><i class="fas fa-sitemap" aria-hidden="true"></i></div>
+                <i class="fas fa-industry"></i>
+            </article>
+
+            <article>
+                <span>02</span>
                 <div>
                     <h3>{% trans "Systems Integration &amp; ERP Automation" %}</h3>
-                    <p>{% trans "Connect ERP platforms, business applications, and external services to synchronize data, reduce duplicate entry, and keep business processes aligned." %}</p>
+                    <p>
+                        {% trans "Connect ERP platforms, business applications, and external services to synchronize data, reduce duplicate entry, and keep business processes aligned." %}
+                    </p>
                 </div>
-            </div>
-            <div class="ax-feat__item">
-                <div class="ax-feat__icon"><i class="fas fa-clock-rotate-left" aria-hidden="true"></i></div>
+                <i class="fas fa-diagram-project"></i>
+            </article>
+
+            <article>
+                <span>03</span>
                 <div>
                     <h3>{% trans "Workload Automation" %}</h3>
-                    <p>{% trans "Schedule, coordinate, and monitor recurring jobs across connected systems, with execution tracking and failure notifications to support reliable operations." %}</p>
+                    <p>
+                        {% trans "Schedule, coordinate, and monitor recurring jobs across connected systems, with execution tracking and failure notifications to support reliable operations." %}
+                    </p>
                 </div>
-            </div>
-            <div class="ax-feat__item">
-                <div class="ax-feat__icon"><i class="fas fa-robot" aria-hidden="true"></i></div>
+                <i class="fas fa-clock"></i>
+            </article>
+
+            <article>
+                <span>04</span>
                 <div>
                     <h3>{% trans "Robotic Process Automation (RPA) &amp; Business Process Automation (BPA)" %}</h3>
-                    <p>{% trans "Automate repetitive tasks and coordinate multi-step business processes to reduce manual work, improve consistency, and give your team more time for higher-value activities." %}</p>
+                    <p>
+                        {% trans "Automate repetitive tasks and coordinate multi-step business processes to reduce manual work, improve consistency, and give your team more time for higher-value activities." %}
+                    </p>
                 </div>
-            </div>
+                <i class="fas fa-robot"></i>
+            </article>
         </div>
-        <div class="ax-cta-center">
-            <a href="{% url 'home:enterprise_automation' %}" class="ax-btn ax-btn--outline">{% trans "Explore entreprise autormation" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
 
+        <div class="oa-inline-cta">
+            <a href="{% url 'home:enterprise_automation' %}" class="oa-text-link">
+                {% trans "Explore Enterprise Automation" %}
+                <i class="fas fa-arrow-right"></i>
+            </a>
         </div>
     </div>
 </section>
 
-<!-- THE PAYOFF -->
-<section class="ax-sec" id="payoff">
+<!-- BUSINESS IMPACT -->
+<section class="oa-section oa-section--white" id="payoff">
     <div class="wrap">
-        <div class="ax-center">
-            <span class="ax-label">{% trans "The Payoff" %}</span>
-            <h2 class="ax-h2">{% trans "Less Manual Work. More Business Impact." %}</h2>
-            <p class="ax-lead ax-lead--wide">{% trans "Every repetitive task takes time away from the work that moves your business forward. OnWebApp connects your workflows, websites, and business systems to reduce manual effort, minimize errors, and help your teams operate more efficiently." %}</p>
-            <p class="ax-lead ax-lead--wide">{% trans "From everyday tasks to complex, cross-system processes, build a more connected business that runs with greater consistency, visibility, and control." %}</p>
-            <h3 class="ax-payoff-h">{% trans "Automation That Delivers Across Your Business" %}</h3>
+        <div class="oa-impact-intro">
+            <span class="oa-kicker">{% trans "The Payoff" %}</span>
+            <h2 class="oa-heading">
+                {% trans "Less manual work. More business impact." %}
+            </h2>
+            <p>
+                {% trans "Every repetitive task takes time away from the work that moves your business forward. OnWebApp connects your workflows, websites, and business systems to reduce manual effort, minimize errors, and help your teams operate more efficiently." %}
+            </p>
+            <p>
+                {% trans "From everyday tasks to complex, cross-system processes, build a more connected business that runs with greater consistency, visibility, and control." %}
+            </p>
         </div>
-        <div class="ax-grid ax-grid--4">
-            <div class="ax-card">
-                <div class="ax-card__icon ax-card__icon--violet"><i class="fas fa-bullhorn" aria-hidden="true"></i></div>
-                <h3 class="ax-card__title">{% trans "Marketing &amp; Customer Experience" %}</h3>
-                <p class="ax-card__body">{% trans "Streamline lead capture, organize customer data, and connect marketing tools to keep information moving across your workflows." %}</p>
-            </div>
-            <div class="ax-card">
-                <div class="ax-card__icon ax-card__icon--indigo"><i class="fas fa-handshake" aria-hidden="true"></i></div>
-                <h3 class="ax-card__title">{% trans "Sales &amp; CRM" %}</h3>
-                <p class="ax-card__body">{% trans "Automate lead routing, follow-up tasks, and CRM updates so your team can spend less time on administration and more time building customer relationships." %}</p>
-            </div>
-            <div class="ax-card">
-                <div class="ax-card__icon ax-card__icon--blue"><i class="fas fa-dollar-sign" aria-hidden="true"></i></div>
-                <h3 class="ax-card__title">{% trans "Finance &amp; Administration" %}</h3>
-                <p class="ax-card__body">{% trans "Simplify invoice handling, recurring reports, and data transfers to reduce manual processing and improve operational accuracy." %}</p>
-            </div>
-            <div class="ax-card">
-                <div class="ax-card__icon ax-card__icon--gold"><i class="fas fa-gears" aria-hidden="true"></i></div>
-                <h3 class="ax-card__title">{% trans "Operations &amp; IT" %}</h3>
-                <p class="ax-card__body">{% trans "Coordinate recurring jobs, synchronize business systems, and monitor automated processes to keep day-to-day operations running smoothly." %}</p>
-            </div>
+
+        <div class="oa-impact-list">
+            <article>
+                <span>01</span>
+                <div>
+                    <h3>{% trans "Marketing &amp; Customer Experience" %}</h3>
+                    <p>
+                        {% trans "Streamline lead capture, organize customer data, and connect marketing tools to keep information moving across your workflows." %}
+                    </p>
+                </div>
+            </article>
+
+            <article>
+                <span>02</span>
+                <div>
+                    <h3>{% trans "Sales &amp; CRM" %}</h3>
+                    <p>
+                        {% trans "Automate lead routing, follow-up tasks, and CRM updates so your team can spend less time on administration and more time building customer relationships." %}
+                    </p>
+                </div>
+            </article>
+
+            <article>
+                <span>03</span>
+                <div>
+                    <h3>{% trans "Finance &amp; Administration" %}</h3>
+                    <p>
+                        {% trans "Simplify invoice handling, recurring reports, and data transfers to reduce manual processing and improve operational accuracy." %}
+                    </p>
+                </div>
+            </article>
+
+            <article>
+                <span>04</span>
+                <div>
+                    <h3>{% trans "Operations &amp; IT" %}</h3>
+                    <p>
+                        {% trans "Coordinate recurring jobs, synchronize business systems, and monitor automated processes to keep day-to-day operations running smoothly." %}
+                    </p>
+                </div>
+            </article>
         </div>
-        <div class="ax-payoff-close">
-            <p><strong>{% trans "Built Around Your Business" %}</strong> {% trans "Start with one time-consuming task, connect the tools you already use, and expand automation as your business grows." %}</p>
-        </div>
+
+        <p class="oa-bottom-note">
+            <strong>{% trans "Built around your business." %}</strong>
+            {% trans "Start with one time-consuming task, connect the tools you already use, and expand automation as your business grows." %}
+        </p>
     </div>
 </section>
 
-<!-- AUTOMATION SOLUTIONS -->
-<section class="ax-sec ax-sec--soft">
+<!-- AUTOMATION TECHNOLOGIES -->
+<section class="oa-section oa-section--ink">
     <div class="wrap">
-        <div class="ax-center">
-            <span class="ax-label ax-label--indigo">{% trans "Automation Solutions" %}</span>
-            <h2 class="ax-h2">{% trans "The Main Automation Technologies" %}</h2>
-            <p class="ax-lead">{% trans "OnWebApp combines the core automation technologies — robotic, intelligent, business process, and digital process automation — so you can match the right approach to each task, from simple data entry to complex, cross-system workflows." %}</p>
+        <div class="oa-section-head oa-section-head--light">
+            <span class="oa-kicker">{% trans "Automation Solutions" %}</span>
+            <h2 class="oa-heading">
+                {% trans "The technologies behind better processes." %}
+            </h2>
+            <p>
+                {% trans "OnWebApp combines the core automation technologies — robotic, intelligent, business process, and digital process automation — so you can match the right approach to each task, from simple data entry to complex, cross-system workflows." %}
+            </p>
         </div>
-        <div class="ax-grid ax-grid--4">
-            <div class="ax-card">
-                <div class="ax-card__icon ax-card__icon--violet"><i class="fas fa-robot" aria-hidden="true"></i></div>
-                <h3 class="ax-card__title">{% trans "Robotic Process Automation (RPA)" %}</h3>
-                <p class="ax-card__body">{% trans "Automate repetitive, rule-based tasks by simulating user interactions with websites and software interfaces. Examples include data entry, report generation, and transferring information between systems." %}</p>
-            </div>
-            <div class="ax-card">
-                <div class="ax-card__icon ax-card__icon--indigo"><i class="fas fa-brain" aria-hidden="true"></i></div>
-                <h3 class="ax-card__title">{% trans "Intelligent Process Automation (IPA)" %}</h3>
-                <p class="ax-card__body">{% trans "Combine automation with AI to process unstructured information, classify customer requests, analyze sentiment, and support more complex decisions." %}</p>
-            </div>
-            <div class="ax-card">
-                <div class="ax-card__icon ax-card__icon--blue"><i class="fas fa-diagram-project" aria-hidden="true"></i></div>
-                <h3 class="ax-card__title">{% trans "Business Process Automation (BPA)" %}</h3>
-                <p class="ax-card__body">{% trans "Coordinate multi-step business operations across departments and applications, from lead management to finance and operational workflows." %}</p>
-            </div>
-            <div class="ax-card">
-                <div class="ax-card__icon ax-card__icon--gold"><i class="fas fa-arrows-spin" aria-hidden="true"></i></div>
-                <h3 class="ax-card__title">{% trans "Digital Process Automation (DPA)" %}</h3>
-                <p class="ax-card__body">{% trans "Connect digital workflows, applications, and human approvals to manage end-to-end processes across teams." %}</p>
-            </div>
+
+        <div class="oa-tech-list">
+            <article>
+                <span>01</span>
+                <div>
+                    <h3>{% trans "Robotic Process Automation (RPA)" %}</h3>
+                    <p>
+                        {% trans "Automate repetitive, rule-based tasks by simulating user interactions with websites and software interfaces. Examples include data entry, report generation, and transferring information between systems." %}
+                    </p>
+                </div>
+            </article>
+
+            <article>
+                <span>02</span>
+                <div>
+                    <h3>{% trans "Intelligent Process Automation (IPA)" %}</h3>
+                    <p>
+                        {% trans "Combine automation with AI to process unstructured information, classify customer requests, analyze sentiment, and support more complex decisions." %}
+                    </p>
+                </div>
+            </article>
+
+            <article>
+                <span>03</span>
+                <div>
+                    <h3>{% trans "Business Process Automation (BPA)" %}</h3>
+                    <p>
+                        {% trans "Coordinate multi-step business operations across departments and applications, from lead management to finance and operational workflows." %}
+                    </p>
+                </div>
+            </article>
+
+            <article>
+                <span>04</span>
+                <div>
+                    <h3>{% trans "Digital Process Automation (DPA)" %}</h3>
+                    <p>
+                        {% trans "Connect digital workflows, applications, and human approvals to manage end-to-end processes across teams." %}
+                    </p>
+                </div>
+            </article>
         </div>
     </div>
 </section>
 
 <!-- WORKFLOW & TASK AUTOMATION -->
-<section class="ax-sec">
+<section class="oa-section oa-section--mist">
     <div class="wrap">
-        <div class="ax-center">
-            <span class="ax-label">{% trans "Workflow &amp; Task Automation" %}</span>
-            <h2 class="ax-h2">{% trans "Build Workflows Around How Your Business Works" %}</h2>
-            <p class="ax-lead ax-lead--wide">{% trans "Build workflows around your business processes instead of handling repetitive work manually." %}</p>
+        <div class="oa-section-head">
+            <span class="oa-kicker">{% trans "Workflow &amp; Task Automation" %}</span>
+            <h2 class="oa-heading">
+                {% trans "Build workflows around how your business works." %}
+            </h2>
+            <p>
+                {% trans "Build workflows around your business processes instead of handling repetitive work manually." %}
+            </p>
         </div>
-        <div class="ax-grid ax-grid--3">
-            <div class="ax-card">
-                <div class="ax-card__icon ax-card__icon--violet"><i class="fas fa-list-check" aria-hidden="true"></i></div>
-                <h3 class="ax-card__title">{% trans "Repetitive Task Automation" %}</h3>
-                <p class="ax-card__body">{% trans "Automate routine activities such as data entry, data transfers, file processing, and report creation." %}</p>
+
+        <div class="oa-workflow">
+            <div class="oa-workflow__visual">
+                <div class="oa-workflow__node">
+                    <span>{% trans "Trigger" %}</span>
+                    <strong>{% trans "New lead received" %}</strong>
+                </div>
+
+                <div class="oa-workflow__line"></div>
+
+                <div class="oa-workflow__node">
+                    <span>{% trans "Action" %}</span>
+                    <strong>{% trans "Create CRM record" %}</strong>
+                </div>
+
+                <div class="oa-workflow__line"></div>
+
+                <div class="oa-workflow__node">
+                    <span>{% trans "Outcome" %}</span>
+                    <strong>{% trans "Notify the team" %}</strong>
+                </div>
             </div>
-            <div class="ax-card">
-                <div class="ax-card__icon ax-card__icon--indigo"><i class="fas fa-route" aria-hidden="true"></i></div>
-                <h3 class="ax-card__title">{% trans "Customer Journey Automation" %}</h3>
-                <p class="ax-card__body">{% trans "Create customized workflows that respond to customer actions, guide prospects through defined steps, and support consistent customer experiences." %}</p>
-            </div>
-            <div class="ax-card">
-                <div class="ax-card__icon ax-card__icon--blue"><i class="fas fa-tasks" aria-hidden="true"></i></div>
-                <h3 class="ax-card__title">{% trans "Predefined Business Journeys" %}</h3>
-                <p class="ax-card__body">{% trans "Configure repeatable workflows with predefined triggers, actions, and conditions so business processes follow consistent rules." %}</p>
-                <div class="ax-ex"><strong>{% trans "Example:" %}</strong> {% trans "When a new lead submits a website form, automatically classify the lead, create a CRM record, and notify the relevant team." %}</div>
+
+            <div class="oa-workflow__copy">
+                <article>
+                    <span>01</span>
+                    <div>
+                        <h3>{% trans "Repetitive Task Automation" %}</h3>
+                        <p>
+                            {% trans "Automate routine activities such as data entry, data transfers, file processing, and report creation." %}
+                        </p>
+                    </div>
+                </article>
+
+                <article>
+                    <span>02</span>
+                    <div>
+                        <h3>{% trans "Customer Journey Automation" %}</h3>
+                        <p>
+                            {% trans "Create customized workflows that respond to customer actions, guide prospects through defined steps, and support consistent customer experiences." %}
+                        </p>
+                    </div>
+                </article>
+
+                <article>
+                    <span>03</span>
+                    <div>
+                        <h3>{% trans "Predefined Business Journeys" %}</h3>
+                        <p>
+                            {% trans "Configure repeatable workflows with predefined triggers, actions, and conditions so business processes follow consistent rules." %}
+                        </p>
+                        <p class="oa-example">
+                            <strong>{% trans "Example" %}</strong> —
+                            {% trans "When a new lead submits a website form, automatically classify the lead, create a CRM record, and notify the relevant team." %}
+                        </p>
+                    </div>
+                </article>
             </div>
         </div>
     </div>
 </section>
 
-<!-- CUSTOMER SERVICE AUTOMATION -->
-<section class="ax-sec ax-sec--soft">
+<!-- CUSTOMER SERVICE -->
+<section class="oa-section oa-section--white">
     <div class="wrap">
-        <div class="ax-center">
-            <span class="ax-label ax-label--indigo">{% trans "Customer Service Automation" %}</span>
-            <h2 class="ax-h2">{% trans "Faster Responses, Better Supported Customers" %}</h2>
-            <p class="ax-lead ax-lead--wide">{% trans "Improve response times and help teams manage customer requests more efficiently." %}</p>
+        <div class="oa-section-head oa-section-head--left">
+            <span class="oa-kicker">{% trans "Customer Service Automation" %}</span>
+            <h2 class="oa-heading">
+                {% trans "Faster responses. Better supported customers." %}
+            </h2>
+            <p>
+                {% trans "Improve response times and help teams manage customer requests more efficiently." %}
+            </p>
         </div>
-        <div class="ax-grid ax-grid--4">
-            <div class="ax-card">
-                <div class="ax-card__icon ax-card__icon--violet"><i class="fas fa-comments" aria-hidden="true"></i></div>
-                <h3 class="ax-card__title">{% trans "AI Chatbots" %}</h3>
-                <p class="ax-card__body">{% trans "Answer common questions using natural language processing and direct customers to relevant services or employees." %}</p>
-            </div>
-            <div class="ax-card">
-                <div class="ax-card__icon ax-card__icon--indigo"><i class="fas fa-book-open" aria-hidden="true"></i></div>
-                <h3 class="ax-card__title">{% trans "Self-Service Knowledge Base" %}</h3>
-                <p class="ax-card__body">{% trans "Organize product and service information into a centralized digital knowledge library that customers can access when needed." %}</p>
-            </div>
-            <div class="ax-card">
-                <div class="ax-card__icon ax-card__icon--blue"><i class="fas fa-bell" aria-hidden="true"></i></div>
-                <h3 class="ax-card__title">{% trans "Proactive Support &amp; Escalation" %}</h3>
-                <p class="ax-card__body">{% trans "Track unresolved issues, trigger follow-ups, and notify senior staff when requests require additional attention." %}</p>
-            </div>
-            <div class="ax-card">
-                <div class="ax-card__icon ax-card__icon--gold"><i class="fas fa-filter" aria-hidden="true"></i></div>
-                <h3 class="ax-card__title">{% trans "Lead Qualification" %}</h3>
-                <p class="ax-card__body">{% trans "Classify incoming prospects according to predefined criteria and automatically create or update CRM records." %}</p>
-            </div>
+
+        <div class="oa-service-grid">
+            <article>
+                <span>01</span>
+                <h3>{% trans "AI Chatbots" %}</h3>
+                <p>
+                    {% trans "Answer common questions using natural language processing and direct customers to relevant services or employees." %}
+                </p>
+            </article>
+
+            <article>
+                <span>02</span>
+                <h3>{% trans "Self-Service Knowledge Base" %}</h3>
+                <p>
+                    {% trans "Organize product and service information into a centralized digital knowledge library that customers can access when needed." %}
+                </p>
+            </article>
+
+            <article>
+                <span>03</span>
+                <h3>{% trans "Proactive Support &amp; Escalation" %}</h3>
+                <p>
+                    {% trans "Track unresolved issues, trigger follow-ups, and notify senior staff when requests require additional attention." %}
+                </p>
+            </article>
+
+            <article>
+                <span>04</span>
+                <h3>{% trans "Lead Qualification" %}</h3>
+                <p>
+                    {% trans "Classify incoming prospects according to predefined criteria and automatically create or update CRM records." %}
+                </p>
+            </article>
         </div>
     </div>
 </section>
 
-<!-- AUTOMATED DASHBOARDS & REPORTING -->
-<section class="ax-sec">
-    <div class="wrap">
-        <div class="ax-center">
-            <span class="ax-label">{% trans "Automated Dashboards &amp; Reporting" %}</span>
-            <h2 class="ax-h2">{% trans "One Clear View of Your Business Data" %}</h2>
-            <p class="ax-lead ax-lead--wide">{% trans "Bring information from different systems into one clear, actionable view." %}</p>
+<!-- DASHBOARDS -->
+<section class="oa-section oa-section--lavender">
+    <div class="wrap oa-dashboard">
+        <div>
+            <span class="oa-kicker">{% trans "Automated Dashboards &amp; Reporting" %}</span>
+            <h2 class="oa-heading">
+                {% trans "One clear view of your business data." %}
+            </h2>
+            <p>
+                {% trans "Bring information from different systems into one clear, actionable view." %}
+            </p>
+            <a href="{% url 'home:dashboard_development' %}" class="oa-text-link">
+                {% trans "Explore Custom Dashboard Development" %}
+                <i class="fas fa-arrow-right"></i>
+            </a>
         </div>
-        <div class="ax-grid ax-grid--2">
-            <div class="ax-card">
-                <h3 class="ax-card__title">{% trans "Key capabilities" %}</h3>
-                <ul class="ax-n-list">
-                    <li>{% trans "Automated data collection from multiple sources." %}</li>
-                    <li>{% trans "Scheduled CSV, Excel, and PDF report generation." %}</li>
-                    <li>{% trans "Data consolidation and dashboard updates." %}</li>
-                    <li>{% trans "Automated email distribution of reports." %}</li>
-                    <li>{% trans "Centralized business performance tracking." %}</li>
-                </ul>
-            </div>
-            <div class="ax-card">
-                <h3 class="ax-card__title">{% trans "Practical example" %}</h3>
-                <p class="ax-card__body">{% trans "Collect daily sales figures and marketing metrics, combine them in one dashboard, and automatically deliver a report to managers every morning." %}</p>
-            </div>
-        </div>
-        <div class="ax-cta-center">
-            <a href="{% url 'home:dashboard_development' %}" class="ax-btn ax-btn--outline">{% trans "Explore Custom Dashboard Development" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+
+        <div class="oa-dashboard__content">
+            <h3>{% trans "From scattered data to shared insight" %}</h3>
+            <ul>
+                <li>{% trans "Automated data collection from multiple sources" %}</li>
+                <li>{% trans "Scheduled CSV, Excel, and PDF report generation" %}</li>
+                <li>{% trans "Data consolidation and dashboard updates" %}</li>
+                <li>{% trans "Automated email distribution of reports" %}</li>
+                <li>{% trans "Centralized business performance tracking" %}</li>
+            </ul>
+            <p class="oa-example">
+                <strong>{% trans "Practical example" %}</strong> —
+                {% trans "Collect daily sales figures and marketing metrics, combine them in one dashboard, and automatically deliver a report to managers every morning." %}
+            </p>
         </div>
     </div>
 </section>
 
-<!-- SOCIAL MEDIA AUTOMATION -->
-<section class="ax-sec" id="social-media">
-    <div class="wrap">
-        <div class="ax-center">
-            <span class="ax-label ax-label--indigo">{% trans "Social Media Automation" %}</span>
-            <h2 class="ax-h2">{% trans "Less Admin Across Every Account" %}</h2>
-            <p class="ax-lead ax-lead--wide">{% trans "Reduce repetitive administrative work involved in managing multiple social media accounts." %}</p>
+<!-- SOCIAL MEDIA -->
+<section class="oa-section oa-section--white">
+    <div class="wrap oa-image-split">
+        <div class="oa-image-split__image">
+            <img src="{% static 'img/webs.jpeg' %}"
+                 alt="{% trans 'Social media automation across connected accounts' %}"
+                 loading="lazy">
         </div>
-        <div class="ax-figure">
-            <img src="{% static 'img/webs.jpeg' %}" alt="{% trans 'Social media automation across connected accounts' %}" loading="lazy">
-        </div>
-        <div class="ax-ex ax-ex--wide">
-            <p><strong>{% trans "Practical example:" %}</strong> {% trans "A marketing team schedules a week's content and receives daily engagement reports without manually checking every account." %}</p>
+
+        <div class="oa-image-split__copy">
+            <span class="oa-kicker">{% trans "Social Media Automation" %}</span>
+            <h2 class="oa-heading">
+                {% trans "Less admin across every account." %}
+            </h2>
+            <p>
+                {% trans "Reduce repetitive administrative work involved in managing multiple social media accounts." %}
+            </p>
+            <p class="oa-example">
+                <strong>{% trans "Practical example" %}</strong> —
+                {% trans "A marketing team schedules a week's content and receives daily engagement reports without manually checking every account." %}
+            </p>
         </div>
     </div>
 </section>
 
-<!-- WEB SECURITY AUTOMATION -->
-<section class="ax-sec">
-    <div class="wrap">
-        <div class="ax-center">
-            <span class="ax-label">{% trans "Web Security Automation" %}</span>
-            <h2 class="ax-h2">{% trans "Automated Monitoring and Response Workflows" %}</h2>
-            <p class="ax-lead ax-lead--wide">{% trans "Automate selected security monitoring and response workflows to help teams identify potential issues faster." %}</p>
+<!-- SECURITY -->
+<section class="oa-section oa-section--mist">
+    <div class="wrap oa-security">
+        <div>
+            <span class="oa-kicker">{% trans "Web Security Automation" %}</span>
+            <h2 class="oa-heading">
+                {% trans "Automated monitoring and response workflows." %}
+            </h2>
+            <p>
+                {% trans "Automate selected security monitoring and response workflows to help teams identify potential issues faster." %}
+            </p>
         </div>
-        <div class="ax-grid ax-grid--narrow">
-            <div class="ax-card">
-                <ul class="ax-n-list ax-n-list--lg">
-                    <li>{% trans "Monitor defined security events." %}</li>
-                    <li>{% trans "Detect anomalous activity using appropriate detection systems." %}</li>
-                    <li>{% trans "Trigger alerts when predefined risk conditions occur." %}</li>
-                    <li>{% trans "Route incidents to the relevant team for investigation." %}</li>
-                </ul>
-            </div>
-        </div>
-        <p class="ax-note">{% trans "Security detection capabilities depend on the available monitoring tools, integrations, and configured rules." %}</p>
+
+        <ul>
+            <li>{% trans "Monitor defined security events." %}</li>
+            <li>{% trans "Detect anomalous activity using appropriate detection systems." %}</li>
+            <li>{% trans "Trigger alerts when predefined risk conditions occur." %}</li>
+            <li>{% trans "Route incidents to the relevant team for investigation." %}</li>
+        </ul>
+
+        <p class="oa-footnote">
+            {% trans "Security detection capabilities depend on the available monitoring tools, integrations, and configured rules." %}
+        </p>
     </div>
 </section>
 
-<!-- SOLUTIONS BY INDUSTRY -->
-<section class="ax-sec">
+<!-- INDUSTRIES -->
+<section class="oa-section oa-section--white">
     <div class="wrap">
-        <div class="ax-center">
-            <span class="ax-label">{% trans "Solutions by Industry" %}</span>
-            <h2 class="ax-h2">{% trans "Business Areas Can Use Automation Solutions" %}</h2>
-            <p class="ax-lead">{% trans "Regardless of your industry, OnWebApp's Digital Workforce can adhere to strict governance and compliance standards without limiting productivity." %}</p>
+        <div class="oa-section-head">
+            <span class="oa-kicker">{% trans "Solutions by Industry" %}</span>
+            <h2 class="oa-heading">
+                {% trans "Automation across business environments." %}
+            </h2>
+            <p>
+                {% trans "Regardless of your industry, OnWebApp's Digital Workforce can adhere to strict governance and compliance standards without limiting productivity." %}
+            </p>
         </div>
-        <div class="ax-figure">
-            <img src="{% static 'img/Solutions.png' %}" alt="{% trans 'OnWebApp automation solutions across industries' %}" loading="lazy">
-        </div>
+
+        <figure class="oa-industry-image">
+            <img src="{% static 'img/Solutions.png' %}"
+                 alt="{% trans 'OnWebApp automation solutions across industries' %}"
+                 loading="lazy">
+        </figure>
     </div>
 </section>
 
-<!-- HOW ONWEBAPP AUTOMATION WORKS -->
-<section class="ax-sec ax-sec--soft" id="how-it-works">
+<!-- HOW IT WORKS -->
+<section class="oa-section oa-section--ink" id="how-it-works">
     <div class="wrap">
-        <div class="ax-center">
-            <span class="ax-label ax-label--indigo">{% trans "How OnWebApp Automation Works" %}</span>
-            <h2 class="ax-h2">{% trans "From Repetitive Task to Monitored Workflow" %}</h2>
-            <p class="ax-lead ax-lead--wide">{% trans "A clear, staged path — we identify the repetitive work worth automating, design the workflow around it, then build, validate, and improve it as your needs evolve." %}</p>
+        <div class="oa-section-head oa-section-head--light">
+            <span class="oa-kicker">{% trans "How OnWebApp Automation Works" %}</span>
+            <h2 class="oa-heading">
+                {% trans "From repetitive task to monitored workflow." %}
+            </h2>
+            <p>
+                {% trans "A clear, staged path — we identify the repetitive work worth automating, design the workflow around it, then build, validate, and improve it as your needs evolve." %}
+            </p>
         </div>
-        <ol class="ax-steps">
-            <li class="ax-step">
-                <span class="ax-step__n" aria-hidden="true">1</span>
-                <h3>{% trans "Discover the process" %}</h3>
-                <p>{% trans "Identify repetitive tasks, bottlenecks, existing tools, and business requirements." %}</p>
+
+        <ol class="oa-process">
+            <li>
+                <span>01</span>
+                <div>
+                    <h3>{% trans "Discover the process" %}</h3>
+                    <p>
+                        {% trans "Identify repetitive tasks, bottlenecks, existing tools, and business requirements." %}
+                    </p>
+                </div>
             </li>
-            <li class="ax-step">
-                <span class="ax-step__n" aria-hidden="true">2</span>
-                <h3>{% trans "Design the workflow" %}</h3>
-                <p>{% trans "Define triggers, conditions, actions, integrations, and exception-handling rules." %}</p>
+
+            <li>
+                <span>02</span>
+                <div>
+                    <h3>{% trans "Design the workflow" %}</h3>
+                    <p>
+                        {% trans "Define triggers, conditions, actions, integrations, and exception-handling rules." %}
+                    </p>
+                </div>
             </li>
-            <li class="ax-step">
-                <span class="ax-step__n" aria-hidden="true">3</span>
-                <h3>{% trans "Build and integrate" %}</h3>
-                <p>{% trans "Configure the appropriate automation technology and connect the required applications or systems." %}</p>
+
+            <li>
+                <span>03</span>
+                <div>
+                    <h3>{% trans "Build and integrate" %}</h3>
+                    <p>
+                        {% trans "Configure the appropriate automation technology and connect the required applications or systems." %}
+                    </p>
+                </div>
             </li>
-            <li class="ax-step">
-                <span class="ax-step__n" aria-hidden="true">4</span>
-                <h3>{% trans "Test and validate" %}</h3>
-                <p>{% trans "Check workflow behavior, permissions, data accuracy, and failure scenarios." %}</p>
+
+            <li>
+                <span>04</span>
+                <div>
+                    <h3>{% trans "Test and validate" %}</h3>
+                    <p>
+                        {% trans "Check workflow behavior, permissions, data accuracy, and failure scenarios." %}
+                    </p>
+                </div>
             </li>
-            <li class="ax-step">
-                <span class="ax-step__n" aria-hidden="true">5</span>
-                <h3>{% trans "Monitor and improve" %}</h3>
-                <p>{% trans "Track executions, review errors, and refine the workflow as business needs evolve." %}</p>
+
+            <li>
+                <span>05</span>
+                <div>
+                    <h3>{% trans "Monitor and improve" %}</h3>
+                    <p>
+                        {% trans "Track executions, review errors, and refine the workflow as business needs evolve." %}
+                    </p>
+                </div>
             </li>
         </ol>
     </div>
 </section>
 
 <!-- CASE STUDY -->
-<section class="ax-sec ax-sec--case">
-    <div class="wrap ax-case">
-        <div class="ax-case__quote">
-            <i class="fas fa-quote-left" aria-hidden="true"></i>
-            <p>{% trans "Our previous system was holding us back." %}</p>
+<section class="oa-section oa-section--white">
+    <div class="wrap oa-case">
+        <div class="oa-case__quote">
+            <span class="oa-kicker">{% trans "Client perspective" %}</span>
+            <h2>{% trans "Our previous system was holding us back." %}</h2>
+            <p>{% trans "Athmr Industrial Company" %}</p>
         </div>
-        <div class="ax-case__body">
-            <p>{% trans "Athmr Industrial Company used OnWebApp automation to revolutionize its operations. It enabled the creation of dynamic forms with digital signatures, significantly improving the user experience and boosting the efficiency of the financial aid department." %}</p>
-            <blockquote>{% trans "&ldquo;OnWebApp has transformed the way we manage forms and processes. We've already seen improvements in efficiency, and this is just the beginning. We look forward to leveraging OnWebApp automation in more departments in the future.&rdquo;" %}</blockquote>
-            <p class="ax-case__cite">{% trans "A software analyst at Athmr" %}</p>
-            <a href="{% url 'home:testimonials' %}" class="ax-btn ax-btn--outline">{% trans "Read Athmr's story" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+
+        <div class="oa-case__content">
+            <p>
+                {% trans "Athmr Industrial Company used OnWebApp automation to revolutionize its operations. It enabled the creation of dynamic forms with digital signatures, significantly improving the user experience and boosting the efficiency of the financial aid department." %}
+            </p>
+
+            <blockquote>
+                {% trans "&ldquo;OnWebApp has transformed the way we manage forms and processes. We've already seen improvements in efficiency, and this is just the beginning. We look forward to leveraging OnWebApp automation in more departments in the future.&rdquo;" %}
+            </blockquote>
+
+            <p class="oa-case__cite">{% trans "A software analyst at Athmr" %}</p>
+
+            <a href="{% url 'home:testimonials' %}" class="oa-text-link">
+                {% trans "Read Athmr's story" %}
+                <i class="fas fa-arrow-right"></i>
+            </a>
         </div>
     </div>
 </section>
 
-<!-- MANAGED AUTOMATION PLANS -->
-<section class="ax-sec ax-sec--soft" id="pricing">
+<!-- PRICING -->
+<section class="oa-section oa-section--mist" id="pricing">
     <div class="wrap">
-        <div class="ax-center">
-            <span class="ax-label ax-label--indigo">{% trans "Managed Automation Plans" %}</span>
-            <h2 class="ax-h2">{% trans "Automation That Scales With Your Business" %}</h2>
-            <p class="ax-lead">{% trans "From your first automated workflow to complex business operations, OnWebApp builds, monitors, and maintains automation solutions tailored to your needs." %}</p>
+        <div class="oa-section-head">
+            <span class="oa-kicker">{% trans "Managed Automation Plans" %}</span>
+            <h2 class="oa-heading">
+                {% trans "Automation that scales with your business." %}
+            </h2>
+            <p>
+                {% trans "From your first automated workflow to complex business operations, OnWebApp builds, monitors, and maintains automation solutions tailored to your needs." %}
+            </p>
         </div>
 
-        <div class="ax-pricing-grid">
-            <article class="ax-pricing-card">
-                <div class="ax-pricing-card__header">
-                    <span class="ax-pricing-card__tag">{% trans "Starter" %}</span>
-                    <h3>$29<span>{% trans "/month" %}</span></h3>
-                    <p class="ax-pricing-card__desc">{% trans "Essential automation for small businesses." %}</p>
-                </div>
-                <ul class="ax-pricing-card__list">
+        <div class="oa-pricing">
+
+            <article>
+                <span class="oa-plan-name">{% trans "Starter" %}</span>
+                <p class="oa-price">$29<span>{% trans "/month" %}</span></p>
+                <p class="oa-plan-desc">
+                    {% trans "Essential automation for small businesses." %}
+                </p>
+
+                <ul>
                     <li>{% trans "Up to 3 active workflows" %}</li>
                     <li>{% trans "1,000 workflow executions/month" %}</li>
                     <li>{% trans "Email and webhook triggers" %}</li>
                     <li>{% trans "Basic workflow monitoring" %}</li>
                     <li>{% trans "Standard maintenance and support" %}</li>
                 </ul>
-                <a href="{% url 'automation:request_form' %}" class="ax-btn ax-btn--outline ax-pricing-card__cta">{% trans "Get Started" %}</a>
+
+                <a href="{% url 'automation:request_form' %}" class="oa-btn oa-btn--outline">
+                    {% trans "Get Started" %}
+                </a>
             </article>
 
-            <article class="ax-pricing-card ax-pricing-card--featured">
-                <div class="ax-pricing-card__header">
-                    <span class="ax-pricing-card__tag">{% trans "Enterprise" %}</span>
-                    <h3>$199<span>{% trans "/month" %}</span></h3>
-                    <p class="ax-pricing-card__desc">{% trans "Advanced automation for connected business operations." %}</p>
-                </div>
-                <ul class="ax-pricing-card__list">
+            <article class="oa-pricing__featured">
+                <span class="oa-plan-name">{% trans "Enterprise" %}</span>
+                <p class="oa-price">$199<span>{% trans "/month" %}</span></p>
+                <p class="oa-plan-desc">
+                    {% trans "Advanced automation for connected business operations." %}
+                </p>
+
+                <ul>
                     <li>{% trans "Up to 25 active workflows" %}</li>
                     <li>{% trans "30,000 workflow executions/month" %}</li>
                     <li>{% trans "ERP, CRM, and API integrations" %}</li>
@@ -531,16 +843,20 @@
                     <li>{% trans "Priority support and maintenance" %}</li>
                     <li>{% trans "Workflow performance optimization" %}</li>
                 </ul>
-                <a href="{% url 'automation:request_form' %}" class="ax-btn ax-btn--primary ax-pricing-card__cta">{% trans "Choose Enterprise" %}</a>
+
+                <a href="{% url 'automation:request_form' %}" class="oa-btn oa-btn--primary">
+                    {% trans "Choose Enterprise" %}
+                </a>
             </article>
 
-            <article class="ax-pricing-card">
-                <div class="ax-pricing-card__header">
-                    <span class="ax-pricing-card__tag">{% trans "Custom" %}</span>
-                    <h3 class="ax-pricing-card__price-text">{% trans "Tailored Pricing" %}</h3>
-                    <p class="ax-pricing-card__desc">{% trans "Automation solutions designed around your business requirements." %}</p>
-                </div>
-                <ul class="ax-pricing-card__list">
+            <article>
+                <span class="oa-plan-name">{% trans "Custom" %}</span>
+                <p class="oa-price oa-price--custom">{% trans "Tailored Pricing" %}</p>
+                <p class="oa-plan-desc">
+                    {% trans "Automation solutions designed around your business requirements." %}
+                </p>
+
+                <ul>
                     <li>{% trans "Custom workflow limits and execution volumes" %}</li>
                     <li>{% trans "Tailored RPA and business process automation" %}</li>
                     <li>{% trans "Complex integrations and multi-system orchestration" %}</li>
@@ -549,244 +865,1182 @@
                     <li>{% trans "Flexible service-level agreements (SLAs)" %}</li>
                     <li>{% trans "A solution designed around your infrastructure" %}</li>
                 </ul>
-                <a href="{% url 'home:rpa_solutions' %}#consultation" class="ax-btn ax-btn--outline ax-pricing-card__cta">{% trans "Discuss Your Project" %}</a>
+
+                <a href="{% url 'home:rpa_solutions' %}#consultation" class="oa-btn oa-btn--outline">
+                    {% trans "Discuss Your Project" %}
+                </a>
             </article>
+
         </div>
     </div>
 </section>
 
 <!-- FINAL CTA -->
-<section class="ax-sec ax-sec--dark">
-    <div class="wrap ax-center">
-        <span class="ax-label ax-label--light">{% trans "Automate Your Business Processes" %}</span>
-        <h2 class="ax-h2 ax-h2--light">{% trans "Ready to Eliminate Repetitive Work?" %}</h2>
-        <p class="ax-lead ax-lead--dark">{% trans "Tell us how your business operates. We'll help identify the right automation approach, connect your existing systems, and design workflows around your needs." %}</p>
-        <div class="ax-hero__actions ax-hero__actions--center">
-            <a href="{% url 'contact:contact' %}" class="ax-btn ax-btn--primary">{% trans "Book a Consultation" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
-            <a href="{% url 'home:rpa_solutions' %}#consultation" class="ax-btn ax-btn--dark-ghost">{% trans "Discuss Your Workflow" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+<section class="oa-final">
+    <div class="wrap">
+        <span class="oa-kicker">{% trans "Automate Your Business Processes" %}</span>
+
+        <h2>{% trans "Ready to eliminate repetitive work?" %}</h2>
+
+        <p>
+            {% trans "Tell us how your business operates. We'll help identify the right automation approach, connect your existing systems, and design workflows around your needs." %}
+        </p>
+
+        <div class="oa-actions">
+            <a href="{% url 'contact:contact' %}" class="oa-btn oa-btn--primary">
+                {% trans "Book a Consultation" %}
+                <i class="fas fa-arrow-right"></i>
+            </a>
+
+            <a href="{% url 'home:rpa_solutions' %}#consultation" class="oa-btn oa-btn--dark">
+                {% trans "Discuss Your Workflow" %}
+            </a>
         </div>
     </div>
 </section>
+
 {% endblock %}
+
 
 {% block extra_css %}
 {% include 'automation/_ax_styles.html' %}
+
 <style>
-    /* ---- Page-scoped additions for the "Why Automation, Why Now" section ---- */
-    .ax-chal-h{font-family:'Fraunces',Georgia,serif;font-size:clamp(1.15rem,2vw,1.4rem);font-weight:500;color:var(--ax-ink);letter-spacing:-.01em;margin:2.75rem 0 1.25rem}
-    .ax-chal{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.1rem 2.25rem}
-    .ax-chal li{display:flex;align-items:flex-start;gap:.7rem;font-size:.92rem;color:var(--ax-body);line-height:1.7}
-    .ax-chal li i{flex:0 0 auto;margin-top:.35rem;width:18px;height:18px;border-radius:50%;background:rgba(124,58,237,.1);color:var(--ax-violet);font-size:.58rem;display:inline-flex;align-items:center;justify-content:center}
-    .ax-chal strong{color:var(--ax-ink);font-weight:700}
-    @media(max-width:767px){
-        .ax-chal{grid-template-columns:1fr}
-        .ax-chal-h{margin-top:2.25rem}
+:root {
+    --oa-violet: #7654d6;
+    --oa-violet-dark: #5636b4;
+    --oa-ink: #111827;
+    --oa-body: #596273;
+    --oa-muted: #8791a1;
+    --oa-line: #e7e9ef;
+    --oa-mist: #f7f7fb;
+    --oa-lavender: #f1effb;
+}
+
+/* GENERAL */
+.oa-section {
+    padding: clamp(4.5rem, 8vw, 7.5rem) 0;
+    overflow: hidden;
+}
+
+.oa-section--white { background: #fff; }
+.oa-section--mist { background: var(--oa-mist); }
+.oa-section--lavender { background: var(--oa-lavender); }
+
+.oa-section--ink {
+    background: #111827;
+    color: #fff;
+}
+
+.oa-kicker {
+    display: inline-block;
+    color: #7654d6;
+    font-size: .72rem;
+    font-weight: 800;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+}
+
+.oa-heading {
+    font-size: clamp(1.9rem, 3.8vw, 3.2rem);
+    line-height: 1.12;
+    letter-spacing: -.05em;
+    color: var(--oa-ink);
+    font-weight: 650;
+    margin: .9rem 0 1.3rem;
+}
+
+/* HERO */
+.oa-hero {
+    position: relative;
+    isolation: isolate;
+    min-height: 660px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    background: #111827;
+    color: #fff;
+}
+
+.oa-hero__visual {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background:
+        linear-gradient(
+            90deg,
+            rgba(12,16,31,.97) 0%,
+            rgba(12,16,31,.91) 48%,
+            rgba(12,16,31,.45) 100%
+        ),
+        url("{% static 'img/entreprise.png' %}") center/cover no-repeat;
+}
+
+.oa-hero:after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    width: 520px;
+    height: 520px;
+    right: 4%;
+    top: 8%;
+    border: 1px solid rgba(196,181,253,.2);
+    border-radius: 50%;
+    box-shadow:
+        0 0 0 70px rgba(196,181,253,.035),
+        0 0 0 140px rgba(196,181,253,.025);
+}
+
+.oa-hero__inner {
+    padding-top: 7rem;
+    padding-bottom: 4rem;
+    position: relative;
+}
+
+.oa-eyebrow {
+    color: #c4b5fd;
+    margin-bottom: 1.8rem;
+    font-size: .72rem;
+    font-weight: 800;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    text-decoration: none;
+}
+
+.oa-hero h1 {
+    max-width: 850px;
+    font-size: clamp(2.6rem, 6vw, 5.2rem);
+    line-height: 1.02;
+    letter-spacing: -.06em;
+    font-weight: 700;
+    margin: 0 0 1.6rem;
+    color: #fff;
+}
+
+.oa-hero__lead {
+    max-width: 660px;
+    color: #d0d5df;
+    font-size: clamp(.94rem, 1.35vw, 1.1rem);
+    line-height: 1.75;
+    margin: 0;
+}
+
+.oa-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 2.1rem;
+}
+
+.oa-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .65rem;
+    min-height: 48px;
+    padding: .8rem 1.25rem;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: .86rem;
+    font-weight: 700;
+    transition: transform .2s, background .2s;
+}
+
+.oa-btn:hover {
+    transform: translateY(-2px);
+}
+
+.oa-btn--primary {
+    background: var(--oa-violet);
+    color: #fff;
+    border: 1px solid var(--oa-violet);
+}
+
+.oa-btn--primary:hover {
+    background: var(--oa-violet-dark);
+    color: #fff;
+}
+
+.oa-btn--light {
+    color: #fff;
+    border: 1px solid rgba(255,255,255,.32);
+    background: transparent;
+}
+
+.oa-btn--dark {
+    color: #fff;
+    border: 1px solid rgba(255,255,255,.35);
+    background: transparent;
+}
+
+.oa-btn--outline {
+    color: var(--oa-violet-dark);
+    border: 1px solid rgba(118,84,214,.45);
+    background: transparent;
+}
+
+.oa-text-link {
+    display: inline-flex;
+    gap: .65rem;
+    align-items: center;
+    color: var(--oa-violet-dark);
+    font-size: .9rem;
+    font-weight: 750;
+    text-decoration: none;
+}
+
+.oa-text-link:hover { color: #39218e; }
+.oa-text-link--light { color: #fff; }
+
+.oa-hero__foot {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    margin-top: 5rem;
+    padding-top: 1.2rem;
+    border-top: 1px solid rgba(255,255,255,.2);
+    color: #c1c7d2;
+    font-size: .75rem;
+    letter-spacing: .04em;
+}
+
+/* INTRODUCTION */
+.oa-intro-grid {
+    display: grid;
+    grid-template-columns: .95fr 1.05fr;
+    gap: clamp(3rem, 8vw, 8rem);
+    align-items: start;
+}
+
+.oa-intro-copy { padding-top: 2.1rem; }
+
+.oa-intro-copy p,
+.oa-section-head > p,
+.oa-enterprise-intro > p,
+.oa-impact-intro > p,
+.oa-dashboard > div > p,
+.oa-image-split__copy > p,
+.oa-security > div > p {
+    font-size: .93rem;
+    line-height: 1.8;
+    color: var(--oa-body);
+    margin: 0 0 1rem;
+}
+
+.oa-emphasis {
+    padding-left: 1.2rem;
+    border-left: 3px solid var(--oa-violet);
+    font-weight: 700;
+    color: var(--oa-ink) !important;
+}
+
+.oa-challenges { margin-top: 5rem; }
+
+.oa-challenges h3 {
+    font-size: 1.18rem;
+    color: var(--oa-ink);
+    margin: 0 0 1.5rem;
+}
+
+.oa-challenge-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    border-top: 1px solid var(--oa-line);
+}
+
+.oa-challenge-grid > div {
+    display: flex;
+    gap: 1.2rem;
+    padding: 1.45rem 1rem 1.45rem 0;
+    border-bottom: 1px solid var(--oa-line);
+}
+
+.oa-challenge-grid > div:nth-child(odd) {
+    margin-right: 2rem;
+}
+
+.oa-challenge-grid span,
+.oa-index {
+    font-size: .75rem;
+    font-weight: 800;
+    color: var(--oa-violet);
+    letter-spacing: .08em;
+}
+
+.oa-challenge-grid p {
+    margin: 0;
+    color: var(--oa-body);
+    font-size: .84rem;
+    line-height: 1.68;
+}
+
+.oa-challenge-grid strong {
+    display: block;
+    color: var(--oa-ink);
+    margin-bottom: .25rem;
+}
+
+/* SECTION HEADINGS */
+.oa-section-head {
+    max-width: 780px;
+    text-align: center;
+    margin: 0 auto 3.5rem;
+}
+
+.oa-section-head .oa-heading {
+    margin: .8rem 0 1rem;
+}
+
+.oa-section-head > p {
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.oa-section-head--left {
+    text-align: left;
+    margin-left: 0;
+}
+
+.oa-section-head--left > p {
+    margin-left: 0;
+}
+
+/* MAIN CAPABILITY VISUALS */
+.oa-capability-feature {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.2rem;
+}
+
+.oa-capability {
+    position: relative;
+    min-height: 440px;
+    overflow: hidden;
+    color: #fff;
+    text-decoration: none;
+    background: #20243a;
+}
+
+.oa-capability:after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        0deg,
+        rgba(10,14,29,.92),
+        rgba(10,14,29,.04) 75%
+    );
+}
+
+.oa-capability img {
+    width: 100%;
+    height: 100%;
+    min-height: 440px;
+    object-fit: cover;
+    transition: transform .7s;
+}
+
+.oa-capability:hover img { transform: scale(1.04); }
+
+.oa-capability__overlay {
+    position: absolute;
+    z-index: 1;
+    left: 2rem;
+    right: 2rem;
+    bottom: 2rem;
+}
+
+.oa-capability__overlay > span:first-child {
+    font-size: .72rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: #c4b5fd;
+    font-weight: 800;
+}
+
+.oa-capability h3 {
+    font-size: clamp(1.4rem, 2.4vw, 2rem);
+    line-height: 1.14;
+    max-width: 440px;
+    margin: .8rem 0 1.2rem;
+    color: #fff;
+}
+
+.oa-arrow {
+    font-size: .82rem;
+    font-weight: 700;
+}
+
+/* EDITORIAL SERVICE ROWS */
+.oa-editorial-list { border-top: 1px solid var(--oa-line); }
+
+.oa-editorial-row {
+    display: grid;
+    grid-template-columns: minmax(220px, .72fr) 1.28fr;
+    gap: clamp(2rem, 6vw, 6rem);
+    padding: 2.6rem 0;
+    border-bottom: 1px solid var(--oa-line);
+    align-items: center;
+}
+
+.oa-editorial-row__visual {
+    height: 260px;
+    overflow: hidden;
+    background: #f0eff6;
+}
+
+.oa-editorial-row__visual img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform .6s;
+}
+
+.oa-editorial-row:hover img { transform: scale(1.035); }
+
+.oa-editorial-row__content { max-width: 720px; }
+
+.oa-editorial-row h3,
+.oa-enterprise-list h3,
+.oa-impact-list h3,
+.oa-tech-list h3,
+.oa-service-grid h3 {
+    font-size: 1.2rem;
+    letter-spacing: -.025em;
+    color: var(--oa-ink);
+    margin: .45rem 0 .65rem;
+}
+
+.oa-editorial-row p,
+.oa-editorial-row li,
+.oa-enterprise-list p,
+.oa-impact-list p,
+.oa-tech-list p,
+.oa-service-grid p {
+    font-size: .85rem;
+    line-height: 1.75;
+    color: var(--oa-body);
+}
+
+.oa-editorial-row ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .35rem 1.5rem;
+    padding-left: 1.1rem;
+    margin: .6rem 0;
+}
+
+.oa-example {
+    font-size: .83rem !important;
+    color: #596273 !important;
+    padding: .8rem 1rem;
+    border-left: 2px solid #a78bfa;
+    background: #f7f5fc;
+    margin-top: 1rem !important;
+}
+
+.oa-example strong { color: var(--oa-ink); }
+.oa-inline-cta { margin-top: 2rem; }
+
+/* ENTERPRISE */
+.oa-enterprise-intro {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5rem;
+    align-items: end;
+    margin-bottom: 3rem;
+}
+
+.oa-enterprise-intro .oa-heading { margin-bottom: 0; }
+.oa-enterprise-intro > p { margin: 0; }
+
+.oa-enterprise-list {
+    border-top: 1px solid rgba(86,54,180,.2);
+}
+
+.oa-enterprise-list article {
+    display: grid;
+    grid-template-columns: 50px 1fr 50px;
+    gap: 1.4rem;
+    align-items: start;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid rgba(86,54,180,.2);
+}
+
+.oa-enterprise-list article > span,
+.oa-impact-list article > span,
+.oa-tech-list article > span {
+    font-size: .78rem;
+    color: var(--oa-violet-dark);
+    font-weight: 800;
+    padding-top: .35rem;
+}
+
+.oa-enterprise-list h3 { margin: 0 0 .4rem; }
+.oa-enterprise-list p { margin: 0; max-width: 780px; }
+
+.oa-enterprise-list article > i {
+    font-size: 1.25rem;
+    color: var(--oa-violet);
+    text-align: right;
+    padding-top: .35rem;
+}
+
+/* BUSINESS IMPACT */
+.oa-impact-intro {
+    max-width: 790px;
+    margin-bottom: 3rem;
+}
+
+.oa-impact-intro .oa-heading { max-width: 700px; }
+
+.oa-impact-list { border-top: 1px solid var(--oa-line); }
+
+.oa-impact-list article {
+    display: grid;
+    grid-template-columns: 70px 1fr;
+    gap: 1.2rem;
+    padding: 1.35rem 0;
+    border-bottom: 1px solid var(--oa-line);
+}
+
+.oa-impact-list h3 { margin: 0 0 .3rem; }
+.oa-impact-list p { margin: 0; max-width: 800px; }
+
+.oa-bottom-note {
+    margin: 2rem 0 0;
+    color: var(--oa-body);
+    font-size: .9rem;
+}
+
+.oa-bottom-note strong { color: var(--oa-ink); }
+
+/* DARK TECHNOLOGY SECTION */
+.oa-section-head--light .oa-heading { color: #fff; }
+.oa-section-head--light > p { color: #b9c0ce; }
+.oa-section--ink .oa-kicker { color: #c4b5fd; }
+
+.oa-tech-list {
+    border-top: 1px solid rgba(255,255,255,.18);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 4rem;
+}
+
+.oa-tech-list article {
+    display: grid;
+    grid-template-columns: 42px 1fr;
+    gap: 1rem;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid rgba(255,255,255,.18);
+}
+
+.oa-tech-list article > span {
+    color: #c4b5fd;
+    font-size: .8rem;
+    font-weight: 800;
+}
+
+.oa-tech-list h3 {
+    color: #fff;
+    margin: 0 0 .45rem;
+}
+
+.oa-tech-list p {
+    color: #b9c0ce;
+    margin: 0;
+}
+
+/* WORKFLOW */
+.oa-workflow {
+    display: grid;
+    grid-template-columns: .8fr 1.2fr;
+    gap: clamp(3rem, 8vw, 8rem);
+    align-items: center;
+}
+
+.oa-workflow__visual {
+    padding: 2rem;
+    background: #171c2c;
+    border-radius: 3px;
+    box-shadow: 0 24px 60px rgba(24,18,57,.12);
+}
+
+.oa-workflow__node {
+    padding: 1.1rem 1.2rem;
+    border: 1px solid rgba(196,181,253,.3);
+    background: rgba(255,255,255,.04);
+    color: #fff;
+}
+
+.oa-workflow__node span {
+    display: block;
+    font-size: .67rem;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+    color: #c4b5fd;
+    margin-bottom: .35rem;
+}
+
+.oa-workflow__node strong {
+    font-size: 1rem;
+    font-weight: 650;
+}
+
+.oa-workflow__line {
+    height: 28px;
+    width: 1px;
+    background: #9b83e8;
+    margin: 0 auto;
+}
+
+.oa-workflow__copy article {
+    display: grid;
+    grid-template-columns: 38px 1fr;
+    gap: 1rem;
+    padding: 1.15rem 0;
+    border-bottom: 1px solid var(--oa-line);
+}
+
+.oa-workflow__copy article:first-child {
+    border-top: 1px solid var(--oa-line);
+}
+
+.oa-workflow__copy article > span {
+    font-size: .75rem;
+    color: var(--oa-violet);
+    font-weight: 800;
+}
+
+.oa-workflow__copy h3 {
+    font-size: 1.05rem;
+    color: var(--oa-ink);
+    margin: 0 0 .35rem;
+}
+
+.oa-workflow__copy p {
+    font-size: .84rem;
+    line-height: 1.7;
+    color: var(--oa-body);
+    margin: 0;
+}
+
+/* CUSTOMER SERVICE */
+.oa-service-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border-top: 1px solid var(--oa-line);
+}
+
+.oa-service-grid article {
+    padding: 1.5rem 1.25rem 0 0;
+    border-right: 1px solid var(--oa-line);
+    margin-right: 1.25rem;
+}
+
+.oa-service-grid article:last-child {
+    border: 0;
+    margin: 0;
+}
+
+.oa-service-grid article > span {
+    font-size: .75rem;
+    color: var(--oa-violet);
+    font-weight: 800;
+}
+
+.oa-service-grid h3 {
+    font-size: 1.04rem;
+    margin: .8rem 0 .45rem;
+}
+
+.oa-service-grid p {
+    font-size: .84rem;
+    margin: 0;
+}
+
+/* DASHBOARD */
+.oa-dashboard {
+    display: grid;
+    grid-template-columns: .9fr 1.1fr;
+    gap: 5rem;
+    align-items: center;
+}
+
+.oa-dashboard .oa-heading {
+    font-size: clamp(1.9rem, 3.2vw, 2.8rem);
+}
+
+.oa-dashboard__content {
+    padding: 2rem 2.2rem;
+    background: #fff;
+    border-left: 3px solid var(--oa-violet);
+}
+
+.oa-dashboard__content h3 {
+    font-size: 1.12rem;
+    color: var(--oa-ink);
+    margin: 0 0 1rem;
+}
+
+.oa-dashboard__content ul {
+    padding: 0;
+    list-style: none;
+    margin: 0;
+}
+
+.oa-dashboard__content li {
+    padding: .65rem 0;
+    border-bottom: 1px solid var(--oa-line);
+    font-size: .84rem;
+    color: var(--oa-body);
+}
+
+.oa-dashboard__content li:before {
+    content: "—";
+    color: var(--oa-violet);
+    margin-right: .7rem;
+}
+
+/* IMAGE SPLIT */
+.oa-image-split {
+    display: grid;
+    grid-template-columns: 1.15fr .85fr;
+    gap: clamp(3rem, 7vw, 7rem);
+    align-items: center;
+}
+
+.oa-image-split__image { height: 430px; }
+
+.oa-image-split__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.oa-image-split__copy .oa-heading {
+    font-size: clamp(1.75rem, 3.2vw, 2.7rem);
+}
+
+/* SECURITY */
+.oa-security {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem 5rem;
+    align-items: center;
+}
+
+.oa-security ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border-top: 1px solid var(--oa-line);
+}
+
+.oa-security li {
+    padding: .9rem 0;
+    border-bottom: 1px solid var(--oa-line);
+    font-size: .86rem;
+    color: var(--oa-body);
+}
+
+.oa-security li:before {
+    content: "✓";
+    color: var(--oa-violet);
+    font-weight: 800;
+    margin-right: .8rem;
+}
+
+.oa-footnote {
+    grid-column: 1/-1;
+    color: var(--oa-muted);
+    font-size: .78rem;
+    margin: 0;
+}
+
+/* INDUSTRIES */
+.oa-industry-image {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.oa-industry-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* PROCESS */
+.oa-process {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    border-top: 1px solid rgba(255,255,255,.2);
+}
+
+.oa-process li {
+    padding: 1.5rem 1.2rem 0 0;
+    margin-right: 1.2rem;
+    border-right: 1px solid rgba(255,255,255,.16);
+}
+
+.oa-process li:last-child {
+    border: 0;
+    margin: 0;
+}
+
+.oa-process li > span {
+    font-size: .8rem;
+    color: #c4b5fd;
+    font-weight: 800;
+}
+
+.oa-process h3 {
+    font-size: 1rem;
+    color: #fff;
+    margin: .9rem 0 .45rem;
+}
+
+.oa-process p {
+    font-size: .82rem;
+    line-height: 1.7;
+    color: #b9c0ce;
+    margin: 0;
+}
+
+/* CASE STUDY */
+.oa-case {
+    display: grid;
+    grid-template-columns: .75fr 1.25fr;
+    gap: 6rem;
+    align-items: start;
+}
+
+.oa-case__quote h2 {
+    font-size: clamp(1.75rem, 3vw, 2.6rem);
+    line-height: 1.14;
+    letter-spacing: -.04em;
+    color: var(--oa-ink);
+    margin: 1rem 0;
+}
+
+.oa-case__quote > p {
+    font-size: .8rem;
+    color: var(--oa-muted);
+}
+
+.oa-case__content > p,
+.oa-case blockquote {
+    font-size: .94rem;
+    line-height: 1.8;
+    color: var(--oa-body);
+}
+
+.oa-case blockquote {
+    border-left: 3px solid var(--oa-violet);
+    padding: .3rem 0 .3rem 1.5rem;
+    margin: 1.5rem 0;
+    color: var(--oa-ink);
+    font-family: Georgia, serif;
+    font-size: 1.04rem;
+}
+
+.oa-case__cite {
+    font-size: .8rem !important;
+    color: var(--oa-muted) !important;
+}
+
+/* PRICING */
+.oa-pricing {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    border-top: 1px solid var(--oa-line);
+    border-bottom: 1px solid var(--oa-line);
+}
+
+.oa-pricing article {
+    padding: 2rem 2rem 2.2rem 0;
+    margin-right: 2rem;
+    border-right: 1px solid var(--oa-line);
+    display: flex;
+    flex-direction: column;
+}
+
+.oa-pricing article:last-child {
+    border: 0;
+    margin: 0;
+    padding-right: 0;
+}
+
+.oa-pricing__featured {
+    position: relative;
+}
+
+.oa-pricing__featured:before {
+    content: "";
+    position: absolute;
+    top: -2px;
+    left: 0;
+    right: 2rem;
+    height: 3px;
+    background: var(--oa-violet);
+}
+
+.oa-plan-name {
+    font-size: .75rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--oa-violet-dark);
+    font-weight: 800;
+}
+
+.oa-price {
+    font-size: 3rem;
+    letter-spacing: -.06em;
+    color: var(--oa-ink);
+    font-weight: 700;
+    margin: .8rem 0;
+}
+
+.oa-price span {
+    font-size: .85rem;
+    letter-spacing: 0;
+    color: var(--oa-muted);
+    font-weight: 500;
+}
+
+.oa-price--custom { font-size: 2.2rem; }
+
+.oa-plan-desc {
+    font-size: .84rem;
+    color: var(--oa-body);
+    min-height: 48px;
+}
+
+.oa-pricing ul {
+    list-style: none;
+    padding: 1rem 0 1.5rem;
+    margin: 0;
+    flex: 1;
+}
+
+.oa-pricing li {
+    padding: .55rem 0;
+    font-size: .8rem;
+    color: var(--oa-body);
+    border-bottom: 1px solid rgba(231,233,239,.75);
+}
+
+.oa-pricing li:before {
+    content: "✓";
+    color: var(--oa-violet);
+    margin-right: .6rem;
+    font-weight: 800;
+}
+
+.oa-pricing .oa-btn { align-self: flex-start; }
+
+/* FINAL CTA */
+.oa-final {
+    padding: clamp(5rem, 9vw, 8rem) 0;
+    background: #111827;
+    color: #fff;
+    text-align: center;
+}
+
+.oa-final .oa-kicker { color: #c4b5fd; }
+
+.oa-final h2 {
+    max-width: 850px;
+    margin: 1rem auto;
+    font-size: clamp(2.05rem, 4.4vw, 3.7rem);
+    line-height: 1.06;
+    letter-spacing: -.05em;
+    color: #fff;
+}
+
+.oa-final > div > p {
+    max-width: 700px;
+    margin: 0 auto;
+    color: #c1c7d2;
+    line-height: 1.8;
+}
+
+.oa-final .oa-actions { justify-content: center; }
+
+/* TABLET */
+@media (max-width: 991px) {
+    .oa-hero { min-height: 600px; }
+
+    .oa-enterprise-intro,
+    .oa-dashboard {
+        gap: 2.5rem;
     }
 
-    /* ---- Design: #website-automation (editorial capability cards) + #enterprise-automation (ax-feat card grid) ---- */
-    /* Website Automation: crisp white cards on the tinted canvas */
-    #website-automation .ax-grid--2{gap:1.5rem}
-    #website-automation .ax-card.ax-card--media{
-        background:#fff;border:1px solid rgba(15,23,42,.07);border-radius:18px;
-        box-shadow:0 12px 32px rgba(15,23,42,.06);
-    }
-    #website-automation .ax-card.ax-card--media:hover{
-        border-color:rgba(124,58,237,.3);
-        box-shadow:0 24px 52px rgba(15,23,42,.14);
-    }
-    /* Compact media banner with a numbered chip */
-    #website-automation .ax-card__media{height:185px;margin:0;border-radius:0}
-    #website-automation .ax-card__media-shade{background:linear-gradient(to top,rgba(15,23,42,.82) 0%,rgba(15,23,42,.2) 58%,rgba(15,23,42,.02) 100%)}
-    #website-automation .ax-card__media-title{left:1.4rem;right:1.4rem;bottom:1.1rem;font-size:1.18rem}
-    #website-automation .wa-card__num{
-        position:absolute;top:1rem;left:1.4rem;z-index:2;
-        display:inline-flex;align-items:center;justify-content:center;
-        min-width:36px;height:36px;padding:0 .6rem;border-radius:50px;
-        background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.38);
-        -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
-        font-family:'Fraunces',Georgia,serif;font-size:.85rem;font-weight:600;color:#fff;letter-spacing:.04em;
-    }
-    /* Evenly padded, bottom-aligned card body */
-    #website-automation .wa-card__body{padding:1.5rem 1.6rem 1.7rem;display:flex;flex-direction:column;flex:1}
-    #website-automation .wa-card__body .ax-card__body{margin:0 0 .9rem}
-    #website-automation .wa-card__body .ax-n-list{margin-top:0}
-    #website-automation .wa-card__body .ax-ex{margin-top:auto}
-
-    /* ---- Design: #capabilities (same white editorial cards as Website Automation) ---- */
-    #capabilities .ax-grid--2{gap:1.5rem}
-    #capabilities .ax-card.ax-card--media{
-        background:#fff;border:1px solid rgba(15,23,42,.07);border-radius:18px;
-        box-shadow:0 12px 32px rgba(15,23,42,.06);
-    }
-    #capabilities .ax-card.ax-card--media:hover{
-        border-color:rgba(124,58,237,.3);
-        box-shadow:0 24px 52px rgba(15,23,42,.14);
-    }
-    #capabilities .ax-card__media{height:185px}
-    #capabilities .ax-card__media-shade{background:linear-gradient(to top,rgba(15,23,42,.82) 0%,rgba(15,23,42,.2) 58%,rgba(15,23,42,.02) 100%)}
-    #capabilities .ax-card__media-title{left:1.4rem;right:1.4rem;bottom:1.1rem;font-size:1.18rem}
-    #capabilities .cap-card__num{
-        position:absolute;top:1rem;left:1.4rem;z-index:2;
-        display:inline-flex;align-items:center;justify-content:center;
-        min-width:36px;height:36px;padding:0 .6rem;border-radius:50px;
-        background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.38);
-        -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
-        font-family:'Fraunces',Georgia,serif;font-size:.85rem;font-weight:600;color:#fff;letter-spacing:.04em;
-    }
-    #capabilities .ax-list--media{padding:1.5rem 1.6rem .85rem}
-    #capabilities .ax-card__more{padding:1rem 1.6rem 1.3rem}
-
-    /* Enterprise capabilities become a card grid on the section canvas */
-    #enterprise-automation .ax-feat__items{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
-    #enterprise-automation .ax-feat__item{
-        flex-direction:column;align-items:flex-start;gap:.8rem;
-        background:#fff;border:1px solid rgba(15,23,42,.07);border-radius:14px;
-        padding:1.3rem 1.25rem;
-        transition:border-color .25s,box-shadow .25s,transform .25s;
-    }
-    #enterprise-automation .ax-feat__item:hover{
-        border-color:rgba(124,58,237,.38);
-        box-shadow:0 14px 34px rgba(15,23,42,.08);
-        transform:translateY(-3px);
-    }
-    #enterprise-automation .ax-feat__item h3{font-size:1rem;letter-spacing:-.01em}
-    #enterprise-automation .ax-feat__item p{line-height:1.65}
-    /* Each section's single action reads as the primary CTA, centered under the grid */
-    #website-automation .ax-btn--outline,#enterprise-automation .ax-btn--outline{
-        background:linear-gradient(135deg,var(--ax-violet),var(--ax-violet-2));
-        border-color:transparent;color:#fff;box-shadow:0 6px 28px rgba(124,58,237,.35);
-    }
-    #website-automation .ax-btn--outline:hover,#enterprise-automation .ax-btn--outline:hover{
-        background:linear-gradient(135deg,var(--ax-violet),var(--ax-violet-2));
-        color:#fff;transform:translateY(-2px);box-shadow:0 10px 34px rgba(124,58,237,.45);
-    }
-    /* On wide screens the four enterprise capabilities sit in a single row of four */
-    @media(min-width:992px){
-        #enterprise-automation .ax-feat__items{grid-template-columns:repeat(4,minmax(0,1fr))}
-        #enterprise-automation .ax-feat__item h3{min-height:2.6em}
-    }
-    @media(max-width:575px){
-        #enterprise-automation .ax-feat__items{grid-template-columns:1fr}
-    }
-    @media(prefers-reduced-motion:reduce){
-        #website-automation .ax-btn--outline,#enterprise-automation .ax-feat__item,#enterprise-automation .ax-btn--outline{transition:none}
-        #website-automation .ax-btn--outline:hover,#enterprise-automation .ax-feat__item:hover,#enterprise-automation .ax-btn--outline:hover{transform:none}
+    .oa-process {
+        grid-template-columns: repeat(3, 1fr);
+        row-gap: 2rem;
     }
 
-    /* ---- Design: #payoff (centered header, two-paragraph lead, ax-grid--4 cards, closing line) ---- */
-    #payoff .ax-lead + .ax-lead{margin-top:1rem}
-    #payoff .ax-payoff-h{font-family:'Fraunces',Georgia,serif;font-size:clamp(1.15rem,2vw,1.4rem);font-weight:500;color:var(--ax-ink);letter-spacing:-.01em;margin:2.25rem auto 0;max-width:720px}
-    #payoff .ax-payoff-close{max-width:820px;margin:2rem auto 0;text-align:center}
-    #payoff .ax-payoff-close p{
-        display:inline-block;background:linear-gradient(135deg,rgba(124,58,237,.07),rgba(124,58,237,.02));
-        border:1px solid rgba(124,58,237,.16);border-radius:14px;
-        padding:1.1rem 1.6rem;margin:0;color:var(--ax-body);font-size:.92rem;line-height:1.7;
-    }
-    #payoff .ax-payoff-close strong{color:var(--ax-ink);font-weight:700}
-
-    /* ---- New catalog sections (Workflow, Customer Service, Dashboards, Social, Security, Departments, How It Works) ---- */
-    /* Bullet lists inside cards */
-    .ax-n-list{list-style:none;padding:0;margin:.85rem 0 0;display:flex;flex-direction:column;gap:.5rem}
-    .ax-n-list li{position:relative;padding-left:1.15rem;font-size:.85rem;color:var(--ax-body);line-height:1.6}
-    .ax-n-list li::before{content:"";position:absolute;left:0;top:.55em;width:6px;height:6px;border-radius:50%;background:var(--ax-violet)}
-    .ax-n-list--lg{margin-top:0;gap:.7rem}
-    .ax-n-list--lg li{font-size:.9rem}
-    /* Example callout inside a card */
-    .ax-ex{
-        margin-top:1rem;padding:.85rem 1.1rem;border-radius:10px;font-size:.82rem;line-height:1.65;
-        background:linear-gradient(135deg,rgba(124,58,237,.07),rgba(124,58,237,.02));
-        border-left:3px solid var(--ax-violet);color:var(--ax-body);
-    }
-    .ax-ex strong{color:var(--ax-ink);font-weight:700}
-    /* Full-width example block (under a grid) */
-    .ax-ex--wide{max-width:820px;margin:1.75rem auto 0;text-align:center;border-left:0;border:1px solid rgba(124,58,237,.16);border-radius:14px;padding:1.1rem 1.6rem}
-    .ax-ex--wide p{margin:0}
-    /* General centered CTA (dashboard section) */
-    .ax-cta-center{text-align:center;margin-top:1.75rem}
-    /* Social Media Automation: white canvas so the image blends in, smaller figure */
-    #social-media .ax-figure{max-width:640px}
-    /* Numbered process steps */
-    .ax-steps{list-style:none;counter-reset:axstep;padding:0;margin:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1rem}
-    .ax-step{
-        counter-increment:axstep;position:relative;background:#fff;
-        border:1px solid rgba(15,23,42,.06);border-radius:14px;padding:1.5rem 1.25rem 1.35rem;
-    }
-    .ax-sec--soft .ax-step{background:#fff;border-color:rgba(15,23,42,.06)}
-    .ax-step__n{
-        display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;
-        border-radius:50%;background:linear-gradient(135deg,var(--ax-violet),var(--ax-violet-2));
-        color:#fff;font-weight:700;font-size:.95rem;margin-bottom:.9rem;
-    }
-    .ax-step h3{margin:0 0 .35rem;font-size:.95rem;color:var(--ax-ink);font-weight:700;line-height:1.3}
-    .ax-step p{margin:0;font-size:.83rem;color:var(--ax-body);line-height:1.6}
-    /* Light label on the dark final CTA */
-    .ax-label--light{color:#C4B5FD}
-    /* Responsive: new catalog pieces */
-    @media(max-width:991px){
-        .ax-steps{grid-template-columns:repeat(2,minmax(0,1fr))}
-    }
-    @media(max-width:575px){
-        .ax-steps{grid-template-columns:1fr}
-        .ax-ex--wide{padding:1rem 1.25rem}
+    .oa-service-grid {
+        grid-template-columns: repeat(2, 1fr);
+        row-gap: 2rem;
     }
 
-    /* ---- Reveal-on-scroll (page-scoped). The class is added by JS at the end of
-       the body; without JS the elements keep no hidden state and simply show.
-       The global IntersectionObserver in base.html toggles .is-visible. ---- */
-    .animate-on-scroll{
-        opacity:0;transform:translateY(26px);
-        transition:opacity .75s cubic-bezier(.22,1,.36,1),transform .75s cubic-bezier(.22,1,.36,1);
+    .oa-service-grid article:nth-child(2) {
+        border-right: 0;
+        margin-right: 0;
     }
-    .animate-on-scroll.is-visible{opacity:1;transform:none}
-    /* Horizontal reveals for split sections */
-    .ax-a-left{transform:translateX(-30px)}
-    .ax-a-right{transform:translateX(30px)}
-    /* Soft zoom for media */
-    .ax-a-zoom{transform:translateY(18px) scale(.965)}
-    /* Stagger steps (declared in ascending order so the highest wins) */
-    .ax-a-d1{transition-delay:.06s}
-    .ax-a-d2{transition-delay:.12s}
-    .ax-a-d3{transition-delay:.18s}
-    .ax-a-d4{transition-delay:.24s}
-    .ax-a-d5{transition-delay:.30s}
-    .ax-a-d6{transition-delay:.36s}
-    /* Reduced motion: show everything immediately, no movement */
-    @media(prefers-reduced-motion:reduce){
-        .animate-on-scroll{opacity:1!important;transform:none!important;transition:none!important}
+
+    .oa-pricing article {
+        margin-right: 1.2rem;
+        padding-right: 1.2rem;
     }
+
+    .oa-workflow { gap: 3rem; }
+}
+
+/* MOBILE */
+@media (max-width: 767px) {
+    .oa-section { padding: 4.2rem 0; }
+    .oa-hero__inner { padding-top: 6rem; }
+
+    .oa-hero h1 {
+        font-size: clamp(2.3rem, 10vw, 3.4rem);
+    }
+
+    .oa-hero__foot {
+        margin-top: 3rem;
+        gap: 1rem 1.4rem;
+    }
+
+    .oa-intro-grid,
+    .oa-enterprise-intro,
+    .oa-workflow,
+    .oa-dashboard,
+    .oa-image-split,
+    .oa-security,
+    .oa-case {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .oa-intro-copy { padding-top: 0; }
+
+    .oa-challenge-grid { grid-template-columns: 1fr; }
+
+    .oa-challenge-grid > div:nth-child(odd) {
+        margin-right: 0;
+    }
+
+    .oa-capability-feature { grid-template-columns: 1fr; }
+
+    .oa-capability,
+    .oa-capability img {
+        min-height: 340px;
+    }
+
+    .oa-editorial-row {
+        grid-template-columns: 1fr;
+        gap: 1.2rem;
+        padding: 2rem 0;
+    }
+
+    .oa-editorial-row__visual { height: 240px; }
+
+    .oa-tech-list { grid-template-columns: 1fr; }
+
+    .oa-service-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .oa-service-grid article {
+        border-right: 0;
+        margin-right: 0;
+        padding-right: 1rem;
+    }
+
+    .oa-dashboard__content { padding: 1.5rem; }
+    .oa-image-split__image { height: 300px; }
+
+    .oa-process { grid-template-columns: 1fr 1fr; }
+
+    .oa-process li { min-height: 150px; }
+
+    .oa-pricing { grid-template-columns: 1fr; }
+
+    .oa-pricing article,
+    .oa-pricing article:last-child {
+        margin: 0;
+        padding: 1.7rem 0;
+        border-right: 0;
+        border-bottom: 1px solid var(--oa-line);
+    }
+
+    .oa-pricing article:last-child { border-bottom: 0; }
+
+    .oa-pricing__featured:before { right: 0; }
+}
+
+/* SMALL MOBILE */
+@media (max-width: 480px) {
+    .oa-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .oa-actions .oa-btn,
+    .oa-actions .oa-text-link {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .oa-capability__overlay {
+        left: 1.3rem;
+        right: 1.3rem;
+        bottom: 1.5rem;
+    }
+
+    .oa-process { grid-template-columns: 1fr; }
+
+    .oa-process li {
+        min-height: 0;
+        padding: 1rem 0;
+        margin: 0;
+        border-right: 0;
+        border-bottom: 1px solid rgba(255,255,255,.16);
+    }
+
+    .oa-service-grid { grid-template-columns: 1fr; }
+
+    .oa-service-grid article {
+        padding: 1.2rem 0;
+        border-bottom: 1px solid var(--oa-line);
+    }
+
+    .oa-enterprise-list article {
+        grid-template-columns: 30px 1fr;
+    }
+
+    .oa-enterprise-list article > i { display: none; }
+
+    .oa-impact-list article { grid-template-columns: 38px 1fr; }
+}
+
+/* ACCESSIBILITY */
+@media (prefers-reduced-motion: reduce) {
+    .oa-btn,
+    .oa-capability img,
+    .oa-editorial-row__visual img {
+        transition: none;
+    }
+
+    .oa-btn:hover { transform: none; }
+}
 </style>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-(function(){
-    /* Respect the user's motion preference: reveal nothing, keep all content static. */
-    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    function add(el, mods){
-        if (!el) return;
-        el.classList.add('animate-on-scroll');
-        (mods || []).forEach(function(m){ if (m) el.classList.add(m); });
-    }
-    function stagger(box){
-        Array.prototype.forEach.call(box.children, function(child, i){
-            add(child, ['ax-a-d' + Math.min(i + 1, 6)]);
-        });
-    }
-    /* Hero + every centered section header: cascade the label / heading / lead. */
-    document.querySelectorAll('.ax-hero__inner, .ax-center').forEach(stagger);
-    /* Split sections: head slides in from the left, body from the right. */
-    document.querySelectorAll('.ax-split__head').forEach(function(el){ add(el, ['ax-a-left']); });
-    document.querySelectorAll('.ax-split__body').forEach(function(el){ add(el, ['ax-a-right']); });
-    /* Stagger the children of each card grid / list. */
-    ['.ax-grid', '.ax-pricing-grid', '.ax-steps', '.ax-chal', '.ax-feat__items'].forEach(function(sel){
-        document.querySelectorAll(sel).forEach(stagger);
-    });
-    /* Standalone blocks. */
-    document.querySelectorAll('.ax-callout, .ax-payoff-close, .ax-ex--wide, .ax-note, .ax-cta-center')
-        .forEach(function(el){ add(el); });
-    document.querySelectorAll('.ax-figure').forEach(function(el){ add(el, ['ax-a-zoom']); });
-    document.querySelectorAll('.ax-case__quote').forEach(function(el){ add(el, ['ax-a-left']); });
-    document.querySelectorAll('.ax-case__body').forEach(function(el){ add(el, ['ax-a-right']); });
-})();
-</script>
 {% endblock %}

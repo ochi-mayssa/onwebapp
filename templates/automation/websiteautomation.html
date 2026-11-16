@@ -118,24 +118,77 @@
     </div>
 </section>
 
-<!-- VISUAL WORKFLOW -->
-<section class="wa-flow-section" aria-labelledby="wa-flow-title">
-    <div class="wrap wa-flow-layout">
-        <div class="wa-flow-copy">
-            <span class="ax-label ax-label--indigo">{% trans "One Connected Workflow" %}</span>
-            <h2 id="wa-flow-title" class="ax-h2">{% trans "From the First Website Interaction to the Right Business Action" %}</h2>
-            <p>{% trans "A website request can become the starting point for a connected sequence: information is captured, systems are updated, and teams gain visibility into what happens next." %}</p>
-            <a href="{% url 'contact:contact' %}" class="wa-text-link">{% trans "Explore what can be connected" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+<!-- WORKFLOW MANAGEMENT -->
+<section class="ax-sec ax-sec--soft wa-wm-section" id="workflow-management" aria-labelledby="wa-wm-title">
+    <div class="wrap">
+        <div class="wa-wm-hero">
+            <div class="wa-wm-hero__copy">
+                <span class="ax-label ax-label--indigo">{% trans "Workflow Management" %}</span>
+                <h2 class="ax-h2" id="wa-wm-title">{% trans "Bring Structure to Every Business Process" %}</h2>
+                <p class="wa-wm-lead">{% trans "A website interaction is often only the beginning. Workflow management defines what happens next: which tasks are created, who is responsible, what rules guide each step, and how progress is followed through to completion." %}</p>
+                <p>{% trans "OnWebApp helps connect these processes with your website, business applications, teams, and operational information, creating a clearer way to coordinate everyday work." %}</p>
+                <a href="{% url 'contact:contact' %}" class="wa-text-link wa-text-link--light">{% trans "Discuss your workflow requirements" %} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+            </div>
+            <figure class="wa-wm-photo wa-wm-photo--main">
+                <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=85" alt="Team collaborating around a table to plan business processes" loading="lazy" width="1200" height="800">
+                <figcaption><span>{% trans "Connected teams" %}</span><span>{% trans "Clear process ownership" %}</span></figcaption>
+            </figure>
         </div>
-        <div class="wa-flow-art" role="img" aria-label="Website request connected to applications and business dashboard">
-            <div class="wa-flow-glow"></div>
-            <div class="wa-flow-node wa-flow-node--web"><span class="wa-flow-node__icon"><i class="fas fa-globe" aria-hidden="true"></i></span><strong>{% trans "Website" %}</strong><small>{% trans "New request" %}</small><span class="wa-flow-node__status"></span></div>
-            <div class="wa-flow-connector wa-flow-connector--one"><span></span></div>
-            <div class="wa-flow-node wa-flow-node--api"><span class="wa-flow-node__icon"><i class="fas fa-code-branch" aria-hidden="true"></i></span><strong>{% trans "Integration" %}</strong><small>{% trans "Data &amp; actions" %}</small><span class="wa-flow-node__status"></span></div>
-            <div class="wa-flow-connector wa-flow-connector--two"><span></span></div>
-            <div class="wa-flow-node wa-flow-node--data"><span class="wa-flow-node__icon"><i class="fas fa-chart-pie" aria-hidden="true"></i></span><strong>{% trans "Business view" %}</strong><small>{% trans "Visibility" %}</small><span class="wa-flow-node__status"></span></div>
-            <div class="wa-flow-caption"><i class="fas fa-circle-check" aria-hidden="true"></i> {% trans "Connected. Coordinated. Visible." %}</div>
+
+        <div class="wa-wm-lifecycle-block">
+            <div class="wa-wm-heading">
+                <span class="ax-label">{% trans "The Workflow Lifecycle" %}</span>
+                <h3>{% trans "From a Trigger to a Completed Process" %}</h3>
+                <p>{% trans "A workflow gives every action a place in the process, from the first event to the final outcome." %}</p>
+            </div>
+            <div class="wa-wm-lifecycle" aria-label="Workflow lifecycle: trigger, process, decision, execute and monitor">
+                <article class="wa-wm-step"><span class="wa-wm-step__number">01</span><span class="wa-wm-step__icon"><i class="fas fa-bolt" aria-hidden="true"></i></span><h4>{% trans "Trigger" %}</h4><p>{% trans "A form submission, request, or system event starts the process." %}</p></article>
+                <article class="wa-wm-step"><span class="wa-wm-step__number">02</span><span class="wa-wm-step__icon"><i class="fas fa-list-check" aria-hidden="true"></i></span><h4>{% trans "Process" %}</h4><p>{% trans "Tasks move through the stages defined for the business process." %}</p></article>
+                <article class="wa-wm-step"><span class="wa-wm-step__number">03</span><span class="wa-wm-step__icon"><i class="fas fa-code-branch" aria-hidden="true"></i></span><h4>{% trans "Decision" %}</h4><p>{% trans "Rules and approvals determine the appropriate next action." %}</p></article>
+                <article class="wa-wm-step"><span class="wa-wm-step__number">04</span><span class="wa-wm-step__icon"><i class="fas fa-gears" aria-hidden="true"></i></span><h4>{% trans "Execute" %}</h4><p>{% trans "People and connected systems complete their assigned actions." %}</p></article>
+                <article class="wa-wm-step"><span class="wa-wm-step__number">05</span><span class="wa-wm-step__icon"><i class="fas fa-chart-line" aria-hidden="true"></i></span><h4>{% trans "Monitor" %}</h4><p>{% trans "Progress, exceptions, and completion are visible to the team." %}</p></article>
+            </div>
         </div>
+
+        <div class="wa-wm-types-block">
+            <div class="wa-wm-types-copy">
+                <span class="ax-label ax-label--indigo">{% trans "Workflow Types" %}</span>
+                <h3>{% trans "Different Processes Need Different Execution Logic" %}</h3>
+                <p>{% trans "The right workflow structure depends on the order of tasks, the decisions involved, and whether people or systems need to act together." %}</p>
+                <figure class="wa-wm-photo wa-wm-photo--secondary">
+                    <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1000&q=85" alt="Business analytics dashboard displayed on a computer screen" loading="lazy" width="1000" height="700">
+                    <figcaption><span>{% trans "Process visibility" %}</span><span>{% trans "Operational insight" %}</span></figcaption>
+                </figure>
+            </div>
+            <div class="wa-wm-type-list">
+                <article class="wa-wm-type"><span>01</span><div><h4>{% trans "Sequential Workflows" %}</h4><p>{% trans "Tasks follow a defined order, with each step depending on the previous one." %}</p></div><i class="fas fa-arrow-right-long" aria-hidden="true"></i></article>
+                <article class="wa-wm-type"><span>02</span><div><h4>{% trans "Parallel Workflows" %}</h4><p>{% trans "Independent tasks run at the same time across different teams or systems." %}</p></div><i class="fas fa-code-branch" aria-hidden="true"></i></article>
+                <article class="wa-wm-type"><span>03</span><div><h4>{% trans "Conditional Workflows" %}</h4><p>{% trans "Rules and conditions direct a process toward the relevant next action." %}</p></div><i class="fas fa-filter" aria-hidden="true"></i></article>
+                <article class="wa-wm-type"><span>04</span><div><h4>{% trans "Approval Workflows" %}</h4><p>{% trans "Requests are reviewed by the appropriate person before proceeding." %}</p></div><i class="fas fa-user-check" aria-hidden="true"></i></article>
+                <article class="wa-wm-type"><span>05</span><div><h4>{% trans "Automated Workflows" %}</h4><p>{% trans "Repeatable actions are performed by connected applications using configured rules." %}</p></div><i class="fas fa-gears" aria-hidden="true"></i></article>
+                <article class="wa-wm-type"><span>06</span><div><h4>{% trans "Event-Driven Workflows" %}</h4><p>{% trans "A defined event, such as a website request or system update, starts a process." %}</p></div><i class="fas fa-bolt" aria-hidden="true"></i></article>
+            </div>
+        </div>
+
+        <div class="wa-wm-system">
+            <div class="wa-wm-system__intro">
+                <span class="ax-label ax-label--indigo">{% trans "Workflow Management System" %}</span>
+                <h3>{% trans "Coordinate Tasks, People, and Connected Systems" %}</h3>
+                <p>{% trans "A workflow management system provides a structured way to design processes, coordinate execution, and understand how work moves across your organization." %}</p>
+            </div>
+            <div class="wa-wm-system__image">
+                <img src="https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1200&q=85" alt="Colleagues reviewing project tasks and coordinating work" loading="lazy" width="1200" height="800">
+            </div>
+            <div class="wa-wm-capabilities">
+                <article><span><i class="fas fa-sitemap" aria-hidden="true"></i></span><h4>{% trans "Workflow Design" %}</h4><p>{% trans "Define process stages, triggers, rules, and completion criteria." %}</p></article>
+                <article><span><i class="fas fa-people-arrows-left-right" aria-hidden="true"></i></span><h4>{% trans "Task Assignment" %}</h4><p>{% trans "Route responsibilities to the appropriate people, teams, or systems." %}</p></article>
+                <article><span><i class="fas fa-gears" aria-hidden="true"></i></span><h4>{% trans "Process Automation" %}</h4><p>{% trans "Automate repeatable actions and coordinate connected applications." %}</p></article>
+                <article><span><i class="fas fa-chart-column" aria-hidden="true"></i></span><h4>{% trans "Progress Monitoring" %}</h4><p>{% trans "Follow workflow status, pending tasks, and process activity." %}</p></article>
+                <article><span><i class="fas fa-triangle-exclamation" aria-hidden="true"></i></span><h4>{% trans "Exception Handling" %}</h4><p>{% trans "Identify delays, failed steps, and cases that need human attention." %}</p></article>
+                <article><span><i class="fas fa-chart-pie" aria-hidden="true"></i></span><h4>{% trans "Performance Analysis" %}</h4><p>{% trans "Review process activity and identify opportunities to improve execution." %}</p></article>
+            </div>
+        </div>
+        <div class="wa-wm-distinction"><span><i class="fas fa-lightbulb" aria-hidden="true"></i> {% trans "A useful distinction" %}</span><p><strong>{% trans "Workflow management" %}</strong> {% trans "defines how a process moves from one step to another. Workload management focuses on the amount of work and the resources or capacity needed to handle it. Website automation connects website activity and systems that can initiate or support those processes." %}</p></div>
     </div>
 </section>
 
@@ -863,6 +916,75 @@
         .wa-hero-points{display:grid;grid-template-columns:1fr 1fr}
     }
 
+    /* ---- Workflow management: editorial lifecycle and capability layout ---- */
+    /* Workflow management — follows the page's existing editorial layout */
+    .wa-wm-section{background:linear-gradient(180deg,#F8F7FF 0%,#fff 100%)}
+    .wa-wm-hero{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:3.5rem;align-items:center}
+    .wa-wm-hero__copy .ax-h2{font-size:clamp(2rem,3.5vw,3.15rem);line-height:1.12;letter-spacing:-.04em;margin:.8rem 0 1rem;color:#20183B}
+    .wa-wm-hero__copy p{color:#665F78;line-height:1.85;font-size:.96rem}
+    .wa-wm-lead{font-size:1.02rem!important;color:#51466F!important}
+    .wa-wm-photo{position:relative;overflow:hidden;margin:0;border-radius:18px;background:#EDE9FE;isolation:isolate}
+    .wa-wm-photo:after{content:"";position:absolute;inset:45% 0 0;background:linear-gradient(180deg,transparent,rgba(20,14,43,.68));z-index:0;pointer-events:none}
+    .wa-wm-photo img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .7s cubic-bezier(.2,.8,.2,1)}
+    .wa-wm-photo:hover img{transform:scale(1.035)}
+    .wa-wm-photo--main{height:390px;box-shadow:0 22px 55px rgba(37,24,74,.12)}
+    .wa-wm-photo--secondary{height:230px;margin-top:1.8rem}
+    .wa-wm-photo figcaption{position:absolute;z-index:1;left:1.1rem;right:1.1rem;bottom:1rem;display:flex;justify-content:space-between;gap:.75rem;color:#fff;font-size:.72rem;font-weight:700;letter-spacing:.02em}
+    .wa-wm-photo figcaption span+span{color:rgba(255,255,255,.76);font-weight:600}
+    .wa-wm-lifecycle-block{margin-top:5.5rem}
+    .wa-wm-heading{max-width:700px;margin:0 auto 2rem;text-align:center}
+    .wa-wm-heading h3,.wa-wm-types-copy h3,.wa-wm-system__intro h3{margin:.65rem 0 .8rem;color:#20183B;font-size:clamp(1.7rem,2.7vw,2.45rem);line-height:1.2;letter-spacing:-.035em}
+    .wa-wm-heading p,.wa-wm-types-copy>p,.wa-wm-system__intro p{color:#706981;line-height:1.8;font-size:.92rem}
+    .wa-wm-lifecycle{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1.4rem;border-top:1px solid #E4DDF3;border-bottom:1px solid #E4DDF3;padding:1.7rem 0}
+    .wa-wm-step{position:relative;min-width:0;padding:.25rem .35rem}
+    .wa-wm-step:not(:last-child):after{content:"";position:absolute;top:1.55rem;right:-.9rem;width:1.1rem;height:1px;background:#C4B5FD}
+    .wa-wm-step__number{display:block;color:#8B5CF6;font-size:.72rem;font-weight:800;letter-spacing:.08em;margin-bottom:.8rem}
+    .wa-wm-step__icon{display:grid;place-items:center;width:42px;height:42px;border-radius:13px;background:#F0EBFF;color:#6D28D9;font-size:.95rem;margin-bottom:.85rem}
+    .wa-wm-step h4{margin:0 0 .4rem;color:#30264F;font-size:.95rem}
+    .wa-wm-step p{margin:0;color:#766F87;font-size:.8rem;line-height:1.65}
+    .wa-wm-types-block{display:grid;grid-template-columns:minmax(0,.78fr) minmax(0,1.22fr);gap:4rem;align-items:start;margin-top:5.5rem}
+    .wa-wm-types-copy{max-width:440px}
+    .wa-wm-type-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:2rem;border-top:1px solid #E4DDF3}
+    .wa-wm-type{display:grid;grid-template-columns:30px 1fr 16px;align-items:start;gap:.7rem;padding:1.15rem 0;border-bottom:1px solid #E4DDF3;min-width:0}
+    .wa-wm-type>span{font-size:.72rem;font-weight:800;color:#8B5CF6;padding-top:.2rem}
+    .wa-wm-type h4{margin:0 0 .35rem;color:#30264F;font-size:.9rem}
+    .wa-wm-type p{margin:0;color:#766F87;font-size:.78rem;line-height:1.65}
+    .wa-wm-type>i{color:#A78BFA;font-size:.75rem;margin-top:.25rem}
+    .wa-wm-system{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:1.5rem 3rem;align-items:center;margin-top:5.5rem;padding-top:3.5rem;border-top:1px solid #E4DDF3}
+    .wa-wm-system__intro{max-width:480px}
+    .wa-wm-system__image{height:250px;overflow:hidden;border-radius:18px;background:#EDE9FE}
+    .wa-wm-system__image img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .7s ease}
+    .wa-wm-system__image:hover img{transform:scale(1.035)}
+    .wa-wm-capabilities{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:2.5rem;row-gap:1.8rem;margin-top:.8rem}
+    .wa-wm-capabilities article{padding-top:1.1rem;border-top:1px solid #E4DDF3}
+    .wa-wm-capabilities article>span{display:grid;place-items:center;width:36px;height:36px;border-radius:11px;background:#F0EBFF;color:#6D28D9;margin-bottom:.7rem}
+    .wa-wm-capabilities h4{margin:0 0 .35rem;color:#30264F;font-size:.9rem}
+    .wa-wm-capabilities p{margin:0;color:#766F87;font-size:.79rem;line-height:1.65}
+    .wa-wm-distinction{display:grid;grid-template-columns:190px 1fr;gap:1.5rem;align-items:start;margin-top:2rem;padding:1.35rem 1.5rem;border-left:3px solid #A78BFA;background:rgba(124,58,237,.045)}
+    .wa-wm-distinction>span{display:flex;align-items:center;gap:.55rem;color:#6D28D9;font-size:.8rem;font-weight:800}
+    .wa-wm-distinction p{margin:0;color:#665F78;font-size:.86rem;line-height:1.75}
+    @media(max-width:991px){.wa-wm-hero{grid-template-columns:1fr;gap:2rem}.wa-wm-hero__copy{max-width:760px}.wa-wm-photo--main{height:360px}.wa-wm-types-block{grid-template-columns:1fr;gap:1.5rem}.wa-wm-types-copy{max-width:700px}.wa-wm-photo--secondary{max-width:560px}.wa-wm-system{grid-template-columns:1fr 1fr}.wa-wm-system__intro{max-width:unset}}
+    @media(max-width:767px){.wa-wm-lifecycle-block,.wa-wm-types-block,.wa-wm-system{margin-top:4rem}.wa-wm-lifecycle{grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}.wa-wm-step:not(:last-child):after{display:none}.wa-wm-type-list{grid-template-columns:1fr}.wa-wm-system{grid-template-columns:1fr;gap:1.3rem}.wa-wm-system__image{height:220px}.wa-wm-capabilities{grid-template-columns:repeat(2,minmax(0,1fr));gap:1.4rem}.wa-wm-distinction{grid-template-columns:1fr;gap:.6rem}.wa-wm-photo--main{height:300px}}
+    @media(max-width:420px){.wa-wm-lifecycle{grid-template-columns:1fr}.wa-wm-capabilities{grid-template-columns:1fr}.wa-wm-photo figcaption{left:.8rem;right:.8rem;bottom:.8rem;font-size:.64rem}.wa-wm-photo--main{height:250px}}
+    @media(prefers-reduced-motion:reduce){.wa-wm-section img{transition:none!important}}
+
+    /* More editorial, fewer card-like elements */
+    .wa-wm-photo--main{box-shadow:none;border-radius:12px}
+    .wa-wm-photo--secondary,.wa-wm-system__image{border-radius:12px}
+    .wa-wm-step{padding:.25rem 0}
+    .wa-wm-step__icon{display:none}
+    .wa-wm-step__number{font-size:.78rem;margin-bottom:.65rem}
+    .wa-wm-step:not(:last-child):after{top:.65rem;right:-.8rem;width:1rem;background:#B9A8E8}
+    .wa-wm-lifecycle{border-top:0;padding:1.25rem 0 1.6rem}
+    .wa-wm-type-list{column-gap:2.8rem}
+    .wa-wm-type{grid-template-columns:28px 1fr;gap:.65rem;padding:1rem 0}
+    .wa-wm-type>i{display:none}
+    .wa-wm-capabilities{column-gap:2.8rem;row-gap:1.5rem}
+    .wa-wm-capabilities article{padding-top:.85rem}
+    .wa-wm-capabilities article>span{display:none}
+    .wa-wm-distinction{grid-template-columns:160px 1fr;padding:1rem 0;border-left:0;border-top:1px solid #E4DDF3;background:transparent}
+    @media(max-width:767px){.wa-wm-step:not(:last-child):after{display:none}.wa-wm-distinction{grid-template-columns:1fr;gap:.5rem}}
+
     /* ---- Reveal-on-scroll (page-scoped). Classes are added by JS at the end of
        the body; without JS the elements keep no hidden state and simply show.
        The global IntersectionObserver in base.html toggles .is-visible. ---- */
@@ -938,6 +1060,152 @@
         .wa-faq__item summary i{transition:none}
         .wa-link:hover{transform:none}
     }
+
+
+    /* ================================================================
+       FULL-PAGE EDITORIAL REDESIGN
+       Replace repeated cards with open layouts, typography and dividers.
+       ================================================================ */
+    :root{--wa-paper:#FBFAFE;--wa-line:#E8E4F0;--wa-muted:#6F6880;--wa-deep:#20183B}
+    .wa-crumbs{background:#fff;border-bottom-color:var(--wa-line)}
+    .ax-sec{padding-top:clamp(4.5rem,7vw,7rem);padding-bottom:clamp(4.5rem,7vw,7rem)}
+    .ax-sec--soft{background:var(--wa-paper)}
+    .ax-center{max-width:850px;margin:0 auto 3.2rem}
+    .ax-label{letter-spacing:.14em;font-size:.68rem}
+    .ax-h2{font-size:clamp(2.15rem,4.1vw,3.65rem);letter-spacing:-.045em;line-height:1.08;color:var(--wa-deep)}
+    .ax-lead{font-size:1.03rem;line-height:1.85;color:var(--wa-muted)}
+    .ax-hero{min-height:690px;display:flex;align-items:center;background-color:#F6F3FF;background-position:center right;background-size:cover}
+    .ax-hero__inner{max-width:1240px;padding-top:6rem;padding-bottom:6rem}
+    .ax-hero__title{max-width:760px;font-size:clamp(3rem,6vw,5.6rem);letter-spacing:-.065em;line-height:.99}
+    .ax-hero__sub{max-width:650px;font-size:1.06rem;line-height:1.85}
+    .wa-hero__line{font-size:.9rem}
+    .wa-hero-points{display:flex;flex-wrap:wrap;gap:.8rem 1.6rem;margin-top:2.1rem}
+    .wa-hero-points span{font-size:.78rem;font-weight:700;color:#51466F}
+    .wa-hero-points i{color:#7C3AED;margin-right:.35rem}
+
+    /* Problem section: no callout card, clear split and list rhythm. */
+    .ax-split{gap:clamp(2rem,7vw,7rem);align-items:start}
+    .ax-split__head{max-width:490px}
+    .ax-split__body{max-width:650px}
+    .ax-callout{padding:1rem 0 0 1.15rem;border:0;border-left:2px solid #A78BFA;border-radius:0;background:transparent;margin-top:1.5rem}
+    .wa-intro-list{max-width:none;margin:2.6rem 0 0;padding-top:1.5rem;border-top:1px solid var(--wa-line);grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem 2.4rem}
+    .wa-intro-list li{padding-left:1rem}
+
+    /* Solutions: two editorial columns, no tile backgrounds. */
+    .wa-solutions-editorial{column-gap:clamp(2rem,6vw,6rem);margin-top:2.4rem;border-top:1px solid var(--wa-line)}
+    .wa-solution-row{padding:2rem 0 2.1rem;grid-template-columns:38px minmax(0,1fr);gap:.75rem;border-color:var(--wa-line)}
+    .wa-solution-index{font-size:.72rem;color:#8B5CF6}
+    .wa-solution-row .ax-card__title{font-size:1.22rem;letter-spacing:-.025em}
+    .wa-solution-row .ax-card__body{font-size:.9rem;line-height:1.8}
+    .wa-solution-row .wa-ex{padding:.55rem 0 0;border:0;background:none;color:#716982;font-size:.8rem}
+    .wa-ex strong{color:#4B3C70}
+
+    /* Workflow management: clean process rail and text-led capability list. */
+    .wa-wm-section{background:#F8F6FC}
+    .wa-wm-hero{gap:clamp(2rem,6vw,6rem)}
+    .wa-wm-hero__copy{max-width:610px}
+    .wa-wm-hero__image,.wa-wm-photo,.wa-wm-system__image{border-radius:2px;overflow:hidden}
+    .wa-wm-lifecycle{border-top:1px solid #DDD6EA;border-bottom:1px solid #DDD6EA;background:transparent}
+    .wa-wm-step{background:transparent;border:0;border-radius:0;box-shadow:none;padding:1.2rem .7rem 1.35rem}
+    .wa-wm-step__number{background:transparent;color:#7C3AED;border:0;font-size:.78rem}
+    .wa-wm-step h3{font-size:1rem}
+    .wa-wm-type-list{border-top:1px solid #DDD6EA;border-bottom:1px solid #DDD6EA}
+    .wa-wm-type{background:transparent;border:0;border-radius:0;box-shadow:none;padding:1.1rem 0;border-bottom:1px solid #E6E0EF}
+    .wa-wm-type:last-child{border-bottom:0}
+    .wa-wm-type>i{display:none}
+    .wa-wm-system{margin-top:5rem}
+    .wa-wm-capabilities{border-top:1px solid #DDD6EA;border-bottom:1px solid #DDD6EA;gap:0 3rem}
+    .wa-wm-capabilities article{padding:1.35rem 0;border-bottom:1px solid #E6E0EF}
+    .wa-wm-capabilities article>span{display:none}
+    .wa-wm-capabilities h4{font-size:1rem;margin-bottom:.35rem}
+    .wa-wm-capabilities p{font-size:.86rem;line-height:1.7}
+    .wa-wm-distinction{margin-top:2rem;padding:1.2rem 0;border:0;border-top:1px solid #DDD6EA;border-bottom:1px solid #DDD6EA;border-radius:0;background:transparent}
+
+    /* Visual foundation: images carry the section; text stays unboxed. */
+    .wa-foundation-editorial{gap:clamp(1.5rem,4vw,4rem);margin-top:2rem}
+    .wa-foundation-item .wa-visual{height:clamp(170px,19vw,245px);border-radius:2px;background:#F0ECF8;box-shadow:none}
+    .wa-foundation-item h3{font-size:1.12rem;letter-spacing:-.02em}
+    .wa-foundation-item p{font-size:.88rem;line-height:1.8;color:var(--wa-muted)}
+
+    /* Operations becomes a quiet feature spread, not a floating-card scene. */
+    .wa-operations-section{padding:clamp(4.5rem,8vw,8rem) 0;background:#F4F1FA}
+    .wa-operations-layout{gap:clamp(2rem,7vw,7rem)}
+    .wa-operations-art{min-height:390px}
+    .wa-ops-float{border:0;border-radius:2px;box-shadow:none;background:#fff;backdrop-filter:none}
+    .wa-operations-copy .ax-h2{letter-spacing:-.045em}
+
+    /* Proof: no fake metric cards or scenario boxes. */
+    .wa-stats{max-width:none;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;border-top:1px solid var(--wa-line);border-bottom:1px solid var(--wa-line)}
+    .wa-stat{background:transparent;border:0;border-radius:0;padding:1.5rem 1rem;text-align:left;border-right:1px solid var(--wa-line)}
+    .wa-stat:last-child{border-right:0}
+    .wa-stat__value{font-size:2.2rem}
+    .wa-stat__label{max-width:150px;text-align:left}
+    .wa-note{margin-top:1.5rem}
+    .wa-scenarios{grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(2rem,5vw,5rem);margin-top:3rem}
+    .wa-scenario{background:transparent;border:0;border-top:2px solid #A78BFA;border-radius:0;padding:1.2rem 0 0}
+    .wa-scenario__row{grid-template-columns:70px 1fr;border-color:var(--wa-line)}
+
+    /* How it works: one continuous horizontal process, not five cards. */
+    .ax-steps{gap:0;border-top:1px solid var(--wa-line);border-bottom:1px solid var(--wa-line)}
+    .ax-step{background:transparent;border:0;border-radius:0;box-shadow:none;padding:1.6rem 1.15rem 1.8rem 0}
+    .ax-step__n{width:auto;height:auto;border-radius:0;background:none;color:#7C3AED;margin-bottom:1.15rem;font-size:.8rem}
+    .ax-step h3{font-size:1rem}
+    .ax-step p{font-size:.84rem;line-height:1.75}
+
+    /* Use cases and objections: typography + separators instead of cards. */
+    .wa-table{border:0;border-radius:0;background:transparent}
+    .wa-table th{background:transparent;border-bottom:1px solid #BEB3D5}
+    .wa-table td{background:transparent}
+    .wa-table tbody tr:nth-child(even){background:transparent}
+    .wa-next{gap:0;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--wa-line);border-bottom:1px solid var(--wa-line)}
+    .wa-next__item{background:transparent;border:0;border-radius:0;padding:1.5rem 1.5rem 1.5rem 0}
+    .wa-next__item + .wa-next__item{border-left:1px solid var(--wa-line);padding-left:1.5rem}
+    .wa-links{grid-template-columns:repeat(4,minmax(0,1fr));gap:0;border-top:1px solid var(--wa-line);border-bottom:1px solid var(--wa-line)}
+    .wa-link{background:transparent;border:0;border-radius:0;padding:1.4rem 1.1rem 1.4rem 0;box-shadow:none}
+    .wa-link + .wa-link{border-left:1px solid var(--wa-line);padding-left:1.1rem}
+    .wa-link:hover{transform:translateY(-2px);box-shadow:none;border-color:var(--wa-line)}
+    .wa-obj__q{font-size:1rem}
+
+    /* FAQ: simple typographic accordion. */
+    .wa-faq__item{background:transparent;border:0;border-bottom:1px solid var(--wa-line);border-radius:0;margin:0}
+    .wa-faq__item:first-child{border-top:1px solid var(--wa-line)}
+    .wa-faq__item[open]{border-color:#C8B9E8}
+    .wa-faq__item summary{padding:1.35rem .1rem;font-size:.96rem}
+    .wa-faq__a{padding:0 2rem 1.35rem .1rem;max-width:720px}
+
+    /* CTA: retain one strong conversion moment; remove decorative box feel. */
+    .ax-sec--dark{background:#17112B}
+    .ax-sec--dark .ax-h2{max-width:850px;margin-left:auto;margin-right:auto}
+    .wa-cta-list{max-width:560px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem 1.5rem}
+    .wa-cta-list li{font-size:.82rem}
+
+    @media(max-width:991px){
+        .wa-intro-list{grid-template-columns:repeat(2,minmax(0,1fr))}
+        .wa-foundation-editorial{grid-template-columns:repeat(2,minmax(0,1fr))}
+        .wa-links{grid-template-columns:repeat(2,minmax(0,1fr))}
+        .wa-link:nth-child(3){border-left:0;padding-left:0}
+        .wa-link:nth-child(n+3){border-top:1px solid var(--wa-line)}
+        .ax-steps{grid-template-columns:repeat(3,minmax(0,1fr))}
+        .wa-wm-capabilities{grid-template-columns:repeat(2,minmax(0,1fr))}
+    }
+    @media(max-width:767px){
+        .ax-hero{min-height:620px;background-position:58% center}
+        .ax-hero__inner{padding-top:4.5rem;padding-bottom:4.5rem}
+        .ax-hero__title{font-size:clamp(2.65rem,12vw,4rem)}
+        .wa-intro-list,.wa-foundation-editorial,.wa-scenarios,.wa-stats,.wa-next,.wa-cta-list{grid-template-columns:1fr}
+        .wa-stat{border-right:0;border-bottom:1px solid var(--wa-line);padding:1.1rem 0;text-align:left}
+        .wa-stat__label{max-width:none}
+        .wa-next__item,.wa-next__item + .wa-next__item{padding:1.25rem 0;border-left:0;border-bottom:1px solid var(--wa-line)}
+        .wa-links{grid-template-columns:1fr}
+        .wa-link,.wa-link + .wa-link,.wa-link:nth-child(3){padding:1.15rem 0;border-left:0;border-top:1px solid var(--wa-line)}
+        .wa-link:first-child{border-top:0}
+        .ax-steps{grid-template-columns:1fr}
+        .ax-step{padding:1.2rem 0;border-bottom:1px solid var(--wa-line)}
+        .wa-wm-capabilities{grid-template-columns:1fr}
+        .wa-cta-list{max-width:100%}
+    }
+    @media(prefers-reduced-motion:reduce){.wa-foundation-item .wa-visual,.wa-operations-art svg{animation:none!important;transition:none!important}}
+
 </style>
 {% endblock %}
 
@@ -963,7 +1231,7 @@
         document.querySelectorAll(sel).forEach(stagger);
     });
     /* Standalone blocks. */
-    document.querySelectorAll('.wa-table-wrap, .wa-stats, .wa-scenarios, .wa-flow-art, .wa-operations-art, .wa-operations-copy').forEach(function(el){ add(el); });
+    document.querySelectorAll('.wa-table-wrap, .wa-stats, .wa-scenarios, .wa-flow-art, .wa-operations-art, .wa-operations-copy, .wa-wm-photo, .wa-wm-system__image').forEach(function(el){ add(el); });
     document.querySelectorAll('.wa-faq__item').forEach(function(el, i){ add(el, ['ax-a-d' + Math.min(i + 1, 6)]); });
 
     /* Page-local reveal (no rAF dependency): in-viewport elements are revealed
