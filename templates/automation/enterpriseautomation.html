@@ -310,7 +310,7 @@
 
                     <div class="ea-actions ea-wms__actions">
                         <a class="ea-button ea-button--primary" href="{% url 'workload:dashboard' %}">{% trans "Explore Workload Management" %}<span aria-hidden="true">↗</span></a>
-                        <a class="ea-text-link" href="{% url 'home:workflow_vs_workload_automation' %}">{% trans "Workflow vs workload automation" %}<span aria-hidden="true">→</span></a>
+                        <a class="ea-text-link ea-text-link--blue" href="{% url 'home:workflow_vs_workload_automation' %}">{% trans "Workflow vs workload automation" %}<span aria-hidden="true">→</span></a>
                     </div>
                 </div>
 
@@ -868,6 +868,14 @@
 
 .ea-wms__actions {
     margin-top: 34px;
+}
+
+.ea-text-link--blue {
+    color: #2563eb;
+}
+
+.ea-text-link--blue:hover {
+    color: #1d4ed8;
 }
 
 .ea-wms__visual {
